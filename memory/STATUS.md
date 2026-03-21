@@ -73,9 +73,9 @@ Ziel:     Rust client foundation — connection, krc20, scanner, zk_proof
 | tests/security_sybil         | ACCEPTED        | 100%     | 2026-03-22  | ACCEPTED     | 500:1 Sybil resistance |
 | tests/security_fp_flood      | ACCEPTED        | 100%     | 2026-03-22  | ACCEPTED     | 500 flood blocked |
 | **SPRINT 7 – DASHBOARD**     |                 |          |             |              |                 |
-| web/audit/index.html         | PENDING_AUDIT   | 100%     | 2026-03-22  | PENDING_AUDIT| Dark theme, stats, rules, grants |
-| README.md                    | PENDING_AUDIT   | 100%     | 2026-03-22  | PENDING_AUDIT| English rewrite, badges, quickstart |
-| WHITEPAPER.md                | PENDING_AUDIT   | 100%     | 2026-03-22  | PENDING_AUDIT| Full v4 English, 16 sections |
+| web/audit/index.html         | ACCEPTED        | 100%     | 2026-03-22  | ACCEPTED     | Dark theme, logo path fixed |
+| README.md                    | ACCEPTED        | 100%     | 2026-03-22  | ACCEPTED     | English, badges, quickstart |
+| WHITEPAPER.md                | ACCEPTED        | 100%     | 2026-03-22  | ACCEPTED     | Full v4 English, 16 sections |
 
 ---
 

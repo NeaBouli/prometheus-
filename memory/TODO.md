@@ -107,10 +107,10 @@
 
 ## ═══ SPRINT 8: COMMUNITY & FÖRDERUNG (Parallel) ═══
 
-- [ ] [P1] Gitcoin Grants Antrag finalisieren (April 2026) | Core Dev | Whitepaper v4
+- [ ] [P1] Gitcoin Grants application finalize (April 2026) | Core Dev | Sprint 7 done
 - [ ] [P1] GitHub Repository öffentlich schalten | Core Dev | Sprint 6 fertig
-- [ ] [P2] README.md rewrite in English | Claude Code | Sprint 2 done
-- [ ] [P2] WHITEPAPER.md: full English whitepaper v4 in repo, with all improvements | Claude Code | Sprint 2 done
+- [x] [P2] README.md rewrite in English | Claude Code | 2026-03-22
+- [x] [P2] WHITEPAPER.md: full English whitepaper v4 in repo, with all improvements | Claude Code | 2026-03-22
 - [ ] [P2] CONTRIBUTING.md erstellen | Claude Code | -
 - [ ] [P2] Wiki-Grundstruktur (docs/) | Claude Code | -
 - [ ] [P2] Landing page + Wiki: use logo from /logo/Prometheus.png for all web assets, README header, and documentation | Claude Code | Sprint 7 done

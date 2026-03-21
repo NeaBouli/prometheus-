@@ -386,7 +386,7 @@ All development is subject to continuous architect audit. Key findings:
 | PATTERN-010: Unnecessary Mutex | LOW | Use `Arc<Phi3Model>` instead of `Arc<Mutex<Phi3Model>>` |
 | PATTERN-011: Heuristic confidence | LOW | Replace with LLM confidence extraction in Sprint 6+ |
 
-Total audits: 12 | Accepted: 10 | Rejected: 2 (all fixed and re-accepted)
+Total audit rounds: 10 | Sprint findings: 11 | All critical/high findings resolved before mainnet
 
 ---
 
