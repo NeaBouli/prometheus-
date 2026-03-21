@@ -60,7 +60,7 @@ ValidatorStaking Contract:
 
 GuardianReputation Contract:
   - Kein finanzielles Staking
-  - Reputation = float64 (0.0 - 10.0)
+  - Reputation = uint64 (0 - 100000, 10000x skaliert, 10000 = 1.0)
   - PROM wird durch akzeptierte Vorschläge VERDIENT
 
 DevIncentivePool Contract:

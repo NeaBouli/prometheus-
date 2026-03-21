@@ -22,8 +22,8 @@ Prüfung:  Vor jedem Silverscript-Commit: grep -n "MIN_STAKE" prüfen
 ### PATTERN-002: Silverscript Kompilierungs-Fehler
 ```
 Problem:  ssc compile ohne --testnet auf Testnet-Contracts
-Symptom:  Contract deployed aber inkompatibel mit Testnet-12
-Lösung:   Testnet: ssc compile --testnet --network testnet-12
+Symptom:  Contract deployed aber inkompatibel mit Testnet-10
+Lösung:   Testnet: ssc compile --testnet --network testnet-10
           Mainnet: ssc compile (ohne Flag)
 Prüfung:  Immer Netzwerk-Flag überprüfen
 ```

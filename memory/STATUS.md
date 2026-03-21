@@ -38,6 +38,7 @@ Ziel:     Testnet-Node läuft, erster Contract deployed
 | Silverscript Compiler (ssc)  | PENDING         | 0%       | 2026-03-21  | -            | Wird mit Covenant-Hardfork 05.05.2026 released |
 | Hello-World Contract         | PENDING         | 0%       | 2026-03-21  | -            | Deployment nach ssc-Release |
 | GitHub Actions CI/CD         | PENDING         | 0%       | -           | -            | -               |
+| Sprint-1 Pre-Check           | PENDING_AUDIT   | 100%     | 2026-03-21  | PENDING_AUDIT| V-001, V-002, V-003 |
 | **SPRINT 1 – CONTRACTS**     |                 |          |             |              |                 |
 | ValidatorStaking.ss          | PENDING         | 0%       | -           | -            | TBD             |
 | GuardianReputation.ss        | PENDING         | 0%       | -           | -            | TBD             |
@@ -76,13 +77,13 @@ Ziel:     Testnet-Node läuft, erster Contract deployed
 
 Aktuell in Bearbeitung:
 ```
-Modul:  Kaspa Testnet-10 Node
-Sprint: 0 (Setup)
+Modul:  Sprint-1 Pre-Check (V-001, V-002, V-003)
+Sprint: 0→1 Übergang
 Start:  2026-03-21
-Status: DONE — kaspad v1.1.0, 8 Peers, IBD active
-Binary: /tmp/rusty-kaspa/target/release/kaspad
-wRPC:   wrpc://127.0.0.1:17210
-P2P:    0.0.0.0:16211
+Status: PENDING_AUDIT — wartet auf Architect Review
+        V-001: float64 → uint64 (RESOLVED, bereits genehmigt)
+        V-002: IPFS CID bytes(46) → bytes(36) vorgeschlagen
+        V-003: Rekursive slash() → nicht-rekursive Version vorgeschlagen
 ```
 
 ## BLOCKED
@@ -93,7 +94,7 @@ Keine Blockaden.
 
 ```
 1. ~~Repo-Struktur auf GitHub anlegen~~ DONE
-2. ~~Testnet-10-Node installieren~~ DONE (Testnet-12 existiert nicht, Testnet-10 verwendet)
+2. ~~Testnet-10-Node installieren~~ DONE
 3. ~~Silverscript Compiler installieren~~ BLOCKED (ssc existiert nicht)
    ~~rusty-kaspa als Cargo Dependency~~ DONE
 4. Hello-World Contract deployen

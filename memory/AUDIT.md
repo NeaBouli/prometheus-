@@ -39,7 +39,9 @@ Wenn Kriterium 1, 2 oder 3 NICHT erfüllt: automatisch REJECTED (kein NEEDS_CHAN
 
 ## AUDIT QUEUE (warten auf Review)
 
-Aktuell leer – noch kein Code-Modul fertiggestellt.
+| Modul                 | Version | Datum      | Auditor     | Ergebnis       | Anmerkungen                                          |
+|-----------------------|---------|------------|-------------|----------------|------------------------------------------------------|
+| Sprint-1 Pre-Check    | 1.0     | 2026-03-21 | Claude Code | PENDING_AUDIT  | V-001 (float64), V-002 (CID-Größe), V-003 (slash recursion) — bereit für Architect Review |
 
 ---
 
@@ -73,7 +75,7 @@ Impact: BLOCKIERT Task 4 (ssc install), Task 5 (Hello-World), und gesamten Sprin
 ssc ist noch nicht released — es wird mit dem Covenant-Hardfork am 5. Mai 2026
 ausgeliefert. Für Sprint 1: Alle Contracts in Silverscript-Syntax schreiben und
 via Rust-basierter txscript-Simulation lokal testen. Deployment-Slot auf
-Testnet-12 ist reserviert für wenn ssc verfügbar wird. Sprint 1 ist NICHT
+Testnet-10 ist reserviert für wenn ssc verfügbar wird. Sprint 1 ist NICHT
 blockiert — mit Code-Schreiben und Unit-Tests in Rust fortfahren.
 ```
 
@@ -99,6 +101,121 @@ Reputation als uint64 mit 10000x Skalierung speichern.
 Beispiel: Reputation 0.5 = gespeichert als 5000.
 SCHEMA.md entsprechend aktualisieren. Alle float64 Reputationsfelder
 in allen Struct-Definitionen auf uint64 ändern.
+```
+
+### V-001: float64 Support — Pre-Flight Verification (2026-03-21)
+```
+Kontext:  Sprint 1 Pre-Check — Verification 1
+Finding:  ssc ist nicht verfügbar (kommt mit Covenant-Hardfork 05.05.2026).
+          float64-Support kann nicht empirisch getestet werden.
+          Kaspa txscript (Bitcoin-Script-Derivat) kennt kein float64.
+          ERRORS.md PATTERN-006 warnt vor float64-Präzisionsproblemen.
+
+Entscheidung (Claude Architect, Q-002):
+  → uint64 mit 10000x-Skalierung (Reputation 0.5 = 5000).
+  → SCHEMA.md bereits aktualisiert (alle float64 → uint64 in Silverscript-Structs).
+
+Status: RESOLVED — Architect hat uint64 mit 10000x-Skalierung genehmigt.
+        SCHEMA.md v2 spiegelt dies wider. Keine weitere Aktion nötig.
+        Rust-seitige Schemas (ThreatReport, ScanResult) behalten f64 für
+        interne Berechnungen — nur On-Chain-Werte verwenden uint64.
+```
+
+### V-002: IPFS CID Feldgröße — Pre-Flight Verification (2026-03-21)
+```
+Kontext:  Sprint 1 Pre-Check — Verification 2
+Finding:  SCHEMA.md definiert rule_content_ipfs: bytes(46) in RuleProposal.
+          Tatsächliche CIDv1-Größen:
+
+          CIDv1 binary (SHA-256 multihash):
+            varint(version=1)         = 1 Byte
+            varint(codec, z.B. raw)   = 1 Byte
+            multihash:
+              varint(sha2-256=0x12)   = 1 Byte
+              varint(digest_len=32)   = 1 Byte
+              digest                  = 32 Bytes
+            TOTAL binary              = 36 Bytes
+
+          CIDv1 base32-encoded (multibase):
+            multibase prefix 'b'      = 1 Zeichen
+            base32lower(36 bytes)     = 58 Zeichen
+            TOTAL string              = 59 Zeichen
+
+          bytes(46) passt zu KEINEM der beiden Formate:
+            - 36 Bytes (binary) ≠ 46
+            - 59 Bytes (base32 string) ≠ 46
+
+          Mögliche Erklärung für 46: Verwechslung mit CIDv0 (Qm...) base58-Kodierung,
+          die 46 Zeichen lang ist. Aber CIDv0 soll laut ERRORS.md PATTERN-005 NICHT
+          verwendet werden ("Immer CIDv1 verwenden").
+
+QUESTION FOR CLAUDE: CID-Feldgröße — bytes(46) ist inkonsistent mit CIDv1 binary
+  (36 Bytes) oder CIDv1 string (59 Zeichen). Korrekte Optionen:
+  Option A: bytes(36) — CIDv1 als raw binary speichern (platzsparend, on-chain optimal)
+  Option B: string(59) — CIDv1 als base32-String speichern (menschenlesbar)
+  Empfehlung: Option A (bytes(36)) für on-chain Speicherung, da platzsparend.
+  Clients konvertieren beim Lesen zu base32 für IPFS-Gateway-Zugriff.
+```
+
+### V-003: Rekursive slash()-Funktion — Pre-Flight Verification (2026-03-21)
+```
+Kontext:  Sprint 1 Pre-Check — Verification 3
+Finding:  Das Whitepaper beschreibt eine slash()-Funktion, die sich rekursiv
+          aufruft wenn slashing_count > 3 (eskalierende Strafen).
+
+          Probleme mit Rekursion:
+          1. Stack-Overflow-Risiko bei hohem slashing_count
+          2. Unvorhersehbarer Gas-/Berechnungsverbrauch
+          3. Schwer zu auditieren und formal zu verifizieren
+          4. In Silverscript/txscript wahrscheinlich nicht erlaubt
+
+          Vorgeschlagene nicht-rekursive Alternative:
+
+          function slash(validator: Validator, slash_type: uint8) -> uint64 {
+              // Basis-Strafprozentsatz nach Typ
+              let base_pct: uint64 = match slash_type {
+                  0 => SLASH_SIMPLE_PCT,       // 5%
+                  1 => SLASH_DOUBLE_VOTE_PCT,  // 10%
+                  2 => SLASH_COLLUSION_PCT,    // 20%
+              };
+
+              // Eskalationsmultiplikator: verdoppelt sich ab slashing_count > 3
+              // Non-rekursiv: Bit-Shift statt Rekursion
+              let escalation: uint64 = if validator.slashing_count <= 3 {
+                  1
+              } else {
+                  // 2^(count-3), gedeckelt auf 16x (= count 7)
+                  let exponent: uint64 = min(validator.slashing_count - 3, 4);
+                  1 << exponent  // 2, 4, 8, 16
+              };
+
+              // Strafe berechnen, gedeckelt auf gesamten Stake
+              let penalty: uint64 = min(
+                  validator.stake_kas * base_pct * escalation / 100,
+                  validator.stake_kas
+              );
+
+              // Stake reduzieren
+              validator.stake_kas -= penalty;
+              validator.slashing_count += 1;
+
+              // Wenn Stake unter Minimum: automatisch deaktivieren
+              if validator.stake_kas < MIN_STAKE_KAS {
+                  validator.active = false;
+              }
+
+              return penalty;
+          }
+
+          Vorteile:
+          - O(1) Ausführung, kein Rekursionsrisiko
+          - Deterministischer Gas-Verbrauch
+          - Eskalation gedeckelt bei 16x (verhindert 100%-Verlust durch Rundung)
+          - Automatische Deaktivierung unter MIN_STAKE_KAS
+
+QUESTION FOR CLAUDE: Rekursive slash()-Funktion durch nicht-rekursive Version
+  mit Bit-Shift-Eskalation ersetzen. Deckelung bei 16x (slashing_count=7).
+  Automatische Deaktivierung wenn Stake unter MIN_STAKE_KAS fällt. Approve?
 ```
 
 ---
@@ -138,8 +255,9 @@ Aktuell keine offenen Changes.
 ## AUDIT STATISTIK
 
 ```
-Total Audits:     6
+Total Audits:     7
 ACCEPTED:         6
+PENDING_AUDIT:    1
 NEEDS_CHANGES:    0
 REJECTED:         0
 Acceptance Rate:  100%

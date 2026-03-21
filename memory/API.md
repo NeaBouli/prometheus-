@@ -15,7 +15,7 @@ const TESTNET_RPC: &str = "ws://127.0.0.1:16210";
 const MAINNET_RPC: &str = "ws://127.0.0.1:16110";
 
 // Verbindung aufbauen
-let client = RpcClient::connect(rpc_url, NetworkId::Testnet12).await?;
+let client = RpcClient::connect(rpc_url, NetworkId::with_suffix(NetworkType::Testnet, 10)).await?;
 ```
 
 ### Wichtige Endpoints

@@ -64,7 +64,7 @@ git push origin main
 
 ---
 
-### Tag 2: Kaspa Testnet-12-Node
+### Tag 2: Kaspa Testnet-10-Node
 
 ```bash
 # Schritt 1: rusty-kaspa installieren
@@ -76,10 +76,10 @@ git clone https://github.com/kaspanet/rusty-kaspa.git
 cd rusty-kaspa
 cargo build --release -p kaspad
 
-# Schritt 2: Testnet-12-Node starten
+# Schritt 2: Testnet-10-Node starten
 ./target/release/kaspad \
     --testnet \
-    --netsuffix 12 \
+    --netsuffix=10 \
     --utxoindex \
     --rpclisten 0.0.0.0:16210 \
     --rpclisten-borsh 0.0.0.0:17210
@@ -89,10 +89,10 @@ cargo build --release -p kaspad
     --url ws://127.0.0.1:16210 \
     --cmd "getBlockDagInfo"
 
-# Erwartet: JSON mit networkName: "kaspa-testnet-12"
+# Erwartet: JSON mit networkName: "kaspa-testnet-10"
 ```
 
-**Erwartetes Ergebnis:** Node läuft, synct Testnet-12-Blöcke.
+**Erwartetes Ergebnis:** Node läuft, synct Testnet-10-Blöcke.
 
 ---
 
@@ -133,7 +133,7 @@ ssc compile --testnet /tmp/hello.ss
 ./target/release/kaspa-wallet create --testnet
 
 # Schritt 2: Testnet-KAS holen (Faucet)
-# https://faucet-testnet-12.kaspa.org (falls verfügbar)
+# https://faucet-testnet-10.kaspa.org (falls verfügbar)
 # Alternativ: Mining auf Testnet
 
 # Schritt 3: Hello-World Contract deployen
@@ -146,7 +146,7 @@ python3 scripts/autodidactic.py --action update_status \
     --address "<contract-adresse>"
 ```
 
-**Erwartetes Ergebnis:** Erster Contract on-chain auf Testnet-12.
+**Erwartetes Ergebnis:** Erster Contract on-chain auf Testnet-10.
 
 ---
 
@@ -208,7 +208,7 @@ jobs:
 ```
 [ ] Repository-Struktur auf GitHub
 [ ] Alle memory/-Dateien committed
-[ ] Testnet-12-Node läuft und synct
+[ ] Testnet-10-Node läuft und synct
 [ ] ssc Compiler funktioniert
 [ ] Hello-World Contract auf Testnet deployed
 [ ] Contract-Adresse in STATUS.md
