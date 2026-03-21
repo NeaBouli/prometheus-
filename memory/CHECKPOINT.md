@@ -140,4 +140,51 @@ Claude → antwortet, Core Dev trägt Antwort in memory/MEMO.md ein
 
 ---
 
+---
+
+## FAQ-BANK (für Wiki und Landing Page)
+
+Diese Fragen wurden im Architect-Chat gesammelt und beantwortet.
+Sie fließen in docs/faq.md und eine zukünftige FAQ-Seite ein.
+
+### Q: Wie funktioniert das Zwei-Token-Modell?
+KAS = wirtschaftliche Kaution der Validators (Slashing bei Betrug).
+PROM = Belohnung für geleistete Sicherheitsarbeit (nie kaufbar, nur verdient).
+Getrennte Rollen verhindern dass Kapital = Einfluss.
+
+### Q: Wie kommt PROM in den Markt?
+Tag 1: Erste PROM entstehen wenn erste Regel akzeptiert wird (0 Vorallokation).
+Gleichzeitig: KAS/PROM Liquiditätspool auf Kasplex DEX (aus Community-Pool).
+Preis entsteht organisch — kein ICO, kein Listing-Preis.
+Deflation (-10%/Jahr) bei wachsender Nutzernachfrage = natürlicher Preisdruck.
+
+### Q: Werden Bedrohungsregeln automatisch bestätigt?
+Nein — 4 Stufen:
+1. KI-Vorfilter: min. 85% Konfidenz (automatisch)
+2. Sammlung: min. 5 unabhängige Meldungen (automatisch)
+3. Validator-Abstimmung: 67% Mehrheit, Commit-Reveal, Bond-Verlust bei Betrug
+4. 24h Challenge-Period: Einsprüche möglich, Auto-Tuning reagiert auf FP-Rate
+
+### Q: Was passiert bei einer False Positive?
+Betroffene Nutzer melden → FP-Rate steigt → Auto-Tuning erhöht Schwellenwert
+automatisch → Guardian der schlechte Regel eingereicht hat verliert 50% Reputation.
+Kein Mensch muss eingreifen.
+
+### Q: Gibt es Mining bei PROM?
+Nein im klassischen Sinne. PROM wird "geminted" wenn eine Regel akzeptiert wird.
+Das ist leistungsbasierte Emission — näher an "Arbeitsnachweis" als an PoW-Mining.
+Guardians = die "Miner" des Prometheus-Netzwerks (mit KI statt GPU-Hashrate).
+
+---
+
+## PENDING FAQ (noch nicht beantwortet — für zukünftige Sessions)
+
+- Wie funktioniert föderiertes Lernen konkret für Endnutzer?
+- Was passiert wenn ein Guardian-Node offline geht?
+- Kann PROM später auf anderen Börsen gehandelt werden?
+- Wie schützt ZK-Proof die Privatsphäre des Melders?
+- Was ist der Unterschied zwischen Prometheus und ClamAV/Wazuh?
+
+---
+
 *Prometheus v4.0 · Checkpoint 2026-03-22 · The fire belongs to humanity.*
