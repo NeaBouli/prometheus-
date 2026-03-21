@@ -64,9 +64,9 @@ Ziel:     Rust client foundation — connection, krc20, scanner, zk_proof
 | guardian-node/analyzer.py    | ACCEPTED        | 100%     | 2026-03-21  | ACCEPTED     | 10 tests, full pipeline |
 | guardian-node/docker-compose.yml | ACCEPTED    | 100%     | 2026-03-21  | ACCEPTED     | 8B active, 70B commented |
 | **SPRINT 5 – VOTING**        |                 |          |             |              |                 |
-| validator/voting/commit.rs   | PENDING_AUDIT   | 100%     | 2026-03-22  | PENDING_AUDIT| 10 tests, cross-verified with SS |
-| validator/voting/reveal.rs   | PENDING_AUDIT   | 100%     | 2026-03-22  | PENDING_AUDIT| 8 tests, bond validation |
-| validator/slashing/mod.rs    | PENDING_AUDIT   | 100%     | 2026-03-22  | PENDING_AUDIT| 11 tests, bit-identical to SS |
+| validator/voting/commit.rs   | ACCEPTED        | 100%     | 2026-03-22  | ACCEPTED     | 10 tests, cross-verified with SS |
+| validator/voting/reveal.rs   | ACCEPTED        | 100%     | 2026-03-22  | ACCEPTED     | 8 tests, bond validation |
+| validator/slashing/mod.rs    | ACCEPTED        | 100%     | 2026-03-22  | ACCEPTED     | 11 tests, bit-identical to SS |
 | **SPRINT 6 – E2E**           |                 |          |             |              |                 |
 | tests/e2e/full_cycle_test.rs | PENDING         | 0%       | -           | -            | -               |
 | **SPRINT 7 – DASHBOARD**     |                 |          |             |              |                 |
