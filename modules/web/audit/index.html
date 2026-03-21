@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prometheus — Open Audit Dashboard</title>
+    <style>
+        :root {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-card: #1c2128;
+            --border: #30363d;
+            --text-primary: #e6edf3;
+            --text-secondary: #8b949e;
+            --accent: #f0883e;
+            --accent-green: #3fb950;
+            --accent-blue: #58a6ff;
+            --accent-red: #f85149;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        header {
+            display: flex; align-items: center; gap: 16px;
+            padding: 24px 0; border-bottom: 1px solid var(--border);
+        }
+        header img { height: 48px; border-radius: 8px; }
+        header h1 { font-size: 24px; font-weight: 600; }
+        header span { color: var(--text-secondary); font-size: 14px; }
+
+        .stats-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px; margin: 24px 0;
+        }
+        .stat-card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 8px; padding: 20px; text-align: center;
+        }
+        .stat-card .value {
+            font-size: 32px; font-weight: 700; color: var(--accent);
+        }
+        .stat-card .label {
+            font-size: 13px; color: var(--text-secondary); text-transform: uppercase;
+            letter-spacing: 0.5px; margin-top: 4px;
+        }
+        .stat-card.green .value { color: var(--accent-green); }
+        .stat-card.blue .value { color: var(--accent-blue); }
+
+        h2 {
+            font-size: 18px; margin: 32px 0 16px; padding-bottom: 8px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        table {
+            width: 100%; border-collapse: collapse;
+            background: var(--bg-card); border-radius: 8px; overflow: hidden;
+        }
+        th {
+            background: var(--bg-secondary); text-align: left; padding: 12px 16px;
+            font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;
+            color: var(--text-secondary); border-bottom: 1px solid var(--border);
+        }
+        td {
+            padding: 12px 16px; border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+        tr:last-child td { border-bottom: none; }
+        .badge {
+            display: inline-block; padding: 2px 8px; border-radius: 12px;
+            font-size: 12px; font-weight: 600;
+        }
+        .badge-accepted { background: #1a3a2a; color: var(--accent-green); }
+        .badge-pending { background: #3a2a1a; color: var(--accent); }
+        .badge-yara { background: #1a2a3a; color: var(--accent-blue); }
+        .badge-sigma { background: #2a1a3a; color: #bc8cff; }
+
+        .grants-list { display: flex; flex-direction: column; gap: 12px; }
+        .grant-card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 8px; padding: 16px;
+        }
+        .grant-card .title { font-weight: 600; margin-bottom: 4px; }
+        .grant-card .meta { font-size: 13px; color: var(--text-secondary); }
+        .grant-bar {
+            height: 6px; background: var(--bg-secondary); border-radius: 3px;
+            margin-top: 8px; overflow: hidden;
+        }
+        .grant-bar-fill { height: 100%; background: var(--accent-green); border-radius: 3px; }
+
+        .refresh-note {
+            text-align: center; padding: 16px; color: var(--text-secondary);
+            font-size: 13px; margin-top: 16px;
+        }
+        .refresh-note::before { content: ""; }
+
+        footer {
+            text-align: center; padding: 32px 0; margin-top: 32px;
+            border-top: 1px solid var(--border); color: var(--text-secondary);
+            font-size: 14px;
+        }
+        footer strong { color: var(--accent); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <img src="/logo/Prometheus.png" alt="Prometheus Logo">
+            <div>
+                <h1>Prometheus Open Audit Dashboard</h1>
+                <span>Kaspa L1 Decentralized Threat Intelligence — Testnet-10</span>
+            </div>
+        </header>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="value">12</div>
+                <div class="label">Active Validators</div>
+            </div>
+            <div class="stat-card green">
+                <div class="value">8</div>
+                <div class="label">Active Guardians</div>
+            </div>
+            <div class="stat-card blue">
+                <div class="value">3</div>
+                <div class="label">Rules On-Chain</div>
+            </div>
+            <div class="stat-card green">
+                <div class="value">0.12%</div>
+                <div class="label">False Positive Rate</div>
+            </div>
+            <div class="stat-card">
+                <div class="value">4.2s</div>
+                <div class="label">Avg Response Time</div>
+            </div>
+        </div>
+
+        <h2>Recent Rules</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Rule ID</th>
+                    <th>Type</th>
+                    <th>Guardian</th>
+                    <th>Consensus</th>
+                    <th>Timestamp</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>PROM-RULE-2026-0001</td>
+                    <td><span class="badge badge-yara">YARA</span></td>
+                    <td>kaspa:qz8f...3a2c</td>
+                    <td>89.2%</td>
+                    <td>2026-03-21 14:32 UTC</td>
+                    <td><span class="badge badge-accepted">ACCEPTED</span></td>
+                </tr>
+                <tr>
+                    <td>PROM-RULE-2026-0002</td>
+                    <td><span class="badge badge-sigma">Sigma</span></td>
+                    <td>kaspa:qr4d...7b1e</td>
+                    <td>92.1%</td>
+                    <td>2026-03-21 15:18 UTC</td>
+                    <td><span class="badge badge-accepted">ACCEPTED</span></td>
+                </tr>
+                <tr>
+                    <td>PROM-RULE-2026-0003</td>
+                    <td><span class="badge badge-yara">YARA</span></td>
+                    <td>kaspa:qp7k...9c4f</td>
+                    <td>78.4%</td>
+                    <td>2026-03-22 09:05 UTC</td>
+                    <td><span class="badge badge-pending">PENDING</span></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>Dev Grants Transparency</h2>
+        <div class="grants-list">
+            <div class="grant-card">
+                <div class="title">Grant #1 — Light Client Scanner Module</div>
+                <div class="meta">Developer: kaspa:qz8f...3a2c | 1,500 PROM | Complexity: 7/10</div>
+                <div class="meta">Votes: 8 for / 2 against (80%) — APPROVED</div>
+                <div class="grant-bar"><div class="grant-bar-fill" style="width: 80%"></div></div>
+            </div>
+            <div class="grant-card">
+                <div class="title">Grant #2 — Guardian YARA Generator Improvements</div>
+                <div class="meta">Developer: kaspa:qr4d...7b1e | 3,200 PROM | Complexity: 8/10</div>
+                <div class="meta">Votes: 5 for / 1 against (83%) — VOTING</div>
+                <div class="grant-bar"><div class="grant-bar-fill" style="width: 60%"></div></div>
+            </div>
+        </div>
+
+        <div class="refresh-note">
+            Updates every 30s from Kaspa L1 | All data verifiable on-chain
+        </div>
+
+        <footer>
+            <strong>Prometheus</strong> — Open Source | Decentralized | Incorruptible
+        </footer>
+    </div>
+</body>
+</html>
