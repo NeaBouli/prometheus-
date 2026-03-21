@@ -33,7 +33,7 @@ body::before{content:'';position:fixed;inset:0;z-index:9999;pointer-events:none;
 nav{position:fixed;top:0;left:0;right:0;z-index:500;padding:0 48px;height:56px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid transparent;transition:border-color .4s,background .4s}
 nav.scrolled{background:rgba(5,5,5,.97);border-color:var(--line);backdrop-filter:blur(8px)}
 .nav-id{display:flex;align-items:center;gap:14px;text-decoration:none}
-.nav-id img{height:28px;width:28px;object-fit:contain;filter:brightness(0) invert(1) brightness(.8)}
+.nav-id img{height:26px;width:26px;object-fit:contain;filter:brightness(0) invert(1) brightness(.7)}
 .nav-wordmark{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;letter-spacing:4px;color:var(--silver);text-transform:uppercase}
 .nav-links{display:flex;gap:36px;list-style:none}
 .nav-links a{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color .2s}
@@ -44,6 +44,8 @@ nav.scrolled{background:rgba(5,5,5,.97);border-color:var(--line);backdrop-filter
 #hero{min-height:100vh;display:grid;grid-template-rows:1fr auto;padding:0 48px;position:relative;overflow:hidden}
 #hero::before{content:'';position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:80px 80px;mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 40%,transparent 100%)}
 #hero::after{content:'';position:absolute;top:30%;left:50%;transform:translate(-50%,-50%);width:600px;height:300px;background:radial-gradient(ellipse,rgba(0,229,160,.04) 0%,transparent 70%);pointer-events:none}
+/* Ambient logo — large, right side, dimmed */
+.hero-logo-ambient{position:absolute;right:4%;top:50%;transform:translateY(-50%);z-index:0;pointer-events:none;width:clamp(280px,28vw,440px);height:clamp(280px,28vw,440px);opacity:.07;filter:grayscale(1) brightness(1.4);object-fit:contain}
 
 .hero-body{align-self:center;padding-top:120px;max-width:960px;position:relative;z-index:1}
 .hero-status{display:inline-flex;align-items:center;gap:10px;border:1px solid var(--line-bright);padding:6px 14px;margin-bottom:48px;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--muted);opacity:0;animation:rise .6s ease .1s forwards}
@@ -78,10 +80,28 @@ nav.scrolled{background:rgba(5,5,5,.97);border-color:var(--line);backdrop-filter
 .lc-node{width:48px;height:48px;border:1px solid var(--line-bright);display:flex;align-items:center;justify-content:center;margin-bottom:20px;position:relative;z-index:1;background:var(--deep);transition:border-color .3s}
 .lc-step:hover .lc-node{border-color:var(--mint);box-shadow:0 0 20px rgba(0,229,160,.08)}
 .lc-t{font-family:'Space Mono',monospace;font-size:9px;font-weight:700;color:var(--mint);letter-spacing:.5px}
-.lc-time{font-family:'Space Mono',monospace;font-size:10px;color:var(--mint-dim);letter-spacing:1px;margin-bottom:8px}
-.lc-who{font-size:13px;font-weight:500;color:var(--silver);margin-bottom:8px}
-.lc-what{font-size:12px;font-weight:300;color:var(--muted);line-height:1.6}
-.lc-tech{margin-top:14px;padding-top:12px;border-top:1px solid var(--line);font-family:'Space Mono',monospace;font-size:9px;color:var(--dim);letter-spacing:.5px;line-height:1.6}
+/* Small text legibility — mono labels get gold, secondary captions get mint-dim */
+.lbl{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--mint);margin-bottom:16px;display:block}
+.lc-time{font-family:'Space Mono',monospace;font-size:10px;color:#C8A060;letter-spacing:1px;margin-bottom:8px}
+.lc-tech{margin-top:14px;padding-top:12px;border-top:1px solid var(--line);font-family:'Space Mono',monospace;font-size:9px;color:#7A9A80;letter-spacing:.5px;line-height:1.6}
+.layer-tag{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--mint);text-transform:uppercase;margin-bottom:20px;display:block}
+.n-glyph{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:3px;color:#7A8A70;margin-bottom:20px;text-transform:uppercase}
+.n-spec{font-family:'Space Mono',monospace;font-size:10px;color:#8A9070;letter-spacing:.5px;border-top:1px solid var(--line);padding-top:14px;line-height:1.7}
+.tok-lbl{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;color:#C8A060;text-transform:uppercase;margin-bottom:28px}
+.tok-k{font-family:'Space Mono',monospace;font-size:10px;color:#7A9A80;min-width:110px;flex-shrink:0;padding-top:1px}
+.metric-k{font-size:11px;font-weight:300;color:#9A9870;letter-spacing:.5px}
+.rm-date{padding:20px 0;font-family:'Space Mono',monospace;font-size:10px;color:#C8A060;letter-spacing:1px}
+.rm-desc{font-size:12px;font-weight:300;color:#787060}
+.rm-badge{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:4px 10px;white-space:nowrap}
+.b-done{color:#00E5A0;border:1px solid rgba(0,229,160,.2)}
+.b-active{color:#C8C8A0;border:1px solid rgba(200,200,160,.15);animation:blink 3s ease infinite}
+.b-plan{color:#555048;border:1px solid var(--line)}
+.hero-stat-key{font-size:11px;color:#6A7860;letter-spacing:.5px}
+.f-left{font-family:'Space Mono',monospace;font-size:11px;color:#4A5040;letter-spacing:1px}
+.f-links a{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1px;color:#4A5040;text-decoration:none;transition:color .2s}
+.f-links a:hover{color:var(--mint)}
+.cta-meta{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;color:#6A7060}
+.layer-idx{position:absolute;right:28px;top:20px;font-family:'Space Mono',monospace;font-size:72px;font-weight:700;color:rgba(255,255,255,.02);line-height:1}
 
 .layers-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);margin-top:56px}
 .layer{background:var(--void);padding:48px 36px;position:relative;overflow:hidden;transition:background .3s}
@@ -196,6 +216,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
 </nav>
 
 <section id="hero">
+  <img src="logo/Prometheus.png" alt="" class="hero-logo-ambient" onerror="this.style.display='none'">
   <div class="hero-body">
     <div class="hero-status">
       <div class="hero-status-dot"></div>
