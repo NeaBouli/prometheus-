@@ -41,6 +41,11 @@ const SLASH_SIMPLE_PCT: uint64 = 5;      // 5% KAS-Verlust
 const SLASH_DOUBLE_VOTE_PCT: uint64 = 10; // 10% KAS-Verlust
 const SLASH_COLLUSION_PCT: uint64 = 20;  // 20% KAS-Verlust
 const COOLDOWN_BLOCKS: uint64 = 100800;  // ~7 Tage bei 10 BPS
+
+// SLASH ESKALATION (nicht-rekursiv, Architect-approved V-003):
+// multiplier = min(3, slashing_count / 3 + 1)
+// penalty = stake_kas * base_pct * multiplier / 100
+// Wenn stake_kas < MIN_STAKE_KAS nach Slashing: validator.active = false
 ```
 
 ### 1.2 Guardian Struct
@@ -71,7 +76,7 @@ struct RuleProposal {
     guardian_pubkey: bytes(32),
     threat_hash: bytes(32),       // SHA-256 der Bedrohung
     rule_type: uint8,             // 0=YARA, 1=STIX, 2=Sigma
-    rule_content_ipfs: bytes(46), // IPFS CID (CIDv1)
+    rule_content_ipfs: bytes(36), // CIDv1 binary, SHA-256 multihash, 36 bytes (NOT CIDv0/base58)
     confidence: uint64,            // 0 - 10000 (10000x skaliert, 10000 = 1.0)
     submitted_at: uint64,
     votes_for: uint64,

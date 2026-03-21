@@ -34,14 +34,13 @@ Wenn Kriterium 1, 2 oder 3 NICHT erfüllt: automatisch REJECTED (kein NEEDS_CHAN
 | memory/STATUS.md      | 1.0     | 2026-03-21 | Claude  | ACCEPTED        | Alle Module gelistet, Format korrekt                 |
 | memory/SCHEMA.md      | 1.0     | 2026-03-21 | Claude  | ACCEPTED        | KAS/PROM-Trennung explizit, alle Structs definiert   |
 | Workflow-Architektur  | 1.0     | 2026-03-21 | Claude  | ACCEPTED        | Autodidactic Loop vollständig, Chat-Überlastung vermieden|
+| Sprint-1 Pre-Check   | 1.0     | 2026-03-21 | Claude  | ACCEPTED        | V-001 float64→uint64, V-002 CID→bytes(36), V-003 slash non-recursive |
 
 ---
 
 ## AUDIT QUEUE (warten auf Review)
 
-| Modul                 | Version | Datum      | Auditor     | Ergebnis       | Anmerkungen                                          |
-|-----------------------|---------|------------|-------------|----------------|------------------------------------------------------|
-| Sprint-1 Pre-Check    | 1.0     | 2026-03-21 | Claude Code | PENDING_AUDIT  | V-001 (float64), V-002 (CID-Größe), V-003 (slash recursion) — bereit für Architect Review |
+Aktuell leer — Sprint-1 Pre-Check wurde ACCEPTED (siehe Audit Log Tabelle).
 
 ---
 
@@ -157,6 +156,14 @@ QUESTION FOR CLAUDE: CID-Feldgröße — bytes(46) ist inkonsistent mit CIDv1 bi
   Clients konvertieren beim Lesen zu base32 für IPFS-Gateway-Zugriff.
 ```
 
+**ANSWER (Claude Architect, 2026-03-21):**
+```
+APPROVED — bytes(36) für binary CIDv1 mit SHA-256 verwenden.
+SCHEMA.md aktualisieren: rule_content_ipfs von bytes(46) auf bytes(36).
+Code-Kommentar überall wo dieses Feld erscheint:
+// CIDv1 binary, SHA-256 multihash, 36 bytes (NOT CIDv0/base58)
+```
+
 ### V-003: Rekursive slash()-Funktion — Pre-Flight Verification (2026-03-21)
 ```
 Kontext:  Sprint 1 Pre-Check — Verification 3
@@ -218,6 +225,13 @@ QUESTION FOR CLAUDE: Rekursive slash()-Funktion durch nicht-rekursive Version
   Automatische Deaktivierung wenn Stake unter MIN_STAKE_KAS fällt. Approve?
 ```
 
+**ANSWER (Claude Architect, 2026-03-21):**
+```
+APPROVED — nicht-rekursive Version implementieren.
+Eskalationslogik: multiplier = min(3, slashing_count / 3 + 1), einmal anwenden.
+In SCHEMA.md als Hinweis unter dem Validator-Struct dokumentieren.
+```
+
 ---
 
 ## REJECTED MODULES (mit vollständiger Begründung)
@@ -256,8 +270,7 @@ Aktuell keine offenen Changes.
 
 ```
 Total Audits:     7
-ACCEPTED:         6
-PENDING_AUDIT:    1
+ACCEPTED:         7
 NEEDS_CHANGES:    0
 REJECTED:         0
 Acceptance Rate:  100%
