@@ -26,3 +26,4 @@ hex = "0.4"
 
 [dev-dependencies]
 tempfile = "3"
+prometheus-validator = { path = "../validator-node" }

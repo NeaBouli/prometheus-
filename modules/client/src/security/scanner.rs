@@ -116,14 +116,40 @@ pub fn compute_sha256(data: &[u8]) -> [u8; 32] {
 }
 
 /// Count how many patterns match in the data.
+/// Uses memchr-style first-byte lookup for fast scanning.
 fn count_pattern_matches(patterns: &[Vec<u8>], data: &[u8]) -> usize {
     patterns
         .iter()
         .filter(|pattern| {
-            data.windows(pattern.len())
-                .any(|window| window == pattern.as_slice())
+            if pattern.is_empty() {
+                return true;
+            }
+            let plen = pattern.len();
+            if plen > data.len() {
+                return false;
+            }
+            let first = pattern[0];
+            // Use memchr to find candidate positions (much faster than byte-by-byte)
+            let mut start = 0;
+            while let Some(offset) = memchr_single(first, &data[start..]) {
+                let pos = start + offset;
+                if pos + plen > data.len() {
+                    break;
+                }
+                if data[pos..pos + plen] == **pattern {
+                    return true;
+                }
+                start = pos + 1;
+            }
+            false
         })
         .count()
+}
+
+/// Fast single-byte search (equivalent to memchr).
+#[inline]
+fn memchr_single(needle: u8, haystack: &[u8]) -> Option<usize> {
+    haystack.iter().position(|&b| b == needle)
 }
 
 /// Parse a simple YARA-like rule string into patterns.

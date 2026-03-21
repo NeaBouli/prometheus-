@@ -68,7 +68,10 @@ Ziel:     Rust client foundation — connection, krc20, scanner, zk_proof
 | validator/voting/reveal.rs   | ACCEPTED        | 100%     | 2026-03-22  | ACCEPTED     | 8 tests, bond validation |
 | validator/slashing/mod.rs    | ACCEPTED        | 100%     | 2026-03-22  | ACCEPTED     | 11 tests, bit-identical to SS |
 | **SPRINT 6 – E2E**           |                 |          |             |              |                 |
-| tests/e2e/full_cycle_test.rs | PENDING         | 0%       | -           | -            | -               |
+| tests/e2e_threat_lifecycle   | PENDING_AUDIT   | 100%     | 2026-03-22  | PENDING_AUDIT| Full pipeline < 60s |
+| tests/performance            | PENDING_AUDIT   | 100%     | 2026-03-22  | PENDING_AUDIT| 6 timing benchmarks |
+| tests/security_sybil         | PENDING_AUDIT   | 100%     | 2026-03-22  | PENDING_AUDIT| 500:1 Sybil resistance |
+| tests/security_fp_flood      | PENDING_AUDIT   | 100%     | 2026-03-22  | PENDING_AUDIT| 500 flood blocked |
 | **SPRINT 7 – DASHBOARD**     |                 |          |             |              |                 |
 | web/audit/App.tsx            | PENDING         | 0%       | -           | -            | -               |
 
