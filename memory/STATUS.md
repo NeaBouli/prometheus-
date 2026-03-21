@@ -55,9 +55,9 @@ Ziel:     Rust client foundation — connection, krc20, scanner, zk_proof
 | client/network/p2p.rs        | PENDING         | 0%       | -           | -            | Sprint 2 Phase 2 |
 | client/network/zk_proof.rs   | ACCEPTED        | 100%     | 2026-03-21  | ACCEPTED     | 7 tests, stub (PATTERN-004) |
 | **SPRINT 3 – PHI-3**         |                 |          |             |              |                 |
-| client/ai/phi3.rs            | PENDING         | 0%       | -           | -            | -               |
-| client/ai/detection.rs       | PENDING         | 0%       | -           | -            | -               |
-| client/ai/federated.rs       | PENDING         | 0%       | -           | -            | -               |
+| client/ai/phi3.rs            | PENDING_AUDIT   | 100%     | 2026-03-21  | PENDING_AUDIT| 8 tests, ONNX stub, graceful degradation |
+| client/ai/detection.rs       | PENDING_AUDIT   | 100%     | 2026-03-21  | PENDING_AUDIT| 10 tests, YARA+AI combined verdict |
+| client/ai/federated.rs       | PENDING_AUDIT   | 100%     | 2026-03-21  | PENDING_AUDIT| 10 tests, Fed-DART stub (Decision #10) |
 | **SPRINT 4 – GUARDIAN**      |                 |          |             |              |                 |
 | guardian-node/llm_server.py  | PENDING         | 0%       | -           | -            | -               |
 | guardian-node/yara_generator.py | PENDING      | 0%       | -           | -            | -               |

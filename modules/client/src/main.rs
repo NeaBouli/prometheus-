@@ -3,6 +3,7 @@
 //! Connects to the Kaspa network via wRPC, reads KRC-20 threat rules,
 //! and provides local security scanning.
 
+pub mod ai;
 pub mod blockchain;
 pub mod network;
 pub mod security;
