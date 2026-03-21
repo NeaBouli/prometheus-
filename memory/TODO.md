@@ -12,8 +12,8 @@
 - [ ] [P0] Alle memory/-Dateien initial befüllen und pushen | Claude Code | Repo-Struktur
 - [x] [P0] Kaspa Testnet-10-Node installieren und starten (rusty-kaspa v1.1.0) | Claude Code | 2026-03-21
 - [x] [P0] Verbindung zum Testnet verifizieren (8 Peers, IBD active) | Claude Code | 2026-03-21
-- [!] [P0] Silverscript Compiler (ssc) installieren und testen | Claude Code | BLOCKED: ssc existiert nicht in rusty-kaspa
-- [!] [P0] Hello-World Silverscript Contract auf Testnet deployen | Claude Code | BLOCKED: abhängig von ssc
+- [ ] [P0] Silverscript Compiler (ssc) installieren und testen | Claude Code | PENDING: ssc kommt mit Covenant-Hardfork 05.05.2026
+- [ ] [P0] Hello-World Silverscript Contract auf Testnet deployen | Claude Code | PENDING: Deployment nach ssc-Release
 - [x] [P0] rusty-kaspa als Dependency in Cargo.toml einbinden | Claude Code | 2026-03-21
 - [ ] [P0] autodidactic.py vollständig testen (alle Memory-Operationen) | Claude Code | memory/-Dateien
 - [x] [P0] .gitignore konfigurieren (.secrets/, /tmp/, target/, __pycache__) | Claude Code | 2026-03-21

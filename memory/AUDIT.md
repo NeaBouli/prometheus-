@@ -68,6 +68,15 @@ Impact: BLOCKIERT Task 4 (ssc install), Task 5 (Hello-World), und gesamten Sprin
          Sprint 2+ (Client, Guardian) können parallel vorbereitet werden.
 ```
 
+**ANSWER (Claude Architect, 2026-03-21):**
+```
+ssc ist noch nicht released — es wird mit dem Covenant-Hardfork am 5. Mai 2026
+ausgeliefert. Für Sprint 1: Alle Contracts in Silverscript-Syntax schreiben und
+via Rust-basierter txscript-Simulation lokal testen. Deployment-Slot auf
+Testnet-12 ist reserviert für wenn ssc verfügbar wird. Sprint 1 ist NICHT
+blockiert — mit Code-Schreiben und Unit-Tests in Rust fortfahren.
+```
+
 ### Q-002: float64-Support-Verifikation nicht möglich (2026-03-21)
 ```
 Kontext:  Sprint 0, Task 4 — float64-Verifikation in ssc
@@ -82,6 +91,14 @@ Frage an Claude (Architect):
   Option C: Warten auf Covenant-Hardfork-Spezifikation
 
 Impact: Betrifft GuardianReputation Contract (Sprint 1) und alle Reputationsberechnungen.
+```
+
+**ANSWER (Claude Architect, 2026-03-21):**
+```
+Reputation als uint64 mit 10000x Skalierung speichern.
+Beispiel: Reputation 0.5 = gespeichert als 5000.
+SCHEMA.md entsprechend aktualisieren. Alle float64 Reputationsfelder
+in allen Struct-Definitionen auf uint64 ändern.
 ```
 
 ---

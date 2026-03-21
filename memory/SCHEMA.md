@@ -30,7 +30,7 @@ struct Validator {
     stake_kas: uint64,        // ← KAS (NICHT PROM!)
     active: bool,
     joined_at: uint64,        // Unix-Timestamp
-    reputation: float64,      // 0.0 - 10.0
+    reputation: uint64,       // 0 - 100000 (10000x skaliert, 10000 = 1.0)
     slashing_count: uint64,   // Anzahl Slashing-Events
     last_vote_block: uint64   // Letzter Abstimmungsblock
 }
@@ -49,7 +49,7 @@ const COOLDOWN_BLOCKS: uint64 = 100800;  // ~7 Tage bei 10 BPS
 struct Guardian {
     pubkey: bytes(32),
     compute_power_gflops: uint64, // GFLOPS der GPU
-    reputation: float64,          // 0.0 - 10.0
+    reputation: uint64,            // 0 - 100000 (10000x skaliert, 10000 = 1.0)
     proposals_submitted: uint64,
     proposals_accepted: uint64,
     registered_at: uint64,
@@ -58,8 +58,9 @@ struct Guardian {
 
 // Konstanten
 const MIN_COMPUTE_GFLOPS: uint64 = 100;  // Minimum Guardian-Hardware
-const MIN_REPUTATION: float64 = 0.1;    // Unter diesem Wert: kein Stimmrecht
-const REPUTATION_START: float64 = 0.1;  // Startwert für neue Guardians
+const MIN_REPUTATION: uint64 = 1000;     // 0.1 * 10000 — unter diesem Wert: kein Stimmrecht
+const REPUTATION_START: uint64 = 1000;   // 0.1 * 10000 — Startwert für neue Guardians
+const REPUTATION_SCALE: uint64 = 10000;  // Skalierungsfaktor: gespeicherter Wert / 10000 = tatsächliche Reputation
 ```
 
 ### 1.3 RuleProposal Struct
@@ -71,7 +72,7 @@ struct RuleProposal {
     threat_hash: bytes(32),       // SHA-256 der Bedrohung
     rule_type: uint8,             // 0=YARA, 1=STIX, 2=Sigma
     rule_content_ipfs: bytes(46), // IPFS CID (CIDv1)
-    confidence: float64,          // 0.0 - 1.0
+    confidence: uint64,            // 0 - 10000 (10000x skaliert, 10000 = 1.0)
     submitted_at: uint64,
     votes_for: uint64,
     votes_against: uint64,
@@ -79,8 +80,8 @@ struct RuleProposal {
     status: uint8                 // 0=PENDING, 1=ACCEPTED, 2=REJECTED
 }
 
-const MIN_CONFIDENCE: float64 = 0.85;   // Mindest-KI-Konfidenz
-const VALIDATOR_QUORUM: float64 = 0.67; // 2/3-Mehrheit
+const MIN_CONFIDENCE: uint64 = 8500;    // 0.85 * 10000 — Mindest-KI-Konfidenz
+const VALIDATOR_QUORUM: uint64 = 6700;  // 0.67 * 10000 — 2/3-Mehrheit
 const VOTING_BLOCKS: uint64 = 864000;   // ~1 Tag bei 10 BPS
 ```
 

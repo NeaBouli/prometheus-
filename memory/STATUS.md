@@ -35,8 +35,8 @@ Ziel:     Testnet-Node läuft, erster Contract deployed
 | claude-code-start.sh         | DONE            | 100%     | 2026-03-21  | -            | -               |
 | **SPRINT 0 – SETUP**         |                 |          |             |              |                 |
 | Testnet-10-Node              | DONE            | 100%     | 2026-03-21  | -            | wrpc://127.0.0.1:17210 |
-| Silverscript Compiler (ssc)  | BLOCKED         | 0%       | 2026-03-21  | -            | ssc existiert nicht in rusty-kaspa |
-| Hello-World Contract         | BLOCKED         | 0%       | 2026-03-21  | -            | Abhängig von ssc |
+| Silverscript Compiler (ssc)  | PENDING         | 0%       | 2026-03-21  | -            | Wird mit Covenant-Hardfork 05.05.2026 released |
+| Hello-World Contract         | PENDING         | 0%       | 2026-03-21  | -            | Deployment nach ssc-Release |
 | GitHub Actions CI/CD         | PENDING         | 0%       | -           | -            | -               |
 | **SPRINT 1 – CONTRACTS**     |                 |          |             |              |                 |
 | ValidatorStaking.ss          | PENDING         | 0%       | -           | -            | TBD             |
