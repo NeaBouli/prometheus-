@@ -40,6 +40,7 @@ Wenn Kriterium 1, 2 oder 3 NICHT erfüllt: automatisch REJECTED (kein NEEDS_CHAN
 | Sprint-3 Phi-3       | 1.0     | 2026-03-21 | Claude  | ACCEPTED        | 3 modules, 28 tests, PATTERN-010 noted |
 | Sprint-4 Guardian    | 1.0     | 2026-03-21 | Claude  | ACCEPTED        | 4 modules, 26 tests, PATTERN-011 noted |
 | Sprint-5 Voting      | 1.0     | 2026-03-22 | Claude  | ACCEPTED        | 3 modules, 29 tests, no fixes |
+| Sprint-6 E2E         | 1.0     | 2026-03-22 | Claude  | ACCEPTED        | 4 test suites, 18 tests, no fixes |
 
 ---
 
@@ -54,7 +55,7 @@ Wenn Kriterium 1, 2 oder 3 NICHT erfüllt: automatisch REJECTED (kein NEEDS_CHAN
 | Sprint-3 Phi-3        | 1.0     | 2026-03-21 | Claude      | ACCEPTED       | 3 modules, 28 tests. PATTERN-010 noted. |
 | Sprint-4 Guardian     | 1.0     | 2026-03-21 | Claude      | ACCEPTED       | 4 modules, 26 tests. PATTERN-011 noted. |
 | Sprint-5 Voting       | 1.0     | 2026-03-22 | Claude      | ACCEPTED       | 3 Rust modules, 29 tests. No fixes required. |
-| Sprint-6 E2E          | 1.0     | 2026-03-22 | Claude Code | PENDING_AUDIT  | 4 test suites, 18 integration tests. All green. |
+| Sprint-6 E2E          | 1.0     | 2026-03-22 | Claude      | ACCEPTED       | 4 test suites, 18 integration tests. No fixes. |
 | Sprint-2 Client Basis | 1.0     | 2026-03-21 | Claude      | ACCEPTED       | 4 modules, 26 tests. Minor fixes applied (test rename, new test). |
 
 ---
