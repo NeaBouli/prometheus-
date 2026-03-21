@@ -8,10 +8,10 @@
 ## AKTUELLER SPRINT
 
 ```
-Sprint 0: Setup & Testnet
-Status:   IN_PROGRESS
+Sprint 1: Core Contracts
+Status:   PENDING_AUDIT
 Start:    2026-03-21
-Ziel:     Testnet-Node läuft, erster Contract deployed
+Ziel:     6 Silverscript Contracts geschrieben und getestet
 ```
 
 ---
@@ -40,12 +40,12 @@ Ziel:     Testnet-Node läuft, erster Contract deployed
 | GitHub Actions CI/CD         | PENDING         | 0%       | -           | -            | -               |
 | Sprint-1 Pre-Check           | ACCEPTED        | 100%     | 2026-03-21  | ACCEPTED     | V-001, V-002, V-003 alle genehmigt |
 | **SPRINT 1 – CONTRACTS**     |                 |          |             |              |                 |
-| ValidatorStaking.ss          | PENDING         | 0%       | -           | -            | TBD             |
-| GuardianReputation.ss        | PENDING         | 0%       | -           | -            | TBD             |
-| GovernanceAutoTuning.ss      | PENDING         | 0%       | -           | -            | TBD             |
-| DevIncentivePool.ss          | PENDING         | 0%       | -           | -            | TBD             |
-| CommunityDonations.ss        | PENDING         | 0%       | -           | -            | TBD             |
-| RuleStorage.ss               | PENDING         | 0%       | -           | -            | TBD             |
+| ValidatorStaking.ss          | PENDING_AUDIT   | 100%     | 2026-03-21  | PENDING_AUDIT| 11 tests, deployment pending ssc |
+| GuardianReputation.ss        | PENDING_AUDIT   | 100%     | 2026-03-21  | PENDING_AUDIT| 9 tests, deployment pending ssc |
+| GovernanceAutoTuning.ss      | PENDING_AUDIT   | 100%     | 2026-03-21  | PENDING_AUDIT| 8 tests, fp_rate oracle stub |
+| DevIncentivePool.ss          | PENDING_AUDIT   | 100%     | 2026-03-21  | PENDING_AUDIT| 9 tests, deployment pending ssc |
+| CommunityDonations.ss        | PENDING_AUDIT   | 100%     | 2026-03-21  | PENDING_AUDIT| 8 tests, deployment pending ssc |
+| RuleStorage.ss               | PENDING_AUDIT   | 100%     | 2026-03-21  | PENDING_AUDIT| 9 tests, KRC20 rule storage |
 | **SPRINT 2 – CLIENT**        |                 |          |             |              |                 |
 | client/blockchain/connection.rs | PENDING      | 0%       | -           | -            | -               |
 | client/blockchain/krc20.rs   | PENDING         | 0%       | -           | -            | -               |

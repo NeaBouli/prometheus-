@@ -23,16 +23,16 @@
 
 ## ═══ SPRINT 1: CORE CONTRACTS (Woche 2-3) ═══
 
-- [ ] [P1] ValidatorStaking.ss schreiben (register, commitVote, revealVote, slash) | Claude Code | ssc + Testnet
-- [ ] [P1] GuardianReputation.ss schreiben (register, submitContribution, votingPower) | Claude Code | ssc + Testnet
-- [ ] [P1] GovernanceAutoTuning.ss schreiben (auto_tune, alle Parameter) | Claude Code | ValidatorStaking.ss
-- [ ] [P1] DevIncentivePool.ss schreiben (proposeGrant, vote, payGrant, recommended_reward) | Claude Code | ssc
-- [ ] [P1] CommunityDonations.ss schreiben (donateKas, getDonations) | Claude Code | ssc
-- [ ] [P1] RuleStorage.ss schreiben (storeRule als KRC20-Asset) | Claude Code | ssc
-- [ ] [P1] Unit-Tests für ValidatorStaking (min. 10 Tests) | Claude Code | ValidatorStaking.ss
-- [ ] [P1] Unit-Tests für GuardianReputation (min. 8 Tests) | Claude Code | GuardianReputation.ss
-- [ ] [P1] Alle Contracts auf Testnet deployen und Adressen in STATUS.md eintragen | Claude Code | Alle Contracts
-- [ ] [P1] Audit-Request für alle Contracts an Claude vorbereiten | Claude Code | Alle Contracts deployed
+- [x] [P1] ValidatorStaking.ss schreiben (register, commitVote, revealVote, slash) | Claude Code | 2026-03-21 (11 tests)
+- [x] [P1] GuardianReputation.ss schreiben (register, submitContribution, votingPower) | Claude Code | 2026-03-21 (9 tests)
+- [x] [P1] GovernanceAutoTuning.ss schreiben (auto_tune, alle Parameter) | Claude Code | 2026-03-21 (8 tests, fp_rate stub)
+- [x] [P1] DevIncentivePool.ss schreiben (proposeGrant, vote, payGrant, recommended_reward) | Claude Code | 2026-03-21 (9 tests)
+- [x] [P1] CommunityDonations.ss schreiben (donateKas, getDonations) | Claude Code | 2026-03-21 (8 tests)
+- [x] [P1] RuleStorage.ss schreiben (storeRule als KRC20-Asset) | Claude Code | 2026-03-21 (9 tests)
+- [x] [P1] Unit-Tests für ValidatorStaking (min. 10 Tests) | Claude Code | 2026-03-21 (11 tests)
+- [x] [P1] Unit-Tests für GuardianReputation (min. 8 Tests) | Claude Code | 2026-03-21 (9 tests)
+- [ ] [P1] Alle Contracts auf Testnet deployen und Adressen in STATUS.md eintragen | Claude Code | Wartet auf ssc (05.05.2026)
+- [x] [P1] Audit-Request für alle Contracts an Claude vorbereiten | Claude Code | 2026-03-21
 
 ---
 

@@ -40,7 +40,9 @@ Wenn Kriterium 1, 2 oder 3 NICHT erfüllt: automatisch REJECTED (kein NEEDS_CHAN
 
 ## AUDIT QUEUE (warten auf Review)
 
-Aktuell leer — Sprint-1 Pre-Check wurde ACCEPTED (siehe Audit Log Tabelle).
+| Modul                 | Version | Datum      | Auditor     | Ergebnis       | Anmerkungen                                          |
+|-----------------------|---------|------------|-------------|----------------|------------------------------------------------------|
+| Sprint-1 Contracts    | 1.0     | 2026-03-21 | Claude Code | PENDING_AUDIT  | 6 Silverscript contracts, 54 tests total. Deployment pending ssc release (Testnet-10). Ready for architect audit. |
 
 ---
 
@@ -230,6 +232,24 @@ QUESTION FOR CLAUDE: Rekursive slash()-Funktion durch nicht-rekursive Version
 APPROVED — nicht-rekursive Version implementieren.
 Eskalationslogik: multiplier = min(3, slashing_count / 3 + 1), einmal anwenden.
 In SCHEMA.md als Hinweis unter dem Validator-Struct dokumentieren.
+```
+
+### Q-003: fp_rate Oracle-Mechanismus undefiniert (2026-03-21)
+```
+Kontext:  Sprint 1, GovernanceAutoTuning.ss — auto_tune() Funktion
+Finding:  Die auto_tune() Funktion benötigt eine False-Positive-Rate (fp_rate)
+          um MIN_CONFIDENCE dynamisch anzupassen. Es gibt keinen definierten
+          Mechanismus, wie fp_rate on-chain gemessen und gemeldet wird.
+
+          Aktuell implementiert: oracle_get_fp_rate() Stub in GovernanceAutoTuning.ss
+          der immer 0 zurückgibt.
+
+QUESTION FOR CLAUDE: fp_rate Oracle-Mechanismus undefiniert — Stub erstellt.
+  Mögliche Ansätze:
+  Option A: Light Clients melden FP-Events via ZK-Proof, on-chain aggregiert
+  Option B: Guardians reichen fp_rate als Teil ihres Reputation-Reports ein
+  Option C: Off-chain Oracle mit Multi-Sig-Validierung
+  Awaiting architectural decision.
 ```
 
 ---
