@@ -45,7 +45,7 @@ nav.scrolled{background:rgba(5,5,5,.97);border-color:var(--line);backdrop-filter
 #hero::before{content:'';position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:80px 80px;mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 40%,transparent 100%)}
 #hero::after{content:'';position:absolute;top:30%;left:50%;transform:translate(-50%,-50%);width:600px;height:300px;background:radial-gradient(ellipse,rgba(0,229,160,.04) 0%,transparent 70%);pointer-events:none}
 /* Ambient logo — large, right side, dimmed */
-.hero-logo-ambient{position:absolute;right:4%;top:50%;transform:translateY(-50%);z-index:0;pointer-events:none;width:clamp(280px,28vw,440px);height:clamp(280px,28vw,440px);opacity:.07;filter:grayscale(1) brightness(1.4);object-fit:contain}
+.hero-logo-ambient{position:absolute;right:4%;top:42%;transform:translateY(-50%);z-index:0;pointer-events:none;width:clamp(280px,28vw,440px);height:clamp(280px,28vw,440px);opacity:.14;filter:grayscale(1) brightness(1.6);object-fit:contain}
 
 .hero-body{align-self:center;padding-top:120px;max-width:960px;position:relative;z-index:1}
 .hero-status{display:inline-flex;align-items:center;gap:10px;border:1px solid var(--line-bright);padding:6px 14px;margin-bottom:48px;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--muted);opacity:0;animation:rise .6s ease .1s forwards}
@@ -85,8 +85,8 @@ nav.scrolled{background:rgba(5,5,5,.97);border-color:var(--line);backdrop-filter
 .lc-time{font-family:'Space Mono',monospace;font-size:10px;color:#C8A060;letter-spacing:1px;margin-bottom:8px}
 .lc-tech{margin-top:14px;padding-top:12px;border-top:1px solid var(--line);font-family:'Space Mono',monospace;font-size:9px;color:#7A9A80;letter-spacing:.5px;line-height:1.6}
 .layer-tag{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--mint);text-transform:uppercase;margin-bottom:20px;display:block}
-.n-glyph{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:3px;color:#7A8A70;margin-bottom:20px;text-transform:uppercase}
-.n-spec{font-family:'Space Mono',monospace;font-size:10px;color:#8A9070;letter-spacing:.5px;border-top:1px solid var(--line);padding-top:14px;line-height:1.7}
+.n-glyph{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:3px;color:var(--mint-dim);margin-bottom:20px;text-transform:uppercase}
+.n-spec{font-family:'Space Mono',monospace;font-size:10px;color:#3A8060;letter-spacing:.5px;border-top:1px solid var(--line);padding-top:14px;line-height:1.7}
 .tok-lbl{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;color:#C8A060;text-transform:uppercase;margin-bottom:28px}
 .tok-k{font-family:'Space Mono',monospace;font-size:10px;color:#7A9A80;min-width:110px;flex-shrink:0;padding-top:1px}
 .metric-k{font-size:11px;font-weight:300;color:#9A9870;letter-spacing:.5px}
@@ -118,10 +118,10 @@ nav.scrolled{background:rgba(5,5,5,.97);border-color:var(--line);backdrop-filter
 .nodes-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);margin-top:56px}
 .n-card{background:var(--deep);padding:36px 28px;transition:background .3s}
 .n-card:hover{background:var(--panel)}
-.n-glyph{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:3px;color:var(--dim);margin-bottom:20px;text-transform:uppercase}
+.n-glyph{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:3px;color:var(--mint-dim);margin-bottom:20px;text-transform:uppercase}
 .n-name{font-size:18px;font-weight:400;color:var(--silver);margin-bottom:12px}
-.n-desc{font-size:12px;font-weight:300;color:var(--muted);line-height:1.65;margin-bottom:20px}
-.n-spec{font-family:'Space Mono',monospace;font-size:10px;color:var(--dim);letter-spacing:.5px;border-top:1px solid var(--line);padding-top:14px;line-height:1.7}
+.n-desc{font-size:12px;font-weight:300;color:#5ABB90;line-height:1.65;margin-bottom:20px}
+.n-spec{font-family:'Space Mono',monospace;font-size:10px;color:#3A8060;letter-spacing:.5px;border-top:1px solid var(--line);padding-top:14px;line-height:1.7}
 
 .tokens-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);margin-top:56px}
 .tok{background:var(--void);padding:56px 48px;position:relative;overflow:hidden}
