@@ -237,8 +237,8 @@ function test_insufficient_approval() {
 #[test]
 function test_recommended_reward_calculation() {
     let reward: uint64 = recommendedReward(100, 5);
-    // Whitepaper: 100 * 10 * (100 + 5*10) / 100 = 100 * 10 * 150 / 100 = 15000
-    assert(reward == 15000);
+    // 100 * 10 * (100 + 5*10) / 100 = 100 * 10 * 150 / 100 = 1500
+    assert(reward == 1500);
 }
 
 #[test]
