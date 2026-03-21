@@ -40,12 +40,12 @@ Ziel:     6 Silverscript Contracts geschrieben und getestet
 | GitHub Actions CI/CD         | PENDING         | 0%       | -           | -            | -               |
 | Sprint-1 Pre-Check           | ACCEPTED        | 100%     | 2026-03-21  | ACCEPTED     | V-001, V-002, V-003 alle genehmigt |
 | **SPRINT 1 – CONTRACTS**     |                 |          |             |              |                 |
-| ValidatorStaking.ss          | PENDING_AUDIT   | 100%     | 2026-03-21  | PENDING_AUDIT| v1.1: FIX-001 slash ACL, FIX-004 bond return |
-| GuardianReputation.ss        | PENDING_AUDIT   | 100%     | 2026-03-21  | PENDING_AUDIT| v1.1: FIX-002 .active() → registered_at |
-| GovernanceAutoTuning.ss      | PENDING_AUDIT   | 100%     | 2026-03-21  | PENDING_AUDIT| v1.1: unchanged, fp_rate oracle stub |
-| DevIncentivePool.ss          | PENDING_AUDIT   | 100%     | 2026-03-21  | PENDING_AUDIT| v1.1: FIX-005 reward formula whitepaper-konform |
-| CommunityDonations.ss        | PENDING_AUDIT   | 100%     | 2026-03-21  | PENDING_AUDIT| v1.1: unchanged |
-| RuleStorage.ss               | PENDING_AUDIT   | 100%     | 2026-03-21  | PENDING_AUDIT| v1.1: FIX-003 time-windowed counter |
+| ValidatorStaking.ss          | ACCEPTED        | 100%     | 2026-03-21  | ACCEPTED     | v1.2: slash ACL, bond return, test patches |
+| GuardianReputation.ss        | ACCEPTED        | 100%     | 2026-03-21  | ACCEPTED     | v1.2: registered_at check |
+| GovernanceAutoTuning.ss      | ACCEPTED        | 100%     | 2026-03-21  | ACCEPTED     | v1.2: fp_rate oracle stub (Q-003 open) |
+| DevIncentivePool.ss          | ACCEPTED        | 100%     | 2026-03-21  | ACCEPTED     | v1.2: whitepaper reward formula |
+| CommunityDonations.ss        | ACCEPTED        | 100%     | 2026-03-21  | ACCEPTED     | v1.2: no changes needed |
+| RuleStorage.ss               | ACCEPTED        | 100%     | 2026-03-21  | ACCEPTED     | v1.2: time-windowed counter |
 | **SPRINT 2 – CLIENT**        |                 |          |             |              |                 |
 | client/blockchain/connection.rs | PENDING      | 0%       | -           | -            | -               |
 | client/blockchain/krc20.rs   | PENDING         | 0%       | -           | -            | -               |

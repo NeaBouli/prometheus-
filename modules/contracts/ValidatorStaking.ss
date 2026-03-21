@@ -297,6 +297,7 @@ function test_double_vote_detection() {
 function test_collusion_slashing() {
     // Slash for collusion at 20%, verify escalation
     register_validator(ADDR_A, 100000);
+    mock_sender(GOVERNANCE_CONTRACT);
     let penalty: uint64 = slash(ADDR_A, SLASH_COLLUSION_PCT, "collusion");
     // multiplier = min(3, 0/3+1) = 1, penalty = 100000 * 20 * 1 / 100 = 20000
     assert(penalty == 20000);
@@ -323,6 +324,7 @@ function test_bond_calculation() {
 function test_slash_escalation_non_recursive() {
     // Verify escalation multiplier: min(3, count/3 + 1)
     register_validator(ADDR_A, 100000);
+    mock_sender(GOVERNANCE_CONTRACT);
 
     // First slash: count=0, multiplier=min(3, 0/3+1)=1
     slash(ADDR_A, 5, "test");
@@ -345,6 +347,7 @@ function test_slash_escalation_non_recursive() {
 function test_auto_deactivation_below_min_stake() {
     // Slash enough to drop below MIN_STAKE_KAS, verify auto-deactivation
     register_validator(ADDR_A, 11000);
+    mock_sender(GOVERNANCE_CONTRACT);
     slash(ADDR_A, SLASH_COLLUSION_PCT, "collusion");
     // penalty = 11000 * 20 * 1 / 100 = 2200, remaining = 8800
     assert(validators[ADDR_A].stake_kas == 8800);

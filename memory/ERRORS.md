@@ -72,6 +72,16 @@ Lösung:   STUN/TURN Server für NAT traversal einrichten
 Prüfung:  Integration-Tests mit simuliertem NAT
 ```
 
+### PATTERN-008: Tests nach ACL-Änderungen vergessen
+```
+Problem:  Nach Hinzufügen von Access Control (require msg.sender == X) schlagen
+          bestehende Tests fehl, weil sie ohne mock_sender() aufrufen
+Symptom:  Tests revert mit "Only governance..." obwohl Logik korrekt ist
+Lösung:   Always add mock_sender(AUTHORIZED_CONTRACT) in tests that call
+          access-controlled functions after adding ACL
+Prüfung:  Nach jeder ACL-Änderung: alle Tests durchsuchen die die Funktion aufrufen
+```
+
 ---
 
 ## FEHLER LOG (werden during Development befüllt)

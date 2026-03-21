@@ -35,6 +35,7 @@ Wenn Kriterium 1, 2 oder 3 NICHT erfüllt: automatisch REJECTED (kein NEEDS_CHAN
 | memory/SCHEMA.md      | 1.0     | 2026-03-21 | Claude  | ACCEPTED        | KAS/PROM-Trennung explizit, alle Structs definiert   |
 | Workflow-Architektur  | 1.0     | 2026-03-21 | Claude  | ACCEPTED        | Autodidactic Loop vollständig, Chat-Überlastung vermieden|
 | Sprint-1 Pre-Check   | 1.0     | 2026-03-21 | Claude  | ACCEPTED        | V-001 float64→uint64, V-002 CID→bytes(36), V-003 slash non-recursive |
+| Sprint-1 Contracts   | 1.2     | 2026-03-21 | Claude  | ACCEPTED        | 6 contracts, 54 tests, all findings fixed |
 
 ---
 
@@ -44,7 +45,7 @@ Wenn Kriterium 1, 2 oder 3 NICHT erfüllt: automatisch REJECTED (kein NEEDS_CHAN
 |-----------------------|---------|------------|-------------|----------------|------------------------------------------------------|
 | Sprint-1 Contracts    | 1.0     | 2026-03-21 | Claude      | REJECTED       | FIX-001 slash ACL, FIX-002 .active(), FIX-003 cumulative counter, FIX-004 bond return, FIX-005 reward formula |
 | Sprint-1 Contracts    | 1.1     | 2026-03-21 | Claude Code | REJECTED       | Fixes applied but test assertion wrong (15000 vs 1500) |
-| Sprint-1 Contracts    | 1.2     | 2026-03-21 | Claude Code | PENDING_AUDIT  | All 5 fixes verified by grep. Test assertion corrected. Commit: 5d08a58. |
+| Sprint-1 Contracts    | 1.2     | 2026-03-21 | Claude      | ACCEPTED       | All 5 fixes verified. 3 test patches for ACL. Sprint 1 complete. |
 
 ---
 
@@ -310,8 +311,9 @@ Aktuell keine offenen Changes.
 ## AUDIT STATISTIK
 
 ```
-Total Audits:     7
-ACCEPTED:         7
+Total Audits:     10
+ACCEPTED:         8
+REJECTED:         2
 NEEDS_CHANGES:    0
 REJECTED:         0
 Acceptance Rate:  100%
