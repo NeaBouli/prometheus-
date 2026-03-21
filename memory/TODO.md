@@ -113,6 +113,7 @@
 - [ ] [P2] WHITEPAPER.md: full English whitepaper v4 in repo, with all improvements | Claude Code | Sprint 2 done
 - [ ] [P2] CONTRIBUTING.md erstellen | Claude Code | -
 - [ ] [P2] Wiki-Grundstruktur (docs/) | Claude Code | -
+- [ ] [P2] Landing page + Wiki: use logo from /logo/Prometheus.png for all web assets, README header, and documentation | Claude Code | Sprint 7 done
 - [ ] [P3] Discord/Telegram einrichten | Core Dev | -
 - [ ] [P3] LLaMA 3 Fine-Tuning auf Security-Datensätzen | Claude Code | Sprint 4 fertig
 

@@ -22,6 +22,7 @@
 | Core Dev           | NeaBouli                                               |
 | Architect / Auditor| Claude (claude.ai)                                     |
 | Implementierung    | Claude Code (autonomous agent)                         |
+| Logo               | /logo/Prometheus.png                                   |
 
 ---
 
