@@ -6,6 +6,7 @@
 #   8B only:  docker compose up guardian-8b
 #   70B:      Uncomment guardian-70b section, then: docker compose up guardian-70b
 
+# Note: version key deprecated in Docker Compose v2.x but harmless
 version: "3.9"
 
 services:

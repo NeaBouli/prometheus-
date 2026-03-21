@@ -59,10 +59,10 @@ Ziel:     Rust client foundation — connection, krc20, scanner, zk_proof
 | client/ai/detection.rs       | ACCEPTED        | 100%     | 2026-03-21  | ACCEPTED     | 10 tests, YARA+AI combined verdict |
 | client/ai/federated.rs       | ACCEPTED        | 100%     | 2026-03-21  | ACCEPTED     | 10 tests, Fed-DART stub (Decision #10) |
 | **SPRINT 4 – GUARDIAN**      |                 |          |             |              |                 |
-| guardian-node/llm_server.py  | PENDING_AUDIT   | 100%     | 2026-03-21  | PENDING_AUDIT| 6 tests (3 need LLM) |
-| guardian-node/yara_generator.py | PENDING_AUDIT| 100%     | 2026-03-21  | PENDING_AUDIT| 10 tests, validation + generation |
-| guardian-node/analyzer.py    | PENDING_AUDIT   | 100%     | 2026-03-21  | PENDING_AUDIT| 10 tests, full pipeline |
-| guardian-node/docker-compose.yml | PENDING_AUDIT| 100%    | 2026-03-21  | PENDING_AUDIT| 8B active, 70B commented |
+| guardian-node/llm_server.py  | ACCEPTED        | 100%     | 2026-03-21  | ACCEPTED     | 6 tests (3 need LLM) |
+| guardian-node/yara_generator.py | ACCEPTED     | 100%     | 2026-03-21  | ACCEPTED     | 10 tests, PATTERN-011 |
+| guardian-node/analyzer.py    | ACCEPTED        | 100%     | 2026-03-21  | ACCEPTED     | 10 tests, full pipeline |
+| guardian-node/docker-compose.yml | ACCEPTED    | 100%     | 2026-03-21  | ACCEPTED     | 8B active, 70B commented |
 | **SPRINT 5 – VOTING**        |                 |          |             |              |                 |
 | voting/commit_reveal.ss      | PENDING         | 0%       | -           | -            | TBD             |
 | voting/salted_voting.ss      | PENDING         | 0%       | -           | -            | TBD             |

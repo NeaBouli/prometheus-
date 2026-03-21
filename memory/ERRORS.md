@@ -101,6 +101,15 @@ Lösung:   Arc<Phi3Model> direkt verwenden statt Arc<Mutex<Phi3Model>>
 Prüfung:  Vor Mutex-Wrap prüfen: braucht die Methode &mut self?
 ```
 
+### PATTERN-011: Heuristic Confidence Scoring in yara_generator.py
+```
+Problem:  yara_generator.py berechnet Confidence heuristisch (base 0.7 + indicator bonus)
+Symptom:  Confidence-Werte korrelieren nicht mit tatsächlicher Regelqualität
+Lösung:   Replace with real LLM confidence extraction in Sprint 6 when live LLM is available
+          LLM soll eigene Confidence als Teil der Antwort liefern
+Prüfung:  Tracked as TODO — Sprint 6 E2E Integration
+```
+
 ---
 
 ## FEHLER LOG (werden during Development befüllt)
