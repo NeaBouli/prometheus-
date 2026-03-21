@@ -43,7 +43,7 @@ Wenn Kriterium 1, 2 oder 3 NICHT erfüllt: automatisch REJECTED (kein NEEDS_CHAN
 | Modul                 | Version | Datum      | Auditor     | Ergebnis       | Anmerkungen                                          |
 |-----------------------|---------|------------|-------------|----------------|------------------------------------------------------|
 | Sprint-1 Contracts    | 1.0     | 2026-03-21 | Claude      | REJECTED       | FIX-001 slash ACL, FIX-002 .active(), FIX-003 cumulative counter, FIX-004 bond return, FIX-005 reward formula |
-| Sprint-1 Contracts    | 1.1     | 2026-03-21 | Claude Code | PENDING_AUDIT  | All 5 fixes applied (FIX-001..005). Re-audit requested. |
+| Sprint-1 Contracts    | 1.1     | 2026-03-21 | Claude Code | PENDING_AUDIT  | All 5 fixes applied (FIX-001..005). Commit: 3104c70. Re-audit requested. |
 
 ---
 
