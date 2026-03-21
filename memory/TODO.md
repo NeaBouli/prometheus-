@@ -16,8 +16,8 @@
 - [!] [P0] Hello-World Silverscript Contract auf Testnet deployen | Claude Code | BLOCKED: abhängig von ssc
 - [x] [P0] rusty-kaspa als Dependency in Cargo.toml einbinden | Claude Code | 2026-03-21
 - [ ] [P0] autodidactic.py vollständig testen (alle Memory-Operationen) | Claude Code | memory/-Dateien
-- [ ] [P0] .gitignore konfigurieren (.secrets/, /tmp/, target/, __pycache__) | Claude Code | -
-- [ ] [P0] GitHub Actions CI/CD Grundkonfiguration (build + test) | Claude Code | Repo-Struktur
+- [x] [P0] .gitignore konfigurieren (.secrets/, /tmp/, target/, __pycache__) | Claude Code | 2026-03-21
+- [x] [P0] GitHub Actions CI/CD Grundkonfiguration (build + test) | Claude Code | 2026-03-21 (ci.yml aus Setup)
 
 ---
 
