@@ -6,6 +6,10 @@ authors.workspace = true
 license.workspace = true
 description = "Prometheus Light Client - Kaspa-based decentralized threat intelligence"
 
+[[bin]]
+name = "prometheus-client"
+path = "src/main.rs"
+
 [dependencies]
 kaspa-wrpc-client.workspace = true
 kaspa-rpc-core.workspace = true
@@ -16,3 +20,9 @@ serde.workspace = true
 serde_json.workspace = true
 anyhow.workspace = true
 log.workspace = true
+env_logger.workspace = true
+sha2.workspace = true
+hex = "0.4"
+
+[dev-dependencies]
+tempfile = "3"
