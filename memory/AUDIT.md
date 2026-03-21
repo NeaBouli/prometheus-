@@ -37,6 +37,7 @@ Wenn Kriterium 1, 2 oder 3 NICHT erfüllt: automatisch REJECTED (kein NEEDS_CHAN
 | Sprint-1 Pre-Check   | 1.0     | 2026-03-21 | Claude  | ACCEPTED        | V-001 float64→uint64, V-002 CID→bytes(36), V-003 slash non-recursive |
 | Sprint-1 Contracts   | 1.2     | 2026-03-21 | Claude  | ACCEPTED        | 6 contracts, 54 tests, all findings fixed |
 | Sprint-2 Client Basis| 1.0     | 2026-03-21 | Claude  | ACCEPTED        | 4 modules, 27 tests, PATTERN-003/004 applied |
+| Sprint-3 Phi-3       | 1.0     | 2026-03-21 | Claude  | ACCEPTED        | 3 modules, 28 tests, PATTERN-010 noted |
 
 ---
 
@@ -48,7 +49,8 @@ Wenn Kriterium 1, 2 oder 3 NICHT erfüllt: automatisch REJECTED (kein NEEDS_CHAN
 | Sprint-1 Contracts    | 1.1     | 2026-03-21 | Claude Code | REJECTED       | Fixes applied but test assertion wrong (15000 vs 1500) |
 | Sprint-1 Contracts    | 1.2     | 2026-03-21 | Claude      | ACCEPTED       | All 5 fixes verified. 3 test patches for ACL. Sprint 1 complete. |
 | Sprint-2 Client Basis | 1.0     | 2026-03-21 | Claude      | ACCEPTED       | 4 modules, 27 tests. Minor fixes applied. |
-| Sprint-3 Phi-3        | 1.0     | 2026-03-21 | Claude Code | PENDING_AUDIT  | 3 modules, 28 tests. cargo clippy clean. |
+| Sprint-3 Phi-3        | 1.0     | 2026-03-21 | Claude      | ACCEPTED       | 3 modules, 28 tests. PATTERN-010 noted. |
+| Sprint-4 Guardian     | 1.0     | 2026-03-21 | Claude Code | PENDING_AUDIT  | 4 modules, 26 tests (23 pass, 3 skip). |
 | Sprint-2 Client Basis | 1.0     | 2026-03-21 | Claude      | ACCEPTED       | 4 modules, 26 tests. Minor fixes applied (test rename, new test). |
 
 ---

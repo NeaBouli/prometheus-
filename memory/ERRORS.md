@@ -92,6 +92,15 @@ Lösung:   Custom Pattern-Matcher in scanner.rs implementiert statt yara crate.
 Prüfung:  cargo build muss auf allen Zielplattformen ohne System-Dependencies bauen
 ```
 
+### PATTERN-010: Unnötiges Mutex-Wrapping bei immutable &self
+```
+Problem:  Phi3Model.analyze_bytes() nimmt &self (immutable), braucht kein Mutex
+Symptom:  Lock-Contention bei vielen gleichzeitigen Scans ohne Grund
+Lösung:   Arc<Phi3Model> direkt verwenden statt Arc<Mutex<Phi3Model>>
+          Mutex nur für tatsächlich mutable shared state
+Prüfung:  Vor Mutex-Wrap prüfen: braucht die Methode &mut self?
+```
+
 ---
 
 ## FEHLER LOG (werden during Development befüllt)
