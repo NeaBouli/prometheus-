@@ -78,7 +78,9 @@ Prüfung:  Integration-Tests mit simuliertem NAT
 
 | Datum | Modul | Fehler | Lösung | Status |
 |-------|-------|--------|--------|--------|
-| (wird gefüllt wenn Entwicklung startet) | | | | |
+| 2026-03-21 | Sprint 0 / ssc | KRITISCH: `ssc` (Silverscript Compiler) existiert nicht im rusty-kaspa Repo. Kein Package "ssc" im Workspace. Silverscript ist kein produktionsreifes Tool im Kaspa-Ökosystem (Stand März 2026). | BLOCKED — Core Dev muss klären: (a) Eigenen Compiler schreiben, (b) KRC-20/WASM-Contracts als Alternative, (c) Kaspa-Community-Fork mit ssc. Siehe AUDIT.md QUESTION FOR CLAUDE. | OPEN |
+| 2026-03-21 | Sprint 0 / Testnet | MITTEL: Testnet-12 existiert nicht in rusty-kaspa v1.1.0. Nur Testnet-10 (netsuffix=10) wird unterstützt. Panic in params.rs:519. | Testnet-10 stattdessen verwendet. Alle Referenzen in MEMO.md und Contracts müssen auf Testnet-10 geändert werden. | RESOLVED |
+| 2026-03-21 | Sprint 0 / kaspad | NIEDRIG: `--netsuffix 12` Syntax-Fehler. Kaspad erwartet `--netsuffix=12` (Gleichheitszeichen). | Korrekte Syntax: `--netsuffix=10` mit Gleichheitszeichen. | RESOLVED |
 
 ---
 

@@ -43,6 +43,49 @@ Aktuell leer – noch kein Code-Modul fertiggestellt.
 
 ---
 
+## QUESTIONS FOR CLAUDE (Architect)
+
+### Q-001: Silverscript Compiler (ssc) existiert nicht (2026-03-21)
+```
+Kontext:  Sprint 0, Task 4 — Silverscript Compiler installieren
+Finding:  Das kaspanet/rusty-kaspa Repository (v1.1.0) enthält kein Package "ssc".
+          grep nach "ssc", "silverscript", "smart.contract" in allen Cargo.toml = 0 Treffer.
+          Das Workspace hat 60+ Crates, keines davon ist ein Smart-Contract-Compiler.
+
+Kaspa-Ökosystem (Stand März 2026):
+  - KRC-20 Token Standard existiert (rudimentär, asset-basiert)
+  - crypto/txscript Crate existiert (Bitcoin-Script-Variante, nicht Turing-complete)
+  - Kein Silverscript, kein .ss Dateiformat, kein ssc Binary
+
+Frage an Claude (Architect):
+  1. Ist "Silverscript" ein geplanter Name für Kaspas zukünftiges Contract-System
+     (Covenant-Hardfork Mai 2026)?
+  2. Soll Claude Code einen eigenen Silverscript-Compiler als Teil von Prometheus entwickeln?
+  3. Oder sollen wir auf Kaspas bestehende txscript/KRC-20-Infrastruktur aufbauen?
+  4. Alternative: Contracts als Rust-Module implementieren, die über RPC mit kaspad interagieren?
+
+Impact: BLOCKIERT Task 4 (ssc install), Task 5 (Hello-World), und gesamten Sprint 1 (Contracts).
+         Sprint 2+ (Client, Guardian) können parallel vorbereitet werden.
+```
+
+### Q-002: float64-Support-Verifikation nicht möglich (2026-03-21)
+```
+Kontext:  Sprint 0, Task 4 — float64-Verifikation in ssc
+Finding:  Da ssc nicht existiert, kann float64-Support nicht verifiziert werden.
+          MEMO.md definiert Reputation = float64 (0.0 - 10.0).
+          ERRORS.md PATTERN-006 warnt vor float64-Präzisionsproblemen.
+
+Frage an Claude (Architect):
+  Falls wir auf txscript aufbauen: txscript kennt KEIN float64 (Bitcoin-Script-Derivat).
+  Option A: Reputation als uint64 mit Skalierungsfaktor (rep * 10000) speichern
+  Option B: Reputation off-chain berechnen, nur Hash on-chain
+  Option C: Warten auf Covenant-Hardfork-Spezifikation
+
+Impact: Betrifft GuardianReputation Contract (Sprint 1) und alle Reputationsberechnungen.
+```
+
+---
+
 ## REJECTED MODULES (mit vollständiger Begründung)
 
 Aktuell keine Rejections.

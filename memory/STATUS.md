@@ -34,9 +34,9 @@ Ziel:     Testnet-Node läuft, erster Contract deployed
 | scripts/audit_trigger.py     | DONE            | 100%     | 2026-03-21  | -            | -               |
 | claude-code-start.sh         | DONE            | 100%     | 2026-03-21  | -            | -               |
 | **SPRINT 0 – SETUP**         |                 |          |             |              |                 |
-| Testnet-12-Node              | PENDING         | 0%       | -           | -            | -               |
-| Silverscript Compiler (ssc)  | PENDING         | 0%       | -           | -            | -               |
-| Hello-World Contract         | PENDING         | 0%       | -           | -            | -               |
+| Testnet-10-Node              | DONE            | 100%     | 2026-03-21  | -            | wrpc://127.0.0.1:17210 |
+| Silverscript Compiler (ssc)  | BLOCKED         | 0%       | 2026-03-21  | -            | ssc existiert nicht in rusty-kaspa |
+| Hello-World Contract         | BLOCKED         | 0%       | 2026-03-21  | -            | Abhängig von ssc |
 | GitHub Actions CI/CD         | PENDING         | 0%       | -           | -            | -               |
 | **SPRINT 1 – CONTRACTS**     |                 |          |             |              |                 |
 | ValidatorStaking.ss          | PENDING         | 0%       | -           | -            | TBD             |
@@ -76,10 +76,13 @@ Ziel:     Testnet-Node läuft, erster Contract deployed
 
 Aktuell in Bearbeitung:
 ```
-Modul:  Repo-Struktur auf GitHub
+Modul:  Kaspa Testnet-10 Node
 Sprint: 0 (Setup)
 Start:  2026-03-21
-Status: DONE
+Status: DONE — kaspad v1.1.0, 8 Peers, IBD active
+Binary: /tmp/rusty-kaspa/target/release/kaspad
+wRPC:   wrpc://127.0.0.1:17210
+P2P:    0.0.0.0:16211
 ```
 
 ## BLOCKED
@@ -90,7 +93,7 @@ Keine Blockaden.
 
 ```
 1. ~~Repo-Struktur auf GitHub anlegen~~ DONE
-2. Testnet-12-Node installieren
+2. ~~Testnet-10-Node installieren~~ DONE (Testnet-12 existiert nicht, Testnet-10 verwendet)
 3. Silverscript Compiler installieren
 4. Hello-World Contract deployen
 → Status aktualisieren nach jedem Schritt

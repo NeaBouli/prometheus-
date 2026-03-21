@@ -10,10 +10,10 @@
 
 - [x] [P0] Repo-Struktur auf GitHub anlegen (memory/, modules/, scripts/, .gitignore) | Claude Code | 2026-03-21
 - [ ] [P0] Alle memory/-Dateien initial befüllen und pushen | Claude Code | Repo-Struktur
-- [ ] [P0] Kaspa Testnet-12-Node installieren und starten (rusty-kaspa) | Claude Code | -
-- [ ] [P0] Verbindung zum Testnet verifizieren (RPC-Ping, Block-Abfrage) | Claude Code | Testnet-Node
-- [ ] [P0] Silverscript Compiler (ssc) installieren und testen | Claude Code | -
-- [ ] [P0] Hello-World Silverscript Contract auf Testnet deployen | Claude Code | ssc + Testnet-Node
+- [x] [P0] Kaspa Testnet-10-Node installieren und starten (rusty-kaspa v1.1.0) | Claude Code | 2026-03-21
+- [x] [P0] Verbindung zum Testnet verifizieren (8 Peers, IBD active) | Claude Code | 2026-03-21
+- [!] [P0] Silverscript Compiler (ssc) installieren und testen | Claude Code | BLOCKED: ssc existiert nicht in rusty-kaspa
+- [!] [P0] Hello-World Silverscript Contract auf Testnet deployen | Claude Code | BLOCKED: abhängig von ssc
 - [ ] [P0] rusty-kaspa als Dependency in Cargo.toml einbinden | Claude Code | -
 - [ ] [P0] autodidactic.py vollständig testen (alle Memory-Operationen) | Claude Code | memory/-Dateien
 - [ ] [P0] .gitignore konfigurieren (.secrets/, /tmp/, target/, __pycache__) | Claude Code | -
