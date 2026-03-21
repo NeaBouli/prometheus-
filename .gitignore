@@ -6,7 +6,7 @@
 # Rust
 target/
 **/*.rs.bk
-Cargo.lock
+# Cargo.lock is tracked for workspace with binaries
 
 # Python
 __pycache__/

@@ -94,7 +94,8 @@ Keine Blockaden.
 ```
 1. ~~Repo-Struktur auf GitHub anlegen~~ DONE
 2. ~~Testnet-10-Node installieren~~ DONE (Testnet-12 existiert nicht, Testnet-10 verwendet)
-3. Silverscript Compiler installieren
+3. ~~Silverscript Compiler installieren~~ BLOCKED (ssc existiert nicht)
+   ~~rusty-kaspa als Cargo Dependency~~ DONE
 4. Hello-World Contract deployen
 → Status aktualisieren nach jedem Schritt
 ```

@@ -14,7 +14,7 @@
 - [x] [P0] Verbindung zum Testnet verifizieren (8 Peers, IBD active) | Claude Code | 2026-03-21
 - [!] [P0] Silverscript Compiler (ssc) installieren und testen | Claude Code | BLOCKED: ssc existiert nicht in rusty-kaspa
 - [!] [P0] Hello-World Silverscript Contract auf Testnet deployen | Claude Code | BLOCKED: abhängig von ssc
-- [ ] [P0] rusty-kaspa als Dependency in Cargo.toml einbinden | Claude Code | -
+- [x] [P0] rusty-kaspa als Dependency in Cargo.toml einbinden | Claude Code | 2026-03-21
 - [ ] [P0] autodidactic.py vollständig testen (alle Memory-Operationen) | Claude Code | memory/-Dateien
 - [ ] [P0] .gitignore konfigurieren (.secrets/, /tmp/, target/, __pycache__) | Claude Code | -
 - [ ] [P0] GitHub Actions CI/CD Grundkonfiguration (build + test) | Claude Code | Repo-Struktur
