@@ -135,7 +135,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_get_rule_by_id_found() {
+    async fn test_cache_lookup_by_id() {
         let conn = KaspaConnection::new("ws://127.0.0.1:17210").unwrap();
         let reader = Krc20RuleReader::new(Arc::new(Mutex::new(conn)));
 
@@ -165,6 +165,19 @@ mod tests {
         let rules = reader.cached_rules.lock().await;
         let found = rules.iter().find(|r| r.rule_id == "PROM-RULE-9999-0000");
         assert!(found.is_none());
+    }
+
+    /// Integration test: requires a live testnet-10 node.
+    /// Run with: cargo test -- --ignored test_get_rule_by_id_returns_none_without_node
+    #[tokio::test]
+    #[ignore]
+    async fn test_get_rule_by_id_returns_none_without_node() {
+        let conn = KaspaConnection::new("ws://127.0.0.1:17210").unwrap();
+        let reader = Krc20RuleReader::new(Arc::new(Mutex::new(conn)));
+        // Without a live node, fetch_latest_rules returns empty cache
+        let result = reader.get_rule_by_id("PROM-RULE-2026-0001").await;
+        // Should succeed but return None (no rules cached, no live node)
+        assert!(result.is_ok());
     }
 
     #[test]

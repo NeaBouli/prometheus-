@@ -109,7 +109,8 @@
 
 - [ ] [P1] Gitcoin Grants Antrag finalisieren (April 2026) | Core Dev | Whitepaper v4
 - [ ] [P1] GitHub Repository öffentlich schalten | Core Dev | Sprint 6 fertig
-- [ ] [P2] README.md erstellen (Projektübersicht, Installation, Contribution) | Claude Code | -
+- [ ] [P2] README.md rewrite in English | Claude Code | Sprint 2 done
+- [ ] [P2] WHITEPAPER.md: full English whitepaper v4 in repo, with all improvements | Claude Code | Sprint 2 done
 - [ ] [P2] CONTRIBUTING.md erstellen | Claude Code | -
 - [ ] [P2] Wiki-Grundstruktur (docs/) | Claude Code | -
 - [ ] [P3] Discord/Telegram einrichten | Core Dev | -

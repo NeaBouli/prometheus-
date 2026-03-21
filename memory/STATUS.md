@@ -47,13 +47,13 @@ Ziel:     Rust client foundation — connection, krc20, scanner, zk_proof
 | CommunityDonations.ss        | ACCEPTED        | 100%     | 2026-03-21  | ACCEPTED     | v1.2: no changes needed |
 | RuleStorage.ss               | ACCEPTED        | 100%     | 2026-03-21  | ACCEPTED     | v1.2: time-windowed counter |
 | **SPRINT 2 – CLIENT**        |                 |          |             |              |                 |
-| client/blockchain/connection.rs | PENDING_AUDIT | 100%    | 2026-03-21  | PENDING_AUDIT| 4 tests, PATTERN-003 applied |
-| client/blockchain/krc20.rs   | PENDING_AUDIT   | 100%     | 2026-03-21  | PENDING_AUDIT| 5 tests, cache-based pre-Covenant |
-| client/security/scanner.rs   | PENDING_AUDIT   | 100%     | 2026-03-21  | PENDING_AUDIT| 10 tests, YARA pattern matching |
+| client/blockchain/connection.rs | ACCEPTED      | 100%     | 2026-03-21  | ACCEPTED     | 4 tests, PATTERN-003 applied |
+| client/blockchain/krc20.rs   | ACCEPTED        | 100%     | 2026-03-21  | ACCEPTED     | 6 tests, cache-based pre-Covenant |
+| client/security/scanner.rs   | ACCEPTED        | 100%     | 2026-03-21  | ACCEPTED     | 10 tests, YARA pattern matching |
 | client/security/heuristic.rs | PENDING         | 0%       | -           | -            | Sprint 2 Phase 2 |
 | client/security/quarantine.rs| PENDING         | 0%       | -           | -            | Sprint 2 Phase 2 |
 | client/network/p2p.rs        | PENDING         | 0%       | -           | -            | Sprint 2 Phase 2 |
-| client/network/zk_proof.rs   | PENDING_AUDIT   | 100%     | 2026-03-21  | PENDING_AUDIT| 7 tests, stub (PATTERN-004) |
+| client/network/zk_proof.rs   | ACCEPTED        | 100%     | 2026-03-21  | ACCEPTED     | 7 tests, stub (PATTERN-004) |
 | **SPRINT 3 – PHI-3**         |                 |          |             |              |                 |
 | client/ai/phi3.rs            | PENDING         | 0%       | -           | -            | -               |
 | client/ai/detection.rs       | PENDING         | 0%       | -           | -            | -               |

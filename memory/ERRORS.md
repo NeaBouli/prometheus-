@@ -82,6 +82,16 @@ Lösung:   Always add mock_sender(AUTHORIZED_CONTRACT) in tests that call
 Prüfung:  Nach jeder ACL-Änderung: alle Tests durchsuchen die die Funktion aufrufen
 ```
 
+### PATTERN-009: yara Crate Cross-Platform Compile
+```
+Problem:  yara crate (C-Bindings) benötigt libyara-dev auf dem System,
+          kompiliert nicht cross-platform ohne zusätzliche Build-Konfiguration
+Symptom:  Build-Fehler bei cargo build auf Systemen ohne libyara
+Lösung:   Custom Pattern-Matcher in scanner.rs implementiert statt yara crate.
+          Für Produktion: yara-x crate evaluieren (pure Rust, keine C-Dependency)
+Prüfung:  cargo build muss auf allen Zielplattformen ohne System-Dependencies bauen
+```
+
 ---
 
 ## FEHLER LOG (werden during Development befüllt)
