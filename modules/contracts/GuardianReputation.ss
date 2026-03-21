@@ -46,7 +46,7 @@ state guardian_count: uint64;
 // PoW difficulty scales with current guardian count to prevent Sybil attacks.
 // No KAS staking required — guardians contribute compute, not capital.
 function register(pubkey: bytes(32), compute_power_gflops: uint64) -> void {
-    require(!guardians[msg.sender].active(), "Guardian already registered");
+    require(guardians[msg.sender].registered_at == 0, "Guardian already registered");
     require(compute_power_gflops >= MIN_COMPUTE_GFLOPS, "Insufficient compute power");
     require(compute_power_gflops < 1000000, "Unrealistic compute power value");
 

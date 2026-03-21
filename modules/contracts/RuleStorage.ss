@@ -58,7 +58,8 @@ state next_proposal_id: uint64;
 state stored_rules: map(string => StoredRule);   // rule_id => StoredRule
 state rule_count: uint64;
 state proposal_voters: map(bytes(32) => bool);   // sha256(proposal_id || voter) => voted
-state recent_proposal_count: uint64;              // proposals in last 24h (for auto-tuning)
+state count_in_window: uint64;                    // proposals in current 24h window
+state last_count_reset_block: uint64;             // block at which window was last reset
 
 // ============================================================
 // FUNCTIONS
@@ -95,7 +96,13 @@ function submitProposal(
         status: STATUS_PENDING
     };
 
-    recent_proposal_count += 1;
+    // Time-windowed counter: reset every VOTING_BLOCKS (~1 day at 10 BPS)
+    if block.height > last_count_reset_block + VOTING_BLOCKS {
+        count_in_window = 0;
+        last_count_reset_block = block.height;
+    }
+    count_in_window += 1;
+
     emit ProposalSubmitted(proposal_id, guardian_pubkey, rule_type);
     return proposal_id;
 }
@@ -193,9 +200,13 @@ function getRuleCount() -> uint64 {
     return rule_count;
 }
 
-// Read-only: get recent proposal count (for auto-tuning)
+// Read-only: get proposal count in current 24h window (for auto-tuning)
 function getRecentProposalCount() -> uint64 {
-    return recent_proposal_count;
+    // If window has expired, the effective count is 0
+    if block.height > last_count_reset_block + VOTING_BLOCKS {
+        return 0;
+    }
+    return count_in_window;
 }
 
 // Internal: generate rule ID in format "PROM-RULE-2026-XXXX"

@@ -133,11 +133,12 @@ function executeGrant(grant_id: uint64) -> void {
 }
 
 // Calculate recommended reward based on lines of code and complexity.
-// Formula: lines * REWARD_PER_LINE * complexity / 5, capped at MAX_GRANT_PROM.
+// Whitepaper formula: lines * REWARD_PER_LINE * (100 + complexity * 10) / 100
+// Example: 100 lines, complexity 5 → 100 * 10 * 150 / 100 = 15000 PROM
 function recommendedReward(lines: uint64, complexity: uint64) -> uint64 {
     require(complexity >= MIN_COMPLEXITY && complexity <= MAX_COMPLEXITY,
             "Complexity must be 1-10");
-    let reward: uint64 = lines * REWARD_PER_LINE * complexity / 5;
+    let reward: uint64 = lines * REWARD_PER_LINE * (100 + complexity * 10) / 100;
     return min(reward, MAX_GRANT_PROM);
 }
 
@@ -236,14 +237,14 @@ function test_insufficient_approval() {
 #[test]
 function test_recommended_reward_calculation() {
     let reward: uint64 = recommendedReward(100, 5);
-    // 100 * 10 * 5 / 5 = 1000
-    assert(reward == 1000);
+    // Whitepaper: 100 * 10 * (100 + 5*10) / 100 = 100 * 10 * 150 / 100 = 15000
+    assert(reward == 15000);
 }
 
 #[test]
 function test_recommended_reward_capped() {
     let reward: uint64 = recommendedReward(100000, 10);
-    // 100000 * 10 * 10 / 5 = 2000000, capped at MAX_GRANT_PROM = 100000
+    // 100000 * 10 * (100 + 100) / 100 = 20000000, capped at MAX_GRANT_PROM = 100000
     assert(reward == MAX_GRANT_PROM);
 }
 

@@ -42,7 +42,8 @@ Wenn Kriterium 1, 2 oder 3 NICHT erfüllt: automatisch REJECTED (kein NEEDS_CHAN
 
 | Modul                 | Version | Datum      | Auditor     | Ergebnis       | Anmerkungen                                          |
 |-----------------------|---------|------------|-------------|----------------|------------------------------------------------------|
-| Sprint-1 Contracts    | 1.0     | 2026-03-21 | Claude Code | PENDING_AUDIT  | 6 Silverscript contracts, 54 tests total. Deployment pending ssc release (Testnet-10). Ready for architect audit. |
+| Sprint-1 Contracts    | 1.0     | 2026-03-21 | Claude      | REJECTED       | FIX-001 slash ACL, FIX-002 .active(), FIX-003 cumulative counter, FIX-004 bond return, FIX-005 reward formula |
+| Sprint-1 Contracts    | 1.1     | 2026-03-21 | Claude Code | PENDING_AUDIT  | All 5 fixes applied (FIX-001..005). Re-audit requested. |
 
 ---
 
@@ -256,7 +257,26 @@ QUESTION FOR CLAUDE: fp_rate Oracle-Mechanismus undefiniert — Stub erstellt.
 
 ## REJECTED MODULES (mit vollständiger Begründung)
 
-Aktuell keine Rejections.
+### Sprint-1 Contracts v1.0 — REJECTED (2026-03-21)
+```
+FINDING-001 (KRITISCH): slash() in ValidatorStaking.ss hatte keine Access Control.
+  Jeder konnte beliebige Validators slashen → Funds at Risk.
+  FIX: require(msg.sender == GOVERNANCE_CONTRACT || msg.sender == RULE_STORAGE_CONTRACT)
+
+FINDING-002 (HOCH): GuardianReputation.ss — .active() ist keine gültige
+  Silverscript-Methode auf Structs. Compile-Fehler.
+  FIX: guardians[msg.sender].registered_at == 0
+
+FINDING-003 (HOCH): RuleStorage.ss — recent_proposal_count war kumulativ,
+  nie resettet. GovernanceAutoTuning behandelte es als "pro Tag".
+  FIX: Time-windowed counter mit VOTING_BLOCKS (864000) Reset-Intervall.
+
+FINDING-004 (NIEDRIG): revealVote() gab Bond bei gültigem Reveal nicht zurück.
+  FIX: transfer(msg.sender, vc.bond_kas) nach erfolgreichem Reveal.
+
+FINDING-005 (NIEDRIG): recommendedReward() wich vom Whitepaper ab.
+  FIX: Formel korrigiert zu lines * REWARD_PER_LINE * (100 + complexity * 10) / 100
+```
 
 ---
 

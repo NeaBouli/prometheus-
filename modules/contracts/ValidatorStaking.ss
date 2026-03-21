@@ -46,6 +46,8 @@ const INITIAL_REPUTATION: uint64 = 10000;     // Start at 1.0
 state validators: map(address => Validator);
 state commitments: map(bytes(32) => VoteCommitment); // key = sha256(validator_addr || proposal_id)
 state withdraw_requests: map(address => uint64);      // block number of withdrawal request
+state GOVERNANCE_CONTRACT: address;                    // Set at deployment — governance contract
+state RULE_STORAGE_CONTRACT: address;                  // Set at deployment — rule storage contract
 
 // ============================================================
 // FUNCTIONS
@@ -120,7 +122,8 @@ function revealVote(proposal_id: uint64, vote: bool, salt: uint64) -> void {
 
         emit RevealFailed(msg.sender, proposal_id, penalty);
     } else {
-        // Valid reveal — record vote and update last_vote_block
+        // Valid reveal — return bond and record vote
+        transfer(msg.sender, vc.bond_kas);
         validators[msg.sender].last_vote_block = block.height;
         emit VoteRevealed(msg.sender, proposal_id, vote);
     }
@@ -134,6 +137,10 @@ function revealVote(proposal_id: uint64, vote: bool, salt: uint64) -> void {
 // penalty = stake_kas * percent * multiplier / 100, capped at total stake.
 // If stake drops below MIN_STAKE_KAS: auto-deactivate.
 function slash(validator_addr: address, percent: uint64, reason: string) -> uint64 {
+    require(
+        msg.sender == GOVERNANCE_CONTRACT || msg.sender == RULE_STORAGE_CONTRACT,
+        "Only governance or rule storage can slash"
+    );
     let validator: Validator = validators[validator_addr];
     require(validator.active, "Validator not active");
     require(percent > 0 && percent <= 100, "Invalid slash percentage");
