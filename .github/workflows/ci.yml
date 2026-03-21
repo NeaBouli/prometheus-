@@ -1,0 +1,73 @@
+name: Prometheus CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # ─── Memory Integrity Check ─────────────────────────────────────────────────
+  memory-check:
+    name: Memory Integrity
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Check Memory Files
+        run: python3 scripts/check_memory_integrity.py
+
+  # ─── Python Scripts Check ────────────────────────────────────────────────────
+  python-check:
+    name: Python Scripts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install tools
+        run: pip install black pylint
+      - name: Format Check (black)
+        run: black --check scripts/
+      - name: Lint (pylint)
+        run: pylint scripts/ --fail-under=7.0 --disable=C0114,C0115,C0116
+
+  # ─── Rust Check (wenn client/ vorhanden) ─────────────────────────────────────
+  rust-check:
+    name: Rust Client
+    runs-on: ubuntu-latest
+    if: hashFiles('modules/client/Cargo.toml') != ''
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          components: rustfmt, clippy
+      - name: Format Check
+        run: cargo fmt --manifest-path modules/client/Cargo.toml --check
+      - name: Clippy
+        run: cargo clippy --manifest-path modules/client/Cargo.toml -- -D warnings
+      - name: Tests
+        run: cargo test --manifest-path modules/client/Cargo.toml
+
+  # ─── Silverscript Check (wenn Contracts vorhanden) ───────────────────────────
+  contract-check:
+    name: Silverscript Contracts
+    runs-on: ubuntu-latest
+    if: hashFiles('modules/contracts/*.ss') != ''
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check Contract Files
+        run: |
+          for f in modules/contracts/*.ss; do
+            echo "Checking: $f"
+            # Prüfe auf KAS/PROM Verwechslung
+            if grep -q "MIN_STAKE\b" "$f" && ! grep -q "MIN_STAKE_KAS\b" "$f"; then
+              echo "ERROR: $f verwendet MIN_STAKE ohne _KAS Suffix!"
+              exit 1
+            fi
+            echo "OK: $f"
+          done

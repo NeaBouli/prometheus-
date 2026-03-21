@@ -1,0 +1,40 @@
+# Secrets
+.secrets/
+*.key
+*.pem
+
+# Rust
+target/
+**/*.rs.bk
+Cargo.lock
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# Temp
+/tmp/
+*.tmp
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.iml
+
+# Node (web/)
+node_modules/
+dist/
+build/
+
+# Testnet data
+testnet-data/
