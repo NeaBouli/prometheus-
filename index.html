@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prometheus — Decentralized Threat Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --void: #050505;
+  --deep: #0a0a0a;
+  --surface: #0f0f0f;
+  --panel: #141414;
+  --line: rgba(255,255,255,0.07);
+  --line-bright: rgba(255,255,255,0.14);
+  --mint: #00E5A0;
+  --mint-dim: #00B880;
+  --mint-faint: rgba(0,229,160,0.06);
+  --mint-faint2: rgba(0,229,160,0.12);
+  --silver: #C8C8C8;
+  --silver-dim: #787878;
+  --silver-ghost: rgba(200,200,200,0.35);
+  --text: #E2E2E2;
+  --muted: #666666;
+  --dim: #333333;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Space Grotesk',sans-serif;background:var(--void);color:var(--text);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+body::before{content:'';position:fixed;inset:0;z-index:9999;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,0) 0px,rgba(0,0,0,0) 1px,rgba(0,0,0,0.03) 1px,rgba(0,0,0,0.03) 2px)}
+
+nav{position:fixed;top:0;left:0;right:0;z-index:500;padding:0 48px;height:56px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid transparent;transition:border-color .4s,background .4s}
+nav.scrolled{background:rgba(5,5,5,.97);border-color:var(--line);backdrop-filter:blur(8px)}
+.nav-id{display:flex;align-items:center;gap:14px;text-decoration:none}
+.nav-id img{height:28px;width:28px;object-fit:contain;filter:brightness(0) invert(1) brightness(.8)}
+.nav-wordmark{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;letter-spacing:4px;color:var(--silver);text-transform:uppercase}
+.nav-links{display:flex;gap:36px;list-style:none}
+.nav-links a{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color .2s}
+.nav-links a:hover{color:var(--mint)}
+.nav-gh{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--mint);text-decoration:none;border:1px solid rgba(0,229,160,.3);padding:7px 18px;transition:background .2s,border-color .2s}
+.nav-gh:hover{background:var(--mint-faint2);border-color:var(--mint)}
+
+#hero{min-height:100vh;display:grid;grid-template-rows:1fr auto;padding:0 48px;position:relative;overflow:hidden}
+#hero::before{content:'';position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:80px 80px;mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 40%,transparent 100%)}
+#hero::after{content:'';position:absolute;top:30%;left:50%;transform:translate(-50%,-50%);width:600px;height:300px;background:radial-gradient(ellipse,rgba(0,229,160,.04) 0%,transparent 70%);pointer-events:none}
+
+.hero-body{align-self:center;padding-top:120px;max-width:960px;position:relative;z-index:1}
+.hero-status{display:inline-flex;align-items:center;gap:10px;border:1px solid var(--line-bright);padding:6px 14px;margin-bottom:48px;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--muted);opacity:0;animation:rise .6s ease .1s forwards}
+.hero-status-dot{width:6px;height:6px;border-radius:50%;background:var(--mint);box-shadow:0 0 8px var(--mint);animation:breathe 3s ease infinite}
+.hero-h1{font-family:'Space Grotesk',sans-serif;font-size:clamp(52px,8vw,96px);font-weight:300;line-height:1.05;color:var(--text);letter-spacing:-1px;margin-bottom:32px;opacity:0;animation:rise .7s ease .25s forwards}
+.hero-h1 em{font-style:normal;color:transparent;-webkit-text-stroke:1px rgba(200,200,200,.4)}
+.hero-h1 strong{font-weight:300;color:var(--mint)}
+.hero-sub{font-size:16px;font-weight:300;line-height:1.75;color:var(--silver-dim);max-width:560px;margin-bottom:56px;opacity:0;animation:rise .7s ease .4s forwards}
+.hero-actions{display:flex;align-items:center;gap:16px;opacity:0;animation:rise .7s ease .55s forwards}
+.btn-solid{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;background:var(--mint);color:var(--void);padding:13px 28px;text-decoration:none;font-weight:700;transition:opacity .2s}
+.btn-solid:hover{opacity:.85}
+.btn-outline{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;background:transparent;color:var(--silver-dim);border:1px solid var(--line-bright);padding:13px 28px;text-decoration:none;transition:border-color .2s,color .2s}
+.btn-outline:hover{border-color:var(--silver-ghost);color:var(--silver)}
+
+.hero-footnote{align-self:end;padding:28px 0;display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border-top:1px solid var(--line);position:relative;z-index:1;opacity:0;animation:rise .7s ease .8s forwards}
+.hero-stat{background:var(--void);padding:20px 24px}
+.hero-stat-val{font-family:'Space Mono',monospace;font-size:22px;color:var(--silver);margin-bottom:4px}
+.hero-stat-val span{color:var(--mint)}
+.hero-stat-key{font-size:11px;color:var(--muted);letter-spacing:.5px}
+
+.section{padding:120px 48px;max-width:1280px;margin:0 auto}
+.sep{border:none;border-top:1px solid var(--line);margin:0 48px}
+.lbl{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--mint);margin-bottom:16px;display:block}
+.hdg{font-size:clamp(32px,5vw,52px);font-weight:300;color:var(--text);line-height:1.1;letter-spacing:-.5px;margin-bottom:20px}
+.sub{font-size:15px;font-weight:300;color:var(--silver-dim);line-height:1.7;max-width:540px}
+
+#lifecycle{background:var(--deep);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.lc-hdr{padding:80px 48px 56px;max-width:1280px;margin:0 auto}
+.lc-track{padding:0 48px 80px;max-width:1280px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr);gap:0;position:relative}
+.lc-track::before{content:'';position:absolute;top:24px;left:64px;right:64px;height:1px;background:linear-gradient(90deg,transparent,var(--mint-dim),transparent);opacity:.3}
+.lc-step{padding:0 20px 0 0}
+.lc-node{width:48px;height:48px;border:1px solid var(--line-bright);display:flex;align-items:center;justify-content:center;margin-bottom:20px;position:relative;z-index:1;background:var(--deep);transition:border-color .3s}
+.lc-step:hover .lc-node{border-color:var(--mint);box-shadow:0 0 20px rgba(0,229,160,.08)}
+.lc-t{font-family:'Space Mono',monospace;font-size:9px;font-weight:700;color:var(--mint);letter-spacing:.5px}
+.lc-time{font-family:'Space Mono',monospace;font-size:10px;color:var(--mint-dim);letter-spacing:1px;margin-bottom:8px}
+.lc-who{font-size:13px;font-weight:500;color:var(--silver);margin-bottom:8px}
+.lc-what{font-size:12px;font-weight:300;color:var(--muted);line-height:1.6}
+.lc-tech{margin-top:14px;padding-top:12px;border-top:1px solid var(--line);font-family:'Space Mono',monospace;font-size:9px;color:var(--dim);letter-spacing:.5px;line-height:1.6}
+
+.layers-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);margin-top:56px}
+.layer{background:var(--void);padding:48px 36px;position:relative;overflow:hidden;transition:background .3s}
+.layer:hover{background:var(--surface)}
+.layer-idx{position:absolute;right:28px;top:20px;font-family:'Space Mono',monospace;font-size:72px;font-weight:700;color:rgba(255,255,255,.02);line-height:1}
+.layer-tag{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--mint);text-transform:uppercase;margin-bottom:20px;display:block}
+.layer-name{font-size:22px;font-weight:300;color:var(--silver);margin-bottom:28px;letter-spacing:-.3px}
+.layer-items{list-style:none}
+.layer-items li{display:flex;gap:12px;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--line);font-size:12px;font-weight:300;color:var(--muted);line-height:1.5}
+.layer-items li:last-child{border-bottom:none}
+.layer-items li::before{content:'';flex-shrink:0;width:1px;height:14px;background:var(--mint);margin-top:2px;opacity:.5}
+
+.nodes-bg{background:var(--deep);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.nodes-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);margin-top:56px}
+.n-card{background:var(--deep);padding:36px 28px;transition:background .3s}
+.n-card:hover{background:var(--panel)}
+.n-glyph{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:3px;color:var(--dim);margin-bottom:20px;text-transform:uppercase}
+.n-name{font-size:18px;font-weight:400;color:var(--silver);margin-bottom:12px}
+.n-desc{font-size:12px;font-weight:300;color:var(--muted);line-height:1.65;margin-bottom:20px}
+.n-spec{font-family:'Space Mono',monospace;font-size:10px;color:var(--dim);letter-spacing:.5px;border-top:1px solid var(--line);padding-top:14px;line-height:1.7}
+
+.tokens-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);margin-top:56px}
+.tok{background:var(--void);padding:56px 48px;position:relative;overflow:hidden}
+.tok::before{content:attr(data-sym);position:absolute;right:32px;top:16px;font-family:'Space Mono',monospace;font-size:100px;font-weight:700;line-height:1;color:rgba(255,255,255,.025)}
+.tok-sym{font-family:'Space Mono',monospace;font-size:36px;font-weight:700;margin-bottom:4px}
+.tok.kas .tok-sym{color:var(--silver)}
+.tok.prom .tok-sym{color:var(--mint)}
+.tok-lbl{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-bottom:28px}
+.tok-role{font-size:16px;font-weight:300;color:var(--silver-dim);line-height:1.6;margin-bottom:28px}
+.tok-rows{border-top:1px solid var(--line)}
+.tok-row{display:flex;gap:16px;padding:11px 0;border-bottom:1px solid var(--line);font-size:12px;font-weight:300;color:var(--muted)}
+.tok-row:last-child{border-bottom:none}
+.tok-k{font-family:'Space Mono',monospace;font-size:10px;color:var(--dim);min-width:110px;flex-shrink:0;padding-top:1px}
+
+.metrics-bg{background:var(--deep);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.metrics-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);margin-top:56px}
+.metric{background:var(--deep);padding:36px 28px;text-align:center}
+.metric-v{font-family:'Space Mono',monospace;font-size:48px;font-weight:700;line-height:1;color:var(--silver);margin-bottom:6px}
+.metric-v b{color:var(--mint);font-weight:700}
+.metric-k{font-size:11px;font-weight:300;color:var(--muted);letter-spacing:.5px}
+
+.roadmap-rows{margin-top:56px;border-top:1px solid var(--line)}
+.rm-row{display:grid;grid-template-columns:120px 28px 1fr auto;gap:0;align-items:center;border-bottom:1px solid var(--line);transition:background .2s}
+.rm-row:hover{background:var(--surface)}
+.rm-date{padding:20px 0;font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:1px}
+.rm-bar{align-self:stretch;width:1px;background:var(--line);margin:0 24px}
+.rm-content{padding:20px 0}
+.rm-sprint{font-size:14px;font-weight:400;color:var(--silver);margin-bottom:3px}
+.rm-desc{font-size:12px;font-weight:300;color:var(--muted)}
+.rm-badge{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:4px 10px;white-space:nowrap}
+.b-done{color:#00E5A0;border:1px solid rgba(0,229,160,.2)}
+.b-active{color:var(--silver);border:1px solid rgba(200,200,200,.15);animation:blink 3s ease infinite}
+.b-plan{color:var(--dim);border:1px solid var(--line)}
+
+.cta-wrap{border-top:1px solid var(--line);padding:140px 48px;position:relative;overflow:hidden}
+.cta-wrap::before{content:'';position:absolute;left:-10%;top:-50%;width:400px;height:400px;background:radial-gradient(circle,rgba(0,229,160,.03) 0%,transparent 70%);pointer-events:none}
+.cta-ghost{font-family:'Space Mono',monospace;font-size:clamp(28px,5vw,56px);font-weight:700;line-height:1.1;color:transparent;-webkit-text-stroke:1px rgba(255,255,255,.06);margin-bottom:-8px;letter-spacing:-1px;display:block}
+.cta-h{font-size:clamp(36px,6vw,64px);font-weight:300;color:var(--text);line-height:1.1;letter-spacing:-1px;margin-bottom:32px;max-width:700px}
+.cta-h span{color:var(--mint)}
+.cta-p{font-size:15px;font-weight:300;color:var(--silver-dim);line-height:1.7;max-width:460px;margin-bottom:48px}
+.cta-btns{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:40px}
+.cta-meta{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--dim)}
+
+footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:24px}
+.f-left{font-family:'Space Mono',monospace;font-size:11px;color:var(--dim);letter-spacing:1px}
+.f-center{font-family:'Space Mono',monospace;font-size:12px;letter-spacing:3px;color:var(--silver-dim);text-align:center}
+.f-links{display:flex;justify-content:flex-end;gap:24px;list-style:none}
+.f-links a{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1px;color:var(--dim);text-decoration:none;transition:color .2s}
+.f-links a:hover{color:var(--mint)}
+
+.r{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease}
+.r.on{opacity:1;transform:translateY(0)}
+.d1{transition-delay:.08s}.d2{transition-delay:.16s}.d3{transition-delay:.24s}.d4{transition-delay:.32s}
+
+@keyframes rise{to{opacity:1;transform:translateY(0)}}
+@keyframes breathe{0%,100%{opacity:1;box-shadow:0 0 8px var(--mint)}50%{opacity:.5;box-shadow:0 0 3px var(--mint)}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
+
+@media(max-width:960px){
+  nav{padding:0 24px}
+  .nav-links{display:none}
+  #hero,.section,.cta-wrap,footer{padding-left:24px;padding-right:24px}
+  .sep{margin:0 24px}
+  .hero-footnote{grid-template-columns:1fr}
+  .lc-hdr,.lc-track{padding-left:24px;padding-right:24px}
+  .lc-track{grid-template-columns:1fr}
+  .lc-track::before{display:none}
+  .layers-grid,.tokens-grid{grid-template-columns:1fr}
+  .nodes-grid{grid-template-columns:1fr 1fr}
+  .metrics-grid{grid-template-columns:1fr 1fr}
+  .rm-row{grid-template-columns:80px 20px 1fr auto}
+  footer{grid-template-columns:1fr;gap:16px;padding:24px}
+  .f-links{justify-content:flex-start}
+}
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <a href="#" class="nav-id">
+    <img src="logo/Prometheus.png" alt="Prometheus" onerror="this.style.display='none'">
+    <span class="nav-wordmark">Prometheus</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#lifecycle">Protocol</a></li>
+    <li><a href="#architecture">Architecture</a></li>
+    <li><a href="#tokens">Tokens</a></li>
+    <li><a href="#roadmap">Roadmap</a></li>
+    <li><a href="docs/developer-guide.md">Docs</a></li>
+  </ul>
+  <a href="https://github.com/NeaBouli/prometheus-" class="nav-gh" target="_blank">GitHub ↗</a>
+</nav>
+
+<section id="hero">
+  <div class="hero-body">
+    <div class="hero-status">
+      <div class="hero-status-dot"></div>
+      Kaspa Testnet-10 · Mainnet May 5, 2026
+    </div>
+    <h1 class="hero-h1">
+      The security <em>the world</em><br>
+      <strong>never controlled.</strong>
+    </h1>
+    <p class="hero-sub">Prometheus is a decentralized AI threat intelligence protocol built on Kaspa. No foundation. No pre-mine. No off switch. The code is the only law.</p>
+    <div class="hero-actions">
+      <a href="WHITEPAPER.md" class="btn-solid">Read the Whitepaper</a>
+      <a href="https://github.com/NeaBouli/prometheus-" class="btn-outline" target="_blank">View Source</a>
+    </div>
+  </div>
+  <div class="hero-footnote">
+    <div class="hero-stat">
+      <div class="hero-stat-val"><span>0</span>%</div>
+      <div class="hero-stat-key">Pre-mine · Founder allocation · Investor tranche</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-val">&lt;<span>60</span>s</div>
+      <div class="hero-stat-key">Threat detection to immutable on-chain rule</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-val"><span>100</span>%</div>
+      <div class="hero-stat-key">Open source · MIT License · Community owned</div>
+    </div>
+  </div>
+</section>
+
+<hr class="sep">
+
+<div id="lifecycle">
+  <div class="lc-hdr">
+    <span class="lbl r">01 / Protocol</span>
+    <h2 class="hdg r">Zero to on-chain in under 60 seconds.</h2>
+    <p class="sub r d1">From first anomaly on a device to a validated, immutable rule on Kaspa — fully automated, no human in the loop.</p>
+  </div>
+  <div class="lc-track">
+    <div class="lc-step r">
+      <div class="lc-node"><span class="lc-t">t=0s</span></div>
+      <div class="lc-time">T = 0 s</div>
+      <div class="lc-who">Light Client</div>
+      <div class="lc-what">Phi-3-mini detects anomaly locally. SHA-256 hash computed. ZK-proof generated. Anonymous hint dispatched to 3 Guardian nodes.</div>
+      <div class="lc-tech">ONNX Runtime<br>Groth16 ZK-proof<br>libp2p</div>
+    </div>
+    <div class="lc-step r d1">
+      <div class="lc-node"><span class="lc-t">t=2s</span></div>
+      <div class="lc-time">T = 2 s</div>
+      <div class="lc-who">Guardian Node</div>
+      <div class="lc-what">LLaMA 3 aggregates reports. Analyzes entropy, API patterns, CVE correlations. Generates YARA rule with confidence score ≥ 0.85.</div>
+      <div class="lc-tech">LLaMA 3 70B / 8B<br>vLLM · YARA<br>Min confidence 0.85</div>
+    </div>
+    <div class="lc-step r d2">
+      <div class="lc-node"><span class="lc-t">t=15s</span></div>
+      <div class="lc-time">T = 15 s</div>
+      <div class="lc-who">Validator Network</div>
+      <div class="lc-what">Commit-Reveal voting. Commitment = sha256(vote ‖ salt ‖ block). 10% bond locked. 67% consensus required.</div>
+      <div class="lc-tech">Silverscript<br>Commit-Reveal<br>Bond system</div>
+    </div>
+    <div class="lc-step r d3">
+      <div class="lc-node"><span class="lc-t">t=35s</span></div>
+      <div class="lc-time">T = 35 s</div>
+      <div class="lc-who">Kaspa Layer 1</div>
+      <div class="lc-what">Rule stored as unique KRC-20 asset. Supply: 1. Immutable. DAGKnight sub-second finality. IPFS CIDv1 reference.</div>
+      <div class="lc-tech">DAGKnight<br>KRC-20 (supply=1)<br>IPFS CIDv1</div>
+    </div>
+    <div class="lc-step r d4">
+      <div class="lc-node"><span class="lc-t">t=36s</span></div>
+      <div class="lc-time">T = 36 s</div>
+      <div class="lc-who">All Clients</div>
+      <div class="lc-what">P2P broadcast or Kaspa polling. New rule automatically loaded. Local scanner active immediately. Every device protected.</div>
+      <div class="lc-tech">rusty-kaspa<br>libp2p broadcast<br>Local YARA engine</div>
+    </div>
+  </div>
+</div>
+
+<hr class="sep">
+
+<div id="architecture">
+  <div class="section r">
+    <span class="lbl">02 / Architecture</span>
+    <h2 class="hdg">Three layers.<br>No center.</h2>
+    <p class="sub d1">Every component is replaceable. Every rule is verifiable. Every decision is on-chain.</p>
+    <div class="layers-grid">
+      <div class="layer r">
+        <span class="layer-idx">1</span>
+        <span class="layer-tag">Kaspa Layer 1</span>
+        <div class="layer-name">Immutable truth</div>
+        <ul class="layer-items">
+          <li>DAGKnight consensus · 100 BPS</li>
+          <li>Silverscript smart contracts</li>
+          <li>KRC-20 rule storage (supply = 1)</li>
+          <li>Native Groth16 ZK-verification</li>
+          <li>Sub-second finality</li>
+          <li>ValidatorStaking · RuleStorage</li>
+        </ul>
+      </div>
+      <div class="layer r d1">
+        <span class="layer-idx">2</span>
+        <span class="layer-tag">Kasplex zkEVM</span>
+        <div class="layer-name">Intelligence layer</div>
+        <ul class="layer-items">
+          <li>Complex governance logic</li>
+          <li>ZK-rollups anchored to L1</li>
+          <li>Reputation computation</li>
+          <li>Reward distribution</li>
+          <li>Dev grant DAO voting</li>
+          <li>Auto-tuning parameters</li>
+        </ul>
+      </div>
+      <div class="layer r d2">
+        <span class="layer-idx">0</span>
+        <span class="layer-tag">Off-Chain · Device</span>
+        <div class="layer-name">Action layer</div>
+        <ul class="layer-items">
+          <li>Phi-3-mini local inference</li>
+          <li>LLaMA 3 Guardian analysis</li>
+          <li>Fed-DART federated learning</li>
+          <li>Raw data never leaves device</li>
+          <li>P2P coordination via libp2p</li>
+          <li>Fully autonomous · no human step</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr class="sep">
+
+<div class="nodes-bg">
+  <div class="section">
+    <span class="lbl r">03 / Node types</span>
+    <h2 class="hdg r">Four roles.<br>Every device contributes.</h2>
+    <div class="nodes-grid">
+      <div class="n-card r">
+        <div class="n-glyph">01 · Light Client</div>
+        <div class="n-name">Light Client</div>
+        <div class="n-desc">Your device. Phi-3-mini runs entirely local. Detects anomalies, hashes them, generates ZK proofs, reports anonymously. Zero raw data leaves.</div>
+        <div class="n-spec">4 GB RAM · No GPU required<br>Windows · macOS · Linux · ARM</div>
+      </div>
+      <div class="n-card r d1">
+        <div class="n-glyph">02 · Guardian</div>
+        <div class="n-name">Guardian Node</div>
+        <div class="n-desc">Runs LLaMA 3. Aggregates threat hints, performs deep analysis, generates YARA rules. Earns PROM reputation for accepted proposals.</div>
+        <div class="n-spec">8B: RTX 4070 Ti+, 16 GB VRAM<br>70B: 4× A100 / H100</div>
+      </div>
+      <div class="n-card r d2">
+        <div class="n-glyph">03 · Validator</div>
+        <div class="n-name">Validator Node</div>
+        <div class="n-desc">Stakes KAS. Votes on rule proposals via Commit-Reveal. Provides economic security. Slashed for misbehavior. 7-day exit cooldown.</div>
+        <div class="n-spec">Minimum 10,000 KAS stake<br>Standard server · No GPU needed</div>
+      </div>
+      <div class="n-card r d3">
+        <div class="n-glyph">04 · Honeypot</div>
+        <div class="n-name">Honeypot Node</div>
+        <div class="n-desc">Emulates vulnerable services. Every attack captured and analyzed. First line of zero-day detection. Earns 5% of total PROM emission.</div>
+        <div class="n-spec">Any internet-exposed server<br>Higher reward per zero-day find</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr class="sep">
+
+<div id="tokens">
+  <div class="section">
+    <span class="lbl r">04 / Economics</span>
+    <h2 class="hdg r">Two tokens.<br>No shortcuts.</h2>
+    <p class="sub r d1">KAS provides economic security. PROM is never purchased — only earned through contribution.</p>
+    <div class="tokens-grid">
+      <div class="tok kas r" data-sym="KAS">
+        <div class="tok-sym">KAS</div>
+        <div class="tok-lbl">Kaspa native token · Validator staking</div>
+        <div class="tok-role">Validators stake KAS as collateral. Misbehavior costs real capital. The alignment of incentives is economic, not ideological.</div>
+        <div class="tok-rows">
+          <div class="tok-row"><span class="tok-k">Min stake</span>10,000 KAS · auto-adjusted weekly</div>
+          <div class="tok-row"><span class="tok-k">Slashing</span>5% simple · 10% double-vote · 20% collusion</div>
+          <div class="tok-row"><span class="tok-k">Cooldown</span>7 days on exit · no flash exits</div>
+          <div class="tok-row"><span class="tok-k">Source</span>Kaspa network · 0% pre-mine · fair launch</div>
+          <div class="tok-row"><span class="tok-k">Liquidity</span>$1B+ market cap · no bootstrap needed</div>
+        </div>
+      </div>
+      <div class="tok prom r d1" data-sym="PROM">
+        <div class="tok-sym">PROM</div>
+        <div class="tok-lbl">Prometheus token · Reputation &amp; governance</div>
+        <div class="tok-role">PROM cannot be bought at launch. It is minted only when a threat rule is accepted by consensus. Every token represents work done.</div>
+        <div class="tok-rows">
+          <div class="tok-row"><span class="tok-k">Year 1</span>20,000,000 PROM · −10% per year</div>
+          <div class="tok-row"><span class="tok-k">Validators</span>40% · for validated rules</div>
+          <div class="tok-row"><span class="tok-k">Guardians</span>30% · for accepted proposals</div>
+          <div class="tok-row"><span class="tok-k">Reporters</span>20% · Light Clients + Honeypots</div>
+          <div class="tok-row"><span class="tok-k">Dev Pool</span>5% · DAO vote only · no foundation</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr class="sep">
+
+<div class="metrics-bg">
+  <div class="section">
+    <span class="lbl r">05 / Numbers</span>
+    <div class="metrics-grid">
+      <div class="metric r"><div class="metric-v"><b>160</b>+</div><div class="metric-k">Tests passing</div></div>
+      <div class="metric r d1"><div class="metric-v"><b>6</b></div><div class="metric-k">Silverscript contracts</div></div>
+      <div class="metric r d2"><div class="metric-v">&lt;<b>60</b>s</div><div class="metric-k">Threat to on-chain rule</div></div>
+      <div class="metric r d3"><div class="metric-v"><b>0</b>%</div><div class="metric-k">Pre-mine</div></div>
+    </div>
+  </div>
+</div>
+
+<hr class="sep">
+
+<div id="roadmap">
+  <div class="section">
+    <span class="lbl r">06 / Roadmap</span>
+    <h2 class="hdg r">Built in public.<br>Audited in public.</h2>
+    <p class="sub r d1">Every sprint is independently audited. Every finding is public. No hidden work.</p>
+    <div class="roadmap-rows r">
+      <div class="rm-row"><div class="rm-date">Mar 2026</div><div class="rm-bar"></div><div class="rm-content"><div class="rm-sprint">Sprint 0 — Setup &amp; Testnet</div><div class="rm-desc">Kaspa Testnet-10 node · repository structure · CI/CD pipeline</div></div><div class="rm-badge b-done">Accepted</div></div>
+      <div class="rm-row"><div class="rm-date">Mar 2026</div><div class="rm-bar"></div><div class="rm-content"><div class="rm-sprint">Sprint 1 — Silverscript Contracts</div><div class="rm-desc">6 contracts · 54 tests · ValidatorStaking · GuardianReputation · RuleStorage</div></div><div class="rm-badge b-done">Accepted</div></div>
+      <div class="rm-row"><div class="rm-date">Mar 2026</div><div class="rm-bar"></div><div class="rm-content"><div class="rm-sprint">Sprint 2–3 — Rust Client &amp; AI</div><div class="rm-desc">Kaspa RPC · YARA scanner · Phi-3 wrapper · ZK-proof stub · Fed-DART</div></div><div class="rm-badge b-done">Accepted</div></div>
+      <div class="rm-row"><div class="rm-date">Mar 2026</div><div class="rm-bar"></div><div class="rm-content"><div class="rm-sprint">Sprint 4–5 — Guardian &amp; Voting</div><div class="rm-desc">vLLM Docker · YARA generator · Commit-Reveal · slashing engine</div></div><div class="rm-badge b-done">Accepted</div></div>
+      <div class="rm-row"><div class="rm-date">Mar 2026</div><div class="rm-bar"></div><div class="rm-content"><div class="rm-sprint">Sprint 6–7 — E2E &amp; Documentation</div><div class="rm-desc">Full lifecycle test &lt;60s · Sybil resistance proof · audit dashboard · whitepaper</div></div><div class="rm-badge b-done">Accepted</div></div>
+      <div class="rm-row"><div class="rm-date">Apr 2026</div><div class="rm-bar"></div><div class="rm-content"><div class="rm-sprint">Sprint 8 — Community</div><div class="rm-desc">Gitcoin Grants · public repository · first external contributors</div></div><div class="rm-badge b-active">In progress</div></div>
+      <div class="rm-row"><div class="rm-date">May 5, 2026</div><div class="rm-bar"></div><div class="rm-content"><div class="rm-sprint">Covenant-Hardfork — Mainnet</div><div class="rm-desc">ssc compiler ships · all contracts deploy · PROM emission begins</div></div><div class="rm-badge b-plan">Planned</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="cta-wrap">
+  <span class="cta-ghost r">The fire belongs</span>
+  <h2 class="cta-h r">to <span>humanity</span>,<br>not to corporations.</h2>
+  <p class="cta-p r d1">No foundation controls this network. No government can shut it down. No corporation can acquire it. The protocol exists as long as the Kaspa blockchain exists.</p>
+  <div class="cta-btns r d2">
+    <a href="https://github.com/NeaBouli/prometheus-" class="btn-solid" target="_blank">Join on GitHub</a>
+    <a href="WHITEPAPER.md" class="btn-outline">Read the Whitepaper</a>
+  </div>
+  <div class="cta-meta r d3">MIT License &nbsp;·&nbsp; 0% Pre-mine &nbsp;·&nbsp; 100% Open Source &nbsp;·&nbsp; Community owned</div>
+</div>
+
+<footer>
+  <div class="f-left">v4.0 · March 2026</div>
+  <div class="f-center">PROMETHEUS</div>
+  <ul class="f-links">
+    <li><a href="WHITEPAPER.md">Whitepaper</a></li>
+    <li><a href="modules/web/audit/index.html">Audit</a></li>
+    <li><a href="memory/AUDIT.md">Audit Log</a></li>
+    <li><a href="CONTRIBUTING.md">Contributing</a></li>
+    <li><a href="https://github.com/NeaBouli/prometheus-" target="_blank">GitHub</a></li>
+  </ul>
+</footer>
+
+<script>
+const nav=document.getElementById('nav');
+window.addEventListener('scroll',()=>nav.classList.toggle('scrolled',window.scrollY>40),{passive:true});
+const obs=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('on');obs.unobserve(e.target)}}),{threshold:.08});
+document.querySelectorAll('.r').forEach(el=>obs.observe(el));
+</script>
+</body>
+</html>
