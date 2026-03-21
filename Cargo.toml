@@ -1,0 +1,28 @@
+[workspace]
+resolver = "2"
+members = [
+    "modules/client",
+    "modules/validator-node",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+authors = ["Prometheus Contributors"]
+license = "MIT"
+repository = "https://github.com/NeaBouli/prometheus-"
+
+[workspace.dependencies]
+# Kaspa ecosystem
+kaspa-consensus-core = { git = "https://github.com/kaspanet/rusty-kaspa.git", branch = "master" }
+kaspa-rpc-core = { git = "https://github.com/kaspanet/rusty-kaspa.git", branch = "master" }
+kaspa-wrpc-client = { git = "https://github.com/kaspanet/rusty-kaspa.git", branch = "master" }
+kaspa-hashes = { git = "https://github.com/kaspanet/rusty-kaspa.git", branch = "master" }
+kaspa-addresses = { git = "https://github.com/kaspanet/rusty-kaspa.git", branch = "master" }
+
+# Common dependencies
+tokio = { version = "1", features = ["full"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+anyhow = "1"
+log = "0.4"
