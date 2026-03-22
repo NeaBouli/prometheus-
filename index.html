@@ -156,7 +156,7 @@ nav.scrolled{background:rgba(5,5,5,.97);border-color:var(--line);backdrop-filter
 
 .tokens-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);margin-top:56px}
 .tok{background:var(--void);padding:56px 48px;position:relative;overflow:hidden}
-.tok::before{content:attr(data-sym);position:absolute;right:32px;top:16px;font-family:'Space Mono',monospace;font-size:100px;font-weight:700;line-height:1;color:rgba(255,255,255,.025)}
+.tok::before{content:attr(data-sym);position:absolute;right:32px;top:16px;font-family:'Space Mono',monospace;font-size:100px;font-weight:700;line-height:1;color:rgba(255,255,255,.025);z-index:0}
 .tok-sym{font-family:'Space Mono',monospace;font-size:36px;font-weight:700;margin-bottom:4px}
 .tok.kas .tok-sym{color:var(--silver)}
 .tok.prom .tok-sym{color:var(--mint)}
@@ -460,7 +460,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
         </div>
       </div>
       <div class="tok prom r d1" data-sym="PROM">
-        <img src="/prometheus-/logo/PROM_coin.png" alt="PROM Token" style="height:64px;width:64px;object-fit:contain;display:block;margin-bottom:12px;position:relative;z-index:1;filter:drop-shadow(0 0 16px rgba(0,229,160,0.4));" onerror="this.style.display='none'">
+        <img src="/prometheus-/logo/prom_coin.png" alt="PROM Token" style="height:64px;width:64px;object-fit:contain;display:block;margin-bottom:12px;position:relative;z-index:1;filter:drop-shadow(0 0 16px rgba(0,229,160,0.4));" onerror="this.style.opacity='0.3';this.alt='PROM'">
         <div class="tok-sym">PROM</div>
         <div class="tok-lbl">Prometheus token · Reputation &amp; governance</div>
         <div class="tok-role">PROM cannot be bought at launch. It is minted only when a threat rule is accepted by consensus. Every token represents work done.</div>

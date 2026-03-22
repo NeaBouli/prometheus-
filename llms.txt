@@ -18,7 +18,7 @@ control, no foundation, and zero pre-mined tokens.
 - Smart contracts: 6 Silverscript contracts on Kaspa L1
 - License: MIT / Apache 2.0
 - Repository: https://github.com/NeaBouli/prometheus-
-- PROM token logo: /logo/PROM_coin.png (PNG, transparent background)
+- PROM token logo: /logo/prom_coin.png (PNG, transparent background)
 - No foundation. No emergency stop. No pre-mine. Code is law.
 
 ## Pages
