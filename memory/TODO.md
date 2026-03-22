@@ -211,3 +211,5 @@
 - [x] Mobile hamburger navigation on all 5 HTML pages | Claude Code | 2026-03-22
 - [x] CI/CD fixed — Rust, Python, contracts, HTML, infra checks | Claude Code | 2026-03-22
 - [x] AUDIT.md + ERRORS.md + STATUS.md translated to English | Claude Code | 2026-03-22
+- [x] SECURITY.md + docs/repository-security.md + fake email removed | Claude Code | 2026-03-22
+- [x] Nav synced across all 5 pages (Architecture + Tokens restored) | Claude Code | 2026-03-22
