@@ -206,4 +206,4 @@ Daily development.
 
 ---
 
-*Prometheus v4.0 · Checkpoint 2026-03-22 · Last updated: af1a06a · The fire belongs to humanity.*
+*Prometheus v4.0 · Checkpoint 2026-03-22 · Last updated: index.html nav fix · The fire belongs to humanity.*
