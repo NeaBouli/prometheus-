@@ -49,6 +49,7 @@ Claude → antwortet, Core Dev trägt Antwort in memory/MEMO.md ein
 | 8 — Docs | DONE | 892a9b5 | CONTRIBUTING.md, 5 Wiki-Guides |
 | Landing Page | DONE | aec339d | index.html — dark theme, mint green, ambient logo |
 | Wiki Pages | DONE | af1a06a | faq.html + roadmap.html — coherent with landing page |
+| Whitepaper HTML | DONE | 8c950f6 | whitepaper.html — full HTML version, all .md links replaced |
 
 ---
 
@@ -206,4 +207,4 @@ Daily development.
 
 ---
 
-*Prometheus v4.0 · Checkpoint 2026-03-22 · Last updated: index.html nav fix · The fire belongs to humanity.*
+*Prometheus v4.0 · Checkpoint 2026-03-22 · Last updated: 8c950f6 whitepaper.html · The fire belongs to humanity.*
