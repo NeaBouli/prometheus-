@@ -140,6 +140,8 @@ Every new HTML page MUST have before commit:
 7. Entry in sitemap.xml with correct lastmod date
 8. llms.txt updated if new major content section added
 
+9. Mobile nav burger menu — required on every new HTML page
+
 This checklist is mandatory. No new page goes live without it.
 
 ## PFLICHT NACH JEDER ABGESCHLOSSENEN AUFGABE

@@ -160,6 +160,18 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
   footer{grid-template-columns:1fr;gap:16px;padding:24px}
   .f-links{justify-content:flex-start}
 }
+/* MOBILE NAV */
+.nav-burger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:8px;z-index:600}
+.nav-burger span{display:block;width:22px;height:1px;background:var(--silver);transition:all .3s ease}
+.nav-burger.open span:nth-child(1){transform:translateY(6px) rotate(45deg)}
+.nav-burger.open span:nth-child(2){opacity:0}
+.nav-burger.open span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
+.mobile-menu{display:none;position:fixed;inset:56px 0 0 0;background:rgba(5,5,5,.98);backdrop-filter:blur(12px);z-index:490;flex-direction:column;padding:40px 32px;border-top:1px solid var(--line);overflow-y:auto}
+.mobile-menu a{font-family:'Space Mono',monospace;font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--silver-dim,#787878);text-decoration:none;padding:16px 0;border-bottom:1px solid var(--line);transition:color .2s}
+.mobile-menu a:last-child{border-bottom:none}
+.mobile-menu a:hover{color:var(--mint)}
+.mobile-menu.open{display:flex}
+@media(max-width:900px){.nav-links,.nav-gh{display:none}.nav-burger{display:flex}}
 </style>
 </head>
 <body>
@@ -179,7 +191,19 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
     <li><a href="whitepaper.html" class="active">Whitepaper</a></li>
   </ul>
   <a href="https://github.com/NeaBouli/prometheus-" class="nav-gh" target="_blank">GitHub ↗</a>
+<button class="nav-burger" id="burger" onclick="toggleMenu()" aria-label="Menu"><span></span><span></span><span></span></button>
 </nav>
+<div class="mobile-menu" id="mobile-menu">
+<a href="index.html">Home</a>
+<a href="index.html#lifecycle">Protocol</a>
+<a href="index.html#architecture">Architecture</a>
+<a href="index.html#tokens">Tokens</a>
+<a href="roadmap.html">Roadmap</a>
+<a href="faq.html">FAQ</a>
+<a href="whitepaper.html">Whitepaper</a>
+<a href="guardian-economics.html">Economics</a>
+<a href="https://github.com/NeaBouli/prometheus-" target="_blank">GitHub ↗</a>
+</div>
 
 <div class="page-header">
   <div class="page-header-inner">
@@ -629,5 +653,6 @@ if ('serviceWorker' in navigator) {
     .catch(() => {});
 }
 </script>
+<script>function toggleMenu(){const burger=document.getElementById("burger");const menu=document.getElementById("mobile-menu");burger.classList.toggle("open");menu.classList.toggle("open");document.body.style.overflow=menu.classList.contains("open")?"hidden":""}document.querySelectorAll(".mobile-menu a").forEach(a=>{a.addEventListener("click",()=>{document.getElementById("burger").classList.remove("open");document.getElementById("mobile-menu").classList.remove("open");document.body.style.overflow=""})});</script>
 </body>
 </html>
