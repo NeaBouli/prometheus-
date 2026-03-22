@@ -50,6 +50,8 @@ Claude → antwortet, Core Dev trägt Antwort in memory/MEMO.md ein
 | Landing Page | DONE | aec339d | index.html — dark theme, mint green, ambient logo |
 | Wiki Pages | DONE | af1a06a | faq.html + roadmap.html — coherent with landing page |
 | Whitepaper HTML | DONE | 8c950f6 | whitepaper.html — full HTML version, all .md links replaced |
+| SEO/GEO/AI | DONE | b696d5b | llms.txt, robots.txt, sitemap.xml, Schema.org all pages |
+| Google + PWA | DONE | 20e8531 | Search Console verified, SW, manifest.json |
 
 ---
 
@@ -207,4 +209,4 @@ Daily development.
 
 ---
 
-*Prometheus v4.0 · Checkpoint 2026-03-22 · Last updated: 8c950f6 whitepaper.html · The fire belongs to humanity.*
+*Prometheus v4.0 · Checkpoint 2026-03-22 · Last updated: 20e8531 GSC+PWA · The fire belongs to humanity.*

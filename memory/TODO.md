@@ -193,3 +193,5 @@
 - [x] docs/faq.md aktualisiert (12 FAQ-Einträge) | Claude Code | 2026-03-22
 - [x] faq.html + roadmap.html deployed to GitHub Pages (Landing-Page-Stil) | Claude Code | 2026-03-22
 - [x] whitepaper.html — full HTML version, .md links replaced across all pages | Claude Code | 2026-03-22
+- [x] SEO/GEO/AI infrastructure: llms.txt, robots.txt, sitemap.xml, Schema.org | Claude Code | 2026-03-22
+- [x] Google Search Console verification + Service Worker + PWA manifest | Claude Code | 2026-03-22
