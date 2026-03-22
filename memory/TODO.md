@@ -111,11 +111,70 @@
 - [ ] [P1] GitHub Repository öffentlich schalten | Core Dev | Sprint 6 fertig
 - [x] [P2] README.md rewrite in English | Claude Code | 2026-03-22
 - [x] [P2] WHITEPAPER.md: full English whitepaper v4 in repo, with all improvements | Claude Code | 2026-03-22
-- [ ] [P2] CONTRIBUTING.md erstellen | Claude Code | -
-- [ ] [P2] Wiki-Grundstruktur (docs/) | Claude Code | -
-- [ ] [P2] Landing page + Wiki: use logo from /logo/Prometheus.png for all web assets, README header, and documentation | Claude Code | Sprint 7 done
+- [x] [P2] CONTRIBUTING.md erstellen | Claude Code | 2026-03-22
+- [x] [P2] Wiki-Grundstruktur (docs/) | Claude Code | 2026-03-22
+- [x] [P2] Landing page + Wiki: use logo from /logo/Prometheus.png | Claude Code | 2026-03-22
 - [ ] [P3] Discord/Telegram einrichten | Core Dev | -
-- [ ] [P3] LLaMA 3 Fine-Tuning auf Security-Datensätzen | Claude Code | Sprint 4 fertig
+
+---
+
+## ═══ SPRINT 9: CONTRACTS LIVE (Mai 2026) ═══
+
+- [ ] [P0] ssc compile + deploy alle 6 Contracts auf Kaspa Mainnet | Claude Code | Covenant-Hardfork
+- [ ] [P0] kaspa-zk-params Crate integrieren, echte Groth16 in zk_proof.rs | Claude Code | ssc live
+- [ ] [P0] PROM Emission Contract schreiben + deployen | Claude Code | ssc live
+- [ ] [P0] KAS/PROM Liquiditätspool auf Kasplex DEX eröffnen | Core Dev | Mainnet live
+- [ ] [P1] 10 Team Guardian + Validator Nodes starten | Core Dev | Mainnet live
+
+---
+
+## ═══ SPRINT 10: P2P + KRC-20 REAL (Mai-Juni 2026) ═══
+
+- [ ] [P0] libp2p Modul komplett implementieren (peer discovery, NAT, STUN/TURN) | Claude Code | -
+- [ ] [P0] Echte KRC-20 UTXO-Abfrage für PROM-RULES Tick | Claude Code | Contracts live
+- [ ] [P1] Regel-Download von IPFS via CIDv1 | Claude Code | KRC-20 Reader
+- [ ] [P1] Light Client ↔ Guardian P2P Kommunikation | Claude Code | libp2p
+
+---
+
+## ═══ SPRINT 11: PHI-3 + LLAMA PRODUCTION (Juni 2026) ═══
+
+- [ ] [P0] Phi-3-mini 3.8B herunterladen + 4-bit ONNX quantisieren | Claude Code | -
+- [ ] [P0] Echte Inferenz statt Entropy-Heuristik in phi3.rs | Claude Code | Phi-3 model
+- [ ] [P1] LLaMA 3 8B LoRA Fine-Tuning auf Security-Datensätzen | Claude Code | Datensätze
+- [ ] [P1] LLaMA 3 70B Fine-Tuning | Claude Code | 8B done
+- [ ] [P2] Fed-DART echte Implementierung (Gradient-Aggregation) | Claude Code | -
+- [ ] [P2] fp_rate Oracle Contract + Integration | Claude Code | Contracts live
+
+---
+
+## ═══ SPRINT 12: DESKTOP CLIENT (Juli-Aug 2026) ═══
+
+- [ ] [P0] Tauri v2 App: System-Tray, Scan-Feed, PROM Balance | Claude Code | Client modules
+- [ ] [P0] Windows MSI Installer + Code-Signing | Claude Code | Tauri App
+- [ ] [P0] macOS DMG + Gatekeeper Signing | Core Dev | Apple Dev Account nötig
+- [ ] [P0] Linux .deb / .AppImage / Flatpak | Claude Code | Tauri App
+- [ ] [P0] GitHub Releases CI/CD mit Checksums + GPG | Claude Code | -
+- [ ] [P1] One-Click Guardian Installer Script | Claude Code | -
+- [ ] [P1] Validator Web Dashboard | Claude Code | -
+
+---
+
+## ═══ SPRINT 13: MOBILE (Aug-Sep 2026) ═══
+
+- [ ] [P0] Flutter Grundgerüst (iOS + Android) | Claude Code | -
+- [ ] [P0] iOS: Phi-3 via Core ML, Background Refresh, Keychain | Claude Code | Flutter
+- [ ] [P0] Android: Phi-3 via ONNX Mobile, WorkManager, Keystore | Claude Code | Flutter
+- [ ] [P1] App Store Submission (iOS) | Core Dev | Apple Dev Account
+- [ ] [P1] Google Play + F-Droid (Android) | Core Dev | Play Dev Account
+
+---
+
+## ═══ SPRINT 14: VPROGS (Q4 2026) ═══
+
+- [ ] [P1] vProgs Deployment nach DAGKnight | Claude Code | Kaspa vProgs live
+- [ ] [P1] KI-Ergebnisse per ZK-Beweis auf L1 | Claude Code | vProgs
+- [ ] [P2] Föderiertes Lernen on-chain auditierbar | Claude Code | vProgs
 
 ---
 
@@ -129,3 +188,6 @@
 - [x] Dev-Review v4: 10/10 – produktionsreif | Externer Dev | 2026-03-21
 - [x] Workflow-Architektur definiert | Claude | 2026-03-21
 - [x] Memory-Layer initialisiert | Claude | 2026-03-21
+- [x] Landing page index.html erstellt und deployed | Claude | 2026-03-22
+- [x] docs/roadmap.md erstellt (vollständige Deployment-Roadmap) | Claude Code | 2026-03-22
+- [x] docs/faq.md aktualisiert (12 FAQ-Einträge) | Claude Code | 2026-03-22

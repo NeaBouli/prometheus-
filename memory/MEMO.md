@@ -134,6 +134,8 @@ DevIncentivePool Contract:
 ## BLOCKADEN (aktuell)
 
 Keine bekannten Blockaden.
+Nächste externe Abhängigkeit: ssc Compiler am 5. Mai 2026.
+Core Dev benötigt: Apple Developer Account + Google Play Account (vor Sprint 13).
 
 ---
 
@@ -146,3 +148,6 @@ Keine bekannten Blockaden.
 | 2026-03-21 | Reporter-Pool 75%/25% aufgeteilt      | Dev-Review | Zero-Days klarer bewertet         |
 | 2026-03-21 | Kein Emergency-Stop                   | Core Dev   | Bewusstes Dezentralisierungs-Feature|
 | 2026-03-21 | Whitepaper v4 = produktionsreif       | Dev-Review | 10/10 Audit-Ergebnis              |
+| 2026-03-22 | Deployment-Ziel Aug/Sep 2026          | Core Dev   | Tägliche Arbeit, kein Zwischenstopp |
+| 2026-03-22 | Mobile: Flutter (nicht React Native)  | Architect  | Hintergrund-Scanning braucht native Integration |
+| 2026-03-22 | Guardian Installer: curl one-click script | Architect | Niedrigste Einstiegshürde für Server-Betreiber |
