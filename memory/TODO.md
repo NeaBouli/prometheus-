@@ -191,3 +191,4 @@
 - [x] Landing page index.html erstellt und deployed | Claude | 2026-03-22
 - [x] docs/roadmap.md erstellt (vollständige Deployment-Roadmap) | Claude Code | 2026-03-22
 - [x] docs/faq.md aktualisiert (12 FAQ-Einträge) | Claude Code | 2026-03-22
+- [x] faq.html + roadmap.html deployed to GitHub Pages (Landing-Page-Stil) | Claude Code | 2026-03-22

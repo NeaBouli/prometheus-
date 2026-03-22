@@ -48,13 +48,14 @@ Claude → antwortet, Core Dev trägt Antwort in memory/MEMO.md ein
 | 7 — Dashboard | ACCEPTED | dc20deb | Audit-Dashboard, README.md, WHITEPAPER.md |
 | 8 — Docs | DONE | 892a9b5 | CONTRIBUTING.md, 5 Wiki-Guides |
 | Landing Page | DONE | aec339d | index.html — dark theme, mint green, ambient logo |
+| Wiki Pages | DONE | af1a06a | faq.html + roadmap.html — coherent with landing page |
 
 ---
 
 ## OFFENE TODOS (Claude Code)
 
 - [ ] GitHub Pages aktivieren (Core Dev: Settings → Pages → main / root)
-- [ ] Wiki-Seiten im Landing-Page-Stil bauen (kohärent)
+- [x] Wiki-Seiten im Landing-Page-Stil bauen (kohärent) — faq.html + roadmap.html deployed
 - [ ] Gitcoin Grants Antrag finalisieren (April 2026) — Core Dev
 - [ ] Repository public schalten — Core Dev (nach Sprint 6 fertig = jetzt)
 - [ ] LLaMA 3 Fine-Tuning auf Security-Datensätzen (P3, nach Mainnet)
@@ -205,4 +206,4 @@ Daily development.
 
 ---
 
-*Prometheus v4.0 · Checkpoint 2026-03-22 · The fire belongs to humanity.*
+*Prometheus v4.0 · Checkpoint 2026-03-22 · Last updated: af1a06a · The fire belongs to humanity.*
