@@ -129,6 +129,18 @@ DevIncentivePool Contract:
 - Nach jedem Modul: AUDIT.md-Eintrag erstellen
 - Git-Commits: `feat:`, `fix:`, `test:`, `docs:` Präfixe
 
+## PFLICHT NACH JEDER ABGESCHLOSSENEN AUFGABE
+
+Nach JEDER Task — egal ob Sprint, Bugfix, oder Docs-Update:
+1. memory/STATUS.md aktualisieren (Modul-Status)
+2. memory/TODO.md: erledigte Tasks als [x] markieren
+3. memory/AUDIT.md: Eintrag wenn Audit nötig
+4. memory/CHECKPOINT.md: letzte Zeile "Last updated" aktualisieren
+5. python3 scripts/autodidactic.py --action show_status ausführen
+6. Erst DANN committen
+
+Dies ist nicht optional. Es ist Teil jeder Task-Definition.
+
 ---
 
 ## BLOCKADEN (aktuell)
