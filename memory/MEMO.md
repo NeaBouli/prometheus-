@@ -149,6 +149,11 @@ This checklist is mandatory. No new page goes live without it.
 
 ## PFLICHT NACH JEDER ABGESCHLOSSENEN AUFGABE
 
+0. Bei JEDER neuen HTML-Seite: SOFORT grep -L "application/ld+json"
+   auf die neue Datei ausführen. Wenn leer → SEO/GEO-Checkliste
+   vollständig anwenden BEVOR erster Commit.
+   Kein HTML-Commit ohne Schema.org. Keine Ausnahme.
+
 Nach JEDER Task — egal ob Sprint, Bugfix, oder Docs-Update:
 1. memory/STATUS.md aktualisieren (Modul-Status)
 2. memory/TODO.md: erledigte Tasks als [x] markieren
