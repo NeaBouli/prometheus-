@@ -207,3 +207,7 @@
 - [x] whitepaper.html — full HTML version, .md links replaced across all pages | Claude Code | 2026-03-22
 - [x] SEO/GEO/AI infrastructure: llms.txt, robots.txt, sitemap.xml, Schema.org | Claude Code | 2026-03-22
 - [x] Google Search Console verification + Service Worker + PWA manifest | Claude Code | 2026-03-22
+- [x] guardian-economics.html — costs, break-even, solutions | Claude Code | 2026-03-22
+- [x] Mobile hamburger navigation on all 5 HTML pages | Claude Code | 2026-03-22
+- [x] CI/CD fixed — Rust, Python, contracts, HTML, infra checks | Claude Code | 2026-03-22
+- [x] AUDIT.md + ERRORS.md + STATUS.md translated to English | Claude Code | 2026-03-22
