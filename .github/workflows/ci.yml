@@ -19,55 +19,93 @@ jobs:
       - name: Check Memory Files
         run: python3 scripts/check_memory_integrity.py
 
-  # ─── Python Scripts Check ────────────────────────────────────────────────────
+  # ─── Silverscript Contract Lint ─────────────────────────────────────────────
+  contract-check:
+    name: Silverscript Contracts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify KAS/PROM separation (PATTERN-001)
+        run: |
+          echo "Checking contracts for KAS/PROM separation..."
+          for f in modules/contracts/*.ss; do
+            echo "  Checking: $f"
+            # MIN_STAKE must always be MIN_STAKE_KAS
+            if grep -qP '\bMIN_STAKE\b' "$f" && ! grep -q 'MIN_STAKE_KAS' "$f"; then
+              echo "ERROR: $f uses MIN_STAKE without _KAS suffix!"
+              exit 1
+            fi
+          done
+          echo "All contracts pass KAS/PROM check."
+      # Note: ssc compile is not available until Covenant-Hardfork (May 5, 2026).
+      # Contract compilation will be added to CI after ssc ships.
+
+  # ─── Rust Workspace Check ───────────────────────────────────────────────────
+  rust-check:
+    name: Rust Workspace
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+      - name: Format Check
+        run: cargo fmt --all --check
+      - name: Clippy
+        run: cargo clippy --workspace -- -D warnings
+      - name: Tests
+        run: cargo test --workspace
+        timeout-minutes: 30
+
+  # ─── Python Guardian Node Check ─────────────────────────────────────────────
   python-check:
-    name: Python Scripts
+    name: Python Guardian
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Install tools
-        run: pip install black pylint
+      - name: Install dependencies
+        run: pip install httpx pytest pytest-asyncio black pylint
       - name: Format Check (black)
-        run: black --check scripts/
+        run: black --check modules/guardian-node/jaeger/
       - name: Lint (pylint)
-        run: pylint scripts/ --fail-under=7.0 --disable=C0114,C0115,C0116
-
-  # ─── Rust Check (wenn client/ vorhanden) ─────────────────────────────────────
-  rust-check:
-    name: Rust Client
-    runs-on: ubuntu-latest
-    if: hashFiles('modules/client/Cargo.toml') != ''
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          components: rustfmt, clippy
-      - name: Format Check
-        run: cargo fmt --manifest-path modules/client/Cargo.toml --check
-      - name: Clippy
-        run: cargo clippy --manifest-path modules/client/Cargo.toml -- -D warnings
+        run: pylint modules/guardian-node/jaeger/ --fail-under=7.0 --disable=C0114,C0115,C0116
       - name: Tests
-        run: cargo test --manifest-path modules/client/Cargo.toml
+        run: cd modules/guardian-node && PYTHONPATH=. python -m pytest tests/ --tb=short
 
-  # ─── Silverscript Check (wenn Contracts vorhanden) ───────────────────────────
-  contract-check:
-    name: Silverscript Contracts
+  # ─── HTML Pages Check ──────────────────────────────────────────────────────
+  pages-check:
+    name: HTML Pages
     runs-on: ubuntu-latest
-    if: hashFiles('modules/contracts/*.ss') != ''
     steps:
       - uses: actions/checkout@v4
-      - name: Check Contract Files
+      - name: Verify key pages exist
         run: |
-          for f in modules/contracts/*.ss; do
-            echo "Checking: $f"
-            # Prüfe auf KAS/PROM Verwechslung
-            if grep -q "MIN_STAKE\b" "$f" && ! grep -q "MIN_STAKE_KAS\b" "$f"; then
-              echo "ERROR: $f verwendet MIN_STAKE ohne _KAS Suffix!"
+          for f in index.html faq.html roadmap.html whitepaper.html guardian-economics.html; do
+            if [ ! -f "$f" ]; then
+              echo "ERROR: $f is missing!"
               exit 1
             fi
-            echo "OK: $f"
+            echo "OK: $f exists ($(wc -l < "$f") lines)"
+          done
+      - name: Verify SEO meta tags
+        run: |
+          for f in index.html faq.html roadmap.html whitepaper.html; do
+            if ! grep -q 'application/ld+json' "$f"; then
+              echo "ERROR: $f missing Schema.org JSON-LD!"
+              exit 1
+            fi
+            if ! grep -q 'og:title' "$f"; then
+              echo "ERROR: $f missing Open Graph tags!"
+              exit 1
+            fi
+          done
+          echo "All pages have required SEO tags."
+      - name: Verify infrastructure files
+        run: |
+          for f in robots.txt sitemap.xml llms.txt manifest.json sw.js; do
+            test -f "$f" && echo "OK: $f" || (echo "MISSING: $f" && exit 1)
           done
