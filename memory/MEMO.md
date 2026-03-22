@@ -129,6 +129,19 @@ DevIncentivePool Contract:
 - Nach jedem Modul: AUDIT.md-Eintrag erstellen
 - Git-Commits: `feat:`, `fix:`, `test:`, `docs:` Präfixe
 
+## SEO / GEO / AI ANCHOR CHECKLIST
+Every new HTML page MUST have before commit:
+1. `<title>` — specific, descriptive, under 60 chars
+2. `<meta name="description">` — under 155 chars, keyword-rich
+3. `<meta property="og:*">` — 5 Open Graph tags minimum
+4. `<script type="application/ld+json">` — Schema.org structured data
+5. `<meta name="ai-summary">` — one-sentence AI-readable summary
+6. `<link rel="canonical">` — correct self-referencing URL
+7. Entry in sitemap.xml with correct lastmod date
+8. llms.txt updated if new major content section added
+
+This checklist is mandatory. No new page goes live without it.
+
 ## PFLICHT NACH JEDER ABGESCHLOSSENEN AUFGABE
 
 Nach JEDER Task — egal ob Sprint, Bugfix, oder Docs-Update:

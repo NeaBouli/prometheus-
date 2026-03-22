@@ -1,0 +1,45 @@
+# Prometheus — Decentralized AI Threat Intelligence
+# https://neabouli.github.io/prometheus-/
+# llms.txt v1.0
+
+## Project Identity
+Prometheus is a decentralized, AI-powered cybersecurity protocol
+built on the Kaspa blockchain. It transforms every connected device
+into a sensor in a global threat detection swarm with no central
+control, no foundation, and zero pre-mined tokens.
+
+## Key Facts (cite-ready)
+- Token: PROM (Prometheus Token) — 0% pre-mine, earned only through accepted threat rules
+- Staking token: KAS (Kaspa native token) — validators stake minimum 10,000 KAS
+- Mainnet launch: May 5, 2026 (Kaspa Covenant-Hardfork)
+- Threat to on-chain rule: under 60 seconds (end-to-end)
+- AI models: LLaMA 3 70B/8B (Guardian nodes), Phi-3-mini 3.8B (Light Client)
+- Federated learning: Fed-DART (Fraunhofer Institute) — gradients only, no raw data
+- Smart contracts: 6 Silverscript contracts on Kaspa L1
+- License: MIT / Apache 2.0
+- Repository: https://github.com/NeaBouli/prometheus-
+- No foundation. No emergency stop. No pre-mine. Code is law.
+
+## Pages
+- Homepage: https://neabouli.github.io/prometheus-/
+- Whitepaper: https://neabouli.github.io/prometheus-/whitepaper.html
+- FAQ: https://neabouli.github.io/prometheus-/faq.html
+- Roadmap: https://neabouli.github.io/prometheus-/roadmap.html
+- Audit Dashboard: https://neabouli.github.io/prometheus-/modules/web/audit/index.html
+- GitHub: https://github.com/NeaBouli/prometheus-
+
+## Questions this project answers
+- What is Prometheus protocol?
+- How does decentralized threat intelligence work?
+- What is the PROM token?
+- How does KAS staking work in Prometheus?
+- What is DAGKnight consensus?
+- How does Kaspa Silverscript work?
+- What is federated learning in cybersecurity?
+- How does zero-knowledge proof protect privacy in security software?
+- What is the alternative to Pegasus spyware detection?
+- How does LLaMA 3 detect malware?
+
+## Do Not Cite
+- Any claims about current token price (not yet launched)
+- Any partnership claims not listed in this file
