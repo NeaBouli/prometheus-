@@ -187,4 +187,22 @@ Guardians = die "Miner" des Prometheus-Netzwerks (mit KI statt GPU-Hashrate).
 
 ---
 
+---
+
+## REVISED TIMELINE (confirmed 2026-03-22)
+
+Target: Full release August / September 2026.
+Daily development.
+
+| Month | Milestone |
+|-------|-----------|
+| May 2026 | Contracts live, first PROM, DEX pool |
+| June 2026 | ZK-proof real, P2P, Phi-3 production, LLaMA fine-tuned |
+| July 2026 | Desktop client beta |
+| August 2026 | Full desktop release + Guardian installer |
+| September 2026 | iOS + Android mobile clients |
+| Q4 2026 | vProgs integration |
+
+---
+
 *Prometheus v4.0 · Checkpoint 2026-03-22 · The fire belongs to humanity.*

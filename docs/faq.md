@@ -1,41 +1,116 @@
 # Prometheus — Frequently Asked Questions
 
-## 1. What is Prometheus?
+---
 
-Prometheus is a decentralized, AI-powered threat intelligence protocol on the Kaspa blockchain. It turns every device into a sensor in a global security swarm — no central authority, no foundation, no pre-mine.
+## Tokenomics
 
-## 2. How is Prometheus different from VirusTotal or CrowdStrike?
+**Q: What is the difference between KAS and PROM?**
+KAS is the Kaspa native token used as economic collateral by validators.
+If a validator misbehaves, they lose KAS — real money. PROM is the
+Prometheus reputation and governance token. It cannot be purchased.
+It is minted exclusively when a threat rule is accepted by consensus.
+KAS = economic security. PROM = proof of contribution.
 
-Prometheus is fully decentralized. No single company controls the threat database. Rules are proposed by AI guardians, voted on by KAS-staking validators, and stored immutably on Kaspa L1. There is no kill switch, no foundation, and no ability for anyone to censor or modify accepted rules.
+**Q: How does PROM enter the market?**
+On launch day, zero PROM exist. The first PROM are minted when the
+first threat rule passes consensus. Simultaneously, a KAS/PROM
+liquidity pool opens on Kasplex DEX (funded from the community pool).
+The price forms organically — no ICO, no presale, no listing price.
+The deflationary curve (-10%/year) combined with growing demand
+creates natural upward price pressure over time.
 
-## 3. Do I need to buy PROM tokens?
+**Q: Is there mining for PROM?**
+Not in the traditional sense. PROM is minted when a threat rule is
+accepted — this is performance-based emission. Guardians are the
+closest equivalent to "miners": they run LLaMA 3 AI to analyze
+threats and generate rules. Instead of GPU hashrate, they contribute
+AI compute and threat intelligence.
 
-No. PROM tokens cannot be purchased — they are exclusively earned through contribution. Guardians earn PROM for accepted threat proposals. Validators earn PROM for honest voting. There is zero pre-mine and no token sale.
+**Q: What is the PROM emission schedule?**
+Year 1: 20,000,000 PROM. Each subsequent year: -10%.
+Year 2: 18M. Year 3: 16M. Year 4: 14M. Year 5: 12M.
+Total over 5 years: 80,000,000 PROM.
+Distribution: 40% Validators. 30% Guardians. 20% Reporters.
+5% Dev Pool. 5% Community.
 
-## 4. What do validators stake?
+---
 
-Validators stake **KAS** (Kaspa's native token), not PROM. Minimum stake is 10,000 KAS. This is a deliberate design decision: KAS is established and liquid, while PROM is a pure reputation token.
+## Security Protocol
 
-## 5. Does the Light Client upload my files?
+**Q: Are threat rules confirmed automatically?**
+No — four independent checkpoints exist:
+1. AI pre-filter: minimum 85% confidence required (automatic)
+2. Collection: minimum 5 independent reports of the same threat
+3. Validator vote: 67% majority via Commit-Reveal (bond at risk)
+4. 24-hour challenge period: anyone can contest, auto-tuning responds
+No single step is fully automatic without verification.
 
-**No.** Your files never leave your device. The Light Client runs Phi-3-mini AI locally (4 GB RAM, no GPU). Only SHA-256 hashes and zero-knowledge proofs are transmitted — your data stays private.
+**Q: What happens with a false positive?**
+Affected users report the false detection. The false positive rate
+rises on-chain. The GovernanceAutoTuning contract automatically
+raises the confidence threshold for new rules. The guardian who
+submitted the bad rule loses 50% of their reputation score.
+No human intervention required.
 
-## 6. What hardware do I need to run a Guardian?
+**Q: How does Prometheus protect my privacy?**
+Your device never sends raw files, paths, or metadata. Only a
+SHA-256 hash of the suspicious file is transmitted — this is a
+one-way fingerprint, the original cannot be reconstructed from it.
+The report is wrapped in a Groth16 ZK-proof that proves you are a
+legitimate network participant without revealing your identity.
+Raw data never leaves your device.
 
-The 8B model requires an NVIDIA RTX 4070 Ti or better (12-16 GB VRAM) and 32 GB RAM. The 70B model requires 4x A100/H100 GPUs with 128 GB RAM. See the [Guardian Guide](guardian-guide.md) for full details.
+**Q: What is Commit-Reveal voting?**
+A cryptographic protocol that prevents validators from copying each
+other's votes. In the commit phase, each validator submits
+sha256(vote || salt || block_height) — a sealed envelope. After all
+validators have committed, the reveal phase begins and everyone
+opens their envelope simultaneously. A 10% bond is locked during
+voting. Invalid reveals result in immediate bond slashing.
 
-## 7. Is there an emergency stop or admin key?
+---
 
-**No.** This is Architecture Decision #3: "Ultimate decentralization — feature, not a bug." The protocol cannot be paused, halted, or modified by any individual. Governance is fully automated through on-chain parameter tuning.
+## Technical
 
-## 8. When does mainnet launch?
+**Q: Why Kaspa and not Ethereum?**
+Kaspa's DAGKnight consensus achieves 100 blocks per second with
+sub-second finality. Ethereum finality is 12 seconds — too slow for
+real-time threat response. Kaspa also shares the 0% pre-mine
+philosophy of Prometheus. Silverscript (native L1 contracts)
+eliminates reentrancy attacks by design.
 
-The target is **May 5, 2026**, coinciding with the Kaspa Covenant-Hardfork that enables Silverscript smart contracts. The `ssc` compiler ships with this hardfork.
+**Q: What is the difference between Prometheus and ClamAV or Wazuh?**
+ClamAV and Wazuh are signature-based — they only detect what is
+already known. Prometheus detects unknown threats through behavioral
+AI analysis and swarm intelligence. It also stores rules permanently
+on a public blockchain that no organization can modify or censor.
+Prometheus complements existing tools — it does not replace them.
 
-## 9. How fast is threat detection?
+**Q: Can Prometheus be shut down?**
+No. There is no foundation, no central server, no emergency stop.
+The protocol exists as long as the Kaspa blockchain exists.
+No government, corporation, or court can disable it.
+This is a deliberate architectural decision, not an oversight.
 
-The complete lifecycle — from anomaly detection to on-chain rule storage — completes in under 60 seconds. This is verified by the end-to-end integration test suite (Sprint 6).
+**Q: When will the mobile app be available?**
+iOS and Android clients are targeted for September 2026.
+Desktop clients (Windows, macOS, Linux) target August 2026.
 
-## 10. How do I earn developer rewards?
+---
 
-The Dev Incentive Pool allocates 5% of PROM emission (1,000,000 PROM/year) for developer grants. Anyone can propose a grant; it requires a 2/3 validator majority vote. The recommended reward formula is: `lines * 10 * (100 + complexity * 10) / 100`. See [CONTRIBUTING.md](../CONTRIBUTING.md) for details.
+## Participation
+
+**Q: How do I earn PROM?**
+Four ways: (1) Run a Light Client and report validated threats.
+(2) Run a Guardian Node with LLaMA 3 and submit accepted rules.
+(3) Run a Validator Node, stake KAS, and vote honestly.
+(4) Run a Honeypot Node and capture zero-day attacks.
+The highest per-report reward goes to Honeypot operators
+(zero-days are rare and extremely valuable).
+
+**Q: What hardware do I need?**
+Light Client: any device with 4 GB RAM, no GPU required.
+Guardian (8B model): RTX 4070 Ti or better, 16 GB VRAM.
+Guardian (70B model): 4x A100/H100, 128 GB RAM.
+Validator: standard VPS, 2 vCPU, 4 GB RAM + 10,000 KAS stake.
+Honeypot: any internet-exposed server.
