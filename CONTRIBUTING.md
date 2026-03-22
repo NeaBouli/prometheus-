@@ -108,13 +108,15 @@ Types:
 
 ## Security Disclosure
 
-If you discover a security vulnerability:
+Report security vulnerabilities via GitHub Security Advisories:
+https://github.com/NeaBouli/prometheus-/security/advisories/new
 
-1. **Do NOT** open a public issue
-2. Email: **security@prometheus-protocol.org**
-3. Include: description, reproduction steps, potential impact
-4. We follow a **90-day responsible disclosure** policy
-5. Acknowledged researchers are credited in the WHITEPAPER.md
+**Do NOT open public issues for security vulnerabilities.**
+
+Include: description, reproduction steps, potential impact.
+We follow a **90-day responsible disclosure** policy.
+No legal action will be taken against ethical security researchers.
+Acknowledged researchers are credited in the WHITEPAPER.md.
 
 Critical vulnerabilities affecting staked KAS funds receive priority response within 24 hours.
 
