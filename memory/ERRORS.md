@@ -110,6 +110,17 @@ Solution: Replace with real LLM confidence extraction when live LLM is available
 Check:    Tracked as TODO — Sprint 6 E2E Integration
 ```
 
+### PATTERN-012: Guardian Centralization Risk
+```
+Problem:  70B Guardian requires $60k-120k hardware → only 50-200
+          nodes realistic worldwide → contradicts decentralization promise
+Symptom:  Network works but is not truly decentralized at Guardian layer
+Solution: Implement hybrid routing (8B default) + ensemble voting
+          (5x 8B majority) BEFORE mainnet. These are Sprint 10B tasks.
+Check:    Before mainnet: verify at least 50 active 8B Guardians
+          and ensemble voting protocol deployed
+```
+
 ---
 
 ## ERROR LOG (populated during development)

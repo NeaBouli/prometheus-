@@ -48,6 +48,9 @@ Abweichungen führen zu automatischem REJECT im Audit.
 | 13 | Abstimmung: Commit-Reveal + Salted    | Verhindert Absprachen kryptografisch            | 2026-03-21 |
 | 14 | Anti-Sybil: Quadratic Voting (Rep^2)  | Mathematisch bewiesen (Buterin 2019)            | 2026-03-21 |
 | 15 | Reporter-Pool: 75% Light / 25% Honeypot| Zero-Days seltener, aber wertvoller             | 2026-03-21 |
+| 16 | Guardian hybrid routing: 8B default, 70B escalation <0.70 | guardian-economics.html documents this | 2026-03-22 |
+| 17 | Ensemble voting: 5+ 8B nodes = alternative to 1x 70B | Reduces centralization risk | 2026-03-22 |
+| 18 | Guardian Pooling: on-chain PROM split for shared 70B | Lowers entry from $60k to ~$6k per operator | 2026-03-22 |
 
 ---
 

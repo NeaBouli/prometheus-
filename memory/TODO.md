@@ -137,6 +137,18 @@
 
 ---
 
+## ═══ SPRINT 10B: GUARDIAN DECENTRALIZATION (parallel to Sprint 10) ═══
+
+- [ ] [P1] Design hybrid routing algorithm: 8B default, 70B escalation when confidence < 0.70 | Claude Code | Sprint 9 done
+- [ ] [P1] Implement ensemble voting protocol: 5+ 8B Guardians vote on same YARA rule via majority | Claude Code | Sprint 10
+- [ ] [P2] Guardian Pooling Contract: on-chain PROM split for shared 70B nodes | Claude Code | Contracts live
+- [ ] [P2] Specialization sharding: Guardian registers attack class (ransomware/network/privilege) during PoW registration | Claude Code | Sprint 11
+- [ ] [P2] Sybil resistance final design: KAS/PROM stake per Guardian identity OR hardware ZK-fingerprint | Architect decision needed
+- [ ] [P3] Evaluate PLONK vs Groth16 for Light Client ZK-proofs | Claude Code | Post hardfork
+- [ ] [P3] YARA-specialized 8B fine-tuning on CVE/YARA datasets only | Claude Code | Sprint 12
+
+---
+
 ## ═══ SPRINT 11: PHI-3 + LLAMA PRODUCTION (Juni 2026) ═══
 
 - [ ] [P0] Phi-3-mini 3.8B herunterladen + 4-bit ONNX quantisieren | Claude Code | -

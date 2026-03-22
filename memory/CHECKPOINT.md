@@ -65,6 +65,10 @@ Claude → antwortet, Core Dev trägt Antwort in memory/MEMO.md ein
 - [ ] Discord/Telegram aufbauen — Core Dev
 - [ ] PATTERN-010 in production: Arc<Phi3Model> statt Arc<Mutex<Phi3Model>>
 - [ ] fp_rate Oracle-Mechanismus entscheiden (Q-003 in AUDIT.md offen)
+- [ ] Guardian hybrid routing (8B/70B) — Sprint 10B, BEFORE mainnet
+- [ ] Ensemble voting protocol (5x 8B majority) — Sprint 10B
+- [ ] Sybil resistance final design — Architect decision needed
+- [ ] PLONK evaluation for Light Client ZK-proofs — Sprint 9+
 
 ---
 
