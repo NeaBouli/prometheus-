@@ -1,22 +1,22 @@
 # PROMETHEUS – MODULE STATUS
-# Format: | Modul | Status | Progress | Last Update | Audit | Testnet-Adresse |
+# Format: | Module | Status | Progress | Last Update | Audit | Testnet Address |
 # Status: PENDING | IN_PROGRESS | DONE | BLOCKED | PENDING_AUDIT | ACCEPTED | REJECTED
 # Last Updated: 2026-03-21
 
 ---
 
-## AKTUELLER SPRINT
+## CURRENT SPRINT
 
 ```
-Sprint 2: Light Client Basis
-Status:   PENDING_AUDIT
+Sprint 7: Dashboard + Docs
+Status:   ACCEPTED
 Start:    2026-03-21
-Ziel:     Rust client foundation — connection, krc20, scanner, zk_proof
+Goal:     All sprints 0-7 accepted. Feature-complete for Covenant-Hardfork.
 ```
 
 ---
 
-## MODULE STATUS TABELLE
+## MODULE STATUS TABLE
 
 | Modul                        | Status          | Progress | Last Update | Audit        | Testnet-Adresse |
 |------------------------------|-----------------|----------|-------------|--------------|-----------------|
@@ -81,37 +81,29 @@ Ziel:     Rust client foundation — connection, krc20, scanner, zk_proof
 
 ## IN_PROGRESS
 
-Aktuell in Bearbeitung:
+Currently in progress:
 ```
-Modul:  Sprint-1 Pre-Check — ACCEPTED
-Sprint: 0→1 Übergang
-Start:  2026-03-21
-Status: ACCEPTED — alle 3 Verifikationen vom Architect genehmigt
-        V-001: uint64 mit 10000x-Skalierung ✓
-        V-002: bytes(36) für CIDv1 binary ✓
-        V-003: Nicht-rekursive slash() mit min(3, count/3+1) ✓
-→ Sprint 1 ist freigegeben
+All sprints 0-7 ACCEPTED. Feature-complete.
+Waiting for Covenant-Hardfork (May 5, 2026) to deploy contracts.
+Next: Sprint 9 — Contracts Live (after ssc compiler ships).
 ```
 
 ## BLOCKED
 
-Keine Blockaden.
+No blockers. Next external dependency: ssc compiler on May 5, 2026.
 
-## NEXT_ACTIONS (für Claude Code)
-
-```
-1. ~~Repo-Struktur auf GitHub anlegen~~ DONE
-2. ~~Testnet-10-Node installieren~~ DONE
-3. ~~Silverscript Compiler installieren~~ BLOCKED (ssc existiert nicht)
-   ~~rusty-kaspa als Cargo Dependency~~ DONE
-4. Hello-World Contract deployen
-→ Status aktualisieren nach jedem Schritt
-```
-
-## TESTNET CONTRACT ADRESSEN
+## NEXT ACTIONS (for Claude Code)
 
 ```
-(werden nach Deployment eingetragen)
+All Sprint 0-7 tasks complete. Waiting for Covenant-Hardfork.
+Next: Sprint 9 — compile and deploy contracts with ssc (May 2026).
+See memory/TODO.md for full Sprint 9-14 task list.
+```
+
+## TESTNET CONTRACT ADDRESSES
+
+```
+(to be filled after deployment)
 ValidatorStaking:    TBD
 GuardianReputation:  TBD
 GovernanceAutoTuning: TBD
@@ -120,8 +112,8 @@ CommunityDonations:  TBD
 RuleStorage:         TBD
 ```
 
-## MAINNET CONTRACT ADRESSEN (ab 5. Mai 2026)
+## MAINNET CONTRACT ADDRESSES (from May 5, 2026)
 
 ```
-(werden am Launch-Tag eingetragen)
+(to be filled on launch day)
 ```
