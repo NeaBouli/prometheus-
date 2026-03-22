@@ -213,3 +213,4 @@
 - [x] AUDIT.md + ERRORS.md + STATUS.md translated to English | Claude Code | 2026-03-22
 - [x] SECURITY.md + docs/repository-security.md + fake email removed | Claude Code | 2026-03-22
 - [x] Nav synced across all 5 pages (Architecture + Tokens restored) | Claude Code | 2026-03-22
+- [x] PROM coin logo integrated — index, manifest, llms.txt, og:image | Claude Code | 2026-03-22
