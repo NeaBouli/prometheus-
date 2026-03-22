@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prometheus — Guardian Economics & Open Problems</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --void: #050505;--deep: #0a0a0a;--surface: #0f0f0f;--panel: #141414;
+  --line: rgba(255,255,255,0.07);--line-bright: rgba(255,255,255,0.14);
+  --mint: #00E5A0;--mint-dim: #00B880;--mint-faint: rgba(0,229,160,0.06);
+  --silver: #C8C8C8;--silver-dim: #787878;--gold: #C8A060;
+  --warn: #FF9500;--warn-faint: rgba(255,149,0,0.06);
+  --danger: #FF453A;--danger-faint: rgba(255,69,58,0.06);
+  --text: #E2E2E2;--muted: #666666;--dim: #333333;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Space Grotesk',sans-serif;background:var(--void);color:var(--text);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+body::before{content:'';position:fixed;inset:0;z-index:9999;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,0) 0px,rgba(0,0,0,0) 1px,rgba(0,0,0,0.03) 1px,rgba(0,0,0,0.03) 2px)}
+
+nav{position:fixed;top:0;left:0;right:0;z-index:500;padding:0 48px;height:56px;display:flex;align-items:center;justify-content:space-between;background:rgba(5,5,5,.97);border-bottom:1px solid var(--line);backdrop-filter:blur(8px)}
+.nav-id{display:flex;align-items:center;gap:14px;text-decoration:none}
+.nav-id img{height:26px;width:26px;object-fit:contain;filter:brightness(0) invert(1) brightness(.7)}
+.nav-wordmark{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;letter-spacing:4px;color:var(--silver);text-transform:uppercase}
+.nav-links{display:flex;gap:36px;list-style:none}
+.nav-links a{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color .2s}
+.nav-links a:hover,.nav-links a.active{color:var(--mint)}
+.nav-gh{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--mint);text-decoration:none;border:1px solid rgba(0,229,160,.3);padding:7px 18px;transition:background .2s}
+.nav-gh:hover{background:rgba(0,229,160,.08)}
+
+.page-header{padding:140px 48px 80px;border-bottom:1px solid var(--line);position:relative;overflow:hidden}
+.page-header::before{content:'';position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:80px 80px;mask-image:radial-gradient(ellipse 60% 100% at 20% 50%,black 30%,transparent 100%)}
+.page-header-inner{max-width:1280px;margin:0 auto;position:relative;z-index:1}
+.breadcrumb{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:20px}
+.breadcrumb a{color:var(--mint);text-decoration:none}
+.breadcrumb span{margin:0 8px;color:var(--dim)}
+.page-title{font-size:clamp(36px,5vw,64px);font-weight:300;color:var(--text);letter-spacing:-1px;line-height:1.05;margin-bottom:16px}
+.page-desc{font-size:15px;font-weight:300;color:var(--silver-dim);line-height:1.7;max-width:600px;margin-top:16px}
+.honesty-banner{display:inline-flex;align-items:center;gap:10px;border:1px solid rgba(255,149,0,.3);background:var(--warn-faint);padding:8px 16px;margin-bottom:24px;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1px;color:var(--warn)}
+
+/* LAYOUT */
+.wp-layout{display:grid;grid-template-columns:260px 1fr;gap:0;max-width:1280px;margin:0 auto;padding:0 48px}
+.sidebar{padding:48px 32px 48px 0;border-right:1px solid var(--line);position:sticky;top:56px;height:calc(100vh - 56px);overflow-y:auto}
+.sidebar::-webkit-scrollbar{width:2px}
+.sidebar::-webkit-scrollbar-thumb{background:var(--dim)}
+.sb-label{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--mint);text-transform:uppercase;margin-bottom:10px;margin-top:24px;display:block}
+.sb-label:first-child{margin-top:0}
+.sb-links{list-style:none}
+.sb-links li a{font-size:12px;font-weight:300;color:var(--muted);text-decoration:none;display:block;padding:4px 0;transition:color .2s;line-height:1.4}
+.sb-links li a:hover{color:var(--silver)}
+.sb-links li a.active{color:var(--mint)}
+.sb-links li a.warn-link{color:var(--warn)}
+
+.wp-content{padding:64px 0 120px 64px}
+.wp-section{margin-bottom:80px;padding-bottom:80px;border-bottom:1px solid var(--line)}
+.wp-section:last-child{border-bottom:none;margin-bottom:0}
+
+.sec-label{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--mint);text-transform:uppercase;margin-bottom:12px;display:block}
+.sec-label.warn{color:var(--warn)}
+.sec-label.danger{color:var(--danger)}
+.sec-title{font-size:clamp(22px,3vw,36px);font-weight:300;color:var(--text);letter-spacing:-.5px;margin-bottom:24px;line-height:1.1}
+.sec-sub{font-size:17px;font-weight:400;color:var(--silver);margin-bottom:14px;margin-top:36px;padding-top:36px;border-top:1px solid var(--line)}
+.sec-sub:first-of-type{border-top:none;padding-top:0;margin-top:0}
+
+p{font-size:14px;font-weight:300;color:var(--silver-dim);line-height:1.85;margin-bottom:14px}
+p:last-child{margin-bottom:0}
+strong{color:var(--silver);font-weight:500}
+
+/* CALLOUTS */
+.callout{border-left:1px solid var(--mint);padding:16px 20px;background:var(--mint-faint);margin:20px 0}
+.callout p{color:var(--silver-dim);font-size:13px;line-height:1.7;margin:0}
+.callout strong{color:var(--mint)}
+.callout-warn{border-left:1px solid var(--warn);padding:16px 20px;background:var(--warn-faint);margin:20px 0}
+.callout-warn p{color:var(--silver-dim);font-size:13px;line-height:1.7;margin:0}
+.callout-warn strong{color:var(--warn)}
+.callout-danger{border-left:1px solid var(--danger);padding:16px 20px;background:var(--danger-faint);margin:20px 0}
+.callout-danger p{color:var(--silver-dim);font-size:13px;line-height:1.7;margin:0}
+.callout-danger strong{color:var(--danger)}
+
+/* TABLES */
+.wp-table{width:100%;border-collapse:collapse;margin:20px 0;font-size:12px}
+.wp-table th{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;padding:10px 14px;border-bottom:1px solid var(--line);text-align:left;font-weight:400;background:var(--deep)}
+.wp-table td{padding:11px 14px;border-bottom:1px solid rgba(255,255,255,.04);color:var(--silver-dim);font-weight:300;vertical-align:top;line-height:1.5}
+.wp-table td:first-child{font-family:'Space Mono',monospace;font-size:11px;color:var(--gold)}
+.wp-table tr:last-child td{border-bottom:none}
+.wp-table .good{color:var(--mint)}
+.wp-table .bad{color:var(--danger)}
+.wp-table .warn{color:var(--warn)}
+.wp-table .num{font-family:'Space Mono',monospace;font-size:12px;color:var(--silver)}
+
+/* BREAK-EVEN CALC */
+.calc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);margin:20px 0}
+.calc-card{background:var(--deep);padding:28px 24px}
+.calc-title{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:16px}
+.calc-big{font-family:'Space Mono',monospace;font-size:36px;font-weight:700;line-height:1;margin-bottom:6px}
+.calc-big.mint{color:var(--mint)}
+.calc-big.warn{color:var(--warn)}
+.calc-big.danger{color:var(--danger)}
+.calc-sub{font-size:12px;font-weight:300;color:var(--muted);line-height:1.5}
+.calc-rows{margin-top:16px;border-top:1px solid var(--line);padding-top:14px}
+.calc-row{display:flex;justify-content:space-between;padding:4px 0;font-size:11px;color:var(--muted)}
+.calc-row span:last-child{font-family:'Space Mono',monospace;color:var(--silver-dim)}
+
+/* SOLUTION CARDS */
+.solutions-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);margin:20px 0}
+.sol-card{background:var(--deep);padding:28px 24px;transition:background .3s}
+.sol-card:hover{background:var(--surface)}
+.sol-tag{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;display:block}
+.sol-tag.now{color:var(--mint)}
+.sol-tag.mid{color:var(--gold)}
+.sol-tag.long{color:var(--muted)}
+.sol-title{font-size:15px;font-weight:400;color:var(--silver);margin-bottom:10px}
+.sol-desc{font-size:12px;font-weight:300;color:var(--muted);line-height:1.6;margin-bottom:14px}
+.sol-impact{font-family:'Space Mono',monospace;font-size:10px;color:var(--mint-dim);border-top:1px solid var(--line);padding-top:10px}
+
+/* BOOTSTRAPPING PHASES */
+.phases-track{margin:20px 0}
+.phase-row{display:grid;grid-template-columns:100px 1fr;gap:0;border-bottom:1px solid var(--line)}
+.phase-row:first-child{border-top:1px solid var(--line)}
+.phase-label{font-family:'Space Mono',monospace;font-size:10px;color:var(--gold);padding:16px 16px 16px 0;border-right:1px solid var(--line)}
+.phase-content{padding:16px 0 16px 20px;font-size:12px;font-weight:300;color:var(--silver-dim);line-height:1.6}
+.phase-content strong{color:var(--silver);font-weight:400}
+
+/* STATUS PILL */
+.pill{display:inline-block;font-family:'Space Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;padding:3px 8px;margin-left:8px}
+.pill-open{color:var(--warn);border:1px solid rgba(255,149,0,.3)}
+.pill-solved{color:var(--mint);border:1px solid rgba(0,229,160,.2)}
+.pill-partial{color:var(--gold);border:1px solid rgba(200,160,96,.3)}
+
+ul.wp-list{list-style:none;margin:14px 0}
+ul.wp-list li{font-size:13px;font-weight:300;color:var(--silver-dim);padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04);display:flex;gap:12px;align-items:flex-start;line-height:1.5}
+ul.wp-list li:last-child{border-bottom:none}
+ul.wp-list li::before{content:'';flex-shrink:0;width:1px;height:13px;background:var(--mint);margin-top:3px;opacity:.5}
+
+footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:24px}
+.f-left{font-family:'Space Mono',monospace;font-size:11px;color:var(--dim);letter-spacing:1px}
+.f-center{font-family:'Space Mono',monospace;font-size:12px;letter-spacing:3px;color:var(--silver-dim);text-align:center}
+.f-links{display:flex;justify-content:flex-end;gap:24px;list-style:none}
+.f-links a{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1px;color:var(--dim);text-decoration:none;transition:color .2s}
+.f-links a:hover{color:var(--mint)}
+
+.r{opacity:0;transform:translateY(20px);transition:opacity .5s ease,transform .5s ease}
+.r.on{opacity:1;transform:translateY(0)}
+.d1{transition-delay:.08s}
+
+@media(max-width:900px){
+  nav{padding:0 24px}
+  .nav-links{display:none}
+  .page-header{padding:120px 24px 60px}
+  .wp-layout{grid-template-columns:1fr;padding:0 24px}
+  .sidebar{display:none}
+  .wp-content{padding:48px 0 80px}
+  .calc-grid,.solutions-grid{grid-template-columns:1fr}
+  footer{grid-template-columns:1fr;gap:16px;padding:24px}
+  .f-links{justify-content:flex-start}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-id">
+    <img src="logo/Prometheus.png" alt="Prometheus" onerror="this.style.display='none'">
+    <span class="nav-wordmark">Prometheus</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="index.html#lifecycle">Protocol</a></li>
+    <li><a href="whitepaper.html">Whitepaper</a></li>
+    <li><a href="roadmap.html">Roadmap</a></li>
+    <li><a href="faq.html">FAQ</a></li>
+    <li><a href="guardian-economics.html" class="active">Guardian Economics</a></li>
+  </ul>
+  <a href="https://github.com/NeaBouli/prometheus-" class="nav-gh" target="_blank">GitHub ↗</a>
+</nav>
+
+<div class="page-header">
+  <div class="page-header-inner">
+    <div class="breadcrumb r"><a href="index.html">Prometheus</a><span>/</span>Guardian Economics &amp; Open Problems</div>
+    <div class="honesty-banner r">⚠ Radical transparency — known problems documented here</div>
+    <h1 class="page-title r">Guardian economics,<br>open problems,<br>and honest answers.</h1>
+    <p class="page-desc r d1">Prometheus is built on the principle that code is truth. That same principle applies to our documentation. This page covers the real challenges the protocol faces — including problems not yet fully solved — alongside concrete approaches to solving them.</p>
+  </div>
+</div>
+
+<div class="wp-layout">
+
+  <aside class="sidebar">
+    <span class="sb-label">The Core Problem</span>
+    <ul class="sb-links">
+      <li><a href="#centralization" class="warn-link">Guardian centralization risk</a></li>
+      <li><a href="#hardware-cost">Hardware cost reality</a></li>
+      <li><a href="#breakeven">Break-even calculations</a></li>
+    </ul>
+    <span class="sb-label">Solution Approaches</span>
+    <ul class="sb-links">
+      <li><a href="#hybrid-routing">Hybrid routing (8B/70B)</a></li>
+      <li><a href="#ensemble">Ensemble voting protocol</a></li>
+      <li><a href="#pooling">Guardian pooling</a></li>
+      <li><a href="#specialization">Specialization sharding</a></li>
+      <li><a href="#plonk">PLONK vs Groth16</a></li>
+    </ul>
+    <span class="sb-label">Bootstrapping</span>
+    <ul class="sb-links">
+      <li><a href="#chicken-egg">The chicken-egg problem</a></li>
+      <li><a href="#kas-bridge">KAS as economic bridge</a></li>
+      <li><a href="#early-mover">Early-mover dynamics</a></li>
+      <li><a href="#phases">Bootstrap phases</a></li>
+    </ul>
+    <span class="sb-label">Other Open Problems</span>
+    <ul class="sb-links">
+      <li><a href="#sybil">Sybil resistance</a></li>
+      <li><a href="#sla">60-second SLA under load</a></li>
+      <li><a href="#yara-quality">8B vs 70B YARA quality</a></li>
+    </ul>
+    <span class="sb-label">Research Directions</span>
+    <ul class="sb-links">
+      <li><a href="#research">Open research questions</a></li>
+    </ul>
+  </aside>
+
+  <main class="wp-content">
+
+    <!-- CORE PROBLEM -->
+    <div class="wp-section r" id="centralization">
+      <span class="sec-label warn">⚠ Core Problem</span>
+      <h2 class="sec-title">Guardian centralization risk.<span class="pill pill-open">Open</span></h2>
+      <p>This is the most significant structural tension in Prometheus. We document it transparently because pretending it doesn't exist would undermine the trust the protocol depends on.</p>
+
+      <div class="callout-danger">
+        <p><strong>The problem in one sentence:</strong> LLaMA 3 70B requires hardware that costs $60,000–120,000 to acquire and $8,000–12,000/year to operate. Globally, only 50–200 nodes at this level are realistic. This contradicts the decentralization promise.</p>
+      </div>
+
+      <div class="sec-sub" id="hardware-cost">Hardware cost reality</div>
+      <table class="wp-table">
+        <tr><th>Node Type</th><th>Hardware</th><th>Acquisition cost</th><th>Annual electricity</th><th>Accessibility</th></tr>
+        <tr>
+          <td>Light Client</td>
+          <td>Any device, 4 GB RAM</td>
+          <td class="num good">$0 extra</td>
+          <td class="num good">Minimal</td>
+          <td class="good">Everyone</td>
+        </tr>
+        <tr>
+          <td>Guardian (8B)</td>
+          <td>RTX 4070 Ti+, 16 GB VRAM</td>
+          <td class="num warn">$800–1,500</td>
+          <td class="num warn">~$1,000</td>
+          <td class="warn">Enthusiasts</td>
+        </tr>
+        <tr>
+          <td>Guardian (70B)</td>
+          <td>4× A100/H100, 128 GB RAM</td>
+          <td class="num bad">$60,000–120,000</td>
+          <td class="num bad">$8,000–12,000</td>
+          <td class="bad">Data centers only</td>
+        </tr>
+        <tr>
+          <td>Validator</td>
+          <td>Standard server + 10,000 KAS</td>
+          <td class="num warn">~$500–1,000</td>
+          <td class="num warn">~$500–1,000</td>
+          <td class="warn">KAS holders</td>
+        </tr>
+        <tr>
+          <td>Honeypot</td>
+          <td>Any internet-exposed server</td>
+          <td class="num good">~$0</td>
+          <td class="num good">Minimal</td>
+          <td class="good">Everyone</td>
+        </tr>
+      </table>
+
+      <p>The 8B Guardian is accessible — RTX 4070 Ti hardware is within reach for enthusiasts, and the reputation system rewards quality output regardless of model size. The 70B Guardian is categorically different: it requires institutional-grade infrastructure.</p>
+    </div>
+
+    <!-- BREAK-EVEN -->
+    <div class="wp-section r" id="breakeven">
+      <span class="sec-label">Economics</span>
+      <h2 class="sec-title">Break-even calculations.</h2>
+      <p>For a Guardian operator to run a node economically, PROM earnings must cover hardware and operating costs. The following calculations use conservative assumptions and are based on Year 1 emission.</p>
+
+      <div class="callout-warn">
+        <p><strong>Important caveat:</strong> PROM has no price before mainnet (May 5, 2026). These calculations use target price scenarios — not predictions. Actual economics depend entirely on market adoption.</p>
+      </div>
+
+      <div class="sec-sub">Assumptions (Year 1)</div>
+      <table class="wp-table">
+        <tr><th>Variable</th><th>Value</th><th>Source</th></tr>
+        <tr><td>Guardian emission Y1</td><td class="num">6,000,000 PROM</td><td>Whitepaper tokenomics</td></tr>
+        <tr><td>Active Guardians (realistic Y1)</td><td class="num">50–150 nodes</td><td>Conservative estimate</td></tr>
+        <tr><td>PROM per Guardian (avg, 100 nodes)</td><td class="num">60,000 PROM/year</td><td>6M ÷ 100</td></tr>
+        <tr><td>Reputation weighting</td><td class="num">70B earns ~3–5× more than 8B</td><td>Quadratic voting power formula</td></tr>
+      </table>
+
+      <div class="sec-sub">Break-even price scenarios</div>
+      <div class="calc-grid">
+        <div class="calc-card">
+          <div class="calc-title">Guardian 8B</div>
+          <div class="calc-big warn">$0.017</div>
+          <div class="calc-sub">PROM/token to break even in Year 1</div>
+          <div class="calc-rows">
+            <div class="calc-row"><span>Annual hardware cost</span><span>~$1,000</span></div>
+            <div class="calc-row"><span>Electricity</span><span>~$1,000</span></div>
+            <div class="calc-row"><span>Total annual cost</span><span>~$2,000</span></div>
+            <div class="calc-row"><span>Avg PROM earned</span><span>~20,000</span></div>
+            <div class="calc-row"><span>Break-even price</span><span>$0.10</span></div>
+            <div class="calc-row"><span>Profitable above</span><span class="good">$0.10/PROM</span></div>
+          </div>
+        </div>
+        <div class="calc-card">
+          <div class="calc-title">Guardian 70B (owned)</div>
+          <div class="calc-big danger">$1.83</div>
+          <div class="calc-sub">PROM/token to break even in Year 1</div>
+          <div class="calc-rows">
+            <div class="calc-row"><span>Hardware (amortized 5yr)</span><span>~$18,000</span></div>
+            <div class="calc-row"><span>Electricity</span><span>~$10,000</span></div>
+            <div class="calc-row"><span>Total annual cost</span><span>~$28,000</span></div>
+            <div class="calc-row"><span>Avg PROM earned (5× weight)</span><span>~100,000</span></div>
+            <div class="calc-row"><span>Break-even price</span><span>$0.28</span></div>
+            <div class="calc-row"><span>Profitable above</span><span class="warn">$0.28/PROM</span></div>
+          </div>
+        </div>
+        <div class="calc-card">
+          <div class="calc-title">Guardian 70B (cloud)</div>
+          <div class="calc-big danger">$3.50+</div>
+          <div class="calc-sub">PROM/token to break even in Year 1</div>
+          <div class="calc-rows">
+            <div class="calc-row"><span>Cloud GPU (4× A100)</span><span>~$1,200/mo</span></div>
+            <div class="calc-row"><span>Annual cloud cost</span><span>~$14,400</span></div>
+            <div class="calc-row"><span>Total annual cost</span><span>~$14,400</span></div>
+            <div class="calc-row"><span>Avg PROM earned</span><span>~100,000</span></div>
+            <div class="calc-row"><span>Break-even price</span><span>$0.144</span></div>
+            <div class="calc-row"><span>Profitable above</span><span class="warn">$0.144/PROM</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout">
+        <p><strong>Key insight:</strong> The 8B Guardian is economically the most attractive entry point. Break-even at $0.10/PROM is achievable if the network gains meaningful adoption. Cloud-hosted 70B is actually more capital-efficient than owning hardware — but depends entirely on PROM market price.</p>
+      </div>
+
+      <div class="sec-sub">Early-mover advantage in numbers</div>
+      <table class="wp-table">
+        <tr><th>Year</th><th>Total Guardian emission</th><th>At 100 nodes</th><th>At 500 nodes</th><th>At 2000 nodes</th></tr>
+        <tr><td>Year 1</td><td class="num">6,000,000 PROM</td><td class="num good">60,000/node</td><td class="num warn">12,000/node</td><td class="num bad">3,000/node</td></tr>
+        <tr><td>Year 2</td><td class="num">5,400,000 PROM</td><td class="num">54,000/node</td><td class="num">10,800/node</td><td class="num">2,700/node</td></tr>
+        <tr><td>Year 3</td><td class="num">4,800,000 PROM</td><td class="num">48,000/node</td><td class="num">9,600/node</td><td class="num">2,400/node</td></tr>
+      </table>
+      <p>Early operators earn significantly more PROM per node — both because emission is higher in Year 1 and because fewer nodes compete for rewards. This is the strongest economic argument for early participation despite the uncertain PROM price.</p>
+    </div>
+
+    <!-- SOLUTIONS -->
+    <div class="wp-section r" id="hybrid-routing">
+      <span class="sec-label">Solution Approaches</span>
+      <h2 class="sec-title">Five paths to solving Guardian centralization.</h2>
+      <p>None of these solutions is implemented yet. They represent the current best thinking on how to address the problem. Community input is explicitly invited — this is an open design question.</p>
+
+      <div class="solutions-grid">
+
+        <div class="sol-card" id="hybrid-routing">
+          <span class="sol-tag now">Immediate · High impact</span>
+          <div class="sol-title">1. Hybrid Routing (8B/70B escalation)</div>
+          <div class="sol-desc">8B Guardians handle standard cases. 70B escalation only triggers when confidence score falls below threshold (e.g. &lt;0.70). Most threats are known variants — 8B handles them well. True zero-days escalate automatically to 70B.</div>
+          <div class="sol-impact">Impact: 70–80% of work stays at 8B level. 70B needed only for edge cases. Decentralization dramatically improved.</div>
+        </div>
+
+        <div class="sol-card" id="ensemble">
+          <span class="sol-tag now">Immediate · Proven pattern</span>
+          <div class="sol-title">2. Ensemble Voting (multiple 8B nodes)</div>
+          <div class="sol-desc">Instead of one 70B node, 5–10 independent 8B Guardians analyze the same threat and vote on the YARA rule via majority consensus. Disagreement triggers 70B escalation. Ensemble accuracy approaches 70B quality for common threats.</div>
+          <div class="sol-impact">Impact: Zero new hardware requirements. Same quality via consensus. Strongly increases Guardian count and geographic distribution.</div>
+        </div>
+
+        <div class="sol-card" id="pooling">
+          <span class="sol-tag mid">Medium term · Architecture needed</span>
+          <div class="sol-title">3. Guardian Pooling Protocol</div>
+          <div class="sol-desc">Multiple operators share a single 70B node. PROM rewards split on-chain proportional to compute contribution. A data center with 4× A100 can serve 10+ operators who each contribute GPU time and receive proportional PROM.</div>
+          <div class="sol-impact">Impact: Lowers 70B entry barrier from $60k to $6k per operator. On-chain split ensures trustless revenue sharing.</div>
+        </div>
+
+        <div class="sol-card" id="specialization">
+          <span class="sol-tag mid">Medium term · Ecosystem maturity needed</span>
+          <div class="sol-title">4. Specialization Sharding</div>
+          <div class="sol-desc">8B Guardians specialize by attack class: Guardian A handles ransomware, Guardian B handles network intrusion, Guardian C handles privilege escalation. Specialization + fine-tuning makes 8B competitive with 70B within its domain.</div>
+          <div class="sol-impact">Impact: Fine-tuned 8B models match 70B quality in their specialty. Natural ecosystem of specialized Guardians emerges organically.</div>
+        </div>
+
+        <div class="sol-card">
+          <span class="sol-tag mid">Medium term · Research needed</span>
+          <div class="sol-title">5. Incentivized Cloud Pooling</div>
+          <div class="sol-desc">DAO provides initial grants (from Dev Pool) to cover first 6–12 months of 70B cloud costs for selected operators. Operators commit to providing public Guardian service in return. After PROM market price matures, grants phase out.</div>
+          <div class="sol-impact">Impact: Ensures 70B presence in early bootstrapping phase without requiring operators to bear full risk during price discovery.</div>
+        </div>
+
+        <div class="sol-card" id="plonk">
+          <span class="sol-tag mid">Medium term · Cryptography research</span>
+          <div class="sol-title">6. PLONK instead of Groth16</div>
+          <div class="sol-desc">Groth16 ZK-proofs can take 5–30 seconds on CPU (Light Client hardware). PLONK proofs are faster to generate and don't require a trusted setup. If Kaspa natively supports PLONK verification, Light Client proof generation drops to &lt;2 seconds.</div>
+          <div class="sol-impact">Impact: 60-second SLA becomes reliably achievable even on weak hardware. Removes GPU requirement for Light Clients entirely.</div>
+        </div>
+
+      </div>
+
+      <div class="callout">
+        <p><strong>Current recommendation:</strong> Solutions 1 (Hybrid Routing) and 2 (Ensemble Voting) can be implemented immediately with existing architecture. They are the highest-impact, lowest-risk interventions. Solutions 3–6 require additional protocol design and will be addressed in Sprints 9–14.</p>
+      </div>
+    </div>
+
+    <!-- BOOTSTRAPPING -->
+    <div class="wp-section r" id="chicken-egg">
+      <span class="sec-label">Bootstrapping</span>
+      <h2 class="sec-title">The chicken-egg problem — and how KAS solves it.</h2>
+      <p>Every decentralized network faces the same fundamental challenge: without nodes, there is no protection. Without protection, there are no users. Without users, there is no incentive for nodes. Prometheus has a structural answer to this that most protocols lack.</p>
+
+      <div class="sec-sub" id="kas-bridge">KAS as the economic bridge</div>
+      <p>The critical insight: <strong>KAS already has economic value.</strong> On day one of mainnet, Validators stake KAS — an asset worth over $1 billion in market capitalization that has been established since 2021. This means Prometheus inherits real economic security immediately, without waiting for PROM to develop a price.</p>
+
+      <div class="callout">
+        <p><strong>Why this matters:</strong> Most new protocols bootstrap security with their own token that has zero initial value. Prometheus bootstraps with KAS — a proven asset. Security comes from established value on day one. PROM can develop a price organically, under no pressure to be the primary security mechanism.</p>
+      </div>
+
+      <div class="sec-sub" id="early-mover">Early-mover dynamics</div>
+      <p>The deflationary emission schedule creates a natural bootstrapping incentive. Year 1 emits 20M PROM across fewer nodes than Year 3. An operator who joins in Month 1 earns dramatically more PROM per node than one who joins in Year 2 — at lower competition and higher token scarcity.</p>
+      <p>This is not artificial scarcity. It is a direct consequence of the network growing while emission decreases. The economic rational actor calculation strongly favors early participation even under price uncertainty.</p>
+
+      <div class="sec-sub" id="phases">Realistic bootstrap phases</div>
+      <div class="phases-track">
+        <div class="phase-row">
+          <div class="phase-label">Phase 1<br>Mo 1–3</div>
+          <div class="phase-content">
+            <strong>Team-operated nodes.</strong> 10 Validators (team) + 10–20 Guardian 8B (team) + 2–5 Guardian 70B (team/partners). Security level: known threats covered. First PROM minted. DEX pool opens. Price discovery begins.
+          </div>
+        </div>
+        <div class="phase-row">
+          <div class="phase-label">Phase 2<br>Mo 4–12</div>
+          <div class="phase-content">
+            <strong>Community expansion.</strong> +500 Light Clients. +50 Guardian 8B (community). +10 Guardian 70B (institutions/data centers). Dev Pool grants cover early 70B operators. Security level: good coverage of common threats + zero-day capability.
+          </div>
+        </div>
+        <div class="phase-row">
+          <div class="phase-label">Phase 3<br>Year 2+</div>
+          <div class="phase-content">
+            <strong>Self-sustaining network.</strong> 10,000+ Light Clients. 500+ Guardian 8B. 30–50 Guardian 70B. PROM market price established. Full security coverage. Guardian Pooling Protocol active. Specialization emerges organically.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SYBIL -->
+    <div class="wp-section r" id="sybil">
+      <span class="sec-label warn">Open Problem</span>
+      <h2 class="sec-title">Sybil resistance for Guardians.<span class="pill pill-partial">Partial</span></h2>
+      <p>An attacker who operates 10 A100 GPUs could theoretically create 5 independent 70B Guardian identities and dominate the pre-analysis stage — injecting malicious YARA rules.</p>
+
+      <div class="sec-sub">Current countermeasures (implemented)</div>
+      <ul class="wp-list">
+        <li><strong>Quadratic voting power:</strong> power = (reputation / 100)² × compute. Linear expansion of nodes does not linearly expand power.</li>
+        <li><strong>PoW registration:</strong> Difficulty scales with current Guardian count. 100 fake nodes cost 100× the registration effort.</li>
+        <li><strong>Historical success rate:</strong> New nodes start at reputation 0.1 (REPUTATION_START). Building influence requires a track record of accepted proposals — which requires honest behavior over time.</li>
+        <li><strong>Validator final gate:</strong> Guardians propose, Validators decide. Even if all Guardians collude, 67% of Validators (who have KAS at risk) must also approve.</li>
+      </ul>
+
+      <div class="sec-sub">Open question (not yet designed)</div>
+      <p>How do we prevent a single operator with 10 A100s from registering 5 independent 70B identities? Current PoW scales with node count but does not verify that two nodes are operated by different people. Proposed approaches under consideration:</p>
+      <ul class="wp-list">
+        <li>Require KAS or PROM stake per Guardian identity (financial Sybil cost)</li>
+        <li>Minimum time-weighted reputation before high voting power (slow Sybil)</li>
+        <li>Hardware fingerprinting via ZK-proof (verifiable compute without revealing identity)</li>
+        <li>Geographic distribution requirements (prevents single-datacenter dominance)</li>
+      </ul>
+      <div class="callout-warn"><p><strong>Status:</strong> This is an open design question. Community proposals are welcome. A final mechanism will be specified before mainnet deployment.</p></div>
+    </div>
+
+    <!-- SLA -->
+    <div class="wp-section r" id="sla">
+      <span class="sec-label warn">Open Problem</span>
+      <h2 class="sec-title">60-second SLA under real-world load.<span class="pill pill-partial">Partial</span></h2>
+      <p>The 60-second end-to-end guarantee has been proven in E2E tests — but under controlled conditions with no network latency, no load, and stub implementations for ZK-proof and AI inference.</p>
+
+      <table class="wp-table">
+        <tr><th>Step</th><th>Target time</th><th>Risk factor</th><th>Status</th></tr>
+        <tr><td>ZK-proof generation</td><td class="num">~2s</td><td>CPU: 5–30s possible on weak hardware</td><td class="warn">Risk</td></tr>
+        <tr><td>LLaMA inference</td><td class="num">~12s</td><td>High load: queue buildup on popular Guardian nodes</td><td class="warn">Risk</td></tr>
+        <tr><td>Network propagation</td><td class="num">~1s</td><td>Intercontinental latency: +100–300ms per hop</td><td class="good">Low risk</td></tr>
+        <tr><td>Validator voting window</td><td class="num">20s</td><td>Fixed — not a bottleneck</td><td class="good">Fixed</td></tr>
+        <tr><td>Kaspa finality</td><td class="num">&lt;1s</td><td>DAGKnight — proven</td><td class="good">Proven</td></tr>
+      </table>
+
+      <p>The real risk is ZK-proof generation on low-end hardware. Groth16 on a 5-year-old laptop CPU can take 20–30 seconds — which would push the total time beyond 60 seconds before the threat even reaches the first Guardian node.</p>
+      <div class="callout-warn"><p><strong>Mitigation under evaluation:</strong> PLONK proofs (faster on CPU) as alternative to Groth16. Local GPU for Light Clients as optional recommendation. Asynchronous proof generation (Light Client submits hint immediately, proof follows). Final decision in Sprint 9.</p></div>
+    </div>
+
+    <!-- YARA QUALITY -->
+    <div class="wp-section r" id="yara-quality">
+      <span class="sec-label">Known Limitation</span>
+      <h2 class="sec-title">8B vs 70B YARA rule quality.<span class="pill pill-partial">Acknowledged</span></h2>
+      <table class="wp-table">
+        <tr><th>Task</th><th>LLaMA 3 8B</th><th>LLaMA 3 70B</th></tr>
+        <tr><td>Known malware families</td><td class="good">Adequate (with fine-tuning)</td><td class="good">Reliable</td></tr>
+        <tr><td>YARA for common CVEs</td><td class="warn">Possible with fine-tuning</td><td class="good">Reliable</td></tr>
+        <tr><td>Zero-day analysis</td><td class="bad">Insufficient alone</td><td class="good">Required</td></tr>
+        <tr><td>Multi-stage threats (&gt;128k context)</td><td class="bad">Context window too small</td><td class="good">128k token context</td></tr>
+        <tr><td>YARA syntax correctness</td><td class="warn">Improvable via YARA-specific fine-tuning</td><td class="good">High quality</td></tr>
+      </table>
+      <p>The 85% confidence threshold combined with the reputation system provides a natural quality filter — 8B Guardians that produce poor rules lose reputation and influence over time. However, for genuine zero-day threats, 70B remains necessary. This is why maintaining at least a small number of 70B Guardians in the network is critical even if 8B dominates in count.</p>
+    </div>
+
+    <!-- RESEARCH -->
+    <div class="wp-section r" id="research">
+      <span class="sec-label">Open Research</span>
+      <h2 class="sec-title">Questions we do not yet have answers to.</h2>
+      <p>The following are genuine open questions where Prometheus would benefit from community research, academic collaboration, or external input. If you have relevant expertise, contributions are welcome.</p>
+
+      <div class="sec-sub">Immediately actionable</div>
+      <ul class="wp-list">
+        <li><strong>Guardian routing mechanism:</strong> What is the optimal algorithm for deciding 8B vs 70B escalation? Confidence-score-based? Reputation-weighted? Random sample? Combination?</li>
+        <li><strong>Ensemble protocol design:</strong> If 7 of 10 8B Guardians agree on a YARA rule — what constitutes "agreement"? Exact match? Semantic similarity? Confidence-weighted average?</li>
+        <li><strong>PLONK on Kaspa:</strong> Does the Kaspa L1 support PLONK proof verification natively, or would this require a protocol change?</li>
+      </ul>
+
+      <div class="sec-sub">Medium term</div>
+      <ul class="wp-list">
+        <li><strong>YARA-specialized 8B model:</strong> Training a fine-tuned 8B exclusively on YARA syntax and CVE datasets — does this reach 70B quality for rule generation while keeping inference lightweight?</li>
+        <li><strong>On-chain reputation formula:</strong> The current formula (quadratic voting power) works well theoretically. Does it hold under adversarial conditions with coordinated reputation farming?</li>
+        <li><strong>Guardian Pooling cryptography:</strong> How do multiple operators share a 70B node with on-chain PROM splitting without any single operator being able to defect with the full reward?</li>
+      </ul>
+
+      <div class="sec-sub">Long-term research</div>
+      <ul class="wp-list">
+        <li><strong>Sub-1B ZK-capable models:</strong> Are there models under 1 billion parameters that can reliably detect specific anomaly types — small enough to run on IoT devices or phones with &lt;2 GB RAM?</li>
+        <li><strong>Decentralized Guardian orchestration:</strong> How do Guardians coordinate without a central coordinator — especially for multi-stage threat analysis that requires sequential steps?</li>
+        <li><strong>Privacy-preserving model evaluation:</strong> Can we verify that a Guardian's AI model is the authentic, unmodified version using ZK-proofs — without revealing model weights?</li>
+      </ul>
+
+      <div class="callout">
+        <p><strong>Contributing:</strong> Open issues for each of these research questions are tracked in the GitHub repository. If you have relevant expertise in cryptography, distributed systems, or ML, your input is genuinely valued. This is not vaporware — the foundation code exists and these are real engineering problems.</p>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<footer>
+  <div class="f-left">v4.0 · March 2026</div>
+  <div class="f-center">PROMETHEUS</div>
+  <ul class="f-links">
+    <li><a href="faq.html">FAQ</a></li>
+    <li><a href="roadmap.html">Roadmap</a></li>
+    <li><a href="whitepaper.html">Whitepaper</a></li>
+    <li><a href="https://github.com/NeaBouli/prometheus-" target="_blank">GitHub</a></li>
+  </ul>
+</footer>
+
+<script>
+const obs = new IntersectionObserver(entries => entries.forEach(e => {
+  if (e.isIntersecting) { e.target.classList.add('on'); obs.unobserve(e.target); }
+}), {threshold:.06});
+document.querySelectorAll('.r').forEach(el => obs.observe(el));
+
+const secs = document.querySelectorAll('.wp-section');
+const sbLinks = document.querySelectorAll('.sb-links a');
+window.addEventListener('scroll', () => {
+  let cur = '';
+  secs.forEach(s => { if(s.getBoundingClientRect().top < 100) cur = s.id; });
+  sbLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + cur));
+}, {passive:true});
+</script>
+</body>
+</html>
