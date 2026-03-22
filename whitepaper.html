@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prometheus — Whitepaper v4.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --void: #050505;--deep: #0a0a0a;--surface: #0f0f0f;--panel: #141414;
+  --line: rgba(255,255,255,0.07);--line-bright: rgba(255,255,255,0.14);
+  --mint: #00E5A0;--mint-dim: #00B880;--mint-faint: rgba(0,229,160,0.06);
+  --silver: #C8C8C8;--silver-dim: #787878;--gold: #C8A060;
+  --text: #E2E2E2;--muted: #666666;--dim: #333333;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Space Grotesk',sans-serif;background:var(--void);color:var(--text);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+body::before{content:'';position:fixed;inset:0;z-index:9999;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,0) 0px,rgba(0,0,0,0) 1px,rgba(0,0,0,0.03) 1px,rgba(0,0,0,0.03) 2px)}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:500;padding:0 48px;height:56px;display:flex;align-items:center;justify-content:space-between;background:rgba(5,5,5,.97);border-bottom:1px solid var(--line);backdrop-filter:blur(8px)}
+.nav-id{display:flex;align-items:center;gap:14px;text-decoration:none}
+.nav-id img{height:26px;width:26px;object-fit:contain;filter:brightness(0) invert(1) brightness(.7)}
+.nav-wordmark{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;letter-spacing:4px;color:var(--silver);text-transform:uppercase}
+.nav-links{display:flex;gap:36px;list-style:none}
+.nav-links a{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color .2s}
+.nav-links a:hover,.nav-links a.active{color:var(--mint)}
+.nav-gh{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--mint);text-decoration:none;border:1px solid rgba(0,229,160,.3);padding:7px 18px;transition:background .2s}
+.nav-gh:hover{background:rgba(0,229,160,.08)}
+
+/* PAGE HEADER */
+.page-header{padding:140px 48px 80px;border-bottom:1px solid var(--line);position:relative;overflow:hidden}
+.page-header::before{content:'';position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:80px 80px;mask-image:radial-gradient(ellipse 60% 100% at 20% 50%,black 30%,transparent 100%)}
+.page-header-inner{max-width:1280px;margin:0 auto;position:relative;z-index:1}
+.breadcrumb{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:20px}
+.breadcrumb a{color:var(--mint);text-decoration:none}
+.breadcrumb span{margin:0 8px;color:var(--dim)}
+.page-title{font-size:clamp(40px,6vw,72px);font-weight:300;color:var(--text);letter-spacing:-1px;line-height:1;margin-bottom:20px}
+.page-meta{display:flex;gap:24px;flex-wrap:wrap;margin-top:24px}
+.page-meta-item{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--muted);border:1px solid var(--line);padding:5px 12px}
+.page-meta-item span{color:var(--mint)}
+
+/* LAYOUT */
+.wp-layout{display:grid;grid-template-columns:260px 1fr;gap:0;max-width:1280px;margin:0 auto;padding:0 48px}
+
+/* SIDEBAR */
+.sidebar{padding:48px 32px 48px 0;border-right:1px solid var(--line);position:sticky;top:56px;height:calc(100vh - 56px);overflow-y:auto}
+.sidebar::-webkit-scrollbar{width:2px}
+.sidebar::-webkit-scrollbar-track{background:transparent}
+.sidebar::-webkit-scrollbar-thumb{background:var(--dim)}
+.sb-label{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--mint);text-transform:uppercase;margin-bottom:10px;margin-top:24px;display:block}
+.sb-label:first-child{margin-top:0}
+.sb-links{list-style:none}
+.sb-links li a{font-size:12px;font-weight:300;color:var(--muted);text-decoration:none;display:block;padding:4px 0;transition:color .2s;line-height:1.4}
+.sb-links li a:hover{color:var(--silver)}
+.sb-links li a.active{color:var(--mint)}
+
+/* CONTENT */
+.wp-content{padding:64px 0 120px 64px}
+
+/* SECTION */
+.wp-section{margin-bottom:80px;padding-bottom:80px;border-bottom:1px solid var(--line)}
+.wp-section:last-child{border-bottom:none}
+
+.sec-label{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--mint);text-transform:uppercase;margin-bottom:12px;display:block}
+.sec-title{font-size:clamp(24px,3vw,40px);font-weight:300;color:var(--text);letter-spacing:-.5px;margin-bottom:32px;line-height:1.1}
+.sec-sub{font-size:18px;font-weight:300;color:var(--silver);margin-bottom:16px;margin-top:40px;padding-top:40px;border-top:1px solid var(--line)}
+.sec-sub:first-of-type{border-top:none;padding-top:0;margin-top:0}
+
+/* PROSE */
+p{font-size:14px;font-weight:300;color:var(--silver-dim);line-height:1.85;margin-bottom:16px}
+p:last-child{margin-bottom:0}
+strong{color:var(--silver);font-weight:500}
+em{color:var(--mint-dim);font-style:normal}
+
+/* TABLE */
+.wp-table{width:100%;border-collapse:collapse;margin:24px 0;font-size:12px}
+.wp-table th{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;padding:10px 14px;border-bottom:1px solid var(--line);text-align:left;font-weight:400;background:var(--deep)}
+.wp-table td{padding:11px 14px;border-bottom:1px solid rgba(255,255,255,.04);color:var(--silver-dim);font-weight:300;vertical-align:top;line-height:1.5}
+.wp-table td:first-child{font-family:'Space Mono',monospace;font-size:11px;color:var(--gold);white-space:nowrap}
+.wp-table tr:last-child td{border-bottom:none}
+.wp-table tr:hover td{background:rgba(255,255,255,.01)}
+
+/* CALLOUT */
+.callout{border-left:1px solid var(--mint);padding:16px 20px;background:var(--mint-faint);margin:20px 0}
+.callout p{color:var(--silver-dim);font-size:13px;line-height:1.7;margin:0}
+.callout strong{color:var(--mint)}
+
+.callout-gold{border-left:1px solid var(--gold);padding:16px 20px;background:rgba(200,160,96,.05);margin:20px 0}
+.callout-gold p{color:var(--silver-dim);font-size:13px;line-height:1.7;margin:0}
+.callout-gold strong{color:var(--gold)}
+
+/* CODE */
+pre{font-family:'Space Mono',monospace;font-size:11px;color:#5ABB90;line-height:1.8;padding:20px 24px;background:var(--deep);border:1px solid var(--line);margin:20px 0;overflow-x:auto;white-space:pre-wrap}
+code{font-family:'Space Mono',monospace;font-size:11px;color:var(--mint);background:rgba(0,229,160,.06);padding:2px 6px}
+
+/* LIST */
+ul.wp-list{list-style:none;margin:16px 0}
+ul.wp-list li{font-size:14px;font-weight:300;color:var(--silver-dim);padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04);display:flex;gap:12px;align-items:flex-start;line-height:1.5}
+ul.wp-list li:last-child{border-bottom:none}
+ul.wp-list li::before{content:'';flex-shrink:0;width:1px;height:14px;background:var(--mint);margin-top:4px;opacity:.5}
+
+/* TIMELINE */
+.timeline{display:grid;grid-template-columns:80px 1fr;gap:0;margin:24px 0}
+.tl-row{display:contents}
+.tl-time{font-family:'Space Mono',monospace;font-size:10px;color:var(--gold);padding:14px 16px 14px 0;border-bottom:1px solid rgba(255,255,255,.04);white-space:nowrap}
+.tl-content{font-size:13px;font-weight:300;color:var(--silver-dim);padding:14px 0;border-bottom:1px solid rgba(255,255,255,.04);line-height:1.5}
+.tl-content strong{color:var(--silver);font-weight:400}
+
+/* FOOTER */
+footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:24px}
+.f-left{font-family:'Space Mono',monospace;font-size:11px;color:var(--dim);letter-spacing:1px}
+.f-center{font-family:'Space Mono',monospace;font-size:12px;letter-spacing:3px;color:var(--silver-dim);text-align:center}
+.f-links{display:flex;justify-content:flex-end;gap:24px;list-style:none}
+.f-links a{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1px;color:var(--dim);text-decoration:none;transition:color .2s}
+.f-links a:hover{color:var(--mint)}
+
+.r{opacity:0;transform:translateY(20px);transition:opacity .5s ease,transform .5s ease}
+.r.on{opacity:1;transform:translateY(0)}
+.d1{transition-delay:.08s}
+
+@media(max-width:900px){
+  nav{padding:0 24px}
+  .nav-links{display:none}
+  .page-header{padding:120px 24px 60px}
+  .wp-layout{grid-template-columns:1fr;padding:0 24px}
+  .sidebar{display:none}
+  .wp-content{padding:48px 0 80px}
+  footer{grid-template-columns:1fr;gap:16px;padding:24px}
+  .f-links{justify-content:flex-start}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-id">
+    <img src="logo/Prometheus.png" alt="Prometheus" onerror="this.style.display='none'">
+    <span class="nav-wordmark">Prometheus</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="index.html#lifecycle">Protocol</a></li>
+    <li><a href="index.html#architecture">Architecture</a></li>
+    <li><a href="index.html#tokens">Tokens</a></li>
+    <li><a href="roadmap.html">Roadmap</a></li>
+    <li><a href="faq.html">FAQ</a></li>
+    <li><a href="whitepaper.html" class="active">Whitepaper</a></li>
+  </ul>
+  <a href="https://github.com/NeaBouli/prometheus-" class="nav-gh" target="_blank">GitHub ↗</a>
+</nav>
+
+<div class="page-header">
+  <div class="page-header-inner">
+    <div class="breadcrumb r"><a href="index.html">Prometheus</a><span>/</span>Whitepaper</div>
+    <h1 class="page-title r">Whitepaper v4.0</h1>
+    <p class="r d1" style="font-size:15px;font-weight:300;color:var(--silver-dim);max-width:560px;line-height:1.7;margin-top:16px">Decentralized AI-Powered Threat Intelligence on Kaspa. The complete technical specification.</p>
+    <div class="page-meta r">
+      <div class="page-meta-item">Version <span>4.0</span></div>
+      <div class="page-meta-item">March <span>2026</span></div>
+      <div class="page-meta-item">License <span>MIT</span></div>
+      <div class="page-meta-item">Mainnet <span>May 5, 2026</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="wp-layout">
+
+  <aside class="sidebar">
+    <span class="sb-label">Overview</span>
+    <ul class="sb-links">
+      <li><a href="#abstract">Abstract</a></li>
+      <li><a href="#problem">Problem Statement</a></li>
+      <li><a href="#solution">Solution Overview</a></li>
+    </ul>
+    <span class="sb-label">Architecture</span>
+    <ul class="sb-links">
+      <li><a href="#architecture">System Architecture</a></li>
+      <li><a href="#nodes">Node Types</a></li>
+      <li><a href="#ai">AI Architecture</a></li>
+      <li><a href="#contracts">Smart Contracts</a></li>
+    </ul>
+    <span class="sb-label">Economics</span>
+    <ul class="sb-links">
+      <li><a href="#tokens">Token Design</a></li>
+      <li><a href="#validators">Validator System</a></li>
+      <li><a href="#guardians">Guardian System</a></li>
+      <li><a href="#voting">Voting Mechanism</a></li>
+    </ul>
+    <span class="sb-label">Protocol</span>
+    <ul class="sb-links">
+      <li><a href="#rules">Rule Storage</a></li>
+      <li><a href="#federated">Federated Learning</a></li>
+      <li><a href="#governance">Governance</a></li>
+      <li><a href="#security">Security Analysis</a></li>
+    </ul>
+    <span class="sb-label">Development</span>
+    <ul class="sb-links">
+      <li><a href="#devpool">Developer Incentives</a></li>
+      <li><a href="#roadmap">Roadmap</a></li>
+      <li><a href="#audit">Audit Findings</a></li>
+    </ul>
+  </aside>
+
+  <main class="wp-content">
+
+    <!-- ABSTRACT -->
+    <div class="wp-section r" id="abstract">
+      <span class="sec-label">01 / Abstract</span>
+      <h2 class="sec-title">The fire belongs to humanity,<br>not to corporations.</h2>
+      <p>Prometheus is a fully decentralized, AI-powered threat intelligence protocol built on the Kaspa blockchain. It transforms every connected device into a node in a global threat detection swarm — without central control, without a foundation, and with zero pre-mined tokens.</p>
+      <p>The protocol combines three layers: <strong>on-device AI</strong> (Phi-3-mini 3.8B, 4-bit quantized) for local anomaly detection, <strong>Guardian nodes</strong> (LLaMA 3 70B/8B) for advanced threat analysis and YARA rule generation, and <strong>Kaspa L1 consensus</strong> (DAGKnight, 100 BPS) for immutable rule storage and governance.</p>
+      <div class="callout"><p><strong>Key properties:</strong> 0% pre-mine · No emergency stop · Fully automated governance · GDPR non-applicable (no personal data on-chain) · Code is the only law.</p></div>
+      <table class="wp-table">
+        <tr><th>Parameter</th><th>Value</th></tr>
+        <tr><td>Blockchain</td><td>Kaspa (DAGKnight, 10–100 BPS, sub-second finality)</td></tr>
+        <tr><td>Smart Contracts</td><td>Silverscript — native L1, from May 5, 2026</td></tr>
+        <tr><td>Guardian AI (primary)</td><td>LLaMA 3 70B (Meta, open source)</td></tr>
+        <tr><td>Guardian AI (fallback)</td><td>LLaMA 3 8B (RTX 4070 Ti+, 16 GB VRAM)</td></tr>
+        <tr><td>Client AI</td><td>Phi-3-mini 3.8B, 4-bit quantized (4 GB RAM, no GPU)</td></tr>
+        <tr><td>Federated Learning</td><td>Fed-DART (Fraunhofer Institute)</td></tr>
+        <tr><td>Staking Token</td><td>KAS (Kaspa native, 0% pre-mine)</td></tr>
+        <tr><td>Governance Token</td><td>PROM (Prometheus Token, 0% pre-mine)</td></tr>
+        <tr><td>Total Emission (5 years)</td><td>80,000,000 PROM</td></tr>
+        <tr><td>Mainnet Launch</td><td>May 5, 2026 (Covenant-Hardfork)</td></tr>
+        <tr><td>License</td><td>MIT / Apache 2.0</td></tr>
+      </table>
+    </div>
+
+    <!-- PROBLEM -->
+    <div class="wp-section r" id="problem">
+      <span class="sec-label">02 / Problem Statement</span>
+      <h2 class="sec-title">The security industry is structurally compromised.</h2>
+
+      <div class="sec-sub">The failure of signature-based security</div>
+      <p>Classical antivirus software works by comparing files against a database of known malware signatures. This approach has a fundamental design flaw: it only detects what is already known. New, unknown attacks — zero-day exploits — pass through undetected.</p>
+      <p>State-sponsored trojans like <strong>Pegasus</strong> (NSO Group), <strong>Predator</strong> (Intellexa), and <strong>FinFisher</strong> were specifically engineered to bypass these detection mechanisms. They use zero-click exploits — the user need not click anything or download anything. A single incoming message is sufficient for complete device compromise.</p>
+
+      <div class="sec-sub">The structural conflict of interest</div>
+      <p>The commercial security industry suffers from a fundamental conflict of interest: the same firms that sell protection also sell attack tools to governments. Firms like NSO Group, Hacking Team, and Intellexa profit from enabling espionage — not from preventing it.</p>
+      <ul class="wp-list">
+        <li><strong>Zero-day market:</strong> A legal but opaque market for security vulnerabilities. Governments pay millions for unknown exploits.</li>
+        <li><strong>Backdoor laws:</strong> The US Cloud Act and similar legislation in other countries compel technology companies to cooperate with authorities.</li>
+        <li><strong>Conflict of interest:</strong> An antivirus company that simultaneously serves government clients has a financial incentive not to detect government malware.</li>
+      </ul>
+
+      <div class="sec-sub">The credible alternatives</div>
+      <p>Trustworthy security research does not come from the large corporations — it comes from independent actors: <strong>Amnesty International Security Lab</strong> (MVT toolkit for Pegasus detection), <strong>The Citizen Lab</strong> (University of Toronto — the leading address for uncovering state cyber-espionage), <strong>ClamAV</strong> (fully transparent, community-maintained open source scanner), and <strong>Wazuh</strong> (open source threat detection platform).</p>
+      <p>Prometheus builds on this tradition — and scales it to global network effects through blockchain technology.</p>
+    </div>
+
+    <!-- SOLUTION -->
+    <div class="wp-section r" id="solution">
+      <span class="sec-label">03 / Solution Overview</span>
+      <h2 class="sec-title">Swarm intelligence. Blockchain immutability. AI analysis.</h2>
+      <p>Prometheus solves the three core failures of the current security industry simultaneously:</p>
+      <table class="wp-table">
+        <tr><th>Failure</th><th>Prometheus Solution</th></tr>
+        <tr><td>Centralization</td><td>No foundation, no central server, no emergency stop. Protocol exists as long as Kaspa exists.</td></tr>
+        <tr><td>Latency</td><td>Threat to on-chain rule in under 60 seconds. Real-time swarm detection via Light Clients worldwide.</td></tr>
+        <tr><td>Misaligned incentives</td><td>0% pre-mine. PROM earned only through verified security work. No commercial relationship with governments.</td></tr>
+      </table>
+
+      <div class="sec-sub">The threat lifecycle — under 60 seconds</div>
+      <div class="timeline">
+        <div class="tl-time">t = 0s</div>
+        <div class="tl-content"><strong>Light Client</strong> — Phi-3-mini detects anomaly. SHA-256 hash computed. ZK-proof generated. Anonymous hint sent to 3 Guardian nodes.</div>
+        <div class="tl-time">t = 2s</div>
+        <div class="tl-content"><strong>Guardian Node</strong> — LLaMA 3 aggregates 5+ similar reports. Analyzes entropy, API patterns, CVE correlations. Generates YARA rule proposal (min. 85% confidence).</div>
+        <div class="tl-time">t = 15s</div>
+        <div class="tl-content"><strong>Validator Network</strong> — Commit-Reveal voting. commitment = sha256(vote ‖ salt ‖ block_height). 67% consensus required. 10% bond locked per validator.</div>
+        <div class="tl-time">t = 35s</div>
+        <div class="tl-content"><strong>Kaspa Layer 1</strong> — Final rule stored as KRC-20 asset (supply=1, immutable). Sub-second finality via DAGKnight.</div>
+        <div class="tl-time">t = 36s</div>
+        <div class="tl-content"><strong>All Clients</strong> — P2P broadcast or Kaspa polling. New rule automatically loaded. Local scanner immediately active. Protection established.</div>
+      </div>
+    </div>
+
+    <!-- ARCHITECTURE -->
+    <div class="wp-section r" id="architecture">
+      <span class="sec-label">04 / Architecture</span>
+      <h2 class="sec-title">Three layers. No center.</h2>
+
+      <div class="sec-sub">Layer 1 — Kaspa (Immutable Truth)</div>
+      <p>Layer 1 is the core of the security system. Validated threat rules are stored here as KRC-20 assets. These data can be deleted or manipulated by nobody — not governments, not companies, not the developers themselves.</p>
+      <ul class="wp-list">
+        <li><strong>DAGKnight consensus:</strong> Adaptive, parameterless consensus with theoretically optimal Byzantine fault tolerance (~50%). Converges under attack orders of magnitude faster than classical systems.</li>
+        <li><strong>BlockDAG architecture:</strong> Parallel block production eliminates the bottleneck of linear chains. 10 BPS today, 100 BPS with Crescendo upgrade.</li>
+        <li><strong>Silverscript (from May 5, 2026):</strong> High-level language for UTXO-based smart contracts. Compiles directly to Kaspa opcodes, no separate VM. Reentrancy attacks are structurally impossible.</li>
+        <li><strong>Native ZK verification:</strong> Groth16 Zero-Knowledge Proofs directly on L1 — essential for anonymous threat reports.</li>
+      </ul>
+
+      <div class="sec-sub">Layer 2 — Kasplex zkEVM (Intelligence Layer)</div>
+      <p>Kasplex brings zkEVM functionality to Kaspa. The complex governance logic runs here: votes, reputation computation, reward distribution. Results are confirmed to L1 via ZK-rollup. Active since August 2025.</p>
+
+      <div class="sec-sub">Off-Chain — The Action Layer</div>
+      <p>The actual protective effect arises off-chain on the devices of users and the nodes of operators. This layer communicates constantly with L1 and L2 but acts autonomously. Raw data never leaves this layer.</p>
+
+      <div class="callout"><p><strong>Why Kaspa?</strong> Kaspa is the only Proof-of-Work blockchain that fulfills the technical requirements of Prometheus: sub-second finality, 100+ BPS, Silverscript for native L1 contracts, ZK-proof support on L1, and a 0% pre-mine philosophy identical to Prometheus.</p></div>
+    </div>
+
+    <!-- NODES -->
+    <div class="wp-section r" id="nodes">
+      <span class="sec-label">05 / Node Types</span>
+      <h2 class="sec-title">Four roles. Every device contributes.</h2>
+
+      <table class="wp-table">
+        <tr><th>Node Type</th><th>Hardware</th><th>Role</th><th>PROM Share</th></tr>
+        <tr><td>Light Client</td><td>4 GB RAM, no GPU</td><td>Local detection, ZK-proof generation, anonymous reporting</td><td>15%</td></tr>
+        <tr><td>Guardian Node</td><td>RTX 4070 Ti+ (8B) or 4× A100 (70B)</td><td>LLaMA 3 analysis, YARA rule generation, reputation-based voting</td><td>30%</td></tr>
+        <tr><td>Validator Node</td><td>Standard server + 10,000 KAS stake</td><td>Commit-Reveal voting, economic security, slashing enforcement</td><td>40%</td></tr>
+        <tr><td>Honeypot Node</td><td>Any internet-exposed server</td><td>Zero-day detection via decoy services</td><td>5%</td></tr>
+      </table>
+
+      <div class="sec-sub">Guardian Node — LLaMA 3 8B as fallback</div>
+      <p>LLaMA 3 70B requires 4× NVIDIA A100/H100 (~$30,000–50,000). This excludes many potential Guardian operators. LLaMA 3 8B runs on a single consumer GPU (e.g. RTX 4070 Ti) — dramatically lower entry barrier. The reputation system automatically filters out poor-quality outputs: incorrect proposals halve reputation and automatically revoke voting rights.</p>
+    </div>
+
+    <!-- AI -->
+    <div class="wp-section r" id="ai">
+      <span class="sec-label">06 / AI Architecture</span>
+      <h2 class="sec-title">Open source models. Security specialization. Federated learning.</h2>
+
+      <div class="sec-sub">Why open source models?</div>
+      <p>The choice of AI model is a security question, not a quality question. Proprietary models (GPT-4, Claude, Gemini) are black boxes — nobody can verify what they actually do. For a security system with transparency as a core principle, they are structurally unsuitable.</p>
+
+      <div class="sec-sub">Wächter-KI — Phi-3-mini (Light Client)</div>
+      <p>Microsoft's Phi-3-mini 3.8B runs completely locally on the end user's device. No data transfer, no cloud, no dependency on external services. The model is 4-bit quantized and runs via ONNX Runtime on 4 GB RAM without GPU on Windows, macOS, Linux, and mobile.</p>
+
+      <div class="sec-sub">Jäger-KI — LLaMA 3 (Guardian Nodes)</div>
+      <p>Meta's LLaMA 3 in the 70B or 8B variant is the centerpiece of the Guardian AI. It runs self-hosted on Guardian nodes and analyzes incoming threat hints from Light Clients across the network. Both variants are fine-tuned with LoRA (Low-Rank Adaptation) on security-specific datasets:</p>
+      <ul class="wp-list">
+        <li><strong>VirusShare:</strong> Largest public malware database, millions of samples</li>
+        <li><strong>MalwareBazaar:</strong> Current malware samples, daily updated</li>
+        <li><strong>Exploit-DB:</strong> Complete exploit database for CVE correlations</li>
+        <li><strong>CuckooSandbox Reports:</strong> Behavioral analysis of malware in sandbox environments</li>
+      </ul>
+
+      <pre>
+# LoRA Fine-Tuning Configuration
+lora_config = LoraConfig(
+    r=16,                              # Rank
+    lora_alpha=32,                     # Scaling factor
+    target_modules=['q_proj', 'v_proj'], # Attention layers only
+    lora_dropout=0.1,
+    task_type='CAUSAL_LM'
+)
+# Only 1-5% of parameters are trained → efficient
+# Training on ~500k malware samples
+# Result: specialized security model on LLaMA 3 base</pre>
+
+      <div class="sec-sub">Federated Learning — Fed-DART</div>
+      <p>The network improves continuously without central data exchange. Fed-DART (Fraunhofer Institute) enables decentralized training: clients train locally and send only mathematical gradients — never the underlying data.</p>
+      <div class="callout"><p><strong>Privacy guarantee:</strong> Only gradients (mathematical differences to the global model) are transmitted. No conclusions about original data can be drawn from gradients. ZK-proofs additionally secure the anonymity of the reporting client.</p></div>
+    </div>
+
+    <!-- CONTRACTS -->
+    <div class="wp-section r" id="contracts">
+      <span class="sec-label">07 / Smart Contracts</span>
+      <h2 class="sec-title">Six Silverscript contracts. Fully automated. Audited.</h2>
+      <p>All contracts are written in Silverscript, audited before mainnet deployment, and use <code>uint64</code> with 10,000× scaling for all reputation and confidence values (no float64).</p>
+      <table class="wp-table">
+        <tr><th>Contract</th><th>Purpose</th><th>Key Functions</th></tr>
+        <tr><td>ValidatorStaking.ss</td><td>KAS staking + consensus voting</td><td>register, commitVote, revealVote, slash, withdraw</td></tr>
+        <tr><td>GuardianReputation.ss</td><td>Reputation + quadratic voting</td><td>register, voting_power, proposal_accepted/rejected</td></tr>
+        <tr><td>GovernanceAutoTuning.ss</td><td>Weekly parameter adjustment</td><td>auto_tune, get_parameter</td></tr>
+        <tr><td>DevIncentivePool.ss</td><td>DAO-voted developer rewards</td><td>proposeGrant, vote, executeGrant</td></tr>
+        <tr><td>CommunityDonations.ss</td><td>Transparent community fund</td><td>donateKas, proposeDisbursement</td></tr>
+        <tr><td>RuleStorage.ss</td><td>KRC-20 rule minting</td><td>submitProposal, voteOnProposal, finalizeProposal</td></tr>
+      </table>
+      <div class="callout-gold"><p><strong>CRITICAL — KAS/PROM separation:</strong> Validators stake KAS (tx.value = KAS, constant = MIN_STAKE_KAS = 10,000). PROM is earned by Guardians through accepted proposals — never staked by Validators. Confusing the two tokens is the most common implementation error (PATTERN-001).</p></div>
+    </div>
+
+    <!-- TOKENS -->
+    <div class="wp-section r" id="tokens">
+      <span class="sec-label">08 / Token Design</span>
+      <h2 class="sec-title">Two tokens. No shortcuts.</h2>
+      <table class="wp-table">
+        <tr><th>Token</th><th>Role</th><th>Source</th><th>Value basis</th></tr>
+        <tr><td>KAS</td><td>Validator staking + slashing</td><td>Kaspa network (existing asset)</td><td>Kaspa network usage, $1B+ market cap</td></tr>
+        <tr><td>PROM</td><td>Reputation + governance</td><td>Minted per accepted rule (0% pre-mine)</td><td>Utility in Prometheus ecosystem</td></tr>
+      </table>
+
+      <div class="sec-sub">PROM emission — first 5 years</div>
+      <table class="wp-table">
+        <tr><th>Year</th><th>Emission</th><th>Validators 40%</th><th>Guardians 30%</th><th>Reporters 20%</th><th>Dev Pool 5%</th><th>Community 5%</th></tr>
+        <tr><td>Year 1</td><td>20,000,000</td><td>8,000,000</td><td>6,000,000</td><td>4,000,000</td><td>1,000,000</td><td>1,000,000</td></tr>
+        <tr><td>Year 2</td><td>18,000,000</td><td>7,200,000</td><td>5,400,000</td><td>3,600,000</td><td>900,000</td><td>900,000</td></tr>
+        <tr><td>Year 3</td><td>16,000,000</td><td>6,400,000</td><td>4,800,000</td><td>3,200,000</td><td>800,000</td><td>800,000</td></tr>
+        <tr><td>Year 5</td><td>12,000,000</td><td>4,800,000</td><td>3,600,000</td><td>2,400,000</td><td>600,000</td><td>600,000</td></tr>
+        <tr><td><strong>Total</strong></td><td><strong>80,000,000</strong></td><td>32,000,000</td><td>24,000,000</td><td>16,000,000</td><td>4,000,000</td><td>4,000,000</td></tr>
+      </table>
+      <div class="callout"><p><strong>0% Pre-mine — absolute and unchangeable.</strong> Not a single PROM token is issued before mainnet launch. No founder allocation. No investor tranche. No team reserve. Developers are compensated exclusively through DAO grants from the 5% Dev Pool — only for work performed.</p></div>
+    </div>
+
+    <!-- VALIDATORS -->
+    <div class="wp-section r" id="validators">
+      <span class="sec-label">09 / Validator System</span>
+      <h2 class="sec-title">Economic security through KAS staking.</h2>
+      <p>Validator nodes are the economic backbone of the network. By staking KAS they put economic capital on the line as a guarantee for honest behavior. Misbehavior is punished by slashing — a direct financial loss.</p>
+      <table class="wp-table">
+        <tr><th>Property</th><th>Value</th></tr>
+        <tr><td>MIN_STAKE_KAS</td><td>10,000 KAS (dynamic via auto-tuning)</td></tr>
+        <tr><td>Slashing — simple</td><td>5% KAS loss</td></tr>
+        <tr><td>Slashing — double vote</td><td>10% KAS loss</td></tr>
+        <tr><td>Slashing — collusion</td><td>20% KAS loss</td></tr>
+        <tr><td>Escalation</td><td>multiplier = min(3, slashing_count / 3 + 1)</td></tr>
+        <tr><td>Cooldown</td><td>7 days (100,800 blocks at 10 BPS)</td></tr>
+        <tr><td>Bond per vote</td><td>10% of current stake</td></tr>
+        <tr><td>Access control on slash()</td><td>Only GOVERNANCE_CONTRACT or RULE_STORAGE_CONTRACT</td></tr>
+      </table>
+    </div>
+
+    <!-- GUARDIANS -->
+    <div class="wp-section r" id="guardians">
+      <span class="sec-label">10 / Guardian System</span>
+      <h2 class="sec-title">Reputation capital through AI contribution.</h2>
+      <p>Guardian nodes are the intelligence of the network. They operate the Jäger-KI, analyze threat patterns, and create rule proposals. Their "stake" is not financial but reputational — a form of social capital earned through good work.</p>
+      <table class="wp-table">
+        <tr><th>Property</th><th>Value</th></tr>
+        <tr><td>REPUTATION_START</td><td>1,000 (= 0.1 at 10,000× scale)</td></tr>
+        <tr><td>MIN_REPUTATION</td><td>1,000 — below this: voting rights revoked</td></tr>
+        <tr><td>On accepted proposal</td><td>reputation += sqrt(compute_power) × 100</td></tr>
+        <tr><td>On rejected proposal</td><td>reputation × 0.5 (halving)</td></tr>
+        <tr><td>Voting power formula</td><td>(reputation / 100)² × compute_power / 1,000</td></tr>
+        <tr><td>Anti-Sybil</td><td>PoW registration + quadratic voting</td></tr>
+        <tr><td>Model auto-assignment</td><td>≥ 500 GFLOPS → 70B, &lt; 500 GFLOPS → 8B</td></tr>
+      </table>
+    </div>
+
+    <!-- VOTING -->
+    <div class="wp-section r" id="voting">
+      <span class="sec-label">11 / Voting Mechanism</span>
+      <h2 class="sec-title">Commit-Reveal. Bond system. 67% quorum.</h2>
+      <p>Commit-Reveal is the core protection mechanism against collusion among validators. No validator knows how the others will vote before they themselves have committed.</p>
+      <pre>
+# Phase 1: COMMIT — validator sends only a hash
+# commitment = sha256(vote_byte || salt_LE || block_height_LE)
+# vote_byte: 1 = true, 0 = false
+# salt and block_height as 8-byte little-endian
+
+# Phase 2: REVEAL — after 10-second collection phase
+# Validator reveals actual vote + salt
+# Network verifies: sha256(vote||salt||block) == commitment
+# Invalid reveal → bond slashed immediately</pre>
+      <div class="callout-gold"><p><strong>This formula is identical in Silverscript contracts and Rust implementation.</strong> Cross-verification tests ensure bit-for-bit identity between the contract and the validator node code.</p></div>
+    </div>
+
+    <!-- RULES -->
+    <div class="wp-section r" id="rules">
+      <span class="sec-label">12 / Rule Storage</span>
+      <h2 class="sec-title">KRC-20 assets. Supply 1. Immutable.</h2>
+      <p>Each accepted rule is stored as a unique KRC-20 asset on Kaspa L1:</p>
+      <ul class="wp-list">
+        <li><strong>Tick:</strong> PROM-RULES</li>
+        <li><strong>Supply:</strong> 1 per rule (NFT-like — unique and non-fungible)</li>
+        <li><strong>ID format:</strong> PROM-RULE-2026-XXXX</li>
+        <li><strong>IPFS reference:</strong> bytes(36) — CIDv1 binary with SHA-256 multihash (not bytes(46) — corrected in audit V-002)</li>
+        <li><strong>Minimum confidence:</strong> 0.85 (stored as 8,500 at 10,000× scale)</li>
+        <li><strong>Challenge period:</strong> 24 hours after acceptance</li>
+      </ul>
+      <p>Rule content is stored on IPFS. The CIDv1 hash is stored on-chain. Every client verifies the IPFS content hash against the on-chain hash before loading a rule — manipulation is structurally impossible.</p>
+    </div>
+
+    <!-- FEDERATED -->
+    <div class="wp-section r" id="federated">
+      <span class="sec-label">13 / Federated Learning</span>
+      <h2 class="sec-title">The network learns. Raw data never leaves.</h2>
+      <p>Fed-DART enables decentralized training: clients train locally and send only mathematical gradients — never the underlying data. The global model improves without any central party knowing the data of the users.</p>
+      <pre>
+# Fed-DART Training Round (simplified)
+async def training_round(self):
+    # 1. Fetch global model from coordinator
+    global_model = await self.client.fetch_global_model()
+    # 2. Train locally — ONLY with local threat data
+    local_gradients = await self.train_local(global_model)
+    # 3. Send ONLY gradients — NEVER raw data
+    await self.client.submit_update(ModelUpdate(
+        gradients=local_gradients,      # Mathematical difference
+        client_id=self.anonymized_id(), # Anonymous
+        data_size=self.local_data_count,# Count, not content
+        signature=self.sign_update()    # Authenticity
+    ))
+    # 4. Aggregated global model is distributed
+    # No single client knows the data of any other</pre>
+    </div>
+
+    <!-- GOVERNANCE -->
+    <div class="wp-section r" id="governance">
+      <span class="sec-label">14 / Governance Auto-Tuning</span>
+      <h2 class="sec-title">Fully automated. No human intervention possible.</h2>
+      <p>All protocol parameters adjust themselves weekly based on network data. No human can intervene — or needs to.</p>
+      <table class="wp-table">
+        <tr><th>Parameter</th><th>Start value</th><th>Target</th></tr>
+        <tr><td>MIN_STAKE_KAS</td><td>10,000</td><td>50–200 active validators</td></tr>
+        <tr><td>MIN_GUARDIAN_REP</td><td>3,000 (= 0.3)</td><td>200–1,000 active guardians</td></tr>
+        <tr><td>MIN_CONFIDENCE_KI</td><td>8,500 (= 0.85)</td><td>False positive rate &lt; 0.5%</td></tr>
+        <tr><td>VALIDATOR_CONSENSUS</td><td>6,700 (= 0.67)</td><td>Stable rule acceptance</td></tr>
+        <tr><td>REWARD_BASE</td><td>100 PROM</td><td>100–200 proposals/day</td></tr>
+        <tr><td>CHALLENGE_PERIOD</td><td>86,400s</td><td>24 hours</td></tr>
+      </table>
+    </div>
+
+    <!-- SECURITY -->
+    <div class="wp-section r" id="security">
+      <span class="sec-label">15 / Security Analysis</span>
+      <h2 class="sec-title">Sybil resistance. FP flood. 51% attack. Collusion.</h2>
+      <table class="wp-table">
+        <tr><th>Attack</th><th>Countermeasure</th></tr>
+        <tr><td>Sybil attack</td><td>Quadratic voting (power = rep²). 1 real guardian outweighs 500+ fakes mathematically.</td></tr>
+        <tr><td>Collusion</td><td>Commit-Reveal: nobody knows others' votes before committing. Bond loss makes false voting irrational.</td></tr>
+        <tr><td>False positive flood</td><td>Min. 85% confidence threshold. Only 5+ independent reports trigger Guardian analysis.</td></tr>
+        <tr><td>Model poisoning</td><td>On-chain model hash. Any manipulation produces a different hash → rejected by all nodes.</td></tr>
+        <tr><td>51% attack</td><td>DAGKnight: ~50% Byzantine fault tolerance. Prometheus inherits Kaspa security.</td></tr>
+        <tr><td>Long-range attack</td><td>Weak subjectivity: new validators can only vote from their entry timestamp.</td></tr>
+        <tr><td>Emergency stop</td><td>Does not exist — by design. No single point of failure. The protocol cannot be paused.</td></tr>
+      </table>
+    </div>
+
+    <!-- DEV POOL -->
+    <div class="wp-section r" id="devpool">
+      <span class="sec-label">16 / Developer Incentives</span>
+      <h2 class="sec-title">5% Dev Pool. DAO vote only. No foundation.</h2>
+      <p>5% of annual PROM emission (1,000,000 PROM/year) is allocated to developer grants. Every single payment requires a DAO vote — full transparency, no hidden payments, no founder allocation.</p>
+      <p>Recommended reward formula: <code>lines × 10 × (100 + complexity × 10) / 100</code> — capped at 100,000 PROM per grant. Complexity scale: 1–10.</p>
+      <div class="sec-sub">Bootstrap financing (before mainnet)</div>
+      <p>Before mainnet launch, no tokens are issued. Development is financed through external funding — Gitcoin Grants (quadratic funding, community-decided), Octant (matching pools for open-source infrastructure), and community donations in KAS.</p>
+    </div>
+
+    <!-- ROADMAP -->
+    <div class="wp-section r" id="roadmap">
+      <span class="sec-label">17 / Roadmap</span>
+      <h2 class="sec-title">Built in public. Audited in public.</h2>
+      <table class="wp-table">
+        <tr><th>Phase</th><th>Timeline</th><th>Milestone</th></tr>
+        <tr><td>Foundation</td><td>March 2026</td><td>Sprints 0–8 complete. 6 contracts, 160+ tests, landing page live.</td></tr>
+        <tr><td>Hardfork</td><td>May 5, 2026</td><td>ssc ships. All contracts on mainnet. First PROM minted. DEX pool live.</td></tr>
+        <tr><td>AI Production</td><td>May–June 2026</td><td>Real ZK-proof, P2P, Phi-3, LLaMA fine-tuned, Fed-DART live.</td></tr>
+        <tr><td>Desktop Release</td><td>July–August 2026</td><td>Windows / macOS / Linux installers. One-click Guardian setup.</td></tr>
+        <tr><td>Mobile Release</td><td>September 2026</td><td>iOS (App Store) + Android (Google Play + F-Droid).</td></tr>
+        <tr><td>vProgs</td><td>Q4 2026</td><td>AI results anchored to L1 via ZK-proofs. Complete architectural vision.</td></tr>
+      </table>
+    </div>
+
+    <!-- AUDIT -->
+    <div class="wp-section r" id="audit">
+      <span class="sec-label">18 / Audit Findings</span>
+      <h2 class="sec-title">All findings public. All resolved before mainnet.</h2>
+      <p>All development is subject to continuous architect audit via the Claude Code workflow. Every finding is documented in <code>memory/AUDIT.md</code> and publicly visible in the repository.</p>
+      <table class="wp-table">
+        <tr><th>Finding</th><th>Severity</th><th>Resolution</th></tr>
+        <tr><td>V-001: float64 not supported in ssc</td><td>HIGH</td><td>uint64 with 10,000× scaling in all contracts</td></tr>
+        <tr><td>V-002: CID bytes(46) incorrect</td><td>HIGH</td><td>bytes(36) for CIDv1 binary SHA-256 multihash</td></tr>
+        <tr><td>V-003: Recursive slash() function</td><td>HIGH</td><td>Non-recursive: multiplier = min(3, count/3+1), applied once</td></tr>
+        <tr><td>FIX-001: slash() without access control</td><td>CRITICAL</td><td>ACL: only GOVERNANCE_CONTRACT or RULE_STORAGE_CONTRACT</td></tr>
+        <tr><td>FIX-002: .active() compile error</td><td>HIGH</td><td>Changed to registered_at == 0</td></tr>
+        <tr><td>FIX-003: Cumulative FP counter</td><td>HIGH</td><td>Time-windowed counter (864,000 blocks = 1 day)</td></tr>
+        <tr><td>FIX-004: Bond not returned on reveal</td><td>LOW</td><td>transfer(msg.sender, vc.bond_kas) on valid reveal</td></tr>
+        <tr><td>FIX-005: Reward formula mismatch</td><td>LOW</td><td>Corrected to whitepaper formula</td></tr>
+        <tr><td>Testnet-12 does not exist</td><td>INFO</td><td>kaspa-testnet-10 confirmed via rusty-kaspa v1.1.0</td></tr>
+      </table>
+      <div class="callout"><p><strong>Total audit rounds: 10 · Sprint findings: 9 · All critical and high findings resolved before mainnet.</strong> Full audit log: <a href="memory/AUDIT.md" style="color:var(--mint)">memory/AUDIT.md</a></p></div>
+    </div>
+
+  </main>
+</div>
+
+<footer>
+  <div class="f-left">v4.0 · March 2026</div>
+  <div class="f-center">PROMETHEUS</div>
+  <ul class="f-links">
+    <li><a href="faq.html">FAQ</a></li>
+    <li><a href="roadmap.html">Roadmap</a></li>
+    <li><a href="modules/web/audit/index.html">Audit</a></li>
+    <li><a href="CONTRIBUTING.md">Contributing</a></li>
+    <li><a href="https://github.com/NeaBouli/prometheus-" target="_blank">GitHub</a></li>
+  </ul>
+</footer>
+
+<script>
+const obs = new IntersectionObserver(entries => entries.forEach(e => {
+  if (e.isIntersecting) { e.target.classList.add('on'); obs.unobserve(e.target); }
+}), {threshold:.05});
+document.querySelectorAll('.r').forEach(el => obs.observe(el));
+
+const secs = document.querySelectorAll('.wp-section');
+const sbLinks = document.querySelectorAll('.sb-links a');
+window.addEventListener('scroll', () => {
+  let cur = '';
+  secs.forEach(s => { if (s.getBoundingClientRect().top < 100) cur = s.id; });
+  sbLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + cur));
+}, {passive:true});
+</script>
+</body>
+</html>
