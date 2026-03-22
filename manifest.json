@@ -1,0 +1,17 @@
+{
+  "name": "Prometheus Protocol",
+  "short_name": "Prometheus",
+  "description": "Decentralized AI threat intelligence on Kaspa",
+  "start_url": "/prometheus-/",
+  "display": "standalone",
+  "background_color": "#050505",
+  "theme_color": "#00E5A0",
+  "icons": [
+    {
+      "src": "logo/Prometheus.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -9,6 +9,9 @@
 <meta name="keywords" content="Prometheus whitepaper, Kaspa Silverscript, PROM tokenomics, LLaMA 3 security, decentralized threat intelligence, Groth16 ZK-proof">
 <meta name="author" content="Prometheus Protocol">
 <meta name="robots" content="index, follow">
+<meta name="google-site-verification" content="googleaa2902079481c7a8">
+<link rel="manifest" href="/prometheus-/manifest.json">
+<meta name="theme-color" content="#00E5A0">
 <link rel="canonical" href="https://neabouli.github.io/prometheus-/whitepaper.html">
 <!-- Open Graph -->
 <meta property="og:type" content="article">
@@ -617,6 +620,13 @@ window.addEventListener('scroll', () => {
   secs.forEach(s => { if (s.getBoundingClientRect().top < 100) cur = s.id; });
   sbLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + cur));
 }, {passive:true});
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/prometheus-/sw.js')
+    .then(() => console.log('SW registered'))
+    .catch(() => {});
+}
 </script>
 </body>
 </html>

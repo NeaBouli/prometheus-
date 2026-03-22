@@ -9,6 +9,9 @@
 <meta name="keywords" content="decentralized security, AI threat intelligence, Kaspa blockchain, PROM token, Silverscript, LLaMA 3, zero-day detection, federated learning, cybersecurity protocol">
 <meta name="author" content="Prometheus Protocol">
 <meta name="robots" content="index, follow">
+<meta name="google-site-verification" content="googleaa2902079481c7a8">
+<link rel="manifest" href="/prometheus-/manifest.json">
+<meta name="theme-color" content="#00E5A0">
 <link rel="canonical" href="https://neabouli.github.io/prometheus-/">
 <!-- Open Graph -->
 <meta property="og:type" content="website">
@@ -509,6 +512,13 @@ const nav=document.getElementById('nav');
 window.addEventListener('scroll',()=>nav.classList.toggle('scrolled',window.scrollY>40),{passive:true});
 const obs=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('on');obs.unobserve(e.target)}}),{threshold:.08});
 document.querySelectorAll('.r').forEach(el=>obs.observe(el));
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/prometheus-/sw.js')
+    .then(() => console.log('SW registered'))
+    .catch(() => {});
+}
 </script>
 </body>
 </html>
