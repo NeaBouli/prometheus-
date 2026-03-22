@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prometheus — Roadmap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --void: #050505;--deep: #0a0a0a;--surface: #0f0f0f;--panel: #141414;
+  --line: rgba(255,255,255,0.07);--line-bright: rgba(255,255,255,0.14);
+  --mint: #00E5A0;--mint-dim: #00B880;--mint-faint: rgba(0,229,160,0.06);
+  --silver: #C8C8C8;--silver-dim: #787878;--gold: #C8A060;
+  --text: #E2E2E2;--muted: #666666;--dim: #333333;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Space Grotesk',sans-serif;background:var(--void);color:var(--text);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+body::before{content:'';position:fixed;inset:0;z-index:9999;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,0) 0px,rgba(0,0,0,0) 1px,rgba(0,0,0,0.03) 1px,rgba(0,0,0,0.03) 2px)}
+
+nav{position:fixed;top:0;left:0;right:0;z-index:500;padding:0 48px;height:56px;display:flex;align-items:center;justify-content:space-between;background:rgba(5,5,5,.97);border-bottom:1px solid var(--line);backdrop-filter:blur(8px)}
+.nav-id{display:flex;align-items:center;gap:14px;text-decoration:none}
+.nav-id img{height:26px;width:26px;object-fit:contain;filter:brightness(0) invert(1) brightness(.7)}
+.nav-wordmark{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;letter-spacing:4px;color:var(--silver);text-transform:uppercase}
+.nav-links{display:flex;gap:36px;list-style:none}
+.nav-links a{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color .2s}
+.nav-links a:hover,.nav-links a.active{color:var(--mint)}
+.nav-gh{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--mint);text-decoration:none;border:1px solid rgba(0,229,160,.3);padding:7px 18px;transition:background .2s}
+.nav-gh:hover{background:rgba(0,229,160,.08)}
+
+.page-header{padding:140px 48px 80px;border-bottom:1px solid var(--line);position:relative;overflow:hidden}
+.page-header::before{content:'';position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:80px 80px;mask-image:radial-gradient(ellipse 60% 100% at 20% 50%,black 30%,transparent 100%)}
+.page-header-inner{max-width:1280px;margin:0 auto;position:relative;z-index:1}
+.breadcrumb{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:20px}
+.breadcrumb a{color:var(--mint);text-decoration:none}
+.breadcrumb span{margin:0 8px;color:var(--dim)}
+.page-title{font-size:clamp(40px,6vw,72px);font-weight:300;color:var(--text);letter-spacing:-1px;line-height:1;margin-bottom:20px}
+.page-desc{font-size:15px;font-weight:300;color:var(--silver-dim);line-height:1.7;max-width:540px}
+
+/* TIMELINE OVERVIEW */
+.overview{max-width:1280px;margin:0 auto;padding:80px 48px 0}
+.overview-title{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--mint);text-transform:uppercase;margin-bottom:40px}
+.timeline-overview{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:var(--line)}
+.to-item{background:var(--void);padding:24px 20px;position:relative}
+.to-item.done{border-top:2px solid var(--mint)}
+.to-item.active{border-top:2px solid var(--gold);animation:pulse-border 3s ease infinite}
+.to-item.planned{border-top:2px solid var(--dim)}
+.to-date{font-family:'Space Mono',monospace;font-size:9px;color:var(--gold);letter-spacing:1px;margin-bottom:8px}
+.to-label{font-size:12px;font-weight:400;color:var(--silver);margin-bottom:6px;line-height:1.3}
+.to-status{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase}
+.to-item.done .to-status{color:var(--mint)}
+.to-item.active .to-status{color:var(--gold)}
+.to-item.planned .to-status{color:var(--dim)}
+
+/* PHASES */
+.phases{max-width:1280px;margin:0 auto;padding:80px 48px 120px}
+
+.phase{margin-bottom:80px}
+.phase:last-child{margin-bottom:0}
+
+.phase-header{display:grid;grid-template-columns:80px 1fr;gap:0;border-bottom:1px solid var(--line);padding-bottom:24px;margin-bottom:40px;align-items:end}
+.phase-letter{font-family:'Space Mono',monospace;font-size:64px;font-weight:700;line-height:1;color:rgba(255,255,255,.04)}
+.phase-meta{}
+.phase-tag{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--mint);text-transform:uppercase;margin-bottom:8px;display:block}
+.phase-title{font-size:clamp(22px,3vw,32px);font-weight:300;color:var(--text);letter-spacing:-.5px;margin-bottom:4px}
+.phase-date{font-family:'Space Mono',monospace;font-size:11px;color:var(--gold)}
+.phase-status{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:3px 8px;margin-left:12px}
+.s-done{color:var(--mint);border:1px solid rgba(0,229,160,.2)}
+.s-active{color:var(--gold);border:1px solid rgba(200,160,96,.2)}
+.s-planned{color:var(--dim);border:1px solid var(--line)}
+
+.sprints-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line)}
+.sprint{background:var(--void);padding:32px 28px;transition:background .3s}
+.sprint:hover{background:var(--surface)}
+.sprint-num{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--dim);margin-bottom:12px}
+.sprint-title{font-size:15px;font-weight:400;color:var(--silver);margin-bottom:16px}
+.sprint-items{list-style:none}
+.sprint-items li{font-size:12px;font-weight:300;color:var(--muted);padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04);display:flex;gap:10px;align-items:flex-start;line-height:1.4}
+.sprint-items li:last-child{border-bottom:none}
+.sprint-items li::before{content:'';flex-shrink:0;width:1px;height:12px;background:var(--mint);margin-top:2px;opacity:.4}
+.sprint-items li.done-item{color:#3A6050}
+.sprint-items li.done-item::before{background:#3A6050}
+
+/* DEVICES TABLE */
+.devices-section{background:var(--deep);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:80px 48px}
+.devices-inner{max-width:1280px;margin:0 auto}
+.section-lbl{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--mint);text-transform:uppercase;margin-bottom:16px;display:block}
+.section-hdg{font-size:clamp(24px,3vw,36px);font-weight:300;color:var(--text);letter-spacing:-.5px;margin-bottom:40px}
+.devices-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line)}
+.device-card{background:var(--deep);padding:28px 24px;transition:background .3s}
+.device-card:hover{background:var(--panel)}
+.device-icon{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--dim);margin-bottom:16px}
+.device-name{font-size:15px;font-weight:400;color:var(--silver);margin-bottom:8px}
+.device-when{font-family:'Space Mono',monospace;font-size:10px;color:var(--mint);margin-bottom:10px}
+.device-how{font-size:12px;font-weight:300;color:#5ABB90;line-height:1.5}
+
+/* HARDWARE TABLE */
+.hw-section{max-width:1280px;margin:0 auto;padding:80px 48px}
+.hw-table{width:100%;border-collapse:collapse;font-size:13px}
+.hw-table th{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;padding:12px 16px;border-bottom:1px solid var(--line);text-align:left;font-weight:400}
+.hw-table td{padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.04);font-weight:300;color:var(--silver-dim);vertical-align:top}
+.hw-table td:first-child{font-family:'Space Mono',monospace;font-size:11px;color:var(--gold);font-weight:700}
+.hw-table td:last-child{color:#5ABB90;font-family:'Space Mono',monospace;font-size:11px}
+.hw-table tr:last-child td{border-bottom:none}
+.hw-table tr:hover td{color:var(--silver)}
+
+footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:24px}
+.f-left{font-family:'Space Mono',monospace;font-size:11px;color:var(--dim);letter-spacing:1px}
+.f-center{font-family:'Space Mono',monospace;font-size:12px;letter-spacing:3px;color:var(--silver-dim);text-align:center}
+.f-links{display:flex;justify-content:flex-end;gap:24px;list-style:none}
+.f-links a{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1px;color:var(--dim);text-decoration:none;transition:color .2s}
+.f-links a:hover{color:var(--mint)}
+
+.r{opacity:0;transform:translateY(20px);transition:opacity .5s ease,transform .5s ease}
+.r.on{opacity:1;transform:translateY(0)}
+.d1{transition-delay:.08s}.d2{transition-delay:.16s}
+
+@keyframes pulse-border{0%,100%{border-top-color:var(--gold)}50%{border-top-color:rgba(200,160,96,.3)}}
+
+@media(max-width:900px){
+  nav{padding:0 24px}
+  .nav-links{display:none}
+  .page-header,.overview,.phases,.hw-section{padding-left:24px;padding-right:24px}
+  .devices-section{padding:60px 24px}
+  .timeline-overview{grid-template-columns:1fr 1fr}
+  .sprints-grid{grid-template-columns:1fr}
+  .devices-grid{grid-template-columns:1fr 1fr}
+  footer{grid-template-columns:1fr;gap:16px;padding:24px}
+  .f-links{justify-content:flex-start}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-id">
+    <img src="logo/Prometheus.png" alt="Prometheus" onerror="this.style.display='none'">
+    <span class="nav-wordmark">Prometheus</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="index.html#lifecycle">Protocol</a></li>
+    <li><a href="index.html#architecture">Architecture</a></li>
+    <li><a href="index.html#tokens">Tokens</a></li>
+    <li><a href="roadmap.html" class="active">Roadmap</a></li>
+    <li><a href="faq.html">FAQ</a></li>
+  </ul>
+  <a href="https://github.com/NeaBouli/prometheus-" class="nav-gh" target="_blank">GitHub ↗</a>
+</nav>
+
+<div class="page-header">
+  <div class="page-header-inner">
+    <div class="breadcrumb r"><a href="index.html">Prometheus</a><span>/</span>Roadmap</div>
+    <h1 class="page-title r">Full deployment<br>roadmap.</h1>
+    <p class="page-desc r d1">Target: full public release August / September 2026. Working daily. No shortcuts.</p>
+  </div>
+</div>
+
+<!-- TIMELINE OVERVIEW -->
+<div class="overview">
+  <div class="overview-title r">Timeline overview</div>
+  <div class="timeline-overview r d1">
+    <div class="to-item done">
+      <div class="to-date">Mar 2026</div>
+      <div class="to-label">Foundation complete</div>
+      <div class="to-status">✓ done</div>
+    </div>
+    <div class="to-item done">
+      <div class="to-date">May 5, 2026</div>
+      <div class="to-label">Covenant-Hardfork · Contracts live</div>
+      <div class="to-status">planned</div>
+    </div>
+    <div class="to-item active">
+      <div class="to-date">May–Jun 2026</div>
+      <div class="to-label">ZK-Proof · P2P · Phi-3 real</div>
+      <div class="to-status">→ next</div>
+    </div>
+    <div class="to-item planned">
+      <div class="to-date">Jun 2026</div>
+      <div class="to-label">LLaMA fine-tuning · Fed-DART</div>
+      <div class="to-status">planned</div>
+    </div>
+    <div class="to-item planned">
+      <div class="to-date">Jul 2026</div>
+      <div class="to-label">Desktop client beta</div>
+      <div class="to-status">planned</div>
+    </div>
+    <div class="to-item planned">
+      <div class="to-date">Aug 2026</div>
+      <div class="to-label">Full desktop release · Guardian installer</div>
+      <div class="to-status">planned</div>
+    </div>
+    <div class="to-item planned">
+      <div class="to-date">Sep 2026</div>
+      <div class="to-label">iOS + Android mobile</div>
+      <div class="to-status">planned</div>
+    </div>
+  </div>
+</div>
+
+<!-- PHASES -->
+<div class="phases">
+
+  <!-- PHASE 0 -->
+  <div class="phase r">
+    <div class="phase-header">
+      <div class="phase-letter">0</div>
+      <div class="phase-meta">
+        <span class="phase-tag">Phase 0 · Foundation</span>
+        <div><span class="phase-title">All sprints accepted.</span>
+        <span class="phase-date">March 2026</span>
+        <span class="phase-status s-done">Complete</span></div>
+      </div>
+    </div>
+    <div class="sprints-grid">
+      <div class="sprint">
+        <div class="sprint-num">Sprint 0–1</div>
+        <div class="sprint-title">Setup, Testnet &amp; Contracts</div>
+        <ul class="sprint-items">
+          <li class="done-item">Kaspa Testnet-10 node running</li>
+          <li class="done-item">Repository structure + CI/CD</li>
+          <li class="done-item">6 Silverscript contracts, 54 tests</li>
+          <li class="done-item">ValidatorStaking, GuardianReputation, RuleStorage</li>
+          <li class="done-item">GovernanceAutoTuning, DevPool, Donations</li>
+        </ul>
+      </div>
+      <div class="sprint">
+        <div class="sprint-num">Sprint 2–5</div>
+        <div class="sprint-title">Client, AI &amp; Voting</div>
+        <ul class="sprint-items">
+          <li class="done-item">Rust client: Kaspa RPC, YARA scanner, ZK stub</li>
+          <li class="done-item">Phi-3 ONNX wrapper + anomaly detector</li>
+          <li class="done-item">Fed-DART gradient client (stub)</li>
+          <li class="done-item">Docker vLLM + YARA generator + analyzer</li>
+          <li class="done-item">Commit-Reveal voting + bond + slashing engine</li>
+        </ul>
+      </div>
+      <div class="sprint">
+        <div class="sprint-num">Sprint 6–7</div>
+        <div class="sprint-title">E2E + Documentation</div>
+        <ul class="sprint-items">
+          <li class="done-item">Full lifecycle test: threat to on-chain &lt;60s</li>
+          <li class="done-item">Mathematical Sybil resistance proof</li>
+          <li class="done-item">FP-flood attack resistance verified</li>
+          <li class="done-item">Audit dashboard, README, WHITEPAPER.md</li>
+          <li class="done-item">Landing page live on GitHub Pages</li>
+        </ul>
+      </div>
+      <div class="sprint">
+        <div class="sprint-num">Sprint 8</div>
+        <div class="sprint-title">Documentation &amp; Wiki</div>
+        <ul class="sprint-items">
+          <li class="done-item">CONTRIBUTING.md</li>
+          <li class="done-item">5 wiki guides (user, validator, guardian, dev, faq)</li>
+          <li class="done-item">Full deployment roadmap</li>
+          <li class="done-item">AI architecture documentation</li>
+          <li class="done-item">Session checkpoint — crash recovery</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE A -->
+  <div class="phase r">
+    <div class="phase-header">
+      <div class="phase-letter">A</div>
+      <div class="phase-meta">
+        <span class="phase-tag">Phase A · Covenant-Hardfork</span>
+        <div><span class="phase-title">Contracts live. First PROM minted.</span>
+        <span class="phase-date">May 2026</span>
+        <span class="phase-status s-active">Next</span></div>
+      </div>
+    </div>
+    <div class="sprints-grid">
+      <div class="sprint">
+        <div class="sprint-num">Sprint 9</div>
+        <div class="sprint-title">Contracts on Mainnet + Real ZK-Proof</div>
+        <ul class="sprint-items">
+          <li>ssc compile + deploy all 6 contracts to Kaspa Mainnet</li>
+          <li>Integrate kaspa-zk-params (real Groth16, replaces stub)</li>
+          <li>PROM emission contract: minting logic</li>
+          <li>First KAS/PROM liquidity pool on Kasplex DEX</li>
+          <li>10 team-operated Guardian + Validator nodes</li>
+        </ul>
+      </div>
+      <div class="sprint">
+        <div class="sprint-num">Sprint 10</div>
+        <div class="sprint-title">Real KRC-20 Reader + P2P Network</div>
+        <ul class="sprint-items">
+          <li>Full libp2p module: peer discovery, NAT traversal, STUN/TURN</li>
+          <li>KRC-20 UTXO queries for "PROM-RULES" tick</li>
+          <li>Rule content download from IPFS via CIDv1</li>
+          <li>Light Client ↔ Guardian P2P communication</li>
+          <li>Guardian ↔ Validator proposal submission</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE B -->
+  <div class="phase r">
+    <div class="phase-header">
+      <div class="phase-letter">B</div>
+      <div class="phase-meta">
+        <span class="phase-tag">Phase B · AI Production</span>
+        <div><span class="phase-title">Real Phi-3. Fine-tuned LLaMA 3. Fed-DART live.</span>
+        <span class="phase-date">May – June 2026</span>
+        <span class="phase-status s-planned">Planned</span></div>
+      </div>
+    </div>
+    <div class="sprints-grid">
+      <div class="sprint">
+        <div class="sprint-num">Sprint 11</div>
+        <div class="sprint-title">Phi-3-mini Production Integration</div>
+        <ul class="sprint-items">
+          <li>Download Phi-3-mini 3.8B from Microsoft HuggingFace</li>
+          <li>4-bit quantization via ONNX Runtime</li>
+          <li>Replace entropy heuristic with real inference</li>
+          <li>Model update: IPFS distribution + on-chain hash verification</li>
+          <li>Test: Phi-3 detects known malware samples</li>
+        </ul>
+      </div>
+      <div class="sprint">
+        <div class="sprint-num">Sprint 12</div>
+        <div class="sprint-title">LLaMA 3 Fine-Tuning</div>
+        <ul class="sprint-items">
+          <li>VirusShare + MalwareBazaar + Exploit-DB + CuckooSandbox datasets</li>
+          <li>LoRA fine-tuning on LLaMA 3 8B (single A100)</li>
+          <li>Validation: detects Pegasus and APT indicators</li>
+          <li>LLaMA 3 70B fine-tuning</li>
+          <li>Models published to IPFS, hashes stored on-chain</li>
+        </ul>
+      </div>
+      <div class="sprint">
+        <div class="sprint-num">Sprint 13</div>
+        <div class="sprint-title">Fed-DART + fp_rate Oracle</div>
+        <ul class="sprint-items">
+          <li>Real Fed-DART gradient aggregation client</li>
+          <li>Coordinator rotation via reputation system</li>
+          <li>fp_rate oracle: Light Client reporting → on-chain</li>
+          <li>Replace GovernanceAutoTuning stub with real oracle</li>
+          <li>E2E test: FP rate rises → Auto-Tuning responds</li>
+        </ul>
+      </div>
+      <div class="sprint" style="background:var(--void)">
+        <div class="sprint-num" style="color:var(--mint-dim)">Key milestone</div>
+        <div class="sprint-title" style="color:var(--mint)">Network is learning</div>
+        <ul class="sprint-items">
+          <li>All AI stubs replaced with production implementations</li>
+          <li>Network learns from real threats without sharing raw data</li>
+          <li>Model integrity guaranteed by on-chain hashes</li>
+          <li>Auto-tuning responds to real network conditions</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE C -->
+  <div class="phase r">
+    <div class="phase-header">
+      <div class="phase-letter">C</div>
+      <div class="phase-meta">
+        <span class="phase-tag">Phase C · Desktop Release</span>
+        <div><span class="phase-title">Full desktop client. Public beta.</span>
+        <span class="phase-date">July – August 2026</span>
+        <span class="phase-status s-planned">Planned</span></div>
+      </div>
+    </div>
+    <div class="sprints-grid">
+      <div class="sprint">
+        <div class="sprint-num">Sprint 14</div>
+        <div class="sprint-title">Tauri Desktop Application</div>
+        <ul class="sprint-items">
+          <li>Tauri v2 (Rust + React/TypeScript)</li>
+          <li>System tray with live scan status</li>
+          <li>Real-time threat feed + rule history</li>
+          <li>PROM balance + reputation display</li>
+          <li>Settings: model path, node URL, privacy controls</li>
+        </ul>
+      </div>
+      <div class="sprint">
+        <div class="sprint-num">Sprint 15</div>
+        <div class="sprint-title">Installers + Public Beta</div>
+        <ul class="sprint-items">
+          <li>Windows MSI installer + code signing</li>
+          <li>macOS DMG + Gatekeeper signing</li>
+          <li>Linux: .deb, .rpm, .AppImage, Flatpak</li>
+          <li>GitHub Releases CI/CD + SHA-256 checksums + GPG</li>
+          <li><strong>First public beta release</strong></li>
+        </ul>
+      </div>
+      <div class="sprint">
+        <div class="sprint-num">Sprint 16</div>
+        <div class="sprint-title">One-Click Guardian Installer</div>
+        <ul class="sprint-items">
+          <li>Auto-detects GPU (NVIDIA / AMD / Apple Silicon)</li>
+          <li>Downloads LLaMA 3 8B from IPFS (on-chain hash verified)</li>
+          <li>Configures Docker + vLLM automatically</li>
+          <li>Systemd service for auto-start</li>
+          <li>Ubuntu 22.04+, Debian, Rocky Linux, Windows Server (WSL2)</li>
+        </ul>
+      </div>
+      <div class="sprint">
+        <div class="sprint-num">Sprint 17</div>
+        <div class="sprint-title">Validator Web Dashboard</div>
+        <ul class="sprint-items">
+          <li>Full web UI for validator operators</li>
+          <li>KAS staking interface</li>
+          <li>Voting queue with proposal details</li>
+          <li>Slashing risk display + bond status</li>
+          <li>Rewards history and analytics</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE D -->
+  <div class="phase r">
+    <div class="phase-header">
+      <div class="phase-letter">D</div>
+      <div class="phase-meta">
+        <span class="phase-tag">Phase D · Mobile</span>
+        <div><span class="phase-title">iOS + Android. Full public release.</span>
+        <span class="phase-date">August – September 2026</span>
+        <span class="phase-status s-planned">Planned</span></div>
+      </div>
+    </div>
+    <div class="sprints-grid">
+      <div class="sprint">
+        <div class="sprint-num">Sprint 18</div>
+        <div class="sprint-title">iOS Client (Flutter)</div>
+        <ul class="sprint-items">
+          <li>Flutter foundation (shared codebase iOS + Android)</li>
+          <li>Phi-3-mini via Core ML (ONNX → Core ML conversion)</li>
+          <li>iOS Background App Refresh for continuous scanning</li>
+          <li>Keychain for ZK-proof key storage</li>
+          <li>TestFlight beta → App Store submission</li>
+        </ul>
+      </div>
+      <div class="sprint">
+        <div class="sprint-num">Sprint 19</div>
+        <div class="sprint-title">Android Client (Flutter)</div>
+        <ul class="sprint-items">
+          <li>Phi-3-mini via ONNX Runtime Mobile</li>
+          <li>WorkManager for background scanning</li>
+          <li>Android Keystore for ZK-proof keys</li>
+          <li>Google Play Store submission</li>
+          <li>F-Droid release (open source community)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE E -->
+  <div class="phase r">
+    <div class="phase-header">
+      <div class="phase-letter">E</div>
+      <div class="phase-meta">
+        <span class="phase-tag">Phase E · vProgs</span>
+        <div><span class="phase-title">Complete architectural vision.</span>
+        <span class="phase-date">Q4 2026</span>
+        <span class="phase-status s-planned">Planned</span></div>
+      </div>
+    </div>
+    <div class="sprints-grid">
+      <div class="sprint">
+        <div class="sprint-num">Sprint 20</div>
+        <div class="sprint-title">vProgs Integration</div>
+        <ul class="sprint-items">
+          <li>vProgs ships after DAGKnight deployment (Q4 2026)</li>
+          <li>AI analysis results anchored to L1 via ZK-proofs</li>
+          <li>Federated learning auditable on-chain via CDAG</li>
+          <li>Guardian compute resource tracking transparent</li>
+          <li>No possibility to manipulate AI outputs retroactively</li>
+        </ul>
+      </div>
+      <div class="sprint" style="background:var(--void)">
+        <div class="sprint-num" style="color:var(--mint-dim)">Final state</div>
+        <div class="sprint-title" style="color:var(--mint)">Full vision realized</div>
+        <ul class="sprint-items">
+          <li>Every AI decision verifiable on-chain</li>
+          <li>Every model update tamper-proof and auditable</li>
+          <li>Federated learning fully decentralized</li>
+          <li>Protocol self-governing, self-improving, unstoppable</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- DEVICES -->
+<div class="devices-section">
+  <div class="devices-inner">
+    <span class="section-lbl r">By device</span>
+    <h2 class="section-hdg r">Every device. Every platform.</h2>
+    <div class="devices-grid r d1">
+      <div class="device-card">
+        <div class="device-icon">01 · Desktop</div>
+        <div class="device-name">Windows</div>
+        <div class="device-when">August 2026</div>
+        <div class="device-how">MSI installer. Download, run, done.</div>
+      </div>
+      <div class="device-card">
+        <div class="device-icon">02 · Desktop</div>
+        <div class="device-name">macOS</div>
+        <div class="device-when">August 2026</div>
+        <div class="device-how">DMG with Gatekeeper signing. Intel + Apple Silicon.</div>
+      </div>
+      <div class="device-card">
+        <div class="device-icon">03 · Desktop</div>
+        <div class="device-name">Linux</div>
+        <div class="device-when">August 2026</div>
+        <div class="device-how">.deb, .AppImage, Flatpak. x86_64 + ARM.</div>
+      </div>
+      <div class="device-card">
+        <div class="device-icon">04 · Server</div>
+        <div class="device-name">Ubuntu Server</div>
+        <div class="device-when">August 2026</div>
+        <div class="device-how">One-click guardian installer script.</div>
+      </div>
+      <div class="device-card">
+        <div class="device-icon">05 · Mobile</div>
+        <div class="device-name">iPhone / iPad</div>
+        <div class="device-when">September 2026</div>
+        <div class="device-how">App Store. Phi-3 via Core ML. Background scanning.</div>
+      </div>
+      <div class="device-card">
+        <div class="device-icon">06 · Mobile</div>
+        <div class="device-name">Android</div>
+        <div class="device-when">September 2026</div>
+        <div class="device-how">Google Play + F-Droid. ONNX Runtime Mobile.</div>
+      </div>
+      <div class="device-card">
+        <div class="device-icon">07 · Cloud</div>
+        <div class="device-name">Any VPS</div>
+        <div class="device-when">May 2026</div>
+        <div class="device-how">Docker Compose. Guardian or Validator node.</div>
+      </div>
+      <div class="device-card">
+        <div class="device-icon">08 · Edge</div>
+        <div class="device-name">Raspberry Pi</div>
+        <div class="device-when">August 2026</div>
+        <div class="device-how">ARM Linux client. Light Client or Honeypot.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- HARDWARE -->
+<div class="hw-section">
+  <span class="section-lbl r">Hardware requirements</span>
+  <h2 class="section-hdg r">From any laptop to a server rack.</h2>
+  <table class="hw-table r d1">
+    <thead>
+      <tr>
+        <th>Role</th>
+        <th>Minimum hardware</th>
+        <th>Details</th>
+        <th>Est. monthly cost</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Light Client</td>
+        <td>Any device, 4 GB RAM</td>
+        <td>No GPU required. Windows, macOS, Linux, iOS, Android.</td>
+        <td>$0 (existing device)</td>
+      </tr>
+      <tr>
+        <td>Honeypot</td>
+        <td>Any internet-exposed server</td>
+        <td>Emulates vulnerable services. Higher reward per zero-day.</td>
+        <td>~$5–20 / mo VPS</td>
+      </tr>
+      <tr>
+        <td>Validator</td>
+        <td>2 vCPU · 4 GB RAM + 10,000 KAS</td>
+        <td>No GPU needed. Standard VPS. 7-day exit cooldown.</td>
+        <td>~$20 / mo VPS</td>
+      </tr>
+      <tr>
+        <td>Guardian (8B)</td>
+        <td>RTX 4070 Ti+ · 16 GB VRAM</td>
+        <td>LLaMA 3 8B. Consumer GPU viable. 500+ GFLOPS.</td>
+        <td>Own hardware</td>
+      </tr>
+      <tr>
+        <td>Guardian (70B)</td>
+        <td>4× A100/H100 · 128 GB RAM</td>
+        <td>LLaMA 3 70B. Primary model. Highest reputation potential.</td>
+        <td>$500–2,000 / mo cloud</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<footer>
+  <div class="f-left">v4.0 · March 2026</div>
+  <div class="f-center">PROMETHEUS</div>
+  <ul class="f-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="faq.html">FAQ</a></li>
+    <li><a href="WHITEPAPER.md">Whitepaper</a></li>
+    <li><a href="https://github.com/NeaBouli/prometheus-" target="_blank">GitHub</a></li>
+  </ul>
+</footer>
+
+<script>
+const obs = new IntersectionObserver(entries => entries.forEach(e => {
+  if (e.isIntersecting) { e.target.classList.add('on'); obs.unobserve(e.target); }
+}), {threshold: .06});
+document.querySelectorAll('.r').forEach(el => obs.observe(el));
+</script>
+</body>
+</html>

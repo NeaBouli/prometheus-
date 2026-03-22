@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prometheus — FAQ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --void: #050505;
+  --deep: #0a0a0a;
+  --surface: #0f0f0f;
+  --panel: #141414;
+  --line: rgba(255,255,255,0.07);
+  --line-bright: rgba(255,255,255,0.14);
+  --mint: #00E5A0;
+  --mint-dim: #00B880;
+  --mint-faint: rgba(0,229,160,0.06);
+  --silver: #C8C8C8;
+  --silver-dim: #787878;
+  --gold: #C8A060;
+  --text: #E2E2E2;
+  --muted: #666666;
+  --dim: #333333;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Space Grotesk',sans-serif;background:var(--void);color:var(--text);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+body::before{content:'';position:fixed;inset:0;z-index:9999;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,0) 0px,rgba(0,0,0,0) 1px,rgba(0,0,0,0.03) 1px,rgba(0,0,0,0.03) 2px)}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:500;padding:0 48px;height:56px;display:flex;align-items:center;justify-content:space-between;background:rgba(5,5,5,.97);border-bottom:1px solid var(--line);backdrop-filter:blur(8px)}
+.nav-id{display:flex;align-items:center;gap:14px;text-decoration:none}
+.nav-id img{height:26px;width:26px;object-fit:contain;filter:brightness(0) invert(1) brightness(.7)}
+.nav-wordmark{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;letter-spacing:4px;color:var(--silver);text-transform:uppercase}
+.nav-links{display:flex;gap:36px;list-style:none}
+.nav-links a{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color .2s}
+.nav-links a:hover,.nav-links a.active{color:var(--mint)}
+.nav-gh{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--mint);text-decoration:none;border:1px solid rgba(0,229,160,.3);padding:7px 18px;transition:background .2s}
+.nav-gh:hover{background:rgba(0,229,160,.08)}
+
+/* PAGE HEADER */
+.page-header{padding:140px 48px 80px;border-bottom:1px solid var(--line);position:relative;overflow:hidden}
+.page-header::before{content:'';position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:80px 80px;mask-image:radial-gradient(ellipse 60% 100% at 20% 50%,black 30%,transparent 100%)}
+.page-header-inner{max-width:1280px;margin:0 auto;position:relative;z-index:1}
+.breadcrumb{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:20px}
+.breadcrumb a{color:var(--mint);text-decoration:none}
+.breadcrumb span{margin:0 8px;color:var(--dim)}
+.page-title{font-size:clamp(40px,6vw,72px);font-weight:300;color:var(--text);letter-spacing:-1px;line-height:1;margin-bottom:20px}
+.page-desc{font-size:15px;font-weight:300;color:var(--silver-dim);line-height:1.7;max-width:500px}
+
+/* LAYOUT */
+.faq-layout{display:grid;grid-template-columns:240px 1fr;gap:0;max-width:1280px;margin:0 auto;padding:0 48px}
+
+/* SIDEBAR */
+.sidebar{padding:48px 32px 48px 0;border-right:1px solid var(--line);position:sticky;top:56px;height:calc(100vh - 56px);overflow-y:auto}
+.sidebar-section{margin-bottom:32px}
+.sidebar-label{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--mint);text-transform:uppercase;margin-bottom:12px;display:block}
+.sidebar-links{list-style:none}
+.sidebar-links li a{font-size:12px;font-weight:300;color:var(--muted);text-decoration:none;display:block;padding:5px 0;transition:color .2s;line-height:1.4}
+.sidebar-links li a:hover{color:var(--silver)}
+.sidebar-links li a.active{color:var(--mint)}
+
+/* FAQ CONTENT */
+.faq-content{padding:64px 0 120px 64px}
+
+.faq-group{margin-bottom:80px}
+.faq-group:last-child{margin-bottom:0}
+
+.group-label{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--mint);text-transform:uppercase;margin-bottom:8px;display:block}
+.group-title{font-size:clamp(24px,3vw,36px);font-weight:300;color:var(--text);letter-spacing:-.5px;margin-bottom:40px;padding-bottom:20px;border-bottom:1px solid var(--line)}
+
+/* FAQ ITEM */
+.faq-item{border-bottom:1px solid var(--line);padding:0}
+.faq-item:first-of-type{border-top:1px solid var(--line)}
+
+.faq-q{width:100%;background:none;border:none;text-align:left;padding:24px 0;display:flex;align-items:flex-start;justify-content:space-between;gap:24px;cursor:pointer;color:var(--text)}
+.faq-q-text{font-size:15px;font-weight:400;color:var(--silver);line-height:1.4;transition:color .2s}
+.faq-item:hover .faq-q-text{color:var(--text)}
+.faq-icon{flex-shrink:0;width:20px;height:20px;border:1px solid var(--dim);display:flex;align-items:center;justify-content:center;transition:border-color .2s,transform .3s}
+.faq-icon::after{content:'+';font-family:'Space Mono',monospace;font-size:12px;color:var(--muted);transition:color .2s}
+.faq-item.open .faq-icon{border-color:var(--mint);transform:rotate(45deg)}
+.faq-item.open .faq-icon::after{color:var(--mint)}
+
+.faq-a{max-height:0;overflow:hidden;transition:max-height .4s ease}
+.faq-item.open .faq-a{max-height:1000px}
+.faq-a-inner{padding:0 0 28px;font-size:14px;font-weight:300;color:var(--silver-dim);line-height:1.8;max-width:680px}
+.faq-a-inner p{margin-bottom:14px}
+.faq-a-inner p:last-child{margin-bottom:0}
+.faq-a-inner strong{color:var(--silver);font-weight:500}
+.faq-a-inner code{font-family:'Space Mono',monospace;font-size:11px;color:var(--mint);background:rgba(0,229,160,.06);padding:2px 6px}
+
+/* TABLE IN FAQ */
+.faq-table{width:100%;border-collapse:collapse;margin:16px 0;font-size:12px}
+.faq-table th{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;padding:10px 16px;border-bottom:1px solid var(--line);text-align:left;font-weight:400}
+.faq-table td{padding:10px 16px;border-bottom:1px solid rgba(255,255,255,.04);color:var(--silver-dim);font-weight:300}
+.faq-table td:first-child{font-family:'Space Mono',monospace;font-size:11px;color:var(--gold)}
+.faq-table tr:last-child td{border-bottom:none}
+
+/* CALLOUT */
+.callout{border-left:1px solid var(--mint);padding:16px 20px;background:var(--mint-faint);margin:16px 0}
+.callout p{color:var(--silver-dim);font-size:13px;line-height:1.7;margin:0}
+.callout strong{color:var(--mint)}
+
+/* FLOW */
+.flow{font-family:'Space Mono',monospace;font-size:11px;color:#5ABB90;line-height:2;padding:16px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin:16px 0}
+
+/* FOOTER */
+footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:24px}
+.f-left{font-family:'Space Mono',monospace;font-size:11px;color:var(--dim);letter-spacing:1px}
+.f-center{font-family:'Space Mono',monospace;font-size:12px;letter-spacing:3px;color:var(--silver-dim);text-align:center}
+.f-links{display:flex;justify-content:flex-end;gap:24px;list-style:none}
+.f-links a{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1px;color:var(--dim);text-decoration:none;transition:color .2s}
+.f-links a:hover{color:var(--mint)}
+
+/* REVEAL */
+.r{opacity:0;transform:translateY(20px);transition:opacity .5s ease,transform .5s ease}
+.r.on{opacity:1;transform:translateY(0)}
+.d1{transition-delay:.07s}.d2{transition-delay:.14s}.d3{transition-delay:.21s}
+
+@media(max-width:900px){
+  nav{padding:0 24px}
+  .nav-links{display:none}
+  .page-header{padding:120px 24px 60px}
+  .faq-layout{grid-template-columns:1fr;padding:0 24px}
+  .sidebar{display:none}
+  .faq-content{padding:48px 0 80px}
+  footer{grid-template-columns:1fr;gap:16px;padding:24px}
+  .f-links{justify-content:flex-start}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-id">
+    <img src="logo/Prometheus.png" alt="Prometheus" onerror="this.style.display='none'">
+    <span class="nav-wordmark">Prometheus</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="index.html#lifecycle">Protocol</a></li>
+    <li><a href="index.html#architecture">Architecture</a></li>
+    <li><a href="index.html#tokens">Tokens</a></li>
+    <li><a href="docs/roadmap.html" class="active">Roadmap</a></li>
+    <li><a href="faq.html" class="active">FAQ</a></li>
+  </ul>
+  <a href="https://github.com/NeaBouli/prometheus-" class="nav-gh" target="_blank">GitHub ↗</a>
+</nav>
+
+<div class="page-header">
+  <div class="page-header-inner">
+    <div class="breadcrumb r"><a href="index.html">Prometheus</a><span>/</span>FAQ</div>
+    <h1 class="page-title r">Frequently asked<br>questions.</h1>
+    <p class="page-desc r d1">Everything you need to understand how Prometheus works — the protocol, the economics, the AI, and how to participate.</p>
+  </div>
+</div>
+
+<div class="faq-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <span class="sidebar-label">Tokenomics</span>
+      <ul class="sidebar-links">
+        <li><a href="#kas-prom">KAS vs PROM</a></li>
+        <li><a href="#prom-market">How PROM enters the market</a></li>
+        <li><a href="#prom-mining">Is there mining?</a></li>
+        <li><a href="#emission">Emission schedule</a></li>
+      </ul>
+    </div>
+    <div class="sidebar-section">
+      <span class="sidebar-label">Security Protocol</span>
+      <ul class="sidebar-links">
+        <li><a href="#rules-auto">Are rules confirmed automatically?</a></li>
+        <li><a href="#false-positive">False positives</a></li>
+        <li><a href="#privacy">Privacy protection</a></li>
+        <li><a href="#commit-reveal">Commit-Reveal voting</a></li>
+      </ul>
+    </div>
+    <div class="sidebar-section">
+      <span class="sidebar-label">AI Architecture</span>
+      <ul class="sidebar-links">
+        <li><a href="#own-model">Own model or open source?</a></li>
+        <li><a href="#which-models">Which models and why?</a></li>
+        <li><a href="#fine-tuning">How is LLaMA 3 trained?</a></li>
+        <li><a href="#smarter">How does it get smarter?</a></li>
+        <li><a href="#model-integrity">Model integrity</a></li>
+      </ul>
+    </div>
+    <div class="sidebar-section">
+      <span class="sidebar-label">Technical</span>
+      <ul class="sidebar-links">
+        <li><a href="#why-kaspa">Why Kaspa?</a></li>
+        <li><a href="#vs-clamav">vs ClamAV / Wazuh</a></li>
+        <li><a href="#shutdown">Can it be shut down?</a></li>
+        <li><a href="#mobile">Mobile app?</a></li>
+      </ul>
+    </div>
+    <div class="sidebar-section">
+      <span class="sidebar-label">Participation</span>
+      <ul class="sidebar-links">
+        <li><a href="#earn-prom">How to earn PROM</a></li>
+        <li><a href="#hardware">Hardware requirements</a></li>
+      </ul>
+    </div>
+  </aside>
+
+  <!-- CONTENT -->
+  <main class="faq-content">
+
+    <!-- TOKENOMICS -->
+    <div class="faq-group r" id="tokenomics">
+      <span class="group-label">01</span>
+      <h2 class="group-title">Tokenomics</h2>
+
+      <div class="faq-item" id="kas-prom">
+        <button class="faq-q" onclick="toggle(this)">
+          <span class="faq-q-text">What is the difference between KAS and PROM?</span>
+          <span class="faq-icon"></span>
+        </button>
+        <div class="faq-a"><div class="faq-a-inner">
+          <p><strong>KAS</strong> is the native Kaspa token that already exists. Validators stake KAS as economic collateral. If a validator misbehaves, they lose KAS — real money with real consequences. The alignment of incentives is economic, not ideological.</p>
+          <p><strong>PROM</strong> is the Prometheus reputation and governance token. It cannot be purchased at launch. It is minted exclusively when a threat rule is accepted by validator consensus. Every PROM token represents verified security work.</p>
+          <div class="callout"><p><strong>The key distinction:</strong> KAS = economic security deposit. PROM = proof of contribution. Keeping them separate ensures that capital alone cannot buy influence over the protocol.</p></div>
+        </div></div>
+      </div>
+
+      <div class="faq-item" id="prom-market">
+        <button class="faq-q" onclick="toggle(this)">
+          <span class="faq-q-text">How does PROM enter the market and how does a price form?</span>
+          <span class="faq-icon"></span>
+        </button>
+        <div class="faq-a"><div class="faq-a-inner">
+          <p>On launch day, <strong>zero PROM exist</strong>. No presale, no airdrop, no team allocation. The first PROM are minted when the first threat rule passes consensus.</p>
+          <p>Simultaneously with the mainnet launch, a <strong>KAS/PROM liquidity pool</strong> opens on Kasplex DEX (funded from the 5% community pool). From this moment, PROM has a market price formed entirely by supply and demand — no ICO, no listing price, no market-making.</p>
+          <p>The deflationary emission schedule (−10% per year) combined with growing network demand creates natural upward price pressure over time. The more threats Prometheus detects, the more PROM is earned by participants — and the more PROM is needed to vote on governance and access the AI assistant.</p>
+        </div></div>
+      </div>
+
+      <div class="faq-item" id="prom-mining">
+        <button class="faq-q" onclick="toggle(this)">
+          <span class="faq-q-text">Is there mining for PROM?</span>
+          <span class="faq-icon"></span>
+        </button>
+        <div class="faq-a"><div class="faq-a-inner">
+          <p>Not in the traditional sense. PROM is minted when a threat rule is accepted by consensus — this is <strong>performance-based emission</strong>.</p>
+          <p>Guardian Nodes are the closest equivalent to "miners": instead of GPU hashrate, they contribute AI compute and threat intelligence. They run LLaMA 3 to analyze threats, generate YARA rules, and earn PROM for accepted proposals.</p>
+          <p>The analogy holds deeper: just as Bitcoin miners must spend real electricity to earn Bitcoin, Guardian operators must spend real compute and produce real security value to earn PROM.</p>
+        </div></div>
+      </div>
+
+      <div class="faq-item" id="emission">
+        <button class="faq-q" onclick="toggle(this)">
+          <span class="faq-q-text">What is the PROM emission schedule?</span>
+          <span class="faq-icon"></span>
+        </button>
+        <div class="faq-a"><div class="faq-a-inner">
+          <table class="faq-table">
+            <tr><th>Year</th><th>Total Emission</th><th>Validators 40%</th><th>Guardians 30%</th><th>Reporters 20%</th><th>Dev Pool 5%</th></tr>
+            <tr><td>Year 1</td><td>20,000,000</td><td>8,000,000</td><td>6,000,000</td><td>4,000,000</td><td>1,000,000</td></tr>
+            <tr><td>Year 2</td><td>18,000,000</td><td>7,200,000</td><td>5,400,000</td><td>3,600,000</td><td>900,000</td></tr>
+            <tr><td>Year 3</td><td>16,000,000</td><td>6,400,000</td><td>4,800,000</td><td>3,200,000</td><td>800,000</td></tr>
+            <tr><td>Year 5</td><td>12,000,000</td><td>4,800,000</td><td>3,600,000</td><td>2,400,000</td><td>600,000</td></tr>
+          </table>
+          <p>Reporters (20%) split: 75% to Light Clients for validated threat reports, 25% to Honeypot operators for zero-day discoveries. Dev Pool (5%) is only released via DAO vote — no automatic flow to any team member.</p>
+        </div></div>
+      </div>
+    </div>
+
+    <!-- SECURITY -->
+    <div class="faq-group r" id="security">
+      <span class="group-label">02</span>
+      <h2 class="group-title">Security Protocol</h2>
+
+      <div class="faq-item" id="rules-auto">
+        <button class="faq-q" onclick="toggle(this)">
+          <span class="faq-q-text">Are threat rules confirmed automatically?</span>
+          <span class="faq-icon"></span>
+        </button>
+        <div class="faq-a"><div class="faq-a-inner">
+          <p>No — four independent checkpoints exist before any rule reaches the blockchain:</p>
+          <div class="flow">
+            1. AI pre-filter ········· min. 85% confidence (automatic)<br>
+            2. Collection ············ min. 5 independent reports<br>
+            3. Validator vote ········ 67% majority · Commit-Reveal · bond at risk<br>
+            4. Challenge period ······ 24 hours · auto-tuning responds to FP rate
+          </div>
+          <p>No single step is fully automatic without verification. The automation lies in the <em>execution</em> of the rules — the decision itself has multiple independent checkpoints. This makes it structurally difficult to push a false rule through: an attacker would need to simultaneously overcome AI confidence thresholds, gather 5 fake reports, win a validator vote, and survive the challenge period.</p>
+        </div></div>
+      </div>
+
+      <div class="faq-item" id="false-positive">
+        <button class="faq-q" onclick="toggle(this)">
+          <span class="faq-q-text">What happens when there is a false positive?</span>
+          <span class="faq-icon"></span>
+        </button>
+        <div class="faq-a"><div class="faq-a-inner">
+          <p>Affected users report the false detection. The false positive rate rises on-chain. The <code>GovernanceAutoTuning</code> contract automatically raises the confidence threshold for new rules — without any human intervention.</p>
+          <p>The Guardian who submitted the bad rule loses 50% of their reputation score. Reputation halving is a strong deterrent: it takes many accepted proposals to rebuild what one rejection destroys.</p>
+          <p>The target false positive rate is under 0.5%. Auto-tuning continuously adjusts parameters to stay within this range.</p>
+        </div></div>
+      </div>
+
+      <div class="faq-item" id="privacy">
+        <button class="faq-q" onclick="toggle(this)">
+          <span class="faq-q-text">How does Prometheus protect my privacy?</span>
+          <span class="faq-icon"></span>
+        </button>
+        <div class="faq-a"><div class="faq-a-inner">
+          <p>Your device never sends raw files, paths, or metadata. Only a <strong>SHA-256 hash</strong> of the suspicious file is transmitted — a one-way fingerprint from which the original cannot be reconstructed.</p>
+          <p>The report is wrapped in a <strong>Groth16 ZK-proof</strong> that proves you are a legitimate network participant without revealing your identity or the details of the threat.</p>
+          <div class="callout"><p><strong>Privacy by design, not by policy.</strong> No personal data is processed on-chain. The GDPR is not applicable — not as a compliance workaround, but as a direct consequence of the system design (EDSA Guidelines 02/2025).</p></div>
+        </div></div>
+      </div>
+
+      <div class="faq-item" id="commit-reveal">
+        <button class="faq-q" onclick="toggle(this)">
+          <span class="faq-q-text">What is Commit-Reveal voting and why does it matter?</span>
+          <span class="faq-icon"></span>
+        </button>
+        <div class="faq-a"><div class="faq-a-inner">
+          <p>A cryptographic protocol that prevents validators from copying each other's votes or coordinating before voting ends.</p>
+          <p><strong>Commit phase:</strong> Each validator submits <code>sha256(vote ‖ salt ‖ block_height)</code> — a sealed envelope. Nobody can see what's inside.</p>
+          <p><strong>Reveal phase:</strong> After all validators have committed, everyone opens their envelope simultaneously. The network verifies that the revealed vote matches the original commitment.</p>
+          <p>A 10% bond (in KAS) is locked during voting. Invalid reveals — or no reveal at all — result in immediate bond slashing. This makes strategic abstention and vote-copying economically irrational.</p>
+        </div></div>
+      </div>
+    </div>
+
+    <!-- AI -->
+    <div class="faq-group r" id="ai">
+      <span class="group-label">03</span>
+      <h2 class="group-title">AI Architecture</h2>
+
+      <div class="faq-item" id="own-model">
+        <button class="faq-q" onclick="toggle(this)">
+          <span class="faq-q-text">Does Prometheus develop its own AI model from scratch?</span>
+          <span class="faq-icon"></span>
+        </button>
+        <div class="faq-a"><div class="faq-a-inner">
+          <p>No — and that would be the wrong approach. Training foundation models from scratch costs hundreds of millions of dollars and years of research time. That is not Prometheus.</p>
+          <p>Prometheus takes existing state-of-the-art open-source models and <strong>specializes them for security work</strong> using LoRA fine-tuning. This is the Prometheus metaphor in practice: we take the fire that already exists and give it to humanity in a new, more powerful form.</p>
+          <div class="callout"><p><strong>We are not reinventing the wheel. We are building the vehicle.</strong></p></div>
+        </div></div>
+      </div>
+
+      <div class="faq-item" id="which-models">
+        <button class="faq-q" onclick="toggle(this)">
+          <span class="faq-q-text">Which AI models does Prometheus use and why open source?</span>
+          <span class="faq-icon"></span>
+        </button>
+        <div class="faq-a"><div class="faq-a-inner">
+          <table class="faq-table">
+            <tr><th>Model</th><th>Where</th><th>License</th><th>Role</th></tr>
+            <tr><td>Phi-3-mini 3.8B</td><td>Light Client (your device)</td><td>MIT</td><td>Local anomaly detection</td></tr>
+            <tr><td>LLaMA 3 8B</td><td>Guardian Node (RTX 4070 Ti+)</td><td>Community</td><td>Threat analysis + YARA</td></tr>
+            <tr><td>LLaMA 3 70B</td><td>Guardian Node (4× A100)</td><td>Community</td><td>Deep analysis (primary)</td></tr>
+          </table>
+          <p>Proprietary models (GPT-4, Claude, Gemini) are black boxes — nobody can verify what they actually do with your data. For a security system whose core principle is transparency, they are structurally unsuitable. Open source models can be audited, self-hosted, and fine-tuned. Malware samples never leave the local environment.</p>
+        </div></div>
+      </div>
+
+      <div class="faq-item" id="fine-tuning">
+        <button class="faq-q" onclick="toggle(this)">
+          <span class="faq-q-text">How is LLaMA 3 trained for security tasks?</span>
+          <span class="faq-icon"></span>
+        </button>
+        <div class="faq-a"><div class="faq-a-inner">
+          <p>Through <strong>LoRA (Low-Rank Adaptation)</strong> — a technique that fine-tunes only 1-5% of the model's parameters. A single A100 GPU is sufficient. No supercomputer needed.</p>
+          <p>Training datasets:</p>
+          <table class="faq-table">
+            <tr><th>Dataset</th><th>Content</th></tr>
+            <tr><td>VirusShare</td><td>Largest public malware database, millions of samples</td></tr>
+            <tr><td>MalwareBazaar</td><td>Daily updated current malware samples</td></tr>
+            <tr><td>Exploit-DB</td><td>Complete CVE and exploit correlation database</td></tr>
+            <tr><td>CuckooSandbox</td><td>Behavioral analysis reports of malware in sandboxes</td></tr>
+          </table>
+          <p>The result is a security-specialized model that understands malware behavior, CVE correlations, and can generate syntactically valid YARA rules with high confidence.</p>
+        </div></div>
+      </div>
+
+      <div class="faq-item" id="smarter">
+        <button class="faq-q" onclick="toggle(this)">
+          <span class="faq-q-text">How does the network get smarter over time?</span>
+          <span class="faq-icon"></span>
+        </button>
+        <div class="faq-a"><div class="faq-a-inner">
+          <p>Through <strong>federated learning via the Fed-DART protocol</strong> (Fraunhofer Institute, open source). No raw data is ever shared — only mathematical gradients.</p>
+          <div class="flow">
+            Guardian Node A sees threat X in Germany → local gradient<br>
+            Guardian Node B sees threat X in Japan ··· → local gradient<br>
+            Guardian Node C sees threat X in Brazil · → local gradient<br>
+            ·············································· ↓<br>
+            Coordinator aggregates gradients (weighted by reputation)<br>
+            ·············································· ↓<br>
+            Improved global model → IPFS → on-chain hash → all nodes
+          </div>
+          <p><strong>After 1 month:</strong> 50 nodes × 1,000 threats = 50,000 new patterns learned network-wide.</p>
+          <p><strong>After 6 months:</strong> the model outperforms commercial solutions because it trains on real threats from the entire world in real time.</p>
+        </div></div>
+      </div>
+
+      <div class="faq-item" id="model-integrity">
+        <button class="faq-q" onclick="toggle(this)">
+          <span class="faq-q-text">Can a malicious model update be pushed to the network?</span>
+          <span class="faq-icon"></span>
+        </button>
+        <div class="faq-a"><div class="faq-a-inner">
+          <p>No. Every model update follows this integrity chain:</p>
+          <div class="flow">
+            1. Model uploaded to IPFS (content-addressed, immutable)<br>
+            2. CIDv1 hash stored on Kaspa L1 (tamper-proof)<br>
+            3. Every node verifies: IPFS hash == on-chain hash<br>
+            4. Mismatch = automatic rejection, no installation
+          </div>
+          <p>A manipulated model would produce a different hash and be rejected by every node automatically. Compromising the model distribution would require compromising the Kaspa blockchain itself — which has approximately 50% Byzantine fault tolerance under DAGKnight consensus.</p>
+        </div></div>
+      </div>
+    </div>
+
+    <!-- TECHNICAL -->
+    <div class="faq-group r" id="technical">
+      <span class="group-label">04</span>
+      <h2 class="group-title">Technical</h2>
+
+      <div class="faq-item" id="why-kaspa">
+        <button class="faq-q" onclick="toggle(this)">
+          <span class="faq-q-text">Why Kaspa and not Ethereum or another chain?</span>
+          <span class="faq-icon"></span>
+        </button>
+        <div class="faq-a"><div class="faq-a-inner">
+          <table class="faq-table">
+            <tr><th>Requirement</th><th>Kaspa</th><th>Ethereum</th></tr>
+            <tr><td>Block finality</td><td>&lt;1 second (DAGKnight)</td><td>~12 seconds</td></tr>
+            <tr><td>Throughput</td><td>100 BPS (Crescendo)</td><td>~15 TPS</td></tr>
+            <tr><td>Pre-mine</td><td>0%</td><td>72M ETH pre-mined</td></tr>
+            <tr><td>Native ZK</td><td>Groth16 on L1</td><td>External circuits</td></tr>
+            <tr><td>Smart contracts</td><td>Silverscript (L1)</td><td>Solidity (EVM)</td></tr>
+          </table>
+          <p>Real-time threat response requires sub-second finality. Ethereum's 12-second blocks make it unsuitable. Kaspa's DAGKnight consensus also shares the 0% pre-mine philosophy of Prometheus — the alignment of values matters.</p>
+        </div></div>
+      </div>
+
+      <div class="faq-item" id="vs-clamav">
+        <button class="faq-q" onclick="toggle(this)">
+          <span class="faq-q-text">What is the difference between Prometheus and ClamAV or Wazuh?</span>
+          <span class="faq-icon"></span>
+        </button>
+        <div class="faq-a"><div class="faq-a-inner">
+          <p>ClamAV and Wazuh are <strong>signature-based</strong> — they only detect what is already known and catalogued. A zero-day exploit that appeared 10 minutes ago is invisible to them.</p>
+          <p>Prometheus detects <strong>unknown threats</strong> through behavioral AI analysis and swarm intelligence. It also stores rules permanently on a public blockchain that no organization can modify, censor, or selectively enforce.</p>
+          <p>Prometheus is designed to <strong>complement</strong> existing tools, not replace them. A device running ClamAV, Wazuh, and the Prometheus Light Client has layered defense — signatures for the known, AI for the unknown.</p>
+        </div></div>
+      </div>
+
+      <div class="faq-item" id="shutdown">
+        <button class="faq-q" onclick="toggle(this)">
+          <span class="faq-q-text">Can Prometheus be shut down by a government or corporation?</span>
+          <span class="faq-icon"></span>
+        </button>
+        <div class="faq-a"><div class="faq-a-inner">
+          <p>No. There is no foundation to dissolve, no central server to seize, no CEO to arrest, no emergency stop to trigger.</p>
+          <p>The protocol exists as long as the Kaspa blockchain exists. Its rules are encoded in immutable smart contracts. Its governance is fully automated. No human has the power to pause, halt, or modify it.</p>
+          <div class="callout"><p><strong>This is a deliberate architectural decision, not an oversight.</strong> The absence of a kill switch is a feature. The fire belongs to humanity.</p></div>
+        </div></div>
+      </div>
+
+      <div class="faq-item" id="mobile">
+        <button class="faq-q" onclick="toggle(this)">
+          <span class="faq-q-text">When will the mobile app be available?</span>
+          <span class="faq-icon"></span>
+        </button>
+        <div class="faq-a"><div class="faq-a-inner">
+          <p>Desktop clients (Windows, macOS, Linux) are targeted for <strong>August 2026</strong>. iOS and Android mobile clients target <strong>September 2026</strong>.</p>
+          <p>Mobile uses Flutter for cross-platform development. Phi-3-mini runs on iOS via Core ML and on Android via ONNX Runtime Mobile. Background scanning uses native OS mechanisms (iOS Background App Refresh, Android WorkManager).</p>
+        </div></div>
+      </div>
+    </div>
+
+    <!-- PARTICIPATION -->
+    <div class="faq-group r" id="participation">
+      <span class="group-label">05</span>
+      <h2 class="group-title">Participation</h2>
+
+      <div class="faq-item" id="earn-prom">
+        <button class="faq-q" onclick="toggle(this)">
+          <span class="faq-q-text">How do I earn PROM?</span>
+          <span class="faq-icon"></span>
+        </button>
+        <div class="faq-a"><div class="faq-a-inner">
+          <table class="faq-table">
+            <tr><th>Role</th><th>How to earn</th><th>PROM share</th></tr>
+            <tr><td>Light Client</td><td>Run the app — validated threat reports</td><td>15% of total</td></tr>
+            <tr><td>Guardian Node</td><td>Run LLaMA 3 — accepted rule proposals</td><td>30% of total</td></tr>
+            <tr><td>Validator Node</td><td>Stake KAS — honest voting</td><td>40% of total</td></tr>
+            <tr><td>Honeypot Node</td><td>Expose server — zero-day discoveries</td><td>5% of total</td></tr>
+          </table>
+          <p>Honeypot operators receive the highest reward <em>per discovery</em> because zero-day threats are rare and extremely valuable. A single validated zero-day can earn significantly more than thousands of ordinary threat reports.</p>
+        </div></div>
+      </div>
+
+      <div class="faq-item" id="hardware">
+        <button class="faq-q" onclick="toggle(this)">
+          <span class="faq-q-text">What hardware do I need?</span>
+          <span class="faq-icon"></span>
+        </button>
+        <div class="faq-a"><div class="faq-a-inner">
+          <table class="faq-table">
+            <tr><th>Role</th><th>Minimum hardware</th><th>Cost estimate</th></tr>
+            <tr><td>Light Client</td><td>Any device, 4 GB RAM, no GPU</td><td>$0 (existing device)</td></tr>
+            <tr><td>Honeypot</td><td>Any internet-exposed server</td><td>~$5–20/mo VPS</td></tr>
+            <tr><td>Validator</td><td>VPS 2 vCPU / 4 GB RAM + 10,000 KAS stake</td><td>~$20/mo VPS</td></tr>
+            <tr><td>Guardian (8B)</td><td>RTX 4070 Ti+, 16 GB VRAM</td><td>Own hardware</td></tr>
+            <tr><td>Guardian (70B)</td><td>4× A100/H100, 128 GB RAM</td><td>$500–2,000/mo cloud</td></tr>
+          </table>
+          <p>The Guardian 8B option was specifically added to lower the barrier for smaller operators. The reputation system automatically filters out low-quality outputs — hardware alone does not guarantee influence.</p>
+        </div></div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<footer>
+  <div class="f-left">v4.0 · March 2026</div>
+  <div class="f-center">PROMETHEUS</div>
+  <ul class="f-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="docs/roadmap.html">Roadmap</a></li>
+    <li><a href="WHITEPAPER.md">Whitepaper</a></li>
+    <li><a href="https://github.com/NeaBouli/prometheus-" target="_blank">GitHub</a></li>
+  </ul>
+</footer>
+
+<script>
+function toggle(btn) {
+  const item = btn.closest('.faq-item');
+  const wasOpen = item.classList.contains('open');
+  document.querySelectorAll('.faq-item.open').forEach(el => el.classList.remove('open'));
+  if (!wasOpen) item.classList.add('open');
+}
+
+const obs = new IntersectionObserver(entries => entries.forEach(e => {
+  if (e.isIntersecting) { e.target.classList.add('on'); obs.unobserve(e.target); }
+}), {threshold: .08});
+document.querySelectorAll('.r').forEach(el => obs.observe(el));
+
+// Highlight active sidebar link on scroll
+const sections = document.querySelectorAll('.faq-item');
+const sideLinks = document.querySelectorAll('.sidebar-links a');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(s => { if (s.getBoundingClientRect().top < 120) current = s.id; });
+  sideLinks.forEach(a => {
+    a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+  });
+}, {passive: true});
+</script>
+</body>
+</html>
