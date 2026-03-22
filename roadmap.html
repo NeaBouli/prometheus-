@@ -60,7 +60,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:500;padding:0 48px;height:56px;d
 .phase:last-child{margin-bottom:0}
 
 .phase-header{display:grid;grid-template-columns:80px 1fr;gap:0;border-bottom:1px solid var(--line);padding-bottom:24px;margin-bottom:40px;align-items:end}
-.phase-letter{font-family:'Space Mono',monospace;font-size:64px;font-weight:700;line-height:1;color:rgba(255,255,255,.04)}
+.phase-letter{font-family:'Space Mono',monospace;font-size:64px;font-weight:700;line-height:1;color:rgba(0,229,160,.1);transition:color .3s}
+.phase:hover .phase-letter{color:rgba(0,229,160,.18)}
 .phase-meta{}
 .phase-tag{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--mint);text-transform:uppercase;margin-bottom:8px;display:block}
 .phase-title{font-size:clamp(22px,3vw,32px);font-weight:300;color:var(--text);letter-spacing:-.5px;margin-bottom:4px}
