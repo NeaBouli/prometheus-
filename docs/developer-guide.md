@@ -103,3 +103,61 @@ The `memory/` directory is the project's persistent knowledge base:
 | ERRORS.md | Known patterns and error log |
 | SPRINTS.md | Sprint planning |
 | API.md | API definitions |
+
+---
+
+## AI Stack Details
+
+### Why Not Train From Scratch?
+
+Training a foundation model from scratch requires:
+- $100M+ compute budget
+- 6-18 months of training time
+- Thousands of H100 GPUs
+- A dedicated AI research team
+
+Prometheus does none of this. We use LoRA fine-tuning on
+existing state-of-the-art open-source models. This approach:
+- Trains only 1-5% of parameters (fast, cheap)
+- Preserves the base model's general capabilities
+- Adds security domain expertise on top
+- Can be re-run as new threat data becomes available
+
+### LoRA Fine-Tuning Pipeline
+```python
+from peft import LoraConfig, get_peft_model
+
+lora_config = LoraConfig(
+    r=16,                    # Rank
+    lora_alpha=32,           # Scaling factor
+    target_modules=['q_proj', 'v_proj'],  # Attention layers only
+    lora_dropout=0.1,
+    task_type='CAUSAL_LM'
+)
+
+# Only 1-5% of parameters are trained
+model = get_peft_model(base_llama3_model, lora_config)
+# Train on ~500k malware samples
+# Result: specialized security model on LLaMA 3 base
+```
+
+### Fed-DART Gradient Flow
+
+```
+Light Client A ──gradients──┐
+Light Client B ──gradients──┤
+Light Client C ──gradients──┼──→ Coordinator ──→ Aggregated Model ──→ All Nodes
+Guardian D    ──gradients──┤     (rotated by      (IPFS + on-chain
+Guardian E    ──gradients──┘      reputation)       hash verification)
+
+PRIVACY: Only gradients flow. Raw data stays local. Always.
+```
+
+### Model Distribution
+
+1. New model trained by coordinator via gradient aggregation
+2. Model uploaded to IPFS → CIDv1 hash generated
+3. Hash stored on Kaspa L1 via RuleStorage contract
+4. All nodes fetch model from IPFS
+5. Each node verifies: `sha256(downloaded_model) == on_chain_hash`
+6. Mismatch → reject update, report coordinator

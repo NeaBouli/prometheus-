@@ -114,3 +114,102 @@ Guardian (8B model): RTX 4070 Ti or better, 16 GB VRAM.
 Guardian (70B model): 4x A100/H100, 128 GB RAM.
 Validator: standard VPS, 2 vCPU, 4 GB RAM + 10,000 KAS stake.
 Honeypot: any internet-exposed server.
+
+---
+
+## AI Architecture
+
+**Q: Does Prometheus develop its own AI model from scratch?**
+No — and that would be the wrong approach. Training foundation models
+from scratch costs hundreds of millions of dollars and years of time.
+Prometheus takes a different path: we take the best existing
+open-source models and specialize them for security work.
+This is the Prometheus metaphor in practice — we take the fire
+that already exists and give it to humanity in a new form.
+
+**Q: Which AI models does Prometheus use and why open source?**
+Two models, both fully open source:
+
+Phi-3-mini 3.8B (Microsoft, MIT License) runs locally on every
+Light Client. It requires only 4 GB RAM, no GPU, and runs on
+Windows, macOS, Linux, and mobile. It handles local anomaly
+detection — the first line of defense on your device.
+
+LLaMA 3 (Meta, Community License) runs on Guardian Nodes.
+The 8B variant requires an RTX 4070 Ti or better. The 70B variant
+requires 4x A100/H100. It handles deep threat analysis and
+YARA rule generation.
+
+Proprietary models (GPT-4, Claude, Gemini) are black boxes —
+nobody can verify what they actually do. For a security system
+whose core principle is transparency, they are structurally
+unsuitable. Open source models can be audited, self-hosted,
+and fine-tuned. Malware samples never leave the local environment.
+
+**Q: How is LLaMA 3 trained for security tasks?**
+We use LoRA (Low-Rank Adaptation) — a technique that fine-tunes
+only 1-5% of the model's parameters on security-specific datasets.
+This means no supercomputer is needed. A single A100 GPU is
+sufficient for training.
+
+Training datasets:
+- VirusShare: the largest public malware database, millions of samples
+- MalwareBazaar: daily updated malware samples
+- Exploit-DB: complete CVE and exploit database
+- CuckooSandbox reports: behavioral analysis of malware in sandboxes
+
+The result is a specialized security model built on LLaMA 3 —
+trained to recognize threat patterns, correlate CVEs, and generate
+valid YARA rules with high confidence.
+
+**Q: How does the network get smarter over time?**
+Through federated learning via the Fed-DART protocol
+(Fraunhofer Institute, open source). Here is how it works:
+
+Guardian Node A sees malware X in Germany.
+Guardian Node B sees malware X in Japan.
+Guardian Node C sees malware X in Brazil.
+
+None of them send the malware itself. Each sends only mathematical
+gradients — the direction in which the model should improve.
+A rotating coordinator (chosen by reputation) aggregates all
+gradients and distributes an improved global model to all nodes.
+Every Guardian Node becomes smarter simultaneously.
+Nobody knows the data of anyone else.
+
+After 1 month: 50 nodes x 1,000 threats = 50,000 new patterns learned.
+After 6 months: the model outperforms commercial solutions because
+it trains on real threats from the entire world, not lab data.
+After 1 year: the model understands regional threat landscapes,
+new exploit categories, and attack patterns that did not exist in 2025.
+
+**Q: Can a compromised model be pushed to the network?**
+No. Every model update is distributed via IPFS. The SHA-256 hash
+of the new model is stored on the Kaspa blockchain before
+distribution. Every Guardian Node and Light Client verifies
+the IPFS content hash against the on-chain hash before installing
+any update. A manipulated model would have a different hash —
+it would be automatically rejected. The blockchain is the
+tamper-proof source of truth for model integrity.
+
+**Q: What exactly does Prometheus develop vs. what does it reuse?**
+
+Reused (existing open source):
+- LLaMA 3 base model (Meta)
+- Phi-3-mini base model (Microsoft)
+- Fed-DART federated learning protocol (Fraunhofer)
+- Kaspa blockchain infrastructure (kaspanet)
+- YARA rule engine (VirusTotal)
+
+Developed by Prometheus:
+- Security fine-tuning pipeline (LoRA on malware datasets)
+- YARA generation prompts and validation logic
+- Fed-DART integration and coordinator rotation
+- Model distribution via IPFS with on-chain hash verification
+- The complete protocol connecting all components
+- 6 Silverscript smart contracts
+- Rust light client, Python guardian node, Rust validator node
+
+This is software engineering and ML engineering — not AI research.
+The distinction matters: we are not reinventing the wheel.
+We are building the vehicle.
