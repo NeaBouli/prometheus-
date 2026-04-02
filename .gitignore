@@ -26,6 +26,10 @@ venv/
 .DS_Store
 Thumbs.db
 
+# Logo duplicates/temp downloads
+logo/Prometheus Kopie.png
+logo/344decce-e5af-4086-a330-3df536c9e6a6.png
+
 # IDE
 .vscode/
 .idea/
