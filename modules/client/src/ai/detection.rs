@@ -13,7 +13,7 @@ use std::sync::Arc;
 
 use anyhow::{Context, Result};
 use sha2::{Digest, Sha256};
-use tokio::sync::Mutex;
+use tokio::sync::Mutex; // only for YaraScanner (&mut self)
 
 use super::phi3::{AiAnalysis, Phi3Model, MIN_CONFIDENCE_KI};
 use crate::security::scanner::{ScanResult, YaraScanner};
@@ -48,15 +48,16 @@ pub enum Verdict {
 }
 
 /// Anomaly detector combining YARA pattern matching and Phi-3-mini AI.
-/// Uses tokio::sync::Mutex for async safety (PATTERN-003).
+/// Phi3Model uses Arc<Phi3Model> — analyze_bytes() takes &self, no Mutex needed (PATTERN-010).
+/// YaraScanner keeps Mutex — scan_bytes() may need &mut self.
 pub struct AnomalyDetector {
-    model: Arc<Mutex<Phi3Model>>,
+    model: Arc<Phi3Model>,
     scanner: Arc<Mutex<YaraScanner>>,
 }
 
 impl AnomalyDetector {
     /// Create a new anomaly detector with the given AI model and YARA scanner.
-    pub fn new(model: Arc<Mutex<Phi3Model>>, scanner: Arc<Mutex<YaraScanner>>) -> Self {
+    pub fn new(model: Arc<Phi3Model>, scanner: Arc<Mutex<YaraScanner>>) -> Self {
         Self { model, scanner }
     }
 
@@ -78,11 +79,8 @@ impl AnomalyDetector {
             scanner.scan_bytes(data)?
         };
 
-        // Run AI analysis
-        let ai_analysis = {
-            let model = self.model.lock().await;
-            model.analyze_bytes(data).await?
-        };
+        // Run AI analysis — no lock needed, Phi3Model is read-only (PATTERN-010)
+        let ai_analysis = self.model.analyze_bytes(data).await?;
 
         // Determine verdict
         let final_verdict = determine_verdict(yara_result.is_threat, ai_analysis.confidence);
@@ -136,7 +134,7 @@ mod tests {
         for rule in rules {
             scanner.add_rule(rule);
         }
-        AnomalyDetector::new(Arc::new(Mutex::new(model)), Arc::new(Mutex::new(scanner)))
+        AnomalyDetector::new(Arc::new(model), Arc::new(Mutex::new(scanner)))
     }
 
     fn eicar_rule() -> CompiledRule {

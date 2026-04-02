@@ -54,7 +54,7 @@ fn test_scanner_10mb_under_500ms() {
 async fn test_detector_without_model_under_100ms() {
     let model = Phi3Model::new(&PathBuf::from("/nonexistent/model.onnx")).unwrap();
     let scanner = YaraScanner::new().unwrap();
-    let detector = AnomalyDetector::new(Arc::new(Mutex::new(model)), Arc::new(Mutex::new(scanner)));
+    let detector = AnomalyDetector::new(Arc::new(model), Arc::new(Mutex::new(scanner)));
 
     let data = vec![0x42u8; 1024];
 

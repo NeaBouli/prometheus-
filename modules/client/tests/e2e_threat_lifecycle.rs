@@ -55,7 +55,7 @@ async fn test_full_threat_lifecycle_under_60s() {
 
     // Run anomaly detector (AI model not loaded → stub mode)
     let model = Phi3Model::new(&PathBuf::from("/nonexistent/phi3.onnx")).unwrap();
-    let detector = AnomalyDetector::new(Arc::new(Mutex::new(model)), Arc::new(Mutex::new(scanner)));
+    let detector = AnomalyDetector::new(Arc::new(model), Arc::new(Mutex::new(scanner)));
     let detection = detector.analyze_bytes(EICAR).await.unwrap();
     assert_eq!(
         detection.final_verdict,
