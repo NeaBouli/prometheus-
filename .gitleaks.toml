@@ -1,0 +1,24 @@
+title = "Prometheus Custom Gitleaks Config"
+
+[allowlist]
+  description = "Global allowlist"
+  paths = [
+    '''node_modules''',
+    '''\.git''',
+    '''target''',
+    '''package-lock\.json'''
+  ]
+
+[[rules]]
+  description = "Kaspa Private Key"
+  id = "kaspa-private-key"
+  regex = '''(?i)(private[_-]?key|secret[_-]?key)\s*[=:]\s*["']?[a-fA-F0-9]{64}["']?'''
+  tags = ["key", "kaspa", "crypto"]
+  severity = "CRITICAL"
+
+[[rules]]
+  description = "Generic API Key"
+  id = "generic-api-key"
+  regex = '''(?i)(api[_-]?key|apikey)\s*[=:]\s*["']?[a-zA-Z0-9_\-]{20,}["']?'''
+  tags = ["api", "key"]
+  severity = "HIGH"
