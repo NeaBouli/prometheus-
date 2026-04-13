@@ -51,9 +51,7 @@ class YaraRuleGenerator:
         self.llm: LlmServer = llm_server
         self._rule_counter: int = 0
 
-    async def generate_rule(
-        self, threat_hash: str, indicators: list[str]
-    ) -> YaraRule:
+    async def generate_rule(self, threat_hash: str, indicators: list[str]) -> YaraRule:
         """Generate a YARA rule from threat indicators.
 
         Args:
@@ -63,9 +61,8 @@ class YaraRuleGenerator:
         Returns:
             A YaraRule with generated content and metadata.
         """
-        description = (
-            f"Threat hash: {threat_hash}\n"
-            f"Indicators:\n" + "\n".join(f"  - {ind}" for ind in indicators)
+        description = f"Threat hash: {threat_hash}\n" f"Indicators:\n" + "\n".join(
+            f"  - {ind}" for ind in indicators
         )
 
         rule_content = await self.llm.generate_yara_rule(description)
