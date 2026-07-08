@@ -37,7 +37,7 @@ Goal:     All sprints 0-7 accepted. Post-Toccata deployment verification.
 | Testnet-10-Node              | DONE            | 100%     | 2026-03-21  | -            | wrpc://127.0.0.1:17210 |
 | Silverscript Compiler (ssc)  | BLOCKED         | 0%       | 2026-07-07  | -            | Post-Toccata local install/test required; not found on Sandbox PATH |
 | Hello-World Contract         | PENDING         | 0%       | 2026-03-21  | -            | Deployment nach ssc-Release |
-| GitHub Actions CI/CD         | PENDING         | 0%       | -           | -            | -               |
+| GitHub Actions CI/CD         | ACCEPTED        | 100%     | 2026-07-08  | ACCEPTED     | CI, Security Audit, and Pages green for eeb4808 |
 | Sprint-1 Pre-Check           | ACCEPTED        | 100%     | 2026-03-21  | ACCEPTED     | V-001, V-002, V-003 alle genehmigt |
 | **SPRINT 1 – CONTRACTS**     |                 |          |             |              |                 |
 | ValidatorStaking.ss          | ACCEPTED        | 100%     | 2026-03-21  | ACCEPTED     | v1.2: slash ACL, bond return, test patches |

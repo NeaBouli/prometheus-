@@ -1,13 +1,16 @@
 # prometheus — Backlog
 
 ## 🔴 Aktiv (diese Session)
+- Current repo head is `eeb4808` on `main`.
+- CI, Security Audit, and GitHub Pages deployment were green for `eeb4808`.
 - Runtime stub gates added for Rust client; remaining production-stub task is contract-side Q-003 `fp_rate` oracle.
+- Sprint 9 remains blocked by local Silverscript tooling plus H-001 verification.
 
 ## 🟡 Nächste Session — STARTFLOW
 
 ### Pflicht VOR neuem Code:
 1. `cd /Users/gio/Desktop/repos/prometheus`
-2. `git log --oneline -5` — Aktueller HEAD vor lokalen Diffs: `467ca03`
+2. `git log --oneline -5` — Aktueller HEAD vor lokalen Diffs: `eeb4808`
 3. Lies `memory/CHECKPOINT.md` — vollständiger Projektstatus
 4. Lies `memory/AUDIT.md` ab Zeile 337 — Pre-Hardfork-Audit-Ergebnisse
 5. Lies `memory/ERRORS.md` — 12 bekannte Patterns
@@ -39,8 +42,9 @@
 
 ## ✅ Erledigt (letzte 7 Tage)
 - [x] H-002 PATTERN-010 fix: Arc<Phi3Model> statt Arc<Mutex<Phi3Model>> — `6347b85` (06.04.2026)
+- [x] Post-Toccata docs/bridge status, Kaspa v2.0.1 pin, Security Audit gate, H-001 vectors, and runtime stub gates — `eeb4808` (08.07.2026)
 - [x] Pre-Hardfork Full Audit: 35 Checks, 0 CRITICAL, 92% Confidence — `2ad7a1e` (02.04.2026)
 - [x] Cargo.lock + Logo Variants + Gitignore Cleanup — `9a8c344` (02.04.2026)
 
 ---
-*Zuletzt aktualisiert: 2026-04-13*
+*Zuletzt aktualisiert: 2026-07-08*

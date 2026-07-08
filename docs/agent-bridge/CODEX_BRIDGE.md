@@ -1,9 +1,9 @@
 # PROMETHEUS CODEX BRIDGE
 
-Last updated: 2026-07-07 20:13 EEST
+Last updated: 2026-07-08 EEST
 Repo path: /Users/gio/Desktop/repos/prometheus
 Branch observed: main
-HEAD observed: 467ca03 - docs: add security master as CLAUDE.md -- enforces security-first behavior
+HEAD observed: eeb4808 - docs: update post-toccata bridge status
 
 Purpose: This file is the local bridge for Codex/Claude Code handover. Read it before touching product code. It consolidates the project state, architecture rules, workflow logic, current open issues, the Reputation Badge decision, and the new direct Sandbox access note.
 
@@ -491,7 +491,7 @@ Sources consolidated into this file:
 Staleness warning:
 
 - The downloaded handover says date `2026-03-23` and last commit `6347b85`.
-- The local repo observed on 2026-07-07 is on branch `main` at `467ca03`.
+- The local repo observed on 2026-07-08 is on branch `main` at `eeb4808`.
 - Therefore the handover is useful for architecture and workflow, but not authoritative for current git state.
 - Always verify current files and tests before implementing.
 
@@ -501,10 +501,10 @@ Staleness warning:
 
 Highest priority:
 
-1. Verify hardfork/ssc status for NEA-116.
-2. Verify H-001 LE encoding before Sprint 9.
-3. Install/locate local Silverscript tooling and run H-001 against the Rust hex vectors.
-4. Re-run tests and reconcile the stated 203/204 test status with current HEAD.
+1. Install/build local Silverscript tooling (`silverc` upstream; no `ssc` binary found yet).
+2. Verify H-001 LE encoding before Sprint 9 by comparing Silverscript behavior against the Rust H-001 vectors.
+3. Document Silverscript/TN12/Mainnet compatibility limits before any deploy attempt.
+4. Resolve Q-003 contract-side `fp_rate` oracle stub before beta/mainnet governance.
 5. Keep Reputation Badge decision as "no badge, L1 reputation only".
 
 If asked to continue project work:

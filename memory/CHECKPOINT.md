@@ -1,5 +1,5 @@
 # PROMETHEUS — SESSION CHECKPOINT
-# Last updated: 2026-04-02
+# Last updated: 2026-07-08
 # Purpose: Full recovery document. If Claude (Architect) or Claude Code
 # loses context, read this file first. It contains the complete project state.
 
@@ -13,7 +13,7 @@
 | Repo | https://github.com/NeaBouli/prometheus- |
 | Branch | main |
 | Lokaler Pfad | ~/Desktop/prometheus |
-| Letzter Commit | 6347b85 — fix: Arc<Phi3Model> — remove unnecessary Mutex (PATTERN-010) |
+| Letzter Commit | eeb4808 — docs: update post-toccata bridge status |
 | Rollback-Tag | `pre-session-20260413` → `6347b85` |
 | Whitepaper | WHITEPAPER.md (root) + whitepaper.html (styled) |
 | Status | Feature-complete through Sprint 7. Post-Toccata deployment verification active. |
@@ -99,7 +99,7 @@
 ## OFFENE TODOS (Priorität)
 
 ### Für Core Dev (manuell):
-- [ ] GitHub Pages aktivieren (Settings → Pages → main / root)
+- [x] GitHub Pages aktiv/live: latest pages-build-deployment succeeded for `eeb4808`
 - [ ] Repository public schalten
 - [ ] Gitcoin Grants Antrag einreichen (Deadline: April 2026)
 - [ ] Discord/Telegram aufbauen
@@ -110,7 +110,7 @@
 **STARTFLOW — Lies dies zuerst:**
 ```
 1. cd /Users/gio/Desktop/repos/prometheus
-2. git log --oneline -5              → HEAD before local diffs = 467ca03
+2. git log --oneline -5              → HEAD before local diffs = eeb4808
 3. git tag -l                        → Rollback: pre-session-20260413
 4. cargo test 2>&1 | tail -5         → Muss grün sein
 5. Lies BACKLOG.md                   → Priorisierte Task-Liste

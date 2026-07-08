@@ -72,7 +72,7 @@ This is not mainnet-ready today. The right verdict is: good work, continue the p
   - Evidence: `python3 scripts/check_memory_integrity.py` passed all required memory files.
 
 - **[PASS] Remote branch alignment**
-  - Evidence: local `main` HEAD `467ca03`; `git ls-remote origin refs/heads/main` returned same commit.
+  - Evidence: local `main` HEAD `eeb4808`; `git ls-remote origin refs/heads/main` returned same commit.
 
 - **[PASS] No tracked env/key filenames found**
   - Evidence: filename scan found no tracked `.env`, `.pem`, `.key`, secret/password/token files.
