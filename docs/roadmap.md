@@ -25,14 +25,15 @@ E2E tests, documentation, landing page — all complete and on GitHub.
 
 ---
 
-## Phase A — Covenant-Hardfork + Core Integration
-**May 2026**
+## Phase A — Post-Toccata Core Integration
+**June/July 2026**
 
-The Kaspa Covenant-Hardfork on May 5, 2026 ships the ssc compiler.
-This unlocks everything that was waiting.
+Kaspa Toccata moved the ecosystem into the post-fork verification phase.
+Prometheus deployment now depends on local ssc/Silverscript tooling and H-001 commit-reveal encoding verification.
 
 **Sprint 9 — Contracts Live + Real ZK-Proof**
-- Compile and deploy all 6 contracts to Kaspa Mainnet
+- Verify ssc/Silverscript tooling and H-001 LE encoding vectors
+- Compile and deploy all 6 contracts to Kaspa Mainnet only after verification passes
 - Integrate kaspa-zk-params crate (real Groth16, replacing stub)
 - Implement PROM emission contract (minting logic)
 - Deploy first KAS/PROM liquidity pool on Kasplex DEX
@@ -165,8 +166,8 @@ This is the final architectural milestone described in the whitepaper.
 | Date | Milestone |
 |------|-----------|
 | March 2026 | All sprints 0-8 accepted. Foundation complete. |
-| May 5, 2026 | Covenant-Hardfork. ssc ships. Contracts deploy. |
-| May 2026 | First PROM minted. First DEX pool live. |
+| June/July 2026 | Toccata post-fork verification. ssc tooling and H-001 vectors checked. |
+| Post-verification | First PROM minted. First DEX pool live. |
 | June 2026 | Real ZK-proof, P2P network, Phi-3 production |
 | June 2026 | LLaMA 3 fine-tuned on security datasets |
 | July 2026 | Desktop client beta (Windows / macOS / Linux) |
@@ -186,7 +187,7 @@ This is the final architectural milestone described in the whitepaper.
 | Ubuntu Server | One-click guardian installer script | August 2026 |
 | iPhone / iPad | App Store download | September 2026 |
 | Android | Google Play or F-Droid | September 2026 |
-| Any VPS | Docker Compose (guardian or validator) | May 2026 |
+| Any VPS | Docker Compose (guardian or validator) | Post-verification |
 | Raspberry Pi | ARM Linux client | August 2026 |
 
 ---

@@ -77,8 +77,8 @@ Light Client (Phi-3-mini)          Guardian (LLaMA 3)           Kaspa L1
 ### 4.1 Blockchain Layer (Kaspa L1)
 
 - **Network**: Kaspa with Silverscript smart contracts
-- **Testnet**: kaspa-testnet-10 (verified March 2026; Testnet-12 does not exist in rusty-kaspa v1.1.0)
-- **Compiler**: ssc ships with the Covenant-Hardfork (May 5, 2026)
+- **Testnet**: kaspa-testnet-10 for legacy tests; post-Toccata deployment requires TN12/Toccata tooling compatibility checks
+- **Compiler**: ssc/Silverscript tooling must be verified after the Kaspa Toccata activation before Prometheus deployment
 - **Consensus**: DAGKnight with 100 blocks per second
 - **Contracts**: 6 Silverscript contracts (see Section 10)
 
@@ -363,8 +363,8 @@ This is a deliberate design decision, not an oversight. Architecture Decision #3
 | Sprint 5: Voting | March 2026 | ACCEPTED |
 | Sprint 6: E2E | March 2026 | ACCEPTED |
 | Sprint 7: Dashboard | March 2026 | IN PROGRESS |
-| **Covenant-Hardfork** | **May 5, 2026** | **ssc compiler + testnet deployment** |
-| Mainnet Launch | May 2026 | PLANNED |
+| **Kaspa Toccata / post-fork verification** | **June/July 2026** | **ssc tooling + H-001 encoding verification before deployment** |
+| Mainnet Launch | Post-verification | PLANNED |
 
 ---
 

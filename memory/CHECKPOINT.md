@@ -13,9 +13,10 @@
 | Repo | https://github.com/NeaBouli/prometheus- |
 | Branch | main |
 | Lokaler Pfad | ~/Desktop/prometheus |
-| Letzter Commit | 9a8c344 — chore: commit Cargo.lock, logo variants, gitignore cleanup |
+| Letzter Commit | 6347b85 — fix: Arc<Phi3Model> — remove unnecessary Mutex (PATTERN-010) |
+| Rollback-Tag | `pre-session-20260413` → `6347b85` |
 | Whitepaper | WHITEPAPER.md (root) + whitepaper.html (styled) |
-| Status | Feature-complete. Warten auf Covenant-Hardfork 5. Mai 2026. |
+| Status | Feature-complete through Sprint 7. Post-Toccata deployment verification active. |
 | GitHub Pages | https://neabouli.github.io/prometheus-/ |
 | Google Search Console | Verified: googleaa2902079481c7a8 |
 
@@ -105,16 +106,34 @@
 - [ ] Apple Developer Account + Google Play Account (vor Sprint 13)
 
 ### Für Claude Code (nächste Session):
-- [ ] CI/CD Ergebnis prüfen (https://github.com/NeaBouli/prometheus-/actions)
-- [ ] Guardian hybrid routing (8B/70B) — Sprint 10B
-- [ ] Ensemble voting protocol (5x 8B majority) — Sprint 10B
-- [ ] fp_rate Oracle-Mechanismus entscheiden (Q-003 offen)
-- [ ] PATTERN-010 fixen: Arc<Phi3Model> statt Arc<Mutex<Phi3Model>>
+
+**STARTFLOW — Lies dies zuerst:**
+```
+1. cd /Users/gio/Desktop/repos/prometheus
+2. git log --oneline -5              → HEAD before local diffs = 467ca03
+3. git tag -l                        → Rollback: pre-session-20260413
+4. cargo test 2>&1 | tail -5         → Muss grün sein
+5. Lies BACKLOG.md                   → Priorisierte Task-Liste
+6. Lies memory/AUDIT.md ab Zeile 337 → Pre-Hardfork Findings
+7. Lies memory/ERRORS.md             → 12 bekannte Patterns
+```
+
+**Status: Feature-complete through Sprint 7. Kaspa Toccata status researched 2026-07-07; deployment now depends on local ssc/tooling and H-001 verification.**
+
+**Offene Tasks (priorisiert):**
+- [x] PATTERN-010 fix: Arc<Phi3Model> statt Arc<Mutex<Phi3Model>> — DONE `6347b85`
+- [x] Rust client production/beta stub gates — DONE 2026-07-08 (`PROMETHEUS_RUNTIME`)
+- [ ] H-001: LE encoding Verifikation — verify with ssc/Silverscript tooling and Rust vectors
+- [ ] Sprint 9: Contracts compile + deploy — blocked until ssc tooling + H-001 pass
+- [ ] Sprint 10B: Guardian hybrid routing (8B/70B) + Ensemble voting
+- [ ] Q-003: fp_rate Oracle — Contract-side stub remains; Architect-Entscheidung nötig
 - [ ] Sybil resistance final design — Architect decision needed
+- [ ] M-001: yara_generator.py Heuristic → LLM confidence
+- [ ] M-002: Performance test threshold relaxen oder --release gate
 - [ ] PLONK evaluation for Light Client ZK-proofs
 
 ### Wartet auf externe Events:
-- [ ] ssc Compiler (Covenant-Hardfork 5. Mai 2026) → Sprint 9
+- [ ] ssc/Silverscript tooling local install + smoke test → Sprint 9
 - [ ] Phi-3-mini Modell herunterladen → Sprint 11
 - [ ] LLaMA 3 Fine-Tuning → Sprint 12
 - [ ] vProgs (DAGKnight) → Sprint 14
@@ -131,8 +150,8 @@
 6. IPFS CID = bytes(36) binär CIDv1 (nicht bytes(46))
 7. Commit-Reveal: sha256(vote_byte || salt_le || block_height_le)
 8. cargo fmt + cargo clippy -- -D warnings vor jedem Rust-Commit
-9. Testnet = kaspa-testnet-10 (Testnet-12 existiert nicht)
-10. ssc Compiler erscheint mit Covenant-Hardfork am 5. Mai 2026
+9. Legacy-Tests nutzen kaspa-testnet-10; post-Toccata Deployment braucht TN12/Toccata-Tooling-Verifikation
+10. ssc/Silverscript tooling must be installed and tested post-Toccata before Sprint 9
 11. Jede neue HTML-Seite: SEO/GEO-Checkliste (Schema.org, OG, ai-summary)
 12. Mobile Hamburger-Menü auf jeder Seite
 13. GitHub-only Contact (kein Email, kein Discord DM)
@@ -245,6 +264,6 @@ Leistungsbasierte Emission. Guardians = "Miner" (KI statt GPU).
 - Full 7-level audit completed (35 checks, 5 parallel agents)
 - 0 CRITICAL, 2 HIGH, 2 MEDIUM, 3 LOW findings
 - 203/204 tests passing, 92% audit confidence
-- VERDICT: READY FOR HARDFORK — fix H-001 + H-002 before May 5
+- VERDICT update 2026-07-07: H-002 fixed; H-001 remains the deploy blocker before Sprint 9.
 
-*Prometheus v4.0 · Checkpoint 2026-04-02 · Last updated: pre-hardfork audit · The fire belongs to humanity.*
+*Prometheus v4.0 · Checkpoint 2026-07-08 · Last updated: runtime stub gates + H-001 deploy gate · The fire belongs to humanity.*

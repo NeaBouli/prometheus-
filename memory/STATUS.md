@@ -1,7 +1,7 @@
 # PROMETHEUS – MODULE STATUS
 # Format: | Module | Status | Progress | Last Update | Audit | Testnet Address |
 # Status: PENDING | IN_PROGRESS | DONE | BLOCKED | PENDING_AUDIT | ACCEPTED | REJECTED
-# Last Updated: 2026-03-21
+# Last Updated: 2026-07-07
 
 ---
 
@@ -11,7 +11,7 @@
 Sprint 7: Dashboard + Docs
 Status:   ACCEPTED
 Start:    2026-03-21
-Goal:     All sprints 0-7 accepted. Feature-complete for Covenant-Hardfork.
+Goal:     All sprints 0-7 accepted. Post-Toccata deployment verification.
 ```
 
 ---
@@ -35,7 +35,7 @@ Goal:     All sprints 0-7 accepted. Feature-complete for Covenant-Hardfork.
 | claude-code-start.sh         | DONE            | 100%     | 2026-03-21  | -            | -               |
 | **SPRINT 0 – SETUP**         |                 |          |             |              |                 |
 | Testnet-10-Node              | DONE            | 100%     | 2026-03-21  | -            | wrpc://127.0.0.1:17210 |
-| Silverscript Compiler (ssc)  | PENDING         | 0%       | 2026-03-21  | -            | Wird mit Covenant-Hardfork 05.05.2026 released |
+| Silverscript Compiler (ssc)  | BLOCKED         | 0%       | 2026-07-07  | -            | Post-Toccata local install/test required; not found on Sandbox PATH |
 | Hello-World Contract         | PENDING         | 0%       | 2026-03-21  | -            | Deployment nach ssc-Release |
 | GitHub Actions CI/CD         | PENDING         | 0%       | -           | -            | -               |
 | Sprint-1 Pre-Check           | ACCEPTED        | 100%     | 2026-03-21  | ACCEPTED     | V-001, V-002, V-003 alle genehmigt |
@@ -84,20 +84,35 @@ Goal:     All sprints 0-7 accepted. Feature-complete for Covenant-Hardfork.
 Currently in progress:
 ```
 All sprints 0-7 ACCEPTED. Feature-complete.
-Waiting for Covenant-Hardfork (May 5, 2026) to deploy contracts.
-Next: Sprint 9 — Contracts Live (after ssc compiler ships).
+Pre-Hardfork Audit completed 2026-04-02: 0 CRITICAL, 2 HIGH, 2 MEDIUM, 3 LOW.
+H-002 (PATTERN-010) FIXED in 6347b85 (Arc<Phi3Model>).
+Kaspa Toccata status researched 2026-07-07; Rusty-Kaspa v2.0.0 scheduled mainnet activation at DAA 474,165,565 (~2026-06-30 16:15 UTC).
+Direct Sandbox check: `ssh sandbox` works, but `kaspad` and `ssc` were not found in PATH.
+Rusty-Kaspa workspace dependencies pinned to `v2.0.1`; `cargo audit` now reports no vulnerabilities, only allowed warnings.
+GitHub Security Audit workflow re-enabled and dependency audits now fail on findings instead of using `|| true`.
+Rust client runtime gate added: `PROMETHEUS_RUNTIME=beta|mainnet|production|prod` rejects ZK/Phi-3/KRC-20/Fed-DART stubs; development mode remains testable.
+Rollback tag: pre-session-20260413 → 6347b85
 ```
 
 ## BLOCKED
 
-No blockers. Next external dependency: ssc compiler on May 5, 2026.
+Sprint 9 remains blocked until local ssc/Silverscript tooling is installed/tested and H-001 LE encoding is verified.
 
 ## NEXT ACTIONS (for Claude Code)
 
 ```
-All Sprint 0-7 tasks complete. Waiting for Covenant-Hardfork.
-Next: Sprint 9 — compile and deploy contracts with ssc (May 2026).
-See memory/TODO.md for full Sprint 9-14 task list.
+STARTFLOW — Read in this order:
+1. BACKLOG.md → Priorisierte Tasks mit Startflow
+2. memory/AUDIT.md (line 337+) → Pre-Hardfork Findings (H-001 open, H-002 fixed)
+3. memory/ERRORS.md → 12 known patterns
+
+Priority tasks:
+- Sprint 9: install/verify ssc tooling, then compile + deploy only after H-001 passes
+- H-001: LE encoding verification with contract/Rust test vectors
+- Q-003: replace/gate contract-side `fp_rate` oracle stub before beta/mainnet governance
+- Sprint 10B: Guardian Decentralization (hybrid routing, ensemble voting)
+- Q-003: fp_rate Oracle (Architect decision needed)
+- M-001/M-002: Medium findings (can wait until Aug/Sep)
 ```
 
 ## TESTNET CONTRACT ADDRESSES
@@ -112,7 +127,7 @@ CommunityDonations:  TBD
 RuleStorage:         TBD
 ```
 
-## MAINNET CONTRACT ADDRESSES (from May 5, 2026)
+## MAINNET CONTRACT ADDRESSES (post-verification)
 
 ```
 (to be filled on launch day)

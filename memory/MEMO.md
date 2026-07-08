@@ -168,8 +168,8 @@ Dies ist nicht optional. Es ist Teil jeder Task-Definition.
 
 ## BLOCKADEN (aktuell)
 
-Keine bekannten Blockaden.
-Nächste externe Abhängigkeit: ssc Compiler am 5. Mai 2026.
+Sprint 9 bleibt blockiert, bis lokale Silverscript/TN12-Tooling-Tests und H-001 Commit-Reveal-Bytevektoren gegen ssc verifiziert sind.
+Rusty-Kaspa Workspace-Dependencies sind seit 2026-07-07 auf `v2.0.1` gepinnt.
 Core Dev benötigt: Apple Developer Account + Google Play Account (vor Sprint 13).
 
 ---
