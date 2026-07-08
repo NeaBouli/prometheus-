@@ -37,8 +37,10 @@ jobs:
             fi
           done
           echo "All contracts pass KAS/PROM check."
-      # Note: ssc compile is not available until Covenant-Hardfork (May 5, 2026).
-      # Contract compilation will be added to CI after ssc ships.
+      # Note: ssc/Silverscript compile is intentionally not a CI gate yet.
+      # The upstream Silverscript workspace is experimental and currently documents
+      # Testnet-12-only output. Add contract compilation after the toolchain is pinned
+      # and H-001 commit-reveal byte encoding is verified.
 
   # ─── Rust Workspace Check ───────────────────────────────────────────────────
   rust-check:
@@ -109,3 +111,11 @@ jobs:
           for f in robots.txt sitemap.xml llms.txt manifest.json sw.js; do
             test -f "$f" && echo "OK: $f" || (echo "MISSING: $f" && exit 1)
           done
+      - name: Verify public launch status is not stale
+        run: |
+          files=(index.html faq.html roadmap.html whitepaper.html guardian-economics.html README.md WHITEPAPER.md docs/roadmap.md llms.txt)
+          if grep -nE 'May 5, 2026|Mainnet launches|Mainnet target|Mainnet launch: May|Contracts May 2026|from May 5|Mainnet May|Testnet-12 does not exist|Testnet-12 existiert nicht' "${files[@]}"; then
+            echo "ERROR: stale launch or testnet status wording found in public docs."
+            exit 1
+          fi
+          echo "Public launch status wording is current."

@@ -5,8 +5,12 @@ on:
     branches: [main, master, develop, dev]
   pull_request:
     branches: [main, master]
+  workflow_dispatch:
   schedule:
     - cron: '0 3 * * 1'
+
+permissions:
+  contents: read
 
 jobs:
   secret-scan:
@@ -40,7 +44,7 @@ jobs:
 
       - name: npm audit
         if: steps.check-npm.outputs.has_npm == 'true'
-        run: npm audit --audit-level=high || true
+        run: npm audit --audit-level=high
 
       - name: Check for Cargo.toml
         id: check-cargo
@@ -54,8 +58,8 @@ jobs:
       - name: cargo audit
         if: steps.check-cargo.outputs.has_cargo == 'true'
         run: |
-          cargo install cargo-audit 2>/dev/null || true
-          cargo audit || true
+          cargo install cargo-audit --locked
+          cargo audit
 
       - name: Check for requirements.txt
         id: check-pip
@@ -69,8 +73,8 @@ jobs:
       - name: pip audit
         if: steps.check-pip.outputs.has_pip == 'true'
         run: |
-          pip install pip-audit 2>/dev/null || true
-          find . -maxdepth 3 -name "requirements.txt" -exec pip-audit -r {} \; || true
+          python -m pip install pip-audit
+          find . -maxdepth 3 -name "requirements.txt" -exec pip-audit -r {} \;
 
   security-summary:
     name: Security Summary
