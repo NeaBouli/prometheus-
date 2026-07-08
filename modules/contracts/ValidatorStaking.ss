@@ -21,7 +21,7 @@ struct Validator {
 struct VoteCommitment {
     validator_pubkey: bytes(32),
     proposal_id: uint64,
-    commitment: bytes(32),        // sha256(vote || salt || block_height)
+    commitment: bytes(32),        // sha256(vote_byte || salt_le || block_height_le)
     bond_kas: uint64,             // 10% des Stakes als Kaution
     committed_at_block: uint64
 }
@@ -73,7 +73,8 @@ function register(pubkey: bytes(32)) -> void {
 }
 
 // Submit a vote commitment for a proposal (commit phase of Commit-Reveal).
-// commitment = sha256(vote || salt || block_height).
+// Canonical H-001 preimage: vote_byte(1) || salt_le(8) || block_height_le(8).
+// commitment = sha256(canonical_preimage).
 // Bond = 10% of validator's current stake, locked until reveal.
 function commitVote(proposal_id: uint64, commitment: bytes(32), bond: uint64) -> void {
     let validator: Validator = validators[msg.sender];
@@ -107,7 +108,8 @@ function revealVote(proposal_id: uint64, vote: bool, salt: uint64) -> void {
     let vc: VoteCommitment = commitments[commitment_key];
     require(vc.committed_at_block > 0, "No commitment found");
 
-    // Reconstruct commitment: sha256(vote || salt || committed_at_block)
+    // Reconstruct commitment from the canonical H-001 preimage:
+    // vote_byte(1) || salt_le(8) || committed_at_block_le(8).
     let expected: bytes(32) = sha256(vote || salt || vc.committed_at_block);
 
     if expected != vc.commitment {

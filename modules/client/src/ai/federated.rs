@@ -12,6 +12,8 @@ use anyhow::Result;
 use log::info;
 use sha2::{Digest, Sha256};
 
+use crate::runtime::require_stub_allowed;
+
 /// Model update containing gradient data for federated learning.
 ///
 /// PRIVACY: Only mathematical gradients are transmitted.
@@ -66,6 +68,7 @@ impl FederatedClient {
 
         // Stub: real implementation will POST to Fed-DART aggregation endpoint
         // via the P2P network after Covenant-Hardfork
+        require_stub_allowed("Fed-DART gradient submit")?;
         info!(
             "Gradient update submitted to {} ({} parameters, {} samples)",
             self.node_url,
@@ -81,6 +84,7 @@ impl FederatedClient {
         // Stub: returns a placeholder hash
         // Real implementation will query the on-chain model registry
         // where the latest aggregated model hash is stored
+        require_stub_allowed("Fed-DART global model hash")?;
         info!("Fetching global model hash from {}", self.node_url);
 
         // Placeholder: hash of "prometheus-global-model-v0"

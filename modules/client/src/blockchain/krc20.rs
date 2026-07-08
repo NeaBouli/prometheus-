@@ -10,6 +10,8 @@ use log::info;
 use serde::{Deserialize, Serialize};
 use tokio::sync::Mutex;
 
+use crate::runtime::require_stub_allowed;
+
 use super::connection::KaspaConnection;
 
 /// KRC-20 tick identifier for Prometheus rules
@@ -72,6 +74,7 @@ impl Krc20RuleReader {
         // decode the metadata, and return as ThreatRule structs.
         // For now: return cached rules (will be populated when ssc + Covenant-Hardfork
         // enable on-chain rule storage).
+        require_stub_allowed("KRC-20 rule cache")?;
         let rules = self.cached_rules.lock().await;
         info!(
             "Fetched {} rules from {} (tick: {})",

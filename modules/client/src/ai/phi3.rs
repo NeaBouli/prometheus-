@@ -16,6 +16,8 @@ use std::path::{Path, PathBuf};
 use anyhow::Result;
 use log::{info, warn};
 
+use crate::runtime::require_stub_allowed;
+
 /// Minimum confidence threshold for reporting (from MEMO.md AUTO-TUNING)
 pub const MIN_CONFIDENCE_KI: f64 = 0.85;
 
@@ -89,8 +91,11 @@ impl Phi3Model {
     /// When model is loaded: runs ONNX inference and returns analysis.
     pub async fn analyze_bytes(&self, data: &[u8]) -> Result<AiAnalysis> {
         if !self.loaded {
+            require_stub_allowed("Phi-3 model fallback")?;
             return Ok(AiAnalysis::default());
         }
+
+        require_stub_allowed("Phi-3 heuristic inference")?;
 
         // Stub: real ONNX inference will be implemented when model is available.
         // The actual pipeline:

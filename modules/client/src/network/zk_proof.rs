@@ -10,6 +10,8 @@
 use anyhow::Result;
 use sha2::{Digest, Sha256};
 
+use crate::runtime::require_stub_allowed;
+
 /// Zero-knowledge proof structure.
 /// In production: Groth16 proof compatible with Kaspa KIP-16.
 #[derive(Debug, Clone)]
@@ -45,6 +47,8 @@ impl ZkProofGenerator {
     /// Stub: creates a SHA-256 commitment proof.
     /// Production: will generate Groth16 proof compatible with Kaspa KIP-16.
     pub fn generate_threat_proof(&self, threat_hash: &[u8; 32]) -> Result<ZkProof> {
+        require_stub_allowed("ZK proof")?;
+
         // Stub implementation: commitment = SHA-256(threat_hash || "prometheus-zk")
         // Replace with real Groth16 when kaspa-zk-params is available
         // post Covenant-Hardfork
@@ -69,6 +73,10 @@ impl ZkProofGenerator {
     /// Stub: verifies the SHA-256 commitment matches.
     /// Production: will verify Groth16 proof on-chain.
     pub fn verify_proof(&self, proof: &ZkProof) -> bool {
+        if proof.is_stub && require_stub_allowed("ZK proof").is_err() {
+            return false;
+        }
+
         if proof.is_stub {
             // Stub verification: recompute commitment and compare
             let mut hasher = Sha256::new();
