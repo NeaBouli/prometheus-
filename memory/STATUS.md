@@ -89,7 +89,7 @@ H-002 (PATTERN-010) FIXED in 6347b85 (Arc<Phi3Model>).
 Kaspa Toccata status researched 2026-07-07; Rusty-Kaspa v2.0.0 scheduled mainnet activation at DAA 474,165,565 (~2026-06-30 16:15 UTC).
 Direct Sandbox check: `ssh sandbox` works, but `kaspad` and `ssc` were not found in PATH.
 Local upstream Silverscript check: `/tmp/prom-silverscript` `cargo test -p silverscript-lang` passed; `silverc --help` works.
-Repo H-001 fixture: `modules/contracts/silverc/ValidatorStakingH001.sil` plus `scripts/verify_silverc_h001.py` verifies explicit `vote_byte || byte[8](salt) || byte[8](block_height)` against Rust vectors for positive 64-bit values.
+Repo H-001 fixture: `modules/contracts/silverc/ValidatorStakingH001.sil` plus `scripts/verify_silverc_h001.py` verifies explicit `vote_byte || byte[8](salt) || byte[8](block_height)` against Rust vectors for positive 64-bit values at pinned Silverscript ref `d25bd3427a093c17327ca3d6b9e1aa5f7688c863`.
 Rusty-Kaspa workspace dependencies pinned to `v2.0.1`; `cargo audit` now reports no vulnerabilities, only allowed warnings.
 GitHub Security Audit workflow re-enabled and dependency audits now fail on findings instead of using `|| true`.
 Rust client runtime gate added: `PROMETHEUS_RUNTIME=beta|mainnet|production|prod` rejects ZK/Phi-3/KRC-20/Fed-DART stubs; development mode remains testable.

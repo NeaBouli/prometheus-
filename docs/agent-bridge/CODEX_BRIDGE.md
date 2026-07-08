@@ -322,7 +322,7 @@ Critical active rule:
 
 ```text
 H-001 is still OPEN for the actual Prometheus contract unless memory/AUDIT.md proves otherwise.
-On 2026-07-08, upstream `silverscript-lang`/`silverc` built and passed tests locally. The repo now contains `modules/contracts/silverc/ValidatorStakingH001.sil` and `scripts/verify_silverc_h001.py`; the script verifies explicit `vote_byte || byte[8](salt) || byte[8](block_height)` against the Rust H-001 vectors for positive 64-bit values. The full `ValidatorStaking.ss` state machine still needs port/compile/runtime verification because it uses legacy `.ss`/`uint64` syntax and old state abstractions.
+On 2026-07-08, upstream `silverscript-lang`/`silverc` built and passed tests locally. The repo now contains `modules/contracts/silverc/ValidatorStakingH001.sil` and `scripts/verify_silverc_h001.py`; the script verifies explicit `vote_byte || byte[8](salt) || byte[8](block_height)` against the Rust H-001 vectors for positive 64-bit values at pinned Silverscript ref `d25bd3427a093c17327ca3d6b9e1aa5f7688c863`. The full `ValidatorStaking.ss` state machine still needs port/compile/runtime verification because it uses legacy `.ss`/`uint64` syntax and old state abstractions.
 ```
 
 Known findings:

@@ -119,7 +119,7 @@
 7. Lies memory/ERRORS.md             → 12 bekannte Patterns
 ```
 
-**Status: Feature-complete through Sprint 7. Kaspa Toccata status researched 2026-07-07; upstream `silverc` verified locally 2026-07-08; repo H-001 fixture verifies; deployment now depends on full Prometheus state-machine contract compatibility and H-001 verification in the ported contract form.**
+**Status: Feature-complete through Sprint 7. Kaspa Toccata status researched 2026-07-07; upstream `silverc` verified locally 2026-07-08; repo H-001 fixture verifies at pinned Silverscript ref `d25bd3427a093c17327ca3d6b9e1aa5f7688c863`; deployment now depends on full Prometheus state-machine contract compatibility and H-001 verification in the ported contract form.**
 
 **Offene Tasks (priorisiert):**
 - [x] PATTERN-010 fix: Arc<Phi3Model> statt Arc<Mutex<Phi3Model>> — DONE `6347b85`

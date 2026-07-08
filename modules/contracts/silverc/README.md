@@ -25,9 +25,10 @@ Run from the Prometheus repo root:
 python3 scripts/verify_silverc_h001.py
 ```
 
-The script uses `/tmp/prom-silverscript` by default. Override with:
+The script uses `/tmp/prom-silverscript` and the pinned upstream ref
+`d25bd3427a093c17327ca3d6b9e1aa5f7688c863` by default. Override with:
 
 ```bash
 SILVERSCRIPT_REPO=/path/to/silverscript python3 scripts/verify_silverc_h001.py
+SILVERSCRIPT_REF=<commit-or-tag> python3 scripts/verify_silverc_h001.py
 ```
-

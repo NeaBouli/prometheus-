@@ -13,6 +13,7 @@
 - Added repo-tracked current-Silverscript H-001 fixture `modules/contracts/silverc/ValidatorStakingH001.sil`.
 - Added `scripts/verify_silverc_h001.py` to inject a temporary upstream integration test and verify the repo fixture against the Rust H-001 vectors.
 - Added a lightweight CI guard ensuring the H-001 fixture keeps explicit byte construction and does not regress to implicit `sha256(vote || salt ...)` serialization.
+- Pinned the H-001 `silverc` verifier to upstream Silverscript ref `d25bd3427a093c17327ca3d6b9e1aa5f7688c863` and added a GitHub Actions runtime job for the H-001 vectors.
 
 ## 2026-07-07
 

@@ -12,6 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 CONTRACT = ROOT / "modules" / "contracts" / "silverc" / "ValidatorStakingH001.sil"
 DEFAULT_SILVERSCRIPT_REPO = Path("/tmp/prom-silverscript")
 SILVERSCRIPT_GIT = "https://github.com/kaspanet/silverscript.git"
+DEFAULT_SILVERSCRIPT_REF = "d25bd3427a093c17327ca3d6b9e1aa5f7688c863"
 
 RUST_TEST = r"""
 use kaspa_consensus_core::hashing::sighash::SigHashReusedValuesUnsync;
@@ -96,11 +97,13 @@ def run(cmd: list[str], cwd: Path, env: dict[str, str] | None = None) -> None:
     subprocess.run(cmd, cwd=cwd, env=env, check=True)
 
 
-def ensure_silverscript_repo(path: Path) -> None:
+def ensure_silverscript_repo(path: Path, ref: str) -> None:
     if path.exists():
-        return
-    path.parent.mkdir(parents=True, exist_ok=True)
-    run(["git", "clone", SILVERSCRIPT_GIT, str(path)], ROOT)
+        run(["git", "fetch", "--quiet", "--tags", "origin"], path)
+    else:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        run(["git", "clone", SILVERSCRIPT_GIT, str(path)], ROOT)
+    run(["git", "-c", "advice.detachedHead=false", "checkout", "--quiet", ref], path)
 
 
 def main() -> int:
@@ -113,7 +116,8 @@ def main() -> int:
         .expanduser()
         .resolve()
     )
-    ensure_silverscript_repo(silver_repo)
+    silver_ref = os.environ.get("SILVERSCRIPT_REF", DEFAULT_SILVERSCRIPT_REF)
+    ensure_silverscript_repo(silver_repo, silver_ref)
 
     test_dir = silver_repo / "silverscript-lang" / "tests"
     if not test_dir.is_dir():
@@ -147,6 +151,7 @@ def main() -> int:
             pass
 
     print("H-001 silverc fixture verification passed.")
+    print(f"Silverscript ref: {silver_ref}")
     print(
         "Note: current silverc uses signed int entrypoint arguments; the u64::MAX Rust vector remains a full-contract port item."
     )
