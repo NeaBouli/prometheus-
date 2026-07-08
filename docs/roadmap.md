@@ -29,10 +29,10 @@ E2E tests, documentation, landing page — all complete and on GitHub.
 **June/July 2026**
 
 Kaspa Toccata moved the ecosystem into the post-fork verification phase.
-Prometheus deployment now depends on local ssc/Silverscript tooling and H-001 commit-reveal encoding verification.
+Prometheus deployment now depends on current-Silverscript runtime transition verification for the validator state machine and remaining deployment-scoped contract ports. H-001 byte encoding has a pinned current-Silverscript fixture.
 
 **Sprint 9 — Contracts Live + Real ZK-Proof**
-- Verify ssc/Silverscript tooling and H-001 LE encoding vectors
+- Verify current-Silverscript validator-state runtime transitions and H-001 LE encoding vectors
 - Compile and deploy all 6 contracts to Kaspa Mainnet only after verification passes
 - Integrate kaspa-zk-params crate (real Groth16, replacing stub)
 - Implement PROM emission contract (minting logic)
@@ -166,7 +166,7 @@ This is the final architectural milestone described in the whitepaper.
 | Date | Milestone |
 |------|-----------|
 | March 2026 | All sprints 0-8 accepted. Foundation complete. |
-| June/July 2026 | Toccata post-fork verification. ssc tooling and H-001 vectors checked. |
+| June/July 2026 | Toccata post-fork verification. Current-Silverscript H-001 vectors checked; validator-state runtime transition gate in progress. |
 | Post-verification | First PROM minted. First DEX pool live. |
 | June 2026 | Real ZK-proof, P2P network, Phi-3 production |
 | June 2026 | LLaMA 3 fine-tuned on security datasets |

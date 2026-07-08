@@ -32,3 +32,37 @@ The script uses `/tmp/prom-silverscript` and the pinned upstream ref
 SILVERSCRIPT_REPO=/path/to/silverscript python3 scripts/verify_silverc_h001.py
 SILVERSCRIPT_REF=<commit-or-tag> python3 scripts/verify_silverc_h001.py
 ```
+
+## ValidatorStakingState.sil
+
+`ValidatorStakingState.sil` is the current-`silverc` port fixture for the
+validator-owned state machine. It models one validator UTXO and keeps the core
+legacy invariants:
+
+- validators stake KAS, never PROM
+- minimum stake is `MIN_STAKE_KAS = 10000`
+- commit bond is `BOND_PERCENT = 10`
+- withdrawal cooldown is `COOLDOWN_BLOCKS = 100800`
+- reveal verification uses the same H-001 canonical preimage as
+  `ValidatorStakingH001.sil`
+
+The port uses `#[covenant.singleton(mode = transition)]` because current
+Silverscript expresses contract state as covenant-authorized UTXO state, not as
+legacy global maps. The fixture currently covers:
+
+- `commitVote`
+- `revealVote`
+- `slashInvalidReveal`
+- `requestWithdraw`
+- `completeWithdraw`
+
+The shared verifier compiles this fixture against the pinned upstream
+Silverscript ref and builds all covenant declaration sigscripts:
+
+```bash
+python3 scripts/verify_silverc_h001.py
+```
+
+This is a compile/ABI gate for the state-machine port. Runtime transition tests
+with real signatures and transaction outputs are the next contract task before
+testnet deployment.

@@ -48,19 +48,28 @@ jobs:
             exit 1
           fi
           echo "H-001 fixture uses explicit canonical preimage bytes."
-      # Note: ssc/Silverscript compile is intentionally not a CI gate yet.
-      # The upstream Silverscript workspace is experimental and currently documents
-      # Testnet-12-only output. Add contract compilation after the toolchain is pinned
-      # and H-001 commit-reveal byte encoding is verified.
+      - name: Verify ValidatorStakingState current-silverc fixture exists
+        run: |
+          fixture="modules/contracts/silverc/ValidatorStakingState.sil"
+          test -f "$fixture" || (echo "ERROR: missing $fixture" && exit 1)
+          grep -q 'MIN_STAKE_KAS = 10000' "$fixture"
+          grep -q 'BOND_PERCENT = 10' "$fixture"
+          grep -q 'COOLDOWN_BLOCKS = 100800' "$fixture"
+          grep -q 'commitmentHash(vote, salt, prev_state.committed_at_block)' "$fixture"
+          if grep -q 'PROM' "$fixture"; then
+            echo "ERROR: Validator staking fixture must not introduce PROM staking."
+            exit 1
+          fi
+          echo "ValidatorStakingState fixture keeps core staking invariants."
 
   h001-silverc-runtime:
-    name: H-001 Silverc Runtime
+    name: H-001 + Validator State Silverc Runtime
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
-      - name: Verify H-001 vectors against pinned silverc runtime
+      - name: Verify H-001 vectors and validator state fixture against pinned silverc
         run: python3 scripts/verify_silverc_h001.py
 
   # ─── Rust Workspace Check ───────────────────────────────────────────────────

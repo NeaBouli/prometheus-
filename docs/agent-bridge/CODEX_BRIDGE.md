@@ -3,7 +3,7 @@
 Last updated: 2026-07-08 EEST
 Repo path: /Users/gio/Desktop/repos/prometheus
 Branch observed: main
-Latest product-code baseline observed: eeb4808 - docs: update post-toccata bridge status
+Latest product-code baseline observed: verify with `git log --oneline -1`
 Current HEAD: verify with `git log --oneline -1`; bridge-only commits may advance it.
 
 Purpose: This file is the local bridge for Codex/Claude Code handover. Read it before touching product code. It consolidates the project state, architecture rules, workflow logic, current open issues, the Reputation Badge decision, and the new direct Sandbox access note.
@@ -295,7 +295,7 @@ Known consolidated status from memory/handover and user-provided synthesis:
 | 6 | E2E integration, 18 tests | ACCEPTED |
 | 7 | Dashboard and docs | ACCEPTED |
 | 8 | Contributing/wiki/site/SEO in older handover | ACCEPTED in older handover |
-| 9 | Contract deploy on Testnet/Mainnet path | BLOCKED until hardfork/ssc/H-001 verification |
+| 9 | Contract deploy on Testnet/Mainnet path | BLOCKED until current-Silverscript runtime transition tests and deployment-scoped contract ports pass |
 | 10B | Guardian decentralization | Startable, but architecture-sensitive |
 
 Test status from user synthesis:
@@ -313,7 +313,7 @@ Pre-hardfork audit synthesis:
 | Severity | Count | Notes |
 | --- | ---: | --- |
 | Critical | 0 | None known |
-| High | 2 | H-001 open/pending ssc; H-002 fixed |
+| High | 2 | H-001 byte-core verified, runtime transition/u64 boundary open; H-002 fixed |
 | Medium | 2 | M-001 heuristic confidence; M-002 flaky perf test |
 | Low | 3 | L-001 deposit ACL, L-002 fp_rate stub, L-003 CEI |
 | Passed clean | 28 | From 35-check audit synthesis |
@@ -321,13 +321,13 @@ Pre-hardfork audit synthesis:
 Critical active rule:
 
 ```text
-H-001 is still OPEN for the actual Prometheus contract unless memory/AUDIT.md proves otherwise.
-On 2026-07-08, upstream `silverscript-lang`/`silverc` built and passed tests locally. The repo now contains `modules/contracts/silverc/ValidatorStakingH001.sil` and `scripts/verify_silverc_h001.py`; the script verifies explicit `vote_byte || byte[8](salt) || byte[8](block_height)` against the Rust H-001 vectors for positive 64-bit values at pinned Silverscript ref `d25bd3427a093c17327ca3d6b9e1aa5f7688c863`. The full `ValidatorStaking.ss` state machine still needs port/compile/runtime verification because it uses legacy `.ss`/`uint64` syntax and old state abstractions.
+H-001 byte-core is verified, but deployment is still gated by current-Silverscript runtime transition coverage.
+On 2026-07-08, upstream `silverscript-lang`/`silverc` built and passed tests locally. The repo now contains `modules/contracts/silverc/ValidatorStakingH001.sil`, `modules/contracts/silverc/ValidatorStakingState.sil`, and `scripts/verify_silverc_h001.py`; the script verifies explicit `vote_byte || byte[8](salt) || byte[8](block_height)` against the Rust H-001 vectors for positive 64-bit values, and compiles/builds covenant sigscripts for the ValidatorStaking state fixture at pinned Silverscript ref `d25bd3427a093c17327ca3d6b9e1aa5f7688c863`. Runtime transition tests with real signatures/authorized outputs and signed-int/u64 boundary handling remain open.
 ```
 
 Known findings:
 
-- H-001: `ValidatorStaking.ss:111` commit-reveal LE-encoding ambiguity. Repo-tracked current-Silverscript H-001 fixture passes; pending full Prometheus state-machine port/compile/runtime verification.
+- H-001: `ValidatorStaking.ss:111` legacy commit-reveal LE-encoding ambiguity. Repo-tracked current-Silverscript H-001 fixture passes; `ValidatorStakingState.sil` compile/ABI gate passes; pending runtime transition tests and signed-int/u64 deployment boundary.
 - H-002: unnecessary Mutex around Phi3Model. Fixed in commit `6347b85` according to memory/handover.
 - M-001: Guardian YARA generator confidence is heuristic, needs real LLM confidence or validated metric.
 - M-002: performance test flaky in debug mode, threshold/release gate needed.
@@ -492,7 +492,7 @@ Sources consolidated into this file:
 Staleness warning:
 
 - The downloaded handover says date `2026-03-23` and last commit `6347b85`.
-- The local repo observed on 2026-07-08 had latest product-code baseline `eeb4808`.
+- The local repo observed on 2026-07-08 had a moving product-code baseline; use `git log --oneline -1` as source of truth.
 - Bridge-only reconciliation commits may advance `HEAD`; use `git log --oneline -1` as source of truth.
 - Therefore the handover is useful for architecture and workflow, but not authoritative for current git state.
 - Always verify current files and tests before implementing.
@@ -503,11 +503,12 @@ Staleness warning:
 
 Highest priority:
 
-1. Port/compile `ValidatorStaking.ss` with current upstream Silverscript (`silverc`), replacing implicit H-001 serialization with explicit byte construction if required.
-2. Re-run H-001 vectors against the actual Prometheus contract form before Sprint 9.
-3. Document Silverscript/TN12/Mainnet compatibility limits before any deploy attempt.
-4. Resolve Q-003 contract-side `fp_rate` oracle stub before beta/mainnet governance.
-5. Keep Reputation Badge decision as "no badge, L1 reputation only".
+1. Add runtime covenant transition tests for `ValidatorStakingState.sil` with real signatures and authorized outputs.
+2. Resolve/document the current `silverc` signed-int/u64 boundary before deployment.
+3. Port or deployment-scope the remaining Prometheus contracts against current upstream Silverscript (`silverc`).
+4. Document Silverscript/TN12/Mainnet compatibility limits before any deploy attempt.
+5. Resolve Q-003 contract-side `fp_rate` oracle stub before beta/mainnet governance.
+6. Keep Reputation Badge decision as "no badge, L1 reputation only".
 
 If asked to continue project work:
 
@@ -521,7 +522,7 @@ If asked to continue project work:
 
 ## 18. One-Line Decision Summary
 
-Prometheus does not need reputation badges; it needs readable, provable Kaspa L1 Guardian reputation. Codex has direct Sandbox access via `ssh sandbox`, upstream `silverc` works locally, and Sprint 9 remains blocked until the actual Prometheus contracts compile and H-001 passes in that contract form.
+Prometheus does not need reputation badges; it needs readable, provable Kaspa L1 Guardian reputation. Codex has direct Sandbox access via `ssh sandbox`, upstream `silverc` works locally, H-001 byte-core passes, and Sprint 9 remains blocked until current-Silverscript runtime transition tests plus deployment-scoped contract ports pass.
 <!-- CODEX_CLAUDE_CODE_TERMINAL_BRIDGE_V1 -->
 ## Codex -> Claude Code Terminal Bridge
 

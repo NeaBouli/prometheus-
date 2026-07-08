@@ -72,7 +72,7 @@ Off-Chain:           Phi-3-mini (local AI) | LLaMA 3 (guardian AI) | Fed-DART (f
 | 6 — E2E | ACCEPTED | Full lifecycle test, Sybil + FP flood resistance |
 | 7 — Dashboard | CURRENT | Audit dashboard, documentation |
 
-**Deployment status:** Kaspa Toccata post-fork verification is active. Prometheus contract deployment is gated by ssc/tooling availability and H-001 commit-reveal encoding verification.
+**Deployment status:** Kaspa Toccata post-fork verification is active. H-001 commit-reveal byte encoding now has a pinned current-Silverscript fixture; deployment is gated by runtime transition tests for the current-Silverscript validator state machine and remaining deployment-scoped contract ports.
 
 ---
 

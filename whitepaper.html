@@ -269,7 +269,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
       <table class="wp-table">
         <tr><th>Parameter</th><th>Value</th></tr>
         <tr><td>Blockchain</td><td>Kaspa (DAGKnight, 10–100 BPS, sub-second finality)</td></tr>
-        <tr><td>Smart Contracts</td><td>Silverscript — native L1, post-Toccata verification pending</td></tr>
+        <tr><td>Smart Contracts</td><td>Silverscript — native L1, current-Silverscript runtime transition verification pending</td></tr>
         <tr><td>Guardian AI (primary)</td><td>LLaMA 3 70B (Meta, open source)</td></tr>
         <tr><td>Guardian AI (fallback)</td><td>LLaMA 3 8B (RTX 4070 Ti+, 16 GB VRAM)</td></tr>
         <tr><td>Client AI</td><td>Phi-3-mini 3.8B, 4-bit quantized (4 GB RAM, no GPU)</td></tr>
@@ -277,7 +277,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
         <tr><td>Staking Token</td><td>KAS (Kaspa native, 0% pre-mine)</td></tr>
         <tr><td>Governance Token</td><td>PROM (Prometheus Token, 0% pre-mine)</td></tr>
         <tr><td>Total Emission (5 years)</td><td>80,000,000 PROM</td></tr>
-        <tr><td>Mainnet Launch</td><td>Pending ssc tooling and H-001 commit-reveal verification after Toccata</td></tr>
+        <tr><td>Mainnet Launch</td><td>Pending validator-state runtime transition tests and remaining deployment-scoped contract ports after Toccata</td></tr>
         <tr><td>License</td><td>MIT / Apache 2.0</td></tr>
       </table>
     </div>
@@ -341,7 +341,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
       <ul class="wp-list">
         <li><strong>DAGKnight consensus:</strong> Adaptive, parameterless consensus with theoretically optimal Byzantine fault tolerance (~50%). Converges under attack orders of magnitude faster than classical systems.</li>
         <li><strong>BlockDAG architecture:</strong> Parallel block production eliminates the bottleneck of linear chains. 10 BPS today, 100 BPS with Crescendo upgrade.</li>
-        <li><strong>Silverscript:</strong> High-level language for UTXO-based smart contracts. Compiles directly to Kaspa opcodes, no separate VM. Prometheus deployment requires post-Toccata compiler and H-001 encoding verification.</li>
+        <li><strong>Silverscript:</strong> High-level language for UTXO-based smart contracts. Compiles directly to Kaspa opcodes, no separate VM. Prometheus deployment requires current-Silverscript runtime transition verification and H-001 encoding gates.</li>
         <li><strong>Native ZK verification:</strong> Groth16 Zero-Knowledge Proofs directly on L1 — essential for anonymous threat reports.</li>
       </ul>
 
@@ -589,7 +589,7 @@ async def training_round(self):
       <table class="wp-table">
         <tr><th>Phase</th><th>Timeline</th><th>Milestone</th></tr>
         <tr><td>Foundation</td><td>March 2026</td><td>Sprints 0–8 complete. 6 contracts, 160+ tests, landing page live.</td></tr>
-        <tr><td>Kaspa Toccata</td><td>June 30, 2026</td><td>Post-fork tooling verification, H-001 encoding vectors, and deploy gate for Prometheus contracts.</td></tr>
+        <tr><td>Kaspa Toccata</td><td>June 30, 2026</td><td>Post-fork current-Silverscript runtime transition verification, H-001 encoding vectors, and deploy gate for Prometheus contracts.</td></tr>
         <tr><td>AI Production</td><td>Post-verification</td><td>Real ZK-proof, P2P, Phi-3, LLaMA fine-tuned, Fed-DART live.</td></tr>
         <tr><td>Desktop Release</td><td>July–August 2026</td><td>Windows / macOS / Linux installers. One-click Guardian setup.</td></tr>
         <tr><td>Mobile Release</td><td>September 2026</td><td>iOS (App Store) + Android (Google Play + F-Droid).</td></tr>

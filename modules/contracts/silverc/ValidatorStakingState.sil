@@ -1,0 +1,168 @@
+pragma silverscript ^0.1.0;
+
+contract ValidatorStakingState(
+    pubkey init_validator_pk,
+    int init_stake_kas,
+    bool init_active,
+    int init_joined_at,
+    int init_reputation,
+    int init_slashing_count,
+    int init_last_vote_block,
+    byte[32] init_commitment,
+    int init_bond_kas,
+    int init_committed_at_block,
+    int init_withdraw_request_block
+) {
+    int constant MIN_STAKE_KAS = 10000;
+    int constant BOND_PERCENT = 10;
+    int constant COOLDOWN_BLOCKS = 100800;
+
+    pubkey validator_pk = init_validator_pk;
+    int stake_kas = init_stake_kas;
+    bool active = init_active;
+    int joined_at = init_joined_at;
+    int reputation = init_reputation;
+    int slashing_count = init_slashing_count;
+    int last_vote_block = init_last_vote_block;
+    byte[32] commitment = init_commitment;
+    int bond_kas = init_bond_kas;
+    int committed_at_block = init_committed_at_block;
+    int withdraw_request_block = init_withdraw_request_block;
+
+    function emptyCommitment() : byte[32] {
+        return(0x0000000000000000000000000000000000000000000000000000000000000000);
+    }
+
+    function isEmptyCommitment(byte[32] value) : bool {
+        return(value == emptyCommitment());
+    }
+
+    function commitmentHash(bool vote, int salt, int block_height) : byte[32] {
+        byte[] vote_byte = vote ? byte[](0x01) : byte[](0x00);
+        byte[] preimage = vote_byte + byte[8](salt) + byte[8](block_height);
+        return(sha256(preimage));
+    }
+
+    function carryForward(State prev_state) : State {
+        return({
+            validator_pk: prev_state.validator_pk,
+            stake_kas: prev_state.stake_kas,
+            active: prev_state.active,
+            joined_at: prev_state.joined_at,
+            reputation: prev_state.reputation,
+            slashing_count: prev_state.slashing_count,
+            last_vote_block: prev_state.last_vote_block,
+            commitment: prev_state.commitment,
+            bond_kas: prev_state.bond_kas,
+            committed_at_block: prev_state.committed_at_block,
+            withdraw_request_block: prev_state.withdraw_request_block
+        });
+    }
+
+    #[covenant.singleton(mode = transition)]
+    function commitVote(State prev_state, byte[32] new_commitment, int new_bond_kas, int block_height, sig validator_sig) : State {
+        require(prev_state.active);
+        require(prev_state.withdraw_request_block == 0);
+        require(isEmptyCommitment(prev_state.commitment));
+        require(!isEmptyCommitment(new_commitment));
+        require(new_bond_kas >= prev_state.stake_kas * BOND_PERCENT / 100);
+        require(new_bond_kas <= prev_state.stake_kas);
+        require(checkSig(validator_sig, prev_state.validator_pk));
+
+        return({
+            validator_pk: prev_state.validator_pk,
+            stake_kas: prev_state.stake_kas,
+            active: prev_state.active,
+            joined_at: prev_state.joined_at,
+            reputation: prev_state.reputation,
+            slashing_count: prev_state.slashing_count,
+            last_vote_block: prev_state.last_vote_block,
+            commitment: new_commitment,
+            bond_kas: new_bond_kas,
+            committed_at_block: block_height,
+            withdraw_request_block: prev_state.withdraw_request_block
+        });
+    }
+
+    #[covenant.singleton(mode = transition)]
+    function revealVote(State prev_state, bool vote, int salt, int reveal_block_height, sig validator_sig) : State {
+        require(prev_state.active);
+        require(!isEmptyCommitment(prev_state.commitment));
+        require(commitmentHash(vote, salt, prev_state.committed_at_block) == prev_state.commitment);
+        require(checkSig(validator_sig, prev_state.validator_pk));
+
+        return({
+            validator_pk: prev_state.validator_pk,
+            stake_kas: prev_state.stake_kas,
+            active: prev_state.active,
+            joined_at: prev_state.joined_at,
+            reputation: prev_state.reputation,
+            slashing_count: prev_state.slashing_count,
+            last_vote_block: reveal_block_height,
+            commitment: emptyCommitment(),
+            bond_kas: 0,
+            committed_at_block: 0,
+            withdraw_request_block: prev_state.withdraw_request_block
+        });
+    }
+
+    #[covenant.singleton(mode = transition)]
+    function slashInvalidReveal(State prev_state, bool vote, int salt, sig validator_sig) : State {
+        require(prev_state.active);
+        require(!isEmptyCommitment(prev_state.commitment));
+        require(prev_state.bond_kas <= prev_state.stake_kas);
+        require(commitmentHash(vote, salt, prev_state.committed_at_block) != prev_state.commitment);
+        require(checkSig(validator_sig, prev_state.validator_pk));
+
+        int remaining_stake_kas = prev_state.stake_kas - prev_state.bond_kas;
+
+        return({
+            validator_pk: prev_state.validator_pk,
+            stake_kas: remaining_stake_kas,
+            active: remaining_stake_kas >= MIN_STAKE_KAS,
+            joined_at: prev_state.joined_at,
+            reputation: prev_state.reputation,
+            slashing_count: prev_state.slashing_count + 1,
+            last_vote_block: prev_state.last_vote_block,
+            commitment: emptyCommitment(),
+            bond_kas: 0,
+            committed_at_block: 0,
+            withdraw_request_block: prev_state.withdraw_request_block
+        });
+    }
+
+    #[covenant.singleton(mode = transition)]
+    function requestWithdraw(State prev_state, int block_height, sig validator_sig) : State {
+        require(prev_state.stake_kas > 0);
+        require(prev_state.active);
+        require(prev_state.withdraw_request_block == 0);
+        require(isEmptyCommitment(prev_state.commitment));
+        require(checkSig(validator_sig, prev_state.validator_pk));
+
+        return({
+            validator_pk: prev_state.validator_pk,
+            stake_kas: prev_state.stake_kas,
+            active: false,
+            joined_at: prev_state.joined_at,
+            reputation: prev_state.reputation,
+            slashing_count: prev_state.slashing_count,
+            last_vote_block: prev_state.last_vote_block,
+            commitment: prev_state.commitment,
+            bond_kas: prev_state.bond_kas,
+            committed_at_block: prev_state.committed_at_block,
+            withdraw_request_block: block_height
+        });
+    }
+
+    #[covenant.singleton(mode = transition, termination = allowed)]
+    function completeWithdraw(State prev_state, State[] next_states, int block_height, sig validator_sig) : State[] {
+        require(prev_state.stake_kas > 0);
+        require(!prev_state.active);
+        require(prev_state.withdraw_request_block > 0);
+        require(block_height >= prev_state.withdraw_request_block + COOLDOWN_BLOCKS);
+        require(next_states.length == 0);
+        require(checkSig(validator_sig, prev_state.validator_pk));
+
+        return(next_states);
+    }
+}

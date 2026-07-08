@@ -14,6 +14,10 @@
 - Added `scripts/verify_silverc_h001.py` to inject a temporary upstream integration test and verify the repo fixture against the Rust H-001 vectors.
 - Added a lightweight CI guard ensuring the H-001 fixture keeps explicit byte construction and does not regress to implicit `sha256(vote || salt ...)` serialization.
 - Pinned the H-001 `silverc` verifier to upstream Silverscript ref `d25bd3427a093c17327ca3d6b9e1aa5f7688c863` and added a GitHub Actions runtime job for the H-001 vectors.
+- Added current-Silverscript validator state-machine fixture `modules/contracts/silverc/ValidatorStakingState.sil`.
+- Extended `scripts/verify_silverc_h001.py` so the pinned upstream `silverc` test now verifies both H-001 runtime vectors and the ValidatorStaking state fixture compile/ABI path.
+- Updated CI contract guards and the runtime job name to cover the H-001 + Validator State current-silverc gate.
+- Verified locally: `python3 scripts/verify_silverc_h001.py` passed with 2 upstream tests; Black via `/tmp/prometheus-guardian-venv`; Pylint 10/10; `python3 -m py_compile`; `git diff --check`; memory integrity; contract fixture shell guards.
 
 ## 2026-07-07
 

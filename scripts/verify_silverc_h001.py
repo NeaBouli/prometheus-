@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Verify Prometheus H-001 vectors against current upstream silverc runtime."""
+"""Verify Prometheus current-silverc contract fixtures against upstream silverc."""
 
 from __future__ import annotations
 
@@ -9,7 +9,10 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-CONTRACT = ROOT / "modules" / "contracts" / "silverc" / "ValidatorStakingH001.sil"
+H001_CONTRACT = ROOT / "modules" / "contracts" / "silverc" / "ValidatorStakingH001.sil"
+VALIDATOR_STATE_CONTRACT = (
+    ROOT / "modules" / "contracts" / "silverc" / "ValidatorStakingState.sil"
+)
 DEFAULT_SILVERSCRIPT_REPO = Path("/tmp/prom-silverscript")
 SILVERSCRIPT_GIT = "https://github.com/kaspanet/silverscript.git"
 DEFAULT_SILVERSCRIPT_REF = "d25bd3427a093c17327ca3d6b9e1aa5f7688c863"
@@ -23,7 +26,7 @@ use kaspa_consensus_core::tx::{
 use kaspa_txscript::caches::Cache;
 use kaspa_txscript::{EngineCtx, EngineFlags, TxScriptEngine};
 use silverscript_lang::ast::Expr;
-use silverscript_lang::compiler::{CompileOptions, compile_contract};
+use silverscript_lang::compiler::{CompileOptions, CovenantDeclCallOptions, compile_contract};
 
 fn run_script(script: Vec<u8>, sigscript: Vec<u8>) -> Result<(), kaspa_txscript_errors::TxScriptError> {
     let reused_values = SigHashReusedValuesUnsync::new();
@@ -59,6 +62,48 @@ fn hex32(input: &str) -> Vec<u8> {
         .collect()
 }
 
+fn zero32() -> Vec<u8> {
+    vec![0u8; 32]
+}
+
+fn dummy_signature() -> Vec<u8> {
+    vec![0u8; 65]
+}
+
+fn validator_state_args(
+    validator_pk: Vec<u8>,
+    stake_kas: i64,
+    active: bool,
+    joined_at: i64,
+    reputation: i64,
+    slashing_count: i64,
+    last_vote_block: i64,
+    commitment: Vec<u8>,
+    bond_kas: i64,
+    committed_at_block: i64,
+    withdraw_request_block: i64,
+) -> Vec<Expr<'static>> {
+    vec![
+        Expr::bytes(validator_pk),
+        Expr::int(stake_kas),
+        Expr::bool(active),
+        Expr::int(joined_at),
+        Expr::int(reputation),
+        Expr::int(slashing_count),
+        Expr::int(last_vote_block),
+        Expr::bytes(commitment),
+        Expr::int(bond_kas),
+        Expr::int(committed_at_block),
+        Expr::int(withdraw_request_block),
+    ]
+}
+
+fn build_covenant_sigscript(compiled: &silverscript_lang::compiler::CompiledContract<'_>, function_name: &str, args: Vec<Expr<'_>>) {
+    compiled
+        .build_sig_script_for_covenant_decl(function_name, args, CovenantDeclCallOptions { is_leader: false })
+        .unwrap_or_else(|err| panic!("ValidatorStakingState {function_name} sigscript builds: {err}"));
+}
+
 #[test]
 fn prometheus_h001_vectors_match_current_silverc_runtime() {
     let contract_path = std::env::var("PROMETHEUS_H001_CONTRACT").expect("PROMETHEUS_H001_CONTRACT is set");
@@ -89,6 +134,85 @@ fn prometheus_h001_vectors_match_current_silverc_runtime() {
         );
     }
 }
+
+#[test]
+fn prometheus_validator_state_fixture_compiles_against_current_silverc() {
+    let contract_path = std::env::var("PROMETHEUS_VALIDATOR_STATE_CONTRACT")
+        .expect("PROMETHEUS_VALIDATOR_STATE_CONTRACT is set");
+    let source = std::fs::read_to_string(contract_path).expect("read Prometheus validator state contract fixture");
+    let validator_pk = vec![7u8; 32];
+    let commitment = hex32("cda9cc6bb51d36be5db27eb6e86bfc6b6173d5918f24f81939af5411bff90ffb");
+    let sig = dummy_signature();
+
+    let active_args = validator_state_args(
+        validator_pk.clone(),
+        20_000,
+        true,
+        1_000,
+        10_000,
+        0,
+        0,
+        zero32(),
+        0,
+        0,
+        0,
+    );
+    let active = compile_contract(&source, &active_args, CompileOptions::default())
+        .expect("ValidatorStakingState active fixture compiles");
+    build_covenant_sigscript(
+        &active,
+        "commitVote",
+        vec![Expr::bytes(commitment.clone()), Expr::int(2_000), Expr::int(42), Expr::bytes(sig.clone())],
+    );
+    build_covenant_sigscript(&active, "requestWithdraw", vec![Expr::int(500), Expr::bytes(sig.clone())]);
+
+    let committed_args = validator_state_args(
+        validator_pk.clone(),
+        20_000,
+        true,
+        1_000,
+        10_000,
+        0,
+        0,
+        commitment,
+        2_000,
+        42,
+        0,
+    );
+    let committed = compile_contract(&source, &committed_args, CompileOptions::default())
+        .expect("ValidatorStakingState committed fixture compiles");
+    build_covenant_sigscript(
+        &committed,
+        "revealVote",
+        vec![Expr::bool(true), Expr::int(42), Expr::int(600), Expr::bytes(sig.clone())],
+    );
+    build_covenant_sigscript(
+        &committed,
+        "slashInvalidReveal",
+        vec![Expr::bool(false), Expr::int(42), Expr::bytes(sig.clone())],
+    );
+
+    let withdraw_args = validator_state_args(
+        validator_pk,
+        20_000,
+        false,
+        1_000,
+        10_000,
+        0,
+        0,
+        zero32(),
+        0,
+        0,
+        500,
+    );
+    let withdraw = compile_contract(&source, &withdraw_args, CompileOptions::default())
+        .expect("ValidatorStakingState withdrawal fixture compiles");
+    build_covenant_sigscript(
+        &withdraw,
+        "completeWithdraw",
+        vec![Vec::<Expr>::new().into(), Expr::int(101_300), Expr::bytes(sig)],
+    );
+}
 """
 
 
@@ -107,9 +231,10 @@ def ensure_silverscript_repo(path: Path, ref: str) -> None:
 
 
 def main() -> int:
-    if not CONTRACT.exists():
-        print(f"missing contract fixture: {CONTRACT}", file=sys.stderr)
-        return 1
+    for contract in (H001_CONTRACT, VALIDATOR_STATE_CONTRACT):
+        if not contract.exists():
+            print(f"missing contract fixture: {contract}", file=sys.stderr)
+            return 1
 
     silver_repo = (
         Path(os.environ.get("SILVERSCRIPT_REPO", str(DEFAULT_SILVERSCRIPT_REPO)))
@@ -128,7 +253,8 @@ def main() -> int:
     test_file.write_text(RUST_TEST, encoding="utf-8")
 
     env = os.environ.copy()
-    env["PROMETHEUS_H001_CONTRACT"] = str(CONTRACT)
+    env["PROMETHEUS_H001_CONTRACT"] = str(H001_CONTRACT)
+    env["PROMETHEUS_VALIDATOR_STATE_CONTRACT"] = str(VALIDATOR_STATE_CONTRACT)
     try:
         run(
             [
@@ -150,7 +276,7 @@ def main() -> int:
         except FileNotFoundError:
             pass
 
-    print("H-001 silverc fixture verification passed.")
+    print("H-001 and ValidatorStakingState silverc fixture verification passed.")
     print(f"Silverscript ref: {silver_ref}")
     print(
         "Note: current silverc uses signed int entrypoint arguments; the u64::MAX Rust vector remains a full-contract port item."

@@ -265,6 +265,6 @@ Leistungsbasierte Emission. Guardians = "Miner" (KI statt GPU).
 - Full 7-level audit completed (35 checks, 5 parallel agents)
 - 0 CRITICAL, 2 HIGH, 2 MEDIUM, 3 LOW findings
 - 203/204 tests passing, 92% audit confidence
-- VERDICT update 2026-07-08: H-002 fixed; upstream `silverc` and repo H-001 fixture passed; full `ValidatorStaking` state-machine port remains the deploy blocker before Sprint 9.
+- VERDICT update 2026-07-08: H-002 fixed; upstream `silverc`, repo H-001 fixture, and current-silverc `ValidatorStakingState.sil` compile/ABI gate passed; runtime transition tests and remaining deployment-scoped contract ports remain the deploy blockers before Sprint 9.
 
-*Prometheus v4.0 · Checkpoint 2026-07-08 · Last updated: runtime stub gates + H-001 deploy gate · The fire belongs to humanity.*
+*Prometheus v4.0 · Checkpoint 2026-07-08 · Last updated: ValidatorStaking current-silverc state fixture + H-001 deploy gate · The fire belongs to humanity.*

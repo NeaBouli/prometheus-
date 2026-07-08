@@ -35,7 +35,7 @@ Goal:     All sprints 0-7 accepted. Post-Toccata deployment verification.
 | claude-code-start.sh         | DONE            | 100%     | 2026-03-21  | -            | -               |
 | **SPRINT 0 – SETUP**         |                 |          |             |              |                 |
 | Testnet-10-Node              | DONE            | 100%     | 2026-03-21  | -            | wrpc://127.0.0.1:17210 |
-| Silverscript tooling (silverc/ssc) | IN_PROGRESS | 80%      | 2026-07-08  | -            | Upstream `silverc` builds/tests locally; repo H-001 fixture verifies; full Prometheus state-machine port pending |
+| Silverscript tooling (silverc/ssc) | IN_PROGRESS | 88%      | 2026-07-08  | -            | Upstream `silverc` builds/tests locally; H-001 fixture verifies; ValidatorStaking current-silverc state fixture compiles; runtime transition tests pending |
 | Hello-World Contract         | PENDING         | 0%       | 2026-03-21  | -            | Deployment nach ssc-Release |
 | GitHub Actions CI/CD         | ACCEPTED        | 100%     | 2026-07-08  | ACCEPTED     | CI, Security Audit, and Pages green for eeb4808 |
 | Sprint-1 Pre-Check           | ACCEPTED        | 100%     | 2026-03-21  | ACCEPTED     | V-001, V-002, V-003 alle genehmigt |
@@ -90,6 +90,7 @@ Kaspa Toccata status researched 2026-07-07; Rusty-Kaspa v2.0.0 scheduled mainnet
 Direct Sandbox check: `ssh sandbox` works, but `kaspad` and `ssc` were not found in PATH.
 Local upstream Silverscript check: `/tmp/prom-silverscript` `cargo test -p silverscript-lang` passed; `silverc --help` works.
 Repo H-001 fixture: `modules/contracts/silverc/ValidatorStakingH001.sil` plus `scripts/verify_silverc_h001.py` verifies explicit `vote_byte || byte[8](salt) || byte[8](block_height)` against Rust vectors for positive 64-bit values at pinned Silverscript ref `d25bd3427a093c17327ca3d6b9e1aa5f7688c863`.
+Repo ValidatorStaking current-silverc state fixture: `modules/contracts/silverc/ValidatorStakingState.sil` compiles against the same pinned upstream `silverc`; the verifier builds covenant sigscripts for `commitVote`, `revealVote`, `slashInvalidReveal`, `requestWithdraw`, and `completeWithdraw`.
 Rusty-Kaspa workspace dependencies pinned to `v2.0.1`; `cargo audit` now reports no vulnerabilities, only allowed warnings.
 GitHub Security Audit workflow re-enabled and dependency audits now fail on findings instead of using `|| true`.
 Rust client runtime gate added: `PROMETHEUS_RUNTIME=beta|mainnet|production|prod` rejects ZK/Phi-3/KRC-20/Fed-DART stubs; development mode remains testable.
@@ -98,7 +99,7 @@ Rollback tag: pre-session-20260413 → 6347b85
 
 ## BLOCKED
 
-Sprint 9 remains blocked until the full Prometheus state-machine contracts compile against current Silverscript tooling and H-001 LE encoding is verified in the ported `ValidatorStaking` contract form.
+Sprint 9 remains blocked until the current-Silverscript validator state fixture has runtime transition tests with real signatures/authorized outputs, and the remaining Prometheus contracts are ported or deployment-scoped against current Silverscript tooling.
 
 ## NEXT ACTIONS (for Claude Code)
 
@@ -109,8 +110,8 @@ STARTFLOW — Read in this order:
 3. memory/ERRORS.md → 12 known patterns
 
 Priority tasks:
-- Sprint 9: port/compile Prometheus contracts with current `silverc`, then deploy only after H-001 passes
-- H-001: LE encoding verification with actual `ValidatorStaking.ss` contract/Rust test vectors
+- Sprint 9: add runtime transition tests for `ValidatorStakingState.sil`, then port/compile remaining deployment-scoped contracts with current `silverc`
+- H-001: keep LE encoding verification gated in CI; resolve signed-int/u64 boundary before full contract deployment
 - Q-003: replace/gate contract-side `fp_rate` oracle stub before beta/mainnet governance
 - Sprint 10B: Guardian Decentralization (hybrid routing, ensemble voting)
 - Q-003: fp_rate Oracle (Architect decision needed)

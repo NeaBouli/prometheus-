@@ -354,17 +354,25 @@ uint64 scaling, CID format, CEI pattern) are correctly implemented.
 **H-001: Commit-Reveal LE encoding ambiguity (Check 1.5)**
 ```
 File:     modules/contracts/ValidatorStaking.ss:111
+          modules/contracts/silverc/ValidatorStakingH001.sil
+          modules/contracts/silverc/ValidatorStakingState.sil
 Finding:  Hash computed as sha256(vote || salt || committed_at_block)
           without explicit to_le_bytes() on uint64 values.
           Spec requires: sha256(vote_byte || salt_LE || block_height_LE).
           Rust client (validator-node/src/voting/commit.rs:79-91) DOES use
           explicit .to_le_bytes() and cross-verifies with test.
-Risk:     If ssc VM serializes uint64 differently than little-endian,
-          on-chain verification will reject valid reveals.
-Action:   When ssc ships (May 5): verify ssc uint64 serialization order
-          in hash preimages. Add explicit LE conversion if needed.
-          Currently mitigated by Rust-side cross-verification test.
-Severity: HIGH (could break commit-reveal on mainnet)
+Update:   Current-silverc fixture `ValidatorStakingH001.sil` now verifies
+          explicit `vote_byte || byte[8](salt) || byte[8](block_height)`
+          against Rust vectors at pinned upstream ref
+          d25bd3427a093c17327ca3d6b9e1aa5f7688c863.
+          `ValidatorStakingState.sil` now compiles and builds covenant
+          sigscripts for commit/reveal/slash/withdraw transitions.
+Risk:     Current upstream silverc entrypoint numeric arguments are signed
+          `int`; the u64::MAX boundary and full runtime transition tests
+          remain unresolved before deployment.
+Action:   Add runtime covenant transition tests with real signatures and
+          authorized outputs, then resolve signed-int/u64 deployment bounds.
+Severity: HIGH until runtime transition gate passes
 ```
 
 **H-002: Arc<Mutex<Phi3Model>> unnecessary lock (Check 2.2, PATTERN-010)**
@@ -507,13 +515,16 @@ Contracts audited:      6/6
 Rust modules audited:   10/10
 Python modules audited: 4/4
 
-Audit confidence:       92%
-(Deduction: ssc VM not available for runtime verification of LE encoding,
- LLM not available for confidence extraction verification)
+Audit confidence:       94%
+(Deduction: ValidatorStaking current-silverc compile/ABI gate exists, but
+ runtime covenant transitions and LLM confidence extraction remain open)
 ```
 
-**VERDICT: READY FOR HARDFORK** — No critical blockers.
-Fix H-001 and H-002 before mainnet deployment on May 5.
+**VERDICT UPDATE 2026-07-08:** Toccata/hardfork no longer looks like the
+primary blocker. The deployment blocker is now current-Silverscript contract
+runtime readiness: H-001 byte-core is verified, `ValidatorStakingState.sil`
+compiles/builds covenant sigscripts, but runtime transition tests and the
+signed-int/u64 boundary must pass before Sprint 9 deployment.
 M-001 and M-002 can wait until full release (Aug/Sep 2026).
 
 *Audit completed 2026-04-02 by Claude Code (5 parallel agents, 7 levels, 35 checks).*
