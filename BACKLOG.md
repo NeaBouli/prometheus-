@@ -4,7 +4,7 @@
 - Latest product-code baseline is `eeb4808` on `main`; run `git log --oneline -1` for the current bridge/docs HEAD.
 - CI, Security Audit, and GitHub Pages deployment were green for `eeb4808`.
 - Runtime stub gates added for Rust client; remaining production-stub task is contract-side Q-003 `fp_rate` oracle.
-- Sprint 9 remains blocked by local Silverscript tooling plus H-001 verification.
+- Sprint 9 remains blocked by Prometheus-contract Silverscript compatibility plus H-001 verification in the actual contract form.
 
 ## 🟡 Nächste Session — STARTFLOW
 
@@ -17,12 +17,12 @@
 6. `cargo test 2>&1 | tail -5` — Tests grün?
 
 ### Offene HIGH-Findings (Pre-Hardfork Audit 02.04.2026):
-- **H-001**: Commit-Reveal LE encoding — `ValidatorStaking.ss:111`. Post-Toccata: ssc/Silverscript tooling installieren und uint64-Serialisierung verifizieren. Aktuell mitigiert durch kanonische Rust-Preimage-Funktion + H-001 Hex-Testvektoren.
+- **H-001**: Commit-Reveal LE encoding — `ValidatorStaking.ss:111`. Upstream `silverc` builds/tests locally; a temporary runtime probe verified explicit byte construction against Rust vectors for positive 64-bit values. Still open for the actual Prometheus contract because it uses legacy `.ss`/`uint64` and implicit `sha256(vote || salt || block)` syntax.
 - **H-002**: ~~Arc<Mutex<Phi3Model>>~~ → **FIXED** in Commit `6347b85`. Arc<Phi3Model> direkt.
 
 ### Nächste konkrete Tasks (Priorität):
-1. **[P0] Sprint 9 Vorbereitung** — ssc/Silverscript tooling lokal installieren, Version/Smoke-Test und Mainnet-Kompatibilität dokumentieren, dann H-001 gegen die Rust-Hexvektoren verifizieren.
-2. **[P1] H-001 Verifikation** — LE encoding in ValidatorStaking.ss mit ssc und Rust-Testvektoren testen
+1. **[P0] Sprint 9 Vorbereitung** — `ValidatorStaking.ss` auf aktuelle Silverscript-Syntax portieren/kompilieren und H-001 gegen die Rust-Hexvektoren in genau dieser Contract-Form testen.
+2. **[P1] H-001 Verifikation** — explizite Byte-Preimage-Konstruktion in `ValidatorStaking.ss` absichern, falls implizite `bool/uint64`-Serialisierung nicht nachweisbar ist.
 3. **[P1] Sprint 10B: Guardian Decentralization** — Hybrid routing (8B/70B), Ensemble voting (5x 8B)
 4. **[P2] fp_rate Oracle** — Q-003 offen; contract-side stub remains and must be resolved before beta/mainnet governance
 5. **[P2] M-001** — Heuristic confidence in yara_generator.py durch LLM-Confidence ersetzen
@@ -30,7 +30,7 @@
 7. **[P3] L-001/L-002/L-003** — DevIncentivePool ACL, fp_rate stub, CEI borderline
 
 ### Wartet auf externe Events:
-- ssc/Silverscript tooling lokal verfügbar machen → Sprint 9
+- Prometheus Contracts auf aktuelle `silverc`-Syntax bringen → Sprint 9
 - Phi-3-mini Download → Sprint 11
 - LLaMA 3 Fine-Tuning → Sprint 12
 - vProgs (DAGKnight) → Sprint 14
@@ -43,6 +43,7 @@
 ## ✅ Erledigt (letzte 7 Tage)
 - [x] H-002 PATTERN-010 fix: Arc<Phi3Model> statt Arc<Mutex<Phi3Model>> — `6347b85` (06.04.2026)
 - [x] Post-Toccata docs/bridge status, Kaspa v2.0.1 pin, Security Audit gate, H-001 vectors, and runtime stub gates — `eeb4808` (08.07.2026)
+- [x] Upstream Silverscript `silverc` local build/test and temporary H-001 explicit-preimage probe — 08.07.2026
 - [x] Pre-Hardfork Full Audit: 35 Checks, 0 CRITICAL, 92% Confidence — `2ad7a1e` (02.04.2026)
 - [x] Cargo.lock + Logo Variants + Gitignore Cleanup — `9a8c344` (02.04.2026)
 

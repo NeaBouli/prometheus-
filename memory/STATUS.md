@@ -35,7 +35,7 @@ Goal:     All sprints 0-7 accepted. Post-Toccata deployment verification.
 | claude-code-start.sh         | DONE            | 100%     | 2026-03-21  | -            | -               |
 | **SPRINT 0 – SETUP**         |                 |          |             |              |                 |
 | Testnet-10-Node              | DONE            | 100%     | 2026-03-21  | -            | wrpc://127.0.0.1:17210 |
-| Silverscript Compiler (ssc)  | BLOCKED         | 0%       | 2026-07-07  | -            | Post-Toccata local install/test required; not found on Sandbox PATH |
+| Silverscript tooling (silverc/ssc) | IN_PROGRESS | 70%      | 2026-07-08  | -            | Upstream `silverc` builds/tests locally; no `ssc` binary found; Prometheus contract syntax compatibility pending |
 | Hello-World Contract         | PENDING         | 0%       | 2026-03-21  | -            | Deployment nach ssc-Release |
 | GitHub Actions CI/CD         | ACCEPTED        | 100%     | 2026-07-08  | ACCEPTED     | CI, Security Audit, and Pages green for eeb4808 |
 | Sprint-1 Pre-Check           | ACCEPTED        | 100%     | 2026-03-21  | ACCEPTED     | V-001, V-002, V-003 alle genehmigt |
@@ -88,6 +88,8 @@ Pre-Hardfork Audit completed 2026-04-02: 0 CRITICAL, 2 HIGH, 2 MEDIUM, 3 LOW.
 H-002 (PATTERN-010) FIXED in 6347b85 (Arc<Phi3Model>).
 Kaspa Toccata status researched 2026-07-07; Rusty-Kaspa v2.0.0 scheduled mainnet activation at DAA 474,165,565 (~2026-06-30 16:15 UTC).
 Direct Sandbox check: `ssh sandbox` works, but `kaspad` and `ssc` were not found in PATH.
+Local upstream Silverscript check: `/tmp/prom-silverscript` `cargo test -p silverscript-lang` passed; `silverc --help` works.
+Temporary H-001 probe: explicit `vote_byte || byte[8](salt) || byte[8](block_height)` matched Rust vectors for positive 64-bit values.
 Rusty-Kaspa workspace dependencies pinned to `v2.0.1`; `cargo audit` now reports no vulnerabilities, only allowed warnings.
 GitHub Security Audit workflow re-enabled and dependency audits now fail on findings instead of using `|| true`.
 Rust client runtime gate added: `PROMETHEUS_RUNTIME=beta|mainnet|production|prod` rejects ZK/Phi-3/KRC-20/Fed-DART stubs; development mode remains testable.
@@ -96,7 +98,7 @@ Rollback tag: pre-session-20260413 → 6347b85
 
 ## BLOCKED
 
-Sprint 9 remains blocked until local ssc/Silverscript tooling is installed/tested and H-001 LE encoding is verified.
+Sprint 9 remains blocked until Prometheus contracts compile against current Silverscript tooling and H-001 LE encoding is verified in the actual contract form.
 
 ## NEXT ACTIONS (for Claude Code)
 
@@ -107,8 +109,8 @@ STARTFLOW — Read in this order:
 3. memory/ERRORS.md → 12 known patterns
 
 Priority tasks:
-- Sprint 9: install/verify ssc tooling, then compile + deploy only after H-001 passes
-- H-001: LE encoding verification with contract/Rust test vectors
+- Sprint 9: port/compile Prometheus contracts with current `silverc`, then deploy only after H-001 passes
+- H-001: LE encoding verification with actual `ValidatorStaking.ss` contract/Rust test vectors
 - Q-003: replace/gate contract-side `fp_rate` oracle stub before beta/mainnet governance
 - Sprint 10B: Guardian Decentralization (hybrid routing, ensemble voting)
 - Q-003: fp_rate Oracle (Architect decision needed)

@@ -10,16 +10,17 @@
 
 Prometheus is well-structured for a pre-mainnet/prototype codebase. The architecture memory is unusually strong: KAS/PROM separation, no emergency stop, slash ACL, reputation source of truth, CIDv1, and the agent workflow are all documented and mostly reflected in code.
 
-This is not mainnet-ready today. The right verdict is: good work, continue the professional schema, but keep Sprint 9 blocked until H-001/ssc status is verified. The stale public May 5 launch language was corrected in the same 2026-07-07 follow-up.
+This is not mainnet-ready today. The right verdict is: good work, continue the professional schema, but keep Sprint 9 blocked until the Prometheus contracts compile against current Silverscript tooling and H-001 is verified in that contract form. The stale public May 5 launch language was corrected in the same 2026-07-07 follow-up.
 
 ### Findings by Domain
 
 #### Contracts — FAIL
 
-- **[BLOCKING / MITIGATED 2026-07-07] H-001 commit-reveal preimage encoding is still unverified for ssc** — `modules/contracts/ValidatorStaking.ss:110-112`, `modules/validator-node/src/voting/commit.rs`
-  - What: Rust now builds a canonical 17-byte preimage through `commitment_preimage_bytes(vote, salt, block_height)` and tests known H-001 hex vectors. Silverscript still hashes `vote || salt || vc.committed_at_block`; final byte-equivalence must be proven with the actual compiler/runtime.
-  - Path: If ssc serializes `uint64` differently than Rust, validators can create valid Rust commitments that fail on-chain reveal, causing broken voting or bond loss.
-  - Fix: Before Sprint 9, install/pin Silverscript tooling and verify the contract hash against the Rust H-001 vectors. If needed, add explicit LE conversion in Silverscript or canonical serializer helpers and re-run cross-language vectors.
+- **[BLOCKING / PARTIALLY VERIFIED 2026-07-08] H-001 commit-reveal preimage encoding still needs Prometheus contract verification** — `modules/contracts/ValidatorStaking.ss:110-112`, `modules/validator-node/src/voting/commit.rs`
+  - What: Rust builds a canonical 17-byte preimage through `commitment_preimage_bytes(vote, salt, block_height)` and tests known H-001 hex vectors. Upstream Silverscript tooling now builds locally, and a temporary `/tmp` runtime probe verified that explicit `sha256(vote_byte || byte[8](salt) || byte[8](block_height))` matches the Rust vectors for positive 64-bit values.
+  - Remaining risk: Prometheus `ValidatorStaking.ss` still uses legacy `.ss`/`uint64` syntax and `sha256(vote || salt || vc.committed_at_block)`. That exact contract form has not been compiled/executed with upstream `silverc`.
+  - Path: If the deployed contract serializes `uint64` or `bool` differently than the Rust preimage, validators can create valid Rust commitments that fail on-chain reveal, causing broken voting or bond loss.
+  - Fix: Port or adapt `ValidatorStaking.ss` to current Silverscript syntax, use explicit byte construction, and re-run the H-001 vectors against the actual contract before Sprint 9.
 
 - **[LOW] Known contract cleanups remain before deploy refactor** — `modules/contracts/DevIncentivePool.ss:145-149`, `modules/contracts/ValidatorStaking.ss:124-132`
   - What: DevIncentivePool deposit has no emission-contract ACL, and revealVote transfers bond before deleting commitment.
@@ -99,7 +100,7 @@ This is not mainnet-ready today. The right verdict is: good work, continue the p
 
 #### BLOCKING
 
-1. H-001 ssc/LE encoding verification before Sprint 9 or any contract deployment.
+1. H-001 Prometheus-contract compile/runtime verification before Sprint 9 or any contract deployment.
 2. Contract-side `fp_rate` oracle remains unresolved before beta/mainnet governance.
 
 #### HIGH
@@ -120,5 +121,5 @@ This is not mainnet-ready today. The right verdict is: good work, continue the p
 
 Continue with the current professional schema. The team worked well: the repo has a strong memory layer, transparent caveats, and tests that currently pass. The next practical task should be either:
 
-1. Install/locate ssc/Silverscript tooling and run the H-001 LE preimage smoke test against the Rust hex vectors, or
+1. Port/compile `ValidatorStaking.ss` against current Silverscript tooling and run the H-001 vectors against that actual contract form, or
 2. Resolve Q-003 by replacing/gating the contract-side `fp_rate` oracle stub before beta/mainnet governance.

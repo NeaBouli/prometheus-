@@ -7,6 +7,9 @@
 - Reconciled stale bridge/backlog/checkpoint status entries that still referenced `467ca03` or April startflow data.
 - Updated `memory/STATUS.md` to mark GitHub Actions CI/CD as accepted for the green `eeb4808` CI, Security Audit, and Pages runs.
 - No product code changed in this reconciliation pass.
+- Verified upstream Silverscript tooling in `/tmp/prom-silverscript`: `cargo test -p silverscript-lang` passed, and `cargo run -p silverscript-lang --bin silverc -- --help` works.
+- Added and ran a temporary `/tmp`-only H-001 probe test against upstream `silverc`/runtime: explicit `sha256(vote_byte || byte[8](salt) || byte[8](block_height))` matches the Prometheus Rust vectors for positive 64-bit values.
+- H-001 is partially verified, not closed: Prometheus `ValidatorStaking.ss` still uses legacy `.ss`/`uint64` syntax and `sha256(vote || salt || block)` form, so the contract must be ported/compiled against current Silverscript syntax before Sprint 9.
 
 ## 2026-07-07
 

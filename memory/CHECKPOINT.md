@@ -119,13 +119,13 @@
 7. Lies memory/ERRORS.md             → 12 bekannte Patterns
 ```
 
-**Status: Feature-complete through Sprint 7. Kaspa Toccata status researched 2026-07-07; deployment now depends on local ssc/tooling and H-001 verification.**
+**Status: Feature-complete through Sprint 7. Kaspa Toccata status researched 2026-07-07; upstream `silverc` verified locally 2026-07-08; deployment now depends on Prometheus contract compatibility and H-001 verification in the actual contract form.**
 
 **Offene Tasks (priorisiert):**
 - [x] PATTERN-010 fix: Arc<Phi3Model> statt Arc<Mutex<Phi3Model>> — DONE `6347b85`
 - [x] Rust client production/beta stub gates — DONE 2026-07-08 (`PROMETHEUS_RUNTIME`)
-- [ ] H-001: LE encoding Verifikation — verify with ssc/Silverscript tooling and Rust vectors
-- [ ] Sprint 9: Contracts compile + deploy — blocked until ssc tooling + H-001 pass
+- [~] H-001: LE encoding Verifikation — explicit upstream `silverc` probe passed for positive 64-bit vectors; actual `ValidatorStaking.ss` still pending
+- [ ] Sprint 9: Contracts compile + deploy — blocked until Prometheus contracts compile with current Silverscript and H-001 passes
 - [ ] Sprint 10B: Guardian hybrid routing (8B/70B) + Ensemble voting
 - [ ] Q-003: fp_rate Oracle — Contract-side stub remains; Architect-Entscheidung nötig
 - [ ] Sybil resistance final design — Architect decision needed
@@ -134,7 +134,7 @@
 - [ ] PLONK evaluation for Light Client ZK-proofs
 
 ### Wartet auf externe Events:
-- [ ] ssc/Silverscript tooling local install + smoke test → Sprint 9
+- [~] ssc/Silverscript tooling local install + smoke test → upstream `silverc` passed; Prometheus contract compatibility pending
 - [ ] Phi-3-mini Modell herunterladen → Sprint 11
 - [ ] LLaMA 3 Fine-Tuning → Sprint 12
 - [ ] vProgs (DAGKnight) → Sprint 14
@@ -152,7 +152,7 @@
 7. Commit-Reveal: sha256(vote_byte || salt_le || block_height_le)
 8. cargo fmt + cargo clippy -- -D warnings vor jedem Rust-Commit
 9. Legacy-Tests nutzen kaspa-testnet-10; post-Toccata Deployment braucht TN12/Toccata-Tooling-Verifikation
-10. ssc/Silverscript tooling must be installed and tested post-Toccata before Sprint 9
+10. Current Silverscript tooling and actual Prometheus contract compatibility must be tested post-Toccata before Sprint 9
 11. Jede neue HTML-Seite: SEO/GEO-Checkliste (Schema.org, OG, ai-summary)
 12. Mobile Hamburger-Menü auf jeder Seite
 13. GitHub-only Contact (kein Email, kein Discord DM)
@@ -265,6 +265,6 @@ Leistungsbasierte Emission. Guardians = "Miner" (KI statt GPU).
 - Full 7-level audit completed (35 checks, 5 parallel agents)
 - 0 CRITICAL, 2 HIGH, 2 MEDIUM, 3 LOW findings
 - 203/204 tests passing, 92% audit confidence
-- VERDICT update 2026-07-07: H-002 fixed; H-001 remains the deploy blocker before Sprint 9.
+- VERDICT update 2026-07-08: H-002 fixed; upstream `silverc` and explicit H-001 probe passed; actual `ValidatorStaking.ss` H-001 verification remains the deploy blocker before Sprint 9.
 
 *Prometheus v4.0 · Checkpoint 2026-07-08 · Last updated: runtime stub gates + H-001 deploy gate · The fire belongs to humanity.*

@@ -321,13 +321,13 @@ Pre-hardfork audit synthesis:
 Critical active rule:
 
 ```text
-H-001 is still OPEN unless memory/AUDIT.md proves otherwise.
-ValidatorStaking.ss commit-reveal LE encoding must be verified after ssc/hardfork before Sprint 9 deployment or any validator mainnet contact.
+H-001 is still OPEN for the actual Prometheus contract unless memory/AUDIT.md proves otherwise.
+On 2026-07-08, upstream `silverscript-lang`/`silverc` built and passed tests locally, and a temporary `/tmp` probe verified explicit `vote_byte || byte[8](salt) || byte[8](block_height)` against the Rust H-001 vectors for positive 64-bit values. `ValidatorStaking.ss` itself still needs port/compile/runtime verification because it uses legacy `.ss`/`uint64` syntax and implicit `sha256(vote || salt || block)` form.
 ```
 
 Known findings:
 
-- H-001: `ValidatorStaking.ss:111` commit-reveal LE-encoding ambiguity. Pending compiler/hardfork verification.
+- H-001: `ValidatorStaking.ss:111` commit-reveal LE-encoding ambiguity. Upstream tooling smoke passed; pending Prometheus-contract port/compile/runtime verification.
 - H-002: unnecessary Mutex around Phi3Model. Fixed in commit `6347b85` according to memory/handover.
 - M-001: Guardian YARA generator confidence is heuristic, needs real LLM confidence or validated metric.
 - M-002: performance test flaky in debug mode, threshold/release gate needed.
@@ -453,7 +453,7 @@ H-001 exists because the contract compiler/preimage encoding must be proven bit-
 Technical:
 
 - H-001 LE encoding can break validator voting if contract and Rust preimages differ.
-- `ssc` compiler/hardfork status must be verified with current upstream state before Sprint 9.
+- Upstream `silverc` is the currently verified compiler path; no separate `ssc` binary was found. Prometheus contracts still need current-Silverscript compatibility work before Sprint 9.
 - `rusty-kaspa` is pinned to tag `v2.0.1`; keep this pin unless a reviewed upgrade is needed.
 
 Economic:
@@ -503,8 +503,8 @@ Staleness warning:
 
 Highest priority:
 
-1. Install/build local Silverscript tooling (`silverc` upstream; no `ssc` binary found yet).
-2. Verify H-001 LE encoding before Sprint 9 by comparing Silverscript behavior against the Rust H-001 vectors.
+1. Port/compile `ValidatorStaking.ss` with current upstream Silverscript (`silverc`), replacing implicit H-001 serialization with explicit byte construction if required.
+2. Re-run H-001 vectors against the actual Prometheus contract form before Sprint 9.
 3. Document Silverscript/TN12/Mainnet compatibility limits before any deploy attempt.
 4. Resolve Q-003 contract-side `fp_rate` oracle stub before beta/mainnet governance.
 5. Keep Reputation Badge decision as "no badge, L1 reputation only".
@@ -521,7 +521,7 @@ If asked to continue project work:
 
 ## 18. One-Line Decision Summary
 
-Prometheus does not need reputation badges; it needs readable, provable Kaspa L1 Guardian reputation. Codex has direct Sandbox access via `ssh sandbox`, and Sprint 9 remains blocked until H-001/ssc/hardfork status is verified.
+Prometheus does not need reputation badges; it needs readable, provable Kaspa L1 Guardian reputation. Codex has direct Sandbox access via `ssh sandbox`, upstream `silverc` works locally, and Sprint 9 remains blocked until the actual Prometheus contracts compile and H-001 passes in that contract form.
 <!-- CODEX_CLAUDE_CODE_TERMINAL_BRIDGE_V1 -->
 ## Codex -> Claude Code Terminal Bridge
 
