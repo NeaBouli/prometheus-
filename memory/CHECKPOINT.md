@@ -119,12 +119,12 @@
 7. Lies memory/ERRORS.md             → 12 bekannte Patterns
 ```
 
-**Status: Feature-complete through Sprint 7. Kaspa Toccata status researched 2026-07-07; upstream `silverc` verified locally 2026-07-08; deployment now depends on Prometheus contract compatibility and H-001 verification in the actual contract form.**
+**Status: Feature-complete through Sprint 7. Kaspa Toccata status researched 2026-07-07; upstream `silverc` verified locally 2026-07-08; repo H-001 fixture verifies; deployment now depends on full Prometheus state-machine contract compatibility and H-001 verification in the ported contract form.**
 
 **Offene Tasks (priorisiert):**
 - [x] PATTERN-010 fix: Arc<Phi3Model> statt Arc<Mutex<Phi3Model>> — DONE `6347b85`
 - [x] Rust client production/beta stub gates — DONE 2026-07-08 (`PROMETHEUS_RUNTIME`)
-- [~] H-001: LE encoding Verifikation — explicit upstream `silverc` probe passed for positive 64-bit vectors; actual `ValidatorStaking.ss` still pending
+- [~] H-001: LE encoding Verifikation — repo `silverc` fixture passes for positive 64-bit vectors; full `ValidatorStaking` state-machine port still pending
 - [ ] Sprint 9: Contracts compile + deploy — blocked until Prometheus contracts compile with current Silverscript and H-001 passes
 - [ ] Sprint 10B: Guardian hybrid routing (8B/70B) + Ensemble voting
 - [ ] Q-003: fp_rate Oracle — Contract-side stub remains; Architect-Entscheidung nötig
@@ -134,7 +134,7 @@
 - [ ] PLONK evaluation for Light Client ZK-proofs
 
 ### Wartet auf externe Events:
-- [~] ssc/Silverscript tooling local install + smoke test → upstream `silverc` passed; Prometheus contract compatibility pending
+- [~] ssc/Silverscript tooling local install + smoke test → upstream `silverc` passed; H-001 fixture passes; full Prometheus contract compatibility pending
 - [ ] Phi-3-mini Modell herunterladen → Sprint 11
 - [ ] LLaMA 3 Fine-Tuning → Sprint 12
 - [ ] vProgs (DAGKnight) → Sprint 14
@@ -265,6 +265,6 @@ Leistungsbasierte Emission. Guardians = "Miner" (KI statt GPU).
 - Full 7-level audit completed (35 checks, 5 parallel agents)
 - 0 CRITICAL, 2 HIGH, 2 MEDIUM, 3 LOW findings
 - 203/204 tests passing, 92% audit confidence
-- VERDICT update 2026-07-08: H-002 fixed; upstream `silverc` and explicit H-001 probe passed; actual `ValidatorStaking.ss` H-001 verification remains the deploy blocker before Sprint 9.
+- VERDICT update 2026-07-08: H-002 fixed; upstream `silverc` and repo H-001 fixture passed; full `ValidatorStaking` state-machine port remains the deploy blocker before Sprint 9.
 
 *Prometheus v4.0 · Checkpoint 2026-07-08 · Last updated: runtime stub gates + H-001 deploy gate · The fire belongs to humanity.*

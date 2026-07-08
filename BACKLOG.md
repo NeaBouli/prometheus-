@@ -17,7 +17,7 @@
 6. `cargo test 2>&1 | tail -5` — Tests grün?
 
 ### Offene HIGH-Findings (Pre-Hardfork Audit 02.04.2026):
-- **H-001**: Commit-Reveal LE encoding — `ValidatorStaking.ss:111`. Upstream `silverc` builds/tests locally; a temporary runtime probe verified explicit byte construction against Rust vectors for positive 64-bit values. Still open for the actual Prometheus contract because it uses legacy `.ss`/`uint64` and implicit `sha256(vote || salt || block)` syntax.
+- **H-001**: Commit-Reveal LE encoding — `ValidatorStaking.ss:111`. Upstream `silverc` builds/tests locally; repo fixture `modules/contracts/silverc/ValidatorStakingH001.sil` verifies explicit byte construction against Rust vectors for positive 64-bit values. Still open for the full Prometheus state-machine contract because it uses legacy `.ss`/`uint64` syntax and old state abstractions.
 - **H-002**: ~~Arc<Mutex<Phi3Model>>~~ → **FIXED** in Commit `6347b85`. Arc<Phi3Model> direkt.
 
 ### Nächste konkrete Tasks (Priorität):
@@ -44,6 +44,7 @@
 - [x] H-002 PATTERN-010 fix: Arc<Phi3Model> statt Arc<Mutex<Phi3Model>> — `6347b85` (06.04.2026)
 - [x] Post-Toccata docs/bridge status, Kaspa v2.0.1 pin, Security Audit gate, H-001 vectors, and runtime stub gates — `eeb4808` (08.07.2026)
 - [x] Upstream Silverscript `silverc` local build/test and temporary H-001 explicit-preimage probe — 08.07.2026
+- [x] Repo-tracked current-Silverscript H-001 fixture + verifier script + CI explicit-byte guard — 08.07.2026
 - [x] Pre-Hardfork Full Audit: 35 Checks, 0 CRITICAL, 92% Confidence — `2ad7a1e` (02.04.2026)
 - [x] Cargo.lock + Logo Variants + Gitignore Cleanup — `9a8c344` (02.04.2026)
 

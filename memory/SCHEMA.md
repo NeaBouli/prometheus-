@@ -96,7 +96,7 @@ const VOTING_BLOCKS: uint64 = 864000;   // ~1 Tag bei 10 BPS
 struct VoteCommitment {
     validator_pubkey: bytes(32),
     proposal_id: uint64,
-    commitment: bytes(32),        // sha256(vote || salt || block_height)
+    commitment: bytes(32),        // sha256(vote_byte || salt_le || block_height_le)
     bond_kas: uint64,             // 10% des Stakes als Kaution
     committed_at_block: uint64
 }

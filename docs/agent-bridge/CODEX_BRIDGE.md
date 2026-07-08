@@ -322,12 +322,12 @@ Critical active rule:
 
 ```text
 H-001 is still OPEN for the actual Prometheus contract unless memory/AUDIT.md proves otherwise.
-On 2026-07-08, upstream `silverscript-lang`/`silverc` built and passed tests locally, and a temporary `/tmp` probe verified explicit `vote_byte || byte[8](salt) || byte[8](block_height)` against the Rust H-001 vectors for positive 64-bit values. `ValidatorStaking.ss` itself still needs port/compile/runtime verification because it uses legacy `.ss`/`uint64` syntax and implicit `sha256(vote || salt || block)` form.
+On 2026-07-08, upstream `silverscript-lang`/`silverc` built and passed tests locally. The repo now contains `modules/contracts/silverc/ValidatorStakingH001.sil` and `scripts/verify_silverc_h001.py`; the script verifies explicit `vote_byte || byte[8](salt) || byte[8](block_height)` against the Rust H-001 vectors for positive 64-bit values. The full `ValidatorStaking.ss` state machine still needs port/compile/runtime verification because it uses legacy `.ss`/`uint64` syntax and old state abstractions.
 ```
 
 Known findings:
 
-- H-001: `ValidatorStaking.ss:111` commit-reveal LE-encoding ambiguity. Upstream tooling smoke passed; pending Prometheus-contract port/compile/runtime verification.
+- H-001: `ValidatorStaking.ss:111` commit-reveal LE-encoding ambiguity. Repo-tracked current-Silverscript H-001 fixture passes; pending full Prometheus state-machine port/compile/runtime verification.
 - H-002: unnecessary Mutex around Phi3Model. Fixed in commit `6347b85` according to memory/handover.
 - M-001: Guardian YARA generator confidence is heuristic, needs real LLM confidence or validated metric.
 - M-002: performance test flaky in debug mode, threshold/release gate needed.

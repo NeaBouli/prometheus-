@@ -10,6 +10,9 @@
 - Verified upstream Silverscript tooling in `/tmp/prom-silverscript`: `cargo test -p silverscript-lang` passed, and `cargo run -p silverscript-lang --bin silverc -- --help` works.
 - Added and ran a temporary `/tmp`-only H-001 probe test against upstream `silverc`/runtime: explicit `sha256(vote_byte || byte[8](salt) || byte[8](block_height))` matches the Prometheus Rust vectors for positive 64-bit values.
 - H-001 is partially verified, not closed: Prometheus `ValidatorStaking.ss` still uses legacy `.ss`/`uint64` syntax and `sha256(vote || salt || block)` form, so the contract must be ported/compiled against current Silverscript syntax before Sprint 9.
+- Added repo-tracked current-Silverscript H-001 fixture `modules/contracts/silverc/ValidatorStakingH001.sil`.
+- Added `scripts/verify_silverc_h001.py` to inject a temporary upstream integration test and verify the repo fixture against the Rust H-001 vectors.
+- Added a lightweight CI guard ensuring the H-001 fixture keeps explicit byte construction and does not regress to implicit `sha256(vote || salt ...)` serialization.
 
 ## 2026-07-07
 

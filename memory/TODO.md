@@ -12,7 +12,7 @@
 - [ ] [P0] Alle memory/-Dateien initial befüllen und pushen | Claude Code | Repo-Struktur
 - [x] [P0] Kaspa Testnet-10-Node installieren und starten (rusty-kaspa v1.1.0) | Claude Code | 2026-03-21
 - [x] [P0] Verbindung zum Testnet verifizieren (8 Peers, IBD active) | Claude Code | 2026-03-21
-- [~] [P0] Silverscript Compiler/Tooling installieren und testen | Claude Code | Upstream `silverc` builds/tests locally; no `ssc` binary found; Prometheus contract compatibility pending
+- [~] [P0] Silverscript Compiler/Tooling installieren und testen | Claude Code | Upstream `silverc` builds/tests locally; H-001 fixture verifies; full Prometheus contract compatibility pending
 - [ ] [P0] Hello-World Silverscript Contract auf Testnet deployen | Claude Code | PENDING: after Prometheus contract syntax compatibility + H-001 verification
 - [x] [P0] rusty-kaspa als Dependency in Cargo.toml einbinden | Claude Code | 2026-03-21; pinned to v2.0.1 on 2026-07-07
 - [ ] [P0] autodidactic.py vollständig testen (alle Memory-Operationen) | Claude Code | memory/-Dateien

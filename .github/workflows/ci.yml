@@ -37,6 +37,17 @@ jobs:
             fi
           done
           echo "All contracts pass KAS/PROM check."
+      - name: Verify H-001 current-silverc fixture is explicit
+        run: |
+          fixture="modules/contracts/silverc/ValidatorStakingH001.sil"
+          test -f "$fixture" || (echo "ERROR: missing $fixture" && exit 1)
+          grep -q 'vote_byte = vote ? byte\[\](0x01) : byte\[\](0x00)' "$fixture"
+          grep -q 'vote_byte + byte\[8\](salt) + byte\[8\](block_height)' "$fixture"
+          if grep -q 'sha256(vote || salt' "$fixture"; then
+            echo "ERROR: H-001 fixture uses implicit bool/int serialization."
+            exit 1
+          fi
+          echo "H-001 fixture uses explicit canonical preimage bytes."
       # Note: ssc/Silverscript compile is intentionally not a CI gate yet.
       # The upstream Silverscript workspace is experimental and currently documents
       # Testnet-12-only output. Add contract compilation after the toolchain is pinned

@@ -17,10 +17,10 @@ This is not mainnet-ready today. The right verdict is: good work, continue the p
 #### Contracts — FAIL
 
 - **[BLOCKING / PARTIALLY VERIFIED 2026-07-08] H-001 commit-reveal preimage encoding still needs Prometheus contract verification** — `modules/contracts/ValidatorStaking.ss:110-112`, `modules/validator-node/src/voting/commit.rs`
-  - What: Rust builds a canonical 17-byte preimage through `commitment_preimage_bytes(vote, salt, block_height)` and tests known H-001 hex vectors. Upstream Silverscript tooling now builds locally, and a temporary `/tmp` runtime probe verified that explicit `sha256(vote_byte || byte[8](salt) || byte[8](block_height))` matches the Rust vectors for positive 64-bit values.
-  - Remaining risk: Prometheus `ValidatorStaking.ss` still uses legacy `.ss`/`uint64` syntax and `sha256(vote || salt || vc.committed_at_block)`. That exact contract form has not been compiled/executed with upstream `silverc`.
+  - What: Rust builds a canonical 17-byte preimage through `commitment_preimage_bytes(vote, salt, block_height)` and tests known H-001 hex vectors. Upstream Silverscript tooling now builds locally. The repo now includes `modules/contracts/silverc/ValidatorStakingH001.sil` plus `scripts/verify_silverc_h001.py`; the script verifies explicit `sha256(vote_byte || byte[8](salt) || byte[8](block_height))` against the Rust vectors for positive 64-bit values.
+  - Remaining risk: The full Prometheus `ValidatorStaking.ss` state machine still uses legacy `.ss`/`uint64` syntax. That full contract form has not been ported, compiled, or executed with upstream `silverc`.
   - Path: If the deployed contract serializes `uint64` or `bool` differently than the Rust preimage, validators can create valid Rust commitments that fail on-chain reveal, causing broken voting or bond loss.
-  - Fix: Port or adapt `ValidatorStaking.ss` to current Silverscript syntax, use explicit byte construction, and re-run the H-001 vectors against the actual contract before Sprint 9.
+  - Fix: Port or adapt the full `ValidatorStaking.ss` state machine to current Silverscript syntax, keep explicit byte construction, and re-run the H-001 vectors against the ported contract before Sprint 9.
 
 - **[LOW] Known contract cleanups remain before deploy refactor** — `modules/contracts/DevIncentivePool.ss:145-149`, `modules/contracts/ValidatorStaking.ss:124-132`
   - What: DevIncentivePool deposit has no emission-contract ACL, and revealVote transfers bond before deleting commitment.

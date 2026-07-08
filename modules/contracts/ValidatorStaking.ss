@@ -2,7 +2,9 @@
 // Validators stake KAS (Kaspa native token) to participate in consensus.
 // PROM is NEVER staked — it is earned through accepted proposals.
 // No emergency stop mechanism (Architecture Decision #3).
-// Compile: ssc compile --testnet modules/contracts/ValidatorStaking.ss
+// Legacy architecture contract. Current upstream silverc compatibility is tracked
+// through modules/contracts/silverc/ValidatorStakingH001.sil for the H-001
+// commit-reveal preimage until the full state-machine port is complete.
 
 // ============================================================
 // STRUCTS (from SCHEMA.md 1.1 — DO NOT MODIFY)
@@ -108,7 +110,9 @@ function revealVote(proposal_id: uint64, vote: bool, salt: uint64) -> void {
     let vc: VoteCommitment = commitments[commitment_key];
     require(vc.committed_at_block > 0, "No commitment found");
 
-    // Reconstruct commitment from the canonical H-001 preimage:
+    // TODO(H-001/current-silverc-port): replace this legacy implicit
+    // concatenation with the explicit byte construction proven in
+    // modules/contracts/silverc/ValidatorStakingH001.sil:
     // vote_byte(1) || salt_le(8) || committed_at_block_le(8).
     let expected: bytes(32) = sha256(vote || salt || vc.committed_at_block);
 
