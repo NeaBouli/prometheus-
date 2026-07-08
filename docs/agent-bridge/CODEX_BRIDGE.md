@@ -3,7 +3,8 @@
 Last updated: 2026-07-08 EEST
 Repo path: /Users/gio/Desktop/repos/prometheus
 Branch observed: main
-HEAD observed: eeb4808 - docs: update post-toccata bridge status
+Latest product-code baseline observed: eeb4808 - docs: update post-toccata bridge status
+Current HEAD: verify with `git log --oneline -1`; bridge-only commits may advance it.
 
 Purpose: This file is the local bridge for Codex/Claude Code handover. Read it before touching product code. It consolidates the project state, architecture rules, workflow logic, current open issues, the Reputation Badge decision, and the new direct Sandbox access note.
 
@@ -491,7 +492,8 @@ Sources consolidated into this file:
 Staleness warning:
 
 - The downloaded handover says date `2026-03-23` and last commit `6347b85`.
-- The local repo observed on 2026-07-08 is on branch `main` at `eeb4808`.
+- The local repo observed on 2026-07-08 had latest product-code baseline `eeb4808`.
+- Bridge-only reconciliation commits may advance `HEAD`; use `git log --oneline -1` as source of truth.
 - Therefore the handover is useful for architecture and workflow, but not authoritative for current git state.
 - Always verify current files and tests before implementing.
 

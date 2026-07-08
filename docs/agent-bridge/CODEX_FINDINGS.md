@@ -72,7 +72,7 @@ This is not mainnet-ready today. The right verdict is: good work, continue the p
   - Evidence: `python3 scripts/check_memory_integrity.py` passed all required memory files.
 
 - **[PASS] Remote branch alignment**
-  - Evidence: local `main` HEAD `eeb4808`; `git ls-remote origin refs/heads/main` returned same commit.
+  - Evidence: local `main` and `origin/main` were aligned after the post-Toccata update. Use `git log --oneline -1` and `git ls-remote origin refs/heads/main` for the live commit, because bridge-only commits may advance HEAD.
 
 - **[PASS] No tracked env/key filenames found**
   - Evidence: filename scan found no tracked `.env`, `.pem`, `.key`, secret/password/token files.

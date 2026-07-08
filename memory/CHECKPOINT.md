@@ -13,7 +13,8 @@
 | Repo | https://github.com/NeaBouli/prometheus- |
 | Branch | main |
 | Lokaler Pfad | ~/Desktop/prometheus |
-| Letzter Commit | eeb4808 — docs: update post-toccata bridge status |
+| Letzter Produkt-Code-Baseline-Commit | eeb4808 — docs: update post-toccata bridge status |
+| Aktueller HEAD | Mit `git log --oneline -1` prüfen; Bridge-/Status-Commits können neuer sein |
 | Rollback-Tag | `pre-session-20260413` → `6347b85` |
 | Whitepaper | WHITEPAPER.md (root) + whitepaper.html (styled) |
 | Status | Feature-complete through Sprint 7. Post-Toccata deployment verification active. |
@@ -110,7 +111,7 @@
 **STARTFLOW — Lies dies zuerst:**
 ```
 1. cd /Users/gio/Desktop/repos/prometheus
-2. git log --oneline -5              → HEAD before local diffs = eeb4808
+2. git log --oneline -5              → aktuellen HEAD prüfen; Produkt-Code-Baseline = eeb4808
 3. git tag -l                        → Rollback: pre-session-20260413
 4. cargo test 2>&1 | tail -5         → Muss grün sein
 5. Lies BACKLOG.md                   → Priorisierte Task-Liste
