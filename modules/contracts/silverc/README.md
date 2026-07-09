@@ -58,8 +58,8 @@ legacy global maps. The fixture currently covers:
 
 The shared verifier compiles this fixture against the pinned upstream
 Silverscript ref, builds all covenant declaration sigscripts, and runtime-tests
-the `commitVote` transition with real Schnorr signatures and authorized
-covenant outputs:
+the `commitVote` and `revealVote` transitions with real Schnorr signatures and
+authorized covenant outputs:
 
 ```bash
 python3 scripts/verify_silverc_h001.py
@@ -69,10 +69,11 @@ Current runtime coverage:
 
 - `commitVote` accepts a valid 10% bond, validator signature, and successor state
 - `commitVote` rejects a bond below 10% of stake
+- `revealVote` accepts a valid commitment, validator signature, and successor state
+- `revealVote` rejects a salt that does not match the commitment
 
 Remaining runtime coverage before deployment:
 
-- `revealVote`
 - `slashInvalidReveal`
 - `requestWithdraw`
 - `completeWithdraw`

@@ -12,7 +12,7 @@
 - [ ] [P0] Alle memory/-Dateien initial befüllen und pushen | Claude Code | Repo-Struktur
 - [x] [P0] Kaspa Testnet-10-Node installieren und starten (rusty-kaspa v1.1.0) | Claude Code | 2026-03-21
 - [x] [P0] Verbindung zum Testnet verifizieren (8 Peers, IBD active) | Claude Code | 2026-03-21
-- [~] [P0] Silverscript Compiler/Tooling installieren und testen | Claude Code | H-001 fixture verifies; ValidatorStaking state fixture compiles; commitVote runtime tests pass; reveal/slash/withdraw runtime tests pending
+- [~] [P0] Silverscript Compiler/Tooling installieren und testen | Claude Code | H-001 fixture verifies; ValidatorStaking state fixture compiles; commitVote/revealVote runtime tests pass; slash/withdraw runtime tests pending
 - [ ] [P0] Hello-World Silverscript Contract auf Testnet deployen | Claude Code | PENDING: after Prometheus contract syntax compatibility + H-001 verification
 - [x] [P0] rusty-kaspa als Dependency in Cargo.toml einbinden | Claude Code | 2026-03-21; pinned to v2.0.1 on 2026-07-07
 - [ ] [P0] autodidactic.py vollständig testen (alle Memory-Operationen) | Claude Code | memory/-Dateien
@@ -75,7 +75,7 @@
 
 ## ═══ SPRINT 5: VOTING MECHANISMUS (Woche 7) ═══
 
-- [~] [P1] Commit-Reveal vollständig in Silverscript implementieren | Claude Code | H-001 runtime fixture + ValidatorStakingState compile/ABI + commitVote runtime gate done; reveal/slash runtime tests pending
+- [~] [P1] Commit-Reveal vollständig in Silverscript implementieren | Claude Code | H-001 runtime fixture + ValidatorStakingState compile/ABI + commitVote/revealVote runtime gates done; slash runtime tests pending
 - [ ] [P1] Salted Voting (30% Zufallsstichprobe) implementieren | Claude Code | Commit-Reveal
 - [ ] [P1] Bond-System (10% des Stakes als Kaution) implementieren | Claude Code | Commit-Reveal
 - [ ] [P2] Voting-Tests: Kollusion-Angriff scheitert | Claude Code | Voting-System

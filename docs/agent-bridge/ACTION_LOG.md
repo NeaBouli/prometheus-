@@ -21,6 +21,8 @@
 - Added `.claude/` to `.gitignore` so local agent state cannot be staged accidentally.
 - Extended the pinned upstream `silverc` verifier with real `commitVote` runtime transition tests: valid bond/signature/state transition accepted, low bond rejected.
 - GitHub Prometheus CI passed for `f1dd616`, including the H-001 + Validator State Silverc Runtime job with 4 injected upstream tests.
+- Extended the pinned upstream `silverc` verifier with real `revealVote` runtime transition tests: valid reveal/signature/state transition accepted, wrong salt rejected.
+- GitHub Prometheus CI, Security Audit, and Pages passed for `8f05afb`; the H-001 + Validator State Silverc Runtime job now covers H-001 vectors plus commit/reveal runtime paths.
 
 ## 2026-07-07
 
