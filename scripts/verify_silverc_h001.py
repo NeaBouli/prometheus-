@@ -403,6 +403,148 @@ fn prometheus_validator_state_commit_vote_runtime_rejects_low_bond() {
     let err = execute_input_with_covenants(tx, entries, 0).expect_err("commitVote must reject bond below 10% of stake");
     common::assert_verify_like_error(err);
 }
+
+#[test]
+fn prometheus_validator_state_reveal_vote_runtime_accepts_valid_transition() {
+    let contract_path = std::env::var("PROMETHEUS_VALIDATOR_STATE_CONTRACT")
+        .expect("PROMETHEUS_VALIDATOR_STATE_CONTRACT is set");
+    let source = std::fs::read_to_string(contract_path).expect("read Prometheus validator state contract fixture");
+    let keypair = keypair_from_seed(7);
+    let validator_pk = keypair.x_only_public_key().0.serialize().to_vec();
+    let commitment = hex32("cda9cc6bb51d36be5db27eb6e86bfc6b6173d5918f24f81939af5411bff90ffb");
+
+    let committed = compile_validator_state(
+        &source,
+        validator_state_args(
+            validator_pk.clone(),
+            20_000,
+            true,
+            1_000,
+            10_000,
+            0,
+            0,
+            commitment.clone(),
+            2_000,
+            1_000,
+            0,
+        ),
+    );
+    let revealed = compile_validator_state(
+        &source,
+        validator_state_args(
+            validator_pk,
+            20_000,
+            true,
+            1_000,
+            10_000,
+            0,
+            1_200,
+            zero32(),
+            0,
+            0,
+            0,
+        ),
+    );
+
+    let placeholder_sigscript = validator_state_entry_sigscript(
+        &committed,
+        "revealVote",
+        vec![Expr::bool(true), Expr::int(42), Expr::int(1_200), Expr::bytes(dummy_signature())],
+    );
+    let outputs = vec![covenant_output(&revealed, 0, COV_A)];
+    let entries = vec![covenant_utxo(&committed, COV_A)];
+    let mut tx = Transaction::new(
+        1,
+        vec![tx_input_with_sigops(0, placeholder_sigscript, 1)],
+        outputs,
+        0,
+        Default::default(),
+        0,
+        vec![],
+    );
+    let sig = sign_tx_input(&tx, &entries, 0, &keypair);
+    tx.inputs[0].signature_script = validator_state_entry_sigscript(
+        &committed,
+        "revealVote",
+        vec![Expr::bool(true), Expr::int(42), Expr::int(1_200), Expr::bytes(sig)],
+    );
+
+    let result = execute_input_with_covenants(tx, entries, 0);
+    assert!(
+        result.is_ok(),
+        "revealVote runtime should accept valid commitment/signature/state transition: {:?}",
+        result.err()
+    );
+}
+
+#[test]
+fn prometheus_validator_state_reveal_vote_runtime_rejects_wrong_salt() {
+    let contract_path = std::env::var("PROMETHEUS_VALIDATOR_STATE_CONTRACT")
+        .expect("PROMETHEUS_VALIDATOR_STATE_CONTRACT is set");
+    let source = std::fs::read_to_string(contract_path).expect("read Prometheus validator state contract fixture");
+    let keypair = keypair_from_seed(7);
+    let validator_pk = keypair.x_only_public_key().0.serialize().to_vec();
+    let commitment = hex32("cda9cc6bb51d36be5db27eb6e86bfc6b6173d5918f24f81939af5411bff90ffb");
+
+    let committed = compile_validator_state(
+        &source,
+        validator_state_args(
+            validator_pk.clone(),
+            20_000,
+            true,
+            1_000,
+            10_000,
+            0,
+            0,
+            commitment,
+            2_000,
+            1_000,
+            0,
+        ),
+    );
+    let revealed = compile_validator_state(
+        &source,
+        validator_state_args(
+            validator_pk,
+            20_000,
+            true,
+            1_000,
+            10_000,
+            0,
+            1_200,
+            zero32(),
+            0,
+            0,
+            0,
+        ),
+    );
+
+    let placeholder_sigscript = validator_state_entry_sigscript(
+        &committed,
+        "revealVote",
+        vec![Expr::bool(true), Expr::int(43), Expr::int(1_200), Expr::bytes(dummy_signature())],
+    );
+    let outputs = vec![covenant_output(&revealed, 0, COV_A)];
+    let entries = vec![covenant_utxo(&committed, COV_A)];
+    let mut tx = Transaction::new(
+        1,
+        vec![tx_input_with_sigops(0, placeholder_sigscript, 1)],
+        outputs,
+        0,
+        Default::default(),
+        0,
+        vec![],
+    );
+    let sig = sign_tx_input(&tx, &entries, 0, &keypair);
+    tx.inputs[0].signature_script = validator_state_entry_sigscript(
+        &committed,
+        "revealVote",
+        vec![Expr::bool(true), Expr::int(43), Expr::int(1_200), Expr::bytes(sig)],
+    );
+
+    let err = execute_input_with_covenants(tx, entries, 0).expect_err("revealVote must reject a salt that does not match the commitment");
+    common::assert_verify_like_error(err);
+}
 """
 
 
