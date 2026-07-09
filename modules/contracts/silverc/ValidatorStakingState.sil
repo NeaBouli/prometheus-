@@ -62,6 +62,7 @@ contract ValidatorStakingState(
     #[covenant.singleton(mode = transition)]
     function commitVote(State prev_state, byte[32] new_commitment, int new_bond_kas, int block_height, sig validator_sig) : State {
         require(prev_state.active);
+        require(block_height >= 0);
         require(prev_state.withdraw_request_block == 0);
         require(isEmptyCommitment(prev_state.commitment));
         require(!isEmptyCommitment(new_commitment));
@@ -87,6 +88,7 @@ contract ValidatorStakingState(
     #[covenant.singleton(mode = transition)]
     function revealVote(State prev_state, bool vote, int salt, int reveal_block_height, sig validator_sig) : State {
         require(prev_state.active);
+        require(reveal_block_height >= 0);
         require(!isEmptyCommitment(prev_state.commitment));
         require(commitmentHash(vote, salt, prev_state.committed_at_block) == prev_state.commitment);
         require(checkSig(validator_sig, prev_state.validator_pk));
@@ -135,6 +137,7 @@ contract ValidatorStakingState(
     function requestWithdraw(State prev_state, int block_height, sig validator_sig) : State {
         require(prev_state.stake_kas > 0);
         require(prev_state.active);
+        require(block_height >= 0);
         require(prev_state.withdraw_request_block == 0);
         require(isEmptyCommitment(prev_state.commitment));
         require(checkSig(validator_sig, prev_state.validator_pk));

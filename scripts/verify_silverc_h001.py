@@ -166,6 +166,12 @@ fn prometheus_h001_vectors_match_current_silverc_runtime() {
             0x1112131415161718,
             "66fb23b92e68c968da255e16a553db24a2dff80e2a9bfe6af494b3480a4af651",
         ),
+        (
+            false,
+            -1,
+            -1,
+            "1d037f75eb96d1ab0615732e2aacdd2a701ecf59fb048987a47cb50a2b483a86",
+        ),
     ];
 
     for (vote, salt, block_height, expected_hash) in vectors {
@@ -405,6 +411,75 @@ fn prometheus_validator_state_commit_vote_runtime_rejects_low_bond() {
 }
 
 #[test]
+fn prometheus_validator_state_commit_vote_runtime_rejects_negative_block_height() {
+    let contract_path = std::env::var("PROMETHEUS_VALIDATOR_STATE_CONTRACT")
+        .expect("PROMETHEUS_VALIDATOR_STATE_CONTRACT is set");
+    let source = std::fs::read_to_string(contract_path).expect("read Prometheus validator state contract fixture");
+    let keypair = keypair_from_seed(7);
+    let validator_pk = keypair.x_only_public_key().0.serialize().to_vec();
+    let commitment = hex32("cda9cc6bb51d36be5db27eb6e86bfc6b6173d5918f24f81939af5411bff90ffb");
+
+    let active = compile_validator_state(
+        &source,
+        validator_state_args(
+            validator_pk.clone(),
+            20_000,
+            true,
+            1_000,
+            10_000,
+            0,
+            0,
+            zero32(),
+            0,
+            0,
+            0,
+        ),
+    );
+    let committed = compile_validator_state(
+        &source,
+        validator_state_args(
+            validator_pk,
+            20_000,
+            true,
+            1_000,
+            10_000,
+            0,
+            0,
+            commitment.clone(),
+            2_000,
+            -1,
+            0,
+        ),
+    );
+
+    let placeholder_sigscript = validator_state_entry_sigscript(
+        &active,
+        "commitVote",
+        vec![Expr::bytes(commitment.clone()), Expr::int(2_000), Expr::int(-1), Expr::bytes(dummy_signature())],
+    );
+    let outputs = vec![covenant_output(&committed, 0, COV_A)];
+    let entries = vec![covenant_utxo(&active, COV_A)];
+    let mut tx = Transaction::new(
+        1,
+        vec![tx_input_with_sigops(0, placeholder_sigscript, 1)],
+        outputs,
+        0,
+        Default::default(),
+        0,
+        vec![],
+    );
+    let sig = sign_tx_input(&tx, &entries, 0, &keypair);
+    tx.inputs[0].signature_script = validator_state_entry_sigscript(
+        &active,
+        "commitVote",
+        vec![Expr::bytes(commitment), Expr::int(2_000), Expr::int(-1), Expr::bytes(sig)],
+    );
+
+    let err = execute_input_with_covenants(tx, entries, 0).expect_err("commitVote must reject negative block height");
+    common::assert_verify_like_error(err);
+}
+
+#[test]
 fn prometheus_validator_state_reveal_vote_runtime_accepts_valid_transition() {
     let contract_path = std::env::var("PROMETHEUS_VALIDATOR_STATE_CONTRACT")
         .expect("PROMETHEUS_VALIDATOR_STATE_CONTRACT is set");
@@ -473,6 +548,79 @@ fn prometheus_validator_state_reveal_vote_runtime_accepts_valid_transition() {
     assert!(
         result.is_ok(),
         "revealVote runtime should accept valid commitment/signature/state transition: {:?}",
+        result.err()
+    );
+}
+
+#[test]
+fn prometheus_validator_state_reveal_vote_runtime_accepts_signed_salt_bitpattern() {
+    let contract_path = std::env::var("PROMETHEUS_VALIDATOR_STATE_CONTRACT")
+        .expect("PROMETHEUS_VALIDATOR_STATE_CONTRACT is set");
+    let source = std::fs::read_to_string(contract_path).expect("read Prometheus validator state contract fixture");
+    let keypair = keypair_from_seed(7);
+    let validator_pk = keypair.x_only_public_key().0.serialize().to_vec();
+    let commitment = hex32("bd29bc18736e3c8b3e46ab62781dc96de07ab222102ea8881309dee54cac47ec");
+
+    let committed = compile_validator_state(
+        &source,
+        validator_state_args(
+            validator_pk.clone(),
+            20_000,
+            true,
+            1_000,
+            10_000,
+            0,
+            0,
+            commitment,
+            2_000,
+            1_000,
+            0,
+        ),
+    );
+    let revealed = compile_validator_state(
+        &source,
+        validator_state_args(
+            validator_pk,
+            20_000,
+            true,
+            1_000,
+            10_000,
+            0,
+            1_200,
+            zero32(),
+            0,
+            0,
+            0,
+        ),
+    );
+
+    let placeholder_sigscript = validator_state_entry_sigscript(
+        &committed,
+        "revealVote",
+        vec![Expr::bool(true), Expr::int(-1), Expr::int(1_200), Expr::bytes(dummy_signature())],
+    );
+    let outputs = vec![covenant_output(&revealed, 0, COV_A)];
+    let entries = vec![covenant_utxo(&committed, COV_A)];
+    let mut tx = Transaction::new(
+        1,
+        vec![tx_input_with_sigops(0, placeholder_sigscript, 1)],
+        outputs,
+        0,
+        Default::default(),
+        0,
+        vec![],
+    );
+    let sig = sign_tx_input(&tx, &entries, 0, &keypair);
+    tx.inputs[0].signature_script = validator_state_entry_sigscript(
+        &committed,
+        "revealVote",
+        vec![Expr::bool(true), Expr::int(-1), Expr::int(1_200), Expr::bytes(sig)],
+    );
+
+    let result = execute_input_with_covenants(tx, entries, 0);
+    assert!(
+        result.is_ok(),
+        "revealVote runtime should accept signed salt carrying the u64::MAX bit pattern: {:?}",
         result.err()
     );
 }
@@ -1002,7 +1150,7 @@ def main() -> int:
     print("H-001 and ValidatorStakingState silverc fixture verification passed.")
     print(f"Silverscript ref: {silver_ref}")
     print(
-        "Note: current silverc uses signed int entrypoint arguments; the u64::MAX Rust vector remains a full-contract port item."
+        "Note: current silverc uses signed int entrypoint arguments; salt values above i64::MAX are passed as their signed two's-complement bit pattern, while deployment block heights remain scoped to 0..=i64::MAX."
     )
     return 0
 
