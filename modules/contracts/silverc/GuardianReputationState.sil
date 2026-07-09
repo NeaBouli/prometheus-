@@ -1,0 +1,114 @@
+pragma silverscript ^0.1.0;
+
+contract GuardianReputationState(
+    pubkey init_guardian_pk,
+    pubkey init_governance_pk,
+    int init_compute_power_gflops,
+    int init_reputation,
+    int init_proposals_submitted,
+    int init_proposals_accepted,
+    int init_registered_at,
+    int init_model_type
+) {
+    int constant MIN_COMPUTE_GFLOPS = 100;
+    int constant REPUTATION_START = 1000;
+    int constant REPUTATION_MAX = 100000;
+    int constant MIN_REPUTATION = 1000;
+    int constant MODEL_TYPE_70B = 0;
+    int constant MODEL_TYPE_8B = 1;
+
+    pubkey guardian_pk = init_guardian_pk;
+    pubkey governance_pk = init_governance_pk;
+    int compute_power_gflops = init_compute_power_gflops;
+    int reputation = init_reputation;
+    int proposals_submitted = init_proposals_submitted;
+    int proposals_accepted = init_proposals_accepted;
+    int registered_at = init_registered_at;
+    int model_type = init_model_type;
+
+    function isqrt(int n) : int {
+        if n == 0 {
+            return(0);
+        }
+
+        int x = n;
+        int y = (x + 1) / 2;
+        while y < x {
+            x = y;
+            y = (x + n / x) / 2;
+        }
+        return(x);
+    }
+
+    function votingPowerFor(State state) : int {
+        if state.reputation < MIN_REPUTATION {
+            return(0);
+        }
+
+        int rep_scaled = state.reputation / 100;
+        return(rep_scaled * rep_scaled * state.compute_power_gflops / 1000);
+    }
+
+    #[covenant.singleton(mode = transition)]
+    function register(State prev_state, int compute_power_gflops, int registered_at, sig guardian_sig) : State {
+        require(prev_state.registered_at == 0);
+        require(compute_power_gflops >= MIN_COMPUTE_GFLOPS);
+        require(compute_power_gflops < 1000000);
+        require(registered_at >= 0);
+        require(checkSig(guardian_sig, prev_state.guardian_pk));
+
+        int model = compute_power_gflops >= 500 ? MODEL_TYPE_70B : MODEL_TYPE_8B;
+
+        return({
+            guardian_pk: prev_state.guardian_pk,
+            governance_pk: prev_state.governance_pk,
+            compute_power_gflops: compute_power_gflops,
+            reputation: REPUTATION_START,
+            proposals_submitted: 0,
+            proposals_accepted: 0,
+            registered_at: registered_at,
+            model_type: model
+        });
+    }
+
+    #[covenant.singleton(mode = transition)]
+    function proposalAccepted(State prev_state, sig governance_sig) : State {
+        require(prev_state.registered_at > 0);
+        require(checkSig(governance_sig, prev_state.governance_pk));
+
+        int increase = isqrt(prev_state.compute_power_gflops) * 100;
+        int increased_reputation = prev_state.reputation + increase;
+        int capped_reputation = increased_reputation > REPUTATION_MAX ? REPUTATION_MAX : increased_reputation;
+
+        return({
+            guardian_pk: prev_state.guardian_pk,
+            governance_pk: prev_state.governance_pk,
+            compute_power_gflops: prev_state.compute_power_gflops,
+            reputation: capped_reputation,
+            proposals_submitted: prev_state.proposals_submitted,
+            proposals_accepted: prev_state.proposals_accepted + 1,
+            registered_at: prev_state.registered_at,
+            model_type: prev_state.model_type
+        });
+    }
+
+    #[covenant.singleton(mode = transition)]
+    function proposalRejected(State prev_state, sig governance_sig) : State {
+        require(prev_state.registered_at > 0);
+        require(checkSig(governance_sig, prev_state.governance_pk));
+
+        int halved_reputation = prev_state.reputation / 2;
+        int final_reputation = halved_reputation < MIN_REPUTATION ? 0 : halved_reputation;
+
+        return({
+            guardian_pk: prev_state.guardian_pk,
+            governance_pk: prev_state.governance_pk,
+            compute_power_gflops: prev_state.compute_power_gflops,
+            reputation: final_reputation,
+            proposals_submitted: prev_state.proposals_submitted,
+            proposals_accepted: prev_state.proposals_accepted,
+            registered_at: prev_state.registered_at,
+            model_type: prev_state.model_type
+        });
+    }
+}

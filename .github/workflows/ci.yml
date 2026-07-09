@@ -61,6 +61,20 @@ jobs:
             exit 1
           fi
           echo "ValidatorStakingState fixture keeps core staking invariants."
+      - name: Verify GuardianReputationState current-silverc fixture exists
+        run: |
+          fixture="modules/contracts/silverc/GuardianReputationState.sil"
+          test -f "$fixture" || (echo "ERROR: missing $fixture" && exit 1)
+          grep -q 'REPUTATION_START = 1000' "$fixture"
+          grep -q 'REPUTATION_MAX = 100000' "$fixture"
+          grep -q 'MIN_COMPUTE_GFLOPS = 100' "$fixture"
+          grep -q 'MODEL_TYPE_70B = 0' "$fixture"
+          grep -q 'MODEL_TYPE_8B = 1' "$fixture"
+          if grep -q 'stake' "$fixture"; then
+            echo "ERROR: Guardian reputation fixture must not introduce Guardian staking."
+            exit 1
+          fi
+          echo "GuardianReputationState fixture keeps L1 reputation invariants."
 
   h001-silverc-runtime:
     name: H-001 + Validator State Silverc Runtime

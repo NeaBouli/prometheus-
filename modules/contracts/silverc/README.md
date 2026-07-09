@@ -97,3 +97,28 @@ Current signed-int deployment boundary:
 Remaining deployment blockers:
 
 - remaining deployment-scoped contract ports
+
+## GuardianReputationState.sil
+
+`GuardianReputationState.sil` is the current-`silverc` port fixture for the
+guardian-owned reputation state machine. Guardian reputation remains canonical
+on Kaspa L1 and does not introduce badge, NFT, Kasplex, or staking semantics.
+
+The fixture models one guardian reputation UTXO and keeps these legacy
+invariants:
+
+- no Guardian staking
+- starting reputation is `REPUTATION_START = 1000`
+- minimum voting reputation is `MIN_REPUTATION = 1000`
+- maximum reputation is `REPUTATION_MAX = 100000`
+- minimum compute is `MIN_COMPUTE_GFLOPS = 100`
+- model type `0` is LLaMA-3-70B and model type `1` is LLaMA-3-8B
+
+The shared verifier compiles this fixture against the same pinned upstream
+Silverscript ref and builds covenant declaration sigscripts for:
+
+- `register`
+- `proposalAccepted`
+- `proposalRejected`
+
+Runtime transition tests for these Guardian reputation paths are still pending.

@@ -13,6 +13,9 @@ H001_CONTRACT = ROOT / "modules" / "contracts" / "silverc" / "ValidatorStakingH0
 VALIDATOR_STATE_CONTRACT = (
     ROOT / "modules" / "contracts" / "silverc" / "ValidatorStakingState.sil"
 )
+GUARDIAN_STATE_CONTRACT = (
+    ROOT / "modules" / "contracts" / "silverc" / "GuardianReputationState.sil"
+)
 DEFAULT_SILVERSCRIPT_REPO = Path("/tmp/prom-silverscript")
 SILVERSCRIPT_GIT = "https://github.com/kaspanet/silverscript.git"
 DEFAULT_SILVERSCRIPT_REF = "d25bd3427a093c17327ca3d6b9e1aa5f7688c863"
@@ -134,6 +137,28 @@ fn validator_state_args(
     ]
 }
 
+fn guardian_state_args(
+    guardian_pk: Vec<u8>,
+    governance_pk: Vec<u8>,
+    compute_power_gflops: i64,
+    reputation: i64,
+    proposals_submitted: i64,
+    proposals_accepted: i64,
+    registered_at: i64,
+    model_type: i64,
+) -> Vec<Expr<'static>> {
+    vec![
+        Expr::bytes(guardian_pk),
+        Expr::bytes(governance_pk),
+        Expr::int(compute_power_gflops),
+        Expr::int(reputation),
+        Expr::int(proposals_submitted),
+        Expr::int(proposals_accepted),
+        Expr::int(registered_at),
+        Expr::int(model_type),
+    ]
+}
+
 fn build_covenant_sigscript(compiled: &silverscript_lang::compiler::CompiledContract<'_>, function_name: &str, args: Vec<Expr<'_>>) {
     compiled
         .build_sig_script_for_covenant_decl(function_name, args, CovenantDeclCallOptions { is_leader: false })
@@ -150,6 +175,10 @@ fn validator_state_entry_sigscript(compiled: &CompiledContract<'_>, function_nam
 
 fn compile_validator_state<'a>(source: &'a str, args: Vec<Expr<'static>>) -> CompiledContract<'a> {
     compile_contract(source, &args, CompileOptions::default()).expect("ValidatorStakingState fixture compiles")
+}
+
+fn compile_guardian_state<'a>(source: &'a str, args: Vec<Expr<'static>>) -> CompiledContract<'a> {
+    compile_contract(source, &args, CompileOptions::default()).expect("GuardianReputationState fixture compiles")
 }
 
 #[test]
@@ -259,6 +288,59 @@ fn prometheus_validator_state_fixture_compiles_against_current_silverc() {
         &withdraw,
         "completeWithdraw",
         vec![Vec::<Expr>::new().into(), Expr::int(101_300), Expr::bytes(sig)],
+    );
+}
+
+#[test]
+fn prometheus_guardian_reputation_state_fixture_compiles_against_current_silverc() {
+    let contract_path = std::env::var("PROMETHEUS_GUARDIAN_STATE_CONTRACT")
+        .expect("PROMETHEUS_GUARDIAN_STATE_CONTRACT is set");
+    let source = std::fs::read_to_string(contract_path).expect("read Prometheus guardian reputation contract fixture");
+    let guardian_pk = vec![9u8; 32];
+    let governance_pk = vec![8u8; 32];
+    let sig = dummy_signature();
+
+    let unregistered = compile_guardian_state(
+        &source,
+        guardian_state_args(
+            guardian_pk.clone(),
+            governance_pk.clone(),
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+        ),
+    );
+    build_covenant_sigscript(
+        &unregistered,
+        "register",
+        vec![Expr::int(500), Expr::int(1_000), Expr::bytes(sig.clone())],
+    );
+
+    let registered = compile_guardian_state(
+        &source,
+        guardian_state_args(
+            guardian_pk,
+            governance_pk,
+            500,
+            1_000,
+            0,
+            0,
+            1_000,
+            0,
+        ),
+    );
+    build_covenant_sigscript(
+        &registered,
+        "proposalAccepted",
+        vec![Expr::bytes(sig.clone())],
+    );
+    build_covenant_sigscript(
+        &registered,
+        "proposalRejected",
+        vec![Expr::bytes(sig)],
     );
 }
 
@@ -1110,7 +1192,7 @@ def ensure_silverscript_repo(path: Path, ref: str) -> None:
 
 
 def main() -> int:
-    for contract in (H001_CONTRACT, VALIDATOR_STATE_CONTRACT):
+    for contract in (H001_CONTRACT, VALIDATOR_STATE_CONTRACT, GUARDIAN_STATE_CONTRACT):
         if not contract.exists():
             print(f"missing contract fixture: {contract}", file=sys.stderr)
             return 1
@@ -1134,6 +1216,7 @@ def main() -> int:
     env = os.environ.copy()
     env["PROMETHEUS_H001_CONTRACT"] = str(H001_CONTRACT)
     env["PROMETHEUS_VALIDATOR_STATE_CONTRACT"] = str(VALIDATOR_STATE_CONTRACT)
+    env["PROMETHEUS_GUARDIAN_STATE_CONTRACT"] = str(GUARDIAN_STATE_CONTRACT)
     try:
         run(
             [
@@ -1155,7 +1238,7 @@ def main() -> int:
         except FileNotFoundError:
             pass
 
-    print("H-001 and ValidatorStakingState silverc fixture verification passed.")
+    print("H-001, ValidatorStakingState, and GuardianReputationState silverc fixture verification passed.")
     print(f"Silverscript ref: {silver_ref}")
     print(
         "Note: current silverc uses signed int entrypoint arguments; deployment salt and block-height values are scoped to 0..=i64::MAX."
