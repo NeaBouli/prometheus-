@@ -367,18 +367,18 @@ Update:   Current-silverc fixture `ValidatorStakingH001.sil` now verifies
           d25bd3427a093c17327ca3d6b9e1aa5f7688c863.
           `ValidatorStakingState.sil` now compiles and builds covenant
           sigscripts for commit/reveal/slash/withdraw transitions.
-          `commitVote`, `revealVote`, `slashInvalidReveal`, and
-          `requestWithdraw` now have runtime tests at the pinned upstream ref:
-          valid commit/reveal/slash/request-withdraw signature/state
-          transitions accepted; low bond, wrong reveal salt, valid-reveal
-          slash, and open-commitment withdrawal rejected.
+          `commitVote`, `revealVote`, `slashInvalidReveal`,
+          `requestWithdraw`, and `completeWithdraw` now have runtime tests
+          at the pinned upstream ref: valid commit/reveal/slash/
+          request-withdraw/complete-withdraw signature/state transitions
+          accepted; low bond, wrong reveal salt, valid-reveal slash,
+          open-commitment withdrawal, and pre-cooldown complete-withdraw
+          rejected.
 Risk:     Current upstream silverc entrypoint numeric arguments are signed
-          `int`; the u64::MAX boundary and complete-withdraw runtime tests
-          remain unresolved before deployment.
-Action:   Add runtime covenant transition tests for completeWithdraw with real
-          signatures and authorized termination outputs, then resolve
-          signed-int/u64 deployment bounds.
-Severity: HIGH until runtime transition gate passes
+          `int`; the u64::MAX boundary remains unresolved before deployment.
+Action:   Resolve signed-int/u64 deployment bounds, then port/compile the
+          remaining deployment-scoped contracts.
+Severity: HIGH until signed-int/u64 deployment boundary is resolved
 ```
 
 **H-002: Arc<Mutex<Phi3Model>> unnecessary lock (Check 2.2, PATTERN-010)**
@@ -522,9 +522,8 @@ Rust modules audited:   10/10
 Python modules audited: 4/4
 
 Audit confidence:       94%
-(Deduction: ValidatorStaking current-silverc compile/ABI and
- commit/reveal/slash/request-withdraw runtime gates exist, but
- complete-withdraw runtime transitions and
+(Deduction: ValidatorStaking current-silverc compile/ABI and runtime
+ transitions are verified, but signed-int/u64 deployment boundary and
  LLM confidence extraction remain open)
 ```
 
@@ -532,9 +531,8 @@ Audit confidence:       94%
 primary blocker. The deployment blocker is now current-Silverscript contract
 runtime readiness: H-001 byte-core is verified, `ValidatorStakingState.sil`
 compiles/builds covenant sigscripts, and `commitVote`/`revealVote`/
-`slashInvalidReveal`/`requestWithdraw` runtime tests pass. Complete-withdraw
-runtime tests and the signed-int/u64 boundary must pass before Sprint 9
-deployment.
+`slashInvalidReveal`/`requestWithdraw`/`completeWithdraw` runtime tests pass.
+The signed-int/u64 boundary must pass before Sprint 9 deployment.
 M-001 and M-002 can wait until full release (Aug/Sep 2026).
 
 *Audit completed 2026-04-02 by Claude Code (5 parallel agents, 7 levels, 35 checks).*
