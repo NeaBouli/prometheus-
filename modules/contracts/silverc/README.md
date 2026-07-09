@@ -98,6 +98,32 @@ Remaining deployment blockers:
 
 - remaining deployment-scoped contract ports
 
+## RuleStorageState.sil
+
+`RuleStorageState.sil` is the current-`silverc` port fixture for the rule
+proposal and storage state machine. It models one active proposal/rule UTXO
+slot and keeps the deployment-critical legacy invariants:
+
+- rule content uses CIDv1 binary as `byte[36]`
+- minimum AI confidence is `MIN_CONFIDENCE = 8500`
+- validator quorum is `VALIDATOR_QUORUM = 6700`
+- voting duration is `VOTING_BLOCKS = 864000`
+- accepted/rejected proposal outcomes are represented as explicit Guardian
+  reputation events for orchestration with `GuardianReputationState.sil`
+
+The fixture intentionally does not pretend to support legacy global maps,
+`msg.sender`, cross-contract `call(...)`, event emission, or KRC20 minting in
+current Silverc. Those concerns remain deployment/orchestration work around the
+current covenant state model.
+
+The shared verifier compiles this fixture against the same pinned upstream
+Silverscript ref and builds covenant declaration sigscripts for:
+
+- `submitProposal`
+- `voteOnProposal`
+- `finalizeProposal`
+- `deactivateRule`
+
 ## GuardianReputationState.sil
 
 `GuardianReputationState.sil` is the current-`silverc` port fixture for the

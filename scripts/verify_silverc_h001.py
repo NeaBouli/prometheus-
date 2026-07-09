@@ -16,6 +16,9 @@ VALIDATOR_STATE_CONTRACT = (
 GUARDIAN_STATE_CONTRACT = (
     ROOT / "modules" / "contracts" / "silverc" / "GuardianReputationState.sil"
 )
+RULE_STORAGE_STATE_CONTRACT = (
+    ROOT / "modules" / "contracts" / "silverc" / "RuleStorageState.sil"
+)
 DEFAULT_SILVERSCRIPT_REPO = Path("/tmp/prom-silverscript")
 SILVERSCRIPT_GIT = "https://github.com/kaspanet/silverscript.git"
 DEFAULT_SILVERSCRIPT_REF = "d25bd3427a093c17327ca3d6b9e1aa5f7688c863"
@@ -76,6 +79,14 @@ fn hex32(input: &str) -> Vec<u8> {
 
 fn zero32() -> Vec<u8> {
     vec![0u8; 32]
+}
+
+fn zero36() -> Vec<u8> {
+    vec![0u8; 36]
+}
+
+fn cid36(seed: u8) -> Vec<u8> {
+    vec![seed; 36]
 }
 
 fn dummy_signature() -> Vec<u8> {
@@ -159,10 +170,60 @@ fn guardian_state_args(
     ]
 }
 
+fn rule_storage_state_args(
+    governance_pk: Vec<u8>,
+    next_proposal_id: i64,
+    proposal_id: i64,
+    guardian_pk: Vec<u8>,
+    threat_hash: Vec<u8>,
+    rule_type: i64,
+    rule_content_ipfs: Vec<u8>,
+    confidence: i64,
+    submitted_at_block: i64,
+    votes_for: i64,
+    votes_against: i64,
+    voting_end_block: i64,
+    status: i64,
+    rule_count: i64,
+    count_in_window: i64,
+    last_count_reset_block: i64,
+    consensus_score: i64,
+    stored_at_block: i64,
+    active: bool,
+    guardian_reputation_event: i64,
+) -> Vec<Expr<'static>> {
+    vec![
+        Expr::bytes(governance_pk),
+        Expr::int(next_proposal_id),
+        Expr::int(proposal_id),
+        Expr::bytes(guardian_pk),
+        Expr::bytes(threat_hash),
+        Expr::int(rule_type),
+        Expr::bytes(rule_content_ipfs),
+        Expr::int(confidence),
+        Expr::int(submitted_at_block),
+        Expr::int(votes_for),
+        Expr::int(votes_against),
+        Expr::int(voting_end_block),
+        Expr::int(status),
+        Expr::int(rule_count),
+        Expr::int(count_in_window),
+        Expr::int(last_count_reset_block),
+        Expr::int(consensus_score),
+        Expr::int(stored_at_block),
+        Expr::bool(active),
+        Expr::int(guardian_reputation_event),
+    ]
+}
+
 fn build_covenant_sigscript(compiled: &silverscript_lang::compiler::CompiledContract<'_>, function_name: &str, args: Vec<Expr<'_>>) {
     compiled
         .build_sig_script_for_covenant_decl(function_name, args, CovenantDeclCallOptions { is_leader: false })
         .unwrap_or_else(|err| panic!("ValidatorStakingState {function_name} sigscript builds: {err}"));
+}
+
+fn compile_rule_storage_state<'a>(source: &'a str, args: Vec<Expr<'static>>) -> CompiledContract<'a> {
+    compile_contract(source, &args, CompileOptions::default()).expect("RuleStorageState fixture compiles")
 }
 
 fn validator_state_entry_sigscript(compiled: &CompiledContract<'_>, function_name: &str, args: Vec<Expr<'_>>) -> Vec<u8> {
@@ -350,6 +411,126 @@ fn prometheus_guardian_reputation_state_fixture_compiles_against_current_silverc
         "proposalRejected",
         vec![Expr::bytes(sig)],
     );
+}
+
+#[test]
+fn prometheus_rule_storage_state_fixture_compiles_against_current_silverc() {
+    let contract_path = std::env::var("PROMETHEUS_RULE_STORAGE_STATE_CONTRACT")
+        .expect("PROMETHEUS_RULE_STORAGE_STATE_CONTRACT is set");
+    let source = std::fs::read_to_string(contract_path).expect("read Prometheus rule storage contract fixture");
+    let governance_pk = vec![8u8; 32];
+    let guardian_pk = vec![9u8; 32];
+    let validator_pk = vec![7u8; 32];
+    let threat_hash = vec![3u8; 32];
+    let rule_cid = cid36(4);
+    let sig = dummy_signature();
+
+    let empty = compile_rule_storage_state(
+        &source,
+        rule_storage_state_args(
+            governance_pk.clone(),
+            1,
+            0,
+            guardian_pk.clone(),
+            zero32(),
+            0,
+            zero36(),
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            false,
+            0,
+        ),
+    );
+    build_covenant_sigscript(
+        &empty,
+        "submitProposal",
+        vec![
+            Expr::bytes(guardian_pk.clone()),
+            Expr::bytes(threat_hash.clone()),
+            Expr::int(0),
+            Expr::bytes(rule_cid.clone()),
+            Expr::int(9_000),
+            Expr::int(1_000),
+            Expr::bytes(sig.clone()),
+        ],
+    );
+
+    let pending = compile_rule_storage_state(
+        &source,
+        rule_storage_state_args(
+            governance_pk.clone(),
+            2,
+            1,
+            guardian_pk.clone(),
+            threat_hash.clone(),
+            0,
+            rule_cid.clone(),
+            9_000,
+            1_000,
+            2,
+            0,
+            865_000,
+            1,
+            0,
+            1,
+            1_000,
+            0,
+            0,
+            false,
+            0,
+        ),
+    );
+    build_covenant_sigscript(
+        &pending,
+        "voteOnProposal",
+        vec![
+            Expr::bool(true),
+            Expr::int(1_100),
+            Expr::bytes(sig.clone()),
+            Expr::bytes(validator_pk),
+        ],
+    );
+    build_covenant_sigscript(
+        &pending,
+        "finalizeProposal",
+        vec![Expr::int(865_000), Expr::bytes(sig.clone())],
+    );
+
+    let accepted = compile_rule_storage_state(
+        &source,
+        rule_storage_state_args(
+            governance_pk,
+            2,
+            1,
+            guardian_pk,
+            threat_hash,
+            0,
+            rule_cid,
+            9_000,
+            1_000,
+            2,
+            0,
+            865_000,
+            2,
+            1,
+            1,
+            1_000,
+            10_000,
+            865_000,
+            true,
+            1,
+        ),
+    );
+    build_covenant_sigscript(&accepted, "deactivateRule", vec![Expr::bytes(sig)]);
 }
 
 #[test]
@@ -1486,7 +1667,12 @@ def ensure_silverscript_repo(path: Path, ref: str) -> None:
 
 
 def main() -> int:
-    for contract in (H001_CONTRACT, VALIDATOR_STATE_CONTRACT, GUARDIAN_STATE_CONTRACT):
+    for contract in (
+        H001_CONTRACT,
+        VALIDATOR_STATE_CONTRACT,
+        GUARDIAN_STATE_CONTRACT,
+        RULE_STORAGE_STATE_CONTRACT,
+    ):
         if not contract.exists():
             print(f"missing contract fixture: {contract}", file=sys.stderr)
             return 1
@@ -1511,6 +1697,7 @@ def main() -> int:
     env["PROMETHEUS_H001_CONTRACT"] = str(H001_CONTRACT)
     env["PROMETHEUS_VALIDATOR_STATE_CONTRACT"] = str(VALIDATOR_STATE_CONTRACT)
     env["PROMETHEUS_GUARDIAN_STATE_CONTRACT"] = str(GUARDIAN_STATE_CONTRACT)
+    env["PROMETHEUS_RULE_STORAGE_STATE_CONTRACT"] = str(RULE_STORAGE_STATE_CONTRACT)
     try:
         run(
             [
@@ -1532,7 +1719,7 @@ def main() -> int:
         except FileNotFoundError:
             pass
 
-    print("H-001, ValidatorStakingState, and GuardianReputationState silverc fixture verification passed.")
+    print("H-001, ValidatorStakingState, GuardianReputationState, and RuleStorageState silverc fixture verification passed.")
     print(f"Silverscript ref: {silver_ref}")
     print(
         "Note: current silverc uses signed int entrypoint arguments; deployment salt and block-height values are scoped to 0..=i64::MAX."

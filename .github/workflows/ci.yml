@@ -75,6 +75,21 @@ jobs:
             exit 1
           fi
           echo "GuardianReputationState fixture keeps L1 reputation invariants."
+      - name: Verify RuleStorageState current-silverc fixture exists
+        run: |
+          fixture="modules/contracts/silverc/RuleStorageState.sil"
+          test -f "$fixture" || (echo "ERROR: missing $fixture" && exit 1)
+          grep -q 'MIN_CONFIDENCE = 8500' "$fixture"
+          grep -q 'VALIDATOR_QUORUM = 6700' "$fixture"
+          grep -q 'VOTING_BLOCKS = 864000' "$fixture"
+          grep -q 'byte\[36\] init_rule_content_ipfs' "$fixture"
+          grep -q 'GUARDIAN_EVENT_ACCEPTED = 1' "$fixture"
+          grep -q 'GUARDIAN_EVENT_REJECTED = 2' "$fixture"
+          if grep -q 'KRC20\|krc20\|mint' "$fixture"; then
+            echo "ERROR: RuleStorageState fixture must not pretend to mint KRC20 assets in current Silverc."
+            exit 1
+          fi
+          echo "RuleStorageState fixture keeps CIDv1, quorum, and reputation-event invariants."
 
   h001-silverc-runtime:
     name: H-001 + Validator State Silverc Runtime
