@@ -380,11 +380,14 @@ Update:   Current-silverc fixture `ValidatorStakingH001.sil` now verifies
           to `0..=i64::MAX`. Rust retains raw u64 H-001 vectors for byte
           compatibility and exposes `build_silverc_checked` /
           `validate_silverc_commitment_bounds` for deployment calls.
-          `GuardianReputationState.sil` compiles and builds covenant sigscripts
-          for `register`, `proposalAccepted`, and `proposalRejected` without
-          badge, NFT, Kasplex, or staking semantics. Guardian runtime
-          transitions and exact accepted-proposal formula verification remain
-          pending because current upstream Silverc has no `while` statement.
+          `GuardianReputationState.sil` compiles, builds covenant sigscripts,
+          and runtime-tests `register`, `proposalAccepted`, and
+          `proposalRejected` without badge, NFT, Kasplex, or staking semantics.
+          Valid guardian/governance signatures and state transitions are
+          accepted; low compute power, negative reputation increase, and
+          unregistered rejection paths are rejected. Exact accepted-proposal
+          formula verification remains pending because current upstream Silverc
+          has no `while` statement.
 Action:   Port/compile the remaining deployment-scoped contracts.
 Severity: HIGH until remaining deployment-scoped contract ports are verified
 ```
@@ -532,9 +535,9 @@ Python modules audited: 4/4
 Audit confidence:       94%
 (Deduction: ValidatorStaking current-silverc compile/ABI and runtime
  transitions plus signed-int deployment bounds are verified, and
- GuardianReputation current-silverc compile/ABI is verified, but remaining
- deployment-scoped contract ports, Guardian runtime/formula gates, and LLM
- confidence extraction remain open)
+ GuardianReputation current-silverc compile/ABI and runtime gates are verified,
+ but remaining deployment-scoped contract ports, the Guardian accepted-proposal
+ formula gate, and LLM confidence extraction remain open)
 ```
 
 **VERDICT UPDATE 2026-07-09:** Toccata/hardfork no longer looks like the
@@ -544,7 +547,8 @@ compiles/builds covenant sigscripts, and `commitVote`/`revealVote`/
 `slashInvalidReveal`/`requestWithdraw`/`completeWithdraw` runtime tests pass.
 The signed-int/u64 boundary is resolved by constraining current-Silverc
 deployment inputs to `0..=i64::MAX`; remaining deployment-scoped contract
-ports and Guardian runtime/formula gates must pass before Sprint 9 deployment.
+ports and the Guardian accepted-proposal formula gate must pass before Sprint 9
+deployment.
 M-001 and M-002 can wait until full release (Aug/Sep 2026).
 
 *Audit completed 2026-04-02 by Claude Code (5 parallel agents, 7 levels, 35 checks).*

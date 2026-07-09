@@ -121,14 +121,20 @@ Silverscript ref and builds covenant declaration sigscripts for:
 - `proposalAccepted`
 - `proposalRejected`
 
+Current runtime coverage:
+
+- `register` accepts a valid guardian signature and state transition
+- `register` rejects compute power below `MIN_COMPUTE_GFLOPS`
+- `proposalAccepted` accepts a valid governance signature and state transition
+- `proposalAccepted` rejects negative reputation increases
+- `proposalRejected` accepts a valid governance signature and state transition
+- `proposalRejected` rejects unregistered guardian state
+
 Current scope note:
 
 - current upstream Silverc has no `while` statement in the grammar
 - the legacy `sqrt(compute_power) * 100` accepted-proposal increment is not
-  computed on-chain in this compile/ABI fixture yet
+  computed on-chain in this fixture yet
 - `proposalAccepted` accepts a governance-signed nonnegative
   `reputation_increase` and caps reputation at `REPUTATION_MAX`
-- exact accepted-proposal formula verification remains pending for the Guardian
-  runtime gate
-
-Runtime transition tests for these Guardian reputation paths are still pending.
+- exact accepted-proposal formula verification remains pending

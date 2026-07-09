@@ -37,6 +37,8 @@
 - Learned and fixed two current-Silverc grammar constraints during the Guardian port: `while` is not available in the upstream grammar, and state field names cannot be reused as entrypoint parameter bindings.
 - GuardianReputation compile/ABI scope intentionally does not introduce badge, NFT, Kasplex, or staking semantics; Guardian reputation remains canonical on Kaspa L1.
 - GitHub Prometheus CI, Security Audit, and Pages passed for `b094444`; Prometheus CI now includes the GuardianReputationState compile/ABI fixture guard in addition to H-001, ValidatorStaking runtime gates, and signed-int deployment bounds.
+- Added GuardianReputation runtime tests to the pinned upstream `silverc` verifier: `register` accepts valid guardian signature/state transition and rejects low compute power; `proposalAccepted` accepts valid governance signature/state transition and rejects negative reputation increase; `proposalRejected` accepts valid governance signature/state transition and rejects unregistered guardian state.
+- GitHub Prometheus CI, Security Audit, and Pages passed for `81e7a97`; the H-001 + Validator State Silverc Runtime job now also covers GuardianReputationState runtime paths.
 
 ## 2026-07-07
 
