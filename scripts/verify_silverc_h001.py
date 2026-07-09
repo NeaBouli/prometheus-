@@ -335,7 +335,7 @@ fn prometheus_guardian_reputation_state_fixture_compiles_against_current_silverc
     build_covenant_sigscript(
         &registered,
         "proposalAccepted",
-        vec![Expr::bytes(sig.clone())],
+        vec![Expr::int(2_000), Expr::bytes(sig.clone())],
     );
     build_covenant_sigscript(
         &registered,
