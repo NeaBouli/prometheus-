@@ -828,6 +828,114 @@ fn prometheus_validator_state_request_withdraw_runtime_rejects_open_commitment()
     let err = execute_input_with_covenants(tx, entries, 0).expect_err("requestWithdraw must reject while a vote commitment is open");
     common::assert_verify_like_error(err);
 }
+
+#[test]
+fn prometheus_validator_state_complete_withdraw_runtime_accepts_after_cooldown() {
+    let contract_path = std::env::var("PROMETHEUS_VALIDATOR_STATE_CONTRACT")
+        .expect("PROMETHEUS_VALIDATOR_STATE_CONTRACT is set");
+    let source = std::fs::read_to_string(contract_path).expect("read Prometheus validator state contract fixture");
+    let keypair = keypair_from_seed(7);
+    let validator_pk = keypair.x_only_public_key().0.serialize().to_vec();
+
+    let withdrawal_requested = compile_validator_state(
+        &source,
+        validator_state_args(
+            validator_pk,
+            20_000,
+            false,
+            1_000,
+            10_000,
+            0,
+            1_200,
+            zero32(),
+            0,
+            0,
+            2_000,
+        ),
+    );
+
+    let placeholder_sigscript = validator_state_entry_sigscript(
+        &withdrawal_requested,
+        "completeWithdraw",
+        vec![Vec::<Expr>::new().into(), Expr::int(102_800), Expr::bytes(dummy_signature())],
+    );
+    let outputs = vec![];
+    let entries = vec![covenant_utxo(&withdrawal_requested, COV_A)];
+    let mut tx = Transaction::new(
+        1,
+        vec![tx_input_with_sigops(0, placeholder_sigscript, 1)],
+        outputs,
+        0,
+        Default::default(),
+        0,
+        vec![],
+    );
+    let sig = sign_tx_input(&tx, &entries, 0, &keypair);
+    tx.inputs[0].signature_script = validator_state_entry_sigscript(
+        &withdrawal_requested,
+        "completeWithdraw",
+        vec![Vec::<Expr>::new().into(), Expr::int(102_800), Expr::bytes(sig)],
+    );
+
+    let result = execute_input_with_covenants(tx, entries, 0);
+    assert!(
+        result.is_ok(),
+        "completeWithdraw runtime should accept zero-output termination after cooldown: {:?}",
+        result.err()
+    );
+}
+
+#[test]
+fn prometheus_validator_state_complete_withdraw_runtime_rejects_before_cooldown() {
+    let contract_path = std::env::var("PROMETHEUS_VALIDATOR_STATE_CONTRACT")
+        .expect("PROMETHEUS_VALIDATOR_STATE_CONTRACT is set");
+    let source = std::fs::read_to_string(contract_path).expect("read Prometheus validator state contract fixture");
+    let keypair = keypair_from_seed(7);
+    let validator_pk = keypair.x_only_public_key().0.serialize().to_vec();
+
+    let withdrawal_requested = compile_validator_state(
+        &source,
+        validator_state_args(
+            validator_pk,
+            20_000,
+            false,
+            1_000,
+            10_000,
+            0,
+            1_200,
+            zero32(),
+            0,
+            0,
+            2_000,
+        ),
+    );
+
+    let placeholder_sigscript = validator_state_entry_sigscript(
+        &withdrawal_requested,
+        "completeWithdraw",
+        vec![Vec::<Expr>::new().into(), Expr::int(102_799), Expr::bytes(dummy_signature())],
+    );
+    let outputs = vec![];
+    let entries = vec![covenant_utxo(&withdrawal_requested, COV_A)];
+    let mut tx = Transaction::new(
+        1,
+        vec![tx_input_with_sigops(0, placeholder_sigscript, 1)],
+        outputs,
+        0,
+        Default::default(),
+        0,
+        vec![],
+    );
+    let sig = sign_tx_input(&tx, &entries, 0, &keypair);
+    tx.inputs[0].signature_script = validator_state_entry_sigscript(
+        &withdrawal_requested,
+        "completeWithdraw",
+        vec![Vec::<Expr>::new().into(), Expr::int(102_799), Expr::bytes(sig)],
+    );
+
+    let err = execute_input_with_covenants(tx, entries, 0).expect_err("completeWithdraw must reject before cooldown expires");
+    common::assert_verify_like_error(err);
+}
 """
 
 
