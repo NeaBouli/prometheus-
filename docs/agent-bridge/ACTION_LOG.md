@@ -6,6 +6,10 @@
 - Observed Security Audit run `28979986241` stuck in the `cargo audit` step for commit `c673766`; Secret Detection passed, but Dependency Audit did not complete.
 - Hardened `.github/workflows/security-audit.yml` with job/step timeouts and split `cargo-audit` install from `cargo audit` execution so dependency-audit jobs cannot hang indefinitely.
 - No product-code behavior changed in the CI hardening pass.
+- GitHub Prometheus CI, Security Audit, and Pages passed for `aed3cbb`; the hardened Security Audit completed successfully.
+- Added current-Silverscript RuleStorage state fixture `modules/contracts/silverc/RuleStorageState.sil` and extended `scripts/verify_silverc_h001.py` so the pinned upstream verifier compiles the fixture and builds covenant sigscripts for `submitProposal`, `voteOnProposal`, `finalizeProposal`, and `deactivateRule`.
+- RuleStorageState keeps CIDv1 `byte[36]`, `MIN_CONFIDENCE = 8500`, `VALIDATOR_QUORUM = 6700`, and explicit Guardian reputation outcome events; it intentionally does not model legacy maps, KRC20 minting, `msg.sender`, events, or cross-contract calls in current Silverc.
+- GitHub Prometheus CI, Security Audit, and Pages passed for `3e53e29`; Prometheus CI now includes the RuleStorageState compile/ABI fixture guard.
 
 ## 2026-07-08
 

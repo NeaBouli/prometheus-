@@ -12,7 +12,7 @@
 - [ ] [P0] Alle memory/-Dateien initial befüllen und pushen | Claude Code | Repo-Struktur
 - [x] [P0] Kaspa Testnet-10-Node installieren und starten (rusty-kaspa v1.1.0) | Claude Code | 2026-03-21
 - [x] [P0] Verbindung zum Testnet verifizieren (8 Peers, IBD active) | Claude Code | 2026-03-21
-- [~] [P0] Silverscript Compiler/Tooling installieren und testen | Claude Code | H-001 fixture verifies; ValidatorStaking state fixture compiles; commitVote/revealVote/slash/requestWithdraw/completeWithdraw runtime tests pass; signed-int deployment bounds enforced; GuardianReputationState compile/ABI/runtime/formula gates pass; remaining deployment-scoped contract ports pending
+- [~] [P0] Silverscript Compiler/Tooling installieren und testen | Claude Code | H-001 fixture verifies; ValidatorStaking state fixture compiles; commitVote/revealVote/slash/requestWithdraw/completeWithdraw runtime tests pass; signed-int deployment bounds enforced; GuardianReputationState compile/ABI/runtime/formula gates pass; RuleStorageState compile/ABI gate passes; remaining deployment-scoped contract ports pending
 - [ ] [P0] Hello-World Silverscript Contract auf Testnet deployen | Claude Code | PENDING: after Prometheus contract syntax compatibility + current-Silverc deploy smoke path
 - [x] [P0] rusty-kaspa als Dependency in Cargo.toml einbinden | Claude Code | 2026-03-21; pinned to v2.0.1 on 2026-07-07
 - [ ] [P0] autodidactic.py vollständig testen (alle Memory-Operationen) | Claude Code | memory/-Dateien
@@ -28,7 +28,7 @@
 - [x] [P1] GovernanceAutoTuning.ss schreiben (auto_tune, alle Parameter) | Claude Code | 2026-03-21 (8 tests, fp_rate stub)
 - [x] [P1] DevIncentivePool.ss schreiben (proposeGrant, vote, payGrant, recommended_reward) | Claude Code | 2026-03-21 (9 tests)
 - [x] [P1] CommunityDonations.ss schreiben (donateKas, getDonations) | Claude Code | 2026-03-21 (8 tests)
-- [x] [P1] RuleStorage.ss schreiben (storeRule als KRC20-Asset) | Claude Code | 2026-03-21 (9 tests)
+- [x] [P1] RuleStorage.ss schreiben (storeRule als KRC20-Asset) | Claude Code | 2026-03-21 (9 tests); current-Silverc RuleStorageState compile/ABI gate added 2026-07-09
 - [x] [P1] Unit-Tests für ValidatorStaking (min. 10 Tests) | Claude Code | 2026-03-21 (11 tests)
 - [x] [P1] Unit-Tests für GuardianReputation (min. 8 Tests) | Claude Code | 2026-03-21 (9 tests)
 - [ ] [P1] Alle Contracts auf Testnet deployen und Adressen in STATUS.md eintragen | Claude Code | Wartet auf remaining deployment-scoped contract ports
@@ -75,7 +75,7 @@
 
 ## ═══ SPRINT 5: VOTING MECHANISMUS (Woche 7) ═══
 
-- [~] [P1] Commit-Reveal vollständig in Silverscript implementieren | Claude Code | H-001 runtime fixture + ValidatorStakingState compile/ABI + commitVote/revealVote/slash/requestWithdraw/completeWithdraw runtime gates done; signed-int deployment bounds enforced; GuardianReputationState compile/ABI/runtime/formula gates done; remaining full-deploy path pending
+- [~] [P1] Commit-Reveal vollständig in Silverscript implementieren | Claude Code | H-001 runtime fixture + ValidatorStakingState compile/ABI + commitVote/revealVote/slash/requestWithdraw/completeWithdraw runtime gates done; signed-int deployment bounds enforced; GuardianReputationState compile/ABI/runtime/formula gates done; RuleStorageState compile/ABI gate done; remaining full-deploy path pending
 - [ ] [P1] Salted Voting (30% Zufallsstichprobe) implementieren | Claude Code | Commit-Reveal
 - [ ] [P1] Bond-System (10% des Stakes als Kaution) implementieren | Claude Code | Commit-Reveal
 - [ ] [P2] Voting-Tests: Kollusion-Angriff scheitert | Claude Code | Voting-System
