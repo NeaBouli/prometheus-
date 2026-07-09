@@ -119,12 +119,12 @@
 7. Lies memory/ERRORS.md             → 12 bekannte Patterns
 ```
 
-**Status: Feature-complete through Sprint 7. Kaspa Toccata status researched 2026-07-07; upstream `silverc` verified in CI; repo H-001 fixture and ValidatorStakingState commit/reveal/slash runtime paths verify at pinned Silverscript ref `d25bd3427a093c17327ca3d6b9e1aa5f7688c863`; deployment now depends on withdraw runtime coverage, signed-int/u64 boundary handling, and remaining deployment-scoped contract ports.**
+**Status: Feature-complete through Sprint 7. Kaspa Toccata status researched 2026-07-07; upstream `silverc` verified in CI; repo H-001 fixture and ValidatorStakingState commit/reveal/slash/request-withdraw runtime paths verify at pinned Silverscript ref `d25bd3427a093c17327ca3d6b9e1aa5f7688c863`; deployment now depends on complete-withdraw runtime coverage, signed-int/u64 boundary handling, and remaining deployment-scoped contract ports.**
 
 **Offene Tasks (priorisiert):**
 - [x] PATTERN-010 fix: Arc<Phi3Model> statt Arc<Mutex<Phi3Model>> — DONE `6347b85`
 - [x] Rust client production/beta stub gates — DONE 2026-07-08 (`PROMETHEUS_RUNTIME`)
-- [~] H-001: LE encoding Verifikation — repo `silverc` fixture passes for positive 64-bit vectors; ValidatorStakingState commit/reveal/slash runtime gates pass; withdraw gates still pending
+- [~] H-001: LE encoding Verifikation — repo `silverc` fixture passes for positive 64-bit vectors; ValidatorStakingState commit/reveal/slash/request-withdraw runtime gates pass; complete-withdraw gate still pending
 - [ ] Sprint 9: Contracts compile + deploy — blocked until Prometheus contracts compile with current Silverscript and H-001 passes
 - [ ] Sprint 10B: Guardian hybrid routing (8B/70B) + Ensemble voting
 - [ ] Q-003: fp_rate Oracle — Contract-side stub remains; Architect-Entscheidung nötig
@@ -134,7 +134,7 @@
 - [ ] PLONK evaluation for Light Client ZK-proofs
 
 ### Wartet auf externe Events:
-- [~] ssc/Silverscript tooling local install + smoke test → upstream `silverc` and H-001/ValidatorState runtime gates pass in CI; withdraw plus full Prometheus contract compatibility pending
+- [~] ssc/Silverscript tooling local install + smoke test → upstream `silverc` and H-001/ValidatorState runtime gates pass in CI; complete-withdraw plus full Prometheus contract compatibility pending
 - [ ] Phi-3-mini Modell herunterladen → Sprint 11
 - [ ] LLaMA 3 Fine-Tuning → Sprint 12
 - [ ] vProgs (DAGKnight) → Sprint 14
@@ -265,6 +265,6 @@ Leistungsbasierte Emission. Guardians = "Miner" (KI statt GPU).
 - Full 7-level audit completed (35 checks, 5 parallel agents)
 - 0 CRITICAL, 2 HIGH, 2 MEDIUM, 3 LOW findings
 - 203/204 tests passing, 92% audit confidence
-- VERDICT update 2026-07-09: H-002 fixed; upstream `silverc`, repo H-001 fixture, current-silverc `ValidatorStakingState.sil` compile/ABI gate, and `commitVote`/`revealVote`/`slashInvalidReveal` runtime tests passed; withdraw runtime tests and remaining deployment-scoped contract ports remain the deploy blockers before Sprint 9.
+- VERDICT update 2026-07-09: H-002 fixed; upstream `silverc`, repo H-001 fixture, current-silverc `ValidatorStakingState.sil` compile/ABI gate, and `commitVote`/`revealVote`/`slashInvalidReveal`/`requestWithdraw` runtime tests passed; complete-withdraw runtime tests and remaining deployment-scoped contract ports remain the deploy blockers before Sprint 9.
 
-*Prometheus v4.0 · Checkpoint 2026-07-09 · Last updated: ValidatorStaking commit/reveal/slash runtime gates + H-001 deploy gate · The fire belongs to humanity.*
+*Prometheus v4.0 · Checkpoint 2026-07-09 · Last updated: ValidatorStaking commit/reveal/slash/request-withdraw runtime gates + H-001 deploy gate · The fire belongs to humanity.*

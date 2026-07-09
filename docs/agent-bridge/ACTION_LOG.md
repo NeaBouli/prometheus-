@@ -25,6 +25,8 @@
 - GitHub Prometheus CI, Security Audit, and Pages passed for `8f05afb`; the H-001 + Validator State Silverc Runtime job now covers H-001 vectors plus commit/reveal runtime paths.
 - Extended the pinned upstream `silverc` verifier with real `slashInvalidReveal` runtime transition tests: invalid reveal slash accepted, valid reveal slash rejected.
 - GitHub Prometheus CI, Security Audit, and Pages passed for `6dfe133`; the H-001 + Validator State Silverc Runtime job now covers H-001 vectors plus commit/reveal/slash runtime paths.
+- Extended the pinned upstream `silverc` verifier with real `requestWithdraw` runtime transition tests: active uncommitted validator withdrawal request accepted, open-commitment withdrawal request rejected.
+- GitHub Prometheus CI, Security Audit, and Pages passed for `b36e5f8`; the H-001 + Validator State Silverc Runtime job now covers H-001 vectors plus commit/reveal/slash/request-withdraw runtime paths.
 
 ## 2026-07-07
 
