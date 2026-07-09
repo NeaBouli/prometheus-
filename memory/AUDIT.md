@@ -374,11 +374,13 @@ Update:   Current-silverc fixture `ValidatorStakingH001.sil` now verifies
           accepted; low bond, wrong reveal salt, valid-reveal slash,
           open-commitment withdrawal, and pre-cooldown complete-withdraw
           rejected.
-Risk:     Current upstream silverc entrypoint numeric arguments are signed
-          `int`; the u64::MAX boundary remains unresolved before deployment.
-Action:   Resolve signed-int/u64 deployment bounds, then port/compile the
-          remaining deployment-scoped contracts.
-Severity: HIGH until signed-int/u64 deployment boundary is resolved
+          Current upstream silverc entrypoint numeric arguments are signed
+          `int`; deployable salt/block-height values are therefore scoped
+          to `0..=i64::MAX`. Rust retains raw u64 H-001 vectors for byte
+          compatibility and exposes `build_silverc_checked` /
+          `validate_silverc_commitment_bounds` for deployment calls.
+Action:   Port/compile the remaining deployment-scoped contracts.
+Severity: HIGH until remaining deployment-scoped contract ports are verified
 ```
 
 **H-002: Arc<Mutex<Phi3Model>> unnecessary lock (Check 2.2, PATTERN-010)**
@@ -523,8 +525,8 @@ Python modules audited: 4/4
 
 Audit confidence:       94%
 (Deduction: ValidatorStaking current-silverc compile/ABI and runtime
- transitions are verified, but signed-int/u64 deployment boundary and
- LLM confidence extraction remain open)
+ transitions plus signed-int deployment bounds are verified, but remaining
+ deployment-scoped contract ports and LLM confidence extraction remain open)
 ```
 
 **VERDICT UPDATE 2026-07-09:** Toccata/hardfork no longer looks like the
@@ -532,7 +534,9 @@ primary blocker. The deployment blocker is now current-Silverscript contract
 runtime readiness: H-001 byte-core is verified, `ValidatorStakingState.sil`
 compiles/builds covenant sigscripts, and `commitVote`/`revealVote`/
 `slashInvalidReveal`/`requestWithdraw`/`completeWithdraw` runtime tests pass.
-The signed-int/u64 boundary must pass before Sprint 9 deployment.
+The signed-int/u64 boundary is resolved by constraining current-Silverc
+deployment inputs to `0..=i64::MAX`; remaining deployment-scoped contract
+ports must pass before Sprint 9 deployment.
 M-001 and M-002 can wait until full release (Aug/Sep 2026).
 
 *Audit completed 2026-04-02 by Claude Code (5 parallel agents, 7 levels, 35 checks).*

@@ -29,6 +29,10 @@
 - GitHub Prometheus CI, Security Audit, and Pages passed for `b36e5f8`; the H-001 + Validator State Silverc Runtime job now covers H-001 vectors plus commit/reveal/slash/request-withdraw runtime paths.
 - Extended the pinned upstream `silverc` verifier with real `completeWithdraw` runtime transition tests: zero-output termination after cooldown accepted, pre-cooldown withdrawal completion rejected.
 - GitHub Prometheus CI, Security Audit, and Pages passed for `50cb9f4`; the H-001 + Validator State Silverc Runtime job now covers H-001 vectors plus commit/reveal/slash/request-withdraw/complete-withdraw runtime paths.
+- Probed the signed-int/u64 boundary and confirmed current Silverc `byte[8](-1)` does not match the Rust `u64::MAX` H-001 vector; no two's-complement deployment shortcut is assumed.
+- Enforced deployment bounds in `ValidatorStakingState.sil` and Rust validator commitment helpers: current-Silverc deployment `salt` and `block_height` are scoped to `0..=i64::MAX`, while raw Rust `u64` H-001 byte vectors remain available for compatibility tests.
+- Added runtime tests rejecting negative signed deployment inputs for commit/reveal/slash/request-withdraw paths and Rust tests rejecting `u64::MAX` through `build_silverc_checked`.
+- GitHub Prometheus CI, Security Audit, and Pages passed for `176ce52`; Prometheus CI includes Memory Integrity, HTML Pages, Python Guardian, Rust Workspace, Silverscript Contracts, and H-001 + Validator State Silverc Runtime.
 
 ## 2026-07-07
 

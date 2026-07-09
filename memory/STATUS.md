@@ -35,9 +35,9 @@ Goal:     All sprints 0-7 accepted. Post-Toccata deployment verification.
 | claude-code-start.sh         | DONE            | 100%     | 2026-03-21  | -            | -               |
 | **SPRINT 0 – SETUP**         |                 |          |             |              |                 |
 | Testnet-10-Node              | DONE            | 100%     | 2026-03-21  | -            | wrpc://127.0.0.1:17210 |
-| Silverscript tooling (silverc/ssc) | IN_PROGRESS | 96%      | 2026-07-09  | -            | Upstream `silverc` builds/tests in CI; H-001 fixture verifies; ValidatorStaking state fixture compiles; `commitVote`, `revealVote`, `slashInvalidReveal`, `requestWithdraw`, and `completeWithdraw` runtime transition tests pass; signed-int/u64 boundary and remaining deployment-scoped contract ports pending |
+| Silverscript tooling (silverc/ssc) | IN_PROGRESS | 97%      | 2026-07-09  | -            | Upstream `silverc` builds/tests in CI; H-001 fixture verifies; ValidatorStaking state fixture compiles; `commitVote`, `revealVote`, `slashInvalidReveal`, `requestWithdraw`, `completeWithdraw`, and signed-int deployment-bound runtime tests pass; remaining deployment-scoped contract ports pending |
 | Hello-World Contract         | PENDING         | 0%       | 2026-03-21  | -            | Deployment nach ssc-Release |
-| GitHub Actions CI/CD         | ACCEPTED        | 100%     | 2026-07-09  | ACCEPTED     | CI, Security Audit, and Pages green for 50cb9f4 |
+| GitHub Actions CI/CD         | ACCEPTED        | 100%     | 2026-07-09  | ACCEPTED     | Prometheus CI, Security Audit, and Pages green for 176ce52 |
 | Sprint-1 Pre-Check           | ACCEPTED        | 100%     | 2026-03-21  | ACCEPTED     | V-001, V-002, V-003 alle genehmigt |
 | **SPRINT 1 – CONTRACTS**     |                 |          |             |              |                 |
 | ValidatorStaking.ss          | ACCEPTED        | 100%     | 2026-03-21  | ACCEPTED     | v1.2: slash ACL, bond return, test patches |
@@ -89,9 +89,10 @@ H-002 (PATTERN-010) FIXED in 6347b85 (Arc<Phi3Model>).
 Kaspa Toccata status researched 2026-07-07; Rusty-Kaspa v2.0.0 scheduled mainnet activation at DAA 474,165,565 (~2026-06-30 16:15 UTC).
 Direct Sandbox check: `ssh sandbox` works, but `kaspad` and `ssc` were not found in PATH.
 Local upstream Silverscript check: `/tmp/prom-silverscript` `cargo test -p silverscript-lang` passed; `silverc --help` works.
-Repo H-001 fixture: `modules/contracts/silverc/ValidatorStakingH001.sil` plus `scripts/verify_silverc_h001.py` verifies explicit `vote_byte || byte[8](salt) || byte[8](block_height)` against Rust vectors for positive 64-bit values at pinned Silverscript ref `d25bd3427a093c17327ca3d6b9e1aa5f7688c863`.
+Repo H-001 fixture: `modules/contracts/silverc/ValidatorStakingH001.sil` plus `scripts/verify_silverc_h001.py` verifies explicit `vote_byte || byte[8](salt) || byte[8](block_height)` against Rust vectors at pinned Silverscript ref `d25bd3427a093c17327ca3d6b9e1aa5f7688c863`.
 Repo ValidatorStaking current-silverc state fixture: `modules/contracts/silverc/ValidatorStakingState.sil` compiles against the same pinned upstream `silverc`; the verifier builds covenant sigscripts for `commitVote`, `revealVote`, `slashInvalidReveal`, `requestWithdraw`, and `completeWithdraw`.
-Repo ValidatorStaking runtime gate: `scripts/verify_silverc_h001.py` now injects upstream runtime tests for `commitVote`, `revealVote`, `slashInvalidReveal`, `requestWithdraw`, and `completeWithdraw`; valid commit/reveal/slash/request-withdraw/complete-withdraw signature/state transitions are accepted, low bond is rejected, wrong reveal salt is rejected, slash of a valid reveal is rejected, withdrawal with an open commitment is rejected, and complete-withdraw before cooldown is rejected in GitHub Prometheus CI for `50cb9f4`.
+Repo ValidatorStaking runtime gate: `scripts/verify_silverc_h001.py` now injects upstream runtime tests for `commitVote`, `revealVote`, `slashInvalidReveal`, `requestWithdraw`, and `completeWithdraw`; valid commit/reveal/slash/request-withdraw/complete-withdraw signature/state transitions are accepted, low bond is rejected, wrong reveal salt is rejected, slash of a valid reveal is rejected, withdrawal with an open commitment is rejected, complete-withdraw before cooldown is rejected, and negative signed deployment inputs are rejected in GitHub Prometheus CI for `176ce52`.
+Signed-int boundary decision: current upstream Silverc entrypoint `int` values are deployable only in the nonnegative signed range `0..=i64::MAX`; Rust retains raw `u64` H-001 vectors for byte compatibility and uses `build_silverc_checked` / `validate_silverc_commitment_bounds` for deployment calls.
 Rusty-Kaspa workspace dependencies pinned to `v2.0.1`; `cargo audit` now reports no vulnerabilities, only allowed warnings.
 GitHub Security Audit workflow re-enabled and dependency audits now fail on findings instead of using `|| true`.
 Rust client runtime gate added: `PROMETHEUS_RUNTIME=beta|mainnet|production|prod` rejects ZK/Phi-3/KRC-20/Fed-DART stubs; development mode remains testable.
@@ -100,7 +101,7 @@ Rollback tag: pre-session-20260413 → 6347b85
 
 ## BLOCKED
 
-Sprint 9 remains blocked until the signed-int/u64 boundary is resolved and the remaining Prometheus contracts are ported or deployment-scoped against current Silverscript tooling.
+Sprint 9 remains blocked until the remaining Prometheus contracts are ported or deployment-scoped against current Silverscript tooling.
 
 ## NEXT ACTIONS (for Claude Code)
 
@@ -111,8 +112,8 @@ STARTFLOW — Read in this order:
 3. memory/ERRORS.md → 12 known patterns
 
 Priority tasks:
-- Sprint 9: resolve signed-int/u64 boundary, then port/compile remaining deployment-scoped contracts with current `silverc`
-- H-001: keep LE encoding verification gated in CI; resolve signed-int/u64 boundary before full contract deployment
+- Sprint 9: port/compile remaining deployment-scoped contracts with current `silverc`
+- H-001: keep LE encoding and signed-boundary verification gated in CI
 - Q-003: replace/gate contract-side `fp_rate` oracle stub before beta/mainnet governance
 - Sprint 10B: Guardian Decentralization (hybrid routing, ensemble voting)
 - Q-003: fp_rate Oracle (Architect decision needed)

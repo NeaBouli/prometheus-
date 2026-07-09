@@ -70,16 +70,30 @@ Current runtime coverage:
 
 - `commitVote` accepts a valid 10% bond, validator signature, and successor state
 - `commitVote` rejects a bond below 10% of stake
+- `commitVote` rejects negative signed block heights
 - `revealVote` accepts a valid commitment, validator signature, and successor state
 - `revealVote` rejects a salt that does not match the commitment
+- `revealVote` rejects negative signed salts
 - `slashInvalidReveal` accepts a provably invalid reveal and slashed successor state
 - `slashInvalidReveal` rejects slashing when the reveal matches the commitment
+- `slashInvalidReveal` rejects negative signed salts
 - `requestWithdraw` accepts an active validator with no open commitment
 - `requestWithdraw` rejects while a vote commitment is open
+- `requestWithdraw` rejects negative signed block heights
 - `completeWithdraw` accepts zero-output termination after cooldown
 - `completeWithdraw` rejects before the cooldown expires
 
+Current signed-int deployment boundary:
+
+- upstream Silverc entrypoint numeric arguments are signed `int`
+- deployable `salt` and `block_height` values are scoped to `0..=i64::MAX`
+- Rust retains raw `u64` H-001 byte vectors, including `u64::MAX`, for
+  compatibility testing only
+- Rust deployment calls must use `build_silverc_checked` or
+  `validate_silverc_commitment_bounds`
+- CI proves signed negative Silverc values do not match the Rust `u64::MAX`
+  vector, so there is no implicit two's-complement workaround
+
 Remaining deployment blockers:
 
-- signed-int/u64 boundary handling for deployment vectors
 - remaining deployment-scoped contract ports

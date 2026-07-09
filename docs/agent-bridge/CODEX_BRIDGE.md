@@ -3,7 +3,7 @@
 Last updated: 2026-07-09 EEST
 Repo path: /Users/gio/Desktop/repos/prometheus
 Branch observed: main
-Latest product-code baseline observed: `50cb9f4 test: add validator complete withdraw runtime checks`
+Latest product-code baseline observed: `176ce52 style: apply rustfmt to silverc boundary guard`
 Current HEAD: verify with `git log --oneline -1`; bridge-only commits may advance it.
 
 Purpose: This file is the local bridge for Codex/Claude Code handover. Read it before touching product code. It consolidates the project state, architecture rules, workflow logic, current open issues, the Reputation Badge decision, and the new direct Sandbox access note.
@@ -34,7 +34,7 @@ Mandatory safety checks:
 - Do not start parallel feature work. One task goes to verification before the next begins.
 - Do not change security, crypto, contract, auth, multisig, key-management, tokenomics, or governance behavior without an explicit risk note and Gio approval.
 - Do not add external dependencies to contracts without architect approval.
-- Do not continue Sprint 9/Mainnet work until H-001 is verified or fixed.
+- Do not continue Sprint 9/Mainnet deploy work until the remaining deployment-scoped contract ports compile and pass current-Silverc runtime gates.
 
 ---
 
@@ -255,7 +255,7 @@ Mandatory checks by area:
 - Rust: `cargo fmt`, `cargo clippy -- -D warnings`, `cargo test`
 - HTML/static: verify structured data and links where relevant
 - Security: do not expose secrets; run targeted grep/gitleaks checks when touching configs/docs
-- Contracts: no Sprint 9 deploy until H-001 is resolved
+- Contracts: no Sprint 9 deploy until remaining deployment-scoped contract ports compile and pass runtime gates
 - Before git add: verify files on disk with `git diff` and targeted reads
 
 No parallel open-ended work. No "finish later" state unless the user explicitly pauses the task and the bridge is updated.
@@ -295,7 +295,7 @@ Known consolidated status from memory/handover and user-provided synthesis:
 | 6 | E2E integration, 18 tests | ACCEPTED |
 | 7 | Dashboard and docs | ACCEPTED |
 | 8 | Contributing/wiki/site/SEO in older handover | ACCEPTED in older handover |
-| 9 | Contract deploy on Testnet/Mainnet path | BLOCKED until signed-int/u64 boundary handling and deployment-scoped contract ports pass |
+| 9 | Contract deploy on Testnet/Mainnet path | BLOCKED until remaining deployment-scoped contract ports pass current-Silverc compile/runtime gates |
 | 10B | Guardian decentralization | Startable, but architecture-sensitive |
 
 Test status from user synthesis:
@@ -313,7 +313,7 @@ Pre-hardfork audit synthesis:
 | Severity | Count | Notes |
 | --- | ---: | --- |
 | Critical | 0 | None known |
-| High | 2 | H-001 byte-core + ValidatorStakingState runtime transitions verified; u64 boundary open; H-002 fixed |
+| High | 2 | H-001 byte-core + ValidatorStakingState runtime transitions + signed-int deployment bounds verified; H-002 fixed |
 | Medium | 2 | M-001 heuristic confidence; M-002 flaky perf test |
 | Low | 3 | L-001 deposit ACL, L-002 fp_rate stub, L-003 CEI |
 | Passed clean | 28 | From 35-check audit synthesis |
@@ -321,13 +321,13 @@ Pre-hardfork audit synthesis:
 Critical active rule:
 
 ```text
-H-001 byte-core and the current-silverc `ValidatorStakingState.sil` runtime transitions are verified, but deployment is still gated by signed-int/u64 boundary handling and remaining deployment-scoped contract ports.
-On 2026-07-09, the repo contains `modules/contracts/silverc/ValidatorStakingH001.sil`, `modules/contracts/silverc/ValidatorStakingState.sil`, and `scripts/verify_silverc_h001.py`; the script verifies explicit `vote_byte || byte[8](salt) || byte[8](block_height)` against the Rust H-001 vectors for positive 64-bit values, compiles/builds covenant sigscripts for the ValidatorStaking state fixture, and runtime-tests `commitVote` valid-bond acceptance plus low-bond rejection, `revealVote` valid-reveal acceptance plus wrong-salt rejection, `slashInvalidReveal` invalid-reveal acceptance plus valid-reveal rejection, `requestWithdraw` active-uncommitted acceptance plus open-commitment rejection, and `completeWithdraw` zero-output termination after cooldown plus cooldown rejection at pinned Silverscript ref `d25bd3427a093c17327ca3d6b9e1aa5f7688c863`. Signed-int/u64 boundary handling remains open.
+H-001 byte-core, current-silverc `ValidatorStakingState.sil` runtime transitions, and deployment signed-int bounds are verified. Current upstream Silverc entrypoint integers are signed, so deployable `salt` and `block_height` values are scoped to `0..=i64::MAX`; Rust keeps the raw H-001 `u64` byte helper for historical vectors and exposes `build_silverc_checked` / `validate_silverc_commitment_bounds` for deployment calls.
+On 2026-07-09, the repo contains `modules/contracts/silverc/ValidatorStakingH001.sil`, `modules/contracts/silverc/ValidatorStakingState.sil`, and `scripts/verify_silverc_h001.py`; the script verifies explicit `vote_byte || byte[8](salt) || byte[8](block_height)` against the Rust H-001 vectors, proves signed negative Silverc values do not match the Rust `u64::MAX` vector, compiles/builds covenant sigscripts for the ValidatorStaking state fixture, and runtime-tests `commitVote` valid-bond acceptance plus low-bond/negative-height rejection, `revealVote` valid-reveal acceptance plus wrong-salt/negative-salt rejection, `slashInvalidReveal` invalid-reveal acceptance plus valid-reveal/negative-salt rejection, `requestWithdraw` active-uncommitted acceptance plus open-commitment/negative-height rejection, and `completeWithdraw` zero-output termination after cooldown plus cooldown rejection at pinned Silverscript ref `d25bd3427a093c17327ca3d6b9e1aa5f7688c863`.
 ```
 
 Known findings:
 
-- H-001: `ValidatorStaking.ss:111` legacy commit-reveal LE-encoding ambiguity. Repo-tracked current-Silverscript H-001 fixture passes; `ValidatorStakingState.sil` compile/ABI gate passes; `commitVote`, `revealVote`, `slashInvalidReveal`, `requestWithdraw`, and `completeWithdraw` runtime tests pass; pending signed-int/u64 deployment boundary.
+- H-001: `ValidatorStaking.ss:111` legacy commit-reveal LE-encoding ambiguity. Repo-tracked current-Silverscript H-001 fixture passes; `ValidatorStakingState.sil` compile/ABI gate passes; `commitVote`, `revealVote`, `slashInvalidReveal`, `requestWithdraw`, and `completeWithdraw` runtime tests pass; deployment bounds are explicitly scoped to `0..=i64::MAX`.
 - H-002: unnecessary Mutex around Phi3Model. Fixed in commit `6347b85` according to memory/handover.
 - M-001: Guardian YARA generator confidence is heuristic, needs real LLM confidence or validated metric.
 - M-002: performance test flaky in debug mode, threshold/release gate needed.
@@ -503,8 +503,8 @@ Staleness warning:
 
 Highest priority:
 
-1. Resolve/document the current `silverc` signed-int/u64 boundary before deployment.
-2. Port or deployment-scope the remaining Prometheus contracts against current upstream Silverscript (`silverc`).
+1. Port or deployment-scope the remaining Prometheus contracts against current upstream Silverscript (`silverc`).
+2. Keep deployment commit-reveal inputs within the documented current-Silverc `0..=i64::MAX` bounds.
 3. Document Silverscript/TN12/Mainnet compatibility limits before any deploy attempt.
 4. Resolve Q-003 contract-side `fp_rate` oracle stub before beta/mainnet governance.
 5. Keep Reputation Badge decision as "no badge, L1 reputation only".
@@ -521,7 +521,7 @@ If asked to continue project work:
 
 ## 18. One-Line Decision Summary
 
-Prometheus does not need reputation badges; it needs readable, provable Kaspa L1 Guardian reputation. Codex has direct Sandbox access via `ssh sandbox`, upstream `silverc` works in CI, H-001 byte-core plus current-silverc `ValidatorStakingState.sil` runtime transitions pass, and Sprint 9 remains blocked until signed-int/u64 boundary handling plus deployment-scoped contract ports pass.
+Prometheus does not need reputation badges; it needs readable, provable Kaspa L1 Guardian reputation. Codex has direct Sandbox access via `ssh sandbox`, upstream `silverc` works in CI, H-001 byte-core plus current-silverc `ValidatorStakingState.sil` runtime transitions pass, signed-int deployment bounds are documented/enforced, and Sprint 9 remains blocked until the remaining deployment-scoped contract ports pass.
 <!-- CODEX_CLAUDE_CODE_TERMINAL_BRIDGE_V1 -->
 ## Codex -> Claude Code Terminal Bridge
 
