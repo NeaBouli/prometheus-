@@ -109,8 +109,8 @@
 
 - [ ] [P1] Gitcoin Grants application finalize (April 2026) | Core Dev | Sprint 7 done
 - [ ] [P1] GitHub Repository öffentlich schalten | Core Dev | Sprint 6 fertig
-- [x] [P2] README.md rewrite in English | Claude Code | 2026-03-22
-- [x] [P2] WHITEPAPER.md: full English whitepaper v4 in repo, with all improvements | Claude Code | 2026-03-22
+- [x] [P2] README.md rewrite in English | Claude Code | 2026-03-22; post-Toccata deployment-gated status refreshed 2026-07-09
+- [x] [P2] WHITEPAPER.md: full English whitepaper v4 in repo, with all improvements | Claude Code | 2026-03-22; current-Silverc/RuleStorage/Kasplex status refreshed 2026-07-09
 - [x] [P2] CONTRIBUTING.md erstellen | Claude Code | 2026-03-22
 - [x] [P2] Wiki-Grundstruktur (docs/) | Claude Code | 2026-03-22
 - [x] [P2] Landing page + Wiki: use logo from /logo/Prometheus.png | Claude Code | 2026-03-22

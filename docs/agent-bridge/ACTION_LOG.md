@@ -2,6 +2,8 @@
 
 ## 2026-07-09
 
+- GitHub Prometheus CI, Security Audit, and Pages passed for `1b0b4c7`; the RuleStorage silverc gate documentation commit is verified remotely.
+- Refreshed public GitHub-facing docs (`README.md`, `WHITEPAPER.md`, `whitepaper.html`) for the July 2026 post-Toccata state: removed stale production-ready wording, marked deployment as gated, aligned current-Silverc gate status, changed RuleStorage/KRC-20 wording from live fact to target/orchestration, and clarified that Kasplex is not a Guardian reputation dependency.
 - Pushed bridge/memory documentation commit `c673766` recording the GuardianReputation formula gate; Prometheus CI and GitHub Pages passed.
 - Observed Security Audit run `28979986241` stuck in the `cargo audit` step for commit `c673766`; Secret Detection passed, but Dependency Audit did not complete.
 - Hardened `.github/workflows/security-audit.yml` with job/step timeouts and split `cargo-audit` install from `cargo audit` execution so dependency-audit jobs cannot hang indefinitely.

@@ -2,6 +2,8 @@
 
 **Whitepaper v4.0 — March 2026**
 
+**Status update — July 2026:** Kaspa Toccata is now treated as a post-fork deployment environment for Prometheus. Current CI verifies H-001 commit-reveal byte encoding, ValidatorStaking runtime transitions, GuardianReputation runtime/formula gates, and RuleStorage compile/ABI gates. Mainnet deployment remains gated by the remaining current-Silverc contract ports, deploy smoke tests, Q-003 `fp_rate` oracle design, and release hardening.
+
 *The fire belongs to humanity, not to corporations.*
 
 ---
@@ -34,7 +36,7 @@ Prometheus is a fully decentralized, AI-powered threat intelligence protocol bui
 The protocol combines three layers:
 - **On-device AI** (Phi-3-mini 3.8B, 4-bit quantized) for local anomaly detection
 - **Guardian nodes** (LLaMA 3 70B/8B) for advanced threat analysis and YARA rule generation
-- **Kaspa L1 consensus** (DAGKnight, 100 BPS) for immutable rule storage and governance
+- **Kaspa L1 consensus** (high-throughput BlockDAG / DAGKnight path) for immutable rule storage and governance
 
 Key properties: 0% pre-mine, no emergency stop, fully automated governance, GDPR non-applicable (no personal data on-chain).
 
@@ -56,10 +58,10 @@ Prometheus eliminates all three by creating a permissionless, self-governing thr
 
 ```
 Light Client (Phi-3-mini)          Guardian (LLaMA 3)           Kaspa L1
- - Local file scanning              - Threat analysis            - Rule storage (KRC-20)
+ - Local file scanning              - Threat analysis            - Rule state anchoring
  - Anomaly detection                - YARA rule generation       - Validator consensus
  - ZK-proof threat hints            - Proposal submission        - Governance auto-tuning
- - Rule updates from L1             - Reputation tracking        - Developer grants
+ - Rule updates from L1             - L1 reputation tracking     - Developer grants
 ```
 
 **Threat Lifecycle (< 60 seconds):**
@@ -67,7 +69,7 @@ Light Client (Phi-3-mini)          Guardian (LLaMA 3)           Kaspa L1
 2. Anonymous threat hint submitted with ZK proof
 3. Guardian node analyzes threat, generates YARA rule
 4. Validators vote via Commit-Reveal (2/3 majority required)
-5. Accepted rule stored on-chain as KRC-20 asset (supply=1)
+5. Accepted rule state anchored on-chain; PROM-RULES asset representation remains deployment orchestration
 6. All light clients receive and load the new rule
 
 ---
@@ -77,9 +79,9 @@ Light Client (Phi-3-mini)          Guardian (LLaMA 3)           Kaspa L1
 ### 4.1 Blockchain Layer (Kaspa L1)
 
 - **Network**: Kaspa with Silverscript smart contracts
-- **Testnet**: kaspa-testnet-10 for legacy tests; post-Toccata deployment requires TN12/Toccata tooling compatibility checks
-- **Compiler**: ssc/Silverscript tooling must be verified after the Kaspa Toccata activation before Prometheus deployment
-- **Consensus**: DAGKnight with 100 blocks per second
+- **Testnet**: kaspa-testnet-10 for legacy tests; post-Toccata deployment requires current Toccata/TN tooling checks
+- **Compiler**: current Silverc gates pass for H-001, ValidatorStakingState, GuardianReputationState, and RuleStorageState; remaining deployment-scoped contract ports are still required before Prometheus deployment
+- **Consensus**: high-throughput Kaspa BlockDAG / DAGKnight path
 - **Contracts**: 6 Silverscript contracts (see Section 10)
 
 ### 4.2 P2P Layer
@@ -172,7 +174,7 @@ Guardians run LLaMA 3 models to analyze threats and generate YARA rules.
 
 - Stored as `uint64` with 10000x scaling (not float64 — Architect decision Q-002)
 - Starting reputation: 0.1 (`REPUTATION_START = 1000`)
-- On accepted proposal: `reputation += 0.01 * sqrt(compute_power)`
+- On accepted proposal: `reputation += isqrt(compute_power_gflops) * 100` at 10000x fixed-point scale
 - On rejected proposal: `reputation *= 0.5`; if below `MIN_REPUTATION (1000)`: set to 0
 
 ### 7.3 Voting Power (Quadratic)
@@ -197,7 +199,7 @@ Quadratic voting (Architecture Decision #14) provides mathematical Sybil resista
 ### 8.2 YARA Scanner
 
 - Pattern-based file scanning with custom matcher
-- Rules loaded from on-chain KRC-20 assets (tick: PROM-RULES)
+- Rules loaded from canonical L1 rule state; PROM-RULES asset representation is a deployment target
 - SHA-256 file hashing for threat identification
 - EICAR test standard for validation
 
@@ -232,12 +234,13 @@ Prevents vote-copying and frontrunning (Architecture Decision #13):
 
 ## 10. Rule Storage
 
-### 10.1 KRC-20 Asset Model
+### 10.1 Rule State and Asset Representation
 
-Each accepted rule is stored as a unique KRC-20 asset:
-- Tick: `PROM-RULES`
-- Supply: 1 per rule (NFT-like)
-- ID format: `PROM-RULE-2026-XXXX`
+Each accepted rule is anchored as canonical rule state on Kaspa L1. The public product target is a unique PROM-RULES asset representation, but current Silverc verification intentionally covers the rule state machine first:
+- Target tick: `PROM-RULES`
+- Target supply: 1 per accepted rule
+- Target ID format: `PROM-RULE-2026-XXXX`
+- Current gate: `RuleStorageState.sil` verifies `byte[36]` CIDv1 storage, confidence threshold, quorum, submit/vote/finalize/deactivate covenant sigscripts, and Guardian reputation outcome events
 
 ### 10.2 IPFS Content Storage
 
@@ -255,9 +258,15 @@ Each accepted rule is stored as a unique KRC-20 asset:
 | GovernanceAutoTuning.ss | auto_tune, get_parameter | Weekly parameter adjustment |
 | DevIncentivePool.ss | proposeGrant, vote, executeGrant | DAO-voted developer rewards |
 | CommunityDonations.ss | donateKas, proposeDisbursement | Transparent community fund |
-| RuleStorage.ss | submitProposal, voteOnProposal, finalizeProposal | KRC-20 rule minting |
+| RuleStorage.ss | submitProposal, voteOnProposal, finalizeProposal | Rule state + target PROM-RULES asset orchestration |
 
-All contracts use `uint64` with 10000x scaling for reputation and confidence values (no float64 in Silverscript).
+Legacy `.ss` contracts use `uint64` with 10000x scaling for reputation and confidence values (no float64 in Silverscript). Current Silverc fixtures use signed entrypoint integers at the deploy boundary, with deployment calls scoped to `0..=i64::MAX` where numeric values enter Silverc.
+
+Current-Silverc verification status:
+- `ValidatorStakingState.sil`: compile/ABI and runtime transition gates pass.
+- `GuardianReputationState.sil`: compile/ABI, runtime transition, and accepted-proposal formula gates pass.
+- `RuleStorageState.sil`: compile/ABI gates pass for submit/vote/finalize/deactivate.
+- `GovernanceAutoTuning`, `DevIncentivePool`, and `CommunityDonations`: remaining deployment-scoped ports.
 
 ---
 
@@ -362,9 +371,10 @@ This is a deliberate design decision, not an oversight. Architecture Decision #3
 | Sprint 4: Guardian | March 2026 | ACCEPTED |
 | Sprint 5: Voting | March 2026 | ACCEPTED |
 | Sprint 6: E2E | March 2026 | ACCEPTED |
-| Sprint 7: Dashboard | March 2026 | IN PROGRESS |
-| **Kaspa Toccata / post-fork verification** | **June/July 2026** | **ssc tooling + H-001 encoding verification before deployment** |
-| Mainnet Launch | Post-verification | PLANNED |
+| Sprint 7: Dashboard | March 2026 | ACCEPTED |
+| Sprint 8: Public Site | March/July 2026 | ACCEPTED / ongoing documentation maintenance |
+| **Kaspa Toccata / post-fork verification** | **June/July 2026** | **Post-fork environment; H-001, ValidatorStaking, GuardianReputation, and RuleStorage gates verified in CI** |
+| Mainnet Launch | Post-verification | PLANNED; gated by remaining current-Silverc ports, deploy smoke path, Q-003 oracle, and release hardening |
 
 ---
 
@@ -386,10 +396,10 @@ All development is subject to continuous architect audit. Key findings:
 | PATTERN-010: Unnecessary Mutex | LOW | Use `Arc<Phi3Model>` instead of `Arc<Mutex<Phi3Model>>` |
 | PATTERN-011: Heuristic confidence | LOW | Replace with LLM confidence extraction in Sprint 6+ |
 
-Total audit rounds: 10 | Sprint findings: 11 | All critical/high findings resolved before mainnet
+Total audit rounds: 10 | Sprint findings: 11 | Critical issues fixed; remaining deployment gates are tracked before beta/mainnet
 
 ---
 
-*Prometheus v4.0 — March 2026*
+*Prometheus v4.0 — March 2026, status refreshed July 2026*
 *License: MIT | GitHub: github.com/NeaBouli/prometheus-*
 *The fire belongs to humanity.*

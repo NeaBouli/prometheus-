@@ -37,7 +37,7 @@ Goal:     All sprints 0-7 accepted. Post-Toccata deployment verification.
 | Testnet-10-Node              | DONE            | 100%     | 2026-03-21  | -            | wrpc://127.0.0.1:17210 |
 | Silverscript tooling (silverc/ssc) | IN_PROGRESS | 99%      | 2026-07-09  | -            | Upstream `silverc` builds/tests in CI; H-001 fixture verifies; ValidatorStaking state fixture compiles; `commitVote`, `revealVote`, `slashInvalidReveal`, `requestWithdraw`, `completeWithdraw`, and signed-int deployment-bound runtime tests pass; GuardianReputationState compile/ABI/runtime/formula gates pass; RuleStorageState compile/ABI gate passes; remaining deployment-scoped contract ports pending |
 | Hello-World Contract         | PENDING         | 0%       | 2026-03-21  | -            | Deployment nach ssc-Release |
-| GitHub Actions CI/CD         | ACCEPTED        | 100%     | 2026-07-09  | ACCEPTED     | Prometheus CI, Security Audit, and Pages green for 3e53e29 |
+| GitHub Actions CI/CD         | ACCEPTED        | 100%     | 2026-07-09  | ACCEPTED     | Prometheus CI, Security Audit, and Pages green for 1b0b4c7 |
 | Sprint-1 Pre-Check           | ACCEPTED        | 100%     | 2026-03-21  | ACCEPTED     | V-001, V-002, V-003 alle genehmigt |
 | **SPRINT 1 – CONTRACTS**     |                 |          |             |              |                 |
 | ValidatorStaking.ss          | ACCEPTED        | 100%     | 2026-03-21  | ACCEPTED     | v1.2: slash ACL, bond return, test patches |
@@ -74,8 +74,8 @@ Goal:     All sprints 0-7 accepted. Post-Toccata deployment verification.
 | tests/security_fp_flood      | ACCEPTED        | 100%     | 2026-03-22  | ACCEPTED     | 500 flood blocked |
 | **SPRINT 7 – DASHBOARD**     |                 |          |             |              |                 |
 | web/audit/index.html         | ACCEPTED        | 100%     | 2026-03-22  | ACCEPTED     | Dark theme, logo path fixed |
-| README.md                    | ACCEPTED        | 100%     | 2026-03-22  | ACCEPTED     | English, badges, quickstart |
-| WHITEPAPER.md                | ACCEPTED        | 100%     | 2026-03-22  | ACCEPTED     | Full v4 English, 16 sections |
+| README.md                    | ACCEPTED        | 100%     | 2026-07-09  | ACCEPTED     | English, badges, quickstart; post-Toccata deployment-gated status refreshed |
+| WHITEPAPER.md                | ACCEPTED        | 100%     | 2026-07-09  | ACCEPTED     | Full v4 English, 16 sections; July 2026 Silverc/RuleStorage/Kasplex status refreshed |
 
 ---
 
@@ -97,6 +97,7 @@ Repo RuleStorage current-silverc state fixture: `modules/contracts/silverc/RuleS
 Signed-int boundary decision: current upstream Silverc entrypoint `int` values are deployable only in the nonnegative signed range `0..=i64::MAX`; Rust retains raw `u64` H-001 vectors for byte compatibility and uses `build_silverc_checked` / `validate_silverc_commitment_bounds` for deployment calls.
 Rusty-Kaspa workspace dependencies pinned to `v2.0.1`; `cargo audit` now reports no vulnerabilities, only allowed warnings.
 GitHub Security Audit workflow re-enabled and dependency audits now fail on findings instead of using `|| true`; after `c673766`, Dependency Audit was hardened with explicit job/step timeouts and split cargo-audit install/run steps, and green reruns passed for `aed3cbb` and `3e53e29`.
+Public docs refreshed 2026-07-09: README, WHITEPAPER.md, and whitepaper.html now state deployment-gated post-Toccata status, verified H-001/ValidatorStaking/GuardianReputation/RuleStorage current-Silverc gates, target-only PROM-RULES asset orchestration, and no Kasplex dependency for Guardian reputation.
 Rust client runtime gate added: `PROMETHEUS_RUNTIME=beta|mainnet|production|prod` rejects ZK/Phi-3/KRC-20/Fed-DART stubs; development mode remains testable.
 Rollback tag: pre-session-20260413 → 6347b85
 ```

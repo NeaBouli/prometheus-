@@ -13,10 +13,10 @@
 | Repo | https://github.com/NeaBouli/prometheus- |
 | Branch | main |
 | Lokaler Pfad | ~/Desktop/prometheus |
-| Letzter Produkt-Code-Baseline-Commit | eebc521 — fix: restore guardian reputation formula gate |
+| Letzter Produkt-Code-Baseline-Commit | 3e53e29 — feat: add rule storage silverc fixture |
 | Aktueller HEAD | Mit `git log --oneline -1` prüfen; Bridge-/Status-Commits können neuer sein |
 | Rollback-Tag | `pre-session-20260413` → `6347b85` |
-| Whitepaper | WHITEPAPER.md (root) + whitepaper.html (styled) |
+| Whitepaper | WHITEPAPER.md (root) + whitepaper.html (styled), status refreshed 2026-07-09 |
 | Status | Feature-complete through Sprint 7. Post-Toccata deployment verification active. |
 | GitHub Pages | https://neabouli.github.io/prometheus-/ |
 | Google Search Console | Verified: googleaa2902079481c7a8 |
@@ -100,7 +100,7 @@
 ## OFFENE TODOS (Priorität)
 
 ### Für Core Dev (manuell):
-- [x] GitHub Pages aktiv/live: latest pages-build-deployment succeeded for `eebc521`
+- [x] GitHub Pages aktiv/live: latest pages-build-deployment succeeded for `1b0b4c7`
 - [ ] Repository public schalten
 - [ ] Gitcoin Grants Antrag einreichen (Deadline: April 2026)
 - [ ] Discord/Telegram aufbauen
@@ -111,7 +111,7 @@
 **STARTFLOW — Lies dies zuerst:**
 ```
 1. cd /Users/gio/Desktop/repos/prometheus
-2. git log --oneline -5              → aktuellen HEAD prüfen; Produkt-Code-Baseline = eebc521
+2. git log --oneline -5              → aktuellen HEAD prüfen; Produkt-Code-Baseline = 3e53e29
 3. git tag -l                        → Rollback: pre-session-20260413
 4. cargo test 2>&1 | tail -5         → Muss grün sein
 5. Lies BACKLOG.md                   → Priorisierte Task-Liste
@@ -119,7 +119,7 @@
 7. Lies memory/ERRORS.md             → 12 bekannte Patterns
 ```
 
-**Status: Feature-complete through Sprint 7. Kaspa Toccata status researched 2026-07-07; upstream `silverc` verified in CI; repo H-001 fixture and ValidatorStakingState commit/reveal/slash/request-withdraw/complete-withdraw runtime paths verify at pinned Silverscript ref `d25bd3427a093c17327ca3d6b9e1aa5f7688c863`; GuardianReputationState compile/ABI/runtime/formula gates pass for register/proposalAccepted/proposalRejected; RuleStorageState compile/ABI gates pass for submitProposal/voteOnProposal/finalizeProposal/deactivateRule; signed-int deployment bounds are enforced as `0..=i64::MAX`; deployment now depends on remaining deployment-scoped contract ports.**
+**Status: Feature-complete through Sprint 7. Kaspa Toccata status researched 2026-07-07; upstream `silverc` verified in CI; repo H-001 fixture and ValidatorStakingState commit/reveal/slash/request-withdraw/complete-withdraw runtime paths verify at pinned Silverscript ref `d25bd3427a093c17327ca3d6b9e1aa5f7688c863`; GuardianReputationState compile/ABI/runtime/formula gates pass for register/proposalAccepted/proposalRejected; RuleStorageState compile/ABI gates pass for submitProposal/voteOnProposal/finalizeProposal/deactivateRule; signed-int deployment bounds are enforced as `0..=i64::MAX`; public README/Whitepaper status refreshed 2026-07-09; deployment now depends on remaining deployment-scoped contract ports.**
 
 **Offene Tasks (priorisiert):**
 - [x] PATTERN-010 fix: Arc<Phi3Model> statt Arc<Mutex<Phi3Model>> — DONE `6347b85`

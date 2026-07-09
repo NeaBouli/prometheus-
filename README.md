@@ -6,7 +6,7 @@
 
 [![CI](https://github.com/NeaBouli/prometheus-/actions/workflows/ci.yml/badge.svg)](https://github.com/NeaBouli/prometheus-/actions)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Network](https://img.shields.io/badge/network-kaspa--testnet--10-orange.svg)](https://kaspa.org)
+[![Network](https://img.shields.io/badge/network-kaspa--post--toccata-orange.svg)](https://kaspa.org)
 
 ---
 
@@ -37,7 +37,7 @@ cargo build --release
 
 ```
 Layer 1 (Kaspa L1):  ValidatorStaking | GuardianReputation | RuleStorage | GovernanceAutoTuning
-                     Silverscript contracts on Kaspa with DAGKnight consensus (100 BPS)
+                     Silverscript contracts on Kaspa with DAGKnight consensus
 
 Layer 2 (P2P):       Threat hints | YARA rule proposals | Commit-Reveal voting | ZK proofs
                      Decentralized coordination between clients, guardians, and validators
@@ -70,9 +70,11 @@ Off-Chain:           Phi-3-mini (local AI) | LLaMA 3 (guardian AI) | Fed-DART (f
 | 4 — Guardian | ACCEPTED | Docker, vLLM, YARA generator, analyzer |
 | 5 — Voting | ACCEPTED | Commit-Reveal, bond system, slashing engine |
 | 6 — E2E | ACCEPTED | Full lifecycle test, Sybil + FP flood resistance |
-| 7 — Dashboard | CURRENT | Audit dashboard, documentation |
+| 7 — Dashboard | ACCEPTED | Audit dashboard, documentation |
+| 8 — Public Site | ACCEPTED | Website, SEO, whitepaper, GitHub Pages |
+| 9 — Deploy Path | BLOCKED | Remaining current-Silverc contract ports and deployment smoke path |
 
-**Deployment status:** Kaspa Toccata post-fork verification is active. H-001 commit-reveal byte encoding now has a pinned current-Silverscript fixture; deployment is gated by runtime transition tests for the current-Silverscript validator state machine and remaining deployment-scoped contract ports.
+**Deployment status:** Kaspa Toccata is now in the post-fork verification phase for Prometheus. H-001 commit-reveal byte encoding, ValidatorStaking runtime transitions, GuardianReputation runtime/formula gates, and RuleStorage compile/ABI gates are pinned in CI. Deployment remains gated by the remaining current-Silverc contract ports, the deploy smoke path, Q-003 `fp_rate` oracle design, and release hardening.
 
 ---
 
