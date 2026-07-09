@@ -225,11 +225,7 @@ mod tests {
 
         assert_eq!(
             commitment.commitment_hash,
-            compute_commitment_hash(
-                true,
-                SILVERC_SIGNED_INT_MAX_U64,
-                SILVERC_SIGNED_INT_MAX_U64,
-            )
+            compute_commitment_hash(true, SILVERC_SIGNED_INT_MAX_U64, SILVERC_SIGNED_INT_MAX_U64,)
         );
     }
 
