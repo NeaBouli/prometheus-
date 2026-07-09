@@ -37,7 +37,7 @@ Goal:     All sprints 0-7 accepted. Post-Toccata deployment verification.
 | Testnet-10-Node              | DONE            | 100%     | 2026-03-21  | -            | wrpc://127.0.0.1:17210 |
 | Silverscript tooling (silverc/ssc) | IN_PROGRESS | 99%      | 2026-07-09  | -            | Upstream `silverc` builds/tests in CI; H-001 fixture verifies; ValidatorStaking state fixture compiles; `commitVote`, `revealVote`, `slashInvalidReveal`, `requestWithdraw`, `completeWithdraw`, and signed-int deployment-bound runtime tests pass; GuardianReputationState compile/ABI/runtime/formula gates pass; remaining deployment-scoped contract ports pending |
 | Hello-World Contract         | PENDING         | 0%       | 2026-03-21  | -            | Deployment nach ssc-Release |
-| GitHub Actions CI/CD         | ACCEPTED        | 100%     | 2026-07-09  | ACCEPTED     | Prometheus CI, Security Audit, and Pages green for eebc521 |
+| GitHub Actions CI/CD         | IN_PROGRESS     | 99%      | 2026-07-09  | -            | Prometheus CI and Pages green for c673766; Security Audit for c673766 stuck in cargo audit, workflow hardened with explicit audit timeouts and needs green rerun |
 | Sprint-1 Pre-Check           | ACCEPTED        | 100%     | 2026-03-21  | ACCEPTED     | V-001, V-002, V-003 alle genehmigt |
 | **SPRINT 1 – CONTRACTS**     |                 |          |             |              |                 |
 | ValidatorStaking.ss          | ACCEPTED        | 100%     | 2026-03-21  | ACCEPTED     | v1.2: slash ACL, bond return, test patches |
@@ -95,7 +95,7 @@ Repo ValidatorStaking runtime gate: `scripts/verify_silverc_h001.py` now injects
 Repo GuardianReputation current-silverc state fixture: `modules/contracts/silverc/GuardianReputationState.sil` compiles against the same pinned upstream `silverc`; the verifier builds covenant sigscripts and runtime-tests `register`, `proposalAccepted`, and `proposalRejected` without badge, NFT, Kasplex, or staking semantics. Valid guardian/governance signature transitions are accepted, low compute power is rejected, unregistered rejection is rejected, reputation caps at `REPUTATION_MAX`, and the accepted-proposal formula is verified as exact bounded `isqrt(compute_power_gflops) * 100`.
 Signed-int boundary decision: current upstream Silverc entrypoint `int` values are deployable only in the nonnegative signed range `0..=i64::MAX`; Rust retains raw `u64` H-001 vectors for byte compatibility and uses `build_silverc_checked` / `validate_silverc_commitment_bounds` for deployment calls.
 Rusty-Kaspa workspace dependencies pinned to `v2.0.1`; `cargo audit` now reports no vulnerabilities, only allowed warnings.
-GitHub Security Audit workflow re-enabled and dependency audits now fail on findings instead of using `|| true`.
+GitHub Security Audit workflow re-enabled and dependency audits now fail on findings instead of using `|| true`; after `c673766`, Dependency Audit stuck in `cargo audit`, so the workflow was hardened with explicit job/step timeouts and split cargo-audit install/run steps.
 Rust client runtime gate added: `PROMETHEUS_RUNTIME=beta|mainnet|production|prod` rejects ZK/Phi-3/KRC-20/Fed-DART stubs; development mode remains testable.
 Rollback tag: pre-session-20260413 → 6347b85
 ```

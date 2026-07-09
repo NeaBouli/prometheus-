@@ -5,6 +5,7 @@ Repo path: /Users/gio/Desktop/repos/prometheus
 Branch observed: main
 Latest product-code baseline observed: `eebc521 fix: restore guardian reputation formula gate`
 Current HEAD: verify with `git log --oneline -1`; bridge-only commits may advance it.
+Latest CI note: Prometheus CI and Pages passed for `c673766`; Security Audit for `c673766` stuck in `cargo audit`, so `.github/workflows/security-audit.yml` was hardened with explicit audit timeouts and requires a green rerun.
 
 Purpose: This file is the local bridge for Codex/Claude Code handover. Read it before touching product code. It consolidates the project state, architecture rules, workflow logic, current open issues, the Reputation Badge decision, and the new direct Sandbox access note.
 

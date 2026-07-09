@@ -1,5 +1,12 @@
 # Action Log
 
+## 2026-07-09
+
+- Pushed bridge/memory documentation commit `c673766` recording the GuardianReputation formula gate; Prometheus CI and GitHub Pages passed.
+- Observed Security Audit run `28979986241` stuck in the `cargo audit` step for commit `c673766`; Secret Detection passed, but Dependency Audit did not complete.
+- Hardened `.github/workflows/security-audit.yml` with job/step timeouts and split `cargo-audit` install from `cargo audit` execution so dependency-audit jobs cannot hang indefinitely.
+- No product-code behavior changed in the CI hardening pass.
+
 ## 2026-07-08
 
 - Verified working tree after push: branch `main` tracks `origin/main`; only untracked local artifacts are `.claude/` and `Prometheus-1.png`.
