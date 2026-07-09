@@ -173,6 +173,14 @@ fn validator_state_entry_sigscript(compiled: &CompiledContract<'_>, function_nam
     sigscript
 }
 
+fn guardian_state_entry_sigscript(compiled: &CompiledContract<'_>, function_name: &str, args: Vec<Expr<'_>>) -> Vec<u8> {
+    let mut sigscript = compiled
+        .build_sig_script_for_covenant_decl(function_name, args, CovenantDeclCallOptions { is_leader: false })
+        .unwrap_or_else(|err| panic!("GuardianReputationState {function_name} sigscript builds: {err}"));
+    sigscript.extend_from_slice(&common::push_redeem_script(&compiled.script));
+    sigscript
+}
+
 fn compile_validator_state<'a>(source: &'a str, args: Vec<Expr<'static>>) -> CompiledContract<'a> {
     compile_contract(source, &args, CompileOptions::default()).expect("ValidatorStakingState fixture compiles")
 }
@@ -342,6 +350,288 @@ fn prometheus_guardian_reputation_state_fixture_compiles_against_current_silverc
         "proposalRejected",
         vec![Expr::bytes(sig)],
     );
+}
+
+#[test]
+fn prometheus_guardian_reputation_register_runtime_accepts_valid_transition() {
+    let contract_path = std::env::var("PROMETHEUS_GUARDIAN_STATE_CONTRACT")
+        .expect("PROMETHEUS_GUARDIAN_STATE_CONTRACT is set");
+    let source = std::fs::read_to_string(contract_path).expect("read Prometheus guardian reputation contract fixture");
+    let guardian_keypair = keypair_from_seed(9);
+    let guardian_pk = guardian_keypair.x_only_public_key().0.serialize().to_vec();
+    let governance_pk = keypair_from_seed(8).x_only_public_key().0.serialize().to_vec();
+
+    let unregistered = compile_guardian_state(
+        &source,
+        guardian_state_args(guardian_pk.clone(), governance_pk.clone(), 0, 0, 0, 0, 0, 1),
+    );
+    let registered = compile_guardian_state(
+        &source,
+        guardian_state_args(guardian_pk, governance_pk, 500, 1_000, 0, 0, 1_000, 0),
+    );
+
+    let placeholder_sigscript = guardian_state_entry_sigscript(
+        &unregistered,
+        "register",
+        vec![Expr::int(500), Expr::int(1_000), Expr::bytes(dummy_signature())],
+    );
+    let outputs = vec![covenant_output(&registered, 0, COV_A)];
+    let entries = vec![covenant_utxo(&unregistered, COV_A)];
+    let mut tx = Transaction::new(
+        1,
+        vec![tx_input_with_sigops(0, placeholder_sigscript, 1)],
+        outputs,
+        0,
+        Default::default(),
+        0,
+        vec![],
+    );
+    let sig = sign_tx_input(&tx, &entries, 0, &guardian_keypair);
+    tx.inputs[0].signature_script = guardian_state_entry_sigscript(
+        &unregistered,
+        "register",
+        vec![Expr::int(500), Expr::int(1_000), Expr::bytes(sig)],
+    );
+
+    let result = execute_input_with_covenants(tx, entries, 0);
+    assert!(
+        result.is_ok(),
+        "Guardian register runtime should accept valid guardian signature/state transition: {:?}",
+        result.err()
+    );
+}
+
+#[test]
+fn prometheus_guardian_reputation_register_runtime_rejects_low_compute_power() {
+    let contract_path = std::env::var("PROMETHEUS_GUARDIAN_STATE_CONTRACT")
+        .expect("PROMETHEUS_GUARDIAN_STATE_CONTRACT is set");
+    let source = std::fs::read_to_string(contract_path).expect("read Prometheus guardian reputation contract fixture");
+    let guardian_keypair = keypair_from_seed(9);
+    let guardian_pk = guardian_keypair.x_only_public_key().0.serialize().to_vec();
+    let governance_pk = keypair_from_seed(8).x_only_public_key().0.serialize().to_vec();
+
+    let unregistered = compile_guardian_state(
+        &source,
+        guardian_state_args(guardian_pk.clone(), governance_pk.clone(), 0, 0, 0, 0, 0, 1),
+    );
+    let low_compute_state = compile_guardian_state(
+        &source,
+        guardian_state_args(guardian_pk, governance_pk, 99, 1_000, 0, 0, 1_000, 1),
+    );
+
+    let placeholder_sigscript = guardian_state_entry_sigscript(
+        &unregistered,
+        "register",
+        vec![Expr::int(99), Expr::int(1_000), Expr::bytes(dummy_signature())],
+    );
+    let outputs = vec![covenant_output(&low_compute_state, 0, COV_A)];
+    let entries = vec![covenant_utxo(&unregistered, COV_A)];
+    let mut tx = Transaction::new(
+        1,
+        vec![tx_input_with_sigops(0, placeholder_sigscript, 1)],
+        outputs,
+        0,
+        Default::default(),
+        0,
+        vec![],
+    );
+    let sig = sign_tx_input(&tx, &entries, 0, &guardian_keypair);
+    tx.inputs[0].signature_script = guardian_state_entry_sigscript(
+        &unregistered,
+        "register",
+        vec![Expr::int(99), Expr::int(1_000), Expr::bytes(sig)],
+    );
+
+    let err = execute_input_with_covenants(tx, entries, 0).expect_err("Guardian register must reject compute below minimum");
+    common::assert_verify_like_error(err);
+}
+
+#[test]
+fn prometheus_guardian_reputation_proposal_accepted_runtime_accepts_valid_transition() {
+    let contract_path = std::env::var("PROMETHEUS_GUARDIAN_STATE_CONTRACT")
+        .expect("PROMETHEUS_GUARDIAN_STATE_CONTRACT is set");
+    let source = std::fs::read_to_string(contract_path).expect("read Prometheus guardian reputation contract fixture");
+    let guardian_pk = keypair_from_seed(9).x_only_public_key().0.serialize().to_vec();
+    let governance_keypair = keypair_from_seed(8);
+    let governance_pk = governance_keypair.x_only_public_key().0.serialize().to_vec();
+
+    let registered = compile_guardian_state(
+        &source,
+        guardian_state_args(guardian_pk.clone(), governance_pk.clone(), 500, 1_000, 0, 0, 1_000, 0),
+    );
+    let accepted = compile_guardian_state(
+        &source,
+        guardian_state_args(guardian_pk, governance_pk, 500, 3_000, 0, 1, 1_000, 0),
+    );
+
+    let placeholder_sigscript = guardian_state_entry_sigscript(
+        &registered,
+        "proposalAccepted",
+        vec![Expr::int(2_000), Expr::bytes(dummy_signature())],
+    );
+    let outputs = vec![covenant_output(&accepted, 0, COV_A)];
+    let entries = vec![covenant_utxo(&registered, COV_A)];
+    let mut tx = Transaction::new(
+        1,
+        vec![tx_input_with_sigops(0, placeholder_sigscript, 1)],
+        outputs,
+        0,
+        Default::default(),
+        0,
+        vec![],
+    );
+    let sig = sign_tx_input(&tx, &entries, 0, &governance_keypair);
+    tx.inputs[0].signature_script = guardian_state_entry_sigscript(
+        &registered,
+        "proposalAccepted",
+        vec![Expr::int(2_000), Expr::bytes(sig)],
+    );
+
+    let result = execute_input_with_covenants(tx, entries, 0);
+    assert!(
+        result.is_ok(),
+        "Guardian proposalAccepted runtime should accept valid governance signature/state transition: {:?}",
+        result.err()
+    );
+}
+
+#[test]
+fn prometheus_guardian_reputation_proposal_accepted_runtime_rejects_negative_increase() {
+    let contract_path = std::env::var("PROMETHEUS_GUARDIAN_STATE_CONTRACT")
+        .expect("PROMETHEUS_GUARDIAN_STATE_CONTRACT is set");
+    let source = std::fs::read_to_string(contract_path).expect("read Prometheus guardian reputation contract fixture");
+    let guardian_pk = keypair_from_seed(9).x_only_public_key().0.serialize().to_vec();
+    let governance_keypair = keypair_from_seed(8);
+    let governance_pk = governance_keypair.x_only_public_key().0.serialize().to_vec();
+
+    let registered = compile_guardian_state(
+        &source,
+        guardian_state_args(guardian_pk.clone(), governance_pk.clone(), 500, 1_000, 0, 0, 1_000, 0),
+    );
+    let invalid_next = compile_guardian_state(
+        &source,
+        guardian_state_args(guardian_pk, governance_pk, 500, 1_000, 0, 1, 1_000, 0),
+    );
+
+    let placeholder_sigscript = guardian_state_entry_sigscript(
+        &registered,
+        "proposalAccepted",
+        vec![Expr::int(-1), Expr::bytes(dummy_signature())],
+    );
+    let outputs = vec![covenant_output(&invalid_next, 0, COV_A)];
+    let entries = vec![covenant_utxo(&registered, COV_A)];
+    let mut tx = Transaction::new(
+        1,
+        vec![tx_input_with_sigops(0, placeholder_sigscript, 1)],
+        outputs,
+        0,
+        Default::default(),
+        0,
+        vec![],
+    );
+    let sig = sign_tx_input(&tx, &entries, 0, &governance_keypair);
+    tx.inputs[0].signature_script = guardian_state_entry_sigscript(
+        &registered,
+        "proposalAccepted",
+        vec![Expr::int(-1), Expr::bytes(sig)],
+    );
+
+    let err = execute_input_with_covenants(tx, entries, 0).expect_err("proposalAccepted must reject negative reputation increase");
+    common::assert_verify_like_error(err);
+}
+
+#[test]
+fn prometheus_guardian_reputation_proposal_rejected_runtime_accepts_valid_transition() {
+    let contract_path = std::env::var("PROMETHEUS_GUARDIAN_STATE_CONTRACT")
+        .expect("PROMETHEUS_GUARDIAN_STATE_CONTRACT is set");
+    let source = std::fs::read_to_string(contract_path).expect("read Prometheus guardian reputation contract fixture");
+    let guardian_pk = keypair_from_seed(9).x_only_public_key().0.serialize().to_vec();
+    let governance_keypair = keypair_from_seed(8);
+    let governance_pk = governance_keypair.x_only_public_key().0.serialize().to_vec();
+
+    let registered = compile_guardian_state(
+        &source,
+        guardian_state_args(guardian_pk.clone(), governance_pk.clone(), 500, 3_000, 0, 1, 1_000, 0),
+    );
+    let rejected = compile_guardian_state(
+        &source,
+        guardian_state_args(guardian_pk, governance_pk, 500, 1_500, 0, 1, 1_000, 0),
+    );
+
+    let placeholder_sigscript = guardian_state_entry_sigscript(
+        &registered,
+        "proposalRejected",
+        vec![Expr::bytes(dummy_signature())],
+    );
+    let outputs = vec![covenant_output(&rejected, 0, COV_A)];
+    let entries = vec![covenant_utxo(&registered, COV_A)];
+    let mut tx = Transaction::new(
+        1,
+        vec![tx_input_with_sigops(0, placeholder_sigscript, 1)],
+        outputs,
+        0,
+        Default::default(),
+        0,
+        vec![],
+    );
+    let sig = sign_tx_input(&tx, &entries, 0, &governance_keypair);
+    tx.inputs[0].signature_script = guardian_state_entry_sigscript(
+        &registered,
+        "proposalRejected",
+        vec![Expr::bytes(sig)],
+    );
+
+    let result = execute_input_with_covenants(tx, entries, 0);
+    assert!(
+        result.is_ok(),
+        "Guardian proposalRejected runtime should accept valid governance signature/state transition: {:?}",
+        result.err()
+    );
+}
+
+#[test]
+fn prometheus_guardian_reputation_proposal_rejected_runtime_rejects_unregistered_state() {
+    let contract_path = std::env::var("PROMETHEUS_GUARDIAN_STATE_CONTRACT")
+        .expect("PROMETHEUS_GUARDIAN_STATE_CONTRACT is set");
+    let source = std::fs::read_to_string(contract_path).expect("read Prometheus guardian reputation contract fixture");
+    let guardian_pk = keypair_from_seed(9).x_only_public_key().0.serialize().to_vec();
+    let governance_keypair = keypair_from_seed(8);
+    let governance_pk = governance_keypair.x_only_public_key().0.serialize().to_vec();
+
+    let unregistered = compile_guardian_state(
+        &source,
+        guardian_state_args(guardian_pk.clone(), governance_pk.clone(), 0, 0, 0, 0, 0, 1),
+    );
+    let invalid_next = compile_guardian_state(
+        &source,
+        guardian_state_args(guardian_pk, governance_pk, 0, 0, 0, 0, 0, 1),
+    );
+
+    let placeholder_sigscript = guardian_state_entry_sigscript(
+        &unregistered,
+        "proposalRejected",
+        vec![Expr::bytes(dummy_signature())],
+    );
+    let outputs = vec![covenant_output(&invalid_next, 0, COV_A)];
+    let entries = vec![covenant_utxo(&unregistered, COV_A)];
+    let mut tx = Transaction::new(
+        1,
+        vec![tx_input_with_sigops(0, placeholder_sigscript, 1)],
+        outputs,
+        0,
+        Default::default(),
+        0,
+        vec![],
+    );
+    let sig = sign_tx_input(&tx, &entries, 0, &governance_keypair);
+    tx.inputs[0].signature_script = guardian_state_entry_sigscript(
+        &unregistered,
+        "proposalRejected",
+        vec![Expr::bytes(sig)],
+    );
+
+    let err = execute_input_with_covenants(tx, entries, 0).expect_err("proposalRejected must reject unregistered guardian state");
+    common::assert_verify_like_error(err);
 }
 
 #[test]
