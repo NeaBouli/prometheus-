@@ -88,6 +88,7 @@ contract ValidatorStakingState(
     #[covenant.singleton(mode = transition)]
     function revealVote(State prev_state, bool vote, int salt, int reveal_block_height, sig validator_sig) : State {
         require(prev_state.active);
+        require(salt >= 0);
         require(reveal_block_height >= 0);
         require(!isEmptyCommitment(prev_state.commitment));
         require(commitmentHash(vote, salt, prev_state.committed_at_block) == prev_state.commitment);
@@ -111,6 +112,7 @@ contract ValidatorStakingState(
     #[covenant.singleton(mode = transition)]
     function slashInvalidReveal(State prev_state, bool vote, int salt, sig validator_sig) : State {
         require(prev_state.active);
+        require(salt >= 0);
         require(!isEmptyCommitment(prev_state.commitment));
         require(prev_state.bond_kas <= prev_state.stake_kas);
         require(commitmentHash(vote, salt, prev_state.committed_at_block) != prev_state.commitment);

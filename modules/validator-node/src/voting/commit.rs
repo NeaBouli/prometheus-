@@ -13,6 +13,22 @@ use crate::BOND_PERCENT;
 /// vote_byte(1) || salt_le(8) || block_height_le(8).
 pub const COMMITMENT_PREIMAGE_LEN: usize = 17;
 
+/// Current upstream Silverc exposes entrypoint integers as signed `int`.
+///
+/// The H-001 byte formula remains `u64` little-endian on the Rust side, but
+/// deployable current-Silverc calls must stay in this nonnegative signed range
+/// until a native unsigned contract type is available.
+pub const SILVERC_SIGNED_INT_MAX_U64: u64 = i64::MAX as u64;
+
+/// Boundary error for current-Silverc commit-reveal calls.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CommitmentBoundaryError {
+    /// Salt cannot be represented as a nonnegative current-Silverc `int`.
+    SaltExceedsSilvercInt { salt: u64 },
+    /// Block height cannot be represented as a nonnegative current-Silverc `int`.
+    BlockHeightExceedsSilvercInt { block_height: u64 },
+}
+
 /// A vote commitment for the Commit-Reveal protocol.
 /// Matches the VoteCommitment struct in SCHEMA.md 1.4.
 #[derive(Debug, Clone, PartialEq)]
@@ -65,6 +81,23 @@ impl CommitmentBuilder {
         }
     }
 
+    /// Build a commitment for the current-Silverc deployment path.
+    ///
+    /// Use this when the commitment will be revealed through current upstream
+    /// Silverc, whose entrypoint integers are signed. The raw H-001 hash helper
+    /// intentionally remains `u64` so historical vectors stay testable.
+    pub fn build_silverc_checked(
+        &self,
+        proposal_id: u64,
+        vote: bool,
+        salt: u64,
+        block_height: u64,
+        stake_kas: u64,
+    ) -> Result<VoteCommitment, CommitmentBoundaryError> {
+        validate_silverc_commitment_bounds(salt, block_height)?;
+        Ok(self.build(proposal_id, vote, salt, block_height, stake_kas))
+    }
+
     /// Verify that a commitment matches the given vote and salt.
     ///
     /// Recomputes the hash and compares to the stored commitment.
@@ -88,6 +121,22 @@ pub fn compute_commitment_hash(vote: bool, salt: u64, block_height: u64) -> [u8;
     let mut hash = [0u8; 32];
     hash.copy_from_slice(&result);
     hash
+}
+
+/// Validate whether a Rust commitment tuple is representable by current Silverc.
+pub fn validate_silverc_commitment_bounds(
+    salt: u64,
+    block_height: u64,
+) -> Result<(), CommitmentBoundaryError> {
+    if salt > SILVERC_SIGNED_INT_MAX_U64 {
+        return Err(CommitmentBoundaryError::SaltExceedsSilvercInt { salt });
+    }
+
+    if block_height > SILVERC_SIGNED_INT_MAX_U64 {
+        return Err(CommitmentBoundaryError::BlockHeightExceedsSilvercInt { block_height });
+    }
+
+    Ok(())
 }
 
 /// Build the canonical commit-reveal preimage.
@@ -159,6 +208,57 @@ mod tests {
         assert_eq!(commitment.validator_addr, TEST_ADDR);
         assert_eq!(commitment.block_height, 1000);
         assert_eq!(commitment.bond_kas, 5000); // 10% of 50000
+    }
+
+    #[test]
+    fn test_build_silverc_checked_accepts_signed_int_range() {
+        let builder = CommitmentBuilder::new(TEST_ADDR);
+        let commitment = builder
+            .build_silverc_checked(
+                1,
+                true,
+                SILVERC_SIGNED_INT_MAX_U64,
+                SILVERC_SIGNED_INT_MAX_U64,
+                50000,
+            )
+            .expect("max nonnegative signed Silverc values are valid");
+
+        assert_eq!(
+            commitment.commitment_hash,
+            compute_commitment_hash(
+                true,
+                SILVERC_SIGNED_INT_MAX_U64,
+                SILVERC_SIGNED_INT_MAX_U64,
+            )
+        );
+    }
+
+    #[test]
+    fn test_build_silverc_checked_rejects_u64_max_salt() {
+        let builder = CommitmentBuilder::new(TEST_ADDR);
+        let err = builder
+            .build_silverc_checked(1, true, u64::MAX, 1000, 50000)
+            .expect_err("u64::MAX salt is not representable as current-Silverc signed int");
+
+        assert_eq!(
+            err,
+            CommitmentBoundaryError::SaltExceedsSilvercInt { salt: u64::MAX }
+        );
+    }
+
+    #[test]
+    fn test_build_silverc_checked_rejects_u64_max_block_height() {
+        let builder = CommitmentBuilder::new(TEST_ADDR);
+        let err = builder
+            .build_silverc_checked(1, true, 42, u64::MAX, 50000)
+            .expect_err("u64::MAX block height is not representable as current-Silverc signed int");
+
+        assert_eq!(
+            err,
+            CommitmentBoundaryError::BlockHeightExceedsSilvercInt {
+                block_height: u64::MAX
+            }
+        );
     }
 
     #[test]

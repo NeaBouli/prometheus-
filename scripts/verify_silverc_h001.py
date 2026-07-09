@@ -166,12 +166,6 @@ fn prometheus_h001_vectors_match_current_silverc_runtime() {
             0x1112131415161718,
             "66fb23b92e68c968da255e16a553db24a2dff80e2a9bfe6af494b3480a4af651",
         ),
-        (
-            false,
-            -1,
-            -1,
-            "1d037f75eb96d1ab0615732e2aacdd2a701ecf59fb048987a47cb50a2b483a86",
-        ),
     ];
 
     for (vote, salt, block_height, expected_hash) in vectors {
@@ -553,7 +547,25 @@ fn prometheus_validator_state_reveal_vote_runtime_accepts_valid_transition() {
 }
 
 #[test]
-fn prometheus_validator_state_reveal_vote_runtime_accepts_signed_salt_bitpattern() {
+fn prometheus_h001_signed_negative_values_do_not_match_u64_max_vector() {
+    let contract_path = std::env::var("PROMETHEUS_H001_CONTRACT").expect("PROMETHEUS_H001_CONTRACT is set");
+    let source = std::fs::read_to_string(contract_path).expect("read Prometheus H-001 contract fixture");
+    let compiled = compile_contract(
+        &source,
+        &[Expr::bytes(hex32("1d037f75eb96d1ab0615732e2aacdd2a701ecf59fb048987a47cb50a2b483a86"))],
+        CompileOptions::default(),
+    )
+    .expect("H-001 fixture compiles");
+    let sigscript = compiled
+        .build_sig_script("verify", vec![Expr::bool(false), Expr::int(-1), Expr::int(-1)])
+        .expect("H-001 fixture signed negative sigscript builds");
+
+    let err = run_script(compiled.script, sigscript).expect_err("signed negative int values must not be treated as Rust u64::MAX");
+    common::assert_verify_like_error(err);
+}
+
+#[test]
+fn prometheus_validator_state_reveal_vote_runtime_rejects_negative_salt() {
     let contract_path = std::env::var("PROMETHEUS_VALIDATOR_STATE_CONTRACT")
         .expect("PROMETHEUS_VALIDATOR_STATE_CONTRACT is set");
     let source = std::fs::read_to_string(contract_path).expect("read Prometheus validator state contract fixture");
@@ -617,12 +629,8 @@ fn prometheus_validator_state_reveal_vote_runtime_accepts_signed_salt_bitpattern
         vec![Expr::bool(true), Expr::int(-1), Expr::int(1_200), Expr::bytes(sig)],
     );
 
-    let result = execute_input_with_covenants(tx, entries, 0);
-    assert!(
-        result.is_ok(),
-        "revealVote runtime should accept signed salt carrying the u64::MAX bit pattern: {:?}",
-        result.err()
-    );
+    let err = execute_input_with_covenants(tx, entries, 0).expect_err("revealVote must reject negative salt values");
+    common::assert_verify_like_error(err);
 }
 
 #[test]
@@ -1150,7 +1158,7 @@ def main() -> int:
     print("H-001 and ValidatorStakingState silverc fixture verification passed.")
     print(f"Silverscript ref: {silver_ref}")
     print(
-        "Note: current silverc uses signed int entrypoint arguments; salt values above i64::MAX are passed as their signed two's-complement bit pattern, while deployment block heights remain scoped to 0..=i64::MAX."
+        "Note: current silverc uses signed int entrypoint arguments; deployment salt and block-height values are scoped to 0..=i64::MAX."
     )
     return 0
 
