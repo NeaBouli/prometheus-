@@ -57,12 +57,22 @@ legacy global maps. The fixture currently covers:
 - `completeWithdraw`
 
 The shared verifier compiles this fixture against the pinned upstream
-Silverscript ref and builds all covenant declaration sigscripts:
+Silverscript ref, builds all covenant declaration sigscripts, and runtime-tests
+the `commitVote` transition with real Schnorr signatures and authorized
+covenant outputs:
 
 ```bash
 python3 scripts/verify_silverc_h001.py
 ```
 
-This is a compile/ABI gate for the state-machine port. Runtime transition tests
-with real signatures and transaction outputs are the next contract task before
-testnet deployment.
+Current runtime coverage:
+
+- `commitVote` accepts a valid 10% bond, validator signature, and successor state
+- `commitVote` rejects a bond below 10% of stake
+
+Remaining runtime coverage before deployment:
+
+- `revealVote`
+- `slashInvalidReveal`
+- `requestWithdraw`
+- `completeWithdraw`

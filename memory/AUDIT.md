@@ -367,11 +367,14 @@ Update:   Current-silverc fixture `ValidatorStakingH001.sil` now verifies
           d25bd3427a093c17327ca3d6b9e1aa5f7688c863.
           `ValidatorStakingState.sil` now compiles and builds covenant
           sigscripts for commit/reveal/slash/withdraw transitions.
+          `commitVote` now has runtime tests at the pinned upstream ref:
+          valid bond/signature/state transition accepted; low bond rejected.
 Risk:     Current upstream silverc entrypoint numeric arguments are signed
           `int`; the u64::MAX boundary and full runtime transition tests
           remain unresolved before deployment.
-Action:   Add runtime covenant transition tests with real signatures and
-          authorized outputs, then resolve signed-int/u64 deployment bounds.
+Action:   Add runtime covenant transition tests for reveal/slash/withdraw
+          with real signatures and authorized outputs, then resolve
+          signed-int/u64 deployment bounds.
 Severity: HIGH until runtime transition gate passes
 ```
 
@@ -516,15 +519,17 @@ Rust modules audited:   10/10
 Python modules audited: 4/4
 
 Audit confidence:       94%
-(Deduction: ValidatorStaking current-silverc compile/ABI gate exists, but
- runtime covenant transitions and LLM confidence extraction remain open)
+(Deduction: ValidatorStaking current-silverc compile/ABI and commitVote
+ runtime gates exist, but reveal/slash/withdraw runtime transitions and
+ LLM confidence extraction remain open)
 ```
 
 **VERDICT UPDATE 2026-07-08:** Toccata/hardfork no longer looks like the
 primary blocker. The deployment blocker is now current-Silverscript contract
 runtime readiness: H-001 byte-core is verified, `ValidatorStakingState.sil`
-compiles/builds covenant sigscripts, but runtime transition tests and the
-signed-int/u64 boundary must pass before Sprint 9 deployment.
+compiles/builds covenant sigscripts, and `commitVote` runtime tests pass.
+Reveal/slash/withdraw runtime tests and the signed-int/u64 boundary must pass
+before Sprint 9 deployment.
 M-001 and M-002 can wait until full release (Aug/Sep 2026).
 
 *Audit completed 2026-04-02 by Claude Code (5 parallel agents, 7 levels, 35 checks).*

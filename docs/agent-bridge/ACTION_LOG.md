@@ -18,6 +18,9 @@
 - Extended `scripts/verify_silverc_h001.py` so the pinned upstream `silverc` test now verifies both H-001 runtime vectors and the ValidatorStaking state fixture compile/ABI path.
 - Updated CI contract guards and the runtime job name to cover the H-001 + Validator State current-silverc gate.
 - Verified locally: `python3 scripts/verify_silverc_h001.py` passed with 2 upstream tests; Black via `/tmp/prometheus-guardian-venv`; Pylint 10/10; `python3 -m py_compile`; `git diff --check`; memory integrity; contract fixture shell guards.
+- Added `.claude/` to `.gitignore` so local agent state cannot be staged accidentally.
+- Extended the pinned upstream `silverc` verifier with real `commitVote` runtime transition tests: valid bond/signature/state transition accepted, low bond rejected.
+- GitHub Prometheus CI passed for `f1dd616`, including the H-001 + Validator State Silverc Runtime job with 4 injected upstream tests.
 
 ## 2026-07-07
 
