@@ -18,15 +18,24 @@ SILVERSCRIPT_GIT = "https://github.com/kaspanet/silverscript.git"
 DEFAULT_SILVERSCRIPT_REF = "d25bd3427a093c17327ca3d6b9e1aa5f7688c863"
 
 RUST_TEST = r"""
-use kaspa_consensus_core::hashing::sighash::SigHashReusedValuesUnsync;
+use kaspa_consensus_core::hashing::sighash::{SigHashReusedValuesUnsync, calc_schnorr_signature_hash};
+use kaspa_consensus_core::hashing::sighash_type::SIG_HASH_ALL;
+use kaspa_consensus_core::Hash;
 use kaspa_consensus_core::mass::units::SigopCount;
 use kaspa_consensus_core::tx::{
     PopulatedTransaction, ScriptPublicKey, Transaction, TransactionId, TransactionInput, TransactionOutpoint, TransactionOutput, UtxoEntry,
 };
 use kaspa_txscript::caches::Cache;
 use kaspa_txscript::{EngineCtx, EngineFlags, TxScriptEngine};
+use secp256k1::{Keypair, Message, Secp256k1, SecretKey};
 use silverscript_lang::ast::Expr;
-use silverscript_lang::compiler::{CompileOptions, CovenantDeclCallOptions, compile_contract};
+use silverscript_lang::compiler::{CompileOptions, CompiledContract, CovenantDeclCallOptions, compile_contract};
+
+mod common;
+
+use common::{covenant_output, covenant_utxo, execute_input_with_covenants};
+
+const COV_A: Hash = Hash::from_bytes(*b"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
 
 fn run_script(script: Vec<u8>, sigscript: Vec<u8>) -> Result<(), kaspa_txscript_errors::TxScriptError> {
     let reused_values = SigHashReusedValuesUnsync::new();
@@ -70,6 +79,33 @@ fn dummy_signature() -> Vec<u8> {
     vec![0u8; 65]
 }
 
+fn keypair_from_seed(seed: u8) -> Keypair {
+    let secp = Secp256k1::new();
+    let secret = SecretKey::from_slice(&[seed; 32]).expect("valid deterministic secret key");
+    Keypair::from_secret_key(&secp, &secret)
+}
+
+fn tx_input_with_sigops(index: u32, signature_script: Vec<u8>, sigops: u8) -> TransactionInput {
+    TransactionInput::new(
+        TransactionOutpoint { transaction_id: TransactionId::from_bytes([index as u8 + 1; 32]), index },
+        signature_script,
+        0,
+        SigopCount(sigops).into(),
+    )
+}
+
+fn sign_tx_input(tx: &Transaction, entries: &[UtxoEntry], input_idx: usize, keypair: &Keypair) -> Vec<u8> {
+    let reused_values = SigHashReusedValuesUnsync::new();
+    let populated = PopulatedTransaction::new(tx, entries.to_vec());
+    let sig_hash = calc_schnorr_signature_hash(&populated, input_idx, SIG_HASH_ALL, &reused_values);
+    let msg = Message::from_digest_slice(sig_hash.as_bytes().as_slice()).expect("valid sighash message");
+    let sig = keypair.sign_schnorr(msg);
+    let mut signature = Vec::new();
+    signature.extend_from_slice(sig.as_ref());
+    signature.push(SIG_HASH_ALL.to_u8());
+    signature
+}
+
 fn validator_state_args(
     validator_pk: Vec<u8>,
     stake_kas: i64,
@@ -102,6 +138,18 @@ fn build_covenant_sigscript(compiled: &silverscript_lang::compiler::CompiledCont
     compiled
         .build_sig_script_for_covenant_decl(function_name, args, CovenantDeclCallOptions { is_leader: false })
         .unwrap_or_else(|err| panic!("ValidatorStakingState {function_name} sigscript builds: {err}"));
+}
+
+fn validator_state_entry_sigscript(compiled: &CompiledContract<'_>, function_name: &str, args: Vec<Expr<'_>>) -> Vec<u8> {
+    let mut sigscript = compiled
+        .build_sig_script_for_covenant_decl(function_name, args, CovenantDeclCallOptions { is_leader: false })
+        .unwrap_or_else(|err| panic!("ValidatorStakingState {function_name} sigscript builds: {err}"));
+    sigscript.extend_from_slice(&common::push_redeem_script(&compiled.script));
+    sigscript
+}
+
+fn compile_validator_state<'a>(source: &'a str, args: Vec<Expr<'static>>) -> CompiledContract<'a> {
+    compile_contract(source, &args, CompileOptions::default()).expect("ValidatorStakingState fixture compiles")
 }
 
 #[test]
@@ -212,6 +260,148 @@ fn prometheus_validator_state_fixture_compiles_against_current_silverc() {
         "completeWithdraw",
         vec![Vec::<Expr>::new().into(), Expr::int(101_300), Expr::bytes(sig)],
     );
+}
+
+#[test]
+fn prometheus_validator_state_commit_vote_runtime_accepts_valid_transition() {
+    let contract_path = std::env::var("PROMETHEUS_VALIDATOR_STATE_CONTRACT")
+        .expect("PROMETHEUS_VALIDATOR_STATE_CONTRACT is set");
+    let source = std::fs::read_to_string(contract_path).expect("read Prometheus validator state contract fixture");
+    let keypair = keypair_from_seed(7);
+    let validator_pk = keypair.x_only_public_key().0.serialize().to_vec();
+    let commitment = hex32("cda9cc6bb51d36be5db27eb6e86bfc6b6173d5918f24f81939af5411bff90ffb");
+
+    let active = compile_validator_state(
+        &source,
+        validator_state_args(
+            validator_pk.clone(),
+            20_000,
+            true,
+            1_000,
+            10_000,
+            0,
+            0,
+            zero32(),
+            0,
+            0,
+            0,
+        ),
+    );
+    let committed = compile_validator_state(
+        &source,
+        validator_state_args(
+            validator_pk,
+            20_000,
+            true,
+            1_000,
+            10_000,
+            0,
+            0,
+            commitment.clone(),
+            2_000,
+            42,
+            0,
+        ),
+    );
+
+    let placeholder_sigscript = validator_state_entry_sigscript(
+        &active,
+        "commitVote",
+        vec![Expr::bytes(commitment.clone()), Expr::int(2_000), Expr::int(42), Expr::bytes(dummy_signature())],
+    );
+    let outputs = vec![covenant_output(&committed, 0, COV_A)];
+    let entries = vec![covenant_utxo(&active, COV_A)];
+    let mut tx = Transaction::new(
+        1,
+        vec![tx_input_with_sigops(0, placeholder_sigscript, 1)],
+        outputs,
+        0,
+        Default::default(),
+        0,
+        vec![],
+    );
+    let sig = sign_tx_input(&tx, &entries, 0, &keypair);
+    tx.inputs[0].signature_script = validator_state_entry_sigscript(
+        &active,
+        "commitVote",
+        vec![Expr::bytes(commitment), Expr::int(2_000), Expr::int(42), Expr::bytes(sig)],
+    );
+
+    let result = execute_input_with_covenants(tx, entries, 0);
+    assert!(
+        result.is_ok(),
+        "commitVote runtime should accept valid bond/signature/state transition: {:?}",
+        result.err()
+    );
+}
+
+#[test]
+fn prometheus_validator_state_commit_vote_runtime_rejects_low_bond() {
+    let contract_path = std::env::var("PROMETHEUS_VALIDATOR_STATE_CONTRACT")
+        .expect("PROMETHEUS_VALIDATOR_STATE_CONTRACT is set");
+    let source = std::fs::read_to_string(contract_path).expect("read Prometheus validator state contract fixture");
+    let keypair = keypair_from_seed(7);
+    let validator_pk = keypair.x_only_public_key().0.serialize().to_vec();
+    let commitment = hex32("cda9cc6bb51d36be5db27eb6e86bfc6b6173d5918f24f81939af5411bff90ffb");
+
+    let active = compile_validator_state(
+        &source,
+        validator_state_args(
+            validator_pk.clone(),
+            20_000,
+            true,
+            1_000,
+            10_000,
+            0,
+            0,
+            zero32(),
+            0,
+            0,
+            0,
+        ),
+    );
+    let low_bond_state = compile_validator_state(
+        &source,
+        validator_state_args(
+            validator_pk,
+            20_000,
+            true,
+            1_000,
+            10_000,
+            0,
+            0,
+            commitment.clone(),
+            1_999,
+            42,
+            0,
+        ),
+    );
+
+    let placeholder_sigscript = validator_state_entry_sigscript(
+        &active,
+        "commitVote",
+        vec![Expr::bytes(commitment.clone()), Expr::int(1_999), Expr::int(42), Expr::bytes(dummy_signature())],
+    );
+    let outputs = vec![covenant_output(&low_bond_state, 0, COV_A)];
+    let entries = vec![covenant_utxo(&active, COV_A)];
+    let mut tx = Transaction::new(
+        1,
+        vec![tx_input_with_sigops(0, placeholder_sigscript, 1)],
+        outputs,
+        0,
+        Default::default(),
+        0,
+        vec![],
+    );
+    let sig = sign_tx_input(&tx, &entries, 0, &keypair);
+    tx.inputs[0].signature_script = validator_state_entry_sigscript(
+        &active,
+        "commitVote",
+        vec![Expr::bytes(commitment), Expr::int(1_999), Expr::int(42), Expr::bytes(sig)],
+    );
+
+    let err = execute_input_with_covenants(tx, entries, 0).expect_err("commitVote must reject bond below 10% of stake");
+    common::assert_verify_like_error(err);
 }
 """
 

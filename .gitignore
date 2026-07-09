@@ -5,6 +5,9 @@
 *.key
 *.pem
 
+# Local agent/tooling state
+.claude/
+
 # Rust
 target/
 **/*.rs.bk
