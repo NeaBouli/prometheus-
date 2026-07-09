@@ -126,15 +126,14 @@ Current runtime coverage:
 - `register` accepts a valid guardian signature and state transition
 - `register` rejects compute power below `MIN_COMPUTE_GFLOPS`
 - `proposalAccepted` accepts a valid governance signature and state transition
-- `proposalAccepted` rejects negative reputation increases
+- `proposalAccepted` computes `isqrt(compute_power_gflops) * 100` on-chain
 - `proposalRejected` accepts a valid governance signature and state transition
 - `proposalRejected` rejects unregistered guardian state
 
 Current scope note:
 
-- current upstream Silverc has no `while` statement in the grammar
-- the legacy `sqrt(compute_power) * 100` accepted-proposal increment is not
-  computed on-chain in this fixture yet
-- `proposalAccepted` accepts a governance-signed nonnegative
-  `reputation_increase` and caps reputation at `REPUTATION_MAX`
-- exact accepted-proposal formula verification remains pending
+- current upstream Silverc uses bounded `for` loops rather than `while`
+- the legacy `sqrt(compute_power) * 100` accepted-proposal increment is
+  implemented as exact integer square root for the allowed `< 1_000_000`
+  compute-power range
+- `proposalAccepted` caps reputation at `REPUTATION_MAX`

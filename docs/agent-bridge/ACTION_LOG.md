@@ -39,6 +39,8 @@
 - GitHub Prometheus CI, Security Audit, and Pages passed for `b094444`; Prometheus CI now includes the GuardianReputationState compile/ABI fixture guard in addition to H-001, ValidatorStaking runtime gates, and signed-int deployment bounds.
 - Added GuardianReputation runtime tests to the pinned upstream `silverc` verifier: `register` accepts valid guardian signature/state transition and rejects low compute power; `proposalAccepted` accepts valid governance signature/state transition and rejects negative reputation increase; `proposalRejected` accepts valid governance signature/state transition and rejects unregistered guardian state.
 - GitHub Prometheus CI, Security Audit, and Pages passed for `81e7a97`; the H-001 + Validator State Silverc Runtime job now also covers GuardianReputationState runtime paths.
+- Restored the exact GuardianReputation accepted-proposal formula in current Silverc using a bounded `for`-loop `isqrt` implementation over the allowed `< 1_000_000` compute-power range; `proposalAccepted` now computes `isqrt(compute_power_gflops) * 100` on-chain and caps at `REPUTATION_MAX`.
+- GitHub Prometheus CI, Security Audit, and Pages passed for `eebc521`; the GuardianReputation formula gate is now verified against pinned upstream `silverc`.
 
 ## 2026-07-07
 

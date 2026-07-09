@@ -35,9 +35,9 @@ Goal:     All sprints 0-7 accepted. Post-Toccata deployment verification.
 | claude-code-start.sh         | DONE            | 100%     | 2026-03-21  | -            | -               |
 | **SPRINT 0 – SETUP**         |                 |          |             |              |                 |
 | Testnet-10-Node              | DONE            | 100%     | 2026-03-21  | -            | wrpc://127.0.0.1:17210 |
-| Silverscript tooling (silverc/ssc) | IN_PROGRESS | 99%      | 2026-07-09  | -            | Upstream `silverc` builds/tests in CI; H-001 fixture verifies; ValidatorStaking state fixture compiles; `commitVote`, `revealVote`, `slashInvalidReveal`, `requestWithdraw`, `completeWithdraw`, and signed-int deployment-bound runtime tests pass; GuardianReputationState compile/ABI and runtime gates pass; remaining deployment-scoped contract ports and Guardian accepted-proposal formula gate pending |
+| Silverscript tooling (silverc/ssc) | IN_PROGRESS | 99%      | 2026-07-09  | -            | Upstream `silverc` builds/tests in CI; H-001 fixture verifies; ValidatorStaking state fixture compiles; `commitVote`, `revealVote`, `slashInvalidReveal`, `requestWithdraw`, `completeWithdraw`, and signed-int deployment-bound runtime tests pass; GuardianReputationState compile/ABI/runtime/formula gates pass; remaining deployment-scoped contract ports pending |
 | Hello-World Contract         | PENDING         | 0%       | 2026-03-21  | -            | Deployment nach ssc-Release |
-| GitHub Actions CI/CD         | ACCEPTED        | 100%     | 2026-07-09  | ACCEPTED     | Prometheus CI, Security Audit, and Pages green for 81e7a97 |
+| GitHub Actions CI/CD         | ACCEPTED        | 100%     | 2026-07-09  | ACCEPTED     | Prometheus CI, Security Audit, and Pages green for eebc521 |
 | Sprint-1 Pre-Check           | ACCEPTED        | 100%     | 2026-03-21  | ACCEPTED     | V-001, V-002, V-003 alle genehmigt |
 | **SPRINT 1 – CONTRACTS**     |                 |          |             |              |                 |
 | ValidatorStaking.ss          | ACCEPTED        | 100%     | 2026-03-21  | ACCEPTED     | v1.2: slash ACL, bond return, test patches |
@@ -92,7 +92,7 @@ Local upstream Silverscript check: `/tmp/prom-silverscript` `cargo test -p silve
 Repo H-001 fixture: `modules/contracts/silverc/ValidatorStakingH001.sil` plus `scripts/verify_silverc_h001.py` verifies explicit `vote_byte || byte[8](salt) || byte[8](block_height)` against Rust vectors at pinned Silverscript ref `d25bd3427a093c17327ca3d6b9e1aa5f7688c863`.
 Repo ValidatorStaking current-silverc state fixture: `modules/contracts/silverc/ValidatorStakingState.sil` compiles against the same pinned upstream `silverc`; the verifier builds covenant sigscripts for `commitVote`, `revealVote`, `slashInvalidReveal`, `requestWithdraw`, and `completeWithdraw`.
 Repo ValidatorStaking runtime gate: `scripts/verify_silverc_h001.py` now injects upstream runtime tests for `commitVote`, `revealVote`, `slashInvalidReveal`, `requestWithdraw`, and `completeWithdraw`; valid commit/reveal/slash/request-withdraw/complete-withdraw signature/state transitions are accepted, low bond is rejected, wrong reveal salt is rejected, slash of a valid reveal is rejected, withdrawal with an open commitment is rejected, complete-withdraw before cooldown is rejected, and negative signed deployment inputs are rejected in GitHub Prometheus CI for `b094444`.
-Repo GuardianReputation current-silverc state fixture: `modules/contracts/silverc/GuardianReputationState.sil` compiles against the same pinned upstream `silverc`; the verifier builds covenant sigscripts and runtime-tests `register`, `proposalAccepted`, and `proposalRejected` without badge, NFT, Kasplex, or staking semantics. Valid guardian/governance signature transitions are accepted, low compute power is rejected, negative reputation increase is rejected, and unregistered rejection is rejected. Exact accepted-proposal formula verification remains pending.
+Repo GuardianReputation current-silverc state fixture: `modules/contracts/silverc/GuardianReputationState.sil` compiles against the same pinned upstream `silverc`; the verifier builds covenant sigscripts and runtime-tests `register`, `proposalAccepted`, and `proposalRejected` without badge, NFT, Kasplex, or staking semantics. Valid guardian/governance signature transitions are accepted, low compute power is rejected, unregistered rejection is rejected, reputation caps at `REPUTATION_MAX`, and the accepted-proposal formula is verified as exact bounded `isqrt(compute_power_gflops) * 100`.
 Signed-int boundary decision: current upstream Silverc entrypoint `int` values are deployable only in the nonnegative signed range `0..=i64::MAX`; Rust retains raw `u64` H-001 vectors for byte compatibility and uses `build_silverc_checked` / `validate_silverc_commitment_bounds` for deployment calls.
 Rusty-Kaspa workspace dependencies pinned to `v2.0.1`; `cargo audit` now reports no vulnerabilities, only allowed warnings.
 GitHub Security Audit workflow re-enabled and dependency audits now fail on findings instead of using `|| true`.
@@ -102,7 +102,7 @@ Rollback tag: pre-session-20260413 → 6347b85
 
 ## BLOCKED
 
-Sprint 9 remains blocked until the remaining Prometheus contracts are ported or deployment-scoped against current Silverscript tooling and the Guardian accepted-proposal formula gate passes.
+Sprint 9 remains blocked until the remaining Prometheus contracts are ported or deployment-scoped against current Silverscript tooling.
 
 ## NEXT ACTIONS (for Claude Code)
 
