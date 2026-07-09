@@ -26,6 +26,19 @@ contract GuardianReputationState(
     int registered_at = init_registered_at;
     int model_type = init_model_type;
 
+    function isqrt(int n) : int {
+        require(n >= 0);
+        require(n < 1000000);
+
+        int result = 0;
+        for (i, 1, 1001, 1000) {
+            if (i * i <= n) {
+                result = i;
+            }
+        }
+        return(result);
+    }
+
     #[covenant.singleton(mode = transition)]
     function register(State prev_state, int new_compute_power_gflops, int new_registered_at, sig guardian_sig) : State {
         require(prev_state.registered_at == 0);
@@ -49,11 +62,13 @@ contract GuardianReputationState(
     }
 
     #[covenant.singleton(mode = transition)]
-    function proposalAccepted(State prev_state, int reputation_increase, sig governance_sig) : State {
+    function proposalAccepted(State prev_state, sig governance_sig) : State {
         require(prev_state.registered_at > 0);
-        require(reputation_increase >= 0);
+        require(prev_state.compute_power_gflops >= MIN_COMPUTE_GFLOPS);
+        require(prev_state.compute_power_gflops < 1000000);
         require(checkSig(governance_sig, prev_state.governance_pk));
 
+        int reputation_increase = isqrt(prev_state.compute_power_gflops) * 100;
         int increased_reputation = prev_state.reputation + reputation_increase;
         int capped_reputation = increased_reputation > REPUTATION_MAX ? REPUTATION_MAX : increased_reputation;
 

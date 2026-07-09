@@ -343,7 +343,7 @@ fn prometheus_guardian_reputation_state_fixture_compiles_against_current_silverc
     build_covenant_sigscript(
         &registered,
         "proposalAccepted",
-        vec![Expr::int(2_000), Expr::bytes(sig.clone())],
+        vec![Expr::bytes(sig.clone())],
     );
     build_covenant_sigscript(
         &registered,
@@ -461,13 +461,13 @@ fn prometheus_guardian_reputation_proposal_accepted_runtime_accepts_valid_transi
     );
     let accepted = compile_guardian_state(
         &source,
-        guardian_state_args(guardian_pk, governance_pk, 500, 3_000, 0, 1, 1_000, 0),
+        guardian_state_args(guardian_pk, governance_pk, 500, 3_200, 0, 1, 1_000, 0),
     );
 
     let placeholder_sigscript = guardian_state_entry_sigscript(
         &registered,
         "proposalAccepted",
-        vec![Expr::int(2_000), Expr::bytes(dummy_signature())],
+        vec![Expr::bytes(dummy_signature())],
     );
     let outputs = vec![covenant_output(&accepted, 0, COV_A)];
     let entries = vec![covenant_utxo(&registered, COV_A)];
@@ -484,7 +484,7 @@ fn prometheus_guardian_reputation_proposal_accepted_runtime_accepts_valid_transi
     tx.inputs[0].signature_script = guardian_state_entry_sigscript(
         &registered,
         "proposalAccepted",
-        vec![Expr::int(2_000), Expr::bytes(sig)],
+        vec![Expr::bytes(sig)],
     );
 
     let result = execute_input_with_covenants(tx, entries, 0);
@@ -496,7 +496,7 @@ fn prometheus_guardian_reputation_proposal_accepted_runtime_accepts_valid_transi
 }
 
 #[test]
-fn prometheus_guardian_reputation_proposal_accepted_runtime_rejects_negative_increase() {
+fn prometheus_guardian_reputation_proposal_accepted_runtime_caps_reputation() {
     let contract_path = std::env::var("PROMETHEUS_GUARDIAN_STATE_CONTRACT")
         .expect("PROMETHEUS_GUARDIAN_STATE_CONTRACT is set");
     let source = std::fs::read_to_string(contract_path).expect("read Prometheus guardian reputation contract fixture");
@@ -506,19 +506,19 @@ fn prometheus_guardian_reputation_proposal_accepted_runtime_rejects_negative_inc
 
     let registered = compile_guardian_state(
         &source,
-        guardian_state_args(guardian_pk.clone(), governance_pk.clone(), 500, 1_000, 0, 0, 1_000, 0),
+        guardian_state_args(guardian_pk.clone(), governance_pk.clone(), 500, 99_000, 0, 0, 1_000, 0),
     );
-    let invalid_next = compile_guardian_state(
+    let capped = compile_guardian_state(
         &source,
-        guardian_state_args(guardian_pk, governance_pk, 500, 1_000, 0, 1, 1_000, 0),
+        guardian_state_args(guardian_pk, governance_pk, 500, 100_000, 0, 1, 1_000, 0),
     );
 
     let placeholder_sigscript = guardian_state_entry_sigscript(
         &registered,
         "proposalAccepted",
-        vec![Expr::int(-1), Expr::bytes(dummy_signature())],
+        vec![Expr::bytes(dummy_signature())],
     );
-    let outputs = vec![covenant_output(&invalid_next, 0, COV_A)];
+    let outputs = vec![covenant_output(&capped, 0, COV_A)];
     let entries = vec![covenant_utxo(&registered, COV_A)];
     let mut tx = Transaction::new(
         1,
@@ -533,11 +533,15 @@ fn prometheus_guardian_reputation_proposal_accepted_runtime_rejects_negative_inc
     tx.inputs[0].signature_script = guardian_state_entry_sigscript(
         &registered,
         "proposalAccepted",
-        vec![Expr::int(-1), Expr::bytes(sig)],
+        vec![Expr::bytes(sig)],
     );
 
-    let err = execute_input_with_covenants(tx, entries, 0).expect_err("proposalAccepted must reject negative reputation increase");
-    common::assert_verify_like_error(err);
+    let result = execute_input_with_covenants(tx, entries, 0);
+    assert!(
+        result.is_ok(),
+        "Guardian proposalAccepted runtime should cap reputation at REPUTATION_MAX: {:?}",
+        result.err()
+    );
 }
 
 #[test]
