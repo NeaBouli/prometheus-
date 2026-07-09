@@ -27,23 +27,23 @@ contract GuardianReputationState(
     int model_type = init_model_type;
 
     #[covenant.singleton(mode = transition)]
-    function register(State prev_state, int compute_power_gflops, int registered_at, sig guardian_sig) : State {
+    function register(State prev_state, int new_compute_power_gflops, int new_registered_at, sig guardian_sig) : State {
         require(prev_state.registered_at == 0);
-        require(compute_power_gflops >= MIN_COMPUTE_GFLOPS);
-        require(compute_power_gflops < 1000000);
-        require(registered_at >= 0);
+        require(new_compute_power_gflops >= MIN_COMPUTE_GFLOPS);
+        require(new_compute_power_gflops < 1000000);
+        require(new_registered_at >= 0);
         require(checkSig(guardian_sig, prev_state.guardian_pk));
 
-        int model = compute_power_gflops >= 500 ? MODEL_TYPE_70B : MODEL_TYPE_8B;
+        int model = new_compute_power_gflops >= 500 ? MODEL_TYPE_70B : MODEL_TYPE_8B;
 
         return({
             guardian_pk: prev_state.guardian_pk,
             governance_pk: prev_state.governance_pk,
-            compute_power_gflops: compute_power_gflops,
+            compute_power_gflops: new_compute_power_gflops,
             reputation: REPUTATION_START,
             proposals_submitted: 0,
             proposals_accepted: 0,
-            registered_at: registered_at,
+            registered_at: new_registered_at,
             model_type: model
         });
     }
