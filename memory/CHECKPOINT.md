@@ -13,7 +13,7 @@
 | Repo | https://github.com/NeaBouli/prometheus- |
 | Branch | main |
 | Lokaler Pfad | ~/Desktop/prometheus |
-| Letzter Produkt-Code-Baseline-Commit | 176ce52 — style: apply rustfmt to silverc boundary guard |
+| Letzter Produkt-Code-Baseline-Commit | b094444 — fix: avoid guardian silverc state binding collision |
 | Aktueller HEAD | Mit `git log --oneline -1` prüfen; Bridge-/Status-Commits können neuer sein |
 | Rollback-Tag | `pre-session-20260413` → `6347b85` |
 | Whitepaper | WHITEPAPER.md (root) + whitepaper.html (styled) |
@@ -100,7 +100,7 @@
 ## OFFENE TODOS (Priorität)
 
 ### Für Core Dev (manuell):
-- [x] GitHub Pages aktiv/live: latest pages-build-deployment succeeded for `176ce52`
+- [x] GitHub Pages aktiv/live: latest pages-build-deployment succeeded for `b094444`
 - [ ] Repository public schalten
 - [ ] Gitcoin Grants Antrag einreichen (Deadline: April 2026)
 - [ ] Discord/Telegram aufbauen
@@ -111,7 +111,7 @@
 **STARTFLOW — Lies dies zuerst:**
 ```
 1. cd /Users/gio/Desktop/repos/prometheus
-2. git log --oneline -5              → aktuellen HEAD prüfen; Produkt-Code-Baseline = 176ce52
+2. git log --oneline -5              → aktuellen HEAD prüfen; Produkt-Code-Baseline = b094444
 3. git tag -l                        → Rollback: pre-session-20260413
 4. cargo test 2>&1 | tail -5         → Muss grün sein
 5. Lies BACKLOG.md                   → Priorisierte Task-Liste
@@ -119,12 +119,12 @@
 7. Lies memory/ERRORS.md             → 12 bekannte Patterns
 ```
 
-**Status: Feature-complete through Sprint 7. Kaspa Toccata status researched 2026-07-07; upstream `silverc` verified in CI; repo H-001 fixture and ValidatorStakingState commit/reveal/slash/request-withdraw/complete-withdraw runtime paths verify at pinned Silverscript ref `d25bd3427a093c17327ca3d6b9e1aa5f7688c863`; signed-int deployment bounds are enforced as `0..=i64::MAX`; deployment now depends on remaining deployment-scoped contract ports.**
+**Status: Feature-complete through Sprint 7. Kaspa Toccata status researched 2026-07-07; upstream `silverc` verified in CI; repo H-001 fixture and ValidatorStakingState commit/reveal/slash/request-withdraw/complete-withdraw runtime paths verify at pinned Silverscript ref `d25bd3427a093c17327ca3d6b9e1aa5f7688c863`; GuardianReputationState compile/ABI gate passes for register/proposalAccepted/proposalRejected; signed-int deployment bounds are enforced as `0..=i64::MAX`; deployment now depends on remaining deployment-scoped contract ports and Guardian runtime/formula gates.**
 
 **Offene Tasks (priorisiert):**
 - [x] PATTERN-010 fix: Arc<Phi3Model> statt Arc<Mutex<Phi3Model>> — DONE `6347b85`
 - [x] Rust client production/beta stub gates — DONE 2026-07-08 (`PROMETHEUS_RUNTIME`)
-- [~] H-001: LE encoding Verifikation — repo `silverc` fixture passes for Rust byte vectors; ValidatorStakingState commit/reveal/slash/request-withdraw/complete-withdraw runtime gates pass; signed-int deployment bounds enforced as `0..=i64::MAX`
+- [~] H-001: LE encoding Verifikation — repo `silverc` fixture passes for Rust byte vectors; ValidatorStakingState commit/reveal/slash/request-withdraw/complete-withdraw runtime gates pass; signed-int deployment bounds enforced as `0..=i64::MAX`; GuardianReputationState compile/ABI gate passes, runtime/formula gate pending
 - [ ] Sprint 9: Contracts compile + deploy — blocked until remaining Prometheus contracts compile with current Silverscript and runtime gates pass
 - [ ] Sprint 10B: Guardian hybrid routing (8B/70B) + Ensemble voting
 - [ ] Q-003: fp_rate Oracle — Contract-side stub remains; Architect-Entscheidung nötig
@@ -134,7 +134,7 @@
 - [ ] PLONK evaluation for Light Client ZK-proofs
 
 ### Wartet auf externe Events:
-- [~] ssc/Silverscript tooling local install + smoke test → upstream `silverc` and H-001/ValidatorState runtime gates pass in CI; signed-int deployment bounds enforced; full Prometheus contract compatibility pending
+- [~] ssc/Silverscript tooling local install + smoke test → upstream `silverc`, H-001/ValidatorState runtime gates, and GuardianReputationState compile/ABI gate pass in CI; signed-int deployment bounds enforced; full Prometheus contract compatibility pending
 - [ ] Phi-3-mini Modell herunterladen → Sprint 11
 - [ ] LLaMA 3 Fine-Tuning → Sprint 12
 - [ ] vProgs (DAGKnight) → Sprint 14
@@ -265,6 +265,6 @@ Leistungsbasierte Emission. Guardians = "Miner" (KI statt GPU).
 - Full 7-level audit completed (35 checks, 5 parallel agents)
 - 0 CRITICAL, 2 HIGH, 2 MEDIUM, 3 LOW findings
 - 203/204 tests passing, 92% audit confidence
-- VERDICT update 2026-07-09: H-002 fixed; upstream `silverc`, repo H-001 fixture, current-silverc `ValidatorStakingState.sil` compile/ABI gate, `commitVote`/`revealVote`/`slashInvalidReveal`/`requestWithdraw`/`completeWithdraw` runtime tests, and signed-int deployment-bound guards passed; remaining deployment-scoped contract ports remain the deploy blockers before Sprint 9.
+- VERDICT update 2026-07-09: H-002 fixed; upstream `silverc`, repo H-001 fixture, current-silverc `ValidatorStakingState.sil` compile/ABI gate, `commitVote`/`revealVote`/`slashInvalidReveal`/`requestWithdraw`/`completeWithdraw` runtime tests, signed-int deployment-bound guards, and GuardianReputationState compile/ABI gate passed; remaining deployment-scoped contract ports and Guardian runtime/formula gates remain the deploy blockers before Sprint 9.
 
-*Prometheus v4.0 · Checkpoint 2026-07-09 · Last updated: ValidatorStaking runtime gates + signed-int deployment bounds + H-001 deploy gate · The fire belongs to humanity.*
+*Prometheus v4.0 · Checkpoint 2026-07-09 · Last updated: ValidatorStaking runtime gates + GuardianReputation compile/ABI gate + signed-int deployment bounds · The fire belongs to humanity.*

@@ -33,6 +33,10 @@
 - Enforced deployment bounds in `ValidatorStakingState.sil` and Rust validator commitment helpers: current-Silverc deployment `salt` and `block_height` are scoped to `0..=i64::MAX`, while raw Rust `u64` H-001 byte vectors remain available for compatibility tests.
 - Added runtime tests rejecting negative signed deployment inputs for commit/reveal/slash/request-withdraw paths and Rust tests rejecting `u64::MAX` through `build_silverc_checked`.
 - GitHub Prometheus CI, Security Audit, and Pages passed for `176ce52`; Prometheus CI includes Memory Integrity, HTML Pages, Python Guardian, Rust Workspace, Silverscript Contracts, and H-001 + Validator State Silverc Runtime.
+- Added current-Silverscript GuardianReputation state fixture `modules/contracts/silverc/GuardianReputationState.sil` and extended `scripts/verify_silverc_h001.py` so the pinned upstream verifier compiles the fixture and builds covenant sigscripts for `register`, `proposalAccepted`, and `proposalRejected`.
+- Learned and fixed two current-Silverc grammar constraints during the Guardian port: `while` is not available in the upstream grammar, and state field names cannot be reused as entrypoint parameter bindings.
+- GuardianReputation compile/ABI scope intentionally does not introduce badge, NFT, Kasplex, or staking semantics; Guardian reputation remains canonical on Kaspa L1.
+- GitHub Prometheus CI, Security Audit, and Pages passed for `b094444`; Prometheus CI now includes the GuardianReputationState compile/ABI fixture guard in addition to H-001, ValidatorStaking runtime gates, and signed-int deployment bounds.
 
 ## 2026-07-07
 
