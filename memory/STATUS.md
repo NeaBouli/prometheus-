@@ -35,7 +35,7 @@ Goal:     All sprints 0-7 accepted. Post-Toccata deployment verification.
 | claude-code-start.sh         | DONE            | 100%     | 2026-03-21  | -            | -               |
 | **SPRINT 0 – SETUP**         |                 |          |             |              |                 |
 | Testnet-10-Node              | DONE            | 100%     | 2026-03-21  | -            | wrpc://127.0.0.1:17210 |
-| Silverscript tooling (silverc/ssc) | IN_PROGRESS | 90%      | 2026-07-09  | -            | Upstream `silverc` builds/tests in CI; H-001 fixture verifies; ValidatorStaking state fixture compiles; `commitVote` and `revealVote` runtime transition tests pass; slash/withdraw transitions pending |
+| Silverscript tooling (silverc/ssc) | IN_PROGRESS | 92%      | 2026-07-09  | -            | Upstream `silverc` builds/tests in CI; H-001 fixture verifies; ValidatorStaking state fixture compiles; `commitVote`, `revealVote`, and `slashInvalidReveal` runtime transition tests pass; withdraw transitions pending |
 | Hello-World Contract         | PENDING         | 0%       | 2026-03-21  | -            | Deployment nach ssc-Release |
 | GitHub Actions CI/CD         | ACCEPTED        | 100%     | 2026-07-08  | ACCEPTED     | CI, Security Audit, and Pages green for eeb4808 |
 | Sprint-1 Pre-Check           | ACCEPTED        | 100%     | 2026-03-21  | ACCEPTED     | V-001, V-002, V-003 alle genehmigt |
@@ -91,7 +91,7 @@ Direct Sandbox check: `ssh sandbox` works, but `kaspad` and `ssc` were not found
 Local upstream Silverscript check: `/tmp/prom-silverscript` `cargo test -p silverscript-lang` passed; `silverc --help` works.
 Repo H-001 fixture: `modules/contracts/silverc/ValidatorStakingH001.sil` plus `scripts/verify_silverc_h001.py` verifies explicit `vote_byte || byte[8](salt) || byte[8](block_height)` against Rust vectors for positive 64-bit values at pinned Silverscript ref `d25bd3427a093c17327ca3d6b9e1aa5f7688c863`.
 Repo ValidatorStaking current-silverc state fixture: `modules/contracts/silverc/ValidatorStakingState.sil` compiles against the same pinned upstream `silverc`; the verifier builds covenant sigscripts for `commitVote`, `revealVote`, `slashInvalidReveal`, `requestWithdraw`, and `completeWithdraw`.
-Repo ValidatorStaking runtime gate: `scripts/verify_silverc_h001.py` now injects upstream runtime tests for `commitVote` and `revealVote`; valid commit/reveal signature/state transitions are accepted, low bond is rejected, and wrong reveal salt is rejected in GitHub Prometheus CI for `8f05afb`.
+Repo ValidatorStaking runtime gate: `scripts/verify_silverc_h001.py` now injects upstream runtime tests for `commitVote`, `revealVote`, and `slashInvalidReveal`; valid commit/reveal/slash signature/state transitions are accepted, low bond is rejected, wrong reveal salt is rejected, and slash of a valid reveal is rejected in GitHub Prometheus CI for `6dfe133`.
 Rusty-Kaspa workspace dependencies pinned to `v2.0.1`; `cargo audit` now reports no vulnerabilities, only allowed warnings.
 GitHub Security Audit workflow re-enabled and dependency audits now fail on findings instead of using `|| true`.
 Rust client runtime gate added: `PROMETHEUS_RUNTIME=beta|mainnet|production|prod` rejects ZK/Phi-3/KRC-20/Fed-DART stubs; development mode remains testable.
@@ -100,7 +100,7 @@ Rollback tag: pre-session-20260413 → 6347b85
 
 ## BLOCKED
 
-Sprint 9 remains blocked until the remaining current-Silverscript validator transitions (`slashInvalidReveal`, `requestWithdraw`, `completeWithdraw`) have runtime tests with real signatures/authorized outputs, the signed-int/u64 boundary is resolved, and the remaining Prometheus contracts are ported or deployment-scoped against current Silverscript tooling.
+Sprint 9 remains blocked until the remaining current-Silverscript validator transitions (`requestWithdraw`, `completeWithdraw`) have runtime tests with real signatures/authorized outputs, the signed-int/u64 boundary is resolved, and the remaining Prometheus contracts are ported or deployment-scoped against current Silverscript tooling.
 
 ## NEXT ACTIONS (for Claude Code)
 
@@ -111,7 +111,7 @@ STARTFLOW — Read in this order:
 3. memory/ERRORS.md → 12 known patterns
 
 Priority tasks:
-- Sprint 9: add runtime transition tests for `ValidatorStakingState.sil` slash/withdraw paths, then port/compile remaining deployment-scoped contracts with current `silverc`
+- Sprint 9: add runtime transition tests for `ValidatorStakingState.sil` withdraw paths, then port/compile remaining deployment-scoped contracts with current `silverc`
 - H-001: keep LE encoding verification gated in CI; resolve signed-int/u64 boundary before full contract deployment
 - Q-003: replace/gate contract-side `fp_rate` oracle stub before beta/mainnet governance
 - Sprint 10B: Guardian Decentralization (hybrid routing, ensemble voting)

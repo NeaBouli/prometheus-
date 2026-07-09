@@ -23,6 +23,8 @@
 - GitHub Prometheus CI passed for `f1dd616`, including the H-001 + Validator State Silverc Runtime job with 4 injected upstream tests.
 - Extended the pinned upstream `silverc` verifier with real `revealVote` runtime transition tests: valid reveal/signature/state transition accepted, wrong salt rejected.
 - GitHub Prometheus CI, Security Audit, and Pages passed for `8f05afb`; the H-001 + Validator State Silverc Runtime job now covers H-001 vectors plus commit/reveal runtime paths.
+- Extended the pinned upstream `silverc` verifier with real `slashInvalidReveal` runtime transition tests: invalid reveal slash accepted, valid reveal slash rejected.
+- GitHub Prometheus CI, Security Audit, and Pages passed for `6dfe133`; the H-001 + Validator State Silverc Runtime job now covers H-001 vectors plus commit/reveal/slash runtime paths.
 
 ## 2026-07-07
 
