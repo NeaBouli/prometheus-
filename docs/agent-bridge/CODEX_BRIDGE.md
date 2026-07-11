@@ -3,10 +3,10 @@
 Last updated: 2026-07-11 EEST
 Repo path: /Users/gio/Desktop/repos/prometheus
 Branch observed: main
-Latest product-code baseline observed: `26b7aa1 docs: record governance auto tuning runtime ci`
-Latest verified feature baseline observed: `2bb7521 feat: add governance auto tuning silverc gates`
-Latest CI note: Prometheus CI, Security Audit, and Pages passed for `26b7aa1`; pinned Silverc runtime job passes 55 upstream-injected tests including GovernanceAutoTuningState signed metrics and auto-tune runtime gates.
-Latest local tooling note: `scripts/smoke_silverc_artifacts.py` locally compiles all 7 current-Silverc fixtures through the pinned upstream `silverc` CLI into JSON artifacts and validates script bytes, state layout, compiler version, and expected ABI entrypoints. No upstream network deploy CLI exists in `silverc`; real on-chain deploy/orchestration remains open.
+Latest product-code baseline observed: `14b89a1 ci: add current silverc artifact smoke`
+Latest verified feature baseline observed: `14b89a1 ci: add current silverc artifact smoke`
+Latest CI note: Prometheus CI, Security Audit, and Pages passed for `14b89a1`; pinned Silverc runtime job passes 55 upstream-injected tests and the new current-Silverc artifact-smoke CI step compiles all 7 fixtures through upstream `silverc`.
+Latest tooling note: `scripts/smoke_silverc_artifacts.py` compiles all 7 current-Silverc fixtures through the pinned upstream `silverc` CLI into JSON artifacts and validates script bytes, state layout, compiler version, and expected ABI entrypoints. No upstream network deploy CLI exists in `silverc`; real on-chain deploy/orchestration remains open.
 Latest public-docs note: README, `WHITEPAPER.md`, and `whitepaper.html` were refreshed to reflect post-Toccata deployment gating, verified current-Silverc H-001/Validator/Guardian/RuleStorage/CommunityDonations/DevIncentivePool/GovernanceAutoTuning runtime gates, target-only PROM-RULES asset orchestration, and the no-Kasplex-reputation rule.
 
 Purpose: This file is the local bridge for Codex/Claude Code handover. Read it before touching product code. It consolidates the project state, architecture rules, workflow logic, current open issues, the Reputation Badge decision, and the new direct Sandbox access note.
@@ -298,7 +298,7 @@ Known consolidated status from memory/handover and user-provided synthesis:
 | 6 | E2E integration, 18 tests | ACCEPTED |
 | 7 | Dashboard and docs | ACCEPTED |
 | 8 | Contributing/wiki/site/SEO in older handover | ACCEPTED in older handover |
-| 9 | Contract deploy on Testnet/Mainnet path | BLOCKED until current-Silverc JSON artifact smoke is CI-verified and the missing network deploy/orchestration path, signed metrics-oracle operator integration, and release hardening pass |
+| 9 | Contract deploy on Testnet/Mainnet path | BLOCKED until the missing network deploy/orchestration path, signed metrics-oracle operator integration, and release hardening pass. Current-Silverc runtime and JSON artifact-smoke gates are CI-verified. |
 | 10B | Guardian decentralization | Startable, but architecture-sensitive |
 
 Test status from user synthesis:
