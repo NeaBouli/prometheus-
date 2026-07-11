@@ -1,7 +1,7 @@
 # PROMETHEUS – MODULE STATUS
 # Format: | Module | Status | Progress | Last Update | Audit | Testnet Address |
 # Status: PENDING | IN_PROGRESS | DONE | BLOCKED | PENDING_AUDIT | ACCEPTED | REJECTED
-# Last Updated: 2026-07-07
+# Last Updated: 2026-07-11
 
 ---
 
@@ -37,7 +37,7 @@ Goal:     All sprints 0-7 accepted. Post-Toccata deployment verification.
 | Testnet-10-Node              | DONE            | 100%     | 2026-03-21  | -            | wrpc://127.0.0.1:17210 |
 | Silverscript tooling (silverc/ssc) | IN_PROGRESS | 99%      | 2026-07-09  | -            | Upstream `silverc` builds/tests in CI; H-001 fixture verifies; ValidatorStaking state fixture compiles; `commitVote`, `revealVote`, `slashInvalidReveal`, `requestWithdraw`, `completeWithdraw`, and signed-int deployment-bound runtime tests pass; GuardianReputationState compile/ABI/runtime/formula gates pass; RuleStorageState compile/ABI gate passes; remaining deployment-scoped contract ports pending |
 | Hello-World Contract         | PENDING         | 0%       | 2026-03-21  | -            | Deployment nach ssc-Release |
-| GitHub Actions CI/CD         | ACCEPTED        | 100%     | 2026-07-09  | ACCEPTED     | Prometheus CI, Security Audit, and Pages green for 1b0b4c7 |
+| GitHub Actions CI/CD         | ACCEPTED        | 100%     | 2026-07-11  | ACCEPTED     | Prometheus CI, Security Audit, and Pages green for a11545b |
 | Sprint-1 Pre-Check           | ACCEPTED        | 100%     | 2026-03-21  | ACCEPTED     | V-001, V-002, V-003 alle genehmigt |
 | **SPRINT 1 – CONTRACTS**     |                 |          |             |              |                 |
 | ValidatorStaking.ss          | ACCEPTED        | 100%     | 2026-03-21  | ACCEPTED     | v1.2: slash ACL, bond return, test patches |
@@ -96,8 +96,8 @@ Repo GuardianReputation current-silverc state fixture: `modules/contracts/silver
 Repo RuleStorage current-silverc state fixture: `modules/contracts/silverc/RuleStorageState.sil` compiles against the same pinned upstream `silverc`; the verifier builds covenant sigscripts for `submitProposal`, `voteOnProposal`, `finalizeProposal`, and `deactivateRule`. The fixture keeps CIDv1 `byte[36]`, `MIN_CONFIDENCE = 8500`, `VALIDATOR_QUORUM = 6700`, and explicit Guardian reputation outcome events without pretending to support legacy maps, KRC20 minting, `msg.sender`, events, or cross-contract calls in current Silverc.
 Signed-int boundary decision: current upstream Silverc entrypoint `int` values are deployable only in the nonnegative signed range `0..=i64::MAX`; Rust retains raw `u64` H-001 vectors for byte compatibility and uses `build_silverc_checked` / `validate_silverc_commitment_bounds` for deployment calls.
 Rusty-Kaspa workspace dependencies pinned to `v2.0.1`; `cargo audit` now reports no vulnerabilities, only allowed warnings.
-GitHub Security Audit workflow re-enabled and dependency audits now fail on findings instead of using `|| true`; after `c673766`, Dependency Audit was hardened with explicit job/step timeouts and split cargo-audit install/run steps, and green reruns passed for `aed3cbb` and `3e53e29`.
-Public docs refreshed 2026-07-09: README, WHITEPAPER.md, and whitepaper.html now state deployment-gated post-Toccata status, verified H-001/ValidatorStaking/GuardianReputation/RuleStorage current-Silverc gates, target-only PROM-RULES asset orchestration, and no Kasplex dependency for Guardian reputation.
+GitHub Security Audit workflow re-enabled and dependency audits now fail on findings instead of using `|| true`; after `c673766`, Dependency Audit was hardened with explicit job/step timeouts and split cargo-audit install/run steps, and green reruns passed through `a11545b`.
+Public docs refreshed and verified in CI/Pages by 2026-07-11: README, WHITEPAPER.md, and whitepaper.html now state deployment-gated post-Toccata status, verified H-001/ValidatorStaking/GuardianReputation/RuleStorage current-Silverc gates, target-only PROM-RULES asset orchestration, and no Kasplex dependency for Guardian reputation.
 Rust client runtime gate added: `PROMETHEUS_RUNTIME=beta|mainnet|production|prod` rejects ZK/Phi-3/KRC-20/Fed-DART stubs; development mode remains testable.
 Rollback tag: pre-session-20260413 → 6347b85
 ```

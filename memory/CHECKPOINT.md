@@ -1,5 +1,5 @@
 # PROMETHEUS — SESSION CHECKPOINT
-# Last updated: 2026-07-09
+# Last updated: 2026-07-11
 # Purpose: Full recovery document. If Claude (Architect) or Claude Code
 # loses context, read this file first. It contains the complete project state.
 
@@ -16,7 +16,7 @@
 | Letzter Produkt-Code-Baseline-Commit | 3e53e29 — feat: add rule storage silverc fixture |
 | Aktueller HEAD | Mit `git log --oneline -1` prüfen; Bridge-/Status-Commits können neuer sein |
 | Rollback-Tag | `pre-session-20260413` → `6347b85` |
-| Whitepaper | WHITEPAPER.md (root) + whitepaper.html (styled), status refreshed 2026-07-09 |
+| Whitepaper | WHITEPAPER.md (root) + whitepaper.html (styled), status refreshed and verified 2026-07-11 |
 | Status | Feature-complete through Sprint 7. Post-Toccata deployment verification active. |
 | GitHub Pages | https://neabouli.github.io/prometheus-/ |
 | Google Search Console | Verified: googleaa2902079481c7a8 |
@@ -100,7 +100,7 @@
 ## OFFENE TODOS (Priorität)
 
 ### Für Core Dev (manuell):
-- [x] GitHub Pages aktiv/live: latest pages-build-deployment succeeded for `1b0b4c7`
+- [x] GitHub Pages aktiv/live: latest pages-build-deployment succeeded for `a11545b`
 - [ ] Repository public schalten
 - [ ] Gitcoin Grants Antrag einreichen (Deadline: April 2026)
 - [ ] Discord/Telegram aufbauen
@@ -119,7 +119,7 @@
 7. Lies memory/ERRORS.md             → 12 bekannte Patterns
 ```
 
-**Status: Feature-complete through Sprint 7. Kaspa Toccata status researched 2026-07-07; upstream `silverc` verified in CI; repo H-001 fixture and ValidatorStakingState commit/reveal/slash/request-withdraw/complete-withdraw runtime paths verify at pinned Silverscript ref `d25bd3427a093c17327ca3d6b9e1aa5f7688c863`; GuardianReputationState compile/ABI/runtime/formula gates pass for register/proposalAccepted/proposalRejected; RuleStorageState compile/ABI gates pass for submitProposal/voteOnProposal/finalizeProposal/deactivateRule; signed-int deployment bounds are enforced as `0..=i64::MAX`; public README/Whitepaper status refreshed 2026-07-09; deployment now depends on remaining deployment-scoped contract ports.**
+**Status: Feature-complete through Sprint 7. Kaspa Toccata status researched 2026-07-07; upstream `silverc` verified in CI; repo H-001 fixture and ValidatorStakingState commit/reveal/slash/request-withdraw/complete-withdraw runtime paths verify at pinned Silverscript ref `d25bd3427a093c17327ca3d6b9e1aa5f7688c863`; GuardianReputationState compile/ABI/runtime/formula gates pass for register/proposalAccepted/proposalRejected; RuleStorageState compile/ABI gates pass for submitProposal/voteOnProposal/finalizeProposal/deactivateRule; signed-int deployment bounds are enforced as `0..=i64::MAX`; public README/Whitepaper status refreshed and verified on GitHub CI/Pages by 2026-07-11; deployment now depends on remaining deployment-scoped contract ports.**
 
 **Offene Tasks (priorisiert):**
 - [x] PATTERN-010 fix: Arc<Phi3Model> statt Arc<Mutex<Phi3Model>> — DONE `6347b85`

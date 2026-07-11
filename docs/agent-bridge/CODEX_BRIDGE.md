@@ -1,12 +1,12 @@
 # PROMETHEUS CODEX BRIDGE
 
-Last updated: 2026-07-09 EEST
+Last updated: 2026-07-11 EEST
 Repo path: /Users/gio/Desktop/repos/prometheus
 Branch observed: main
 Latest product-code baseline observed: `3e53e29 feat: add rule storage silverc fixture`
-Current HEAD: verify with `git log --oneline -1`; bridge-only commits may advance it.
-Latest CI note: Prometheus CI, Security Audit, and Pages passed for `1b0b4c7`; Security Audit workflow is hardened with explicit cargo/pip audit timeouts.
-Latest public-docs note: README, `WHITEPAPER.md`, and `whitepaper.html` were refreshed on 2026-07-09 to reflect post-Toccata deployment gating, verified current-Silverc H-001/Validator/Guardian/RuleStorage gates, and the no-Kasplex-reputation rule.
+Current HEAD observed: `a11545b docs: refresh post-toccata whitepaper status`
+Latest CI note: Prometheus CI, Security Audit, and Pages passed for `a11545b`; Security Audit workflow is hardened with explicit cargo/pip audit timeouts.
+Latest public-docs note: README, `WHITEPAPER.md`, and `whitepaper.html` were refreshed to reflect post-Toccata deployment gating, verified current-Silverc H-001/Validator/Guardian/RuleStorage gates, target-only PROM-RULES asset orchestration, and the no-Kasplex-reputation rule.
 
 Purpose: This file is the local bridge for Codex/Claude Code handover. Read it before touching product code. It consolidates the project state, architecture rules, workflow logic, current open issues, the Reputation Badge decision, and the new direct Sandbox access note.
 
