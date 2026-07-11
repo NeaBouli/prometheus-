@@ -144,6 +144,28 @@ def run_deploy_requests(args: argparse.Namespace, archive: Path, out_dir: Path) 
     return load_json(summary_path)
 
 
+def run_deploy_request_verification(archive: Path, out_dir: Path) -> dict[str, Any]:
+    summary_path = out_dir / "deploy-request-verification.json"
+    runbook_path = out_dir / "deploy-request-verification.md"
+    run(
+        [
+            sys.executable,
+            "scripts/verify_silverc_deploy_requests.py",
+            "--archive",
+            str(archive),
+            "--request-set",
+            str(out_dir / "deploy-request-set.json"),
+            "--requests-dir",
+            str(out_dir / "deploy-requests"),
+            "--summary-out",
+            str(summary_path),
+            "--runbook-out",
+            str(runbook_path),
+        ]
+    )
+    return load_json(summary_path)
+
+
 def run_receipt_verification(
     archive: Path,
     receipts: Path,
@@ -262,6 +284,7 @@ def write_handoff_markdown(out_dir: Path, summary: dict[str, Any]) -> None:
         [
             f"- Deploy preflight: {'supported' if summary['deploy_supported'] else 'blocked'}",
             f"- Deploy request set: {summary['deploy_requests_status']}",
+            f"- Deploy request verification: {summary['deploy_request_verification_status']}",
             f"- CI receipt verification: {summary['ci_receipts_status']}",
             f"- Operator receipt verification: {summary['operator_receipts_status']}",
             f"- Metrics report preflight: {summary['metrics_report_status']}",
@@ -307,6 +330,7 @@ def main() -> int:
 
     deploy_plan = run_deploy_preflight(args, packaged_archive, out_dir)
     deploy_requests = run_deploy_requests(args, packaged_archive, out_dir)
+    deploy_request_verification = run_deploy_request_verification(packaged_archive, out_dir)
     ci_receipts_summary = run_receipt_verification(
         packaged_archive,
         ci_receipts,
@@ -336,6 +360,7 @@ def main() -> int:
         "deploy_supported": deploy_plan["deploy_supported"],
         "deploy_requests_status": deploy_requests["status"],
         "deploy_request_count": deploy_requests["request_count"],
+        "deploy_request_verification_status": deploy_request_verification["status"],
         "ci_receipts_status": ci_receipts_summary["status"],
         "operator_receipts_status": (
             operator_receipts_summary["status"] if operator_receipts_summary else "MISSING_OPERATOR_RECORD"

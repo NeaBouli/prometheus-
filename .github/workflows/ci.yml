@@ -287,6 +287,90 @@ jobs:
           assert proc.returncode != 0
           assert "--rpc-url must not contain credentials" in proc.stderr
           PY
+      - name: Verify external deploy request set
+        run: |
+          python3 scripts/verify_silverc_deploy_requests.py \
+            --archive /tmp/prometheus-silverc-artifacts.tar.gz \
+            --request-set /tmp/prometheus-silverc-deploy-request-set.json \
+            --requests-dir /tmp/prometheus-silverc-deploy-requests \
+            --summary-out /tmp/prometheus-silverc-deploy-request-verification.json \
+            --runbook-out /tmp/prometheus-silverc-deploy-request-verification.md
+          test -s /tmp/prometheus-silverc-deploy-request-verification.json
+          test -s /tmp/prometheus-silverc-deploy-request-verification.md
+          python3 - <<'PY'
+          import hashlib
+          import json
+          import shutil
+          import subprocess
+          import tempfile
+          from pathlib import Path
+
+          summary = json.loads(Path("/tmp/prometheus-silverc-deploy-request-verification.json").read_text())
+          runbook = Path("/tmp/prometheus-silverc-deploy-request-verification.md").read_text()
+          assert summary["status"] == "DEPLOY_REQUEST_SET_VERIFIED"
+          assert summary["request_count"] == 7
+          assert len(summary["request_set_sha256"]) == 64
+          assert summary["requests"][0]["contract_name"] == "ValidatorStakingH001"
+          assert summary["requests"][-1]["contract_name"] == "GovernanceAutoTuningState"
+          assert summary["safety"]["accepts_private_keys"] is False
+          assert summary["safety"]["signs_transactions"] is False
+          assert summary["safety"]["assembles_chain_transaction"] is False
+          assert summary["safety"]["broadcasts_transactions"] is False
+          assert summary["safety"]["deploys_contracts"] is False
+          assert summary["safety"]["updates_status_files"] is False
+          assert "does not accept private keys" in runbook
+
+          with tempfile.TemporaryDirectory(prefix="prometheus-request-verify-negative.") as tmp:
+              tmp = Path(tmp)
+              bad_set = tmp / "bad-request-set.json"
+              request_set = json.loads(Path("/tmp/prometheus-silverc-deploy-request-set.json").read_text())
+              request_set["requests"][0]["script_sha256"] = "0" * 64
+              bad_set.write_text(json.dumps(request_set, indent=2, sort_keys=True) + "\n")
+              proc = subprocess.run(
+                  [
+                      "python3",
+                      "scripts/verify_silverc_deploy_requests.py",
+                      "--archive",
+                      "/tmp/prometheus-silverc-artifacts.tar.gz",
+                      "--request-set",
+                      str(bad_set),
+                      "--requests-dir",
+                      "/tmp/prometheus-silverc-deploy-requests",
+                  ],
+                  text=True,
+                  capture_output=True,
+              )
+              assert proc.returncode != 0
+              assert "request_set_sha256 mismatch" in proc.stderr
+
+              bad_dir = tmp / "bad-requests"
+              shutil.copytree("/tmp/prometheus-silverc-deploy-requests", bad_dir)
+              first = bad_dir / "01-ValidatorStakingH001.deploy-request.json"
+              request = json.loads(first.read_text())
+              request["_".join(["private", "key"])] = "do-not-accept"
+              clone = dict(request)
+              clone.pop("request_sha256", None)
+              request["request_sha256"] = hashlib.sha256(
+                  json.dumps(clone, sort_keys=True, separators=(",", ":")).encode()
+              ).hexdigest()
+              first.write_text(json.dumps(request, indent=2, sort_keys=True) + "\n")
+              proc = subprocess.run(
+                  [
+                      "python3",
+                      "scripts/verify_silverc_deploy_requests.py",
+                      "--archive",
+                      "/tmp/prometheus-silverc-artifacts.tar.gz",
+                      "--request-set",
+                      "/tmp/prometheus-silverc-deploy-request-set.json",
+                      "--requests-dir",
+                      str(bad_dir),
+                  ],
+                  text=True,
+                  capture_output=True,
+              )
+              assert proc.returncode != 0
+              assert "secret-like fields are not allowed" in proc.stderr
+          PY
       - name: Build unsigned metrics-oracle transaction request
         run: |
           python3 scripts/build_metrics_oracle_tx_request.py \
@@ -525,6 +609,7 @@ jobs:
           assert summary["deploy_supported"] is False
           assert summary["deploy_requests_status"] == "REQUESTS_READY_EXTERNAL_ORCHESTRATOR_REQUIRED"
           assert summary["deploy_request_count"] == 7
+          assert summary["deploy_request_verification_status"] == "DEPLOY_REQUEST_SET_VERIFIED"
           assert summary["ci_receipts_status"] == "CI_FIXTURE_VALID"
           assert summary["operator_receipts_status"] == "MISSING_OPERATOR_RECORD"
           assert summary["metrics_report_status"] == "READY_FOR_TX_BUILDER"
@@ -543,6 +628,8 @@ jobs:
           assert "Real status updates require verified operator_record receipts" in handoff
           assert "prometheus-silverc-artifacts.tar.gz" in summary["included_files"]
           assert "deploy-request-set.json" in summary["included_files"]
+          assert "deploy-request-verification.json" in summary["included_files"]
+          assert "deploy-request-verification.md" in summary["included_files"]
           assert "deploy-requests/07-GovernanceAutoTuningState.deploy-request.json" in summary["included_files"]
           PY
 

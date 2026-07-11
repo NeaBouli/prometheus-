@@ -186,6 +186,11 @@ rejects RPC URLs with embedded credentials. The output status is
 `REQUESTS_READY_EXTERNAL_ORCHESTRATOR_REQUIRED` until an approved external
 orchestrator consumes the requests and returns real `operator_record` receipts.
 
+`scripts/verify_silverc_deploy_requests.py` independently verifies the request
+set before operator handoff. It checks the request-set hash, every per-contract
+request hash, manifest-bound source/constructor/artifact/script hashes, fixture
+order, constructor args, safety flags, and secret-field rejection.
+
 ## Deployment receipt verifier
 
 `scripts/verify_silverc_deploy_receipts.py` validates public deployment receipt
@@ -218,7 +223,7 @@ or release notes.
 
 `scripts/build_silverc_operator_handoff.py` builds a public handoff directory
 from an existing release archive. It copies the archive, runs deploy preflight,
-builds the external deploy request set, verifies the synthetic CI receipt
+builds and verifies the external deploy request set, verifies the synthetic CI receipt
 fixture, optionally verifies real `operator_record` receipts, validates the
 metrics-oracle report, builds the unsigned metrics-oracle transaction request,
 and emits `HANDOFF.md` plus `operator-handoff-summary.json`.

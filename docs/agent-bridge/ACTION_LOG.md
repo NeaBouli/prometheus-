@@ -4,6 +4,7 @@
 
 - Added `scripts/build_silverc_deploy_requests.py`, a CI-safe public deploy-request builder for approved external orchestrators. It emits one request per current-Silverc contract plus a request-set summary/runbook, rejects credentialed RPC URLs, and does not sign, assemble chain transactions, broadcast, deploy, or update status files.
 - Extended the operator handoff package to include the deploy request set and per-contract request files.
+- Added `scripts/verify_silverc_deploy_requests.py`, an independent request-set verifier. It checks request-set/per-contract hashes, manifest-bound source/constructor/artifact/script hashes, constructor args, order, safety flags, and secret-field rejection before handoff.
 - GitHub Prometheus CI, Security Audit, and Pages passed for `46818cd`; Prometheus CI now validates the external deploy request set and verifies the operator handoff includes the per-contract deploy request files.
 - GitHub Prometheus CI, Security Audit, and Pages passed for `d011d7a`; live GitHub Pages `whitepaper.html` includes deployment status staging wording.
 - Added `scripts/stage_silverc_deployment_status.py` to stage manual deployment-status drafts only from verified `operator_record` receipts.
