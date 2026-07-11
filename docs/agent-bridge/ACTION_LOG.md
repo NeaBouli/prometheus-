@@ -4,6 +4,7 @@
 
 - Added `scripts/preflight_silverc_deploy.py`, a CI-safe deploy preflight that validates release archive layout, manifest/source/constructor-args/artifact/script hashes, public operator inputs, and current upstream `silverc` deploy capability without accepting secrets or pretending to deploy.
 - Local preflight passed against a freshly built release archive and reported `deploy_supported: false` with blocker `upstream silverc exposes no network deploy command`; CI now asserts the expected preflight plan fields.
+- GitHub Prometheus CI, Security Audit, and Pages passed for `4236d27`; Prometheus CI now covers the current-Silverc release archive and deploy preflight plan.
 - Extended `scripts/smoke_silverc_artifacts.py` into a reusable release-bundle builder with `--out-dir`, `--silverscript-ref`, `--silverscript-repo`, and optional deterministic `--archive` output; local two-run byte comparison passed for manifest and archive.
 - Updated Prometheus CI to generate the current-Silverc release archive and assert that it contains the manifest.
 - GitHub Prometheus CI, Security Audit, and Pages passed for `d07aeba`; Prometheus CI now covers the current-Silverc release archive path.

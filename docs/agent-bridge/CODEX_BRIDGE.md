@@ -3,9 +3,9 @@
 Last updated: 2026-07-11 EEST
 Repo path: /Users/gio/Desktop/repos/prometheus
 Branch observed: main
-Latest product-code baseline observed: `d07aeba ci: package silverc release archive`
-Latest verified feature baseline observed: `d07aeba ci: package silverc release archive`
-Latest CI note: Prometheus CI, Security Audit, and Pages passed for `d07aeba`; pinned Silverc runtime job passes 55 upstream-injected tests and the current-Silverc release-bundle CI step compiles all 7 fixtures through upstream `silverc`, writes the deterministic manifest, and validates the optional release archive contains the manifest.
+Latest product-code baseline observed: `4236d27 ci: add silverc deploy preflight`
+Latest verified feature baseline observed: `4236d27 ci: add silverc deploy preflight`
+Latest CI note: Prometheus CI, Security Audit, and Pages passed for `4236d27`; pinned Silverc runtime job passes 55 upstream-injected tests and the current-Silverc release-bundle CI step compiles all 7 fixtures through upstream `silverc`, writes the deterministic manifest/archive, and validates the deploy preflight plan.
 Latest tooling note: `scripts/smoke_silverc_artifacts.py` compiles all 7 current-Silverc fixtures through the pinned upstream `silverc` CLI into JSON artifacts and now writes a deterministic `manifest.json` plus optional deterministic `.tar.gz` release archive with source, constructor-args, artifact, and compiled-script SHA-256 hashes plus ABI/state-layout metadata. `scripts/preflight_silverc_deploy.py` validates that bundle and public operator inputs while confirming current upstream `silverc` exposes no network deploy command. Real on-chain deploy/orchestration remains open.
 Latest public-docs note: README, `WHITEPAPER.md`, and `whitepaper.html` were refreshed to reflect post-Toccata deployment gating, verified current-Silverc H-001/Validator/Guardian/RuleStorage/CommunityDonations/DevIncentivePool/GovernanceAutoTuning runtime gates, target-only PROM-RULES asset orchestration, and the no-Kasplex-reputation rule.
 
