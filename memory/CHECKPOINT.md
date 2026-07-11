@@ -13,7 +13,7 @@
 | Repo | https://github.com/NeaBouli/prometheus- |
 | Branch | main |
 | Lokaler Pfad | ~/Desktop/prometheus |
-| Letzter grün verifizierter Produkt-/Tooling-Commit | 6e33ecf — ci: update actions for node 24 |
+| Letzter grün verifizierter Produkt-/Tooling-Commit | fe4c62f — ci: generate silverc deploy runbook |
 | Aktueller HEAD | Mit `git log --oneline -1` prüfen; Bridge-/Status-Commits können neuer sein |
 | Rollback-Tag | `pre-session-20260413` → `6347b85` |
 | Whitepaper | WHITEPAPER.md (root) + whitepaper.html (styled), status refreshed and verified 2026-07-11 |
@@ -111,7 +111,7 @@
 **STARTFLOW — Lies dies zuerst:**
 ```
 1. cd /Users/gio/Desktop/repos/prometheus
-2. git log --oneline -5              → aktuellen HEAD prüfen; letzter grün verifizierter Produkt-/Tooling-Commit = 6e33ecf
+2. git log --oneline -5              → aktuellen HEAD prüfen; letzter grün verifizierter Produkt-/Tooling-Commit = fe4c62f
 3. git tag -l                        → Rollback: pre-session-20260413
 4. cargo test 2>&1 | tail -5         → Muss grün sein
 5. Lies BACKLOG.md                   → Priorisierte Task-Liste

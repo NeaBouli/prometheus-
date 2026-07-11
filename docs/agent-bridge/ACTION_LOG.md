@@ -2,6 +2,7 @@
 
 ## 2026-07-11
 
+- GitHub Prometheus CI, Security Audit, and Pages passed for `fe4c62f`; Prometheus CI now validates the generated current-Silverc deploy operator runbook in addition to the release archive and JSON preflight plan.
 - Added Markdown operator runbook generation to `scripts/preflight_silverc_deploy.py` via `--runbook-out`; local end-to-end archive/preflight/runbook validation passed and CI now asserts the generated runbook remains blocked, explicit about no broadcast, and includes the expected contract hashes/table.
 - GitHub Prometheus CI, Security Audit, and Pages passed for `6e33ecf`; the workflow action upgrade removed the observed Node-20 annotations in the checked runs.
 - Updated CI workflow action refs to Node 24-compatible majors after checking official action metadata: `actions/checkout@v7`, `actions/setup-python@v6`, and `gitleaks/gitleaks-action@v3`. Local YAML parse, memory integrity, and `git diff --check` passed before push.
