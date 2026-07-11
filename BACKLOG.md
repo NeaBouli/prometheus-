@@ -1,8 +1,8 @@
 # prometheus — Backlog
 
 ## 🔴 Aktiv (diese Session)
-- Latest documented green product/tooling baseline is `4236d27` on `main`; run `git log --oneline -1` for the current working HEAD.
-- CI, Security Audit, and GitHub Pages deployment were green for `4236d27`.
+- Latest documented green product/tooling baseline is `6e33ecf` on `main`; run `git log --oneline -1` for the current working HEAD.
+- CI, Security Audit, and GitHub Pages deployment were green for `6e33ecf`; workflow actions now use Node 24-compatible majors.
 - Runtime stub gates added for Rust client; current-Silverc contract gates now cover H-001, ValidatorStaking, GuardianReputation, RuleStorage, CommunityDonations, DevIncentivePool, and GovernanceAutoTuning.
 - Local current-Silverc release-bundle smoke now compiles all 7 fixtures through pinned upstream `silverc` and writes a deterministic manifest plus optional archive with source/artifact/script hashes; deploy preflight validates the bundle/operator public inputs and confirms upstream `silverc` has no network deploy command.
 - Sprint 9 remains blocked by missing network deploy/orchestration tooling, oracle operator integration, and release hardening.
@@ -11,7 +11,7 @@
 
 ### Pflicht VOR neuem Code:
 1. `cd /Users/gio/Desktop/repos/prometheus`
-2. `git log --oneline -5` — aktuellen HEAD prüfen; letzter dokumentierter grüner Produkt-/Tooling-Baseline-Commit ist `4236d27`
+2. `git log --oneline -5` — aktuellen HEAD prüfen; letzter dokumentierter grüner Produkt-/Tooling-Baseline-Commit ist `6e33ecf`
 3. Lies `memory/CHECKPOINT.md` — vollständiger Projektstatus
 4. Lies `memory/AUDIT.md` ab Zeile 337 — Pre-Hardfork-Audit-Ergebnisse
 5. Lies `memory/ERRORS.md` — 12 bekannte Patterns

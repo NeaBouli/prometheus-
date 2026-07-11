@@ -2,8 +2,9 @@
 
 ## 2026-07-11
 
+- GitHub Prometheus CI, Security Audit, and Pages passed for `6e33ecf`; the workflow action upgrade removed the observed Node-20 annotations in the checked runs.
+- Updated CI workflow action refs to Node 24-compatible majors after checking official action metadata: `actions/checkout@v7`, `actions/setup-python@v6`, and `gitleaks/gitleaks-action@v3`. Local YAML parse, memory integrity, and `git diff --check` passed before push.
 - GitHub Prometheus CI, Security Audit, and Pages passed for `408b0f0`; this was the bridge/memory status commit after the Silverc deploy-preflight rollout.
-- Updated CI workflow action refs to Node 24-compatible majors after checking official action metadata: `actions/checkout@v7`, `actions/setup-python@v6`, and `gitleaks/gitleaks-action@v3`. Local YAML parse, memory integrity, and `git diff --check` passed; remote validation pending.
 - Added `scripts/preflight_silverc_deploy.py`, a CI-safe deploy preflight that validates release archive layout, manifest/source/constructor-args/artifact/script hashes, public operator inputs, and current upstream `silverc` deploy capability without accepting secrets or pretending to deploy.
 - Local preflight passed against a freshly built release archive and reported `deploy_supported: false` with blocker `upstream silverc exposes no network deploy command`; CI now asserts the expected preflight plan fields.
 - GitHub Prometheus CI, Security Audit, and Pages passed for `4236d27`; Prometheus CI now covers the current-Silverc release archive and deploy preflight plan.
