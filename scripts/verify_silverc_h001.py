@@ -25,6 +25,9 @@ COMMUNITY_DONATIONS_STATE_CONTRACT = (
 DEV_INCENTIVE_POOL_STATE_CONTRACT = (
     ROOT / "modules" / "contracts" / "silverc" / "DevIncentivePoolState.sil"
 )
+GOVERNANCE_AUTO_TUNING_STATE_CONTRACT = (
+    ROOT / "modules" / "contracts" / "silverc" / "GovernanceAutoTuningState.sil"
+)
 DEFAULT_SILVERSCRIPT_REPO = Path("/tmp/prom-silverscript")
 SILVERSCRIPT_GIT = "https://github.com/kaspanet/silverscript.git"
 DEFAULT_SILVERSCRIPT_REF = "d25bd3427a093c17327ca3d6b9e1aa5f7688c863"
@@ -300,6 +303,36 @@ fn dev_incentive_pool_state_args(
     ]
 }
 
+fn governance_auto_tuning_state_args(
+    metrics_oracle_pk: Vec<u8>,
+    min_stake_kas: i64,
+    min_guardian_rep: i64,
+    min_confidence_ki: i64,
+    validator_consensus: i64,
+    reward_base: i64,
+    last_tuning_block: i64,
+    active_validators: i64,
+    active_guardians: i64,
+    proposals_per_day: i64,
+    fp_rate: i64,
+    last_metrics_block: i64,
+) -> Vec<Expr<'static>> {
+    vec![
+        Expr::bytes(metrics_oracle_pk),
+        Expr::int(min_stake_kas),
+        Expr::int(min_guardian_rep),
+        Expr::int(min_confidence_ki),
+        Expr::int(validator_consensus),
+        Expr::int(reward_base),
+        Expr::int(last_tuning_block),
+        Expr::int(active_validators),
+        Expr::int(active_guardians),
+        Expr::int(proposals_per_day),
+        Expr::int(fp_rate),
+        Expr::int(last_metrics_block),
+    ]
+}
+
 fn build_covenant_sigscript(compiled: &silverscript_lang::compiler::CompiledContract<'_>, function_name: &str, args: Vec<Expr<'_>>) {
     compiled
         .build_sig_script_for_covenant_decl(function_name, args, CovenantDeclCallOptions { is_leader: false })
@@ -350,6 +383,14 @@ fn dev_incentive_pool_state_entry_sigscript(compiled: &CompiledContract<'_>, fun
     sigscript
 }
 
+fn governance_auto_tuning_state_entry_sigscript(compiled: &CompiledContract<'_>, function_name: &str, args: Vec<Expr<'_>>) -> Vec<u8> {
+    let mut sigscript = compiled
+        .build_sig_script_for_covenant_decl(function_name, args, CovenantDeclCallOptions { is_leader: false })
+        .unwrap_or_else(|err| panic!("GovernanceAutoTuningState {function_name} sigscript builds: {err}"));
+    sigscript.extend_from_slice(&common::push_redeem_script(&compiled.script));
+    sigscript
+}
+
 fn compile_validator_state<'a>(source: &'a str, args: Vec<Expr<'static>>) -> CompiledContract<'a> {
     compile_contract(source, &args, CompileOptions::default()).expect("ValidatorStakingState fixture compiles")
 }
@@ -364,6 +405,10 @@ fn compile_community_donations_state<'a>(source: &'a str, args: Vec<Expr<'static
 
 fn compile_dev_incentive_pool_state<'a>(source: &'a str, args: Vec<Expr<'static>>) -> CompiledContract<'a> {
     compile_contract(source, &args, CompileOptions::default()).expect("DevIncentivePoolState fixture compiles")
+}
+
+fn compile_governance_auto_tuning_state<'a>(source: &'a str, args: Vec<Expr<'static>>) -> CompiledContract<'a> {
+    compile_contract(source, &args, CompileOptions::default()).expect("GovernanceAutoTuningState fixture compiles")
 }
 
 #[test]
@@ -1168,6 +1213,232 @@ fn prometheus_dev_incentive_pool_state_fixture_compiles_against_current_silverc(
         vec![Expr::bool(true), Expr::int(1_200), Expr::bytes(sig), Expr::bytes(validator_pk)],
     );
     build_covenant_sigscript(&pending, "executeGrant", vec![Expr::int(605_800)]);
+}
+
+#[test]
+fn prometheus_governance_auto_tuning_state_fixture_compiles_against_current_silverc() {
+    let contract_path = std::env::var("PROMETHEUS_GOVERNANCE_AUTO_TUNING_STATE_CONTRACT")
+        .expect("PROMETHEUS_GOVERNANCE_AUTO_TUNING_STATE_CONTRACT is set");
+    let source = std::fs::read_to_string(contract_path).expect("read Prometheus governance auto tuning contract fixture");
+    let oracle_pk = vec![8u8; 32];
+    let sig = dummy_signature();
+
+    let current = compile_governance_auto_tuning_state(
+        &source,
+        governance_auto_tuning_state_args(oracle_pk.clone(), 10_000, 1_000, 8_500, 6_700, 100, 0, 100, 500, 150, 0, 0),
+    );
+    build_covenant_sigscript(
+        &current,
+        "reportMetrics",
+        vec![
+            Expr::int(30),
+            Expr::int(500),
+            Expr::int(50),
+            Expr::int(100),
+            Expr::int(1_000),
+            Expr::bytes(sig),
+        ],
+    );
+    build_covenant_sigscript(&current, "autoTune", vec![Expr::int(604_800)]);
+}
+
+#[test]
+fn prometheus_governance_auto_tuning_report_metrics_runtime_accepts_valid_transition() {
+    let contract_path = std::env::var("PROMETHEUS_GOVERNANCE_AUTO_TUNING_STATE_CONTRACT")
+        .expect("PROMETHEUS_GOVERNANCE_AUTO_TUNING_STATE_CONTRACT is set");
+    let source = std::fs::read_to_string(contract_path).expect("read Prometheus governance auto tuning contract fixture");
+    let oracle_keypair = keypair_from_seed(8);
+    let oracle_pk = oracle_keypair.x_only_public_key().0.serialize().to_vec();
+
+    let current = compile_governance_auto_tuning_state(
+        &source,
+        governance_auto_tuning_state_args(oracle_pk.clone(), 10_000, 1_000, 8_500, 6_700, 100, 0, 100, 500, 150, 0, 0),
+    );
+    let reported = compile_governance_auto_tuning_state(
+        &source,
+        governance_auto_tuning_state_args(oracle_pk.clone(), 10_000, 1_000, 8_500, 6_700, 100, 0, 30, 500, 50, 100, 1_000),
+    );
+
+    let placeholder_sigscript = governance_auto_tuning_state_entry_sigscript(
+        &current,
+        "reportMetrics",
+        vec![Expr::int(30), Expr::int(500), Expr::int(50), Expr::int(100), Expr::int(1_000), Expr::bytes(dummy_signature())],
+    );
+    let outputs = vec![covenant_output(&reported, 0, COV_A)];
+    let entries = vec![covenant_utxo(&current, COV_A)];
+    let mut tx = Transaction::new(
+        1,
+        vec![tx_input_with_sigops(0, placeholder_sigscript, 1)],
+        outputs,
+        0,
+        Default::default(),
+        0,
+        vec![],
+    );
+    let sig = sign_tx_input(&tx, &entries, 0, &oracle_keypair);
+    tx.inputs[0].signature_script = governance_auto_tuning_state_entry_sigscript(
+        &current,
+        "reportMetrics",
+        vec![Expr::int(30), Expr::int(500), Expr::int(50), Expr::int(100), Expr::int(1_000), Expr::bytes(sig)],
+    );
+
+    let result = execute_input_with_covenants(tx, entries, 0);
+    assert!(
+        result.is_ok(),
+        "GovernanceAutoTuning reportMetrics runtime should accept valid oracle signature/state transition: {:?}",
+        result.err()
+    );
+}
+
+#[test]
+fn prometheus_governance_auto_tuning_report_metrics_runtime_rejects_fp_rate_above_max() {
+    let contract_path = std::env::var("PROMETHEUS_GOVERNANCE_AUTO_TUNING_STATE_CONTRACT")
+        .expect("PROMETHEUS_GOVERNANCE_AUTO_TUNING_STATE_CONTRACT is set");
+    let source = std::fs::read_to_string(contract_path).expect("read Prometheus governance auto tuning contract fixture");
+    let oracle_keypair = keypair_from_seed(8);
+    let oracle_pk = oracle_keypair.x_only_public_key().0.serialize().to_vec();
+
+    let current = compile_governance_auto_tuning_state(
+        &source,
+        governance_auto_tuning_state_args(oracle_pk.clone(), 10_000, 1_000, 8_500, 6_700, 100, 0, 100, 500, 150, 0, 0),
+    );
+    let invalid_next = compile_governance_auto_tuning_state(
+        &source,
+        governance_auto_tuning_state_args(oracle_pk.clone(), 10_000, 1_000, 8_500, 6_700, 100, 0, 30, 500, 50, 10_001, 1_000),
+    );
+
+    let placeholder_sigscript = governance_auto_tuning_state_entry_sigscript(
+        &current,
+        "reportMetrics",
+        vec![Expr::int(30), Expr::int(500), Expr::int(50), Expr::int(10_001), Expr::int(1_000), Expr::bytes(dummy_signature())],
+    );
+    let outputs = vec![covenant_output(&invalid_next, 0, COV_A)];
+    let entries = vec![covenant_utxo(&current, COV_A)];
+    let mut tx = Transaction::new(
+        1,
+        vec![tx_input_with_sigops(0, placeholder_sigscript, 1)],
+        outputs,
+        0,
+        Default::default(),
+        0,
+        vec![],
+    );
+    let sig = sign_tx_input(&tx, &entries, 0, &oracle_keypair);
+    tx.inputs[0].signature_script = governance_auto_tuning_state_entry_sigscript(
+        &current,
+        "reportMetrics",
+        vec![Expr::int(30), Expr::int(500), Expr::int(50), Expr::int(10_001), Expr::int(1_000), Expr::bytes(sig)],
+    );
+
+    let err = execute_input_with_covenants(tx, entries, 0).expect_err("reportMetrics must reject fp_rate above MAX_FP_RATE");
+    common::assert_verify_like_error(err);
+}
+
+#[test]
+fn prometheus_governance_auto_tuning_auto_tune_runtime_accepts_high_fp_adjustment() {
+    let contract_path = std::env::var("PROMETHEUS_GOVERNANCE_AUTO_TUNING_STATE_CONTRACT")
+        .expect("PROMETHEUS_GOVERNANCE_AUTO_TUNING_STATE_CONTRACT is set");
+    let source = std::fs::read_to_string(contract_path).expect("read Prometheus governance auto tuning contract fixture");
+    let oracle_pk = keypair_from_seed(8).x_only_public_key().0.serialize().to_vec();
+
+    let current = compile_governance_auto_tuning_state(
+        &source,
+        governance_auto_tuning_state_args(oracle_pk.clone(), 10_000, 1_000, 8_500, 6_700, 100, 0, 30, 500, 50, 100, 1_000),
+    );
+    let tuned = compile_governance_auto_tuning_state(
+        &source,
+        governance_auto_tuning_state_args(oracle_pk, 9_500, 1_000, 8_600, 6_700, 110, 604_800, 30, 500, 50, 100, 1_000),
+    );
+
+    let sigscript = governance_auto_tuning_state_entry_sigscript(&current, "autoTune", vec![Expr::int(604_800)]);
+    let outputs = vec![covenant_output(&tuned, 0, COV_A)];
+    let entries = vec![covenant_utxo(&current, COV_A)];
+    let tx = Transaction::new(
+        1,
+        vec![tx_input_with_sigops(0, sigscript, 1)],
+        outputs,
+        0,
+        Default::default(),
+        0,
+        vec![],
+    );
+
+    let result = execute_input_with_covenants(tx, entries, 0);
+    assert!(
+        result.is_ok(),
+        "GovernanceAutoTuning autoTune runtime should accept deterministic high-FP adjustment: {:?}",
+        result.err()
+    );
+}
+
+#[test]
+fn prometheus_governance_auto_tuning_auto_tune_runtime_rejects_early_execution() {
+    let contract_path = std::env::var("PROMETHEUS_GOVERNANCE_AUTO_TUNING_STATE_CONTRACT")
+        .expect("PROMETHEUS_GOVERNANCE_AUTO_TUNING_STATE_CONTRACT is set");
+    let source = std::fs::read_to_string(contract_path).expect("read Prometheus governance auto tuning contract fixture");
+    let oracle_pk = keypair_from_seed(8).x_only_public_key().0.serialize().to_vec();
+
+    let current = compile_governance_auto_tuning_state(
+        &source,
+        governance_auto_tuning_state_args(oracle_pk.clone(), 10_000, 1_000, 8_500, 6_700, 100, 0, 30, 500, 50, 100, 1_000),
+    );
+    let invalid_next = compile_governance_auto_tuning_state(
+        &source,
+        governance_auto_tuning_state_args(oracle_pk, 9_500, 1_000, 8_600, 6_700, 110, 604_799, 30, 500, 50, 100, 1_000),
+    );
+
+    let sigscript = governance_auto_tuning_state_entry_sigscript(&current, "autoTune", vec![Expr::int(604_799)]);
+    let outputs = vec![covenant_output(&invalid_next, 0, COV_A)];
+    let entries = vec![covenant_utxo(&current, COV_A)];
+    let tx = Transaction::new(
+        1,
+        vec![tx_input_with_sigops(0, sigscript, 1)],
+        outputs,
+        0,
+        Default::default(),
+        0,
+        vec![],
+    );
+
+    let err = execute_input_with_covenants(tx, entries, 0).expect_err("autoTune must reject execution before TUNING_INTERVAL_BLOCKS");
+    common::assert_verify_like_error(err);
+}
+
+#[test]
+fn prometheus_governance_auto_tuning_auto_tune_runtime_lowers_confidence_on_zero_fp() {
+    let contract_path = std::env::var("PROMETHEUS_GOVERNANCE_AUTO_TUNING_STATE_CONTRACT")
+        .expect("PROMETHEUS_GOVERNANCE_AUTO_TUNING_STATE_CONTRACT is set");
+    let source = std::fs::read_to_string(contract_path).expect("read Prometheus governance auto tuning contract fixture");
+    let oracle_pk = keypair_from_seed(8).x_only_public_key().0.serialize().to_vec();
+
+    let current = compile_governance_auto_tuning_state(
+        &source,
+        governance_auto_tuning_state_args(oracle_pk.clone(), 10_000, 1_000, 8_500, 6_700, 100, 0, 100, 500, 150, 0, 1_000),
+    );
+    let tuned = compile_governance_auto_tuning_state(
+        &source,
+        governance_auto_tuning_state_args(oracle_pk, 10_000, 1_000, 8_400, 6_700, 100, 604_800, 100, 500, 150, 0, 1_000),
+    );
+
+    let sigscript = governance_auto_tuning_state_entry_sigscript(&current, "autoTune", vec![Expr::int(604_800)]);
+    let outputs = vec![covenant_output(&tuned, 0, COV_A)];
+    let entries = vec![covenant_utxo(&current, COV_A)];
+    let tx = Transaction::new(
+        1,
+        vec![tx_input_with_sigops(0, sigscript, 1)],
+        outputs,
+        0,
+        Default::default(),
+        0,
+        vec![],
+    );
+
+    let result = execute_input_with_covenants(tx, entries, 0);
+    assert!(
+        result.is_ok(),
+        "GovernanceAutoTuning autoTune runtime should lower confidence when fp_rate is zero: {:?}",
+        result.err()
+    );
 }
 
 #[test]
@@ -3179,6 +3450,8 @@ def main() -> int:
         GUARDIAN_STATE_CONTRACT,
         RULE_STORAGE_STATE_CONTRACT,
         COMMUNITY_DONATIONS_STATE_CONTRACT,
+        DEV_INCENTIVE_POOL_STATE_CONTRACT,
+        GOVERNANCE_AUTO_TUNING_STATE_CONTRACT,
     ):
         if not contract.exists():
             print(f"missing contract fixture: {contract}", file=sys.stderr)
@@ -3207,6 +3480,7 @@ def main() -> int:
     env["PROMETHEUS_RULE_STORAGE_STATE_CONTRACT"] = str(RULE_STORAGE_STATE_CONTRACT)
     env["PROMETHEUS_COMMUNITY_DONATIONS_STATE_CONTRACT"] = str(COMMUNITY_DONATIONS_STATE_CONTRACT)
     env["PROMETHEUS_DEV_INCENTIVE_POOL_STATE_CONTRACT"] = str(DEV_INCENTIVE_POOL_STATE_CONTRACT)
+    env["PROMETHEUS_GOVERNANCE_AUTO_TUNING_STATE_CONTRACT"] = str(GOVERNANCE_AUTO_TUNING_STATE_CONTRACT)
     try:
         run(
             [
@@ -3228,7 +3502,7 @@ def main() -> int:
         except FileNotFoundError:
             pass
 
-    print("H-001, ValidatorStakingState, GuardianReputationState, RuleStorageState, CommunityDonationsState, and DevIncentivePoolState silverc fixture verification passed.")
+    print("H-001, ValidatorStakingState, GuardianReputationState, RuleStorageState, CommunityDonationsState, DevIncentivePoolState, and GovernanceAutoTuningState silverc fixture verification passed.")
     print(f"Silverscript ref: {silver_ref}")
     print(
         "Note: current silverc uses signed int entrypoint arguments; deployment salt and block-height values are scoped to 0..=i64::MAX."

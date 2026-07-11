@@ -2,7 +2,7 @@
 
 **Whitepaper v4.0 — March 2026**
 
-**Status update — July 2026:** Kaspa Toccata is now treated as a post-fork deployment environment for Prometheus. The current Silverc verifier covers H-001 commit-reveal byte encoding, ValidatorStaking runtime transitions, GuardianReputation runtime/formula gates, RuleStorage runtime gates, CommunityDonations runtime gates, and DevIncentivePool runtime gates. Mainnet deployment remains gated by the remaining GovernanceAutoTuning current-Silverc port, deploy smoke tests, Q-003 `fp_rate` oracle design, and release hardening.
+**Status update — July 2026:** Kaspa Toccata is now treated as a post-fork deployment environment for Prometheus. The current Silverc verifier covers H-001 commit-reveal byte encoding, ValidatorStaking runtime transitions, GuardianReputation runtime/formula gates, RuleStorage runtime gates, CommunityDonations runtime gates, DevIncentivePool runtime gates, and GovernanceAutoTuning runtime gates. GovernanceAutoTuning resolves Q-003 in the current-Silverc path with signed metrics-oracle input for `fp_rate` instead of the legacy stub. Mainnet deployment remains gated by deploy smoke tests, oracle operator integration, and release hardening.
 
 *The fire belongs to humanity, not to corporations.*
 
@@ -80,7 +80,7 @@ Light Client (Phi-3-mini)          Guardian (LLaMA 3)           Kaspa L1
 
 - **Network**: Kaspa with Silverscript smart contracts
 - **Testnet**: kaspa-testnet-10 for legacy tests; post-Toccata deployment requires current Toccata/TN tooling checks
-- **Compiler**: current Silverc gates pass for H-001, ValidatorStakingState, GuardianReputationState, RuleStorageState, CommunityDonationsState, and DevIncentivePoolState; GovernanceAutoTuning/Q-003 and deploy smoke still gate Prometheus deployment
+- **Compiler**: current Silverc gates pass for H-001, ValidatorStakingState, GuardianReputationState, RuleStorageState, CommunityDonationsState, DevIncentivePoolState, and GovernanceAutoTuningState; deploy smoke and oracle operator integration still gate Prometheus deployment
 - **Consensus**: high-throughput Kaspa BlockDAG / DAGKnight path
 - **Contracts**: 6 Silverscript contracts (see Section 10)
 
@@ -268,7 +268,7 @@ Current-Silverc verification status:
 - `RuleStorageState.sil`: compile/ABI/runtime gates pass for submit/vote/finalize/deactivate, including low-confidence, late-vote, zero-vote, and pending-rule rejection paths.
 - `CommunityDonationsState.sil`: compile/ABI/runtime gates pass for donate/propose/vote/execute disbursement paths, including zero-donation, over-pool proposal, late-vote, and insufficient-quorum rejection paths.
 - `DevIncentivePoolState.sil`: compile/ABI/runtime gates pass for propose/vote/execute grant paths, including max-grant, late-vote, quorum, and approval rejection paths.
-- `GovernanceAutoTuning`: remaining deployment-scoped port, blocked on Q-003 `fp_rate` oracle design.
+- `GovernanceAutoTuningState.sil`: compile/ABI/runtime gates pass for signed metrics reporting and deterministic weekly auto-tuning, including invalid `fp_rate`, early tuning, high-FP, and zero-FP paths.
 
 ---
 
@@ -313,7 +313,7 @@ Fully automated parameter adjustment (Architecture Decision #5):
 
 Tuning interval: weekly (604,800 blocks). Parameter bounds enforced to prevent extreme values.
 
-**Note**: `fp_rate` oracle mechanism is stub-implemented (Audit Q-003). Architecture decision pending on whether Light Clients, Guardians, or a dedicated oracle report false positives.
+**Q-003 update**: the legacy `.ss` contract kept `fp_rate` as a stub. The current-Silverc `GovernanceAutoTuningState.sil` path replaces that stub with a signed metrics-oracle report containing active validators, active guardians, proposals/day, and `fp_rate` bounded to `0..10000`. Operator integration for that oracle remains deployment work.
 
 ---
 
@@ -376,7 +376,7 @@ This is a deliberate design decision, not an oversight. Architecture Decision #3
 | Sprint 7: Dashboard | March 2026 | ACCEPTED |
 | Sprint 8: Public Site | March/July 2026 | ACCEPTED / ongoing documentation maintenance |
 | **Kaspa Toccata / post-fork verification** | **June/July 2026** | **Post-fork environment; H-001, ValidatorStaking, GuardianReputation, and RuleStorage gates verified in CI** |
-| Mainnet Launch | Post-verification | PLANNED; gated by remaining current-Silverc ports, deploy smoke path, Q-003 oracle, and release hardening |
+| Mainnet Launch | Post-verification | PLANNED; gated by deploy smoke path, oracle operator integration, and release hardening |
 
 ---
 

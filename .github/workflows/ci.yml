@@ -124,6 +124,23 @@ jobs:
             exit 1
           fi
           echo "DevIncentivePoolState fixture keeps grant voting and PROM pool invariants."
+      - name: Verify GovernanceAutoTuningState current-silverc fixture exists
+        run: |
+          fixture="modules/contracts/silverc/GovernanceAutoTuningState.sil"
+          test -f "$fixture" || (echo "ERROR: missing $fixture" && exit 1)
+          grep -q 'TUNING_INTERVAL_BLOCKS = 604800' "$fixture"
+          grep -q 'TARGET_FP_RATE_MAX = 50' "$fixture"
+          grep -q 'MAX_FP_RATE = 10000' "$fixture"
+          grep -q 'CONFIDENCE_FLOOR = 5000' "$fixture"
+          grep -q 'CONFIDENCE_CEILING = 9900' "$fixture"
+          grep -q 'metrics_oracle_pk' "$fixture"
+          grep -q 'reportMetrics' "$fixture"
+          grep -q 'autoTune' "$fixture"
+          if grep -q 'oracle_get_fp_rate\|return 0' "$fixture"; then
+            echo "ERROR: GovernanceAutoTuningState fixture must not keep the legacy fp_rate stub."
+            exit 1
+          fi
+          echo "GovernanceAutoTuningState fixture keeps signed metrics and deterministic tuning invariants."
 
   h001-silverc-runtime:
     name: H-001 + Validator State Silverc Runtime

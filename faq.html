@@ -351,7 +351,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
           <span class="faq-icon"></span>
         </button>
         <div class="faq-a"><div class="faq-a-inner">
-          <p>Affected users report the false detection. The false positive rate rises on-chain. The <code>GovernanceAutoTuning</code> contract automatically raises the confidence threshold for new rules — without any human intervention.</p>
+          <p>Affected users report the false detection. The signed metrics-oracle pipeline reports the bounded false positive rate on-chain. The <code>GovernanceAutoTuning</code> contract deterministically raises the confidence threshold for new rules — without any human intervention.</p>
           <p>The Guardian who submitted the bad rule loses 50% of their reputation score. Reputation halving is a strong deterrent: it takes many accepted proposals to rebuild what one rejection destroys.</p>
           <p>The target false positive rate is under 0.5%. Auto-tuning continuously adjusts parameters to stay within this range.</p>
         </div></div>

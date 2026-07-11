@@ -12,7 +12,7 @@
 - [ ] [P0] Alle memory/-Dateien initial befüllen und pushen | Claude Code | Repo-Struktur
 - [x] [P0] Kaspa Testnet-10-Node installieren und starten (rusty-kaspa v1.1.0) | Claude Code | 2026-03-21
 - [x] [P0] Verbindung zum Testnet verifizieren (8 Peers, IBD active) | Claude Code | 2026-03-21
-- [~] [P0] Silverscript Compiler/Tooling installieren und testen | Claude Code | H-001 fixture verifies; ValidatorStaking state fixture compiles; commitVote/revealVote/slash/requestWithdraw/completeWithdraw runtime tests pass; signed-int deployment bounds enforced; GuardianReputationState compile/ABI/runtime/formula gates pass; RuleStorageState/CommunityDonationsState/DevIncentivePoolState compile/ABI/runtime gates pass locally/in CI; GovernanceAutoTuning/Q-003 and deploy smoke pending
+- [~] [P0] Silverscript Compiler/Tooling installieren und testen | Claude Code | H-001 fixture verifies; ValidatorStaking state fixture compiles; commitVote/revealVote/slash/requestWithdraw/completeWithdraw runtime tests pass; signed-int deployment bounds enforced; GuardianReputationState compile/ABI/runtime/formula gates pass; RuleStorageState/CommunityDonationsState/DevIncentivePoolState/GovernanceAutoTuningState compile/ABI/runtime gates pass locally; direct deploy smoke pending
 - [ ] [P0] Hello-World Silverscript Contract auf Testnet deployen | Claude Code | PENDING: after Prometheus contract syntax compatibility + current-Silverc deploy smoke path
 - [x] [P0] rusty-kaspa als Dependency in Cargo.toml einbinden | Claude Code | 2026-03-21; pinned to v2.0.1 on 2026-07-07
 - [ ] [P0] autodidactic.py vollständig testen (alle Memory-Operationen) | Claude Code | memory/-Dateien
@@ -25,13 +25,13 @@
 
 - [x] [P1] ValidatorStaking.ss schreiben (register, commitVote, revealVote, slash) | Claude Code | 2026-03-21 (11 tests)
 - [x] [P1] GuardianReputation.ss schreiben (register, submitContribution, votingPower) | Claude Code | 2026-03-21 (9 tests); current-Silverc GuardianReputationState compile/ABI/runtime/formula gates added 2026-07-09
-- [x] [P1] GovernanceAutoTuning.ss schreiben (auto_tune, alle Parameter) | Claude Code | 2026-03-21 (8 tests, fp_rate stub)
+- [x] [P1] GovernanceAutoTuning.ss schreiben (auto_tune, alle Parameter) | Claude Code | 2026-03-21 (8 tests, legacy fp_rate stub); current-Silverc GovernanceAutoTuningState runtime gates added 2026-07-11 with signed metrics `fp_rate` input
 - [x] [P1] DevIncentivePool.ss schreiben (proposeGrant, vote, payGrant, recommended_reward) | Claude Code | 2026-03-21 (9 tests); current-Silverc DevIncentivePoolState compile/ABI/runtime gates added 2026-07-11
 - [x] [P1] CommunityDonations.ss schreiben (donateKas, getDonations) | Claude Code | 2026-03-21 (8 tests); current-Silverc CommunityDonationsState compile/ABI/runtime gates added 2026-07-11
 - [x] [P1] RuleStorage.ss schreiben (storeRule als KRC20-Asset) | Claude Code | 2026-03-21 (9 tests); current-Silverc RuleStorageState compile/ABI/runtime gates added 2026-07-11
 - [x] [P1] Unit-Tests für ValidatorStaking (min. 10 Tests) | Claude Code | 2026-03-21 (11 tests)
 - [x] [P1] Unit-Tests für GuardianReputation (min. 8 Tests) | Claude Code | 2026-03-21 (9 tests)
-- [ ] [P1] Alle Contracts auf Testnet deployen und Adressen in STATUS.md eintragen | Claude Code | Wartet auf GovernanceAutoTuning/Q-003, remaining current-Silverc runtime gate, and deploy smoke path
+- [ ] [P1] Alle Contracts auf Testnet deployen und Adressen in STATUS.md eintragen | Claude Code | Wartet auf direct `ssc`/current-Silverc deploy smoke path und signed metrics-oracle operator integration
 - [x] [P1] Audit-Request für alle Contracts an Claude vorbereiten | Claude Code | 2026-03-21
 
 ---
@@ -75,7 +75,7 @@
 
 ## ═══ SPRINT 5: VOTING MECHANISMUS (Woche 7) ═══
 
-- [~] [P1] Commit-Reveal vollständig in Silverscript implementieren | Claude Code | H-001 runtime fixture + ValidatorStakingState compile/ABI + commitVote/revealVote/slash/requestWithdraw/completeWithdraw runtime gates done; signed-int deployment bounds enforced; GuardianReputationState compile/ABI/runtime/formula gates done; RuleStorageState compile/ABI/runtime gates done locally; remaining full-deploy path pending
+- [~] [P1] Commit-Reveal vollständig in Silverscript implementieren | Claude Code | H-001 runtime fixture + ValidatorStakingState compile/ABI + commitVote/revealVote/slash/requestWithdraw/completeWithdraw runtime gates done; signed-int deployment bounds enforced; GuardianReputationState/RuleStorageState/CommunityDonationsState/DevIncentivePoolState/GovernanceAutoTuningState compile/ABI/runtime gates done locally; remaining full-deploy path pending
 - [ ] [P1] Salted Voting (30% Zufallsstichprobe) implementieren | Claude Code | Commit-Reveal
 - [ ] [P1] Bond-System (10% des Stakes als Kaution) implementieren | Claude Code | Commit-Reveal
 - [ ] [P2] Voting-Tests: Kollusion-Angriff scheitert | Claude Code | Voting-System
@@ -156,7 +156,7 @@
 - [ ] [P1] LLaMA 3 8B LoRA Fine-Tuning auf Security-Datensätzen | Claude Code | Datensätze
 - [ ] [P1] LLaMA 3 70B Fine-Tuning | Claude Code | 8B done
 - [ ] [P2] Fed-DART echte Implementierung (Gradient-Aggregation) | Claude Code | -
-- [ ] [P2] fp_rate Oracle Contract + Integration | Claude Code | Contracts live
+- [~] [P2] fp_rate Oracle Contract + Integration | Claude Code | Current-Silverc contract gate uses signed metrics `fp_rate` input; oracle operator/deploy integration pending
 
 ---
 

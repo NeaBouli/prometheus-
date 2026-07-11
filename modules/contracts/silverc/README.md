@@ -96,8 +96,40 @@ Current signed-int deployment boundary:
 
 Remaining deployment blockers:
 
-- GovernanceAutoTuning current-Silverc port, blocked on Q-003 `fp_rate` oracle design
 - deployment smoke path against direct `ssc`/current Silverc tooling
+
+## GovernanceAutoTuningState.sil
+
+`GovernanceAutoTuningState.sil` is the current-`silverc` port fixture for
+weekly protocol parameter tuning. It resolves the deployment-blocking Q-003
+stub in the current-Silverc path by making `fp_rate` an explicit signed
+metrics-oracle input instead of an implicit `oracle_get_fp_rate() -> 0` value.
+
+The fixture keeps the legacy tuning invariants that are safe to express in the
+current covenant state model:
+
+- tuning interval is `TUNING_INTERVAL_BLOCKS = 604800`
+- confidence target remains `TARGET_FP_RATE_MAX = 50` (0.5%, 10000x scaled)
+- reported `fp_rate` is bounded to `0..10000`
+- confidence bounds remain `CONFIDENCE_FLOOR = 5000` and
+  `CONFIDENCE_CEILING = 9900`
+- stake bounds remain `MIN_STAKE_KAS_FLOOR = 1000` and
+  `MIN_STAKE_KAS_CEILING = 100000`
+- reward bounds remain `REWARD_FLOOR = 10` and `REWARD_CEILING = 1000`
+
+The fixture intentionally does not pretend to support legacy global state,
+string parameter lookup, cross-contract `call(...)`, or an off-chain oracle
+operator implementation. The deploy path must still provision and operate the
+metrics signer represented by `metrics_oracle_pk`.
+
+The shared verifier currently compiles this fixture against the same pinned
+upstream Silverscript ref and runtime-tests covenant transitions for:
+
+- `reportMetrics`
+- `autoTune`
+
+Verified rejection paths include `fp_rate` above `MAX_FP_RATE` and auto-tuning
+before `TUNING_INTERVAL_BLOCKS`.
 
 ## DevIncentivePoolState.sil
 

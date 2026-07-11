@@ -73,8 +73,8 @@ Prometheus deployment now depends on current-Silverscript runtime transition ver
 - Integrate Fed-DART protocol (Fraunhofer ITWM)
 - Real gradient aggregation client in federated.rs
 - Coordinator rotation via reputation
-- fp_rate oracle: Light Client reporting → on-chain aggregation
-- Replace GovernanceAutoTuning.ss stub with real oracle
+- fp_rate oracle: operate signed metrics reporter for GovernanceAutoTuningState
+- Integrate Light Client false-positive reports into the metrics-oracle pipeline
 - End-to-end test: FP rate rises → Auto-Tuning responds
 
 ---

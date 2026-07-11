@@ -29,10 +29,11 @@ This is not mainnet-ready today. The right verdict is: good work, continue the p
 
 #### Production Stubs — WARN
 
-- **[PARTIAL / MITIGATED 2026-07-08] Production/beta stub paths are gated in the Rust client** — `modules/client/src/runtime.rs`, `modules/client/src/network/zk_proof.rs`, `modules/client/src/ai/phi3.rs`, `modules/client/src/blockchain/krc20.rs`, `modules/client/src/ai/federated.rs`, `modules/contracts/GovernanceAutoTuning.ss:117-125`
+- **[PARTIAL / MITIGATED 2026-07-11] Production/beta stub paths are gated in the Rust client and GovernanceAutoTuning has a current-Silverc metrics gate** — `modules/client/src/runtime.rs`, `modules/client/src/network/zk_proof.rs`, `modules/client/src/ai/phi3.rs`, `modules/client/src/blockchain/krc20.rs`, `modules/client/src/ai/federated.rs`, `modules/contracts/silverc/GovernanceAutoTuningState.sil`
   - What: Rust client stubs for ZK proofs, Phi-3 fallback/heuristic inference, KRC-20 cached rules, and Fed-DART placeholder calls now call a central runtime gate. `PROMETHEUS_RUNTIME=beta|mainnet|production|prod` rejects those stubs. Development mode remains offline-testable.
-  - Remaining risk: `GovernanceAutoTuning.ss` still has `fp_rate = 0` and cannot be runtime-gated until the contract/tooling path is active.
-  - Fix: Keep Rust client gate; add contract-side oracle decision for Q-003 before beta/mainnet governance.
+  - Current-Silverc update: `GovernanceAutoTuningState.sil` replaces the contract-side Q-003 stub with signed metrics-oracle input and runtime gates for `reportMetrics` and `autoTune`.
+  - Remaining risk: the signed metrics-oracle operator and deploy path still need production integration before beta/mainnet governance.
+  - Fix: Keep Rust client gate; implement oracle operator integration and direct deploy smoke before beta/mainnet governance.
 
 #### Guardian / AI Pipeline — WARN
 
@@ -100,8 +101,8 @@ This is not mainnet-ready today. The right verdict is: good work, continue the p
 
 #### BLOCKING
 
-1. H-001 Prometheus-contract compile/runtime verification before Sprint 9 or any contract deployment.
-2. Contract-side `fp_rate` oracle remains unresolved before beta/mainnet governance.
+1. Direct `ssc`/current-Silverc deploy smoke before Sprint 9 or any contract deployment.
+2. Signed metrics-oracle operator integration before beta/mainnet governance.
 
 #### HIGH
 
@@ -121,5 +122,5 @@ This is not mainnet-ready today. The right verdict is: good work, continue the p
 
 Continue with the current professional schema. The team worked well: the repo has a strong memory layer, transparent caveats, and tests that currently pass. The next practical task should be either:
 
-1. Port/compile `ValidatorStaking.ss` against current Silverscript tooling and run the H-001 vectors against that actual contract form, or
-2. Resolve Q-003 by replacing/gating the contract-side `fp_rate` oracle stub before beta/mainnet governance.
+1. Prove a direct `ssc`/current-Silverc deploy smoke path for at least one state fixture and document the deployment runbook, or
+2. Implement the signed metrics-oracle operator path required by `GovernanceAutoTuningState.sil`.

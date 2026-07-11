@@ -1,36 +1,36 @@
 # prometheus — Backlog
 
 ## 🔴 Aktiv (diese Session)
-- Latest product-code baseline is `eeb4808` on `main`; run `git log --oneline -1` for the current bridge/docs HEAD.
-- CI, Security Audit, and GitHub Pages deployment were green for `eeb4808`.
-- Runtime stub gates added for Rust client; remaining production-stub task is contract-side Q-003 `fp_rate` oracle.
-- Sprint 9 remains blocked by Prometheus-contract Silverscript compatibility plus H-001 verification in the actual contract form.
+- Latest product-code baseline is `f9d86a4` on `main`; run `git log --oneline -1` for the current bridge/docs HEAD.
+- CI, Security Audit, and GitHub Pages deployment were green for `f9d86a4`.
+- Runtime stub gates added for Rust client; current-Silverc contract gates now cover H-001, ValidatorStaking, GuardianReputation, RuleStorage, CommunityDonations, DevIncentivePool, and GovernanceAutoTuning.
+- Sprint 9 remains blocked by direct `ssc`/current-Silverc deployment smoke, oracle operator integration, and release hardening.
 
 ## 🟡 Nächste Session — STARTFLOW
 
 ### Pflicht VOR neuem Code:
 1. `cd /Users/gio/Desktop/repos/prometheus`
-2. `git log --oneline -5` — aktuellen HEAD prüfen; letzter Produkt-Code-Baseline-Commit ist `eeb4808`
+2. `git log --oneline -5` — aktuellen HEAD prüfen; letzter dokumentierter Main-HEAD ist `f9d86a4`
 3. Lies `memory/CHECKPOINT.md` — vollständiger Projektstatus
 4. Lies `memory/AUDIT.md` ab Zeile 337 — Pre-Hardfork-Audit-Ergebnisse
 5. Lies `memory/ERRORS.md` — 12 bekannte Patterns
 6. `cargo test 2>&1 | tail -5` — Tests grün?
 
 ### Offene HIGH-Findings (Pre-Hardfork Audit 02.04.2026):
-- **H-001**: Commit-Reveal LE encoding — `ValidatorStaking.ss:111`. Upstream `silverc` builds/tests locally; repo fixture `modules/contracts/silverc/ValidatorStakingH001.sil` verifies explicit byte construction against Rust vectors for positive 64-bit values. Still open for the full Prometheus state-machine contract because it uses legacy `.ss`/`uint64` syntax and old state abstractions.
+- **H-001**: Commit-Reveal LE encoding — `ValidatorStaking.ss:111`. Current-Silverc H-001 and `ValidatorStakingState.sil` runtime gates verify explicit byte construction, signed deployment bounds, and validator state transitions.
 - **H-002**: ~~Arc<Mutex<Phi3Model>>~~ → **FIXED** in Commit `6347b85`. Arc<Phi3Model> direkt.
 
 ### Nächste konkrete Tasks (Priorität):
-1. **[P0] Sprint 9 Vorbereitung** — `ValidatorStaking.ss` auf aktuelle Silverscript-Syntax portieren/kompilieren und H-001 gegen die Rust-Hexvektoren in genau dieser Contract-Form testen.
-2. **[P1] H-001 Verifikation** — explizite Byte-Preimage-Konstruktion in `ValidatorStaking.ss` absichern, falls implizite `bool/uint64`-Serialisierung nicht nachweisbar ist.
+1. **[P0] Sprint 9 Vorbereitung** — direct `ssc`/current-Silverc deploy smoke für mindestens ein fixture beweisen und Deployment-Runbook ableiten.
+2. **[P1] Oracle Operator Integration** — signed metrics-oracle signer/process für `GovernanceAutoTuningState.sil` definieren und operationalisieren.
 3. **[P1] Sprint 10B: Guardian Decentralization** — Hybrid routing (8B/70B), Ensemble voting (5x 8B)
-4. **[P2] fp_rate Oracle** — Q-003 offen; contract-side stub remains and must be resolved before beta/mainnet governance
+4. **[P2] fp_rate Oracle** — Q-003 current-Silverc contract gate uses signed metrics input; production oracle operator/integration remains
 5. **[P2] M-001** — Heuristic confidence in yara_generator.py durch LLM-Confidence ersetzen
 6. **[P2] M-002** — Performance test threshold (1ms → 2ms) oder --release gate
-7. **[P3] L-001/L-002/L-003** — DevIncentivePool ACL, fp_rate stub, CEI borderline
+7. **[P3] L-001/L-003** — DevIncentivePool ACL, CEI borderline
 
 ### Wartet auf externe Events:
-- Prometheus Contracts auf aktuelle `silverc`-Syntax bringen → Sprint 9
+- Direct `ssc`/current-Silverc deploy smoke → Sprint 9
 - Phi-3-mini Download → Sprint 11
 - LLaMA 3 Fine-Tuning → Sprint 12
 - vProgs (DAGKnight) → Sprint 14
@@ -42,6 +42,7 @@
 
 ## ✅ Erledigt (letzte 7 Tage)
 - [x] H-002 PATTERN-010 fix: Arc<Phi3Model> statt Arc<Mutex<Phi3Model>> — `6347b85` (06.04.2026)
+- [x] GovernanceAutoTuning current-Silverc runtime gates with signed metrics `fp_rate` input — 11.07.2026
 - [x] Post-Toccata docs/bridge status, Kaspa v2.0.1 pin, Security Audit gate, H-001 vectors, and runtime stub gates — `eeb4808` (08.07.2026)
 - [x] Upstream Silverscript `silverc` local build/test and temporary H-001 explicit-preimage probe — 08.07.2026
 - [x] Repo-tracked current-Silverscript H-001 fixture + verifier script + CI explicit-byte guard — 08.07.2026
@@ -49,4 +50,4 @@
 - [x] Cargo.lock + Logo Variants + Gitignore Cleanup — `9a8c344` (02.04.2026)
 
 ---
-*Zuletzt aktualisiert: 2026-07-08*
+*Zuletzt aktualisiert: 2026-07-11*

@@ -35,14 +35,14 @@ Goal:     All sprints 0-7 accepted. Post-Toccata deployment verification.
 | claude-code-start.sh         | DONE            | 100%     | 2026-03-21  | -            | -               |
 | **SPRINT 0 – SETUP**         |                 |          |             |              |                 |
 | Testnet-10-Node              | DONE            | 100%     | 2026-03-21  | -            | wrpc://127.0.0.1:17210 |
-| Silverscript tooling (silverc/ssc) | IN_PROGRESS | 99%      | 2026-07-11  | -            | Upstream `silverc` builds/tests in CI; H-001 fixture verifies; ValidatorStaking state fixture compiles; `commitVote`, `revealVote`, `slashInvalidReveal`, `requestWithdraw`, `completeWithdraw`, and signed-int deployment-bound runtime tests pass; GuardianReputationState compile/ABI/runtime/formula gates pass; RuleStorageState, CommunityDonationsState, and DevIncentivePoolState compile/ABI/runtime gates pass locally and in CI; GovernanceAutoTuning/Q-003 and deploy smoke pending |
+| Silverscript tooling (silverc/ssc) | IN_PROGRESS | 99%      | 2026-07-11  | -            | Upstream `silverc` builds/tests in CI; H-001 fixture verifies; ValidatorStaking state fixture compiles; `commitVote`, `revealVote`, `slashInvalidReveal`, `requestWithdraw`, `completeWithdraw`, and signed-int deployment-bound runtime tests pass; GuardianReputationState compile/ABI/runtime/formula gates pass; RuleStorageState, CommunityDonationsState, DevIncentivePoolState, and GovernanceAutoTuningState compile/ABI/runtime gates pass locally; direct deploy smoke pending |
 | Hello-World Contract         | PENDING         | 0%       | 2026-03-21  | -            | Deployment nach ssc-Release |
-| GitHub Actions CI/CD         | ACCEPTED        | 100%     | 2026-07-11  | ACCEPTED     | Prometheus CI, Security Audit, and Pages green for 73069fd |
+| GitHub Actions CI/CD         | ACCEPTED        | 100%     | 2026-07-11  | ACCEPTED     | Prometheus CI, Security Audit, and Pages green for f9d86a4; GovernanceAutoTuningState changes pending remote CI after next push |
 | Sprint-1 Pre-Check           | ACCEPTED        | 100%     | 2026-03-21  | ACCEPTED     | V-001, V-002, V-003 alle genehmigt |
 | **SPRINT 1 – CONTRACTS**     |                 |          |             |              |                 |
 | ValidatorStaking.ss          | ACCEPTED        | 100%     | 2026-03-21  | ACCEPTED     | v1.2: slash ACL, bond return, test patches |
 | GuardianReputation.ss        | ACCEPTED        | 100%     | 2026-03-21  | ACCEPTED     | v1.2: registered_at check |
-| GovernanceAutoTuning.ss      | ACCEPTED        | 100%     | 2026-03-21  | ACCEPTED     | v1.2: fp_rate oracle stub (Q-003 open) |
+| GovernanceAutoTuning.ss      | ACCEPTED        | 100%     | 2026-07-11  | ACCEPTED     | Legacy `.ss` kept for architecture history; current-Silverc GovernanceAutoTuningState compile/ABI/runtime gates added with signed metrics `fp_rate` input |
 | DevIncentivePool.ss          | ACCEPTED        | 100%     | 2026-03-21  | ACCEPTED     | v1.2: whitepaper reward formula; current-Silverc DevIncentivePoolState compile/ABI/runtime gates added 2026-07-11 |
 | CommunityDonations.ss        | ACCEPTED        | 100%     | 2026-03-21  | ACCEPTED     | v1.2: no changes needed; current-Silverc CommunityDonationsState compile/ABI/runtime gates added 2026-07-11 |
 | RuleStorage.ss               | ACCEPTED        | 100%     | 2026-03-21  | ACCEPTED     | v1.2: time-windowed counter |
@@ -96,17 +96,18 @@ Repo GuardianReputation current-silverc state fixture: `modules/contracts/silver
 Repo RuleStorage current-silverc state fixture: `modules/contracts/silverc/RuleStorageState.sil` compiles against the same pinned upstream `silverc`; the verifier builds covenant sigscripts and runtime-tests `submitProposal`, `voteOnProposal`, `finalizeProposal`, and `deactivateRule`. Valid guardian/validator/governance signature transitions are accepted; low confidence, late vote, zero-vote finalization, and pending-rule deactivation are rejected. The fixture keeps CIDv1 `byte[36]`, `MIN_CONFIDENCE = 8500`, `VALIDATOR_QUORUM = 6700`, and explicit Guardian reputation outcome events without pretending to support legacy maps, KRC20 minting, `msg.sender`, events, or cross-contract calls in current Silverc.
 Repo CommunityDonations current-silverc state fixture: `modules/contracts/silverc/CommunityDonationsState.sil` compiles against the same pinned upstream `silverc`; the verifier builds covenant sigscripts and runtime-tests `donateKas`, `proposeDisbursement`, `voteDisbursement`, and `executeDisbursement`. Valid donor/proposer/validator/governance signature transitions are accepted; zero donation amount, disbursement amount above pool balance, voting at `voting_end_block`, and execution below `DISBURSEMENT_QUORUM` are rejected. The fixture keeps KAS-denominated pool accounting, `MIN_DONATION_KAS = 1`, `DISBURSEMENT_QUORUM = 10`, and `VALIDATOR_QUORUM = 6700` without pretending to support legacy maps, strings, `tx.value`, direct KAS transfer, or cross-contract validator lookups in current Silverc.
 Repo DevIncentivePool current-silverc state fixture: `modules/contracts/silverc/DevIncentivePoolState.sil` compiles against the same pinned upstream `silverc`; the verifier builds covenant sigscripts and runtime-tests `proposeGrant`, `voteGrant`, and `executeGrant`. Valid proposer/validator execution transitions are accepted; amount above `MAX_GRANT_PROM`, voting at `voting_end_block`, execution below `QUORUM_VOTES`, and execution below `VALIDATOR_QUORUM` are rejected. The fixture keeps PROM-denominated grant pool accounting without introducing PROM staking or pretending to support legacy maps, strings, `msg.sender`, direct PROM transfer, or cross-contract validator lookups in current Silverc. Legacy `deposit()` ACL remains a deployment/orchestration decision once emission authority is finalized.
+Repo GovernanceAutoTuning current-silverc state fixture: `modules/contracts/silverc/GovernanceAutoTuningState.sil` compiles against the same pinned upstream `silverc`; the verifier builds covenant sigscripts and runtime-tests `reportMetrics` and `autoTune`. Valid signed metrics-oracle reports are accepted; `fp_rate > MAX_FP_RATE` is rejected; deterministic weekly tuning accepts high-FP and zero-FP paths; early tuning before `TUNING_INTERVAL_BLOCKS` is rejected. Q-003 is resolved in the current-Silverc contract path as signed metrics input, while oracle operator deployment/integration remains open.
 Signed-int boundary decision: current upstream Silverc entrypoint `int` values are deployable only in the nonnegative signed range `0..=i64::MAX`; Rust retains raw `u64` H-001 vectors for byte compatibility and uses `build_silverc_checked` / `validate_silverc_commitment_bounds` for deployment calls.
 Rusty-Kaspa workspace dependencies pinned to `v2.0.1`; `cargo audit` now reports no vulnerabilities, only allowed warnings.
 GitHub Security Audit workflow re-enabled and dependency audits now fail on findings instead of using `|| true`; after `c673766`, Dependency Audit was hardened with explicit job/step timeouts and split cargo-audit install/run steps, and green reruns passed through `a11545b`.
-Public docs refreshed and verified in CI/Pages by 2026-07-11: README, WHITEPAPER.md, and whitepaper.html now state deployment-gated post-Toccata status, verified H-001/ValidatorStaking/GuardianReputation/RuleStorage/CommunityDonations/DevIncentivePool current-Silverc runtime gates, target-only PROM-RULES asset orchestration, and no Kasplex dependency for Guardian reputation.
+Public docs refreshed and verified in CI/Pages by 2026-07-11: README, WHITEPAPER.md, and whitepaper.html now state deployment-gated post-Toccata status, verified H-001/ValidatorStaking/GuardianReputation/RuleStorage/CommunityDonations/DevIncentivePool/GovernanceAutoTuning current-Silverc runtime gates, target-only PROM-RULES asset orchestration, and no Kasplex dependency for Guardian reputation.
 Rust client runtime gate added: `PROMETHEUS_RUNTIME=beta|mainnet|production|prod` rejects ZK/Phi-3/KRC-20/Fed-DART stubs; development mode remains testable.
 Rollback tag: pre-session-20260413 → 6347b85
 ```
 
 ## BLOCKED
 
-Sprint 9 remains blocked until the remaining Prometheus contracts are ported or deployment-scoped against current Silverscript tooling.
+Sprint 9 remains blocked until the direct `ssc`/current-Silverc deploy smoke path and signed metrics-oracle operator integration are proven.
 
 ## NEXT ACTIONS (for Claude Code)
 
@@ -117,11 +118,10 @@ STARTFLOW — Read in this order:
 3. memory/ERRORS.md → 12 known patterns
 
 Priority tasks:
-- Sprint 9: resolve GovernanceAutoTuning/Q-003, port the remaining current-Silverc contract, and prove the deploy smoke path
+- Sprint 9: prove the direct `ssc`/current-Silverc deploy smoke path
 - H-001: keep LE encoding and signed-boundary verification gated in CI
-- Q-003: replace/gate contract-side `fp_rate` oracle stub before beta/mainnet governance
+- Oracle: integrate the signed metrics-oracle operator for GovernanceAutoTuning before beta/mainnet governance
 - Sprint 10B: Guardian Decentralization (hybrid routing, ensemble voting)
-- Q-003: fp_rate Oracle (Architect decision needed)
 - M-001/M-002: Medium findings (can wait until Aug/Sep)
 ```
 
@@ -131,7 +131,7 @@ Priority tasks:
 (to be filled after deployment)
 ValidatorStaking:    TBD
 GuardianReputation:  TBD
-GovernanceAutoTuning: TBD
+GovernanceAutoTuning: current-Silverc state fixture compile/ABI/runtime gates pass
 DevIncentivePool:    current-Silverc state fixture compile/ABI/runtime gates pass
 CommunityDonations:  TBD
 RuleStorage:         TBD

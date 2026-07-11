@@ -266,6 +266,14 @@ QUESTION FOR CLAUDE: fp_rate oracle mechanism undefined — stub created.
   Option B: Guardians submit fp_rate as part of their reputation report
   Option C: Off-chain oracle with multi-sig validation
   Awaiting architectural decision.
+
+Resolution update 2026-07-11:
+  Current-Silverc path uses `GovernanceAutoTuningState.sil` with signed
+  metrics-oracle reports. The report includes active validators, active
+  guardians, proposals/day, and `fp_rate` bounded to `0..10000`. Runtime gates
+  verify valid signed reports, reject out-of-range `fp_rate`, and verify
+  deterministic weekly tuning. Remaining work is oracle operator/deploy
+  integration, not the contract-side Q-003 stub.
 ```
 
 ---
@@ -398,8 +406,14 @@ Update:   Current-silverc fixture `ValidatorStakingH001.sil` now verifies
           `VALIDATOR_QUORUM = 6700` while leaving legacy maps, KRC20 minting,
           events, and cross-contract calls out of the current-Silverc fixture
           scope.
-Action:   Resolve GovernanceAutoTuning/Q-003 and prove the deploy smoke path.
-Severity: HIGH until remaining current-Silverc runtime/deploy gates are verified
+          `GovernanceAutoTuningState.sil` now compiles, builds covenant
+          sigscripts, and runtime-tests signed metrics reporting plus
+          deterministic weekly auto-tuning; valid signed metrics reports are
+          accepted, `fp_rate > MAX_FP_RATE` is rejected, high-FP and zero-FP
+          tuning paths are accepted, and early tuning is rejected.
+Action:   Prove direct `ssc`/current-Silverc deploy smoke and implement the
+          signed metrics-oracle operator before beta/mainnet governance.
+Severity: HIGH until deployment smoke and oracle operations are verified
 ```
 
 **H-002: Arc<Mutex<Phi3Model>> unnecessary lock (Check 2.2, PATTERN-010)**
@@ -449,12 +463,15 @@ Action:   Add ACL when emission contract address is known.
 Severity: LOW
 ```
 
-**L-002: Q-003 fp_rate oracle still stub (Check 1.12 related)**
+**L-002: Q-003 fp_rate oracle operator integration pending (Check 1.12 related)**
 ```
-File:     modules/contracts/GovernanceAutoTuning.ss
-Finding:  oracle_get_fp_rate() returns 0. Architectural decision pending.
-Action:   Architect decision needed before mainnet.
-Severity: LOW (auto-tuning works with default params, stub is safe)
+File:     modules/contracts/GovernanceAutoTuning.ss; modules/contracts/silverc/GovernanceAutoTuningState.sil
+Finding:  Legacy `.ss` keeps oracle_get_fp_rate() as an archival stub, but
+          current-Silverc GovernanceAutoTuningState replaces it with a signed
+          metrics-oracle report and runtime gates. The remaining risk is
+          deployment/operator integration for the metrics signer.
+Action:   Implement and document the oracle operator before beta/mainnet.
+Severity: LOW (contract gate exists; operational integration remains)
 ```
 
 **L-003: revealVote CEI borderline (Check 6.4)**
@@ -534,7 +551,7 @@ Total checks run:       35
 Critical findings:      0
 High findings:          2  (H-001 LE encoding, H-002 Mutex)
 Medium findings:        2  (M-001 heuristic confidence, M-002 perf test)
-Low findings:           3  (L-001 deposit ACL, L-002 fp_rate stub, L-003 CEI)
+Low findings:           3  (L-001 deposit ACL, L-002 fp_rate operator integration, L-003 CEI)
 Passed clean:           28
 
 Tests passing:          203/204 (180 unit + 23 python + 1 flaky perf)
@@ -546,9 +563,10 @@ Audit confidence:       94%
 (Deduction: ValidatorStaking current-silverc compile/ABI and runtime
  transitions plus signed-int deployment bounds are verified,
  GuardianReputation current-silverc compile/ABI/runtime/formula gates are
- verified, RuleStorage, CommunityDonations, and DevIncentivePool current-silverc
- compile/ABI/runtime gates are verified locally/in CI,
- but GovernanceAutoTuning/Q-003, deploy smoke, and LLM confidence extraction
+ verified, RuleStorage, CommunityDonations, DevIncentivePool, and
+ GovernanceAutoTuning current-silverc compile/ABI/runtime gates are verified
+ locally/in CI or pending remote CI for the latest governance addition,
+ but deploy smoke, oracle operator integration, and LLM confidence extraction
  remain open)
 ```
 
@@ -560,8 +578,9 @@ compiles/builds covenant sigscripts, and `commitVote`/`revealVote`/
 The signed-int/u64 boundary is resolved by constraining current-Silverc
 deployment inputs to `0..=i64::MAX`; GuardianReputationState runtime/formula
 gates, RuleStorageState runtime gates, CommunityDonationsState runtime gates,
-and DevIncentivePoolState runtime gates now pass locally/in CI. GovernanceAutoTuning/Q-003
-and the deploy smoke path must pass before Sprint 9 deployment.
+DevIncentivePoolState runtime gates, and GovernanceAutoTuningState signed
+metrics/auto-tune runtime gates now pass locally. Direct deploy smoke and
+oracle operator integration must pass before Sprint 9 deployment.
 M-001 and M-002 can wait until full release (Aug/Sep 2026).
 
 *Audit completed 2026-04-02 by Claude Code (5 parallel agents, 7 levels, 35 checks).*

@@ -72,9 +72,9 @@ Off-Chain:           Phi-3-mini (local AI) | LLaMA 3 (guardian AI) | Fed-DART (f
 | 6 — E2E | ACCEPTED | Full lifecycle test, Sybil + FP flood resistance |
 | 7 — Dashboard | ACCEPTED | Audit dashboard, documentation |
 | 8 — Public Site | ACCEPTED | Website, SEO, whitepaper, GitHub Pages |
-| 9 — Deploy Path | BLOCKED | Remaining current-Silverc contract ports and deployment smoke path |
+| 9 — Deploy Path | BLOCKED | Current-Silverc contract gates pass; deployment smoke path and release hardening remain |
 
-**Deployment status:** Kaspa Toccata is now in the post-fork verification phase for Prometheus. H-001 commit-reveal byte encoding, ValidatorStaking runtime transitions, GuardianReputation runtime/formula gates, RuleStorage runtime gates, CommunityDonations runtime gates, and DevIncentivePool runtime gates are covered by the current Silverc verifier. Deployment remains gated by the remaining GovernanceAutoTuning current-Silverc port, the deploy smoke path, Q-003 `fp_rate` oracle design, and release hardening.
+**Deployment status:** Kaspa Toccata is now in the post-fork verification phase for Prometheus. H-001 commit-reveal byte encoding plus ValidatorStaking, GuardianReputation, RuleStorage, CommunityDonations, DevIncentivePool, and GovernanceAutoTuning runtime gates are covered by the current Silverc verifier. GovernanceAutoTuning now uses a signed metrics-oracle input for Q-003 `fp_rate` instead of the legacy stub. Deployment remains gated by the direct `ssc`/current-Silverc smoke path, oracle operator integration, and release hardening.
 
 ---
 

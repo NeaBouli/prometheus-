@@ -46,10 +46,11 @@ No — four independent checkpoints exist:
 No single step is fully automatic without verification.
 
 **Q: What happens with a false positive?**
-Affected users report the false detection. The false positive rate
-rises on-chain. The GovernanceAutoTuning contract automatically
-raises the confidence threshold for new rules. The guardian who
-submitted the bad rule loses 50% of their reputation score.
+Affected users report the false detection. The signed metrics-oracle
+pipeline reports the bounded false positive rate on-chain.
+GovernanceAutoTuning then deterministically raises the confidence
+threshold for new rules. The guardian who submitted the bad rule
+loses 50% of their reputation score.
 No human intervention required.
 
 **Q: How does Prometheus protect my privacy?**
