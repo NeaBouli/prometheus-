@@ -34,14 +34,16 @@ GuardianReputation, RuleStorage, CommunityDonations, DevIncentivePool, and
 GovernanceAutoTuning. A local release-bundle smoke compiles all 7 current-Silverc
 fixtures through the pinned upstream `silverc` CLI and writes deterministic
 source/artifact/script hashes plus an optional deterministic archive. A deploy
-preflight validates release-bundle integrity and public operator inputs, while
-confirming upstream `silverc` still exposes no network deploy command. The
-remaining deployment blockers are the missing network deploy/orchestration path,
-signed metrics-oracle operation, and release hardening.
+preflight validates release-bundle integrity and public operator inputs, emits a
+Markdown operator runbook with contract hashes and safety rules, and confirms
+upstream `silverc` still exposes no network deploy command. The remaining
+deployment blockers are the missing network deploy/orchestration path, signed
+metrics-oracle operation, and release hardening.
 
 **Sprint 9 — Contracts Live + Real ZK-Proof**
 - Keep current-Silverscript runtime and release-bundle manifest gates green
 - Keep release-bundle deploy preflight green
+- Keep the generated deploy operator runbook green and free of signing material
 - Compile and deploy all 6 contracts to Kaspa Mainnet only after verification passes
 - Integrate kaspa-zk-params crate (real Groth16, replacing stub)
 - Implement PROM emission contract (minting logic)

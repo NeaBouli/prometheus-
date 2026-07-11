@@ -165,17 +165,25 @@ jobs:
             --rpc-url ws://127.0.0.1:17210 \
             --deployer-address kaspatest:qptestpreflight000000000000000000000000000000000 \
             --metrics-oracle-pubkey 1111111111111111111111111111111111111111111111111111111111111111 \
-            --plan-out /tmp/prometheus-silverc-deploy-preflight.json
+            --plan-out /tmp/prometheus-silverc-deploy-preflight.json \
+            --runbook-out /tmp/prometheus-silverc-deploy-runbook.md
           test -s /tmp/prometheus-silverc-deploy-preflight.json
+          test -s /tmp/prometheus-silverc-deploy-runbook.md
           python3 - <<'PY'
           import json
           from pathlib import Path
 
           plan = json.loads(Path("/tmp/prometheus-silverc-deploy-preflight.json").read_text())
+          runbook = Path("/tmp/prometheus-silverc-deploy-runbook.md").read_text()
           assert plan["bundle"]["fixture_count"] == 7
           assert plan["operator_inputs"]["missing"] == []
           assert plan["deploy_supported"] is False
           assert "upstream silverc exposes no network deploy command" in plan["deploy_blockers"]
+          assert "Status: BLOCKED" in runbook
+          assert "This preflight does not deploy or broadcast transactions." in runbook
+          assert "ValidatorStakingH001" in runbook
+          assert "GovernanceAutoTuningState" in runbook
+          assert "private keys" in runbook
           PY
 
   # ─── Rust Workspace Check ───────────────────────────────────────────────────

@@ -70,6 +70,7 @@ def parse_args() -> argparse.Namespace:
         help="Silverscript commit, tag, or branch to inspect before deployment",
     )
     parser.add_argument("--plan-out", type=Path, help="Optional JSON deployment preflight report path")
+    parser.add_argument("--runbook-out", type=Path, help="Optional Markdown operator handoff runbook path")
     parser.add_argument(
         "--require-network-deploy-tool",
         action="store_true",
@@ -280,6 +281,83 @@ def write_plan(
     return plan
 
 
+def write_runbook(args: argparse.Namespace, manifest: dict[str, Any], plan: dict[str, Any]) -> None:
+    if not args.runbook_out:
+        return
+
+    status = "READY_FOR_NETWORK_DEPLOY_TOOL" if plan["deploy_supported"] else "BLOCKED"
+    lines = [
+        "# Prometheus Silverc Deploy Preflight Runbook",
+        "",
+        f"Status: {status}",
+        f"Network: {plan['network']}",
+        f"Silverscript ref: `{plan['bundle']['silverscript_ref']}`",
+        f"Silverscript commit: `{plan['bundle']['silverscript_commit']}`",
+        f"Fixture count: {plan['bundle']['fixture_count']}",
+        "",
+        "## Safety Rules",
+        "",
+        "- This runbook is generated from a validated release bundle.",
+        "- This preflight does not deploy or broadcast transactions.",
+        "- Do not paste private keys, seed phrases, wallet files, or keystore material into this repo or into preflight arguments.",
+        "- Operator secrets must stay in the local wallet/keychain or deployment vault.",
+        "- Validators stake KAS only; PROM remains earned-only and is not a staking asset.",
+        "",
+        "## Public Operator Inputs",
+        "",
+        f"- RPC URL present: {str(plan['operator_inputs']['rpc_url_present']).lower()}",
+        f"- Deployer address present: {str(plan['operator_inputs']['deployer_address_present']).lower()}",
+        f"- Metrics-oracle public key present: {str(plan['operator_inputs']['metrics_oracle_pubkey_present']).lower()}",
+        f"- Missing public inputs: {', '.join(plan['operator_inputs']['missing']) or 'none'}",
+        "",
+        "## Tooling",
+        "",
+        f"- silverc path inspected: `{plan['tooling']['silverc_path']}`",
+        f"- Network deploy command available: {str(plan['tooling']['has_network_deploy_command']).lower()}",
+        "",
+        "## Contracts",
+        "",
+        "| Order | Contract | Artifact | Script SHA-256 | Script bytes |",
+        "|------:|----------|----------|----------------|-------------:|",
+    ]
+    for index, entry in enumerate(manifest["fixtures"], start=1):
+        lines.append(
+            "| {index} | `{contract}` | `{artifact}` | `{script_hash}` | {script_len} |".format(
+                index=index,
+                contract=entry["contract_name"],
+                artifact=entry["artifact_file"],
+                script_hash=entry["script_sha256"],
+                script_len=entry["script_len"],
+            )
+        )
+
+    lines.extend(
+        [
+            "",
+            "## Operator Sequence",
+            "",
+            "1. Build the release archive with `scripts/smoke_silverc_artifacts.py --archive <path>`.",
+            "2. Run this preflight against the archive with public RPC/deployer/oracle inputs only.",
+            "3. Confirm every source, constructor-args, artifact, and script hash is covered by the generated manifest.",
+            "4. Confirm a network deploy/broadcast tool exists before attempting Sprint 9 deployment.",
+            "5. Use a separate wallet/vault process for signing; never store signing material in the repository.",
+            "6. Record deployed contract IDs/addresses in `memory/STATUS.md` only after a real network receipt is verified.",
+            "",
+            "## Deploy Blockers",
+            "",
+        ]
+    )
+    blockers = plan["deploy_blockers"]
+    if blockers:
+        lines.extend(f"- {blocker}" for blocker in blockers)
+    else:
+        lines.append("- none")
+
+    runbook_path = args.runbook_out.expanduser().resolve()
+    runbook_path.parent.mkdir(parents=True, exist_ok=True)
+    runbook_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
 def main() -> int:
     args = parse_args()
     silverscript_repo = Path(args.silverscript_repo).expanduser().resolve()
@@ -289,6 +367,7 @@ def main() -> int:
         missing_inputs = validate_operator_inputs(args)
         tooling = inspect_silverc(silverscript_repo, args.silverscript_ref)
         plan = write_plan(args, manifest, missing_inputs, tooling)
+        write_runbook(args, manifest, plan)
         print(json.dumps(plan, indent=2, sort_keys=True))
 
         if args.require_network_deploy_tool and not tooling.has_deploy_command:

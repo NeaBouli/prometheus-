@@ -35,7 +35,7 @@ SILVERSCRIPT_REF=<commit-or-tag> python3 scripts/verify_silverc_h001.py
 SILVERSCRIPT_REPO=/path/to/silverscript python3 scripts/smoke_silverc_artifacts.py
 PROMETHEUS_SILVERC_ARTIFACT_DIR=/tmp/out python3 scripts/smoke_silverc_artifacts.py
 python3 scripts/smoke_silverc_artifacts.py --out-dir /tmp/out --archive /tmp/prometheus-silverc-artifacts.tar.gz
-python3 scripts/preflight_silverc_deploy.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --network sandbox --rpc-url ws://127.0.0.1:17210 --deployer-address kaspatest:qptestpreflight000000000000000000000000000000000 --metrics-oracle-pubkey 1111111111111111111111111111111111111111111111111111111111111111
+python3 scripts/preflight_silverc_deploy.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --network sandbox --rpc-url ws://127.0.0.1:17210 --deployer-address kaspatest:qptestpreflight000000000000000000000000000000000 --metrics-oracle-pubkey 1111111111111111111111111111111111111111111111111111111111111111 --plan-out /tmp/prometheus-silverc-deploy-preflight.json --runbook-out /tmp/prometheus-silverc-deploy-runbook.md
 ```
 
 ## ValidatorStakingState.sil
@@ -156,6 +156,15 @@ Today it reports `deploy_supported: false` because upstream `silverc` exposes
 compile/AST artifact generation but no network deploy command. This turns the
 remaining Sprint 9 deploy blocker into a concrete, CI-visible capability gap
 instead of a vague manual step.
+
+Use `--runbook-out <path>` to emit a Markdown operator handoff next to the JSON
+plan. The runbook is generated only after bundle and public-input validation
+passes. It lists the inspected network, missing public inputs, the deploy-tool
+capability status, each contract artifact with script SHA-256 and script byte
+length, the safe operator sequence, and the remaining deploy blockers. It still
+does not include private keys, seed phrases, wallet files, or keystore material.
+CI checks that the runbook remains generated, blocked while no upstream network
+deploy command exists, and explicit about not broadcasting transactions.
 
 ## GovernanceAutoTuningState.sil
 
