@@ -39,6 +39,8 @@ BASE_REQUIRED_FILES = {
     "deploy-requests.md",
     "deploy-request-verification.json",
     "deploy-request-verification.md",
+    "deploy-operator-procedure.json",
+    "deploy-operator-procedure.md",
     "ci-fixture-receipt-summary.json",
     "ci-fixture-receipt-runbook.md",
     "metrics-oracle-report-preflight.json",
@@ -174,6 +176,7 @@ def validate_component_summaries(root: Path, handoff: dict[str, Any]) -> dict[st
     deploy_preflight = require_json(root, "deploy-preflight.json")
     deploy_request_set = require_json(root, "deploy-request-set.json")
     deploy_request_verification = require_json(root, "deploy-request-verification.json")
+    deploy_operator_procedure = require_json(root, "deploy-operator-procedure.json")
     ci_receipts = require_json(root, "ci-fixture-receipt-summary.json")
     metrics_report = require_json(root, "metrics-oracle-report-preflight.json")
     metrics_tx_request = require_json(root, "metrics-oracle-tx-request.json")
@@ -187,6 +190,17 @@ def validate_component_summaries(root: Path, handoff: dict[str, Any]) -> dict[st
         handoff["deploy_request_verification_status"],
         "deploy-request-verification",
     )
+    expect_status(
+        deploy_operator_procedure,
+        "status",
+        handoff["deploy_operator_procedure_status"],
+        "deploy-operator-procedure",
+    )
+    validate_safety(
+        deploy_operator_procedure,
+        OPERATOR_PROCEDURE_FALSE_SAFETY_FLAGS,
+        "deploy-operator-procedure",
+    )
     expect_status(ci_receipts, "status", handoff["ci_receipts_status"], "ci-fixture-receipt-summary")
     expect_status(metrics_report, "status", handoff["metrics_report_status"], "metrics-oracle-report-preflight")
     expect_status(metrics_tx_request, "status", handoff["metrics_tx_request_status"], "metrics-oracle-tx-request")
@@ -195,6 +209,7 @@ def validate_component_summaries(root: Path, handoff: dict[str, Any]) -> dict[st
         "deploy_preflight": "READY_FOR_NETWORK_DEPLOY_TOOL" if deploy_preflight["deploy_supported"] else "BLOCKED",
         "deploy_request_set": deploy_request_set["status"],
         "deploy_request_verification": deploy_request_verification["status"],
+        "deploy_operator_procedure": deploy_operator_procedure["status"],
         "ci_receipts": ci_receipts["status"],
         "metrics_report": metrics_report["status"],
         "metrics_tx_request": metrics_tx_request["status"],
@@ -273,6 +288,7 @@ def validate_handoff(root: Path) -> dict[str, Any]:
     ready = (
         handoff["status"] == "READY_FOR_OPERATOR_DEPLOY"
         and handoff.get("deploy_supported") is True
+        and handoff.get("deploy_operator_procedure_status") == "READY_FOR_EXTERNAL_DEPLOY_OPERATOR"
         and handoff.get("operator_receipts_status") == "READY_FOR_STATUS_RECORDING"
         and handoff.get("metrics_tx_request_status") == "READY_FOR_EXTERNAL_TX_ASSEMBLER"
         and handoff.get("metrics_operator_procedure_status") == "READY_FOR_EXTERNAL_ORACLE_OPERATOR"

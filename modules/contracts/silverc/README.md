@@ -38,6 +38,7 @@ python3 scripts/smoke_silverc_artifacts.py --out-dir /tmp/out --archive /tmp/pro
 python3 scripts/preflight_silverc_deploy.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --network sandbox --rpc-url ws://127.0.0.1:17210 --deployer-address kaspatest:qptestpreflight000000000000000000000000000000000 --metrics-oracle-pubkey 1111111111111111111111111111111111111111111111111111111111111111 --plan-out /tmp/prometheus-silverc-deploy-preflight.json --runbook-out /tmp/prometheus-silverc-deploy-runbook.md
 python3 scripts/build_silverc_deploy_requests.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --out-dir /tmp/prometheus-silverc-deploy-requests --network sandbox --rpc-url ws://127.0.0.1:17210 --deployer-address kaspatest:qptestpreflight000000000000000000000000000000000 --metrics-oracle-pubkey 1111111111111111111111111111111111111111111111111111111111111111 --request-set-out /tmp/prometheus-silverc-deploy-request-set.json --runbook-out /tmp/prometheus-silverc-deploy-requests.md
 python3 scripts/verify_silverc_deploy_requests.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --request-set /tmp/prometheus-silverc-deploy-request-set.json --requests-dir /tmp/prometheus-silverc-deploy-requests --summary-out /tmp/prometheus-silverc-deploy-request-verification.json --runbook-out /tmp/prometheus-silverc-deploy-request-verification.md
+python3 scripts/build_silverc_deploy_operator_procedure.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --request-set /tmp/prometheus-silverc-deploy-request-set.json --requests-dir /tmp/prometheus-silverc-deploy-requests --summary-out /tmp/prometheus-silverc-deploy-operator-procedure.json --runbook-out /tmp/prometheus-silverc-deploy-operator-procedure.md
 python3 scripts/build_silverc_operator_receipts.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --request-set /tmp/prometheus-silverc-deploy-request-set.json --requests-dir /tmp/prometheus-silverc-deploy-requests --orchestrator-results /path/to/public-external-deploy-results.json --operator-receipts-out /tmp/prometheus-silverc-operator-receipts.json --summary-out /tmp/prometheus-silverc-operator-receipts-summary.json --runbook-out /tmp/prometheus-silverc-operator-receipts.md
 python3 scripts/verify_silverc_deploy_receipts.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --receipts modules/contracts/silverc/deploy-receipts.sample.json --summary-out /tmp/prometheus-silverc-deploy-receipts-summary.json --runbook-out /tmp/prometheus-silverc-deploy-receipts.md
 python3 scripts/stage_silverc_deployment_status.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --operator-receipts /path/to/operator-record-receipts.json --status-out /tmp/prometheus-silverc-status-draft.json --snippet-out /tmp/prometheus-silverc-status-draft.md
@@ -196,6 +197,22 @@ set before operator handoff. It checks the request-set hash, every per-contract
 request hash, manifest-bound source/constructor/artifact/script hashes, fixture
 order, constructor args, safety flags, and secret-field rejection.
 
+## Deploy operator procedure
+
+`scripts/build_silverc_deploy_operator_procedure.py` turns a verified public
+deploy request set into a deploy-operator checklist and required public result
+evidence contract. It reuses the same release-bundle/request-set validation as
+the deploy-request verifier, then emits `deploy-operator-procedure.json/.md`
+with the request-set hash, per-contract request hashes, external operator
+sequence, required `operator_record` result fields, and repository boundary.
+
+The procedure intentionally does not accept private keys, raw transactions,
+serialized transactions, signing material, or wallet files. It also does not
+assemble, sign, broadcast, deploy contracts, or update status files. The
+handoff package includes this procedure for every generated deploy request set,
+and the release-readiness audit treats missing or unsafe procedure files as a
+failed gate.
+
 ## Operator receipt import from external results
 
 `scripts/build_silverc_operator_receipts.py` converts public external
@@ -250,11 +267,12 @@ or release notes.
 
 `scripts/build_silverc_operator_handoff.py` builds a public handoff directory
 from an existing release archive. It copies the archive, runs deploy preflight,
-builds and verifies the external deploy request set, can import public external
-orchestrator results into `operator_record` receipts, verifies the synthetic CI
-receipt fixture, optionally verifies real `operator_record` receipts, validates
-the metrics-oracle report, builds the unsigned metrics-oracle transaction
-request, and emits `HANDOFF.md` plus `operator-handoff-summary.json`.
+builds and verifies the external deploy request set, adds the deploy operator
+procedure, can import public external orchestrator results into
+`operator_record` receipts, verifies the synthetic CI receipt fixture,
+optionally verifies real `operator_record` receipts, validates the
+metrics-oracle report, builds the unsigned metrics-oracle transaction request,
+and emits `HANDOFF.md` plus `operator-handoff-summary.json`.
 
 The package is intentionally blocked until real network deploy/orchestration
 tooling, verified `operator_record` receipts, and signer-ready contract instance
@@ -268,7 +286,8 @@ operator handoff directory before any rollout claim. It checks:
 
 - the handoff summary status, blocker list, safety flags, and included-file list
 - required handoff files for deploy preflight, deploy requests, receipt checks,
-  metrics report preflight, unsigned tx request, and optional oracle tx result
+  deploy operator procedure, metrics report preflight, unsigned tx request, and
+  optional oracle tx result
 - component summary statuses match the handoff summary
 - JSON artifacts do not contain secret-like keys or raw/serialized transaction
   fields

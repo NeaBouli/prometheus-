@@ -2,6 +2,11 @@
 
 ## 2026-07-11
 
+- Added `scripts/build_silverc_deploy_operator_procedure.py`, a public-only deploy operator procedure builder for verified Silverc deploy request sets. It emits the external deploy checklist, per-contract request bindings, and required public `operator_record` result fields without accepting keys, raw transactions, signing material, deployment, or status writes.
+- Extended `scripts/build_silverc_operator_handoff.py` so every generated handoff package includes `deploy-operator-procedure.json/.md` and exposes `deploy_operator_procedure_status`.
+- Extended `scripts/audit_silverc_release_readiness.py` so deploy operator procedure files, status, and no-key/no-raw-transaction safety flags are mandatory before any rollout-ready claim.
+- Extended Prometheus CI with deploy operator procedure positive coverage plus secret-field and request-set tamper rejection, and added readiness-audit tamper coverage for deploy procedure safety flags.
+- Local checks passed for the fresh current-Silverc archive through deploy requests, request verification, deploy operator procedure, handoff package, and release-readiness audit. Remote gates for this new work are pending until the next push.
 - Added `scripts/build_metrics_oracle_operator_procedure.py`, a public-only external operator procedure builder for signer-ready GovernanceAutoTuning metrics-oracle tx requests. It validates the request against the release bundle, emits required public result-evidence fields and the external signing/broadcast checklist, and rejects blocked requests plus secret-like fields without accepting keys or raw transactions.
 - Extended `scripts/build_silverc_operator_handoff.py` to include `metrics-oracle-operator-procedure.json/.md` whenever the metrics tx request is signer-ready.
 - Extended `scripts/audit_silverc_release_readiness.py` so signer-ready metrics tx requests require the operator procedure files and status before any rollout-ready claim.

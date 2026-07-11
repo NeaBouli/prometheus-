@@ -372,6 +372,84 @@ jobs:
               assert proc.returncode != 0
               assert "secret-like fields are not allowed" in proc.stderr
           PY
+      - name: Build public deploy operator procedure
+        run: |
+          python3 scripts/build_silverc_deploy_operator_procedure.py \
+            --archive /tmp/prometheus-silverc-artifacts.tar.gz \
+            --request-set /tmp/prometheus-silverc-deploy-request-set.json \
+            --requests-dir /tmp/prometheus-silverc-deploy-requests \
+            --summary-out /tmp/prometheus-silverc-deploy-operator-procedure.json \
+            --runbook-out /tmp/prometheus-silverc-deploy-operator-procedure.md
+          test -s /tmp/prometheus-silverc-deploy-operator-procedure.json
+          test -s /tmp/prometheus-silverc-deploy-operator-procedure.md
+          python3 - <<'PY'
+          import json
+          import subprocess
+          from pathlib import Path
+
+          procedure = json.loads(Path("/tmp/prometheus-silverc-deploy-operator-procedure.json").read_text())
+          request_set = json.loads(Path("/tmp/prometheus-silverc-deploy-request-set.json").read_text())
+          runbook = Path("/tmp/prometheus-silverc-deploy-operator-procedure.md").read_text()
+
+          assert procedure["status"] == "READY_FOR_EXTERNAL_DEPLOY_OPERATOR"
+          assert procedure["request_set_sha256"] == request_set["request_set_sha256"]
+          assert procedure["request_count"] == 7
+          assert procedure["contracts"][0]["contract_name"] == "ValidatorStakingH001"
+          assert procedure["contracts"][-1]["contract_name"] == "GovernanceAutoTuningState"
+          assert procedure["required_public_result_fields"]["result_type"] == "prometheus_silverc_external_deploy_results"
+          assert procedure["required_public_result_fields"]["results[].status"] == "confirmed"
+          assert procedure["safety"]["accepts_private_keys"] is False
+          assert procedure["safety"]["accepts_raw_transactions"] is False
+          assert procedure["safety"]["signs_transactions"] is False
+          assert procedure["safety"]["assembles_chain_transaction"] is False
+          assert procedure["safety"]["broadcasts_transactions"] is False
+          assert procedure["safety"]["deploys_contracts"] is False
+          assert procedure["safety"]["updates_status_files"] is False
+          assert "public deploy operator checklist" in runbook
+          assert "does not sign" in runbook
+
+          bad = json.loads(Path("/tmp/prometheus-silverc-deploy-request-set.json").read_text())
+          bad["_".join(["wallet", "token"])] = "do-not-accept"
+          bad_path = Path("/tmp/prometheus-silverc-deploy-request-set-secret.json")
+          bad_path.write_text(json.dumps(bad, indent=2, sort_keys=True) + "\n")
+          proc = subprocess.run(
+              [
+                  "python3",
+                  "scripts/build_silverc_deploy_operator_procedure.py",
+                  "--archive",
+                  "/tmp/prometheus-silverc-artifacts.tar.gz",
+                  "--request-set",
+                  str(bad_path),
+                  "--requests-dir",
+                  "/tmp/prometheus-silverc-deploy-requests",
+              ],
+              text=True,
+              capture_output=True,
+          )
+          assert proc.returncode != 0
+          assert "secret-like fields are not allowed" in proc.stderr
+
+          bad = json.loads(Path("/tmp/prometheus-silverc-deploy-request-set.json").read_text())
+          bad["requests"][0]["request_sha256"] = "0" * 64
+          bad_path = Path("/tmp/prometheus-silverc-deploy-request-set-tamper.json")
+          bad_path.write_text(json.dumps(bad, indent=2, sort_keys=True) + "\n")
+          proc = subprocess.run(
+              [
+                  "python3",
+                  "scripts/build_silverc_deploy_operator_procedure.py",
+                  "--archive",
+                  "/tmp/prometheus-silverc-artifacts.tar.gz",
+                  "--request-set",
+                  str(bad_path),
+                  "--requests-dir",
+                  "/tmp/prometheus-silverc-deploy-requests",
+              ],
+              text=True,
+              capture_output=True,
+          )
+          assert proc.returncode != 0
+          assert "request_set_sha256 mismatch" in proc.stderr
+          PY
       - name: Build operator receipts from external deploy results
         run: |
           python3 - <<'PY'
@@ -965,6 +1043,7 @@ jobs:
           assert summary["deploy_requests_status"] == "REQUESTS_READY_EXTERNAL_ORCHESTRATOR_REQUIRED"
           assert summary["deploy_request_count"] == 7
           assert summary["deploy_request_verification_status"] == "DEPLOY_REQUEST_SET_VERIFIED"
+          assert summary["deploy_operator_procedure_status"] == "READY_FOR_EXTERNAL_DEPLOY_OPERATOR"
           assert summary["operator_receipt_import_status"] == "NOT_PROVIDED"
           assert summary["ci_receipts_status"] == "CI_FIXTURE_VALID"
           assert summary["operator_receipts_status"] == "MISSING_OPERATOR_RECORD"
@@ -988,6 +1067,8 @@ jobs:
           assert "deploy-request-set.json" in summary["included_files"]
           assert "deploy-request-verification.json" in summary["included_files"]
           assert "deploy-request-verification.md" in summary["included_files"]
+          assert "deploy-operator-procedure.json" in summary["included_files"]
+          assert "deploy-operator-procedure.md" in summary["included_files"]
           assert "deploy-requests/07-GovernanceAutoTuningState.deploy-request.json" in summary["included_files"]
           PY
           python3 scripts/build_silverc_operator_handoff.py \
@@ -1005,6 +1086,7 @@ jobs:
           root = Path("/tmp/prometheus-silverc-operator-handoff-import")
           summary = json.loads((root / "operator-handoff-summary.json").read_text())
           assert summary["status"] == "HANDOFF_BLOCKED"
+          assert summary["deploy_operator_procedure_status"] == "READY_FOR_EXTERNAL_DEPLOY_OPERATOR"
           assert summary["operator_receipt_import_status"] == "OPERATOR_RECEIPTS_READY_FOR_STATUS_STAGING"
           assert summary["operator_receipts_status"] == "READY_FOR_STATUS_RECORDING"
           assert summary["metrics_tx_result_status"] == "NOT_PROVIDED"
@@ -1031,6 +1113,7 @@ jobs:
           root = Path("/tmp/prometheus-silverc-operator-handoff-oracle-result")
           summary = json.loads((root / "operator-handoff-summary.json").read_text())
           assert summary["status"] == "HANDOFF_BLOCKED"
+          assert summary["deploy_operator_procedure_status"] == "READY_FOR_EXTERNAL_DEPLOY_OPERATOR"
           assert summary["operator_receipts_status"] == "READY_FOR_STATUS_RECORDING"
           assert summary["metrics_tx_request_status"] == "READY_FOR_EXTERNAL_TX_ASSEMBLER"
           assert summary["metrics_operator_procedure_status"] == "READY_FOR_EXTERNAL_ORACLE_OPERATOR"
@@ -1058,6 +1141,7 @@ jobs:
           assert summary["status"] == "ROLLOUT_BLOCKED"
           assert summary["handoff_status"] == "HANDOFF_BLOCKED"
           assert summary["component_statuses"]["operator_receipts"] == "READY_FOR_STATUS_RECORDING"
+          assert summary["component_statuses"]["deploy_operator_procedure"] == "READY_FOR_EXTERNAL_DEPLOY_OPERATOR"
           assert summary["component_statuses"]["metrics_tx_request"] == "READY_FOR_EXTERNAL_TX_ASSEMBLER"
           assert summary["component_statuses"]["metrics_operator_procedure"] == "READY_FOR_EXTERNAL_ORACLE_OPERATOR"
           assert summary["component_statuses"]["metrics_tx_result"] == "METRICS_ORACLE_TX_RESULT_VERIFIED"
@@ -1127,6 +1211,27 @@ jobs:
           )
           assert proc.returncode != 0
           assert "metrics-oracle-operator-procedure.safety.accepts_raw_transactions: expected false" in proc.stderr
+
+          tampered = Path("/tmp/prometheus-silverc-operator-handoff-deploy-procedure-tamper")
+          if tampered.exists():
+              shutil.rmtree(tampered)
+          shutil.copytree("/tmp/prometheus-silverc-operator-handoff-oracle-result", tampered)
+          procedure_path = tampered / "deploy-operator-procedure.json"
+          procedure = json.loads(procedure_path.read_text())
+          procedure["safety"]["accepts_raw_transactions"] = True
+          procedure_path.write_text(json.dumps(procedure, indent=2, sort_keys=True) + "\n")
+          proc = subprocess.run(
+              [
+                  "python3",
+                  "scripts/audit_silverc_release_readiness.py",
+                  "--handoff-dir",
+                  str(tampered),
+              ],
+              text=True,
+              capture_output=True,
+          )
+          assert proc.returncode != 0
+          assert "deploy-operator-procedure.safety.accepts_raw_transactions: expected false" in proc.stderr
           PY
 
   # ─── Rust Workspace Check ───────────────────────────────────────────────────

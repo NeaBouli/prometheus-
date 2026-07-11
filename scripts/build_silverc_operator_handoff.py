@@ -176,6 +176,28 @@ def run_deploy_request_verification(archive: Path, out_dir: Path) -> dict[str, A
     return load_json(summary_path)
 
 
+def run_deploy_operator_procedure(archive: Path, out_dir: Path) -> dict[str, Any]:
+    summary_path = out_dir / "deploy-operator-procedure.json"
+    runbook_path = out_dir / "deploy-operator-procedure.md"
+    run(
+        [
+            sys.executable,
+            "scripts/build_silverc_deploy_operator_procedure.py",
+            "--archive",
+            str(archive),
+            "--request-set",
+            str(out_dir / "deploy-request-set.json"),
+            "--requests-dir",
+            str(out_dir / "deploy-requests"),
+            "--summary-out",
+            str(summary_path),
+            "--runbook-out",
+            str(runbook_path),
+        ]
+    )
+    return load_json(summary_path)
+
+
 def run_operator_receipt_import(archive: Path, out_dir: Path, orchestrator_results: Path) -> dict[str, Any]:
     receipts_path = out_dir / "operator-receipts.from-results.json"
     summary_path = out_dir / "operator-receipts-import-summary.json"
@@ -367,6 +389,7 @@ def write_handoff_markdown(out_dir: Path, summary: dict[str, Any]) -> None:
             f"- Deploy preflight: {'supported' if summary['deploy_supported'] else 'blocked'}",
             f"- Deploy request set: {summary['deploy_requests_status']}",
             f"- Deploy request verification: {summary['deploy_request_verification_status']}",
+            f"- Deploy operator procedure: {summary['deploy_operator_procedure_status']}",
             f"- Operator receipt import: {summary['operator_receipt_import_status']}",
             f"- CI receipt verification: {summary['ci_receipts_status']}",
             f"- Operator receipt verification: {summary['operator_receipts_status']}",
@@ -387,12 +410,13 @@ def write_handoff_markdown(out_dir: Path, summary: dict[str, Any]) -> None:
             "## Operator Sequence",
             "",
             "1. Review `deploy-preflight.md` and confirm the deploy-tool capability status.",
-            "2. Deploy only through an approved external network deploy/orchestration tool.",
-            "3. Import public external deploy results with `--orchestrator-results`, or provide verified `operator_record` receipts with `--operator-receipts`.",
-            "4. Use only verified operator_record contract IDs for signer-ready oracle transaction requests.",
-            "5. Review `metrics-oracle-operator-procedure.md` before any external signing or broadcast.",
-            "6. Sign and broadcast outside this repository through the approved wallet/vault process, then verify the public result with `--metrics-tx-result`.",
-            "7. Update `memory/STATUS.md` only after all real receipts and transaction receipts verify.",
+            "2. Review `deploy-operator-procedure.md` before any external deploy orchestration.",
+            "3. Deploy only through an approved external network deploy/orchestration tool.",
+            "4. Import public external deploy results with `--orchestrator-results`, or provide verified `operator_record` receipts with `--operator-receipts`.",
+            "5. Use only verified operator_record contract IDs for signer-ready oracle transaction requests.",
+            "6. Review `metrics-oracle-operator-procedure.md` before any external signing or broadcast.",
+            "7. Sign and broadcast outside this repository through the approved wallet/vault process, then verify the public result with `--metrics-tx-result`.",
+            "8. Update `memory/STATUS.md` only after all real receipts and transaction receipts verify.",
         ]
     )
     (out_dir / "HANDOFF.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
@@ -423,6 +447,7 @@ def main() -> int:
     deploy_plan = run_deploy_preflight(args, packaged_archive, out_dir)
     deploy_requests = run_deploy_requests(args, packaged_archive, out_dir)
     deploy_request_verification = run_deploy_request_verification(packaged_archive, out_dir)
+    deploy_operator_procedure = run_deploy_operator_procedure(packaged_archive, out_dir)
     operator_receipt_import = None
     if orchestrator_results_path:
         operator_receipt_import = run_operator_receipt_import(packaged_archive, out_dir, orchestrator_results_path)
@@ -464,6 +489,7 @@ def main() -> int:
         "deploy_requests_status": deploy_requests["status"],
         "deploy_request_count": deploy_requests["request_count"],
         "deploy_request_verification_status": deploy_request_verification["status"],
+        "deploy_operator_procedure_status": deploy_operator_procedure["status"],
         "operator_receipt_import_status": (
             operator_receipt_import["status"] if operator_receipt_import else "NOT_PROVIDED"
         ),

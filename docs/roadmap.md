@@ -38,17 +38,21 @@ preflight validates release-bundle integrity and public operator inputs, emits a
 Markdown operator runbook with contract hashes and safety rules, and confirms
 upstream `silverc` still exposes no network deploy command. An external deploy
 request builder emits per-contract public request JSON for an approved
-orchestrator, with request hashes bound to the release bundle. A public
-orchestrator-result importer converts confirmed external deploy results into
-verified `operator_record` receipts without accepting signing material. A
+orchestrator, with request hashes bound to the release bundle. A public deploy
+operator procedure converts the verified request set into a deploy checklist
+and required public result-evidence contract without accepting keys or raw
+transactions. A public orchestrator-result importer converts confirmed external
+deploy results into verified `operator_record` receipts without accepting
+signing material. A
 deployment receipt verifier validates public receipt records against the release
 bundle and keeps synthetic CI fixtures separate from real `operator_record`
 receipts. A status staging guard rejects CI fixtures and emits only a manual
 status-update draft from verified `operator_record` receipts. A CI-safe operator
 handoff builder now packages the release archive, preflight outputs, deploy
 requests, optional imported operator receipts, receipt checks, metrics report
-preflight, unsigned oracle request, and optional verified oracle tx result into
-one public handoff directory while preserving the real blocker list. A separate
+preflight, unsigned oracle request, deploy/oracle operator procedures, and
+optional verified oracle tx result into one public handoff directory while
+preserving the real blocker list. A separate
 metrics-oracle report preflight validates public `reportMetrics` payloads, an
 unsigned oracle tx-request builder binds those payloads to the
 GovernanceAutoTuning artifact hashes for external assembly, an external
@@ -68,6 +72,7 @@ assembly/signing/broadcast/deploy operation, and final release hardening.
 - Keep release-bundle deploy preflight green
 - Keep the generated deploy operator runbook green and free of signing material
 - Keep the external deploy request set green and free of signing material
+- Keep the external deploy operator procedure green and free of signing/raw transaction material
 - Keep public orchestrator-result receipt import green and free of signing material
 - Keep deployment receipt verification green and free of signing material
 - Keep deployment status staging guarded against CI fixture receipts
