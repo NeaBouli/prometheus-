@@ -98,6 +98,34 @@ Remaining deployment blockers:
 
 - remaining deployment-scoped contract ports
 
+## CommunityDonationsState.sil
+
+`CommunityDonationsState.sil` is the current-`silverc` port fixture for the
+community donation pool state machine. It models donation accounting and one
+active disbursement proposal/rule UTXO slot.
+
+The fixture keeps the legacy invariants that are safe to express in the current
+covenant state model:
+
+- minimum donation is `MIN_DONATION_KAS = 1`
+- disbursement quorum is `DISBURSEMENT_QUORUM = 10`
+- validator approval threshold is `VALIDATOR_QUORUM = 6700`
+- pool accounting remains KAS-denominated
+- disbursements require governance signature at execution
+
+The fixture intentionally does not pretend to support legacy global maps,
+string storage, `msg.sender`, `tx.value`, event emission, cross-contract
+validator lookups, or direct KAS `transfer(...)` in current Silverc. Those
+concerns remain deployment/orchestration work around the covenant state model.
+
+The shared verifier currently compiles this fixture against the same pinned
+upstream Silverscript ref and builds covenant declaration sigscripts for:
+
+- `donateKas`
+- `proposeDisbursement`
+- `voteDisbursement`
+- `executeDisbursement`
+
 ## RuleStorageState.sil
 
 `RuleStorageState.sil` is the current-`silverc` port fixture for the rule

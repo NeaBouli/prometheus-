@@ -2,6 +2,9 @@
 
 ## 2026-07-11
 
+- Added current-Silverscript CommunityDonations state fixture `modules/contracts/silverc/CommunityDonationsState.sil` and extended `scripts/verify_silverc_h001.py` so the pinned upstream verifier compiles the fixture and builds covenant sigscripts for `donateKas`, `proposeDisbursement`, `voteDisbursement`, and `executeDisbursement`.
+- CommunityDonationsState keeps KAS-denominated donation/disbursement accounting, `MIN_DONATION_KAS = 1`, `DISBURSEMENT_QUORUM = 10`, and `VALIDATOR_QUORUM = 6700`; it intentionally does not model legacy maps, string storage, `tx.value`, direct KAS transfer, or cross-contract validator lookups in current Silverc.
+- Local verifier passed after CommunityDonations addition: `python3 scripts/verify_silverc_h001.py` injected 33 upstream tests and all passed at Silverscript ref `d25bd3427a093c17327ca3d6b9e1aa5f7688c863`.
 - GitHub Prometheus CI, Security Audit, and Pages passed for `4029da2`; the H-001 + Validator State Silverc Runtime job now covers 32 upstream-injected tests including RuleStorage submit/vote/finalize/deactivate runtime paths.
 - Noted CI annotations: GitHub is forcing Node.js 24 for some Node 20-based actions. This is warning-only today; track action upgrades later, but it did not block CI.
 - Extended the pinned upstream `silverc` verifier with RuleStorageState runtime tests for `submitProposal`, `voteOnProposal`, `finalizeProposal`, and `deactivateRule`.

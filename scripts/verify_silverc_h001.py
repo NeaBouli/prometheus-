@@ -19,6 +19,9 @@ GUARDIAN_STATE_CONTRACT = (
 RULE_STORAGE_STATE_CONTRACT = (
     ROOT / "modules" / "contracts" / "silverc" / "RuleStorageState.sil"
 )
+COMMUNITY_DONATIONS_STATE_CONTRACT = (
+    ROOT / "modules" / "contracts" / "silverc" / "CommunityDonationsState.sil"
+)
 DEFAULT_SILVERSCRIPT_REPO = Path("/tmp/prom-silverscript")
 SILVERSCRIPT_GIT = "https://github.com/kaspanet/silverscript.git"
 DEFAULT_SILVERSCRIPT_REF = "d25bd3427a093c17327ca3d6b9e1aa5f7688c863"
@@ -216,6 +219,46 @@ fn rule_storage_state_args(
     ]
 }
 
+fn community_donations_state_args(
+    governance_pk: Vec<u8>,
+    donation_count: i64,
+    total_donated_kas: i64,
+    pool_balance_kas: i64,
+    next_disbursement_id: i64,
+    disbursement_id: i64,
+    recipient_pk: Vec<u8>,
+    amount_kas: i64,
+    purpose_hash: Vec<u8>,
+    votes_for: i64,
+    votes_against: i64,
+    voting_end_block: i64,
+    status: i64,
+    executed: bool,
+    last_donor_pk: Vec<u8>,
+    last_message_hash: Vec<u8>,
+    last_donation_block: i64,
+) -> Vec<Expr<'static>> {
+    vec![
+        Expr::bytes(governance_pk),
+        Expr::int(donation_count),
+        Expr::int(total_donated_kas),
+        Expr::int(pool_balance_kas),
+        Expr::int(next_disbursement_id),
+        Expr::int(disbursement_id),
+        Expr::bytes(recipient_pk),
+        Expr::int(amount_kas),
+        Expr::bytes(purpose_hash),
+        Expr::int(votes_for),
+        Expr::int(votes_against),
+        Expr::int(voting_end_block),
+        Expr::int(status),
+        Expr::bool(executed),
+        Expr::bytes(last_donor_pk),
+        Expr::bytes(last_message_hash),
+        Expr::int(last_donation_block),
+    ]
+}
+
 fn build_covenant_sigscript(compiled: &silverscript_lang::compiler::CompiledContract<'_>, function_name: &str, args: Vec<Expr<'_>>) {
     compiled
         .build_sig_script_for_covenant_decl(function_name, args, CovenantDeclCallOptions { is_leader: false })
@@ -256,6 +299,10 @@ fn compile_validator_state<'a>(source: &'a str, args: Vec<Expr<'static>>) -> Com
 
 fn compile_guardian_state<'a>(source: &'a str, args: Vec<Expr<'static>>) -> CompiledContract<'a> {
     compile_contract(source, &args, CompileOptions::default()).expect("GuardianReputationState fixture compiles")
+}
+
+fn compile_community_donations_state<'a>(source: &'a str, args: Vec<Expr<'static>>) -> CompiledContract<'a> {
+    compile_contract(source, &args, CompileOptions::default()).expect("CommunityDonationsState fixture compiles")
 }
 
 #[test]
@@ -539,6 +586,87 @@ fn prometheus_rule_storage_state_fixture_compiles_against_current_silverc() {
         ),
     );
     build_covenant_sigscript(&accepted, "deactivateRule", vec![Expr::bytes(sig)]);
+}
+
+#[test]
+fn prometheus_community_donations_state_fixture_compiles_against_current_silverc() {
+    let contract_path = std::env::var("PROMETHEUS_COMMUNITY_DONATIONS_STATE_CONTRACT")
+        .expect("PROMETHEUS_COMMUNITY_DONATIONS_STATE_CONTRACT is set");
+    let source = std::fs::read_to_string(contract_path).expect("read Prometheus community donations contract fixture");
+    let governance_pk = vec![8u8; 32];
+    let donor_pk = vec![6u8; 32];
+    let proposer_pk = vec![5u8; 32];
+    let validator_pk = vec![7u8; 32];
+    let recipient_pk = vec![4u8; 32];
+    let message_hash = vec![2u8; 32];
+    let purpose_hash = vec![3u8; 32];
+    let sig = dummy_signature();
+
+    let empty = compile_community_donations_state(
+        &source,
+        community_donations_state_args(
+            governance_pk.clone(),
+            0,
+            0,
+            0,
+            1,
+            0,
+            recipient_pk.clone(),
+            0,
+            zero32(),
+            0,
+            0,
+            0,
+            0,
+            false,
+            donor_pk.clone(),
+            zero32(),
+            0,
+        ),
+    );
+    build_covenant_sigscript(
+        &empty,
+        "donateKas",
+        vec![Expr::bytes(donor_pk.clone()), Expr::int(100), Expr::bytes(message_hash), Expr::int(1_000), Expr::bytes(sig.clone())],
+    );
+    build_covenant_sigscript(
+        &empty,
+        "proposeDisbursement",
+        vec![Expr::bytes(recipient_pk.clone()), Expr::int(50), Expr::bytes(purpose_hash.clone()), Expr::int(1_100), Expr::bytes(sig.clone()), Expr::bytes(proposer_pk)],
+    );
+
+    let pending = compile_community_donations_state(
+        &source,
+        community_donations_state_args(
+            governance_pk.clone(),
+            1,
+            100,
+            100,
+            2,
+            1,
+            recipient_pk,
+            50,
+            purpose_hash,
+            10,
+            0,
+            606_000,
+            1,
+            false,
+            donor_pk,
+            zero32(),
+            1_000,
+        ),
+    );
+    build_covenant_sigscript(
+        &pending,
+        "voteDisbursement",
+        vec![Expr::bool(true), Expr::int(1_200), Expr::bytes(sig.clone()), Expr::bytes(validator_pk)],
+    );
+    build_covenant_sigscript(
+        &pending,
+        "executeDisbursement",
+        vec![Expr::int(606_000), Expr::bytes(sig)],
+    );
 }
 
 #[test]
@@ -2199,6 +2327,7 @@ def main() -> int:
         VALIDATOR_STATE_CONTRACT,
         GUARDIAN_STATE_CONTRACT,
         RULE_STORAGE_STATE_CONTRACT,
+        COMMUNITY_DONATIONS_STATE_CONTRACT,
     ):
         if not contract.exists():
             print(f"missing contract fixture: {contract}", file=sys.stderr)
@@ -2225,6 +2354,7 @@ def main() -> int:
     env["PROMETHEUS_VALIDATOR_STATE_CONTRACT"] = str(VALIDATOR_STATE_CONTRACT)
     env["PROMETHEUS_GUARDIAN_STATE_CONTRACT"] = str(GUARDIAN_STATE_CONTRACT)
     env["PROMETHEUS_RULE_STORAGE_STATE_CONTRACT"] = str(RULE_STORAGE_STATE_CONTRACT)
+    env["PROMETHEUS_COMMUNITY_DONATIONS_STATE_CONTRACT"] = str(COMMUNITY_DONATIONS_STATE_CONTRACT)
     try:
         run(
             [
@@ -2246,7 +2376,7 @@ def main() -> int:
         except FileNotFoundError:
             pass
 
-    print("H-001, ValidatorStakingState, GuardianReputationState, and RuleStorageState silverc fixture verification passed.")
+    print("H-001, ValidatorStakingState, GuardianReputationState, RuleStorageState, and CommunityDonationsState silverc fixture verification passed.")
     print(f"Silverscript ref: {silver_ref}")
     print(
         "Note: current silverc uses signed int entrypoint arguments; deployment salt and block-height values are scoped to 0..=i64::MAX."

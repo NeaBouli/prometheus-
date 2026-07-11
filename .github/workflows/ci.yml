@@ -90,6 +90,21 @@ jobs:
             exit 1
           fi
           echo "RuleStorageState fixture keeps CIDv1, quorum, and reputation-event invariants."
+      - name: Verify CommunityDonationsState current-silverc fixture exists
+        run: |
+          fixture="modules/contracts/silverc/CommunityDonationsState.sil"
+          test -f "$fixture" || (echo "ERROR: missing $fixture" && exit 1)
+          grep -q 'MIN_DONATION_KAS = 1' "$fixture"
+          grep -q 'DISBURSEMENT_QUORUM = 10' "$fixture"
+          grep -q 'VALIDATOR_QUORUM = 6700' "$fixture"
+          grep -q 'pool_balance_kas' "$fixture"
+          grep -q 'donateKas' "$fixture"
+          grep -q 'executeDisbursement' "$fixture"
+          if grep -q 'transfer(' "$fixture"; then
+            echo "ERROR: CommunityDonationsState fixture must not pretend to transfer KAS in current Silverc."
+            exit 1
+          fi
+          echo "CommunityDonationsState fixture keeps donation/disbursement state invariants."
 
   h001-silverc-runtime:
     name: H-001 + Validator State Silverc Runtime

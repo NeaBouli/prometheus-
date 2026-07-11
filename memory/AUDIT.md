@@ -546,8 +546,9 @@ Audit confidence:       94%
 (Deduction: ValidatorStaking current-silverc compile/ABI and runtime
  transitions plus signed-int deployment bounds are verified,
  GuardianReputation current-silverc compile/ABI/runtime/formula gates are
- verified, and RuleStorage current-silverc compile/ABI/runtime gates are
- verified locally,
+ verified, RuleStorage current-silverc compile/ABI/runtime gates are
+ verified locally/in CI, and CommunityDonations current-silverc compile/ABI
+ gates are verified locally,
  but remaining deployment-scoped contract ports and LLM confidence extraction
  remain open)
 ```
@@ -559,7 +560,8 @@ compiles/builds covenant sigscripts, and `commitVote`/`revealVote`/
 `slashInvalidReveal`/`requestWithdraw`/`completeWithdraw` runtime tests pass.
 The signed-int/u64 boundary is resolved by constraining current-Silverc
 deployment inputs to `0..=i64::MAX`; GuardianReputationState runtime/formula
-gates and RuleStorageState runtime gates now pass locally, and the remaining
+gates and RuleStorageState runtime gates now pass locally/in CI;
+CommunityDonationsState compile/ABI gates now pass locally, and the remaining
 deployment-scoped contract ports must pass before Sprint 9 deployment.
 M-001 and M-002 can wait until full release (Aug/Sep 2026).
 

@@ -1,0 +1,188 @@
+pragma silverscript ^0.1.0;
+
+contract CommunityDonationsState(
+    pubkey init_governance_pk,
+    int init_donation_count,
+    int init_total_donated_kas,
+    int init_pool_balance_kas,
+    int init_next_disbursement_id,
+    int init_disbursement_id,
+    pubkey init_recipient_pk,
+    int init_amount_kas,
+    byte[32] init_purpose_hash,
+    int init_votes_for,
+    int init_votes_against,
+    int init_voting_end_block,
+    int init_status,
+    bool init_executed,
+    pubkey init_last_donor_pk,
+    byte[32] init_last_message_hash,
+    int init_last_donation_block
+) {
+    int constant MIN_DONATION_KAS = 1;
+    int constant DISBURSEMENT_VOTING_BLOCKS = 604800;
+    int constant DISBURSEMENT_QUORUM = 10;
+    int constant VALIDATOR_QUORUM = 6700;
+    int constant STATUS_NONE = 0;
+    int constant STATUS_PENDING = 1;
+    int constant STATUS_EXECUTED = 2;
+    int constant STATUS_REJECTED = 3;
+
+    pubkey governance_pk = init_governance_pk;
+    int donation_count = init_donation_count;
+    int total_donated_kas = init_total_donated_kas;
+    int pool_balance_kas = init_pool_balance_kas;
+    int next_disbursement_id = init_next_disbursement_id;
+    int disbursement_id = init_disbursement_id;
+    pubkey recipient_pk = init_recipient_pk;
+    int amount_kas = init_amount_kas;
+    byte[32] purpose_hash = init_purpose_hash;
+    int votes_for = init_votes_for;
+    int votes_against = init_votes_against;
+    int voting_end_block = init_voting_end_block;
+    int status = init_status;
+    bool executed = init_executed;
+    pubkey last_donor_pk = init_last_donor_pk;
+    byte[32] last_message_hash = init_last_message_hash;
+    int last_donation_block = init_last_donation_block;
+
+    #[covenant.singleton(mode = transition)]
+    function donateKas(State prev_state, pubkey donor_pk, int amount, byte[32] message_hash, int block_height, sig donor_sig) : State {
+        require(amount >= MIN_DONATION_KAS);
+        require(block_height >= 0);
+        require(prev_state.donation_count >= 0);
+        require(prev_state.total_donated_kas >= 0);
+        require(prev_state.pool_balance_kas >= 0);
+        require(checkSig(donor_sig, donor_pk));
+
+        return({
+            governance_pk: prev_state.governance_pk,
+            donation_count: prev_state.donation_count + 1,
+            total_donated_kas: prev_state.total_donated_kas + amount,
+            pool_balance_kas: prev_state.pool_balance_kas + amount,
+            next_disbursement_id: prev_state.next_disbursement_id,
+            disbursement_id: prev_state.disbursement_id,
+            recipient_pk: prev_state.recipient_pk,
+            amount_kas: prev_state.amount_kas,
+            purpose_hash: prev_state.purpose_hash,
+            votes_for: prev_state.votes_for,
+            votes_against: prev_state.votes_against,
+            voting_end_block: prev_state.voting_end_block,
+            status: prev_state.status,
+            executed: prev_state.executed,
+            last_donor_pk: donor_pk,
+            last_message_hash: message_hash,
+            last_donation_block: block_height
+        });
+    }
+
+    #[covenant.singleton(mode = transition)]
+    function proposeDisbursement(
+        State prev_state,
+        pubkey new_recipient_pk,
+        int amount,
+        byte[32] new_purpose_hash,
+        int block_height,
+        sig proposer_sig,
+        pubkey proposer_pk
+    ) : State {
+        require(prev_state.status != STATUS_PENDING);
+        require(amount > 0);
+        require(amount <= prev_state.pool_balance_kas);
+        require(block_height >= 0);
+        require(prev_state.next_disbursement_id >= 0);
+        require(checkSig(proposer_sig, proposer_pk));
+
+        return({
+            governance_pk: prev_state.governance_pk,
+            donation_count: prev_state.donation_count,
+            total_donated_kas: prev_state.total_donated_kas,
+            pool_balance_kas: prev_state.pool_balance_kas,
+            next_disbursement_id: prev_state.next_disbursement_id + 1,
+            disbursement_id: prev_state.next_disbursement_id,
+            recipient_pk: new_recipient_pk,
+            amount_kas: amount,
+            purpose_hash: new_purpose_hash,
+            votes_for: 0,
+            votes_against: 0,
+            voting_end_block: block_height + DISBURSEMENT_VOTING_BLOCKS,
+            status: STATUS_PENDING,
+            executed: false,
+            last_donor_pk: prev_state.last_donor_pk,
+            last_message_hash: prev_state.last_message_hash,
+            last_donation_block: prev_state.last_donation_block
+        });
+    }
+
+    #[covenant.singleton(mode = transition)]
+    function voteDisbursement(State prev_state, bool support, int block_height, sig validator_sig, pubkey validator_pk) : State {
+        require(prev_state.status == STATUS_PENDING);
+        require(!prev_state.executed);
+        require(block_height >= 0);
+        require(block_height < prev_state.voting_end_block);
+        require(checkSig(validator_sig, validator_pk));
+
+        int next_votes_for = prev_state.votes_for;
+        int next_votes_against = prev_state.votes_against;
+        if (support) {
+            next_votes_for = next_votes_for + 1;
+        } else {
+            next_votes_against = next_votes_against + 1;
+        }
+
+        return({
+            governance_pk: prev_state.governance_pk,
+            donation_count: prev_state.donation_count,
+            total_donated_kas: prev_state.total_donated_kas,
+            pool_balance_kas: prev_state.pool_balance_kas,
+            next_disbursement_id: prev_state.next_disbursement_id,
+            disbursement_id: prev_state.disbursement_id,
+            recipient_pk: prev_state.recipient_pk,
+            amount_kas: prev_state.amount_kas,
+            purpose_hash: prev_state.purpose_hash,
+            votes_for: next_votes_for,
+            votes_against: next_votes_against,
+            voting_end_block: prev_state.voting_end_block,
+            status: prev_state.status,
+            executed: prev_state.executed,
+            last_donor_pk: prev_state.last_donor_pk,
+            last_message_hash: prev_state.last_message_hash,
+            last_donation_block: prev_state.last_donation_block
+        });
+    }
+
+    #[covenant.singleton(mode = transition)]
+    function executeDisbursement(State prev_state, int block_height, sig governance_sig) : State {
+        require(prev_state.status == STATUS_PENDING);
+        require(!prev_state.executed);
+        require(block_height >= prev_state.voting_end_block);
+        require(checkSig(governance_sig, prev_state.governance_pk));
+
+        int total_votes = prev_state.votes_for + prev_state.votes_against;
+        require(total_votes >= DISBURSEMENT_QUORUM);
+
+        int approval = prev_state.votes_for * 10000 / total_votes;
+        require(approval >= VALIDATOR_QUORUM);
+        require(prev_state.pool_balance_kas >= prev_state.amount_kas);
+
+        return({
+            governance_pk: prev_state.governance_pk,
+            donation_count: prev_state.donation_count,
+            total_donated_kas: prev_state.total_donated_kas,
+            pool_balance_kas: prev_state.pool_balance_kas - prev_state.amount_kas,
+            next_disbursement_id: prev_state.next_disbursement_id,
+            disbursement_id: prev_state.disbursement_id,
+            recipient_pk: prev_state.recipient_pk,
+            amount_kas: prev_state.amount_kas,
+            purpose_hash: prev_state.purpose_hash,
+            votes_for: prev_state.votes_for,
+            votes_against: prev_state.votes_against,
+            voting_end_block: prev_state.voting_end_block,
+            status: STATUS_EXECUTED,
+            executed: true,
+            last_donor_pk: prev_state.last_donor_pk,
+            last_message_hash: prev_state.last_message_hash,
+            last_donation_block: prev_state.last_donation_block
+        });
+    }
+}
