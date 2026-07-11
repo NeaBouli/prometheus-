@@ -1,8 +1,8 @@
 # prometheus — Backlog
 
 ## 🔴 Aktiv (diese Session)
-- Latest documented green product/tooling baseline is `fa719fc` on `main`; run `git log --oneline -1` for the current working HEAD.
-- Prometheus CI, Security Audit, and GitHub Pages deployment were green for `fa719fc`. Workflow actions use Node 24-compatible majors and current-Silverc CI validates the operator runbook, external deploy request set plus verifier, public orchestrator-result receipt import, deployment receipt verifier, deployment status staging guard, operator handoff package, metrics-oracle report preflight, unsigned oracle tx-request builder, and public oracle tx-result verifier; this session adds release-readiness audit coverage for the generated handoff package.
+- Latest documented green product/tooling baseline is `8bf6a14` on `main`; run `git log --oneline -1` for the current working HEAD.
+- Prometheus CI, Security Audit, and GitHub Pages deployment were green for `8bf6a14`. Workflow actions use Node 24-compatible majors and current-Silverc CI validates the operator runbook, external deploy request set plus verifier, public orchestrator-result receipt import, deployment receipt verifier, deployment status staging guard, operator handoff package, release-readiness audit, metrics-oracle report preflight, unsigned oracle tx-request builder, and public oracle tx-result verifier.
 - Runtime stub gates added for Rust client; current-Silverc contract gates now cover H-001, ValidatorStaking, GuardianReputation, RuleStorage, CommunityDonations, DevIncentivePool, and GovernanceAutoTuning.
 - Local current-Silverc release-bundle smoke now compiles all 7 fixtures through pinned upstream `silverc` and writes a deterministic manifest plus optional archive with source/artifact/script hashes; deploy preflight validates the bundle/operator public inputs, emits a Markdown operator runbook, and confirms upstream `silverc` has no network deploy command.
 - Deployment receipt verifier validates public receipt records against the release bundle, rejects secret-like fields, and keeps synthetic `ci_fixture` receipts separate from real `operator_record` deployment evidence.
@@ -17,7 +17,7 @@
 
 ### Pflicht VOR neuem Code:
 1. `cd /Users/gio/Desktop/repos/prometheus`
-2. `git log --oneline -5` — aktuellen HEAD prüfen; letzter dokumentierter grüner Produkt-/Tooling-Baseline-Commit ist `fa719fc`
+2. `git log --oneline -5` — aktuellen HEAD prüfen; letzter dokumentierter grüner Produkt-/Tooling-Baseline-Commit ist `8bf6a14`
 3. Lies `memory/CHECKPOINT.md` — vollständiger Projektstatus
 4. Lies `memory/AUDIT.md` ab Zeile 337 — Pre-Hardfork-Audit-Ergebnisse
 5. Lies `memory/ERRORS.md` — 12 bekannte Patterns
