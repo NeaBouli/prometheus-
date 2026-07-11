@@ -31,7 +31,7 @@
 - [x] [P1] RuleStorage.ss schreiben (storeRule als KRC20-Asset) | Claude Code | 2026-03-21 (9 tests); current-Silverc RuleStorageState compile/ABI/runtime gates added 2026-07-11
 - [x] [P1] Unit-Tests für ValidatorStaking (min. 10 Tests) | Claude Code | 2026-03-21 (11 tests)
 - [x] [P1] Unit-Tests für GuardianReputation (min. 8 Tests) | Claude Code | 2026-03-21 (9 tests)
-- [ ] [P1] Alle Contracts auf Testnet deployen und Adressen in STATUS.md eintragen | Claude Code | Wartet auf current-Silverc network deploy/orchestration path und signed metrics-oracle operator integration
+- [ ] [P1] Alle Contracts auf Testnet deployen und Adressen in STATUS.md eintragen | Claude Code | Wartet auf current-Silverc network deploy/orchestration path und signed metrics-oracle transaction builder/signing/deploy integration
 - [x] [P1] Audit-Request für alle Contracts an Claude vorbereiten | Claude Code | 2026-03-21
 
 ---
