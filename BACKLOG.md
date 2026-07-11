@@ -2,9 +2,10 @@
 
 ## 🔴 Aktiv (diese Session)
 - Latest documented green product/tooling baseline is `5fd385e` on `main`; run `git log --oneline -1` for the current working HEAD.
-- Prometheus CI, Security Audit, and GitHub Pages deployment were green for `5fd385e`. Workflow actions use Node 24-compatible majors and current-Silverc CI validates the operator runbook, metrics-oracle report preflight, and unsigned oracle tx-request builder.
+- Prometheus CI, Security Audit, and GitHub Pages deployment were green for `5fd385e`. Workflow actions use Node 24-compatible majors and current-Silverc CI validates the operator runbook, deployment receipt verifier, metrics-oracle report preflight, and unsigned oracle tx-request builder.
 - Runtime stub gates added for Rust client; current-Silverc contract gates now cover H-001, ValidatorStaking, GuardianReputation, RuleStorage, CommunityDonations, DevIncentivePool, and GovernanceAutoTuning.
 - Local current-Silverc release-bundle smoke now compiles all 7 fixtures through pinned upstream `silverc` and writes a deterministic manifest plus optional archive with source/artifact/script hashes; deploy preflight validates the bundle/operator public inputs, emits a Markdown operator runbook, and confirms upstream `silverc` has no network deploy command.
+- Deployment receipt verifier validates public receipt records against the release bundle, rejects secret-like fields, and keeps synthetic `ci_fixture` receipts separate from real `operator_record` deployment evidence.
 - Metrics-oracle report preflight validates public GovernanceAutoTuning `reportMetrics` payloads and rejects secret-like fields; unsigned oracle tx-request builder now binds public reports to GovernanceAutoTuning artifacts for external assembly/signing and passes local plus CI positive/blocked/negative checks.
 - Sprint 9 remains blocked by missing network deploy/orchestration tooling, external signed metrics-oracle transaction assembly/signing/deploy integration, and release hardening.
 
@@ -23,7 +24,7 @@
 - **H-002**: ~~Arc<Mutex<Phi3Model>>~~ → **FIXED** in Commit `6347b85`. Arc<Phi3Model> direkt.
 
 ### Nächste konkrete Tasks (Priorität):
-1. **[P0] Sprint 9 Vorbereitung** — current-Silverc network deploy/orchestration path klären; Artifact-Smoke, release archive, deploy preflight, and operator runbook are local/CI-covered, echter On-chain-Deploy fehlt mangels upstream deploy CLI.
+1. **[P0] Sprint 9 Vorbereitung** — current-Silverc network deploy/orchestration path klären; Artifact-Smoke, release archive, deploy preflight, operator runbook, and deployment receipt verification are local/CI-covered, echter On-chain-Deploy fehlt mangels upstream deploy CLI.
 2. **[P1] Oracle Operator Integration** — external signed metrics-oracle transaction assembly/signer process für `GovernanceAutoTuningState.sil` operationalisieren; public report preflight and unsigned tx-request builder are local- and CI-covered.
 3. **[P1] Sprint 10B: Guardian Decentralization** — Hybrid routing (8B/70B), Ensemble voting (5x 8B)
 4. **[P2] fp_rate Oracle** — Q-003 current-Silverc contract gate uses signed metrics input; production external transaction assembly/signing/deploy integration remains
@@ -47,6 +48,7 @@
 - [x] GovernanceAutoTuning current-Silverc runtime gates with signed metrics `fp_rate` input — 11.07.2026
 - [x] Current-Silverc artifact smoke plus deterministic release manifest/archive for all 7 fixtures — 11.07.2026
 - [x] Current-Silverc deploy preflight for release bundle/operator public inputs — 11.07.2026
+- [x] Current-Silverc deployment receipt verifier for public receipts vs release bundle — 11.07.2026
 - [x] Post-Toccata docs/bridge status, Kaspa v2.0.1 pin, Security Audit gate, H-001 vectors, and runtime stub gates — `eeb4808` (08.07.2026)
 - [x] Upstream Silverscript `silverc` local build/test and temporary H-001 explicit-preimage probe — 08.07.2026
 - [x] Repo-tracked current-Silverscript H-001 fixture + verifier script + CI explicit-byte guard — 08.07.2026

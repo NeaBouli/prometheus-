@@ -288,6 +288,100 @@ jobs:
           assert proc.returncode != 0
           assert "--contract-instance-id is required" in proc.stderr
           PY
+      - name: Verify sample deployment receipts
+        run: |
+          python3 scripts/verify_silverc_deploy_receipts.py \
+            --archive /tmp/prometheus-silverc-artifacts.tar.gz \
+            --receipts modules/contracts/silverc/deploy-receipts.sample.json \
+            --summary-out /tmp/prometheus-silverc-deploy-receipts-summary.json \
+            --runbook-out /tmp/prometheus-silverc-deploy-receipts.md
+          test -s /tmp/prometheus-silverc-deploy-receipts-summary.json
+          test -s /tmp/prometheus-silverc-deploy-receipts.md
+          python3 - <<'PY'
+          import json
+          import subprocess
+          import tempfile
+          from pathlib import Path
+
+          receipt_path = Path("modules/contracts/silverc/deploy-receipts.sample.json")
+          summary = json.loads(Path("/tmp/prometheus-silverc-deploy-receipts-summary.json").read_text())
+          runbook = Path("/tmp/prometheus-silverc-deploy-receipts.md").read_text()
+
+          assert summary["status"] == "CI_FIXTURE_VALID"
+          assert summary["provenance_type"] == "ci_fixture"
+          assert summary["receipt_count"] == 7
+          assert summary["safety"]["accepts_private_keys"] is False
+          assert summary["safety"]["signs_transactions"] is False
+          assert summary["safety"]["broadcasts_transactions"] is False
+          assert summary["safety"]["updates_status_files"] is False
+          assert [contract["contract_name"] for contract in summary["contracts"]] == [
+              "ValidatorStakingH001",
+              "ValidatorStakingState",
+              "GuardianReputationState",
+              "RuleStorageState",
+              "CommunityDonationsState",
+              "DevIncentivePoolState",
+              "GovernanceAutoTuningState",
+          ]
+          assert "ci_fixture receipts are test fixtures" in runbook
+          assert "does not accept private keys" in runbook
+
+          proc = subprocess.run(
+              [
+                  "python3",
+                  "scripts/verify_silverc_deploy_receipts.py",
+                  "--archive",
+                  "/tmp/prometheus-silverc-artifacts.tar.gz",
+                  "--receipts",
+                  str(receipt_path),
+                  "--require-operator-record",
+              ],
+              text=True,
+              capture_output=True,
+          )
+          assert proc.returncode != 0
+          assert "provenance.type: expected operator_record" in proc.stderr
+
+          bad = json.loads(receipt_path.read_text())
+          bad["_".join(["private", "key"])] = "do-not-accept"
+          with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as handle:
+              json.dump(bad, handle)
+              secret_path = handle.name
+          proc = subprocess.run(
+              [
+                  "python3",
+                  "scripts/verify_silverc_deploy_receipts.py",
+                  "--archive",
+                  "/tmp/prometheus-silverc-artifacts.tar.gz",
+                  "--receipts",
+                  secret_path,
+              ],
+              text=True,
+              capture_output=True,
+          )
+          assert proc.returncode != 0
+          assert "secret-like fields are not allowed" in proc.stderr
+
+          bad = json.loads(receipt_path.read_text())
+          bad["receipts"][0]["artifact_sha256"] = "0" * 64
+          with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as handle:
+              json.dump(bad, handle)
+              hash_path = handle.name
+          proc = subprocess.run(
+              [
+                  "python3",
+                  "scripts/verify_silverc_deploy_receipts.py",
+                  "--archive",
+                  "/tmp/prometheus-silverc-artifacts.tar.gz",
+                  "--receipts",
+                  hash_path,
+              ],
+              text=True,
+              capture_output=True,
+          )
+          assert proc.returncode != 0
+          assert "artifact_sha256: manifest hash mismatch" in proc.stderr
+          PY
 
   # ─── Rust Workspace Check ───────────────────────────────────────────────────
   rust-check:

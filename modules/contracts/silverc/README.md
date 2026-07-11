@@ -36,6 +36,7 @@ SILVERSCRIPT_REPO=/path/to/silverscript python3 scripts/smoke_silverc_artifacts.
 PROMETHEUS_SILVERC_ARTIFACT_DIR=/tmp/out python3 scripts/smoke_silverc_artifacts.py
 python3 scripts/smoke_silverc_artifacts.py --out-dir /tmp/out --archive /tmp/prometheus-silverc-artifacts.tar.gz
 python3 scripts/preflight_silverc_deploy.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --network sandbox --rpc-url ws://127.0.0.1:17210 --deployer-address kaspatest:qptestpreflight000000000000000000000000000000000 --metrics-oracle-pubkey 1111111111111111111111111111111111111111111111111111111111111111 --plan-out /tmp/prometheus-silverc-deploy-preflight.json --runbook-out /tmp/prometheus-silverc-deploy-runbook.md
+python3 scripts/verify_silverc_deploy_receipts.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --receipts modules/contracts/silverc/deploy-receipts.sample.json --summary-out /tmp/prometheus-silverc-deploy-receipts-summary.json --runbook-out /tmp/prometheus-silverc-deploy-receipts.md
 python3 scripts/preflight_metrics_oracle_report.py --report modules/contracts/silverc/metrics-oracle-report.sample.json --plan-out /tmp/prometheus-metrics-oracle-preflight.json --runbook-out /tmp/prometheus-metrics-oracle-runbook.md
 python3 scripts/build_metrics_oracle_tx_request.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --report modules/contracts/silverc/metrics-oracle-report.sample.json --contract-instance-id sandbox:governance-auto-tuning-state-fixture-0001 --tx-request-out /tmp/prometheus-metrics-oracle-tx-request.json --runbook-out /tmp/prometheus-metrics-oracle-tx-request.md
 ```
@@ -167,6 +168,22 @@ length, the safe operator sequence, and the remaining deploy blockers. It still
 does not include private keys, seed phrases, wallet files, or keystore material.
 CI checks that the runbook remains generated, blocked while no upstream network
 deploy command exists, and explicit about not broadcasting transactions.
+
+## Deployment receipt verifier
+
+`scripts/verify_silverc_deploy_receipts.py` validates public deployment receipt
+records against a previously built current-Silverc release bundle. It accepts
+either `--bundle-dir` or `--archive`, checks that every receipt matches the
+manifest contract order plus source, constructor-args, artifact, and script
+hashes, and emits a JSON summary plus optional Markdown operator runbook.
+
+The verifier intentionally does not accept private keys, sign, broadcast, or
+update status files. It also rejects secret-like field names in receipt JSON.
+`modules/contracts/silverc/deploy-receipts.sample.json` is a synthetic
+`ci_fixture` document used only to keep the schema and negative checks green in
+CI. Real deployment status may be recorded only from verified
+`operator_record` receipts; use `--require-operator-record` before copying any
+contract instance IDs into `memory/STATUS.md`.
 
 ## GovernanceAutoTuningState.sil
 

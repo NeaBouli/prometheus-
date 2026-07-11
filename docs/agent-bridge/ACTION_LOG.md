@@ -2,6 +2,9 @@
 
 ## 2026-07-11
 
+- Added `scripts/verify_silverc_deploy_receipts.py` and `modules/contracts/silverc/deploy-receipts.sample.json`. The verifier checks public deployment receipts against the current-Silverc release-bundle manifest, rejects secret-like fields, and separates synthetic `ci_fixture` checks from real `operator_record` evidence before any status update.
+- Extended Prometheus CI with deployment receipt verification: positive sample check, `--require-operator-record` negative check, secret-field rejection, and manifest hash mismatch rejection.
+- Updated README, Whitepaper, roadmap, Silverc README, Backlog, Bridge, and Memory status to record the deployment receipt verifier as a release-hardening gate, not a real deployment claim.
 - GitHub Prometheus CI, Security Audit, and Pages passed for `5fd385e`; Prometheus CI now covers unsigned metrics-oracle tx-request generation in blocked and signer-ready states plus the negative missing-contract-instance guard.
 - Added `scripts/build_metrics_oracle_tx_request.py`, an unsigned GovernanceAutoTuning metrics-oracle operator request builder. It validates the public report plus current-Silverc release bundle, binds `reportMetrics` arguments to the GovernanceAutoTuning artifact hashes, emits JSON/Markdown handoff, and remains explicit that chain transaction assembly, signing, and broadcast are external.
 - GitHub Prometheus CI and Security Audit passed for `144f71c`; Prometheus CI now covers the GovernanceAutoTuning metrics-oracle report preflight positive path plus secret-field rejection. Latest observed Pages deployment remains green for `98b9f73`.

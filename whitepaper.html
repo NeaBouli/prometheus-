@@ -26,12 +26,12 @@
 <meta name="twitter:description" content="Full technical specification for the decentralized AI cybersecurity protocol on Kaspa.">
 <meta name="twitter:image" content="https://neabouli.github.io/prometheus-/logo/Prometheus.png">
 <!-- GEO: AI-readable -->
-<meta name="ai-summary" content="Prometheus Whitepaper v4.0: decentralized AI threat intelligence on Kaspa. Current-Silverc deployment gates for H-001, ValidatorStaking, GuardianReputation, and RuleStorage; LLaMA 3 + Phi-3-mini AI, Fed-DART federated learning, Commit-Reveal voting, KAS/PROM dual-token model, 0% pre-mine. 18 sections with audit findings.">
+<meta name="ai-summary" content="Prometheus Whitepaper v4.0: decentralized AI threat intelligence on Kaspa. Current-Silverc gates cover H-001, ValidatorStaking, GuardianReputation, RuleStorage, CommunityDonations, DevIncentivePool, GovernanceAutoTuning, release bundles, deployment receipts, and unsigned oracle requests; LLaMA 3 + Phi-3-mini AI, Fed-DART federated learning, KAS/PROM dual-token model, 0% pre-mine.">
 <meta name="ai-category" content="whitepaper, cybersecurity, blockchain, technical-specification">
 <meta name="ai-status" content="v4.0, audited, deployment-gated">
 <!-- Schema.org -->
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"TechArticle","name":"Prometheus Whitepaper v4.0","headline":"Decentralized AI-Powered Threat Intelligence on Kaspa","description":"Full technical specification covering architecture, tokenomics, AI models, smart contracts, security analysis, and audit findings.","url":"https://neabouli.github.io/prometheus-/whitepaper.html","datePublished":"2026-03-22","dateModified":"2026-07-09","version":"4.0","author":{"@type":"Organization","name":"Prometheus Protocol Community"},"publisher":{"@type":"Organization","name":"Prometheus Protocol"},"license":"https://opensource.org/licenses/MIT"}
+{"@context":"https://schema.org","@type":"TechArticle","name":"Prometheus Whitepaper v4.0","headline":"Decentralized AI-Powered Threat Intelligence on Kaspa","description":"Full technical specification covering architecture, tokenomics, AI models, smart contracts, security analysis, and audit findings.","url":"https://neabouli.github.io/prometheus-/whitepaper.html","datePublished":"2026-03-22","dateModified":"2026-07-11","version":"4.0","author":{"@type":"Organization","name":"Prometheus Protocol Community"},"publisher":{"@type":"Organization","name":"Prometheus Protocol"},"license":"https://opensource.org/licenses/MIT"}
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -277,7 +277,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
         <tr><td>Staking Token</td><td>KAS (Kaspa native, 0% pre-mine)</td></tr>
         <tr><td>Governance Token</td><td>PROM (Prometheus Token, 0% pre-mine)</td></tr>
         <tr><td>Total Emission (5 years)</td><td>80,000,000 PROM</td></tr>
-        <tr><td>Mainnet Launch</td><td>Post-Toccata deployment gated by deploy smoke path, unsigned oracle tx-request handoff, external signed metrics-oracle transaction integration, and release hardening</td></tr>
+        <tr><td>Mainnet Launch</td><td>Post-Toccata deployment gated by deploy smoke path, deployment receipt verification, unsigned oracle tx-request handoff, external signed metrics-oracle transaction integration, and release hardening</td></tr>
         <tr><td>License</td><td>MIT / Apache 2.0</td></tr>
       </table>
     </div>
@@ -341,7 +341,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
       <ul class="wp-list">
         <li><strong>DAGKnight consensus:</strong> Adaptive, parameterless consensus with theoretically optimal Byzantine fault tolerance (~50%). Converges under attack orders of magnitude faster than classical systems.</li>
         <li><strong>BlockDAG architecture:</strong> Parallel block production eliminates the bottleneck of linear chains. Prometheus treats high throughput as a deployment requirement and verifies contract/tooling compatibility before launch.</li>
-        <li><strong>Silverscript:</strong> High-level language for UTXO-based smart contracts. H-001, ValidatorStaking, GuardianReputation, RuleStorage, CommunityDonations, DevIncentivePool, and GovernanceAutoTuning current-Silverc gates are verified; deploy smoke, unsigned oracle tx-request handoff, and external signed metrics-oracle transaction integration still gate Prometheus deployment.</li>
+        <li><strong>Silverscript:</strong> High-level language for UTXO-based smart contracts. H-001, ValidatorStaking, GuardianReputation, RuleStorage, CommunityDonations, DevIncentivePool, and GovernanceAutoTuning current-Silverc gates are verified; release-bundle, deploy-preflight, deployment-receipt, metrics-report, and unsigned oracle tx-request gates are covered; network deploy/orchestration, real operator receipts, and external signed metrics-oracle transaction integration still gate Prometheus deployment.</li>
         <li><strong>Native ZK verification:</strong> Groth16 Zero-Knowledge Proofs directly on L1 — essential for anonymous threat reports.</li>
       </ul>
 
@@ -423,7 +423,7 @@ lora_config = LoraConfig(
         <tr><td>CommunityDonations.ss</td><td>Transparent community fund</td><td>donateKas, proposeDisbursement</td></tr>
         <tr><td>RuleStorage.ss</td><td>Rule state + target PROM-RULES asset orchestration</td><td>submitProposal, voteOnProposal, finalizeProposal</td></tr>
       </table>
-      <div class="callout"><p><strong>Current-Silverc gates:</strong> ValidatorStakingState runtime transitions pass; GuardianReputation runtime/formula gates pass; RuleStorage runtime gates pass for submit, vote, finalize, and deactivate paths; CommunityDonations runtime gates pass for donate, propose, vote, and execute disbursement paths; DevIncentivePool runtime gates pass for propose, vote, and execute grant paths; GovernanceAutoTuning runtime gates pass for signed metrics reporting and deterministic weekly auto-tuning.</p></div>
+      <div class="callout"><p><strong>Current-Silverc gates:</strong> ValidatorStakingState runtime transitions pass; GuardianReputation runtime/formula gates pass; RuleStorage runtime gates pass for submit, vote, finalize, and deactivate paths; CommunityDonations runtime gates pass for donate, propose, vote, and execute disbursement paths; DevIncentivePool runtime gates pass for propose, vote, and execute grant paths; GovernanceAutoTuning runtime gates pass for signed metrics reporting and deterministic weekly auto-tuning. Deployment receipt verification checks public receipts against the release bundle and keeps CI fixtures separate from real operator records.</p></div>
       <div class="callout-gold"><p><strong>CRITICAL — KAS/PROM separation:</strong> Validators stake KAS (tx.value = KAS, constant = MIN_STAKE_KAS = 10,000). PROM is earned by Guardians through accepted proposals — never staked by Validators. Confusing the two tokens is the most common implementation error (PATTERN-001).</p></div>
     </div>
 
@@ -590,7 +590,7 @@ async def training_round(self):
       <table class="wp-table">
         <tr><th>Phase</th><th>Timeline</th><th>Milestone</th></tr>
         <tr><td>Foundation</td><td>March 2026</td><td>Sprints 0–8 complete. 6 contracts, 160+ tests, landing page live.</td></tr>
-        <tr><td>Kaspa Toccata</td><td>June/July 2026</td><td>Post-fork environment. Current-Silverc runtime gates cover H-001, ValidatorStaking, GuardianReputation, RuleStorage, CommunityDonations, DevIncentivePool, and GovernanceAutoTuning; deploy smoke, unsigned oracle tx-request handoff, and external signed oracle transaction integration gate Prometheus deployment.</td></tr>
+        <tr><td>Kaspa Toccata</td><td>June/July 2026</td><td>Post-fork environment. Current-Silverc runtime gates cover H-001, ValidatorStaking, GuardianReputation, RuleStorage, CommunityDonations, DevIncentivePool, and GovernanceAutoTuning; deploy smoke, deployment receipt verification, unsigned oracle tx-request handoff, and external signed oracle transaction integration gate Prometheus deployment.</td></tr>
         <tr><td>AI Production</td><td>Post-verification</td><td>Real ZK-proof, P2P, Phi-3, LLaMA fine-tuned, Fed-DART live.</td></tr>
         <tr><td>Desktop Release</td><td>July–August 2026</td><td>Windows / macOS / Linux installers. One-click Guardian setup.</td></tr>
         <tr><td>Mobile Release</td><td>September 2026</td><td>iOS (App Store) + Android (Google Play + F-Droid).</td></tr>
