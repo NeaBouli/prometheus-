@@ -37,7 +37,7 @@ Goal:     All sprints 0-7 accepted. Post-Toccata deployment verification.
 | Testnet-10-Node              | DONE            | 100%     | 2026-03-21  | -            | wrpc://127.0.0.1:17210 |
 | Silverscript tooling (silverc/ssc) | IN_PROGRESS | 99%      | 2026-07-11  | -            | Upstream `silverc` builds/tests in CI; H-001 fixture verifies; ValidatorStaking state fixture compiles; `commitVote`, `revealVote`, `slashInvalidReveal`, `requestWithdraw`, `completeWithdraw`, and signed-int deployment-bound runtime tests pass; GuardianReputationState compile/ABI/runtime/formula gates pass; RuleStorageState compile/ABI/runtime gates pass locally and in CI; CommunityDonationsState compile/ABI gate passes locally; remaining deployment-scoped contract ports pending |
 | Hello-World Contract         | PENDING         | 0%       | 2026-03-21  | -            | Deployment nach ssc-Release |
-| GitHub Actions CI/CD         | ACCEPTED        | 100%     | 2026-07-11  | ACCEPTED     | Prometheus CI, Security Audit, and Pages green for 4029da2 |
+| GitHub Actions CI/CD         | ACCEPTED        | 100%     | 2026-07-11  | ACCEPTED     | Prometheus CI, Security Audit, and Pages green for 19efaa9 |
 | Sprint-1 Pre-Check           | ACCEPTED        | 100%     | 2026-03-21  | ACCEPTED     | V-001, V-002, V-003 alle genehmigt |
 | **SPRINT 1 – CONTRACTS**     |                 |          |             |              |                 |
 | ValidatorStaking.ss          | ACCEPTED        | 100%     | 2026-03-21  | ACCEPTED     | v1.2: slash ACL, bond return, test patches |
@@ -98,7 +98,7 @@ Repo CommunityDonations current-silverc state fixture: `modules/contracts/silver
 Signed-int boundary decision: current upstream Silverc entrypoint `int` values are deployable only in the nonnegative signed range `0..=i64::MAX`; Rust retains raw `u64` H-001 vectors for byte compatibility and uses `build_silverc_checked` / `validate_silverc_commitment_bounds` for deployment calls.
 Rusty-Kaspa workspace dependencies pinned to `v2.0.1`; `cargo audit` now reports no vulnerabilities, only allowed warnings.
 GitHub Security Audit workflow re-enabled and dependency audits now fail on findings instead of using `|| true`; after `c673766`, Dependency Audit was hardened with explicit job/step timeouts and split cargo-audit install/run steps, and green reruns passed through `a11545b`.
-Public docs refreshed by 2026-07-11: README, WHITEPAPER.md, and whitepaper.html now state deployment-gated post-Toccata status, verified H-001/ValidatorStaking/GuardianReputation/RuleStorage current-Silverc runtime gates, CommunityDonations compile/ABI gates, target-only PROM-RULES asset orchestration, and no Kasplex dependency for Guardian reputation.
+Public docs refreshed and verified in CI/Pages by 2026-07-11: README, WHITEPAPER.md, and whitepaper.html now state deployment-gated post-Toccata status, verified H-001/ValidatorStaking/GuardianReputation/RuleStorage current-Silverc runtime gates, CommunityDonations compile/ABI gates, target-only PROM-RULES asset orchestration, and no Kasplex dependency for Guardian reputation.
 Rust client runtime gate added: `PROMETHEUS_RUNTIME=beta|mainnet|production|prod` rejects ZK/Phi-3/KRC-20/Fed-DART stubs; development mode remains testable.
 Rollback tag: pre-session-20260413 → 6347b85
 ```

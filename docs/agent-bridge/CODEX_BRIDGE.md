@@ -4,8 +4,8 @@ Last updated: 2026-07-11 EEST
 Repo path: /Users/gio/Desktop/repos/prometheus
 Branch observed: main
 Latest product-code baseline observed: `3e53e29 feat: add rule storage silverc fixture`
-Latest verified remote baseline observed: `16897e2 docs: record rule storage runtime ci`
-Latest CI note: Prometheus CI, Security Audit, and Pages passed for `16897e2`; RuleStorage runtime gates are verified locally and remotely in the pinned Silverc runtime job. Active local work after that baseline adds a CommunityDonationsState compile/ABI gate pending commit/CI.
+Latest verified feature baseline observed: `19efaa9 feat: add community donations silverc fixture`
+Latest CI note: Prometheus CI, Security Audit, and Pages passed for `19efaa9`; RuleStorage runtime gates and CommunityDonations compile/ABI gates are verified locally and remotely in the pinned Silverc runtime job.
 Latest public-docs note: README, `WHITEPAPER.md`, and `whitepaper.html` were refreshed to reflect post-Toccata deployment gating, verified current-Silverc H-001/Validator/Guardian/RuleStorage runtime gates, target-only PROM-RULES asset orchestration, and the no-Kasplex-reputation rule.
 
 Purpose: This file is the local bridge for Codex/Claude Code handover. Read it before touching product code. It consolidates the project state, architecture rules, workflow logic, current open issues, the Reputation Badge decision, and the new direct Sandbox access note.

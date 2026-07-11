@@ -2,6 +2,7 @@
 
 ## 2026-07-11
 
+- GitHub Prometheus CI, Security Audit, and Pages passed for `19efaa9`; Prometheus CI now includes the CommunityDonationsState compile/ABI fixture guard and the pinned Silverc runtime job passes 33 upstream-injected tests.
 - Added current-Silverscript CommunityDonations state fixture `modules/contracts/silverc/CommunityDonationsState.sil` and extended `scripts/verify_silverc_h001.py` so the pinned upstream verifier compiles the fixture and builds covenant sigscripts for `donateKas`, `proposeDisbursement`, `voteDisbursement`, and `executeDisbursement`.
 - CommunityDonationsState keeps KAS-denominated donation/disbursement accounting, `MIN_DONATION_KAS = 1`, `DISBURSEMENT_QUORUM = 10`, and `VALIDATOR_QUORUM = 6700`; it intentionally does not model legacy maps, string storage, `tx.value`, direct KAS transfer, or cross-contract validator lookups in current Silverc.
 - Local verifier passed after CommunityDonations addition: `python3 scripts/verify_silverc_h001.py` injected 33 upstream tests and all passed at Silverscript ref `d25bd3427a093c17327ca3d6b9e1aa5f7688c863`.
