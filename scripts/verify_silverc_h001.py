@@ -293,6 +293,14 @@ fn rule_storage_state_entry_sigscript(compiled: &CompiledContract<'_>, function_
     sigscript
 }
 
+fn community_donations_state_entry_sigscript(compiled: &CompiledContract<'_>, function_name: &str, args: Vec<Expr<'_>>) -> Vec<u8> {
+    let mut sigscript = compiled
+        .build_sig_script_for_covenant_decl(function_name, args, CovenantDeclCallOptions { is_leader: false })
+        .unwrap_or_else(|err| panic!("CommunityDonationsState {function_name} sigscript builds: {err}"));
+    sigscript.extend_from_slice(&common::push_redeem_script(&compiled.script));
+    sigscript
+}
+
 fn compile_validator_state<'a>(source: &'a str, args: Vec<Expr<'static>>) -> CompiledContract<'a> {
     compile_contract(source, &args, CompileOptions::default()).expect("ValidatorStakingState fixture compiles")
 }
@@ -667,6 +675,402 @@ fn prometheus_community_donations_state_fixture_compiles_against_current_silverc
         "executeDisbursement",
         vec![Expr::int(606_000), Expr::bytes(sig)],
     );
+}
+
+#[test]
+fn prometheus_community_donations_donate_runtime_accepts_valid_transition() {
+    let contract_path = std::env::var("PROMETHEUS_COMMUNITY_DONATIONS_STATE_CONTRACT")
+        .expect("PROMETHEUS_COMMUNITY_DONATIONS_STATE_CONTRACT is set");
+    let source = std::fs::read_to_string(contract_path).expect("read Prometheus community donations contract fixture");
+    let governance_pk = keypair_from_seed(8).x_only_public_key().0.serialize().to_vec();
+    let donor_keypair = keypair_from_seed(6);
+    let donor_pk = donor_keypair.x_only_public_key().0.serialize().to_vec();
+    let recipient_pk = keypair_from_seed(4).x_only_public_key().0.serialize().to_vec();
+    let message_hash = vec![2u8; 32];
+
+    let empty = compile_community_donations_state(
+        &source,
+        community_donations_state_args(governance_pk.clone(), 0, 0, 0, 1, 0, recipient_pk.clone(), 0, zero32(), 0, 0, 0, 0, false, donor_pk.clone(), zero32(), 0),
+    );
+    let donated = compile_community_donations_state(
+        &source,
+        community_donations_state_args(governance_pk, 1, 100, 100, 1, 0, recipient_pk, 0, zero32(), 0, 0, 0, 0, false, donor_pk.clone(), message_hash.clone(), 1_000),
+    );
+
+    let placeholder_sigscript = community_donations_state_entry_sigscript(
+        &empty,
+        "donateKas",
+        vec![Expr::bytes(donor_pk.clone()), Expr::int(100), Expr::bytes(message_hash.clone()), Expr::int(1_000), Expr::bytes(dummy_signature())],
+    );
+    let outputs = vec![covenant_output(&donated, 0, COV_A)];
+    let entries = vec![covenant_utxo(&empty, COV_A)];
+    let mut tx = Transaction::new(
+        1,
+        vec![tx_input_with_sigops(0, placeholder_sigscript, 1)],
+        outputs,
+        0,
+        Default::default(),
+        0,
+        vec![],
+    );
+    let sig = sign_tx_input(&tx, &entries, 0, &donor_keypair);
+    tx.inputs[0].signature_script = community_donations_state_entry_sigscript(
+        &empty,
+        "donateKas",
+        vec![Expr::bytes(donor_pk), Expr::int(100), Expr::bytes(message_hash), Expr::int(1_000), Expr::bytes(sig)],
+    );
+
+    let result = execute_input_with_covenants(tx, entries, 0);
+    assert!(
+        result.is_ok(),
+        "CommunityDonations donateKas runtime should accept valid donor signature/state transition: {:?}",
+        result.err()
+    );
+}
+
+#[test]
+fn prometheus_community_donations_donate_runtime_rejects_zero_amount() {
+    let contract_path = std::env::var("PROMETHEUS_COMMUNITY_DONATIONS_STATE_CONTRACT")
+        .expect("PROMETHEUS_COMMUNITY_DONATIONS_STATE_CONTRACT is set");
+    let source = std::fs::read_to_string(contract_path).expect("read Prometheus community donations contract fixture");
+    let governance_pk = keypair_from_seed(8).x_only_public_key().0.serialize().to_vec();
+    let donor_keypair = keypair_from_seed(6);
+    let donor_pk = donor_keypair.x_only_public_key().0.serialize().to_vec();
+    let recipient_pk = keypair_from_seed(4).x_only_public_key().0.serialize().to_vec();
+    let message_hash = vec![2u8; 32];
+
+    let empty = compile_community_donations_state(
+        &source,
+        community_donations_state_args(governance_pk.clone(), 0, 0, 0, 1, 0, recipient_pk.clone(), 0, zero32(), 0, 0, 0, 0, false, donor_pk.clone(), zero32(), 0),
+    );
+    let invalid_next = compile_community_donations_state(
+        &source,
+        community_donations_state_args(governance_pk, 1, 0, 0, 1, 0, recipient_pk, 0, zero32(), 0, 0, 0, 0, false, donor_pk.clone(), message_hash.clone(), 1_000),
+    );
+
+    let placeholder_sigscript = community_donations_state_entry_sigscript(
+        &empty,
+        "donateKas",
+        vec![Expr::bytes(donor_pk.clone()), Expr::int(0), Expr::bytes(message_hash.clone()), Expr::int(1_000), Expr::bytes(dummy_signature())],
+    );
+    let outputs = vec![covenant_output(&invalid_next, 0, COV_A)];
+    let entries = vec![covenant_utxo(&empty, COV_A)];
+    let mut tx = Transaction::new(
+        1,
+        vec![tx_input_with_sigops(0, placeholder_sigscript, 1)],
+        outputs,
+        0,
+        Default::default(),
+        0,
+        vec![],
+    );
+    let sig = sign_tx_input(&tx, &entries, 0, &donor_keypair);
+    tx.inputs[0].signature_script = community_donations_state_entry_sigscript(
+        &empty,
+        "donateKas",
+        vec![Expr::bytes(donor_pk), Expr::int(0), Expr::bytes(message_hash), Expr::int(1_000), Expr::bytes(sig)],
+    );
+
+    let err = execute_input_with_covenants(tx, entries, 0).expect_err("donateKas must reject amounts below MIN_DONATION_KAS");
+    common::assert_verify_like_error(err);
+}
+
+#[test]
+fn prometheus_community_donations_propose_runtime_accepts_valid_transition() {
+    let contract_path = std::env::var("PROMETHEUS_COMMUNITY_DONATIONS_STATE_CONTRACT")
+        .expect("PROMETHEUS_COMMUNITY_DONATIONS_STATE_CONTRACT is set");
+    let source = std::fs::read_to_string(contract_path).expect("read Prometheus community donations contract fixture");
+    let governance_pk = keypair_from_seed(8).x_only_public_key().0.serialize().to_vec();
+    let donor_pk = keypair_from_seed(6).x_only_public_key().0.serialize().to_vec();
+    let proposer_keypair = keypair_from_seed(5);
+    let proposer_pk = proposer_keypair.x_only_public_key().0.serialize().to_vec();
+    let recipient_pk = keypair_from_seed(4).x_only_public_key().0.serialize().to_vec();
+    let purpose_hash = vec![3u8; 32];
+
+    let funded = compile_community_donations_state(
+        &source,
+        community_donations_state_args(governance_pk.clone(), 1, 100, 100, 1, 0, recipient_pk.clone(), 0, zero32(), 0, 0, 0, 0, false, donor_pk.clone(), zero32(), 1_000),
+    );
+    let pending = compile_community_donations_state(
+        &source,
+        community_donations_state_args(governance_pk, 1, 100, 100, 2, 1, recipient_pk.clone(), 50, purpose_hash.clone(), 0, 0, 605_900, 1, false, donor_pk, zero32(), 1_000),
+    );
+
+    let placeholder_sigscript = community_donations_state_entry_sigscript(
+        &funded,
+        "proposeDisbursement",
+        vec![Expr::bytes(recipient_pk.clone()), Expr::int(50), Expr::bytes(purpose_hash.clone()), Expr::int(1_100), Expr::bytes(dummy_signature()), Expr::bytes(proposer_pk.clone())],
+    );
+    let outputs = vec![covenant_output(&pending, 0, COV_A)];
+    let entries = vec![covenant_utxo(&funded, COV_A)];
+    let mut tx = Transaction::new(
+        1,
+        vec![tx_input_with_sigops(0, placeholder_sigscript, 1)],
+        outputs,
+        0,
+        Default::default(),
+        0,
+        vec![],
+    );
+    let sig = sign_tx_input(&tx, &entries, 0, &proposer_keypair);
+    tx.inputs[0].signature_script = community_donations_state_entry_sigscript(
+        &funded,
+        "proposeDisbursement",
+        vec![Expr::bytes(recipient_pk), Expr::int(50), Expr::bytes(purpose_hash), Expr::int(1_100), Expr::bytes(sig), Expr::bytes(proposer_pk)],
+    );
+
+    let result = execute_input_with_covenants(tx, entries, 0);
+    assert!(
+        result.is_ok(),
+        "CommunityDonations proposeDisbursement runtime should accept valid proposer signature/state transition: {:?}",
+        result.err()
+    );
+}
+
+#[test]
+fn prometheus_community_donations_propose_runtime_rejects_amount_above_pool() {
+    let contract_path = std::env::var("PROMETHEUS_COMMUNITY_DONATIONS_STATE_CONTRACT")
+        .expect("PROMETHEUS_COMMUNITY_DONATIONS_STATE_CONTRACT is set");
+    let source = std::fs::read_to_string(contract_path).expect("read Prometheus community donations contract fixture");
+    let governance_pk = keypair_from_seed(8).x_only_public_key().0.serialize().to_vec();
+    let donor_pk = keypair_from_seed(6).x_only_public_key().0.serialize().to_vec();
+    let proposer_keypair = keypair_from_seed(5);
+    let proposer_pk = proposer_keypair.x_only_public_key().0.serialize().to_vec();
+    let recipient_pk = keypair_from_seed(4).x_only_public_key().0.serialize().to_vec();
+    let purpose_hash = vec![3u8; 32];
+
+    let funded = compile_community_donations_state(
+        &source,
+        community_donations_state_args(governance_pk.clone(), 1, 100, 100, 1, 0, recipient_pk.clone(), 0, zero32(), 0, 0, 0, 0, false, donor_pk.clone(), zero32(), 1_000),
+    );
+    let invalid_next = compile_community_donations_state(
+        &source,
+        community_donations_state_args(governance_pk, 1, 100, 100, 2, 1, recipient_pk.clone(), 101, purpose_hash.clone(), 0, 0, 605_900, 1, false, donor_pk, zero32(), 1_000),
+    );
+
+    let placeholder_sigscript = community_donations_state_entry_sigscript(
+        &funded,
+        "proposeDisbursement",
+        vec![Expr::bytes(recipient_pk.clone()), Expr::int(101), Expr::bytes(purpose_hash.clone()), Expr::int(1_100), Expr::bytes(dummy_signature()), Expr::bytes(proposer_pk.clone())],
+    );
+    let outputs = vec![covenant_output(&invalid_next, 0, COV_A)];
+    let entries = vec![covenant_utxo(&funded, COV_A)];
+    let mut tx = Transaction::new(
+        1,
+        vec![tx_input_with_sigops(0, placeholder_sigscript, 1)],
+        outputs,
+        0,
+        Default::default(),
+        0,
+        vec![],
+    );
+    let sig = sign_tx_input(&tx, &entries, 0, &proposer_keypair);
+    tx.inputs[0].signature_script = community_donations_state_entry_sigscript(
+        &funded,
+        "proposeDisbursement",
+        vec![Expr::bytes(recipient_pk), Expr::int(101), Expr::bytes(purpose_hash), Expr::int(1_100), Expr::bytes(sig), Expr::bytes(proposer_pk)],
+    );
+
+    let err = execute_input_with_covenants(tx, entries, 0).expect_err("proposeDisbursement must reject amounts above pool balance");
+    common::assert_verify_like_error(err);
+}
+
+#[test]
+fn prometheus_community_donations_vote_runtime_accepts_support_vote() {
+    let contract_path = std::env::var("PROMETHEUS_COMMUNITY_DONATIONS_STATE_CONTRACT")
+        .expect("PROMETHEUS_COMMUNITY_DONATIONS_STATE_CONTRACT is set");
+    let source = std::fs::read_to_string(contract_path).expect("read Prometheus community donations contract fixture");
+    let governance_pk = keypair_from_seed(8).x_only_public_key().0.serialize().to_vec();
+    let donor_pk = keypair_from_seed(6).x_only_public_key().0.serialize().to_vec();
+    let validator_keypair = keypair_from_seed(7);
+    let validator_pk = validator_keypair.x_only_public_key().0.serialize().to_vec();
+    let recipient_pk = keypair_from_seed(4).x_only_public_key().0.serialize().to_vec();
+    let purpose_hash = vec![3u8; 32];
+
+    let pending = compile_community_donations_state(
+        &source,
+        community_donations_state_args(governance_pk.clone(), 1, 100, 100, 2, 1, recipient_pk.clone(), 50, purpose_hash.clone(), 0, 0, 605_900, 1, false, donor_pk.clone(), zero32(), 1_000),
+    );
+    let voted = compile_community_donations_state(
+        &source,
+        community_donations_state_args(governance_pk, 1, 100, 100, 2, 1, recipient_pk, 50, purpose_hash, 1, 0, 605_900, 1, false, donor_pk, zero32(), 1_000),
+    );
+
+    let placeholder_sigscript = community_donations_state_entry_sigscript(
+        &pending,
+        "voteDisbursement",
+        vec![Expr::bool(true), Expr::int(1_200), Expr::bytes(dummy_signature()), Expr::bytes(validator_pk.clone())],
+    );
+    let outputs = vec![covenant_output(&voted, 0, COV_A)];
+    let entries = vec![covenant_utxo(&pending, COV_A)];
+    let mut tx = Transaction::new(
+        1,
+        vec![tx_input_with_sigops(0, placeholder_sigscript, 1)],
+        outputs,
+        0,
+        Default::default(),
+        0,
+        vec![],
+    );
+    let sig = sign_tx_input(&tx, &entries, 0, &validator_keypair);
+    tx.inputs[0].signature_script = community_donations_state_entry_sigscript(
+        &pending,
+        "voteDisbursement",
+        vec![Expr::bool(true), Expr::int(1_200), Expr::bytes(sig), Expr::bytes(validator_pk)],
+    );
+
+    let result = execute_input_with_covenants(tx, entries, 0);
+    assert!(
+        result.is_ok(),
+        "CommunityDonations voteDisbursement runtime should accept valid validator signature/state transition: {:?}",
+        result.err()
+    );
+}
+
+#[test]
+fn prometheus_community_donations_vote_runtime_rejects_late_vote() {
+    let contract_path = std::env::var("PROMETHEUS_COMMUNITY_DONATIONS_STATE_CONTRACT")
+        .expect("PROMETHEUS_COMMUNITY_DONATIONS_STATE_CONTRACT is set");
+    let source = std::fs::read_to_string(contract_path).expect("read Prometheus community donations contract fixture");
+    let governance_pk = keypair_from_seed(8).x_only_public_key().0.serialize().to_vec();
+    let donor_pk = keypair_from_seed(6).x_only_public_key().0.serialize().to_vec();
+    let validator_keypair = keypair_from_seed(7);
+    let validator_pk = validator_keypair.x_only_public_key().0.serialize().to_vec();
+    let recipient_pk = keypair_from_seed(4).x_only_public_key().0.serialize().to_vec();
+    let purpose_hash = vec![3u8; 32];
+
+    let pending = compile_community_donations_state(
+        &source,
+        community_donations_state_args(governance_pk.clone(), 1, 100, 100, 2, 1, recipient_pk.clone(), 50, purpose_hash.clone(), 0, 0, 605_900, 1, false, donor_pk.clone(), zero32(), 1_000),
+    );
+    let invalid_next = compile_community_donations_state(
+        &source,
+        community_donations_state_args(governance_pk, 1, 100, 100, 2, 1, recipient_pk, 50, purpose_hash, 1, 0, 605_900, 1, false, donor_pk, zero32(), 1_000),
+    );
+
+    let placeholder_sigscript = community_donations_state_entry_sigscript(
+        &pending,
+        "voteDisbursement",
+        vec![Expr::bool(true), Expr::int(605_900), Expr::bytes(dummy_signature()), Expr::bytes(validator_pk.clone())],
+    );
+    let outputs = vec![covenant_output(&invalid_next, 0, COV_A)];
+    let entries = vec![covenant_utxo(&pending, COV_A)];
+    let mut tx = Transaction::new(
+        1,
+        vec![tx_input_with_sigops(0, placeholder_sigscript, 1)],
+        outputs,
+        0,
+        Default::default(),
+        0,
+        vec![],
+    );
+    let sig = sign_tx_input(&tx, &entries, 0, &validator_keypair);
+    tx.inputs[0].signature_script = community_donations_state_entry_sigscript(
+        &pending,
+        "voteDisbursement",
+        vec![Expr::bool(true), Expr::int(605_900), Expr::bytes(sig), Expr::bytes(validator_pk)],
+    );
+
+    let err = execute_input_with_covenants(tx, entries, 0).expect_err("voteDisbursement must reject votes at or after voting_end_block");
+    common::assert_verify_like_error(err);
+}
+
+#[test]
+fn prometheus_community_donations_execute_runtime_accepts_approved_disbursement() {
+    let contract_path = std::env::var("PROMETHEUS_COMMUNITY_DONATIONS_STATE_CONTRACT")
+        .expect("PROMETHEUS_COMMUNITY_DONATIONS_STATE_CONTRACT is set");
+    let source = std::fs::read_to_string(contract_path).expect("read Prometheus community donations contract fixture");
+    let governance_keypair = keypair_from_seed(8);
+    let governance_pk = governance_keypair.x_only_public_key().0.serialize().to_vec();
+    let donor_pk = keypair_from_seed(6).x_only_public_key().0.serialize().to_vec();
+    let recipient_pk = keypair_from_seed(4).x_only_public_key().0.serialize().to_vec();
+    let purpose_hash = vec![3u8; 32];
+
+    let pending = compile_community_donations_state(
+        &source,
+        community_donations_state_args(governance_pk.clone(), 1, 100, 100, 2, 1, recipient_pk.clone(), 50, purpose_hash.clone(), 10, 0, 605_900, 1, false, donor_pk.clone(), zero32(), 1_000),
+    );
+    let executed = compile_community_donations_state(
+        &source,
+        community_donations_state_args(governance_pk, 1, 100, 50, 2, 1, recipient_pk, 50, purpose_hash, 10, 0, 605_900, 2, true, donor_pk, zero32(), 1_000),
+    );
+
+    let placeholder_sigscript = community_donations_state_entry_sigscript(
+        &pending,
+        "executeDisbursement",
+        vec![Expr::int(605_900), Expr::bytes(dummy_signature())],
+    );
+    let outputs = vec![covenant_output(&executed, 0, COV_A)];
+    let entries = vec![covenant_utxo(&pending, COV_A)];
+    let mut tx = Transaction::new(
+        1,
+        vec![tx_input_with_sigops(0, placeholder_sigscript, 1)],
+        outputs,
+        0,
+        Default::default(),
+        0,
+        vec![],
+    );
+    let sig = sign_tx_input(&tx, &entries, 0, &governance_keypair);
+    tx.inputs[0].signature_script = community_donations_state_entry_sigscript(
+        &pending,
+        "executeDisbursement",
+        vec![Expr::int(605_900), Expr::bytes(sig)],
+    );
+
+    let result = execute_input_with_covenants(tx, entries, 0);
+    assert!(
+        result.is_ok(),
+        "CommunityDonations executeDisbursement runtime should accept approved governance transition: {:?}",
+        result.err()
+    );
+}
+
+#[test]
+fn prometheus_community_donations_execute_runtime_rejects_insufficient_quorum() {
+    let contract_path = std::env::var("PROMETHEUS_COMMUNITY_DONATIONS_STATE_CONTRACT")
+        .expect("PROMETHEUS_COMMUNITY_DONATIONS_STATE_CONTRACT is set");
+    let source = std::fs::read_to_string(contract_path).expect("read Prometheus community donations contract fixture");
+    let governance_keypair = keypair_from_seed(8);
+    let governance_pk = governance_keypair.x_only_public_key().0.serialize().to_vec();
+    let donor_pk = keypair_from_seed(6).x_only_public_key().0.serialize().to_vec();
+    let recipient_pk = keypair_from_seed(4).x_only_public_key().0.serialize().to_vec();
+    let purpose_hash = vec![3u8; 32];
+
+    let pending = compile_community_donations_state(
+        &source,
+        community_donations_state_args(governance_pk.clone(), 1, 100, 100, 2, 1, recipient_pk.clone(), 50, purpose_hash.clone(), 9, 0, 605_900, 1, false, donor_pk.clone(), zero32(), 1_000),
+    );
+    let invalid_next = compile_community_donations_state(
+        &source,
+        community_donations_state_args(governance_pk, 1, 100, 50, 2, 1, recipient_pk, 50, purpose_hash, 9, 0, 605_900, 2, true, donor_pk, zero32(), 1_000),
+    );
+
+    let placeholder_sigscript = community_donations_state_entry_sigscript(
+        &pending,
+        "executeDisbursement",
+        vec![Expr::int(605_900), Expr::bytes(dummy_signature())],
+    );
+    let outputs = vec![covenant_output(&invalid_next, 0, COV_A)];
+    let entries = vec![covenant_utxo(&pending, COV_A)];
+    let mut tx = Transaction::new(
+        1,
+        vec![tx_input_with_sigops(0, placeholder_sigscript, 1)],
+        outputs,
+        0,
+        Default::default(),
+        0,
+        vec![],
+    );
+    let sig = sign_tx_input(&tx, &entries, 0, &governance_keypair);
+    tx.inputs[0].signature_script = community_donations_state_entry_sigscript(
+        &pending,
+        "executeDisbursement",
+        vec![Expr::int(605_900), Expr::bytes(sig)],
+    );
+
+    let err = execute_input_with_covenants(tx, entries, 0).expect_err("executeDisbursement must reject votes below DISBURSEMENT_QUORUM");
+    common::assert_verify_like_error(err);
 }
 
 #[test]
