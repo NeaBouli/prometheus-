@@ -2,6 +2,7 @@
 
 ## 2026-07-11
 
+- GitHub Prometheus CI, Security Audit, and Pages passed for `a5b825f`; the live GitHub Pages whitepaper now includes the operator handoff package status. The GitHub-managed Pages system workflow still emits a Node-20 deprecation annotation for internal Pages actions, outside this repo's workflow files.
 - GitHub Prometheus CI, Security Audit, and Pages passed for `b524936`; this was the bridge/memory status commit after the deployment receipt verifier rollout.
 - Added `scripts/build_silverc_operator_handoff.py`, a CI-safe public handoff package builder. It copies the release archive, runs deploy preflight, verifies CI fixture receipts, optionally verifies real operator receipts, validates the metrics report, builds the unsigned oracle request, and emits `HANDOFF.md` plus `operator-handoff-summary.json` without signing, broadcasting, deploying, or updating status files.
 - Local operator handoff package test passed against a fresh current-Silverc archive; expected status is `HANDOFF_BLOCKED` until upstream network deploy tooling, verified `operator_record` receipts, and a real GovernanceAutoTuningState instance ID exist.
