@@ -12,8 +12,8 @@ jobs:
     name: Memory Integrity
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v6
         with:
           python-version: '3.11'
       - name: Check Memory Files
@@ -24,7 +24,7 @@ jobs:
     name: Silverscript Contracts
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Verify KAS/PROM separation (PATTERN-001)
         run: |
           echo "Checking contracts for KAS/PROM separation..."
@@ -146,7 +146,7 @@ jobs:
     name: Current Silverc Runtime + Artifact Smoke
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
       - name: Verify H-001 vectors and validator state fixture against pinned silverc
@@ -183,7 +183,7 @@ jobs:
     name: Rust Workspace
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt, clippy
@@ -201,8 +201,8 @@ jobs:
     name: Python Guardian
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v6
         with:
           python-version: '3.11'
       - name: Install dependencies
@@ -219,7 +219,7 @@ jobs:
     name: HTML Pages
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Verify key pages exist
         run: |
           for f in index.html faq.html roadmap.html whitepaper.html guardian-economics.html; do
