@@ -2,6 +2,7 @@
 
 ## 2026-07-11
 
+- Added `scripts/preflight_metrics_oracle_report.py` and `modules/contracts/silverc/metrics-oracle-report.sample.json` for public GovernanceAutoTuning `reportMetrics` payload validation. Local positive plan/runbook generation and negative secret-field rejection passed; CI now checks both paths.
 - GitHub Prometheus CI, Security Audit, and Pages passed for `fe4c62f`; Prometheus CI now validates the generated current-Silverc deploy operator runbook in addition to the release archive and JSON preflight plan.
 - Added Markdown operator runbook generation to `scripts/preflight_silverc_deploy.py` via `--runbook-out`; local end-to-end archive/preflight/runbook validation passed and CI now asserts the generated runbook remains blocked, explicit about no broadcast, and includes the expected contract hashes/table.
 - GitHub Prometheus CI, Security Audit, and Pages passed for `6e33ecf`; the workflow action upgrade removed the observed Node-20 annotations in the checked runs.

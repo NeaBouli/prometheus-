@@ -141,6 +141,44 @@ jobs:
             exit 1
           fi
           echo "GovernanceAutoTuningState fixture keeps signed metrics and deterministic tuning invariants."
+      - name: Preflight GovernanceAutoTuning metrics-oracle report
+        run: |
+          python3 scripts/preflight_metrics_oracle_report.py \
+            --report modules/contracts/silverc/metrics-oracle-report.sample.json \
+            --plan-out /tmp/prometheus-metrics-oracle-preflight.json \
+            --runbook-out /tmp/prometheus-metrics-oracle-runbook.md
+          test -s /tmp/prometheus-metrics-oracle-preflight.json
+          test -s /tmp/prometheus-metrics-oracle-runbook.md
+          python3 - <<'PY'
+          import json
+          import subprocess
+          import tempfile
+          from pathlib import Path
+
+          plan = json.loads(Path("/tmp/prometheus-metrics-oracle-preflight.json").read_text())
+          runbook = Path("/tmp/prometheus-metrics-oracle-runbook.md").read_text()
+          assert plan["status"] == "READY_FOR_TX_BUILDER"
+          assert plan["contract"] == "GovernanceAutoTuningState"
+          assert plan["entrypoint"] == "reportMetrics"
+          assert plan["entrypoint_args"]["new_fp_rate"] == 50
+          assert plan["safety"]["accepts_private_keys"] is False
+          assert plan["safety"]["signs_transactions"] is False
+          assert plan["safety"]["broadcasts_transactions"] is False
+          assert "external wallet signature required" in runbook
+
+          bad = json.loads(Path("modules/contracts/silverc/metrics-oracle-report.sample.json").read_text())
+          bad["_".join(["private", "key"])] = "do-not-accept"
+          with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as handle:
+              json.dump(bad, handle)
+              bad_path = handle.name
+          proc = subprocess.run(
+              ["python3", "scripts/preflight_metrics_oracle_report.py", "--report", bad_path],
+              text=True,
+              capture_output=True,
+          )
+          assert proc.returncode != 0
+          assert "secret-like fields are not allowed" in proc.stderr
+          PY
 
   h001-silverc-runtime:
     name: Current Silverc Runtime + Artifact Smoke

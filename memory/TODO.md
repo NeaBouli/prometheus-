@@ -156,7 +156,7 @@
 - [ ] [P1] LLaMA 3 8B LoRA Fine-Tuning auf Security-Datensätzen | Claude Code | Datensätze
 - [ ] [P1] LLaMA 3 70B Fine-Tuning | Claude Code | 8B done
 - [ ] [P2] Fed-DART echte Implementierung (Gradient-Aggregation) | Claude Code | -
-- [~] [P2] fp_rate Oracle Contract + Integration | Claude Code | Current-Silverc contract gate uses signed metrics `fp_rate` input; oracle operator/deploy integration pending
+- [~] [P2] fp_rate Oracle Contract + Integration | Claude Code | Current-Silverc contract gate uses signed metrics `fp_rate` input; public metrics report preflight added; oracle transaction builder/signer/deploy integration pending
 
 ---
 

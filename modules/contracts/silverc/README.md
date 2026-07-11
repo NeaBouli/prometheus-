@@ -36,6 +36,7 @@ SILVERSCRIPT_REPO=/path/to/silverscript python3 scripts/smoke_silverc_artifacts.
 PROMETHEUS_SILVERC_ARTIFACT_DIR=/tmp/out python3 scripts/smoke_silverc_artifacts.py
 python3 scripts/smoke_silverc_artifacts.py --out-dir /tmp/out --archive /tmp/prometheus-silverc-artifacts.tar.gz
 python3 scripts/preflight_silverc_deploy.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --network sandbox --rpc-url ws://127.0.0.1:17210 --deployer-address kaspatest:qptestpreflight000000000000000000000000000000000 --metrics-oracle-pubkey 1111111111111111111111111111111111111111111111111111111111111111 --plan-out /tmp/prometheus-silverc-deploy-preflight.json --runbook-out /tmp/prometheus-silverc-deploy-runbook.md
+python3 scripts/preflight_metrics_oracle_report.py --report modules/contracts/silverc/metrics-oracle-report.sample.json --plan-out /tmp/prometheus-metrics-oracle-preflight.json --runbook-out /tmp/prometheus-metrics-oracle-runbook.md
 ```
 
 ## ValidatorStakingState.sil
@@ -198,6 +199,30 @@ upstream Silverscript ref and runtime-tests covenant transitions for:
 
 Verified rejection paths include `fp_rate` above `MAX_FP_RATE` and auto-tuning
 before `TUNING_INTERVAL_BLOCKS`.
+
+## Metrics-oracle report preflight
+
+`scripts/preflight_metrics_oracle_report.py` validates the public metrics report
+that an operator will use for `GovernanceAutoTuningState.reportMetrics`.
+It does not sign, hold keys, or broadcast. The real covenant signature remains a
+transaction-input signature produced by the metrics-oracle wallet outside this
+repository.
+
+The report schema is demonstrated in
+`metrics-oracle-report.sample.json`. The preflight validates:
+
+- `schema_version = 1`, `contract = GovernanceAutoTuningState`, and
+  `entrypoint = reportMetrics`
+- `metrics_oracle_pubkey` as a 32-byte public key hex string
+- nonnegative `active_validators`, `active_guardians`, and `proposals_per_day`
+- `fp_rate` in the contract-compatible range `0..10000`
+- monotonic `block_height >= previous_state.last_metrics_block`
+- absence of secret-like fields such as private keys, seeds, wallet data, or
+  keystore material
+
+It emits a JSON preflight plan with the exact public `reportMetrics` argument
+mapping and can emit a Markdown operator runbook. CI checks the sample report,
+the generated plan/runbook, and a negative secret-field rejection case.
 
 ## DevIncentivePoolState.sil
 

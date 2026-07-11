@@ -5,6 +5,7 @@
 - CI, Security Audit, and GitHub Pages deployment were green for `fe4c62f`; workflow actions use Node 24-compatible majors and current-Silverc CI now validates the operator runbook.
 - Runtime stub gates added for Rust client; current-Silverc contract gates now cover H-001, ValidatorStaking, GuardianReputation, RuleStorage, CommunityDonations, DevIncentivePool, and GovernanceAutoTuning.
 - Local current-Silverc release-bundle smoke now compiles all 7 fixtures through pinned upstream `silverc` and writes a deterministic manifest plus optional archive with source/artifact/script hashes; deploy preflight validates the bundle/operator public inputs, emits a Markdown operator runbook, and confirms upstream `silverc` has no network deploy command.
+- Metrics-oracle report preflight validates public GovernanceAutoTuning `reportMetrics` payloads and rejects secret-like fields; transaction signing remains an external wallet/deploy-orchestration step.
 - Sprint 9 remains blocked by missing network deploy/orchestration tooling, oracle operator integration, and release hardening.
 
 ## 🟡 Nächste Session — STARTFLOW
@@ -23,7 +24,7 @@
 
 ### Nächste konkrete Tasks (Priorität):
 1. **[P0] Sprint 9 Vorbereitung** — current-Silverc network deploy/orchestration path klären; Artifact-Smoke, release archive, deploy preflight, and operator runbook are local/CI-covered, echter On-chain-Deploy fehlt mangels upstream deploy CLI.
-2. **[P1] Oracle Operator Integration** — signed metrics-oracle signer/process für `GovernanceAutoTuningState.sil` definieren und operationalisieren.
+2. **[P1] Oracle Operator Integration** — signed metrics-oracle transaction builder/signer process für `GovernanceAutoTuningState.sil` operationalisieren; public report preflight is local-covered and pending remote CI.
 3. **[P1] Sprint 10B: Guardian Decentralization** — Hybrid routing (8B/70B), Ensemble voting (5x 8B)
 4. **[P2] fp_rate Oracle** — Q-003 current-Silverc contract gate uses signed metrics input; production oracle operator/integration remains
 5. **[P2] M-001** — Heuristic confidence in yara_generator.py durch LLM-Confidence ersetzen

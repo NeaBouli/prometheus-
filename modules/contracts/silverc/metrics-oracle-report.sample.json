@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "network": "sandbox",
+  "contract": "GovernanceAutoTuningState",
+  "entrypoint": "reportMetrics",
+  "metrics_oracle_pubkey": "1111111111111111111111111111111111111111111111111111111111111111",
+  "previous_state": {
+    "last_metrics_block": 900
+  },
+  "metrics": {
+    "active_validators": 100,
+    "active_guardians": 500,
+    "proposals_per_day": 150,
+    "fp_rate": 50,
+    "block_height": 1000
+  },
+  "sources": [
+    {
+      "name": "ci-sample",
+      "kind": "fixture"
+    }
+  ]
+}

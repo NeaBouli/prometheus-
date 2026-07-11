@@ -38,12 +38,15 @@ preflight validates release-bundle integrity and public operator inputs, emits a
 Markdown operator runbook with contract hashes and safety rules, and confirms
 upstream `silverc` still exposes no network deploy command. The remaining
 deployment blockers are the missing network deploy/orchestration path, signed
-metrics-oracle operation, and release hardening.
+metrics-oracle transaction operation, and release hardening. A separate
+metrics-oracle report preflight validates public `reportMetrics` payloads and
+operator handoff metadata without accepting signing material.
 
 **Sprint 9 — Contracts Live + Real ZK-Proof**
 - Keep current-Silverscript runtime and release-bundle manifest gates green
 - Keep release-bundle deploy preflight green
 - Keep the generated deploy operator runbook green and free of signing material
+- Keep the metrics-oracle report preflight green and free of signing material
 - Compile and deploy all 6 contracts to Kaspa Mainnet only after verification passes
 - Integrate kaspa-zk-params crate (real Groth16, replacing stub)
 - Implement PROM emission contract (minting logic)
