@@ -277,7 +277,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
         <tr><td>Staking Token</td><td>KAS (Kaspa native, 0% pre-mine)</td></tr>
         <tr><td>Governance Token</td><td>PROM (Prometheus Token, 0% pre-mine)</td></tr>
         <tr><td>Total Emission (5 years)</td><td>80,000,000 PROM</td></tr>
-        <tr><td>Mainnet Launch</td><td>Post-Toccata deployment gated by deploy smoke path, signed metrics-oracle operator integration, and release hardening</td></tr>
+        <tr><td>Mainnet Launch</td><td>Post-Toccata deployment gated by deploy smoke path, unsigned oracle tx-request handoff, external signed metrics-oracle transaction integration, and release hardening</td></tr>
         <tr><td>License</td><td>MIT / Apache 2.0</td></tr>
       </table>
     </div>
@@ -341,7 +341,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
       <ul class="wp-list">
         <li><strong>DAGKnight consensus:</strong> Adaptive, parameterless consensus with theoretically optimal Byzantine fault tolerance (~50%). Converges under attack orders of magnitude faster than classical systems.</li>
         <li><strong>BlockDAG architecture:</strong> Parallel block production eliminates the bottleneck of linear chains. Prometheus treats high throughput as a deployment requirement and verifies contract/tooling compatibility before launch.</li>
-        <li><strong>Silverscript:</strong> High-level language for UTXO-based smart contracts. H-001, ValidatorStaking, GuardianReputation, RuleStorage, CommunityDonations, DevIncentivePool, and GovernanceAutoTuning current-Silverc gates are verified; deploy smoke and signed metrics-oracle operator integration still gate Prometheus deployment.</li>
+        <li><strong>Silverscript:</strong> High-level language for UTXO-based smart contracts. H-001, ValidatorStaking, GuardianReputation, RuleStorage, CommunityDonations, DevIncentivePool, and GovernanceAutoTuning current-Silverc gates are verified; deploy smoke, unsigned oracle tx-request handoff, and external signed metrics-oracle transaction integration still gate Prometheus deployment.</li>
         <li><strong>Native ZK verification:</strong> Groth16 Zero-Knowledge Proofs directly on L1 — essential for anonymous threat reports.</li>
       </ul>
 
@@ -590,7 +590,7 @@ async def training_round(self):
       <table class="wp-table">
         <tr><th>Phase</th><th>Timeline</th><th>Milestone</th></tr>
         <tr><td>Foundation</td><td>March 2026</td><td>Sprints 0–8 complete. 6 contracts, 160+ tests, landing page live.</td></tr>
-        <tr><td>Kaspa Toccata</td><td>June/July 2026</td><td>Post-fork environment. Current-Silverc runtime gates cover H-001, ValidatorStaking, GuardianReputation, RuleStorage, CommunityDonations, DevIncentivePool, and GovernanceAutoTuning; deploy smoke and oracle operator integration gate Prometheus deployment.</td></tr>
+        <tr><td>Kaspa Toccata</td><td>June/July 2026</td><td>Post-fork environment. Current-Silverc runtime gates cover H-001, ValidatorStaking, GuardianReputation, RuleStorage, CommunityDonations, DevIncentivePool, and GovernanceAutoTuning; deploy smoke, unsigned oracle tx-request handoff, and external signed oracle transaction integration gate Prometheus deployment.</td></tr>
         <tr><td>AI Production</td><td>Post-verification</td><td>Real ZK-proof, P2P, Phi-3, LLaMA fine-tuned, Fed-DART live.</td></tr>
         <tr><td>Desktop Release</td><td>July–August 2026</td><td>Windows / macOS / Linux installers. One-click Guardian setup.</td></tr>
         <tr><td>Mobile Release</td><td>September 2026</td><td>iOS (App Store) + Android (Google Play + F-Droid).</td></tr>

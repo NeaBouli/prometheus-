@@ -33,7 +33,7 @@ This is not mainnet-ready today. The right verdict is: good work, continue the p
   - What: Rust client stubs for ZK proofs, Phi-3 fallback/heuristic inference, KRC-20 cached rules, and Fed-DART placeholder calls now call a central runtime gate. `PROMETHEUS_RUNTIME=beta|mainnet|production|prod` rejects those stubs. Development mode remains offline-testable.
   - Current-Silverc update: `GovernanceAutoTuningState.sil` replaces the contract-side Q-003 stub with signed metrics-oracle input and runtime gates for `reportMetrics` and `autoTune`.
   - Remaining risk: the signed metrics-oracle operator and deploy path still need production integration before beta/mainnet governance.
-  - Fix: Keep Rust client gate; implement oracle operator integration and direct deploy smoke before beta/mainnet governance.
+  - Fix: Keep Rust client gate; implement external oracle transaction assembly/signing/deploy integration and direct deploy smoke before beta/mainnet governance.
 
 #### Guardian / AI Pipeline — WARN
 
@@ -102,7 +102,7 @@ This is not mainnet-ready today. The right verdict is: good work, continue the p
 #### BLOCKING
 
 1. Direct `ssc`/current-Silverc deploy smoke before Sprint 9 or any contract deployment.
-2. Signed metrics-oracle operator integration before beta/mainnet governance.
+2. External signed metrics-oracle transaction assembly/signing/deploy integration before beta/mainnet governance.
 
 #### HIGH
 

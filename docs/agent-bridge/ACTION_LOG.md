@@ -2,6 +2,7 @@
 
 ## 2026-07-11
 
+- Added `scripts/build_metrics_oracle_tx_request.py`, an unsigned GovernanceAutoTuning metrics-oracle operator request builder. It validates the public report plus current-Silverc release bundle, binds `reportMetrics` arguments to the GovernanceAutoTuning artifact hashes, emits JSON/Markdown handoff, and remains explicit that chain transaction assembly, signing, and broadcast are external.
 - GitHub Prometheus CI and Security Audit passed for `144f71c`; Prometheus CI now covers the GovernanceAutoTuning metrics-oracle report preflight positive path plus secret-field rejection. Latest observed Pages deployment remains green for `98b9f73`.
 - Added `scripts/preflight_metrics_oracle_report.py` and `modules/contracts/silverc/metrics-oracle-report.sample.json` for public GovernanceAutoTuning `reportMetrics` payload validation. Local positive plan/runbook generation and negative secret-field rejection passed; CI now checks both paths.
 - GitHub Prometheus CI, Security Audit, and Pages passed for `fe4c62f`; Prometheus CI now validates the generated current-Silverc deploy operator runbook in addition to the release archive and JSON preflight plan.

@@ -37,6 +37,7 @@ PROMETHEUS_SILVERC_ARTIFACT_DIR=/tmp/out python3 scripts/smoke_silverc_artifacts
 python3 scripts/smoke_silverc_artifacts.py --out-dir /tmp/out --archive /tmp/prometheus-silverc-artifacts.tar.gz
 python3 scripts/preflight_silverc_deploy.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --network sandbox --rpc-url ws://127.0.0.1:17210 --deployer-address kaspatest:qptestpreflight000000000000000000000000000000000 --metrics-oracle-pubkey 1111111111111111111111111111111111111111111111111111111111111111 --plan-out /tmp/prometheus-silverc-deploy-preflight.json --runbook-out /tmp/prometheus-silverc-deploy-runbook.md
 python3 scripts/preflight_metrics_oracle_report.py --report modules/contracts/silverc/metrics-oracle-report.sample.json --plan-out /tmp/prometheus-metrics-oracle-preflight.json --runbook-out /tmp/prometheus-metrics-oracle-runbook.md
+python3 scripts/build_metrics_oracle_tx_request.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --report modules/contracts/silverc/metrics-oracle-report.sample.json --contract-instance-id sandbox:governance-auto-tuning-state-fixture-0001 --tx-request-out /tmp/prometheus-metrics-oracle-tx-request.json --runbook-out /tmp/prometheus-metrics-oracle-tx-request.md
 ```
 
 ## ValidatorStakingState.sil
@@ -223,6 +224,30 @@ The report schema is demonstrated in
 It emits a JSON preflight plan with the exact public `reportMetrics` argument
 mapping and can emit a Markdown operator runbook. CI checks the sample report,
 the generated plan/runbook, and a negative secret-field rejection case.
+
+## Metrics-oracle unsigned transaction request
+
+`scripts/build_metrics_oracle_tx_request.py` binds a validated public metrics
+report to the validated current-Silverc release bundle and the
+`GovernanceAutoTuningState` artifact metadata. It emits a deterministic,
+unsigned operator request for the external deploy/transaction assembler.
+
+The request includes:
+
+- the release bundle Silverscript ref/commit and GovernanceAutoTuning source,
+  constructor-args, artifact, and script hashes
+- the `__covenant_entrypoint_auth_reportMetrics` ABI binding
+- the exact public `reportMetrics` arguments
+- the metrics-oracle public key and external `oracle_sig` requirement
+- a request SHA-256 for operator handoff/review
+- safety flags proving the script does not accept private keys, sign, assemble
+  a chain transaction, or broadcast
+
+Without `--contract-instance-id`, the request status remains
+`BLOCKED_UNTIL_CONTRACT_INSTANCE_ID`. With a public deployed contract instance
+ID or outpoint, the status becomes `READY_FOR_EXTERNAL_TX_ASSEMBLER`; signing
+and broadcast still remain outside this repository. CI checks both states and a
+negative `--require-contract-instance-id` failure path.
 
 ## DevIncentivePoolState.sil
 

@@ -223,6 +223,71 @@ jobs:
           assert "GovernanceAutoTuningState" in runbook
           assert "private keys" in runbook
           PY
+      - name: Build unsigned metrics-oracle transaction request
+        run: |
+          python3 scripts/build_metrics_oracle_tx_request.py \
+            --archive /tmp/prometheus-silverc-artifacts.tar.gz \
+            --report modules/contracts/silverc/metrics-oracle-report.sample.json \
+            --tx-request-out /tmp/prometheus-metrics-oracle-tx-request.json \
+            --runbook-out /tmp/prometheus-metrics-oracle-tx-request.md
+          test -s /tmp/prometheus-metrics-oracle-tx-request.json
+          test -s /tmp/prometheus-metrics-oracle-tx-request.md
+          python3 - <<'PY'
+          import json
+          import subprocess
+          from pathlib import Path
+
+          request = json.loads(Path("/tmp/prometheus-metrics-oracle-tx-request.json").read_text())
+          runbook = Path("/tmp/prometheus-metrics-oracle-tx-request.md").read_text()
+          assert request["status"] == "BLOCKED_UNTIL_CONTRACT_INSTANCE_ID"
+          assert request["contract"]["name"] == "GovernanceAutoTuningState"
+          assert request["contract"]["abi_entrypoint"] == "__covenant_entrypoint_auth_reportMetrics"
+          assert request["entrypoint_args"]["new_fp_rate"] == 50
+          assert len(request["request_sha256"]) == 64
+          assert request["safety"]["accepts_private_keys"] is False
+          assert request["safety"]["signs_transactions"] is False
+          assert request["safety"]["assembles_chain_transaction"] is False
+          assert request["safety"]["broadcasts_transactions"] is False
+          assert "missing deployed GovernanceAutoTuningState contract instance id" in request["blockers"]
+          assert "unsigned operator request, not a serialized Kaspa transaction" in runbook
+
+          ready_path = "/tmp/prometheus-metrics-oracle-tx-request-ready.json"
+          subprocess.run(
+              [
+                  "python3",
+                  "scripts/build_metrics_oracle_tx_request.py",
+                  "--archive",
+                  "/tmp/prometheus-silverc-artifacts.tar.gz",
+                  "--report",
+                  "modules/contracts/silverc/metrics-oracle-report.sample.json",
+                  "--contract-instance-id",
+                  "sandbox:governance-auto-tuning-state-fixture-0001",
+                  "--require-contract-instance-id",
+                  "--tx-request-out",
+                  ready_path,
+              ],
+              check=True,
+          )
+          ready = json.loads(Path(ready_path).read_text())
+          assert ready["status"] == "READY_FOR_EXTERNAL_TX_ASSEMBLER"
+          assert ready["blockers"] == []
+
+          proc = subprocess.run(
+              [
+                  "python3",
+                  "scripts/build_metrics_oracle_tx_request.py",
+                  "--archive",
+                  "/tmp/prometheus-silverc-artifacts.tar.gz",
+                  "--report",
+                  "modules/contracts/silverc/metrics-oracle-report.sample.json",
+                  "--require-contract-instance-id",
+              ],
+              text=True,
+              capture_output=True,
+          )
+          assert proc.returncode != 0
+          assert "--contract-instance-id is required" in proc.stderr
+          PY
 
   # ─── Rust Workspace Check ───────────────────────────────────────────────────
   rust-check:
