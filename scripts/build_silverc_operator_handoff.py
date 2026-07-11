@@ -57,6 +57,11 @@ def parse_args() -> argparse.Namespace:
         "--contract-instance-id",
         help="Optional public GovernanceAutoTuningState deployed instance/outpoint for signer-ready tx requests",
     )
+    parser.add_argument(
+        "--metrics-tx-result",
+        type=Path,
+        help="Optional public metrics-oracle transaction result JSON to verify against the generated tx request",
+    )
     return parser.parse_args()
 
 
@@ -269,10 +274,33 @@ def run_tx_request(
     return load_json(request_path)
 
 
+def run_metrics_tx_result_verification(archive: Path, out_dir: Path, metrics_tx_result: Path) -> dict[str, Any]:
+    summary_path = out_dir / "metrics-oracle-tx-result-summary.json"
+    runbook_path = out_dir / "metrics-oracle-tx-result.md"
+    run(
+        [
+            sys.executable,
+            "scripts/verify_metrics_oracle_tx_result.py",
+            "--archive",
+            str(archive),
+            "--tx-request",
+            str(out_dir / "metrics-oracle-tx-request.json"),
+            "--tx-result",
+            str(metrics_tx_result),
+            "--summary-out",
+            str(summary_path),
+            "--runbook-out",
+            str(runbook_path),
+        ]
+    )
+    return load_json(summary_path)
+
+
 def status_from_components(
     deploy_plan: dict[str, Any],
     operator_receipts: dict[str, Any] | None,
     tx_request: dict[str, Any],
+    tx_result: dict[str, Any] | None,
 ) -> tuple[str, list[str]]:
     blockers = []
     if not deploy_plan["deploy_supported"]:
@@ -281,6 +309,8 @@ def status_from_components(
         blockers.append("missing verified operator_record deployment receipts")
     if tx_request["status"] != "READY_FOR_EXTERNAL_TX_ASSEMBLER":
         blockers.extend(tx_request["blockers"])
+    elif tx_result is None:
+        blockers.append("missing verified metrics-oracle transaction result")
 
     status = "READY_FOR_OPERATOR_DEPLOY" if not blockers else "HANDOFF_BLOCKED"
     return status, blockers
@@ -322,6 +352,7 @@ def write_handoff_markdown(out_dir: Path, summary: dict[str, Any]) -> None:
             f"- Operator receipt verification: {summary['operator_receipts_status']}",
             f"- Metrics report preflight: {summary['metrics_report_status']}",
             f"- Metrics tx request: {summary['metrics_tx_request_status']}",
+            f"- Metrics tx result: {summary['metrics_tx_result_status']}",
             "",
             "## Blockers",
             "",
@@ -338,7 +369,7 @@ def write_handoff_markdown(out_dir: Path, summary: dict[str, Any]) -> None:
             "2. Deploy only through an approved external network deploy/orchestration tool.",
             "3. Import public external deploy results with `--orchestrator-results`, or provide verified `operator_record` receipts with `--operator-receipts`.",
             "4. Use only verified operator_record contract IDs for signer-ready oracle transaction requests.",
-            "5. Sign and broadcast outside this repository through the approved wallet/vault process.",
+            "5. Sign and broadcast outside this repository through the approved wallet/vault process, then verify the public result with `--metrics-tx-result`.",
             "6. Update `memory/STATUS.md` only after all real receipts and transaction receipts verify.",
         ]
     )
@@ -355,6 +386,9 @@ def main() -> int:
     )
     orchestrator_results_path = (
         ensure_public_file(args.orchestrator_results, "orchestrator results") if args.orchestrator_results else None
+    )
+    metrics_tx_result_path = (
+        ensure_public_file(args.metrics_tx_result, "metrics tx result") if args.metrics_tx_result else None
     )
     out_dir = args.out_dir.expanduser().resolve()
     if out_dir.exists():
@@ -390,8 +424,11 @@ def main() -> int:
         )
     metrics_report_plan = run_metrics_report_preflight(report, out_dir)
     tx_request = run_tx_request(packaged_archive, report, out_dir, args.contract_instance_id)
+    tx_result_summary = None
+    if metrics_tx_result_path:
+        tx_result_summary = run_metrics_tx_result_verification(packaged_archive, out_dir, metrics_tx_result_path)
 
-    status, blockers = status_from_components(deploy_plan, operator_receipts_summary, tx_request)
+    status, blockers = status_from_components(deploy_plan, operator_receipts_summary, tx_request, tx_result_summary)
     summary = {
         "schema_version": 1,
         "status": status,
@@ -411,6 +448,7 @@ def main() -> int:
         ),
         "metrics_report_status": metrics_report_plan["status"],
         "metrics_tx_request_status": tx_request["status"],
+        "metrics_tx_result_status": tx_result_summary["status"] if tx_result_summary else "NOT_PROVIDED",
         "safety": {
             "accepts_private_keys": False,
             "signs_transactions": False,

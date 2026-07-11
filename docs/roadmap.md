@@ -47,15 +47,17 @@ receipts. A status staging guard rejects CI fixtures and emits only a manual
 status-update draft from verified `operator_record` receipts. A CI-safe operator
 handoff builder now packages the release archive, preflight outputs, deploy
 requests, optional imported operator receipts, receipt checks, metrics report
-preflight, and unsigned oracle request into one public handoff directory while
-preserving the real blocker list. The remaining deployment blockers are the
-missing network deploy/orchestration path, real public deploy results/receipts
-from that path, external signed metrics-oracle transaction
-assembly/signing/deploy operation, and release hardening. A separate
-metrics-oracle report preflight validates public
-`reportMetrics` payloads, and an unsigned oracle tx-request builder binds those
-payloads to the GovernanceAutoTuning artifact hashes for external assembly
-without accepting signing material.
+preflight, unsigned oracle request, and optional verified oracle tx result into
+one public handoff directory while preserving the real blocker list. A separate
+metrics-oracle report preflight validates public `reportMetrics` payloads, an
+unsigned oracle tx-request builder binds those payloads to the
+GovernanceAutoTuning artifact hashes for external assembly, and a public
+tx-result verifier checks confirmed transaction records against the request and
+release bundle without accepting signing material or raw transaction payloads.
+The remaining deployment blockers are the missing network deploy/orchestration
+path, real public deploy results/receipts from that path, external signed
+metrics-oracle transaction assembly/signing/deploy operation, and release
+hardening.
 
 **Sprint 9 — Contracts Live + Real ZK-Proof**
 - Keep current-Silverscript runtime and release-bundle manifest gates green
@@ -68,6 +70,7 @@ without accepting signing material.
 - Keep the generated operator handoff package green and free of signing material
 - Keep the metrics-oracle report preflight green and free of signing material
 - Keep the unsigned metrics-oracle tx-request builder green and free of signing material
+- Keep public oracle tx-result verification green and free of signing/raw transaction material
 - Compile and deploy all 6 contracts to Kaspa Mainnet only after verification passes
 - Integrate kaspa-zk-params crate (real Groth16, replacing stub)
 - Implement PROM emission contract (minting logic)

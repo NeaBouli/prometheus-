@@ -2,7 +2,7 @@
 
 **Whitepaper v4.0 — March 2026**
 
-**Status update — July 2026:** Kaspa Toccata is now treated as a post-fork deployment environment for Prometheus. The current Silverc verifier covers H-001 commit-reveal byte encoding, ValidatorStaking runtime transitions, GuardianReputation runtime/formula gates, RuleStorage runtime gates, CommunityDonations runtime gates, DevIncentivePool runtime gates, and GovernanceAutoTuning runtime gates. GovernanceAutoTuning resolves Q-003 in the current-Silverc path with signed metrics-oracle input for `fp_rate` instead of the legacy stub. Release-bundle, deploy-preflight, external deploy-request generation and verification, public orchestrator-result receipt import, deployment-receipt, deployment-status staging, operator-handoff, metrics-report, and unsigned oracle tx-request gates prepare operator handoff without holding signing material. Mainnet deployment remains gated by approved network deploy/orchestration tooling, real public deploy results/receipts from that path, external oracle transaction assembly/signing/deploy integration, and release hardening.
+**Status update — July 2026:** Kaspa Toccata is now treated as a post-fork deployment environment for Prometheus. The current Silverc verifier covers H-001 commit-reveal byte encoding, ValidatorStaking runtime transitions, GuardianReputation runtime/formula gates, RuleStorage runtime gates, CommunityDonations runtime gates, DevIncentivePool runtime gates, and GovernanceAutoTuning runtime gates. GovernanceAutoTuning resolves Q-003 in the current-Silverc path with signed metrics-oracle input for `fp_rate` instead of the legacy stub. Release-bundle, deploy-preflight, external deploy-request generation and verification, public orchestrator-result receipt import, deployment-receipt, deployment-status staging, operator-handoff, metrics-report, unsigned oracle tx-request, and public oracle tx-result verification gates prepare operator handoff without holding signing material. Mainnet deployment remains gated by approved network deploy/orchestration tooling, real public deploy results/receipts from that path, external oracle transaction assembly/signing/broadcast/deploy operation, and release hardening.
 
 *The fire belongs to humanity, not to corporations.*
 
@@ -80,7 +80,7 @@ Light Client (Phi-3-mini)          Guardian (LLaMA 3)           Kaspa L1
 
 - **Network**: Kaspa with Silverscript smart contracts
 - **Testnet**: kaspa-testnet-10 for legacy tests; post-Toccata deployment requires current Toccata/TN tooling checks
-- **Compiler**: current Silverc gates pass for H-001, ValidatorStakingState, GuardianReputationState, RuleStorageState, CommunityDonationsState, DevIncentivePoolState, and GovernanceAutoTuningState; release-bundle, deploy-preflight, external deploy-request generation/verification, public orchestrator-result receipt import, deployment-receipt, deployment-status staging, operator-handoff, metrics-report, and unsigned oracle tx-request gates are covered; approved network deploy/orchestration, real public deploy receipts, and external signed oracle transaction integration still gate Prometheus deployment
+- **Compiler**: current Silverc gates pass for H-001, ValidatorStakingState, GuardianReputationState, RuleStorageState, CommunityDonationsState, DevIncentivePoolState, and GovernanceAutoTuningState; release-bundle, deploy-preflight, external deploy-request generation/verification, public orchestrator-result receipt import, deployment-receipt, deployment-status staging, operator-handoff, metrics-report, unsigned oracle tx-request, and public oracle tx-result verification gates are covered; approved network deploy/orchestration, real public deploy receipts, and external signed oracle transaction operation still gate Prometheus deployment
 - **Consensus**: high-throughput Kaspa BlockDAG / DAGKnight path
 - **Contracts**: 6 Silverscript contracts (see Section 10)
 
@@ -318,7 +318,7 @@ Fully automated parameter adjustment (Architecture Decision #5):
 
 Tuning interval: weekly (604,800 blocks). Parameter bounds enforced to prevent extreme values.
 
-**Q-003 update**: the legacy `.ss` contract kept `fp_rate` as a stub. The current-Silverc `GovernanceAutoTuningState.sil` path replaces that stub with a signed metrics-oracle report containing active validators, active guardians, proposals/day, and `fp_rate` bounded to `0..10000`. Public report preflight and unsigned tx-request handoff are covered without repository-held signing material; external transaction assembly, signing, and deploy integration remain deployment work.
+**Q-003 update**: the legacy `.ss` contract kept `fp_rate` as a stub. The current-Silverc `GovernanceAutoTuningState.sil` path replaces that stub with a signed metrics-oracle report containing active validators, active guardians, proposals/day, and `fp_rate` bounded to `0..10000`. Public report preflight, unsigned tx-request handoff, and public tx-result verification are covered without repository-held signing material or raw transaction payloads; external transaction assembly, signing, broadcast, and real network operation remain deployment work.
 
 ---
 
@@ -380,7 +380,7 @@ This is a deliberate design decision, not an oversight. Architecture Decision #3
 | Sprint 6: E2E | March 2026 | ACCEPTED |
 | Sprint 7: Dashboard | March 2026 | ACCEPTED |
 | Sprint 8: Public Site | March/July 2026 | ACCEPTED / ongoing documentation maintenance |
-| **Kaspa Toccata / post-fork verification** | **June/July 2026** | **Post-fork environment; H-001, ValidatorStaking, GuardianReputation, RuleStorage, CommunityDonations, DevIncentivePool, GovernanceAutoTuning, release-bundle, deploy-preflight, external deploy-request verification, public orchestrator-result receipt import, deployment-receipt, operator-handoff, metrics-report, and unsigned oracle tx-request gates verified in CI** |
+| **Kaspa Toccata / post-fork verification** | **June/July 2026** | **Post-fork environment; H-001, ValidatorStaking, GuardianReputation, RuleStorage, CommunityDonations, DevIncentivePool, GovernanceAutoTuning, release-bundle, deploy-preflight, external deploy-request verification, public orchestrator-result receipt import, deployment-receipt, operator-handoff, metrics-report, unsigned oracle tx-request, and public oracle tx-result verification gates verified in CI** |
 | Mainnet Launch | Post-verification | PLANNED; gated by network deploy/orchestration tooling, real public deploy results/receipts, external signed oracle transaction integration, and release hardening |
 
 ---

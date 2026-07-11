@@ -43,7 +43,8 @@ python3 scripts/verify_silverc_deploy_receipts.py --archive /tmp/prometheus-silv
 python3 scripts/stage_silverc_deployment_status.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --operator-receipts /path/to/operator-record-receipts.json --status-out /tmp/prometheus-silverc-status-draft.json --snippet-out /tmp/prometheus-silverc-status-draft.md
 python3 scripts/preflight_metrics_oracle_report.py --report modules/contracts/silverc/metrics-oracle-report.sample.json --plan-out /tmp/prometheus-metrics-oracle-preflight.json --runbook-out /tmp/prometheus-metrics-oracle-runbook.md
 python3 scripts/build_metrics_oracle_tx_request.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --report modules/contracts/silverc/metrics-oracle-report.sample.json --contract-instance-id sandbox:governance-auto-tuning-state-fixture-0001 --tx-request-out /tmp/prometheus-metrics-oracle-tx-request.json --runbook-out /tmp/prometheus-metrics-oracle-tx-request.md
-python3 scripts/build_silverc_operator_handoff.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --out-dir /tmp/prometheus-silverc-operator-handoff --network sandbox --rpc-url ws://127.0.0.1:17210 --deployer-address kaspatest:qptestpreflight000000000000000000000000000000000 --metrics-oracle-pubkey 1111111111111111111111111111111111111111111111111111111111111111 --orchestrator-results /path/to/public-external-deploy-results.json
+python3 scripts/verify_metrics_oracle_tx_result.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --tx-request /tmp/prometheus-metrics-oracle-tx-request.json --tx-result /path/to/public-metrics-oracle-tx-result.json --summary-out /tmp/prometheus-metrics-oracle-tx-result-summary.json --runbook-out /tmp/prometheus-metrics-oracle-tx-result.md
+python3 scripts/build_silverc_operator_handoff.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --out-dir /tmp/prometheus-silverc-operator-handoff --network sandbox --rpc-url ws://127.0.0.1:17210 --deployer-address kaspatest:qptestpreflight000000000000000000000000000000000 --metrics-oracle-pubkey 1111111111111111111111111111111111111111111111111111111111111111 --orchestrator-results /path/to/public-external-deploy-results.json --metrics-tx-result /path/to/public-metrics-oracle-tx-result.json
 ```
 
 ## ValidatorStakingState.sil
@@ -338,6 +339,30 @@ Without `--contract-instance-id`, the request status remains
 ID or outpoint, the status becomes `READY_FOR_EXTERNAL_TX_ASSEMBLER`; signing
 and broadcast still remain outside this repository. CI checks both states and a
 negative `--require-contract-instance-id` failure path.
+
+## Metrics-oracle transaction result verifier
+
+`scripts/verify_metrics_oracle_tx_result.py` validates a public record of an
+external `GovernanceAutoTuningState.reportMetrics` transaction after an
+operator has assembled, signed, broadcast, and confirmed it outside this
+repository.
+
+The verifier requires the signer-ready unsigned tx request plus the release
+bundle. It checks:
+
+- `result_type = prometheus.metrics_oracle.report_metrics.tx_result`
+- `status = confirmed` and `provenance.type = operator_record`
+- matching network, request SHA-256, contract name, entrypoint, and instance ID
+- matching metrics payload hash and entrypoint argument hash
+- public transaction evidence: tx id, block hash, confirmations, DAA score, and
+  UTC broadcast/confirmation timestamps
+- absence of private keys, seeds, wallet data, keystore material, and raw or
+  serialized transaction payloads
+
+It emits `METRICS_ORACLE_TX_RESULT_VERIFIED` plus a Markdown runbook for
+operator review. It does not accept keys, sign, assemble, broadcast, deploy, or
+update status files. CI covers a positive public result plus blocked request,
+secret-field, raw-transaction, and request-hash tamper rejection paths.
 
 ## DevIncentivePoolState.sil
 

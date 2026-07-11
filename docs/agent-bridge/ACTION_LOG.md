@@ -2,6 +2,10 @@
 
 ## 2026-07-11
 
+- Added `scripts/verify_metrics_oracle_tx_result.py`, a public-only verifier for confirmed GovernanceAutoTuning metrics-oracle transaction records. It binds the public result to the signer-ready unsigned request and release bundle, rejects signing material and raw/serialized transaction payloads, and emits JSON/Markdown operator evidence without signing, assembling, broadcasting, deploying, or updating status files.
+- Extended `scripts/build_silverc_operator_handoff.py` with optional `--metrics-tx-result`; handoff packages can now include `metrics-oracle-tx-result-summary.json` and `metrics-oracle-tx-result.md` while still preserving the remaining real deployment blockers.
+- Extended Prometheus CI with public oracle tx-result verification: positive confirmed operator-record fixture plus blocked-request, secret-field, raw-transaction, and request-hash tamper rejection paths.
+- Local checks passed for the verifier and handoff integration against a fresh current-Silverc archive; Sprint 9 remains blocked by missing network deploy/orchestration, real deploy results/receipts, external signed oracle transaction operation, and release hardening.
 - Added `scripts/build_silverc_operator_receipts.py`, a public-only importer that converts confirmed external deploy-orchestrator results into canonical `operator_record` receipts. It validates the release bundle, re-validates the deploy request set, binds every result to a verified request hash, rejects secret-like fields, and immediately re-validates the generated receipts.
 - Extended Prometheus CI with the public orchestrator-result receipt import path: positive import, generated receipt verification, status staging from generated receipts, secret-field rejection, and request-hash tamper rejection.
 - Extended `scripts/build_silverc_operator_handoff.py` with optional `--orchestrator-results`; handoff packages can now include `operator-receipts.from-results.json`, `operator-receipts-import-summary.json`, and `operator-receipts-import.md` while still reporting real blockers.

@@ -240,6 +240,7 @@ jobs:
           test -s /tmp/prometheus-silverc-deploy-requests/07-GovernanceAutoTuningState.deploy-request.json
           python3 - <<'PY'
           import json
+          import hashlib
           import subprocess
           from pathlib import Path
 
@@ -563,6 +564,71 @@ jobs:
           assert ready["status"] == "READY_FOR_EXTERNAL_TX_ASSEMBLER"
           assert ready["blockers"] == []
 
+          tx_result_path = Path("/tmp/prometheus-metrics-oracle-tx-result.json")
+          tx_result = {
+              "schema_version": 1,
+              "result_type": "prometheus.metrics_oracle.report_metrics.tx_result",
+              "network": ready["network"],
+              "provenance": {
+                  "type": "operator_record",
+                  "assembler": "ci-public-metrics-tx-assembler",
+                  "recorded_at": "2026-07-11T00:00:00Z",
+              },
+              "tx_request_sha256": ready["request_sha256"],
+              "status": "confirmed",
+              "contract": {
+                  "name": ready["contract"]["name"],
+                  "entrypoint": ready["contract"]["entrypoint"],
+                  "instance_id": ready["contract"]["instance_id"],
+              },
+              "metrics_report": {
+                  "payload_sha256": ready["metrics_report"]["payload_sha256"],
+              },
+              "entrypoint_args_sha256": hashlib.sha256(
+                  json.dumps(ready["entrypoint_args"], sort_keys=True, separators=(",", ":")).encode()
+              ).hexdigest(),
+              "transaction": {
+                  "tx_id": "3" * 64,
+                  "block_hash": "4" * 64,
+                  "confirmations": 12,
+                  "block_daa_score": 300001,
+                  "broadcast_at": "2026-07-11T00:00:00Z",
+                  "confirmed_at": "2026-07-11T00:00:30Z",
+              },
+          }
+          tx_result_path.write_text(json.dumps(tx_result, indent=2, sort_keys=True) + "\n")
+
+          subprocess.run(
+              [
+                  "python3",
+                  "scripts/verify_metrics_oracle_tx_result.py",
+                  "--archive",
+                  "/tmp/prometheus-silverc-artifacts.tar.gz",
+                  "--tx-request",
+                  ready_path,
+                  "--tx-result",
+                  str(tx_result_path),
+                  "--summary-out",
+                  "/tmp/prometheus-metrics-oracle-tx-result-summary.json",
+                  "--runbook-out",
+                  "/tmp/prometheus-metrics-oracle-tx-result.md",
+              ],
+              check=True,
+          )
+          tx_summary = json.loads(Path("/tmp/prometheus-metrics-oracle-tx-result-summary.json").read_text())
+          tx_runbook = Path("/tmp/prometheus-metrics-oracle-tx-result.md").read_text()
+          assert tx_summary["status"] == "METRICS_ORACLE_TX_RESULT_VERIFIED"
+          assert tx_summary["provenance_type"] == "operator_record"
+          assert tx_summary["tx_request_sha256"] == ready["request_sha256"]
+          assert tx_summary["contract"]["instance_id"] == "sandbox:governance-auto-tuning-state-fixture-0001"
+          assert tx_summary["safety"]["accepts_private_keys"] is False
+          assert tx_summary["safety"]["accepts_raw_transactions"] is False
+          assert tx_summary["safety"]["signs_transactions"] is False
+          assert tx_summary["safety"]["assembles_chain_transaction"] is False
+          assert tx_summary["safety"]["broadcasts_transactions"] is False
+          assert tx_summary["safety"]["updates_status_files"] is False
+          assert "rejects private keys" in tx_runbook
+
           proc = subprocess.run(
               [
                   "python3",
@@ -578,6 +644,86 @@ jobs:
           )
           assert proc.returncode != 0
           assert "--contract-instance-id is required" in proc.stderr
+
+          proc = subprocess.run(
+              [
+                  "python3",
+                  "scripts/verify_metrics_oracle_tx_result.py",
+                  "--archive",
+                  "/tmp/prometheus-silverc-artifacts.tar.gz",
+                  "--tx-request",
+                  "/tmp/prometheus-metrics-oracle-tx-request.json",
+                  "--tx-result",
+                  str(tx_result_path),
+              ],
+              text=True,
+              capture_output=True,
+          )
+          assert proc.returncode != 0
+          assert "tx_request.status: expected READY_FOR_EXTERNAL_TX_ASSEMBLER" in proc.stderr
+
+          bad = json.loads(tx_result_path.read_text())
+          bad["_".join(["private", "key"])] = "do-not-accept"
+          bad_path = Path("/tmp/prometheus-metrics-oracle-tx-result-secret.json")
+          bad_path.write_text(json.dumps(bad, indent=2, sort_keys=True) + "\n")
+          proc = subprocess.run(
+              [
+                  "python3",
+                  "scripts/verify_metrics_oracle_tx_result.py",
+                  "--archive",
+                  "/tmp/prometheus-silverc-artifacts.tar.gz",
+                  "--tx-request",
+                  ready_path,
+                  "--tx-result",
+                  str(bad_path),
+              ],
+              text=True,
+              capture_output=True,
+          )
+          assert proc.returncode != 0
+          assert "secret-like fields are not allowed" in proc.stderr
+
+          bad = json.loads(tx_result_path.read_text())
+          bad["tx_request_sha256"] = "0" * 64
+          bad_path = Path("/tmp/prometheus-metrics-oracle-tx-result-tamper.json")
+          bad_path.write_text(json.dumps(bad, indent=2, sort_keys=True) + "\n")
+          proc = subprocess.run(
+              [
+                  "python3",
+                  "scripts/verify_metrics_oracle_tx_result.py",
+                  "--archive",
+                  "/tmp/prometheus-silverc-artifacts.tar.gz",
+                  "--tx-request",
+                  ready_path,
+                  "--tx-result",
+                  str(bad_path),
+              ],
+              text=True,
+              capture_output=True,
+          )
+          assert proc.returncode != 0
+          assert "tx_request_sha256 mismatch" in proc.stderr
+
+          bad = json.loads(tx_result_path.read_text())
+          bad["transaction"]["raw_transaction"] = "do-not-accept"
+          bad_path = Path("/tmp/prometheus-metrics-oracle-tx-result-raw.json")
+          bad_path.write_text(json.dumps(bad, indent=2, sort_keys=True) + "\n")
+          proc = subprocess.run(
+              [
+                  "python3",
+                  "scripts/verify_metrics_oracle_tx_result.py",
+                  "--archive",
+                  "/tmp/prometheus-silverc-artifacts.tar.gz",
+                  "--tx-request",
+                  ready_path,
+                  "--tx-result",
+                  str(bad_path),
+              ],
+              text=True,
+              capture_output=True,
+          )
+          assert proc.returncode != 0
+          assert "raw or serialized transaction fields are not allowed" in proc.stderr
           PY
       - name: Verify sample deployment receipts
         run: |
@@ -758,6 +904,7 @@ jobs:
           assert summary["operator_receipts_status"] == "MISSING_OPERATOR_RECORD"
           assert summary["metrics_report_status"] == "READY_FOR_TX_BUILDER"
           assert summary["metrics_tx_request_status"] == "BLOCKED_UNTIL_CONTRACT_INSTANCE_ID"
+          assert summary["metrics_tx_result_status"] == "NOT_PROVIDED"
           assert summary["safety"]["accepts_private_keys"] is False
           assert summary["safety"]["signs_transactions"] is False
           assert summary["safety"]["assembles_chain_transaction"] is False
@@ -793,11 +940,38 @@ jobs:
           assert summary["status"] == "HANDOFF_BLOCKED"
           assert summary["operator_receipt_import_status"] == "OPERATOR_RECEIPTS_READY_FOR_STATUS_STAGING"
           assert summary["operator_receipts_status"] == "READY_FOR_STATUS_RECORDING"
+          assert summary["metrics_tx_result_status"] == "NOT_PROVIDED"
           assert "operator-receipts.from-results.json" in summary["included_files"]
           assert "operator-receipts-import-summary.json" in summary["included_files"]
           assert "operator-receipts-import.md" in summary["included_files"]
           assert "upstream silverc exposes no network deploy command" in summary["blockers"]
           assert "missing verified operator_record deployment receipts" not in summary["blockers"]
+          PY
+          python3 scripts/build_silverc_operator_handoff.py \
+            --archive /tmp/prometheus-silverc-artifacts.tar.gz \
+            --out-dir /tmp/prometheus-silverc-operator-handoff-oracle-result \
+            --network sandbox \
+            --rpc-url ws://127.0.0.1:17210 \
+            --deployer-address kaspatest:qptestpreflight000000000000000000000000000000000 \
+            --metrics-oracle-pubkey 1111111111111111111111111111111111111111111111111111111111111111 \
+            --orchestrator-results /tmp/prometheus-silverc-external-deploy-results.json \
+            --contract-instance-id sandbox:governance-auto-tuning-state-fixture-0001 \
+            --metrics-tx-result /tmp/prometheus-metrics-oracle-tx-result.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          root = Path("/tmp/prometheus-silverc-operator-handoff-oracle-result")
+          summary = json.loads((root / "operator-handoff-summary.json").read_text())
+          assert summary["status"] == "HANDOFF_BLOCKED"
+          assert summary["operator_receipts_status"] == "READY_FOR_STATUS_RECORDING"
+          assert summary["metrics_tx_request_status"] == "READY_FOR_EXTERNAL_TX_ASSEMBLER"
+          assert summary["metrics_tx_result_status"] == "METRICS_ORACLE_TX_RESULT_VERIFIED"
+          assert "metrics-oracle-tx-result-summary.json" in summary["included_files"]
+          assert "metrics-oracle-tx-result.md" in summary["included_files"]
+          assert "upstream silverc exposes no network deploy command" in summary["blockers"]
+          assert "missing verified operator_record deployment receipts" not in summary["blockers"]
+          assert "missing verified metrics-oracle transaction result" not in summary["blockers"]
           PY
 
   # ─── Rust Workspace Check ───────────────────────────────────────────────────
