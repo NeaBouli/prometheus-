@@ -2,6 +2,11 @@
 
 ## 2026-07-11
 
+- GitHub Prometheus CI, Security Audit, and Pages passed for `73069fd`; the pinned Silverc runtime job now passes 49 upstream-injected tests and CI has a DevIncentivePoolState fixture guard.
+- Added current-Silverscript DevIncentivePool state fixture `modules/contracts/silverc/DevIncentivePoolState.sil` and runtime gates for `proposeGrant`, `voteGrant`, and `executeGrant`.
+- Verified accepted paths: valid grant proposal, valid validator support vote, and approved grant execution.
+- Verified rejected paths: grant amount above `MAX_GRANT_PROM`, vote at `voting_end_block`, execution below `QUORUM_VOTES`, and execution below `VALIDATOR_QUORUM`.
+- DevIncentivePoolState keeps PROM-denominated grant pool accounting without introducing PROM staking or pretending to perform direct PROM `transfer(...)`; the legacy `deposit()` ACL question remains a deployment/orchestration decision once emission authority is finalized.
 - GitHub Prometheus CI, Security Audit, and Pages passed for `26c31c0`; the pinned Silverc runtime job now passes 41 upstream-injected tests.
 - Extended `scripts/verify_silverc_h001.py` with CommunityDonationsState runtime tests for `donateKas`, `proposeDisbursement`, `voteDisbursement`, and `executeDisbursement`.
 - Verified accepted paths: valid donor donation, valid disbursement proposal, valid validator support vote, and approved governance execution.
@@ -17,7 +22,7 @@
 - Verified accepted paths: valid guardian proposal submission, valid validator support vote, accepted proposal finalization, rejected proposal finalization, and active accepted rule deactivation.
 - Verified rejected paths: confidence below `MIN_CONFIDENCE`, vote at `voting_end_block`, zero-vote finalization, and deactivation of a pending/non-accepted rule.
 - Local verifier passed: `python3 scripts/verify_silverc_h001.py` injected 32 upstream tests and all passed at Silverscript ref `d25bd3427a093c17327ca3d6b9e1aa5f7688c863`.
-- Sprint 9 remains blocked until remaining deployment-scoped contract ports pass current-Silverc compile/runtime gates; RuleStorage runtime coverage reduces, but does not remove, the deploy blocker.
+- Sprint 9 remained blocked after RuleStorage runtime coverage; the current blocker has since narrowed to GovernanceAutoTuning/Q-003 plus deploy smoke after CommunityDonations and DevIncentivePool runtime gates.
 
 ## 2026-07-09
 

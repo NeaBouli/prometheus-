@@ -80,7 +80,7 @@ Light Client (Phi-3-mini)          Guardian (LLaMA 3)           Kaspa L1
 
 - **Network**: Kaspa with Silverscript smart contracts
 - **Testnet**: kaspa-testnet-10 for legacy tests; post-Toccata deployment requires current Toccata/TN tooling checks
-- **Compiler**: current Silverc gates pass for H-001, ValidatorStakingState, GuardianReputationState, and RuleStorageState; remaining deployment-scoped contract ports are still required before Prometheus deployment
+- **Compiler**: current Silverc gates pass for H-001, ValidatorStakingState, GuardianReputationState, RuleStorageState, CommunityDonationsState, and DevIncentivePoolState; GovernanceAutoTuning/Q-003 and deploy smoke still gate Prometheus deployment
 - **Consensus**: high-throughput Kaspa BlockDAG / DAGKnight path
 - **Contracts**: 6 Silverscript contracts (see Section 10)
 

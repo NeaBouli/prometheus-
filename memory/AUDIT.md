@@ -398,8 +398,8 @@ Update:   Current-silverc fixture `ValidatorStakingH001.sil` now verifies
           `VALIDATOR_QUORUM = 6700` while leaving legacy maps, KRC20 minting,
           events, and cross-contract calls out of the current-Silverc fixture
           scope.
-Action:   Port/compile the remaining deployment-scoped contracts.
-Severity: HIGH until remaining deployment-scoped contract ports are verified
+Action:   Resolve GovernanceAutoTuning/Q-003 and prove the deploy smoke path.
+Severity: HIGH until remaining current-Silverc runtime/deploy gates are verified
 ```
 
 **H-002: Arc<Mutex<Phi3Model>> unnecessary lock (Check 2.2, PATTERN-010)**
@@ -546,10 +546,9 @@ Audit confidence:       94%
 (Deduction: ValidatorStaking current-silverc compile/ABI and runtime
  transitions plus signed-int deployment bounds are verified,
  GuardianReputation current-silverc compile/ABI/runtime/formula gates are
- verified, RuleStorage current-silverc compile/ABI/runtime gates are
- verified locally/in CI, and CommunityDonations current-silverc compile/ABI/runtime
- gates are verified locally/in CI,
- but remaining deployment-scoped contract ports and LLM confidence extraction
+ verified, RuleStorage, CommunityDonations, and DevIncentivePool current-silverc
+ compile/ABI/runtime gates are verified locally/in CI,
+ but GovernanceAutoTuning/Q-003, deploy smoke, and LLM confidence extraction
  remain open)
 ```
 
@@ -560,9 +559,9 @@ compiles/builds covenant sigscripts, and `commitVote`/`revealVote`/
 `slashInvalidReveal`/`requestWithdraw`/`completeWithdraw` runtime tests pass.
 The signed-int/u64 boundary is resolved by constraining current-Silverc
 deployment inputs to `0..=i64::MAX`; GuardianReputationState runtime/formula
-gates, RuleStorageState runtime gates, and CommunityDonationsState runtime gates
-now pass locally/in CI, and the remaining
-deployment-scoped contract ports must pass before Sprint 9 deployment.
+gates, RuleStorageState runtime gates, CommunityDonationsState runtime gates,
+and DevIncentivePoolState runtime gates now pass locally/in CI. GovernanceAutoTuning/Q-003
+and the deploy smoke path must pass before Sprint 9 deployment.
 M-001 and M-002 can wait until full release (Aug/Sep 2026).
 
 *Audit completed 2026-04-02 by Claude Code (5 parallel agents, 7 levels, 35 checks).*

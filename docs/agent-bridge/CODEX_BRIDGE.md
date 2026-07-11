@@ -3,10 +3,10 @@
 Last updated: 2026-07-11 EEST
 Repo path: /Users/gio/Desktop/repos/prometheus
 Branch observed: main
-Latest product-code baseline observed: `3e53e29 feat: add rule storage silverc fixture`
-Latest verified feature baseline observed: `26c31c0 test: add community donations runtime gates`
-Latest CI note: Prometheus CI, Security Audit, and Pages passed for `26c31c0`; RuleStorage and CommunityDonations runtime gates are verified locally and remotely in the pinned Silverc runtime job, now 41 upstream-injected tests.
-Latest public-docs note: README, `WHITEPAPER.md`, and `whitepaper.html` were refreshed to reflect post-Toccata deployment gating, verified current-Silverc H-001/Validator/Guardian/RuleStorage/CommunityDonations runtime gates, target-only PROM-RULES asset orchestration, and the no-Kasplex-reputation rule.
+Latest product-code baseline observed: `73069fd feat: add dev incentive pool silverc gates`
+Latest verified feature baseline observed: `73069fd feat: add dev incentive pool silverc gates`
+Latest CI note: Prometheus CI, Security Audit, and Pages passed for `73069fd`; RuleStorage, CommunityDonations, and DevIncentivePool runtime gates are verified locally and remotely in the pinned Silverc runtime job, now 49 upstream-injected tests.
+Latest public-docs note: README, `WHITEPAPER.md`, and `whitepaper.html` were refreshed to reflect post-Toccata deployment gating, verified current-Silverc H-001/Validator/Guardian/RuleStorage/CommunityDonations/DevIncentivePool runtime gates, target-only PROM-RULES asset orchestration, and the no-Kasplex-reputation rule.
 
 Purpose: This file is the local bridge for Codex/Claude Code handover. Read it before touching product code. It consolidates the project state, architecture rules, workflow logic, current open issues, the Reputation Badge decision, and the new direct Sandbox access note.
 
@@ -36,7 +36,7 @@ Mandatory safety checks:
 - Do not start parallel feature work. One task goes to verification before the next begins.
 - Do not change security, crypto, contract, auth, multisig, key-management, tokenomics, or governance behavior without an explicit risk note and Gio approval.
 - Do not add external dependencies to contracts without architect approval.
-- Do not continue Sprint 9/Mainnet deploy work until the remaining deployment-scoped contract ports compile and pass current-Silverc runtime gates.
+- Do not continue Sprint 9/Mainnet deploy work until GovernanceAutoTuning/Q-003 is resolved, the remaining current-Silverc port passes runtime gates, and the deploy smoke path is proven.
 
 ---
 
@@ -257,7 +257,7 @@ Mandatory checks by area:
 - Rust: `cargo fmt`, `cargo clippy -- -D warnings`, `cargo test`
 - HTML/static: verify structured data and links where relevant
 - Security: do not expose secrets; run targeted grep/gitleaks checks when touching configs/docs
-- Contracts: no Sprint 9 deploy until remaining deployment-scoped contract ports compile and pass runtime gates
+- Contracts: no Sprint 9 deploy until GovernanceAutoTuning/Q-003 is resolved, the remaining current-Silverc port passes runtime gates, and the deploy smoke path is proven
 - Before git add: verify files on disk with `git diff` and targeted reads
 
 No parallel open-ended work. No "finish later" state unless the user explicitly pauses the task and the bridge is updated.
@@ -297,7 +297,7 @@ Known consolidated status from memory/handover and user-provided synthesis:
 | 6 | E2E integration, 18 tests | ACCEPTED |
 | 7 | Dashboard and docs | ACCEPTED |
 | 8 | Contributing/wiki/site/SEO in older handover | ACCEPTED in older handover |
-| 9 | Contract deploy on Testnet/Mainnet path | BLOCKED until remaining deployment-scoped contract ports pass current-Silverc compile/runtime gates |
+| 9 | Contract deploy on Testnet/Mainnet path | BLOCKED until GovernanceAutoTuning/Q-003, remaining current-Silverc runtime gate, and deploy smoke path pass |
 | 10B | Guardian decentralization | Startable, but architecture-sensitive |
 
 Test status from user synthesis:
@@ -315,7 +315,7 @@ Pre-hardfork audit synthesis:
 | Severity | Count | Notes |
 | --- | ---: | --- |
 | Critical | 0 | None known |
-| High | 2 | H-001 byte-core + ValidatorStakingState runtime transitions + signed-int deployment bounds verified; GuardianReputationState compile/ABI, runtime transitions, and accepted-proposal formula verified; RuleStorageState and CommunityDonationsState compile/ABI/runtime gates verified in CI; H-002 fixed |
+| High | 2 | H-001 byte-core + ValidatorStakingState runtime transitions + signed-int deployment bounds verified; GuardianReputationState compile/ABI, runtime transitions, and accepted-proposal formula verified; RuleStorageState, CommunityDonationsState, and DevIncentivePoolState compile/ABI/runtime gates verified in CI; H-002 fixed |
 | Medium | 2 | M-001 heuristic confidence; M-002 flaky perf test |
 | Low | 3 | L-001 deposit ACL, L-002 fp_rate stub, L-003 CEI |
 | Passed clean | 28 | From 35-check audit synthesis |
@@ -324,7 +324,7 @@ Critical active rule:
 
 ```text
 H-001 byte-core, current-silverc `ValidatorStakingState.sil` runtime transitions, and deployment signed-int bounds are verified. Current upstream Silverc entrypoint integers are signed, so deployable `salt` and `block_height` values are scoped to `0..=i64::MAX`; Rust keeps the raw H-001 `u64` byte helper for historical vectors and exposes `build_silverc_checked` / `validate_silverc_commitment_bounds` for deployment calls.
-On 2026-07-11, the repo contains `modules/contracts/silverc/ValidatorStakingH001.sil`, `modules/contracts/silverc/ValidatorStakingState.sil`, `modules/contracts/silverc/GuardianReputationState.sil`, `modules/contracts/silverc/RuleStorageState.sil`, `modules/contracts/silverc/CommunityDonationsState.sil`, and `scripts/verify_silverc_h001.py`; the script verifies explicit `vote_byte || byte[8](salt) || byte[8](block_height)` against the Rust H-001 vectors, proves signed negative Silverc values do not match the Rust `u64::MAX` vector, compiles/builds covenant sigscripts for the ValidatorStaking state fixture, runtime-tests `commitVote` valid-bond acceptance plus low-bond/negative-height rejection, `revealVote` valid-reveal acceptance plus wrong-salt/negative-salt rejection, `slashInvalidReveal` invalid-reveal acceptance plus valid-reveal/negative-salt rejection, `requestWithdraw` active-uncommitted acceptance plus open-commitment/negative-height rejection, and `completeWithdraw` zero-output termination after cooldown plus cooldown rejection, compiles/builds/runtime-tests GuardianReputation `register`, `proposalAccepted`, and `proposalRejected` with exact `isqrt(compute_power) * 100` accepted-proposal formula, compiles/builds/runtime-tests RuleStorage `submitProposal`, `voteOnProposal`, `finalizeProposal`, and `deactivateRule`, and compiles/builds/runtime-tests CommunityDonations `donateKas`, `proposeDisbursement`, `voteDisbursement`, and `executeDisbursement` including zero-donation, over-pool proposal, late-vote, and insufficient-quorum rejection paths at pinned Silverscript ref `d25bd3427a093c17327ca3d6b9e1aa5f7688c863`.
+On 2026-07-11, the repo contains `modules/contracts/silverc/ValidatorStakingH001.sil`, `modules/contracts/silverc/ValidatorStakingState.sil`, `modules/contracts/silverc/GuardianReputationState.sil`, `modules/contracts/silverc/RuleStorageState.sil`, `modules/contracts/silverc/CommunityDonationsState.sil`, `modules/contracts/silverc/DevIncentivePoolState.sil`, and `scripts/verify_silverc_h001.py`; the script verifies explicit `vote_byte || byte[8](salt) || byte[8](block_height)` against the Rust H-001 vectors, proves signed negative Silverc values do not match the Rust `u64::MAX` vector, compiles/builds covenant sigscripts for the ValidatorStaking state fixture, runtime-tests `commitVote` valid-bond acceptance plus low-bond/negative-height rejection, `revealVote` valid-reveal acceptance plus wrong-salt/negative-salt rejection, `slashInvalidReveal` invalid-reveal acceptance plus valid-reveal/negative-salt rejection, `requestWithdraw` active-uncommitted acceptance plus open-commitment/negative-height rejection, and `completeWithdraw` zero-output termination after cooldown plus cooldown rejection, compiles/builds/runtime-tests GuardianReputation `register`, `proposalAccepted`, and `proposalRejected` with exact `isqrt(compute_power) * 100` accepted-proposal formula, compiles/builds/runtime-tests RuleStorage `submitProposal`, `voteOnProposal`, `finalizeProposal`, and `deactivateRule`, compiles/builds/runtime-tests CommunityDonations `donateKas`, `proposeDisbursement`, `voteDisbursement`, and `executeDisbursement`, and compiles/builds/runtime-tests DevIncentivePool `proposeGrant`, `voteGrant`, and `executeGrant` including max-grant, late-vote, quorum, and approval rejection paths at pinned Silverscript ref `d25bd3427a093c17327ca3d6b9e1aa5f7688c863`.
 ```
 
 Known findings:
@@ -333,6 +333,7 @@ Known findings:
 - GuardianReputation current-Silverc port: `GuardianReputationState.sil` compile/ABI and runtime gates pass for `register`, `proposalAccepted`, and `proposalRejected` without badge, NFT, Kasplex, or staking semantics. The accepted-proposal reputation formula is restored as exact bounded `isqrt(compute_power_gflops) * 100`.
 - RuleStorage current-Silverc port: `RuleStorageState.sil` compile/ABI/runtime gates pass for `submitProposal`, `voteOnProposal`, `finalizeProposal`, and `deactivateRule`; valid submit/vote/finalize/deactivate transitions are accepted, low confidence, late vote, zero-vote finalization, and pending-rule deactivation are rejected. It keeps CIDv1 `byte[36]`, `MIN_CONFIDENCE = 8500`, `VALIDATOR_QUORUM = 6700`, and explicit Guardian reputation outcome events without pretending to support legacy maps, KRC20 minting, or cross-contract calls in current Silverc.
 - CommunityDonations current-Silverc port: `CommunityDonationsState.sil` compile/ABI/runtime gates pass locally and in CI for `donateKas`, `proposeDisbursement`, `voteDisbursement`, and `executeDisbursement`; valid donate/propose/vote/execute transitions are accepted, zero donation, over-pool proposal, late vote, and insufficient quorum are rejected. It keeps KAS-denominated pool accounting, `MIN_DONATION_KAS = 1`, `DISBURSEMENT_QUORUM = 10`, and `VALIDATOR_QUORUM = 6700` without pretending to support legacy maps, strings, `tx.value`, direct KAS transfer, or cross-contract validator lookups in current Silverc.
+- DevIncentivePool current-Silverc port: `DevIncentivePoolState.sil` compile/ABI/runtime gates pass locally and in CI for `proposeGrant`, `voteGrant`, and `executeGrant`; valid propose/vote/execute transitions are accepted, amount above `MAX_GRANT_PROM`, late vote, insufficient quorum, and insufficient approval are rejected. It keeps PROM-denominated grant pool accounting without introducing PROM staking or pretending to support legacy maps, strings, `msg.sender`, direct PROM transfer, or cross-contract validator lookups in current Silverc. Legacy `deposit()` ACL remains a deployment/orchestration decision once emission authority is finalized.
 - H-002: unnecessary Mutex around Phi3Model. Fixed in commit `6347b85` according to memory/handover.
 - M-001: Guardian YARA generator confidence is heuristic, needs real LLM confidence or validated metric.
 - M-002: performance test flaky in debug mode, threshold/release gate needed.
@@ -526,7 +527,7 @@ If asked to continue project work:
 
 ## 18. One-Line Decision Summary
 
-Prometheus does not need reputation badges; it needs readable, provable Kaspa L1 Guardian reputation. Codex has direct Sandbox access via `ssh sandbox`, upstream `silverc` works in CI, H-001 byte-core plus current-silverc `ValidatorStakingState.sil` runtime transitions pass, `GuardianReputationState.sil` compile/ABI/runtime/formula gates pass, `RuleStorageState.sil` compile/ABI/runtime gates pass, `CommunityDonationsState.sil` compile/ABI/runtime gates pass, signed-int deployment bounds are documented/enforced, and Sprint 9 remains blocked until remaining deployment-scoped contract ports pass.
+Prometheus does not need reputation badges; it needs readable, provable Kaspa L1 Guardian reputation. Codex has direct Sandbox access via `ssh sandbox`, upstream `silverc` works in CI, H-001 byte-core plus current-silverc `ValidatorStakingState.sil` runtime transitions pass, `GuardianReputationState.sil` compile/ABI/runtime/formula gates pass, `RuleStorageState.sil` compile/ABI/runtime gates pass, `CommunityDonationsState.sil` compile/ABI/runtime gates pass, `DevIncentivePoolState.sil` compile/ABI/runtime gates pass, signed-int deployment bounds are documented/enforced, and Sprint 9 remains blocked until GovernanceAutoTuning/Q-003 plus the deploy smoke path pass.
 <!-- CODEX_CLAUDE_CODE_TERMINAL_BRIDGE_V1 -->
 ## Codex -> Claude Code Terminal Bridge
 
