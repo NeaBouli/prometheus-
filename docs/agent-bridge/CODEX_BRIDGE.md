@@ -3,9 +3,9 @@
 Last updated: 2026-07-11 EEST
 Repo path: /Users/gio/Desktop/repos/prometheus
 Branch observed: main
-Latest product-code baseline observed: `f9d86a4 docs: record dev incentive pool runtime ci`
-Latest verified feature baseline observed: local working tree after `f9d86a4` adds GovernanceAutoTuningState current-Silverc gates; not yet committed/pushed at this bridge update point.
-Latest CI note: Prometheus CI, Security Audit, and Pages passed for `f9d86a4`; local pinned Silverc verifier now passes 55 upstream-injected tests including GovernanceAutoTuningState signed metrics and auto-tune runtime gates.
+Latest product-code baseline observed: `2bb7521 feat: add governance auto tuning silverc gates`
+Latest verified feature baseline observed: `2bb7521 feat: add governance auto tuning silverc gates`
+Latest CI note: Prometheus CI, Security Audit, and Pages passed for `2bb7521`; pinned Silverc runtime job now passes 55 upstream-injected tests including GovernanceAutoTuningState signed metrics and auto-tune runtime gates.
 Latest public-docs note: README, `WHITEPAPER.md`, and `whitepaper.html` were refreshed to reflect post-Toccata deployment gating, verified current-Silverc H-001/Validator/Guardian/RuleStorage/CommunityDonations/DevIncentivePool/GovernanceAutoTuning runtime gates, target-only PROM-RULES asset orchestration, and the no-Kasplex-reputation rule.
 
 Purpose: This file is the local bridge for Codex/Claude Code handover. Read it before touching product code. It consolidates the project state, architecture rules, workflow logic, current open issues, the Reputation Badge decision, and the new direct Sandbox access note.

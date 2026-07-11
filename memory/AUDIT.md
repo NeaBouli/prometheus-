@@ -565,7 +565,7 @@ Audit confidence:       94%
  GuardianReputation current-silverc compile/ABI/runtime/formula gates are
  verified, RuleStorage, CommunityDonations, DevIncentivePool, and
  GovernanceAutoTuning current-silverc compile/ABI/runtime gates are verified
- locally/in CI or pending remote CI for the latest governance addition,
+ locally/in CI,
  but deploy smoke, oracle operator integration, and LLM confidence extraction
  remain open)
 ```

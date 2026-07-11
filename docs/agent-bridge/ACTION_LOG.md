@@ -2,6 +2,7 @@
 
 ## 2026-07-11
 
+- GitHub Prometheus CI, Security Audit, and Pages passed for `2bb7521`; the pinned Silverc runtime job now passes 55 upstream-injected tests and CI has a GovernanceAutoTuningState fixture guard.
 - Added current-Silverscript GovernanceAutoTuning state fixture `modules/contracts/silverc/GovernanceAutoTuningState.sil` and runtime gates for `reportMetrics` and `autoTune`.
 - Q-003 is resolved in the current-Silverc contract path as signed metrics-oracle input for `fp_rate`; the legacy `.ss` stub remains archival, and the remaining work is oracle operator/deploy integration.
 - Verified accepted paths locally: signed metrics report, high-FP weekly auto-tuning, and zero-FP confidence reduction.
