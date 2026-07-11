@@ -1,18 +1,18 @@
 # prometheus — Backlog
 
 ## 🔴 Aktiv (diese Session)
-- Latest documented green product/tooling baseline is `cc6592a` on `main`; run `git log --oneline -1` for the current working HEAD.
-- Prometheus CI and Security Audit were green for `cc6592a`; latest observed GitHub Pages deployment was green for `144f71c`. Workflow actions use Node 24-compatible majors and current-Silverc CI validates the operator runbook plus metrics-oracle report preflight.
+- Latest documented green product/tooling baseline is `5fd385e` on `main`; run `git log --oneline -1` for the current working HEAD.
+- Prometheus CI, Security Audit, and GitHub Pages deployment were green for `5fd385e`. Workflow actions use Node 24-compatible majors and current-Silverc CI validates the operator runbook, metrics-oracle report preflight, and unsigned oracle tx-request builder.
 - Runtime stub gates added for Rust client; current-Silverc contract gates now cover H-001, ValidatorStaking, GuardianReputation, RuleStorage, CommunityDonations, DevIncentivePool, and GovernanceAutoTuning.
 - Local current-Silverc release-bundle smoke now compiles all 7 fixtures through pinned upstream `silverc` and writes a deterministic manifest plus optional archive with source/artifact/script hashes; deploy preflight validates the bundle/operator public inputs, emits a Markdown operator runbook, and confirms upstream `silverc` has no network deploy command.
-- Metrics-oracle report preflight validates public GovernanceAutoTuning `reportMetrics` payloads and rejects secret-like fields; unsigned oracle tx-request builder now binds public reports to GovernanceAutoTuning artifacts for external assembly/signing and passes local positive/blocked/negative checks.
+- Metrics-oracle report preflight validates public GovernanceAutoTuning `reportMetrics` payloads and rejects secret-like fields; unsigned oracle tx-request builder now binds public reports to GovernanceAutoTuning artifacts for external assembly/signing and passes local plus CI positive/blocked/negative checks.
 - Sprint 9 remains blocked by missing network deploy/orchestration tooling, external signed metrics-oracle transaction assembly/signing/deploy integration, and release hardening.
 
 ## 🟡 Nächste Session — STARTFLOW
 
 ### Pflicht VOR neuem Code:
 1. `cd /Users/gio/Desktop/repos/prometheus`
-2. `git log --oneline -5` — aktuellen HEAD prüfen; letzter dokumentierter grüner Produkt-/Tooling-Baseline-Commit ist `cc6592a`
+2. `git log --oneline -5` — aktuellen HEAD prüfen; letzter dokumentierter grüner Produkt-/Tooling-Baseline-Commit ist `5fd385e`
 3. Lies `memory/CHECKPOINT.md` — vollständiger Projektstatus
 4. Lies `memory/AUDIT.md` ab Zeile 337 — Pre-Hardfork-Audit-Ergebnisse
 5. Lies `memory/ERRORS.md` — 12 bekannte Patterns
@@ -24,7 +24,7 @@
 
 ### Nächste konkrete Tasks (Priorität):
 1. **[P0] Sprint 9 Vorbereitung** — current-Silverc network deploy/orchestration path klären; Artifact-Smoke, release archive, deploy preflight, and operator runbook are local/CI-covered, echter On-chain-Deploy fehlt mangels upstream deploy CLI.
-2. **[P1] Oracle Operator Integration** — external signed metrics-oracle transaction assembly/signer process für `GovernanceAutoTuningState.sil` operationalisieren; public report preflight is local- and CI-covered, unsigned tx-request builder is local-covered and pending remote CI.
+2. **[P1] Oracle Operator Integration** — external signed metrics-oracle transaction assembly/signer process für `GovernanceAutoTuningState.sil` operationalisieren; public report preflight and unsigned tx-request builder are local- and CI-covered.
 3. **[P1] Sprint 10B: Guardian Decentralization** — Hybrid routing (8B/70B), Ensemble voting (5x 8B)
 4. **[P2] fp_rate Oracle** — Q-003 current-Silverc contract gate uses signed metrics input; production external transaction assembly/signing/deploy integration remains
 5. **[P2] M-001** — Heuristic confidence in yara_generator.py durch LLM-Confidence ersetzen

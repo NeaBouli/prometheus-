@@ -12,7 +12,7 @@
 - [ ] [P0] Alle memory/-Dateien initial befüllen und pushen | Claude Code | Repo-Struktur
 - [x] [P0] Kaspa Testnet-10-Node installieren und starten (rusty-kaspa v1.1.0) | Claude Code | 2026-03-21
 - [x] [P0] Verbindung zum Testnet verifizieren (8 Peers, IBD active) | Claude Code | 2026-03-21
-- [~] [P0] Silverscript Compiler/Tooling installieren und testen | Claude Code | H-001 fixture verifies; ValidatorStaking state fixture compiles; commitVote/revealVote/slash/requestWithdraw/completeWithdraw runtime tests pass; signed-int deployment bounds enforced; GuardianReputationState compile/ABI/runtime/formula gates pass; RuleStorageState/CommunityDonationsState/DevIncentivePoolState/GovernanceAutoTuningState compile/ABI/runtime gates pass locally; all 7 current-Silverc fixtures compile via CLI JSON artifact smoke locally; deterministic release archive, deploy preflight, metrics report preflight, and unsigned oracle tx-request builder pass locally; network deploy/orchestration path pending because upstream `silverc` has no deploy command
+- [~] [P0] Silverscript Compiler/Tooling installieren und testen | Claude Code | H-001 fixture verifies; ValidatorStaking state fixture compiles; commitVote/revealVote/slash/requestWithdraw/completeWithdraw runtime tests pass; signed-int deployment bounds enforced; GuardianReputationState compile/ABI/runtime/formula gates pass; RuleStorageState/CommunityDonationsState/DevIncentivePoolState/GovernanceAutoTuningState compile/ABI/runtime gates pass locally; all 7 current-Silverc fixtures compile via CLI JSON artifact smoke locally; deterministic release archive, deploy preflight, metrics report preflight, and unsigned oracle tx-request builder pass locally and in CI; network deploy/orchestration path pending because upstream `silverc` has no deploy command
 - [ ] [P0] Hello-World Silverscript Contract auf Testnet deployen | Claude Code | PENDING: after current-Silverc deploy preflight is CI-green and network deploy/orchestration tooling exists
 - [x] [P0] rusty-kaspa als Dependency in Cargo.toml einbinden | Claude Code | 2026-03-21; pinned to v2.0.1 on 2026-07-07
 - [ ] [P0] autodidactic.py vollständig testen (alle Memory-Operationen) | Claude Code | memory/-Dateien
@@ -156,7 +156,7 @@
 - [ ] [P1] LLaMA 3 8B LoRA Fine-Tuning auf Security-Datensätzen | Claude Code | Datensätze
 - [ ] [P1] LLaMA 3 70B Fine-Tuning | Claude Code | 8B done
 - [ ] [P2] Fed-DART echte Implementierung (Gradient-Aggregation) | Claude Code | -
-- [~] [P2] fp_rate Oracle Contract + Integration | Claude Code | Current-Silverc contract gate uses signed metrics `fp_rate` input; public metrics report preflight added; unsigned oracle tx-request builder passes locally; external transaction assembly/signer/deploy integration pending
+- [~] [P2] fp_rate Oracle Contract + Integration | Claude Code | Current-Silverc contract gate uses signed metrics `fp_rate` input; public metrics report preflight added; unsigned oracle tx-request builder passes locally and in CI; external transaction assembly/signer/deploy integration pending
 
 ---
 
