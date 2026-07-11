@@ -274,6 +274,26 @@ def run_tx_request(
     return load_json(request_path)
 
 
+def run_metrics_operator_procedure(archive: Path, out_dir: Path) -> dict[str, Any]:
+    summary_path = out_dir / "metrics-oracle-operator-procedure.json"
+    runbook_path = out_dir / "metrics-oracle-operator-procedure.md"
+    run(
+        [
+            sys.executable,
+            "scripts/build_metrics_oracle_operator_procedure.py",
+            "--archive",
+            str(archive),
+            "--tx-request",
+            str(out_dir / "metrics-oracle-tx-request.json"),
+            "--summary-out",
+            str(summary_path),
+            "--runbook-out",
+            str(runbook_path),
+        ]
+    )
+    return load_json(summary_path)
+
+
 def run_metrics_tx_result_verification(archive: Path, out_dir: Path, metrics_tx_result: Path) -> dict[str, Any]:
     summary_path = out_dir / "metrics-oracle-tx-result-summary.json"
     runbook_path = out_dir / "metrics-oracle-tx-result.md"
@@ -352,6 +372,7 @@ def write_handoff_markdown(out_dir: Path, summary: dict[str, Any]) -> None:
             f"- Operator receipt verification: {summary['operator_receipts_status']}",
             f"- Metrics report preflight: {summary['metrics_report_status']}",
             f"- Metrics tx request: {summary['metrics_tx_request_status']}",
+            f"- Metrics operator procedure: {summary['metrics_operator_procedure_status']}",
             f"- Metrics tx result: {summary['metrics_tx_result_status']}",
             "",
             "## Blockers",
@@ -369,8 +390,9 @@ def write_handoff_markdown(out_dir: Path, summary: dict[str, Any]) -> None:
             "2. Deploy only through an approved external network deploy/orchestration tool.",
             "3. Import public external deploy results with `--orchestrator-results`, or provide verified `operator_record` receipts with `--operator-receipts`.",
             "4. Use only verified operator_record contract IDs for signer-ready oracle transaction requests.",
-            "5. Sign and broadcast outside this repository through the approved wallet/vault process, then verify the public result with `--metrics-tx-result`.",
-            "6. Update `memory/STATUS.md` only after all real receipts and transaction receipts verify.",
+            "5. Review `metrics-oracle-operator-procedure.md` before any external signing or broadcast.",
+            "6. Sign and broadcast outside this repository through the approved wallet/vault process, then verify the public result with `--metrics-tx-result`.",
+            "7. Update `memory/STATUS.md` only after all real receipts and transaction receipts verify.",
         ]
     )
     (out_dir / "HANDOFF.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
@@ -424,6 +446,9 @@ def main() -> int:
         )
     metrics_report_plan = run_metrics_report_preflight(report, out_dir)
     tx_request = run_tx_request(packaged_archive, report, out_dir, args.contract_instance_id)
+    metrics_operator_procedure = None
+    if tx_request["status"] == "READY_FOR_EXTERNAL_TX_ASSEMBLER":
+        metrics_operator_procedure = run_metrics_operator_procedure(packaged_archive, out_dir)
     tx_result_summary = None
     if metrics_tx_result_path:
         tx_result_summary = run_metrics_tx_result_verification(packaged_archive, out_dir, metrics_tx_result_path)
@@ -448,6 +473,9 @@ def main() -> int:
         ),
         "metrics_report_status": metrics_report_plan["status"],
         "metrics_tx_request_status": tx_request["status"],
+        "metrics_operator_procedure_status": (
+            metrics_operator_procedure["status"] if metrics_operator_procedure else "NOT_READY_TX_REQUEST_BLOCKED"
+        ),
         "metrics_tx_result_status": tx_result_summary["status"] if tx_result_summary else "NOT_PROVIDED",
         "safety": {
             "accepts_private_keys": False,

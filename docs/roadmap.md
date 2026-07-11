@@ -51,9 +51,11 @@ preflight, unsigned oracle request, and optional verified oracle tx result into
 one public handoff directory while preserving the real blocker list. A separate
 metrics-oracle report preflight validates public `reportMetrics` payloads, an
 unsigned oracle tx-request builder binds those payloads to the
-GovernanceAutoTuning artifact hashes for external assembly, and a public
-tx-result verifier checks confirmed transaction records against the request and
-release bundle without accepting signing material or raw transaction payloads.
+GovernanceAutoTuning artifact hashes for external assembly, an external
+oracle-operator procedure defines the public signing/broadcast checklist and
+required result evidence, and a public tx-result verifier checks confirmed
+transaction records against the request and release bundle without accepting
+signing material or raw transaction payloads.
 A release-readiness auditor now checks the generated handoff package, required
 files, component summaries, safety flags, and JSON secret/raw-transaction
 hygiene before any rollout claim. The remaining deployment blockers are the
@@ -73,6 +75,7 @@ assembly/signing/broadcast/deploy operation, and final release hardening.
 - Keep the release-readiness audit green and blocked until real external evidence exists
 - Keep the metrics-oracle report preflight green and free of signing material
 - Keep the unsigned metrics-oracle tx-request builder green and free of signing material
+- Keep the external oracle operator procedure green and free of signing/raw transaction material
 - Keep public oracle tx-result verification green and free of signing/raw transaction material
 - Compile and deploy all 6 contracts to Kaspa Mainnet only after verification passes
 - Integrate kaspa-zk-params crate (real Groth16, replacing stub)

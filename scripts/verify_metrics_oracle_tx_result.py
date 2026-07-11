@@ -66,7 +66,7 @@ def reject_forbidden_fields(value: Any, path: str = "$") -> None:
         for key, item in value.items():
             key_text = str(key)
             if key_text not in ALLOWED_SECRET_WORD_KEYS and SECRET_KEY_RE.search(key_text):
-                raise ValueError(f"{path}.{key}: secret-like fields are not allowed in tx results")
+                raise ValueError(f"{path}.{key}: secret-like fields are not allowed in public transaction artifacts")
             if RAW_TX_KEY_RE.search(key_text):
                 raise ValueError(f"{path}.{key}: raw or serialized transaction fields are not allowed")
             reject_forbidden_fields(item, f"{path}.{key}")

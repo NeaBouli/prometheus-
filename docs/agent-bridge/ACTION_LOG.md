@@ -2,6 +2,10 @@
 
 ## 2026-07-11
 
+- Added `scripts/build_metrics_oracle_operator_procedure.py`, a public-only external operator procedure builder for signer-ready GovernanceAutoTuning metrics-oracle tx requests. It validates the request against the release bundle, emits required public result-evidence fields and the external signing/broadcast checklist, and rejects blocked requests plus secret-like fields without accepting keys or raw transactions.
+- Extended `scripts/build_silverc_operator_handoff.py` to include `metrics-oracle-operator-procedure.json/.md` whenever the metrics tx request is signer-ready.
+- Extended `scripts/audit_silverc_release_readiness.py` so signer-ready metrics tx requests require the operator procedure files and status before any rollout-ready claim.
+- Local checks passed for the operator procedure positive path, blocked-request failure, secret-field failure, extended operator handoff package, and release-readiness audit. CI coverage is being added in the current working tree; the latest remote-green baseline remains `8bf6a14` until this change is pushed and verified.
 - Added `scripts/audit_silverc_release_readiness.py`, a public-only release-readiness auditor for generated Silverc operator handoff packages. It validates required files, included-file consistency, component statuses, safety flags, and JSON secret/raw-transaction hygiene; it emits `ROLLOUT_BLOCKED` until real external deploy/oracle evidence exists and makes `--require-ready` fail while blockers remain.
 - Extended Prometheus CI to run the release-readiness audit against the operator handoff package with imported operator receipts and verified oracle tx result; CI now checks the expected blocked status, no-key/no-raw-transaction safety flags, `--require-ready` failure, and safety-flag tamper rejection.
 - Updated README, Whitepaper, roadmap, Silverc module docs, Backlog, Memory, and Bridge to track the release-readiness audit without claiming real deploy readiness.

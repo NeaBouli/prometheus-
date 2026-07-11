@@ -28,6 +28,7 @@ EXPECTED_FALSE_SAFETY_FLAGS = {
     "updates_status_files",
 }
 HANDOFF_FALSE_SAFETY_FLAGS = EXPECTED_FALSE_SAFETY_FLAGS | {"deploys_contracts"}
+OPERATOR_PROCEDURE_FALSE_SAFETY_FLAGS = HANDOFF_FALSE_SAFETY_FLAGS | {"accepts_raw_transactions"}
 BASE_REQUIRED_FILES = {
     HANDOFF_SUMMARY,
     "HANDOFF.md",
@@ -57,6 +58,10 @@ OPERATOR_RECEIPT_IMPORT_FILES = {
 METRICS_TX_RESULT_FILES = {
     "metrics-oracle-tx-result-summary.json",
     "metrics-oracle-tx-result.md",
+}
+METRICS_OPERATOR_PROCEDURE_FILES = {
+    "metrics-oracle-operator-procedure.json",
+    "metrics-oracle-operator-procedure.md",
 }
 
 
@@ -155,6 +160,8 @@ def required_files_for_summary(summary: dict[str, Any]) -> set[str]:
         required |= OPERATOR_RECEIPT_IMPORT_FILES
     if summary.get("metrics_tx_result_status") == "METRICS_ORACLE_TX_RESULT_VERIFIED":
         required |= METRICS_TX_RESULT_FILES
+    if summary.get("metrics_tx_request_status") == "READY_FOR_EXTERNAL_TX_ASSEMBLER":
+        required |= METRICS_OPERATOR_PROCEDURE_FILES
     return required
 
 
@@ -192,6 +199,23 @@ def validate_component_summaries(root: Path, handoff: dict[str, Any]) -> dict[st
         "metrics_report": metrics_report["status"],
         "metrics_tx_request": metrics_tx_request["status"],
     }
+
+    if handoff.get("metrics_tx_request_status") == "READY_FOR_EXTERNAL_TX_ASSEMBLER":
+        operator_procedure = require_json(root, "metrics-oracle-operator-procedure.json")
+        expect_status(
+            operator_procedure,
+            "status",
+            handoff["metrics_operator_procedure_status"],
+            "metrics-oracle-operator-procedure",
+        )
+        validate_safety(
+            operator_procedure,
+            OPERATOR_PROCEDURE_FALSE_SAFETY_FLAGS,
+            "metrics-oracle-operator-procedure",
+        )
+        statuses["metrics_operator_procedure"] = operator_procedure["status"]
+    else:
+        statuses["metrics_operator_procedure"] = handoff.get("metrics_operator_procedure_status", "UNKNOWN")
 
     if handoff.get("operator_receipts_status") == "READY_FOR_STATUS_RECORDING":
         operator_receipts = require_json(root, "operator-receipt-summary.json")
@@ -251,6 +275,7 @@ def validate_handoff(root: Path) -> dict[str, Any]:
         and handoff.get("deploy_supported") is True
         and handoff.get("operator_receipts_status") == "READY_FOR_STATUS_RECORDING"
         and handoff.get("metrics_tx_request_status") == "READY_FOR_EXTERNAL_TX_ASSEMBLER"
+        and handoff.get("metrics_operator_procedure_status") == "READY_FOR_EXTERNAL_ORACLE_OPERATOR"
         and handoff.get("metrics_tx_result_status") == "METRICS_ORACLE_TX_RESULT_VERIFIED"
         and not readiness_blockers
     )

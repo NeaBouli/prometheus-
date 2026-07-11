@@ -630,6 +630,37 @@ jobs:
           assert tx_summary["safety"]["updates_status_files"] is False
           assert "rejects private keys" in tx_runbook
 
+          subprocess.run(
+              [
+                  "python3",
+                  "scripts/build_metrics_oracle_operator_procedure.py",
+                  "--archive",
+                  "/tmp/prometheus-silverc-artifacts.tar.gz",
+                  "--tx-request",
+                  ready_path,
+                  "--summary-out",
+                  "/tmp/prometheus-metrics-oracle-operator-procedure.json",
+                  "--runbook-out",
+                  "/tmp/prometheus-metrics-oracle-operator-procedure.md",
+              ],
+              check=True,
+          )
+          procedure = json.loads(Path("/tmp/prometheus-metrics-oracle-operator-procedure.json").read_text())
+          procedure_runbook = Path("/tmp/prometheus-metrics-oracle-operator-procedure.md").read_text()
+          assert procedure["status"] == "READY_FOR_EXTERNAL_ORACLE_OPERATOR"
+          assert procedure["tx_request_sha256"] == ready["request_sha256"]
+          assert procedure["contract"]["instance_id"] == "sandbox:governance-auto-tuning-state-fixture-0001"
+          assert procedure["required_public_result_fields"]["tx_request_sha256"] == ready["request_sha256"]
+          assert procedure["safety"]["accepts_private_keys"] is False
+          assert procedure["safety"]["accepts_raw_transactions"] is False
+          assert procedure["safety"]["signs_transactions"] is False
+          assert procedure["safety"]["assembles_chain_transaction"] is False
+          assert procedure["safety"]["broadcasts_transactions"] is False
+          assert procedure["safety"]["deploys_contracts"] is False
+          assert procedure["safety"]["updates_status_files"] is False
+          assert "public operator checklist" in procedure_runbook
+          assert "does not sign" in procedure_runbook
+
           proc = subprocess.run(
               [
                   "python3",
@@ -662,6 +693,40 @@ jobs:
           )
           assert proc.returncode != 0
           assert "tx_request.status: expected READY_FOR_EXTERNAL_TX_ASSEMBLER" in proc.stderr
+
+          proc = subprocess.run(
+              [
+                  "python3",
+                  "scripts/build_metrics_oracle_operator_procedure.py",
+                  "--archive",
+                  "/tmp/prometheus-silverc-artifacts.tar.gz",
+                  "--tx-request",
+                  "/tmp/prometheus-metrics-oracle-tx-request.json",
+              ],
+              text=True,
+              capture_output=True,
+          )
+          assert proc.returncode != 0
+          assert "tx_request.status: expected READY_FOR_EXTERNAL_TX_ASSEMBLER" in proc.stderr
+
+          bad = json.loads(Path(ready_path).read_text())
+          bad["_".join(["wallet", "token"])] = "do-not-accept"
+          bad_path = Path("/tmp/prometheus-metrics-oracle-tx-request-secret.json")
+          bad_path.write_text(json.dumps(bad, indent=2, sort_keys=True) + "\n")
+          proc = subprocess.run(
+              [
+                  "python3",
+                  "scripts/build_metrics_oracle_operator_procedure.py",
+                  "--archive",
+                  "/tmp/prometheus-silverc-artifacts.tar.gz",
+                  "--tx-request",
+                  str(bad_path),
+              ],
+              text=True,
+              capture_output=True,
+          )
+          assert proc.returncode != 0
+          assert "secret-like fields are not allowed" in proc.stderr
 
           bad = json.loads(tx_result_path.read_text())
           bad["_".join(["private", "key"])] = "do-not-accept"
@@ -905,6 +970,7 @@ jobs:
           assert summary["operator_receipts_status"] == "MISSING_OPERATOR_RECORD"
           assert summary["metrics_report_status"] == "READY_FOR_TX_BUILDER"
           assert summary["metrics_tx_request_status"] == "BLOCKED_UNTIL_CONTRACT_INSTANCE_ID"
+          assert summary["metrics_operator_procedure_status"] == "NOT_READY_TX_REQUEST_BLOCKED"
           assert summary["metrics_tx_result_status"] == "NOT_PROVIDED"
           assert summary["safety"]["accepts_private_keys"] is False
           assert summary["safety"]["signs_transactions"] is False
@@ -967,7 +1033,10 @@ jobs:
           assert summary["status"] == "HANDOFF_BLOCKED"
           assert summary["operator_receipts_status"] == "READY_FOR_STATUS_RECORDING"
           assert summary["metrics_tx_request_status"] == "READY_FOR_EXTERNAL_TX_ASSEMBLER"
+          assert summary["metrics_operator_procedure_status"] == "READY_FOR_EXTERNAL_ORACLE_OPERATOR"
           assert summary["metrics_tx_result_status"] == "METRICS_ORACLE_TX_RESULT_VERIFIED"
+          assert "metrics-oracle-operator-procedure.json" in summary["included_files"]
+          assert "metrics-oracle-operator-procedure.md" in summary["included_files"]
           assert "metrics-oracle-tx-result-summary.json" in summary["included_files"]
           assert "metrics-oracle-tx-result.md" in summary["included_files"]
           assert "upstream silverc exposes no network deploy command" in summary["blockers"]
@@ -990,6 +1059,7 @@ jobs:
           assert summary["handoff_status"] == "HANDOFF_BLOCKED"
           assert summary["component_statuses"]["operator_receipts"] == "READY_FOR_STATUS_RECORDING"
           assert summary["component_statuses"]["metrics_tx_request"] == "READY_FOR_EXTERNAL_TX_ASSEMBLER"
+          assert summary["component_statuses"]["metrics_operator_procedure"] == "READY_FOR_EXTERNAL_ORACLE_OPERATOR"
           assert summary["component_statuses"]["metrics_tx_result"] == "METRICS_ORACLE_TX_RESULT_VERIFIED"
           assert "upstream silverc exposes no network deploy command" in summary["blockers"]
           assert summary["safety"]["accepts_private_keys"] is False
@@ -1036,6 +1106,27 @@ jobs:
           )
           assert proc.returncode != 0
           assert "safety.accepts_private_keys: expected false" in proc.stderr
+
+          tampered = Path("/tmp/prometheus-silverc-operator-handoff-procedure-tamper")
+          if tampered.exists():
+              shutil.rmtree(tampered)
+          shutil.copytree("/tmp/prometheus-silverc-operator-handoff-oracle-result", tampered)
+          procedure_path = tampered / "metrics-oracle-operator-procedure.json"
+          procedure = json.loads(procedure_path.read_text())
+          procedure["safety"]["accepts_raw_transactions"] = True
+          procedure_path.write_text(json.dumps(procedure, indent=2, sort_keys=True) + "\n")
+          proc = subprocess.run(
+              [
+                  "python3",
+                  "scripts/audit_silverc_release_readiness.py",
+                  "--handoff-dir",
+                  str(tampered),
+              ],
+              text=True,
+              capture_output=True,
+          )
+          assert proc.returncode != 0
+          assert "metrics-oracle-operator-procedure.safety.accepts_raw_transactions: expected false" in proc.stderr
           PY
 
   # ─── Rust Workspace Check ───────────────────────────────────────────────────

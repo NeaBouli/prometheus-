@@ -43,6 +43,7 @@ python3 scripts/verify_silverc_deploy_receipts.py --archive /tmp/prometheus-silv
 python3 scripts/stage_silverc_deployment_status.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --operator-receipts /path/to/operator-record-receipts.json --status-out /tmp/prometheus-silverc-status-draft.json --snippet-out /tmp/prometheus-silverc-status-draft.md
 python3 scripts/preflight_metrics_oracle_report.py --report modules/contracts/silverc/metrics-oracle-report.sample.json --plan-out /tmp/prometheus-metrics-oracle-preflight.json --runbook-out /tmp/prometheus-metrics-oracle-runbook.md
 python3 scripts/build_metrics_oracle_tx_request.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --report modules/contracts/silverc/metrics-oracle-report.sample.json --contract-instance-id sandbox:governance-auto-tuning-state-fixture-0001 --tx-request-out /tmp/prometheus-metrics-oracle-tx-request.json --runbook-out /tmp/prometheus-metrics-oracle-tx-request.md
+python3 scripts/build_metrics_oracle_operator_procedure.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --tx-request /tmp/prometheus-metrics-oracle-tx-request.json --summary-out /tmp/prometheus-metrics-oracle-operator-procedure.json --runbook-out /tmp/prometheus-metrics-oracle-operator-procedure.md
 python3 scripts/verify_metrics_oracle_tx_result.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --tx-request /tmp/prometheus-metrics-oracle-tx-request.json --tx-result /path/to/public-metrics-oracle-tx-result.json --summary-out /tmp/prometheus-metrics-oracle-tx-result-summary.json --runbook-out /tmp/prometheus-metrics-oracle-tx-result.md
 python3 scripts/build_silverc_operator_handoff.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --out-dir /tmp/prometheus-silverc-operator-handoff --network sandbox --rpc-url ws://127.0.0.1:17210 --deployer-address kaspatest:qptestpreflight000000000000000000000000000000000 --metrics-oracle-pubkey 1111111111111111111111111111111111111111111111111111111111111111 --orchestrator-results /path/to/public-external-deploy-results.json --metrics-tx-result /path/to/public-metrics-oracle-tx-result.json
 python3 scripts/audit_silverc_release_readiness.py --handoff-dir /tmp/prometheus-silverc-operator-handoff --summary-out /tmp/prometheus-silverc-release-readiness.json --runbook-out /tmp/prometheus-silverc-release-readiness.md
@@ -358,6 +359,24 @@ Without `--contract-instance-id`, the request status remains
 ID or outpoint, the status becomes `READY_FOR_EXTERNAL_TX_ASSEMBLER`; signing
 and broadcast still remain outside this repository. CI checks both states and a
 negative `--require-contract-instance-id` failure path.
+
+## Metrics-oracle operator procedure
+
+`scripts/build_metrics_oracle_operator_procedure.py` turns a signer-ready
+metrics-oracle tx request into a public external-operator checklist. It
+re-validates the request against the release bundle and emits:
+
+- the request hash, contract instance binding, artifact hash, and script hash
+- the public result fields required by `verify_metrics_oracle_tx_result.py`
+- the external sequence for assembler mapping, wallet signature, broadcast,
+  confirmation, and operator-record evidence
+- safety flags proving the repository does not accept keys, raw transactions,
+  signing material, transaction assembly, broadcast, deploy, or status writes
+
+The handoff package includes `metrics-oracle-operator-procedure.json/.md`
+whenever the tx request is signer-ready. This reduces the oracle-operations
+blocker to an explicit external wallet/orchestrator execution step while keeping
+all sensitive material outside the repository.
 
 ## Metrics-oracle transaction result verifier
 
