@@ -7,7 +7,7 @@
 - Added `scripts/smoke_silverc_artifacts.py`, which compiles all 7 current-Silverc fixtures through the pinned upstream `silverc` CLI and validates non-empty script bytes, compiler version, state layout, and expected ABI entries.
 - Local release-bundle smoke passed and generated JSON artifacts plus manifest under `/tmp/prometheus-silverc-artifacts`; this proves the available current-Silverc CLI artifact path only.
 - Confirmed upstream `silverc` has no network deploy command (`silverc --help` exposes compile/AST-only artifact generation), so Sprint 9 remains blocked on a real network deploy/orchestration path plus signed metrics-oracle operator integration and release hardening.
-- GitHub Prometheus CI, Security Audit, and Pages passed for `14b89a1`; Prometheus CI includes the current-Silverc artifact-smoke step. The release-manifest extension is pending remote CI.
+- GitHub Prometheus CI, Security Audit, and Pages passed for `5209414`; Prometheus CI includes the current-Silverc release-bundle manifest step.
 - GitHub Prometheus CI, Security Audit, and Pages passed for `2bb7521`; the pinned Silverc runtime job now passes 55 upstream-injected tests and CI has a GovernanceAutoTuningState fixture guard.
 - Added current-Silverscript GovernanceAutoTuning state fixture `modules/contracts/silverc/GovernanceAutoTuningState.sil` and runtime gates for `reportMetrics` and `autoTune`.
 - Q-003 is resolved in the current-Silverc contract path as signed metrics-oracle input for `fp_rate`; the legacy `.ss` stub remains archival, and the remaining work is oracle operator/deploy integration.
