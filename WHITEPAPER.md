@@ -2,7 +2,7 @@
 
 **Whitepaper v4.0 — March 2026**
 
-**Status update — July 2026:** Kaspa Toccata is now treated as a post-fork deployment environment for Prometheus. The current Silverc verifier covers H-001 commit-reveal byte encoding, ValidatorStaking runtime transitions, GuardianReputation runtime/formula gates, RuleStorage runtime gates, CommunityDonations runtime gates, DevIncentivePool runtime gates, and GovernanceAutoTuning runtime gates. GovernanceAutoTuning resolves Q-003 in the current-Silverc path with signed metrics-oracle input for `fp_rate` instead of the legacy stub. Release-bundle, deploy-preflight, deployment-receipt, metrics-report, and unsigned oracle tx-request gates prepare operator handoff without holding signing material. Mainnet deployment remains gated by network deploy/orchestration tooling, external oracle transaction assembly/signing/deploy integration, and release hardening.
+**Status update — July 2026:** Kaspa Toccata is now treated as a post-fork deployment environment for Prometheus. The current Silverc verifier covers H-001 commit-reveal byte encoding, ValidatorStaking runtime transitions, GuardianReputation runtime/formula gates, RuleStorage runtime gates, CommunityDonations runtime gates, DevIncentivePool runtime gates, and GovernanceAutoTuning runtime gates. GovernanceAutoTuning resolves Q-003 in the current-Silverc path with signed metrics-oracle input for `fp_rate` instead of the legacy stub. Release-bundle, deploy-preflight, deployment-receipt, operator-handoff, metrics-report, and unsigned oracle tx-request gates prepare operator handoff without holding signing material. Mainnet deployment remains gated by network deploy/orchestration tooling, external oracle transaction assembly/signing/deploy integration, and release hardening.
 
 *The fire belongs to humanity, not to corporations.*
 
@@ -80,7 +80,7 @@ Light Client (Phi-3-mini)          Guardian (LLaMA 3)           Kaspa L1
 
 - **Network**: Kaspa with Silverscript smart contracts
 - **Testnet**: kaspa-testnet-10 for legacy tests; post-Toccata deployment requires current Toccata/TN tooling checks
-- **Compiler**: current Silverc gates pass for H-001, ValidatorStakingState, GuardianReputationState, RuleStorageState, CommunityDonationsState, DevIncentivePoolState, and GovernanceAutoTuningState; release-bundle, deploy-preflight, deployment-receipt, metrics-report, and unsigned oracle tx-request gates are covered; network deploy/orchestration, real operator receipts, and external signed oracle transaction integration still gate Prometheus deployment
+- **Compiler**: current Silverc gates pass for H-001, ValidatorStakingState, GuardianReputationState, RuleStorageState, CommunityDonationsState, DevIncentivePoolState, and GovernanceAutoTuningState; release-bundle, deploy-preflight, deployment-receipt, operator-handoff, metrics-report, and unsigned oracle tx-request gates are covered; network deploy/orchestration, real operator receipts, and external signed oracle transaction integration still gate Prometheus deployment
 - **Consensus**: high-throughput Kaspa BlockDAG / DAGKnight path
 - **Contracts**: 6 Silverscript contracts (see Section 10)
 
@@ -270,6 +270,7 @@ Current-Silverc verification status:
 - `DevIncentivePoolState.sil`: compile/ABI/runtime gates pass for propose/vote/execute grant paths, including max-grant, late-vote, quorum, and approval rejection paths.
 - `GovernanceAutoTuningState.sil`: compile/ABI/runtime gates pass for signed metrics reporting and deterministic weekly auto-tuning, including invalid `fp_rate`, early tuning, high-FP, and zero-FP paths.
 - Deployment receipt verification: public receipt records are checked against the release-bundle manifest; synthetic `ci_fixture` receipts are kept separate from real `operator_record` deployment evidence.
+- Operator handoff package: public release archive, deploy preflight, receipt verification, metrics report preflight, and unsigned oracle request artifacts are bundled without accepting signing material or claiming real deployment.
 
 ---
 
@@ -376,7 +377,7 @@ This is a deliberate design decision, not an oversight. Architecture Decision #3
 | Sprint 6: E2E | March 2026 | ACCEPTED |
 | Sprint 7: Dashboard | March 2026 | ACCEPTED |
 | Sprint 8: Public Site | March/July 2026 | ACCEPTED / ongoing documentation maintenance |
-| **Kaspa Toccata / post-fork verification** | **June/July 2026** | **Post-fork environment; H-001, ValidatorStaking, GuardianReputation, RuleStorage, CommunityDonations, DevIncentivePool, GovernanceAutoTuning, release-bundle, deploy-preflight, deployment-receipt, metrics-report, and unsigned oracle tx-request gates verified in CI** |
+| **Kaspa Toccata / post-fork verification** | **June/July 2026** | **Post-fork environment; H-001, ValidatorStaking, GuardianReputation, RuleStorage, CommunityDonations, DevIncentivePool, GovernanceAutoTuning, release-bundle, deploy-preflight, deployment-receipt, operator-handoff, metrics-report, and unsigned oracle tx-request gates verified in CI** |
 | Mainnet Launch | Post-verification | PLANNED; gated by network deploy/orchestration tooling, real operator receipt capture, external signed oracle transaction integration, and release hardening |
 
 ---

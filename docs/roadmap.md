@@ -38,19 +38,23 @@ preflight validates release-bundle integrity and public operator inputs, emits a
 Markdown operator runbook with contract hashes and safety rules, and confirms
 upstream `silverc` still exposes no network deploy command. A deployment receipt
 verifier validates public receipt records against the release bundle and keeps
-synthetic CI fixtures separate from real `operator_record` receipts. The
-remaining deployment blockers are the missing network deploy/orchestration path,
-external signed metrics-oracle transaction assembly/signing/deploy operation,
-and release hardening. A separate metrics-oracle report preflight validates
-public `reportMetrics` payloads, and an unsigned oracle tx-request builder binds
-those payloads to the GovernanceAutoTuning artifact hashes for external
-assembly without accepting signing material.
+synthetic CI fixtures separate from real `operator_record` receipts. A CI-safe
+operator handoff builder now packages the release archive, preflight outputs,
+receipt checks, metrics report preflight, and unsigned oracle request into one
+public handoff directory while preserving the real blocker list. The remaining
+deployment blockers are the missing network deploy/orchestration path, external
+signed metrics-oracle transaction assembly/signing/deploy operation, and release
+hardening. A separate metrics-oracle report preflight validates public
+`reportMetrics` payloads, and an unsigned oracle tx-request builder binds those
+payloads to the GovernanceAutoTuning artifact hashes for external assembly
+without accepting signing material.
 
 **Sprint 9 — Contracts Live + Real ZK-Proof**
 - Keep current-Silverscript runtime and release-bundle manifest gates green
 - Keep release-bundle deploy preflight green
 - Keep the generated deploy operator runbook green and free of signing material
 - Keep deployment receipt verification green and free of signing material
+- Keep the generated operator handoff package green and free of signing material
 - Keep the metrics-oracle report preflight green and free of signing material
 - Keep the unsigned metrics-oracle tx-request builder green and free of signing material
 - Compile and deploy all 6 contracts to Kaspa Mainnet only after verification passes

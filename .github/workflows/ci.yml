@@ -382,6 +382,47 @@ jobs:
           assert proc.returncode != 0
           assert "artifact_sha256: manifest hash mismatch" in proc.stderr
           PY
+      - name: Build operator handoff package
+        run: |
+          python3 scripts/build_silverc_operator_handoff.py \
+            --archive /tmp/prometheus-silverc-artifacts.tar.gz \
+            --out-dir /tmp/prometheus-silverc-operator-handoff \
+            --network sandbox \
+            --rpc-url ws://127.0.0.1:17210 \
+            --deployer-address kaspatest:qptestpreflight000000000000000000000000000000000 \
+            --metrics-oracle-pubkey 1111111111111111111111111111111111111111111111111111111111111111
+          test -s /tmp/prometheus-silverc-operator-handoff/HANDOFF.md
+          test -s /tmp/prometheus-silverc-operator-handoff/operator-handoff-summary.json
+          test -s /tmp/prometheus-silverc-operator-handoff/prometheus-silverc-artifacts.tar.gz
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          root = Path("/tmp/prometheus-silverc-operator-handoff")
+          summary = json.loads((root / "operator-handoff-summary.json").read_text())
+          handoff = (root / "HANDOFF.md").read_text()
+
+          assert summary["status"] == "HANDOFF_BLOCKED"
+          assert summary["network"] == "sandbox"
+          assert summary["deploy_supported"] is False
+          assert summary["ci_receipts_status"] == "CI_FIXTURE_VALID"
+          assert summary["operator_receipts_status"] == "MISSING_OPERATOR_RECORD"
+          assert summary["metrics_report_status"] == "READY_FOR_TX_BUILDER"
+          assert summary["metrics_tx_request_status"] == "BLOCKED_UNTIL_CONTRACT_INSTANCE_ID"
+          assert summary["safety"]["accepts_private_keys"] is False
+          assert summary["safety"]["signs_transactions"] is False
+          assert summary["safety"]["assembles_chain_transaction"] is False
+          assert summary["safety"]["broadcasts_transactions"] is False
+          assert summary["safety"]["deploys_contracts"] is False
+          assert summary["safety"]["updates_status_files"] is False
+          assert "upstream silverc exposes no network deploy command" in summary["blockers"]
+          assert "missing verified operator_record deployment receipts" in summary["blockers"]
+          assert "missing deployed GovernanceAutoTuningState contract instance id" in summary["blockers"]
+          assert "public deployment artifacts only" in handoff
+          assert "does not accept private keys" in handoff
+          assert "Real status updates require verified operator_record receipts" in handoff
+          assert "prometheus-silverc-artifacts.tar.gz" in summary["included_files"]
+          PY
 
   # ─── Rust Workspace Check ───────────────────────────────────────────────────
   rust-check:

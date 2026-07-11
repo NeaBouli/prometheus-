@@ -2,6 +2,9 @@
 
 ## 2026-07-11
 
+- GitHub Prometheus CI, Security Audit, and Pages passed for `b524936`; this was the bridge/memory status commit after the deployment receipt verifier rollout.
+- Added `scripts/build_silverc_operator_handoff.py`, a CI-safe public handoff package builder. It copies the release archive, runs deploy preflight, verifies CI fixture receipts, optionally verifies real operator receipts, validates the metrics report, builds the unsigned oracle request, and emits `HANDOFF.md` plus `operator-handoff-summary.json` without signing, broadcasting, deploying, or updating status files.
+- Local operator handoff package test passed against a fresh current-Silverc archive; expected status is `HANDOFF_BLOCKED` until upstream network deploy tooling, verified `operator_record` receipts, and a real GovernanceAutoTuningState instance ID exist.
 - GitHub Prometheus CI, Security Audit, and Pages passed for `47ab765`; Prometheus CI now includes deployment receipt verification in the current-Silverc runtime/artifact job.
 - Added `scripts/verify_silverc_deploy_receipts.py` and `modules/contracts/silverc/deploy-receipts.sample.json`. The verifier checks public deployment receipts against the current-Silverc release-bundle manifest, rejects secret-like fields, and separates synthetic `ci_fixture` checks from real `operator_record` evidence before any status update.
 - Extended Prometheus CI with deployment receipt verification: positive sample check, `--require-operator-record` negative check, secret-field rejection, and manifest hash mismatch rejection.

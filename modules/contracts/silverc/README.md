@@ -39,6 +39,7 @@ python3 scripts/preflight_silverc_deploy.py --archive /tmp/prometheus-silverc-ar
 python3 scripts/verify_silverc_deploy_receipts.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --receipts modules/contracts/silverc/deploy-receipts.sample.json --summary-out /tmp/prometheus-silverc-deploy-receipts-summary.json --runbook-out /tmp/prometheus-silverc-deploy-receipts.md
 python3 scripts/preflight_metrics_oracle_report.py --report modules/contracts/silverc/metrics-oracle-report.sample.json --plan-out /tmp/prometheus-metrics-oracle-preflight.json --runbook-out /tmp/prometheus-metrics-oracle-runbook.md
 python3 scripts/build_metrics_oracle_tx_request.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --report modules/contracts/silverc/metrics-oracle-report.sample.json --contract-instance-id sandbox:governance-auto-tuning-state-fixture-0001 --tx-request-out /tmp/prometheus-metrics-oracle-tx-request.json --runbook-out /tmp/prometheus-metrics-oracle-tx-request.md
+python3 scripts/build_silverc_operator_handoff.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --out-dir /tmp/prometheus-silverc-operator-handoff --network sandbox --rpc-url ws://127.0.0.1:17210 --deployer-address kaspatest:qptestpreflight000000000000000000000000000000000 --metrics-oracle-pubkey 1111111111111111111111111111111111111111111111111111111111111111
 ```
 
 ## ValidatorStakingState.sil
@@ -184,6 +185,20 @@ update status files. It also rejects secret-like field names in receipt JSON.
 CI. Real deployment status may be recorded only from verified
 `operator_record` receipts; use `--require-operator-record` before copying any
 contract instance IDs into `memory/STATUS.md`.
+
+## Operator handoff package
+
+`scripts/build_silverc_operator_handoff.py` builds a public handoff directory
+from an existing release archive. It copies the archive, runs deploy preflight,
+verifies the synthetic CI receipt fixture, optionally verifies real
+`operator_record` receipts, validates the metrics-oracle report, builds the
+unsigned metrics-oracle transaction request, and emits `HANDOFF.md` plus
+`operator-handoff-summary.json`.
+
+The package is intentionally blocked until real network deploy/orchestration
+tooling, verified `operator_record` receipts, and signer-ready contract instance
+IDs exist. It does not accept private keys, sign, broadcast, deploy contracts,
+or update status files.
 
 ## GovernanceAutoTuningState.sil
 
