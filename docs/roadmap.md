@@ -54,10 +54,12 @@ unsigned oracle tx-request builder binds those payloads to the
 GovernanceAutoTuning artifact hashes for external assembly, and a public
 tx-result verifier checks confirmed transaction records against the request and
 release bundle without accepting signing material or raw transaction payloads.
-The remaining deployment blockers are the missing network deploy/orchestration
-path, real public deploy results/receipts from that path, external signed
-metrics-oracle transaction assembly/signing/deploy operation, and release
-hardening.
+A release-readiness auditor now checks the generated handoff package, required
+files, component summaries, safety flags, and JSON secret/raw-transaction
+hygiene before any rollout claim. The remaining deployment blockers are the
+missing network deploy/orchestration path, real public deploy results/receipts
+from that path, external signed metrics-oracle transaction
+assembly/signing/broadcast/deploy operation, and final release hardening.
 
 **Sprint 9 — Contracts Live + Real ZK-Proof**
 - Keep current-Silverscript runtime and release-bundle manifest gates green
@@ -68,6 +70,7 @@ hardening.
 - Keep deployment receipt verification green and free of signing material
 - Keep deployment status staging guarded against CI fixture receipts
 - Keep the generated operator handoff package green and free of signing material
+- Keep the release-readiness audit green and blocked until real external evidence exists
 - Keep the metrics-oracle report preflight green and free of signing material
 - Keep the unsigned metrics-oracle tx-request builder green and free of signing material
 - Keep public oracle tx-result verification green and free of signing/raw transaction material

@@ -45,6 +45,7 @@ python3 scripts/preflight_metrics_oracle_report.py --report modules/contracts/si
 python3 scripts/build_metrics_oracle_tx_request.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --report modules/contracts/silverc/metrics-oracle-report.sample.json --contract-instance-id sandbox:governance-auto-tuning-state-fixture-0001 --tx-request-out /tmp/prometheus-metrics-oracle-tx-request.json --runbook-out /tmp/prometheus-metrics-oracle-tx-request.md
 python3 scripts/verify_metrics_oracle_tx_result.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --tx-request /tmp/prometheus-metrics-oracle-tx-request.json --tx-result /path/to/public-metrics-oracle-tx-result.json --summary-out /tmp/prometheus-metrics-oracle-tx-result-summary.json --runbook-out /tmp/prometheus-metrics-oracle-tx-result.md
 python3 scripts/build_silverc_operator_handoff.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --out-dir /tmp/prometheus-silverc-operator-handoff --network sandbox --rpc-url ws://127.0.0.1:17210 --deployer-address kaspatest:qptestpreflight000000000000000000000000000000000 --metrics-oracle-pubkey 1111111111111111111111111111111111111111111111111111111111111111 --orchestrator-results /path/to/public-external-deploy-results.json --metrics-tx-result /path/to/public-metrics-oracle-tx-result.json
+python3 scripts/audit_silverc_release_readiness.py --handoff-dir /tmp/prometheus-silverc-operator-handoff --summary-out /tmp/prometheus-silverc-release-readiness.json --runbook-out /tmp/prometheus-silverc-release-readiness.md
 ```
 
 ## ValidatorStakingState.sil
@@ -258,6 +259,24 @@ The package is intentionally blocked until real network deploy/orchestration
 tooling, verified `operator_record` receipts, and signer-ready contract instance
 IDs exist. It does not accept private keys, sign, broadcast, deploy contracts,
 or update status files.
+
+## Release-readiness audit
+
+`scripts/audit_silverc_release_readiness.py` validates a generated public
+operator handoff directory before any rollout claim. It checks:
+
+- the handoff summary status, blocker list, safety flags, and included-file list
+- required handoff files for deploy preflight, deploy requests, receipt checks,
+  metrics report preflight, unsigned tx request, and optional oracle tx result
+- component summary statuses match the handoff summary
+- JSON artifacts do not contain secret-like keys or raw/serialized transaction
+  fields
+
+The audit emits `ROLLOUT_BLOCKED` while real deploy/orchestration or oracle
+operation evidence is missing. `--require-ready` turns that into a failing gate,
+which should only pass after real operator receipts, verified oracle tx results,
+deploy tooling, and final release policy checks are complete. The audit does
+not accept keys, sign, assemble, broadcast, deploy, or update status files.
 
 ## GovernanceAutoTuningState.sil
 
