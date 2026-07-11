@@ -382,6 +382,60 @@ jobs:
           assert proc.returncode != 0
           assert "artifact_sha256: manifest hash mismatch" in proc.stderr
           PY
+      - name: Stage deployment status draft from operator receipts
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          data = json.loads(Path("modules/contracts/silverc/deploy-receipts.sample.json").read_text())
+          data["provenance"] = {
+              "type": "operator_record",
+              "description": "Ephemeral CI schema exercise only; not a deployment status claim.",
+          }
+          Path("/tmp/prometheus-silverc-operator-record-ci.json").write_text(json.dumps(data, indent=2) + "\n")
+          PY
+          python3 scripts/stage_silverc_deployment_status.py \
+            --archive /tmp/prometheus-silverc-artifacts.tar.gz \
+            --operator-receipts /tmp/prometheus-silverc-operator-record-ci.json \
+            --status-out /tmp/prometheus-silverc-status-draft.json \
+            --snippet-out /tmp/prometheus-silverc-status-draft.md
+          test -s /tmp/prometheus-silverc-status-draft.json
+          test -s /tmp/prometheus-silverc-status-draft.md
+          python3 - <<'PY'
+          import json
+          import subprocess
+          from pathlib import Path
+
+          status = json.loads(Path("/tmp/prometheus-silverc-status-draft.json").read_text())
+          snippet = Path("/tmp/prometheus-silverc-status-draft.md").read_text()
+          assert status["status"] == "READY_FOR_MANUAL_STATUS_UPDATE"
+          assert status["provenance_type"] == "operator_record"
+          assert status["contract_count"] == 7
+          assert status["safety"]["accepts_private_keys"] is False
+          assert status["safety"]["signs_transactions"] is False
+          assert status["safety"]["assembles_chain_transaction"] is False
+          assert status["safety"]["broadcasts_transactions"] is False
+          assert status["safety"]["deploys_contracts"] is False
+          assert status["safety"]["updates_status_files"] is False
+          assert "receipts are rejected" in snippet
+          assert "manual status-update draft" in snippet
+
+          proc = subprocess.run(
+              [
+                  "python3",
+                  "scripts/stage_silverc_deployment_status.py",
+                  "--archive",
+                  "/tmp/prometheus-silverc-artifacts.tar.gz",
+                  "--operator-receipts",
+                  "modules/contracts/silverc/deploy-receipts.sample.json",
+              ],
+              text=True,
+              capture_output=True,
+          )
+          assert proc.returncode != 0
+          assert "provenance.type: expected operator_record" in proc.stderr
+          PY
       - name: Build operator handoff package
         run: |
           python3 scripts/build_silverc_operator_handoff.py \

@@ -2,6 +2,10 @@
 
 ## 2026-07-11
 
+- Added `scripts/stage_silverc_deployment_status.py` to stage manual deployment-status drafts only from verified `operator_record` receipts.
+- Extended Prometheus CI to reject `ci_fixture` receipts for status staging and to exercise the operator-record status-draft path with ephemeral CI data only.
+- Updated README, Whitepaper, roadmap, Silverc README, Backlog, Bridge, and Memory to record deployment status staging as a guard, not a real deployment claim.
+- Local guard test passed: `operator_record` draft emits `READY_FOR_MANUAL_STATUS_UPDATE`; committed `ci_fixture` sample is rejected with `provenance.type: expected operator_record`.
 - GitHub Prometheus CI, Security Audit, and Pages passed for `a5b825f`; the live GitHub Pages whitepaper now includes the operator handoff package status. The GitHub-managed Pages system workflow still emits a Node-20 deprecation annotation for internal Pages actions, outside this repo's workflow files.
 - GitHub Prometheus CI, Security Audit, and Pages passed for `b524936`; this was the bridge/memory status commit after the deployment receipt verifier rollout.
 - Added `scripts/build_silverc_operator_handoff.py`, a CI-safe public handoff package builder. It copies the release archive, runs deploy preflight, verifies CI fixture receipts, optionally verifies real operator receipts, validates the metrics report, builds the unsigned oracle request, and emits `HANDOFF.md` plus `operator-handoff-summary.json` without signing, broadcasting, deploying, or updating status files.

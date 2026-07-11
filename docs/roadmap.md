@@ -38,10 +38,12 @@ preflight validates release-bundle integrity and public operator inputs, emits a
 Markdown operator runbook with contract hashes and safety rules, and confirms
 upstream `silverc` still exposes no network deploy command. A deployment receipt
 verifier validates public receipt records against the release bundle and keeps
-synthetic CI fixtures separate from real `operator_record` receipts. A CI-safe
-operator handoff builder now packages the release archive, preflight outputs,
-receipt checks, metrics report preflight, and unsigned oracle request into one
-public handoff directory while preserving the real blocker list. The remaining
+synthetic CI fixtures separate from real `operator_record` receipts. A status
+staging guard rejects CI fixtures and emits only a manual status-update draft
+from verified `operator_record` receipts. A CI-safe operator handoff builder now
+packages the release archive, preflight outputs, receipt checks, metrics report
+preflight, and unsigned oracle request into one public handoff directory while
+preserving the real blocker list. The remaining
 deployment blockers are the missing network deploy/orchestration path, external
 signed metrics-oracle transaction assembly/signing/deploy operation, and release
 hardening. A separate metrics-oracle report preflight validates public
@@ -54,6 +56,7 @@ without accepting signing material.
 - Keep release-bundle deploy preflight green
 - Keep the generated deploy operator runbook green and free of signing material
 - Keep deployment receipt verification green and free of signing material
+- Keep deployment status staging guarded against CI fixture receipts
 - Keep the generated operator handoff package green and free of signing material
 - Keep the metrics-oracle report preflight green and free of signing material
 - Keep the unsigned metrics-oracle tx-request builder green and free of signing material
