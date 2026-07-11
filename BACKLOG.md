@@ -1,8 +1,8 @@
 # prometheus — Backlog
 
 ## 🔴 Aktiv (diese Session)
-- Latest documented green product/tooling baseline is `8bf6a14` on `main`; run `git log --oneline -1` for the current working HEAD.
-- Prometheus CI, Security Audit, and GitHub Pages deployment were green for `8bf6a14`. Workflow actions use Node 24-compatible majors and current-Silverc CI validates the operator runbook, external deploy request set plus verifier, public orchestrator-result receipt import, deployment receipt verifier, deployment status staging guard, operator handoff package, release-readiness audit, metrics-oracle report preflight, unsigned oracle tx-request builder, and public oracle tx-result verifier; this session adds the external oracle operator procedure gate.
+- Latest documented green product/tooling baseline is `442853f` on `main`; run `git log --oneline -1` for the current working HEAD.
+- Prometheus CI, Security Audit, and GitHub Pages deployment were green for `442853f`. Workflow actions use Node 24-compatible majors and current-Silverc CI validates the operator runbook, external deploy request set plus verifier, public orchestrator-result receipt import, deployment receipt verifier, deployment status staging guard, operator handoff package, release-readiness audit, metrics-oracle report preflight, unsigned oracle tx-request builder, external oracle operator procedure, and public oracle tx-result verifier.
 - Runtime stub gates added for Rust client; current-Silverc contract gates now cover H-001, ValidatorStaking, GuardianReputation, RuleStorage, CommunityDonations, DevIncentivePool, and GovernanceAutoTuning.
 - Local current-Silverc release-bundle smoke now compiles all 7 fixtures through pinned upstream `silverc` and writes a deterministic manifest plus optional archive with source/artifact/script hashes; deploy preflight validates the bundle/operator public inputs, emits a Markdown operator runbook, and confirms upstream `silverc` has no network deploy command.
 - Deployment receipt verifier validates public receipt records against the release bundle, rejects secret-like fields, and keeps synthetic `ci_fixture` receipts separate from real `operator_record` deployment evidence.
@@ -17,7 +17,7 @@
 
 ### Pflicht VOR neuem Code:
 1. `cd /Users/gio/Desktop/repos/prometheus`
-2. `git log --oneline -5` — aktuellen HEAD prüfen; letzter dokumentierter grüner Produkt-/Tooling-Baseline-Commit ist `8bf6a14`
+2. `git log --oneline -5` — aktuellen HEAD prüfen; letzter dokumentierter grüner Produkt-/Tooling-Baseline-Commit ist `442853f`
 3. Lies `memory/CHECKPOINT.md` — vollständiger Projektstatus
 4. Lies `memory/AUDIT.md` ab Zeile 337 — Pre-Hardfork-Audit-Ergebnisse
 5. Lies `memory/ERRORS.md` — 12 bekannte Patterns
@@ -29,7 +29,7 @@
 
 ### Nächste konkrete Tasks (Priorität):
 1. **[P0] Sprint 9 Vorbereitung** — current-Silverc network deploy/orchestration path klären; Artifact-Smoke, release archive, deploy preflight, operator runbook, external deploy request set plus verifier, public orchestrator-result receipt import, deployment receipt verification, deployment status staging, and operator handoff package are local/CI-covered, echter On-chain-Deploy fehlt mangels upstream deploy CLI.
-2. **[P1] Oracle Operator Integration** — external signed metrics-oracle transaction assembly/signer/broadcast process für `GovernanceAutoTuningState.sil` operationalisieren; public report preflight, unsigned tx-request builder, operator procedure, and public tx-result verifier are local-covered; CI coverage is being added in this session.
+2. **[P1] Oracle Operator Integration** — external signed metrics-oracle transaction assembly/signer/broadcast process für `GovernanceAutoTuningState.sil` operationalisieren; public report preflight, unsigned tx-request builder, operator procedure, and public tx-result verifier are local- and CI-covered.
 3. **[P1] Sprint 10B: Guardian Decentralization** — Hybrid routing (8B/70B), Ensemble voting (5x 8B)
 4. **[P2] fp_rate Oracle** — Q-003 current-Silverc contract gate uses signed metrics input; public report/request/result verification is covered; production external transaction assembly/signing/broadcast/deploy operation remains
 5. **[P2] M-001** — Heuristic confidence in yara_generator.py durch LLM-Confidence ersetzen
@@ -60,6 +60,7 @@
 - [x] Current-Silverc operator handoff package builder for public release artifacts — 11.07.2026
 - [x] Current-Silverc public oracle tx-result verifier for external metrics-oracle records — 11.07.2026
 - [x] Current-Silverc release-readiness audit for public handoff packages — 11.07.2026
+- [x] Current-Silverc external oracle operator procedure for signer-ready metrics tx requests — `442853f` (11.07.2026)
 - [x] Post-Toccata docs/bridge status, Kaspa v2.0.1 pin, Security Audit gate, H-001 vectors, and runtime stub gates — `eeb4808` (08.07.2026)
 - [x] Upstream Silverscript `silverc` local build/test and temporary H-001 explicit-preimage probe — 08.07.2026
 - [x] Repo-tracked current-Silverscript H-001 fixture + verifier script + CI explicit-byte guard — 08.07.2026
