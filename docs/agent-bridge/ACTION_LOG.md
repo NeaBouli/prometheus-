@@ -2,6 +2,7 @@
 
 ## 2026-07-11
 
+- GitHub Prometheus CI, Security Audit, and Pages passed for `47ab765`; Prometheus CI now includes deployment receipt verification in the current-Silverc runtime/artifact job.
 - Added `scripts/verify_silverc_deploy_receipts.py` and `modules/contracts/silverc/deploy-receipts.sample.json`. The verifier checks public deployment receipts against the current-Silverc release-bundle manifest, rejects secret-like fields, and separates synthetic `ci_fixture` checks from real `operator_record` evidence before any status update.
 - Extended Prometheus CI with deployment receipt verification: positive sample check, `--require-operator-record` negative check, secret-field rejection, and manifest hash mismatch rejection.
 - Updated README, Whitepaper, roadmap, Silverc README, Backlog, Bridge, and Memory status to record the deployment receipt verifier as a release-hardening gate, not a real deployment claim.
