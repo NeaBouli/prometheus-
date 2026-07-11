@@ -4,6 +4,7 @@
 
 - Extended `scripts/smoke_silverc_artifacts.py` into a reusable release-bundle builder with `--out-dir`, `--silverscript-ref`, `--silverscript-repo`, and optional deterministic `--archive` output; local two-run byte comparison passed for manifest and archive.
 - Updated Prometheus CI to generate the current-Silverc release archive and assert that it contains the manifest.
+- GitHub Prometheus CI, Security Audit, and Pages passed for `d07aeba`; Prometheus CI now covers the current-Silverc release archive path.
 - Extended `scripts/smoke_silverc_artifacts.py` from compile-only artifact smoke into a deterministic release-bundle gate: it now writes and validates `/tmp/prometheus-silverc-artifacts/manifest.json` with source, constructor-args, artifact, and compiled-script SHA-256 hashes plus ABI/state-layout metadata.
 - Verified local release manifest determinism: two consecutive current-Silverc bundle builds produced identical manifests for the pinned Silverscript ref.
 - Added `scripts/smoke_silverc_artifacts.py`, which compiles all 7 current-Silverc fixtures through the pinned upstream `silverc` CLI and validates non-empty script bytes, compiler version, state layout, and expected ABI entries.
