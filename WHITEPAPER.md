@@ -2,7 +2,7 @@
 
 **Whitepaper v4.0 — March 2026**
 
-**Status update — July 2026:** Kaspa Toccata is now treated as a post-fork deployment environment for Prometheus. Current CI verifies H-001 commit-reveal byte encoding, ValidatorStaking runtime transitions, GuardianReputation runtime/formula gates, and RuleStorage compile/ABI gates. Mainnet deployment remains gated by the remaining current-Silverc contract ports, deploy smoke tests, Q-003 `fp_rate` oracle design, and release hardening.
+**Status update — July 2026:** Kaspa Toccata is now treated as a post-fork deployment environment for Prometheus. The current Silverc verifier covers H-001 commit-reveal byte encoding, ValidatorStaking runtime transitions, GuardianReputation runtime/formula gates, and RuleStorage runtime gates. Mainnet deployment remains gated by the remaining current-Silverc contract ports, deploy smoke tests, Q-003 `fp_rate` oracle design, and release hardening.
 
 *The fire belongs to humanity, not to corporations.*
 
@@ -265,7 +265,7 @@ Legacy `.ss` contracts use `uint64` with 10000x scaling for reputation and confi
 Current-Silverc verification status:
 - `ValidatorStakingState.sil`: compile/ABI and runtime transition gates pass.
 - `GuardianReputationState.sil`: compile/ABI, runtime transition, and accepted-proposal formula gates pass.
-- `RuleStorageState.sil`: compile/ABI gates pass for submit/vote/finalize/deactivate.
+- `RuleStorageState.sil`: compile/ABI/runtime gates pass for submit/vote/finalize/deactivate, including low-confidence, late-vote, zero-vote, and pending-rule rejection paths.
 - `GovernanceAutoTuning`, `DevIncentivePool`, and `CommunityDonations`: remaining deployment-scoped ports.
 
 ---

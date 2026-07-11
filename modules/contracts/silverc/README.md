@@ -117,12 +117,24 @@ current Silverc. Those concerns remain deployment/orchestration work around the
 current covenant state model.
 
 The shared verifier compiles this fixture against the same pinned upstream
-Silverscript ref and builds covenant declaration sigscripts for:
+Silverscript ref, builds covenant declaration sigscripts, and runtime-tests
+the proposal lifecycle transitions for:
 
 - `submitProposal`
 - `voteOnProposal`
 - `finalizeProposal`
 - `deactivateRule`
+
+Current runtime coverage:
+
+- `submitProposal` accepts a valid guardian signature and successor state
+- `submitProposal` rejects confidence below `MIN_CONFIDENCE`
+- `voteOnProposal` accepts a valid validator support vote and successor state
+- `voteOnProposal` rejects votes at or after `voting_end_block`
+- `finalizeProposal` accepts accepted and rejected proposal outcomes
+- `finalizeProposal` rejects zero-vote finalization
+- `deactivateRule` accepts deactivation of an active accepted rule
+- `deactivateRule` rejects pending/non-accepted rule state
 
 ## GuardianReputationState.sil
 

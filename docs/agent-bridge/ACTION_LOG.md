@@ -1,5 +1,13 @@
 # Action Log
 
+## 2026-07-11
+
+- Extended the pinned upstream `silverc` verifier with RuleStorageState runtime tests for `submitProposal`, `voteOnProposal`, `finalizeProposal`, and `deactivateRule`.
+- Verified accepted paths: valid guardian proposal submission, valid validator support vote, accepted proposal finalization, rejected proposal finalization, and active accepted rule deactivation.
+- Verified rejected paths: confidence below `MIN_CONFIDENCE`, vote at `voting_end_block`, zero-vote finalization, and deactivation of a pending/non-accepted rule.
+- Local verifier passed: `python3 scripts/verify_silverc_h001.py` injected 32 upstream tests and all passed at Silverscript ref `d25bd3427a093c17327ca3d6b9e1aa5f7688c863`.
+- Sprint 9 remains blocked until remaining deployment-scoped contract ports pass current-Silverc compile/runtime gates; RuleStorage runtime coverage reduces, but does not remove, the deploy blocker.
+
 ## 2026-07-09
 
 - GitHub Prometheus CI, Security Audit, and Pages passed for `a11545b`; public README/Whitepaper status refresh is now verified remotely.

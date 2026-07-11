@@ -4,8 +4,8 @@ Last updated: 2026-07-11 EEST
 Repo path: /Users/gio/Desktop/repos/prometheus
 Branch observed: main
 Latest product-code baseline observed: `3e53e29 feat: add rule storage silverc fixture`
-Current HEAD observed: `a11545b docs: refresh post-toccata whitepaper status`
-Latest CI note: Prometheus CI, Security Audit, and Pages passed for `a11545b`; Security Audit workflow is hardened with explicit cargo/pip audit timeouts.
+Current HEAD observed: `4b49d35 docs: record verified whitepaper refresh`
+Latest CI note: Prometheus CI, Security Audit, and Pages passed for `4b49d35`; local RuleStorage runtime gates passed on 2026-07-11 and are awaiting commit/CI verification.
 Latest public-docs note: README, `WHITEPAPER.md`, and `whitepaper.html` were refreshed to reflect post-Toccata deployment gating, verified current-Silverc H-001/Validator/Guardian/RuleStorage gates, target-only PROM-RULES asset orchestration, and the no-Kasplex-reputation rule.
 
 Purpose: This file is the local bridge for Codex/Claude Code handover. Read it before touching product code. It consolidates the project state, architecture rules, workflow logic, current open issues, the Reputation Badge decision, and the new direct Sandbox access note.
@@ -315,7 +315,7 @@ Pre-hardfork audit synthesis:
 | Severity | Count | Notes |
 | --- | ---: | --- |
 | Critical | 0 | None known |
-| High | 2 | H-001 byte-core + ValidatorStakingState runtime transitions + signed-int deployment bounds verified; GuardianReputationState compile/ABI, runtime transitions, and accepted-proposal formula verified; H-002 fixed |
+| High | 2 | H-001 byte-core + ValidatorStakingState runtime transitions + signed-int deployment bounds verified; GuardianReputationState compile/ABI, runtime transitions, and accepted-proposal formula verified; RuleStorageState compile/ABI/runtime gates verified locally; H-002 fixed |
 | Medium | 2 | M-001 heuristic confidence; M-002 flaky perf test |
 | Low | 3 | L-001 deposit ACL, L-002 fp_rate stub, L-003 CEI |
 | Passed clean | 28 | From 35-check audit synthesis |
@@ -324,14 +324,14 @@ Critical active rule:
 
 ```text
 H-001 byte-core, current-silverc `ValidatorStakingState.sil` runtime transitions, and deployment signed-int bounds are verified. Current upstream Silverc entrypoint integers are signed, so deployable `salt` and `block_height` values are scoped to `0..=i64::MAX`; Rust keeps the raw H-001 `u64` byte helper for historical vectors and exposes `build_silverc_checked` / `validate_silverc_commitment_bounds` for deployment calls.
-On 2026-07-09, the repo contains `modules/contracts/silverc/ValidatorStakingH001.sil`, `modules/contracts/silverc/ValidatorStakingState.sil`, `modules/contracts/silverc/GuardianReputationState.sil`, `modules/contracts/silverc/RuleStorageState.sil`, and `scripts/verify_silverc_h001.py`; the script verifies explicit `vote_byte || byte[8](salt) || byte[8](block_height)` against the Rust H-001 vectors, proves signed negative Silverc values do not match the Rust `u64::MAX` vector, compiles/builds covenant sigscripts for the ValidatorStaking state fixture, runtime-tests `commitVote` valid-bond acceptance plus low-bond/negative-height rejection, `revealVote` valid-reveal acceptance plus wrong-salt/negative-salt rejection, `slashInvalidReveal` invalid-reveal acceptance plus valid-reveal/negative-salt rejection, `requestWithdraw` active-uncommitted acceptance plus open-commitment/negative-height rejection, and `completeWithdraw` zero-output termination after cooldown plus cooldown rejection, compiles/builds/runtime-tests GuardianReputation `register`, `proposalAccepted`, and `proposalRejected` with exact `isqrt(compute_power) * 100` accepted-proposal formula, and compiles/builds RuleStorage covenant sigscripts for `submitProposal`, `voteOnProposal`, `finalizeProposal`, and `deactivateRule` at pinned Silverscript ref `d25bd3427a093c17327ca3d6b9e1aa5f7688c863`.
+On 2026-07-11, the repo contains `modules/contracts/silverc/ValidatorStakingH001.sil`, `modules/contracts/silverc/ValidatorStakingState.sil`, `modules/contracts/silverc/GuardianReputationState.sil`, `modules/contracts/silverc/RuleStorageState.sil`, and `scripts/verify_silverc_h001.py`; the script verifies explicit `vote_byte || byte[8](salt) || byte[8](block_height)` against the Rust H-001 vectors, proves signed negative Silverc values do not match the Rust `u64::MAX` vector, compiles/builds covenant sigscripts for the ValidatorStaking state fixture, runtime-tests `commitVote` valid-bond acceptance plus low-bond/negative-height rejection, `revealVote` valid-reveal acceptance plus wrong-salt/negative-salt rejection, `slashInvalidReveal` invalid-reveal acceptance plus valid-reveal/negative-salt rejection, `requestWithdraw` active-uncommitted acceptance plus open-commitment/negative-height rejection, and `completeWithdraw` zero-output termination after cooldown plus cooldown rejection, compiles/builds/runtime-tests GuardianReputation `register`, `proposalAccepted`, and `proposalRejected` with exact `isqrt(compute_power) * 100` accepted-proposal formula, and compiles/builds/runtime-tests RuleStorage `submitProposal`, `voteOnProposal`, `finalizeProposal`, and `deactivateRule` at pinned Silverscript ref `d25bd3427a093c17327ca3d6b9e1aa5f7688c863`.
 ```
 
 Known findings:
 
 - H-001: `ValidatorStaking.ss:111` legacy commit-reveal LE-encoding ambiguity. Repo-tracked current-Silverscript H-001 fixture passes; `ValidatorStakingState.sil` compile/ABI gate passes; `commitVote`, `revealVote`, `slashInvalidReveal`, `requestWithdraw`, and `completeWithdraw` runtime tests pass; deployment bounds are explicitly scoped to `0..=i64::MAX`.
 - GuardianReputation current-Silverc port: `GuardianReputationState.sil` compile/ABI and runtime gates pass for `register`, `proposalAccepted`, and `proposalRejected` without badge, NFT, Kasplex, or staking semantics. The accepted-proposal reputation formula is restored as exact bounded `isqrt(compute_power_gflops) * 100`.
-- RuleStorage current-Silverc port: `RuleStorageState.sil` compile/ABI gate passes for `submitProposal`, `voteOnProposal`, `finalizeProposal`, and `deactivateRule`; it keeps CIDv1 `byte[36]`, `MIN_CONFIDENCE = 8500`, `VALIDATOR_QUORUM = 6700`, and explicit Guardian reputation outcome events without pretending to support legacy maps, KRC20 minting, or cross-contract calls in current Silverc.
+- RuleStorage current-Silverc port: `RuleStorageState.sil` compile/ABI/runtime gates pass for `submitProposal`, `voteOnProposal`, `finalizeProposal`, and `deactivateRule`; valid submit/vote/finalize/deactivate transitions are accepted, low confidence, late vote, zero-vote finalization, and pending-rule deactivation are rejected. It keeps CIDv1 `byte[36]`, `MIN_CONFIDENCE = 8500`, `VALIDATOR_QUORUM = 6700`, and explicit Guardian reputation outcome events without pretending to support legacy maps, KRC20 minting, or cross-contract calls in current Silverc.
 - H-002: unnecessary Mutex around Phi3Model. Fixed in commit `6347b85` according to memory/handover.
 - M-001: Guardian YARA generator confidence is heuristic, needs real LLM confidence or validated metric.
 - M-002: performance test flaky in debug mode, threshold/release gate needed.
@@ -525,7 +525,7 @@ If asked to continue project work:
 
 ## 18. One-Line Decision Summary
 
-Prometheus does not need reputation badges; it needs readable, provable Kaspa L1 Guardian reputation. Codex has direct Sandbox access via `ssh sandbox`, upstream `silverc` works in CI, H-001 byte-core plus current-silverc `ValidatorStakingState.sil` runtime transitions pass, `GuardianReputationState.sil` compile/ABI/runtime/formula gates pass, `RuleStorageState.sil` compile/ABI gates pass, signed-int deployment bounds are documented/enforced, and Sprint 9 remains blocked until remaining deployment-scoped contract ports pass.
+Prometheus does not need reputation badges; it needs readable, provable Kaspa L1 Guardian reputation. Codex has direct Sandbox access via `ssh sandbox`, upstream `silverc` works in CI, H-001 byte-core plus current-silverc `ValidatorStakingState.sil` runtime transitions pass, `GuardianReputationState.sil` compile/ABI/runtime/formula gates pass, `RuleStorageState.sil` compile/ABI/runtime gates pass locally, signed-int deployment bounds are documented/enforced, and Sprint 9 remains blocked until remaining deployment-scoped contract ports pass.
 <!-- CODEX_CLAUDE_CODE_TERMINAL_BRIDGE_V1 -->
 ## Codex -> Claude Code Terminal Bridge
 

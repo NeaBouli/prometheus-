@@ -388,12 +388,16 @@ Update:   Current-silverc fixture `ValidatorStakingH001.sil` now verifies
           rejected; reputation caps at `REPUTATION_MAX`. The exact
           accepted-proposal formula is restored with bounded current-Silverc
           `for` loops as `isqrt(compute_power_gflops) * 100`.
-          `RuleStorageState.sil` compiles and builds covenant sigscripts
-          for `submitProposal`, `voteOnProposal`, `finalizeProposal`, and
-          `deactivateRule`; it preserves CIDv1 `byte[36]`,
-          `MIN_CONFIDENCE = 8500`, and `VALIDATOR_QUORUM = 6700` while
-          leaving legacy maps, KRC20 minting, events, and cross-contract calls
-          out of the current-Silverc fixture scope.
+          `RuleStorageState.sil` compiles, builds covenant sigscripts, and
+          runtime-tests `submitProposal`, `voteOnProposal`,
+          `finalizeProposal`, and `deactivateRule`; valid
+          guardian/validator/governance signature transitions are accepted,
+          while low confidence, late vote, zero-vote finalization, and
+          pending-rule deactivation are rejected. It preserves CIDv1
+          `byte[36]`, `MIN_CONFIDENCE = 8500`, and
+          `VALIDATOR_QUORUM = 6700` while leaving legacy maps, KRC20 minting,
+          events, and cross-contract calls out of the current-Silverc fixture
+          scope.
 Action:   Port/compile the remaining deployment-scoped contracts.
 Severity: HIGH until remaining deployment-scoped contract ports are verified
 ```
@@ -542,20 +546,21 @@ Audit confidence:       94%
 (Deduction: ValidatorStaking current-silverc compile/ABI and runtime
  transitions plus signed-int deployment bounds are verified,
  GuardianReputation current-silverc compile/ABI/runtime/formula gates are
- verified, and RuleStorage current-silverc compile/ABI gates are verified,
+ verified, and RuleStorage current-silverc compile/ABI/runtime gates are
+ verified locally,
  but remaining deployment-scoped contract ports and LLM confidence extraction
  remain open)
 ```
 
-**VERDICT UPDATE 2026-07-09:** Toccata/hardfork no longer looks like the
+**VERDICT UPDATE 2026-07-11:** Toccata/hardfork no longer looks like the
 primary blocker. The deployment blocker is now current-Silverscript contract
 runtime readiness: H-001 byte-core is verified, `ValidatorStakingState.sil`
 compiles/builds covenant sigscripts, and `commitVote`/`revealVote`/
 `slashInvalidReveal`/`requestWithdraw`/`completeWithdraw` runtime tests pass.
 The signed-int/u64 boundary is resolved by constraining current-Silverc
-deployment inputs to `0..=i64::MAX`; RuleStorageState compile/ABI gates now
-pass, and the remaining deployment-scoped contract ports must pass before
-Sprint 9 deployment.
+deployment inputs to `0..=i64::MAX`; GuardianReputationState runtime/formula
+gates and RuleStorageState runtime gates now pass locally, and the remaining
+deployment-scoped contract ports must pass before Sprint 9 deployment.
 M-001 and M-002 can wait until full release (Aug/Sep 2026).
 
 *Audit completed 2026-04-02 by Claude Code (5 parallel agents, 7 levels, 35 checks).*
