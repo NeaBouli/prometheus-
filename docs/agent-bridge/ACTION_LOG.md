@@ -2,6 +2,11 @@
 
 ## 2026-07-11
 
+- GitHub Prometheus CI, Security Audit, and Pages passed for `26c31c0`; the pinned Silverc runtime job now passes 41 upstream-injected tests.
+- Extended `scripts/verify_silverc_h001.py` with CommunityDonationsState runtime tests for `donateKas`, `proposeDisbursement`, `voteDisbursement`, and `executeDisbursement`.
+- Verified accepted paths: valid donor donation, valid disbursement proposal, valid validator support vote, and approved governance execution.
+- Verified rejected paths: zero donation amount, disbursement amount above pool balance, vote at `voting_end_block`, and execution below `DISBURSEMENT_QUORUM`.
+- Branch protection still reports direct-push bypasses for `main`; this is allowed by current credentials but remains a workflow/process risk to clean up before release governance.
 - GitHub Prometheus CI, Security Audit, and Pages passed for `19efaa9`; Prometheus CI now includes the CommunityDonationsState compile/ABI fixture guard and the pinned Silverc runtime job passes 33 upstream-injected tests.
 - Added current-Silverscript CommunityDonations state fixture `modules/contracts/silverc/CommunityDonationsState.sil` and extended `scripts/verify_silverc_h001.py` so the pinned upstream verifier compiles the fixture and builds covenant sigscripts for `donateKas`, `proposeDisbursement`, `voteDisbursement`, and `executeDisbursement`.
 - CommunityDonationsState keeps KAS-denominated donation/disbursement accounting, `MIN_DONATION_KAS = 1`, `DISBURSEMENT_QUORUM = 10`, and `VALIDATOR_QUORUM = 6700`; it intentionally does not model legacy maps, string storage, `tx.value`, direct KAS transfer, or cross-contract validator lookups in current Silverc.

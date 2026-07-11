@@ -119,12 +119,16 @@ validator lookups, or direct KAS `transfer(...)` in current Silverc. Those
 concerns remain deployment/orchestration work around the covenant state model.
 
 The shared verifier currently compiles this fixture against the same pinned
-upstream Silverscript ref and builds covenant declaration sigscripts for:
+upstream Silverscript ref and runtime-tests covenant transitions for:
 
 - `donateKas`
 - `proposeDisbursement`
 - `voteDisbursement`
 - `executeDisbursement`
+
+Verified rejection paths include zero donation amount, disbursement amount
+above pool balance, voting at `voting_end_block`, and execution below
+`DISBURSEMENT_QUORUM`.
 
 ## RuleStorageState.sil
 

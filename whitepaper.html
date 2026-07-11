@@ -423,7 +423,7 @@ lora_config = LoraConfig(
         <tr><td>CommunityDonations.ss</td><td>Transparent community fund</td><td>donateKas, proposeDisbursement</td></tr>
         <tr><td>RuleStorage.ss</td><td>Rule state + target PROM-RULES asset orchestration</td><td>submitProposal, voteOnProposal, finalizeProposal</td></tr>
       </table>
-      <div class="callout"><p><strong>Current-Silverc gates:</strong> ValidatorStakingState runtime transitions pass; GuardianReputation runtime/formula gates pass; RuleStorage runtime gates pass for submit, vote, finalize, and deactivate paths; CommunityDonations compile/ABI gates pass for donate, propose, vote, and execute disbursement paths. GovernanceAutoTuning and DevIncentivePool remain deployment-scoped ports.</p></div>
+      <div class="callout"><p><strong>Current-Silverc gates:</strong> ValidatorStakingState runtime transitions pass; GuardianReputation runtime/formula gates pass; RuleStorage runtime gates pass for submit, vote, finalize, and deactivate paths; CommunityDonations runtime gates pass for donate, propose, vote, and execute disbursement paths. GovernanceAutoTuning and DevIncentivePool remain deployment-scoped ports.</p></div>
       <div class="callout-gold"><p><strong>CRITICAL — KAS/PROM separation:</strong> Validators stake KAS (tx.value = KAS, constant = MIN_STAKE_KAS = 10,000). PROM is earned by Guardians through accepted proposals — never staked by Validators. Confusing the two tokens is the most common implementation error (PATTERN-001).</p></div>
     </div>
 
