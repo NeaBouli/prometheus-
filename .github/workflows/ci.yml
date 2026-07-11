@@ -151,12 +151,32 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       - name: Verify H-001 vectors and validator state fixture against pinned silverc
         run: python3 scripts/verify_silverc_h001.py
-      - name: Build current-silverc release bundle manifest
+      - name: Build current-silverc release bundle archive
         run: |
           python3 scripts/smoke_silverc_artifacts.py \
             --archive /tmp/prometheus-silverc-artifacts.tar.gz
           test -s /tmp/prometheus-silverc-artifacts.tar.gz
           tar -tzf /tmp/prometheus-silverc-artifacts.tar.gz | grep -q 'prometheus-silverc-artifacts/manifest.json'
+      - name: Preflight current-silverc release bundle
+        run: |
+          python3 scripts/preflight_silverc_deploy.py \
+            --archive /tmp/prometheus-silverc-artifacts.tar.gz \
+            --network sandbox \
+            --rpc-url ws://127.0.0.1:17210 \
+            --deployer-address kaspatest:qptestpreflight000000000000000000000000000000000 \
+            --metrics-oracle-pubkey 1111111111111111111111111111111111111111111111111111111111111111 \
+            --plan-out /tmp/prometheus-silverc-deploy-preflight.json
+          test -s /tmp/prometheus-silverc-deploy-preflight.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          plan = json.loads(Path("/tmp/prometheus-silverc-deploy-preflight.json").read_text())
+          assert plan["bundle"]["fixture_count"] == 7
+          assert plan["operator_inputs"]["missing"] == []
+          assert plan["deploy_supported"] is False
+          assert "upstream silverc exposes no network deploy command" in plan["deploy_blockers"]
+          PY
 
   # ─── Rust Workspace Check ───────────────────────────────────────────────────
   rust-check:

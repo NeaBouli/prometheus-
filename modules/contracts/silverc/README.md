@@ -35,6 +35,7 @@ SILVERSCRIPT_REF=<commit-or-tag> python3 scripts/verify_silverc_h001.py
 SILVERSCRIPT_REPO=/path/to/silverscript python3 scripts/smoke_silverc_artifacts.py
 PROMETHEUS_SILVERC_ARTIFACT_DIR=/tmp/out python3 scripts/smoke_silverc_artifacts.py
 python3 scripts/smoke_silverc_artifacts.py --out-dir /tmp/out --archive /tmp/prometheus-silverc-artifacts.tar.gz
+python3 scripts/preflight_silverc_deploy.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --network sandbox --rpc-url ws://127.0.0.1:17210 --deployer-address kaspatest:qptestpreflight000000000000000000000000000000000 --metrics-oracle-pubkey 1111111111111111111111111111111111111111111111111111111111111111
 ```
 
 ## ValidatorStakingState.sil
@@ -135,6 +136,26 @@ Silverscript ref. CI builds the manifest and checks that the optional archive
 contains the manifest. This is a CI-safe release-bundle gate for the available
 current-Silverc CLI surface; it does not claim that contracts were deployed to a
 network.
+
+## Deploy preflight
+
+`scripts/preflight_silverc_deploy.py` validates an already-built release bundle
+from either `--bundle-dir` or `--archive` before any network deploy attempt. It
+checks:
+
+- safe archive layout
+- manifest schema and expected fixture order
+- source, constructor-args, artifact, and compiled-script SHA-256 hashes
+- non-empty ABI and state layout metadata
+- public operator inputs: network, RPC URL, deployer address, and metrics-oracle
+  public key
+- whether the pinned upstream `silverc` CLI exposes a network deploy command
+
+The preflight intentionally does not accept private keys and does not deploy.
+Today it reports `deploy_supported: false` because upstream `silverc` exposes
+compile/AST artifact generation but no network deploy command. This turns the
+remaining Sprint 9 deploy blocker into a concrete, CI-visible capability gap
+instead of a vague manual step.
 
 ## GovernanceAutoTuningState.sil
 

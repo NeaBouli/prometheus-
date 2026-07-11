@@ -33,12 +33,15 @@ Prometheus current-Silverc runtime gates now cover H-001, ValidatorStaking,
 GuardianReputation, RuleStorage, CommunityDonations, DevIncentivePool, and
 GovernanceAutoTuning. A local release-bundle smoke compiles all 7 current-Silverc
 fixtures through the pinned upstream `silverc` CLI and writes deterministic
-source/artifact/script hashes plus an optional deterministic archive. The remaining deployment blockers are the missing
-network deploy/orchestration path, signed metrics-oracle operation, and release
-hardening.
+source/artifact/script hashes plus an optional deterministic archive. A deploy
+preflight validates release-bundle integrity and public operator inputs, while
+confirming upstream `silverc` still exposes no network deploy command. The
+remaining deployment blockers are the missing network deploy/orchestration path,
+signed metrics-oracle operation, and release hardening.
 
 **Sprint 9 — Contracts Live + Real ZK-Proof**
 - Keep current-Silverscript runtime and release-bundle manifest gates green
+- Keep release-bundle deploy preflight green
 - Compile and deploy all 6 contracts to Kaspa Mainnet only after verification passes
 - Integrate kaspa-zk-params crate (real Groth16, replacing stub)
 - Implement PROM emission contract (minting logic)
