@@ -49,6 +49,11 @@ def parse_args() -> argparse.Namespace:
         help="Optional real operator_record receipts JSON; verified with --require-operator-record",
     )
     parser.add_argument(
+        "--orchestrator-results",
+        type=Path,
+        help="Optional public external deploy-orchestrator results JSON to convert into operator_record receipts",
+    )
+    parser.add_argument(
         "--contract-instance-id",
         help="Optional public GovernanceAutoTuningState deployed instance/outpoint for signer-ready tx requests",
     )
@@ -157,6 +162,33 @@ def run_deploy_request_verification(archive: Path, out_dir: Path) -> dict[str, A
             str(out_dir / "deploy-request-set.json"),
             "--requests-dir",
             str(out_dir / "deploy-requests"),
+            "--summary-out",
+            str(summary_path),
+            "--runbook-out",
+            str(runbook_path),
+        ]
+    )
+    return load_json(summary_path)
+
+
+def run_operator_receipt_import(archive: Path, out_dir: Path, orchestrator_results: Path) -> dict[str, Any]:
+    receipts_path = out_dir / "operator-receipts.from-results.json"
+    summary_path = out_dir / "operator-receipts-import-summary.json"
+    runbook_path = out_dir / "operator-receipts-import.md"
+    run(
+        [
+            sys.executable,
+            "scripts/build_silverc_operator_receipts.py",
+            "--archive",
+            str(archive),
+            "--request-set",
+            str(out_dir / "deploy-request-set.json"),
+            "--requests-dir",
+            str(out_dir / "deploy-requests"),
+            "--orchestrator-results",
+            str(orchestrator_results),
+            "--operator-receipts-out",
+            str(receipts_path),
             "--summary-out",
             str(summary_path),
             "--runbook-out",
@@ -285,6 +317,7 @@ def write_handoff_markdown(out_dir: Path, summary: dict[str, Any]) -> None:
             f"- Deploy preflight: {'supported' if summary['deploy_supported'] else 'blocked'}",
             f"- Deploy request set: {summary['deploy_requests_status']}",
             f"- Deploy request verification: {summary['deploy_request_verification_status']}",
+            f"- Operator receipt import: {summary['operator_receipt_import_status']}",
             f"- CI receipt verification: {summary['ci_receipts_status']}",
             f"- Operator receipt verification: {summary['operator_receipts_status']}",
             f"- Metrics report preflight: {summary['metrics_report_status']}",
@@ -303,7 +336,7 @@ def write_handoff_markdown(out_dir: Path, summary: dict[str, Any]) -> None:
             "",
             "1. Review `deploy-preflight.md` and confirm the deploy-tool capability status.",
             "2. Deploy only through an approved external network deploy/orchestration tool.",
-            "3. Record real public receipts as operator_record JSON and rerun this handoff builder with `--operator-receipts`.",
+            "3. Import public external deploy results with `--orchestrator-results`, or provide verified `operator_record` receipts with `--operator-receipts`.",
             "4. Use only verified operator_record contract IDs for signer-ready oracle transaction requests.",
             "5. Sign and broadcast outside this repository through the approved wallet/vault process.",
             "6. Update `memory/STATUS.md` only after all real receipts and transaction receipts verify.",
@@ -320,6 +353,9 @@ def main() -> int:
     operator_receipts_path = (
         ensure_public_file(args.operator_receipts, "operator receipts") if args.operator_receipts else None
     )
+    orchestrator_results_path = (
+        ensure_public_file(args.orchestrator_results, "orchestrator results") if args.orchestrator_results else None
+    )
     out_dir = args.out_dir.expanduser().resolve()
     if out_dir.exists():
         shutil.rmtree(out_dir)
@@ -331,6 +367,11 @@ def main() -> int:
     deploy_plan = run_deploy_preflight(args, packaged_archive, out_dir)
     deploy_requests = run_deploy_requests(args, packaged_archive, out_dir)
     deploy_request_verification = run_deploy_request_verification(packaged_archive, out_dir)
+    operator_receipt_import = None
+    if orchestrator_results_path:
+        operator_receipt_import = run_operator_receipt_import(packaged_archive, out_dir, orchestrator_results_path)
+        if operator_receipts_path is None:
+            operator_receipts_path = out_dir / "operator-receipts.from-results.json"
     ci_receipts_summary = run_receipt_verification(
         packaged_archive,
         ci_receipts,
@@ -361,6 +402,9 @@ def main() -> int:
         "deploy_requests_status": deploy_requests["status"],
         "deploy_request_count": deploy_requests["request_count"],
         "deploy_request_verification_status": deploy_request_verification["status"],
+        "operator_receipt_import_status": (
+            operator_receipt_import["status"] if operator_receipt_import else "NOT_PROVIDED"
+        ),
         "ci_receipts_status": ci_receipts_summary["status"],
         "operator_receipts_status": (
             operator_receipts_summary["status"] if operator_receipts_summary else "MISSING_OPERATOR_RECORD"

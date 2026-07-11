@@ -12,7 +12,7 @@
 - [ ] [P0] Alle memory/-Dateien initial befüllen und pushen | Claude Code | Repo-Struktur
 - [x] [P0] Kaspa Testnet-10-Node installieren und starten (rusty-kaspa v1.1.0) | Claude Code | 2026-03-21
 - [x] [P0] Verbindung zum Testnet verifizieren (8 Peers, IBD active) | Claude Code | 2026-03-21
-- [~] [P0] Silverscript Compiler/Tooling installieren und testen | Claude Code | H-001 fixture verifies; ValidatorStaking state fixture compiles; commitVote/revealVote/slash/requestWithdraw/completeWithdraw runtime tests pass; signed-int deployment bounds enforced; GuardianReputationState compile/ABI/runtime/formula gates pass; RuleStorageState/CommunityDonationsState/DevIncentivePoolState/GovernanceAutoTuningState compile/ABI/runtime gates pass locally; all 7 current-Silverc fixtures compile via CLI JSON artifact smoke locally; deterministic release archive, deploy preflight, external deploy request set/verifier, deployment receipt verifier, deployment status staging guard, operator handoff package, metrics report preflight, and unsigned oracle tx-request builder pass locally and in CI; network deploy/orchestration path pending because upstream `silverc` has no deploy command
+- [~] [P0] Silverscript Compiler/Tooling installieren und testen | Claude Code | H-001 fixture verifies; ValidatorStaking state fixture compiles; commitVote/revealVote/slash/requestWithdraw/completeWithdraw runtime tests pass; signed-int deployment bounds enforced; GuardianReputationState compile/ABI/runtime/formula gates pass; RuleStorageState/CommunityDonationsState/DevIncentivePoolState/GovernanceAutoTuningState compile/ABI/runtime gates pass locally; all 7 current-Silverc fixtures compile via CLI JSON artifact smoke locally; deterministic release archive, deploy preflight, external deploy request set/verifier, public orchestrator-result receipt import, deployment receipt verifier, deployment status staging guard, operator handoff package, metrics report preflight, and unsigned oracle tx-request builder pass locally and in CI; network deploy/orchestration path pending because upstream `silverc` has no deploy command
 - [ ] [P0] Hello-World Silverscript Contract auf Testnet deployen | Claude Code | PENDING: after current-Silverc deploy preflight is CI-green and network deploy/orchestration tooling exists
 - [x] [P0] rusty-kaspa als Dependency in Cargo.toml einbinden | Claude Code | 2026-03-21; pinned to v2.0.1 on 2026-07-07
 - [ ] [P0] autodidactic.py vollständig testen (alle Memory-Operationen) | Claude Code | memory/-Dateien
@@ -31,7 +31,7 @@
 - [x] [P1] RuleStorage.ss schreiben (storeRule als KRC20-Asset) | Claude Code | 2026-03-21 (9 tests); current-Silverc RuleStorageState compile/ABI/runtime gates added 2026-07-11
 - [x] [P1] Unit-Tests für ValidatorStaking (min. 10 Tests) | Claude Code | 2026-03-21 (11 tests)
 - [x] [P1] Unit-Tests für GuardianReputation (min. 8 Tests) | Claude Code | 2026-03-21 (9 tests)
-- [ ] [P1] Alle Contracts auf Testnet deployen und Adressen in STATUS.md eintragen | Claude Code | Wartet auf current-Silverc network deploy/orchestration path, verified operator deployment receipts, und external signed metrics-oracle transaction assembly/signing/deploy integration
+- [ ] [P1] Alle Contracts auf Testnet deployen und Adressen in STATUS.md eintragen | Claude Code | Wartet auf current-Silverc network deploy/orchestration path, real public deploy results/verified operator deployment receipts, und external signed metrics-oracle transaction assembly/signing/deploy integration
 - [x] [P1] Audit-Request für alle Contracts an Claude vorbereiten | Claude Code | 2026-03-21
 
 ---
@@ -75,7 +75,7 @@
 
 ## ═══ SPRINT 5: VOTING MECHANISMUS (Woche 7) ═══
 
-- [~] [P1] Commit-Reveal vollständig in Silverscript implementieren | Claude Code | H-001 runtime fixture + ValidatorStakingState compile/ABI + commitVote/revealVote/slash/requestWithdraw/completeWithdraw runtime gates done; signed-int deployment bounds enforced; GuardianReputationState/RuleStorageState/CommunityDonationsState/DevIncentivePoolState/GovernanceAutoTuningState compile/ABI/runtime gates done locally; current-Silverc artifact smoke/release archive/deploy preflight/deploy request generation/verification done locally; remaining approved network deploy/orchestration path pending
+- [~] [P1] Commit-Reveal vollständig in Silverscript implementieren | Claude Code | H-001 runtime fixture + ValidatorStakingState compile/ABI + commitVote/revealVote/slash/requestWithdraw/completeWithdraw runtime gates done; signed-int deployment bounds enforced; GuardianReputationState/RuleStorageState/CommunityDonationsState/DevIncentivePoolState/GovernanceAutoTuningState compile/ABI/runtime gates done locally; current-Silverc artifact smoke/release archive/deploy preflight/deploy request generation/verification and public orchestrator-result receipt import done locally; remaining approved network deploy/orchestration path pending
 - [ ] [P1] Salted Voting (30% Zufallsstichprobe) implementieren | Claude Code | Commit-Reveal
 - [ ] [P1] Bond-System (10% des Stakes als Kaution) implementieren | Claude Code | Commit-Reveal
 - [ ] [P2] Voting-Tests: Kollusion-Angriff scheitert | Claude Code | Voting-System

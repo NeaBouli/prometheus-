@@ -36,19 +36,23 @@ fixtures through the pinned upstream `silverc` CLI and writes deterministic
 source/artifact/script hashes plus an optional deterministic archive. A deploy
 preflight validates release-bundle integrity and public operator inputs, emits a
 Markdown operator runbook with contract hashes and safety rules, and confirms
-upstream `silverc` still exposes no network deploy command. A deployment receipt
-verifier validates public receipt records against the release bundle and keeps
-synthetic CI fixtures separate from real `operator_record` receipts. A status
-staging guard rejects CI fixtures and emits only a manual status-update draft
-from verified `operator_record` receipts. An external deploy request builder
-emits per-contract public request JSON for an approved orchestrator, with
-request hashes bound to the release bundle. A CI-safe operator handoff builder
-now packages the release archive, preflight outputs, deploy requests, receipt
-checks, metrics report preflight, and unsigned oracle request into one public
-handoff directory while preserving the real blocker list. The remaining
-deployment blockers are the missing network deploy/orchestration path, external
-signed metrics-oracle transaction assembly/signing/deploy operation, and release
-hardening. A separate metrics-oracle report preflight validates public
+upstream `silverc` still exposes no network deploy command. An external deploy
+request builder emits per-contract public request JSON for an approved
+orchestrator, with request hashes bound to the release bundle. A public
+orchestrator-result importer converts confirmed external deploy results into
+verified `operator_record` receipts without accepting signing material. A
+deployment receipt verifier validates public receipt records against the release
+bundle and keeps synthetic CI fixtures separate from real `operator_record`
+receipts. A status staging guard rejects CI fixtures and emits only a manual
+status-update draft from verified `operator_record` receipts. A CI-safe operator
+handoff builder now packages the release archive, preflight outputs, deploy
+requests, optional imported operator receipts, receipt checks, metrics report
+preflight, and unsigned oracle request into one public handoff directory while
+preserving the real blocker list. The remaining deployment blockers are the
+missing network deploy/orchestration path, real public deploy results/receipts
+from that path, external signed metrics-oracle transaction
+assembly/signing/deploy operation, and release hardening. A separate
+metrics-oracle report preflight validates public
 `reportMetrics` payloads, and an unsigned oracle tx-request builder binds those
 payloads to the GovernanceAutoTuning artifact hashes for external assembly
 without accepting signing material.
@@ -58,6 +62,7 @@ without accepting signing material.
 - Keep release-bundle deploy preflight green
 - Keep the generated deploy operator runbook green and free of signing material
 - Keep the external deploy request set green and free of signing material
+- Keep public orchestrator-result receipt import green and free of signing material
 - Keep deployment receipt verification green and free of signing material
 - Keep deployment status staging guarded against CI fixture receipts
 - Keep the generated operator handoff package green and free of signing material

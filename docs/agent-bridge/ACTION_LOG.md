@@ -2,6 +2,10 @@
 
 ## 2026-07-11
 
+- Added `scripts/build_silverc_operator_receipts.py`, a public-only importer that converts confirmed external deploy-orchestrator results into canonical `operator_record` receipts. It validates the release bundle, re-validates the deploy request set, binds every result to a verified request hash, rejects secret-like fields, and immediately re-validates the generated receipts.
+- Extended Prometheus CI with the public orchestrator-result receipt import path: positive import, generated receipt verification, status staging from generated receipts, secret-field rejection, and request-hash tamper rejection.
+- Extended `scripts/build_silverc_operator_handoff.py` with optional `--orchestrator-results`; handoff packages can now include `operator-receipts.from-results.json`, `operator-receipts-import-summary.json`, and `operator-receipts-import.md` while still reporting real blockers.
+- Local end-to-end tests passed against a fresh current-Silverc archive: deploy requests, deploy-request verification, orchestrator-result import, generated receipt verification, status staging, negative secret-field check, negative request-hash tamper check, and handoff import mode.
 - Added `scripts/build_silverc_deploy_requests.py`, a CI-safe public deploy-request builder for approved external orchestrators. It emits one request per current-Silverc contract plus a request-set summary/runbook, rejects credentialed RPC URLs, and does not sign, assemble chain transactions, broadcast, deploy, or update status files.
 - Extended the operator handoff package to include the deploy request set and per-contract request files.
 - Added `scripts/verify_silverc_deploy_requests.py`, an independent request-set verifier. It checks request-set/per-contract hashes, manifest-bound source/constructor/artifact/script hashes, constructor args, order, safety flags, and secret-field rejection before handoff.
