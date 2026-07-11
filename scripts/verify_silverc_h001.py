@@ -22,6 +22,9 @@ RULE_STORAGE_STATE_CONTRACT = (
 COMMUNITY_DONATIONS_STATE_CONTRACT = (
     ROOT / "modules" / "contracts" / "silverc" / "CommunityDonationsState.sil"
 )
+DEV_INCENTIVE_POOL_STATE_CONTRACT = (
+    ROOT / "modules" / "contracts" / "silverc" / "DevIncentivePoolState.sil"
+)
 DEFAULT_SILVERSCRIPT_REPO = Path("/tmp/prom-silverscript")
 SILVERSCRIPT_GIT = "https://github.com/kaspanet/silverscript.git"
 DEFAULT_SILVERSCRIPT_REF = "d25bd3427a093c17327ca3d6b9e1aa5f7688c863"
@@ -259,6 +262,44 @@ fn community_donations_state_args(
     ]
 }
 
+fn dev_incentive_pool_state_args(
+    next_grant_id: i64,
+    pool_balance_prom: i64,
+    grant_id: i64,
+    developer_pk: Vec<u8>,
+    contribution_hash: Vec<u8>,
+    description_hash: Vec<u8>,
+    lines_of_code: i64,
+    complexity: i64,
+    requested_amount_prom: i64,
+    votes_for: i64,
+    votes_against: i64,
+    voting_end_block: i64,
+    executed: bool,
+    paid: bool,
+    status: i64,
+    last_proposer_pk: Vec<u8>,
+) -> Vec<Expr<'static>> {
+    vec![
+        Expr::int(next_grant_id),
+        Expr::int(pool_balance_prom),
+        Expr::int(grant_id),
+        Expr::bytes(developer_pk),
+        Expr::bytes(contribution_hash),
+        Expr::bytes(description_hash),
+        Expr::int(lines_of_code),
+        Expr::int(complexity),
+        Expr::int(requested_amount_prom),
+        Expr::int(votes_for),
+        Expr::int(votes_against),
+        Expr::int(voting_end_block),
+        Expr::bool(executed),
+        Expr::bool(paid),
+        Expr::int(status),
+        Expr::bytes(last_proposer_pk),
+    ]
+}
+
 fn build_covenant_sigscript(compiled: &silverscript_lang::compiler::CompiledContract<'_>, function_name: &str, args: Vec<Expr<'_>>) {
     compiled
         .build_sig_script_for_covenant_decl(function_name, args, CovenantDeclCallOptions { is_leader: false })
@@ -301,6 +342,14 @@ fn community_donations_state_entry_sigscript(compiled: &CompiledContract<'_>, fu
     sigscript
 }
 
+fn dev_incentive_pool_state_entry_sigscript(compiled: &CompiledContract<'_>, function_name: &str, args: Vec<Expr<'_>>) -> Vec<u8> {
+    let mut sigscript = compiled
+        .build_sig_script_for_covenant_decl(function_name, args, CovenantDeclCallOptions { is_leader: false })
+        .unwrap_or_else(|err| panic!("DevIncentivePoolState {function_name} sigscript builds: {err}"));
+    sigscript.extend_from_slice(&common::push_redeem_script(&compiled.script));
+    sigscript
+}
+
 fn compile_validator_state<'a>(source: &'a str, args: Vec<Expr<'static>>) -> CompiledContract<'a> {
     compile_contract(source, &args, CompileOptions::default()).expect("ValidatorStakingState fixture compiles")
 }
@@ -311,6 +360,10 @@ fn compile_guardian_state<'a>(source: &'a str, args: Vec<Expr<'static>>) -> Comp
 
 fn compile_community_donations_state<'a>(source: &'a str, args: Vec<Expr<'static>>) -> CompiledContract<'a> {
     compile_contract(source, &args, CompileOptions::default()).expect("CommunityDonationsState fixture compiles")
+}
+
+fn compile_dev_incentive_pool_state<'a>(source: &'a str, args: Vec<Expr<'static>>) -> CompiledContract<'a> {
+    compile_contract(source, &args, CompileOptions::default()).expect("DevIncentivePoolState fixture compiles")
 }
 
 #[test]
@@ -1070,6 +1123,400 @@ fn prometheus_community_donations_execute_runtime_rejects_insufficient_quorum() 
     );
 
     let err = execute_input_with_covenants(tx, entries, 0).expect_err("executeDisbursement must reject votes below DISBURSEMENT_QUORUM");
+    common::assert_verify_like_error(err);
+}
+
+#[test]
+fn prometheus_dev_incentive_pool_state_fixture_compiles_against_current_silverc() {
+    let contract_path = std::env::var("PROMETHEUS_DEV_INCENTIVE_POOL_STATE_CONTRACT")
+        .expect("PROMETHEUS_DEV_INCENTIVE_POOL_STATE_CONTRACT is set");
+    let source = std::fs::read_to_string(contract_path).expect("read Prometheus dev incentive pool contract fixture");
+    let developer_pk = vec![4u8; 32];
+    let proposer_pk = vec![5u8; 32];
+    let validator_pk = vec![7u8; 32];
+    let contribution_hash = vec![2u8; 32];
+    let description_hash = vec![3u8; 32];
+    let sig = dummy_signature();
+
+    let funded = compile_dev_incentive_pool_state(
+        &source,
+        dev_incentive_pool_state_args(1, 500_000, 0, developer_pk.clone(), zero32(), zero32(), 0, 1, 0, 0, 0, 0, false, false, 0, proposer_pk.clone()),
+    );
+    build_covenant_sigscript(
+        &funded,
+        "proposeGrant",
+        vec![
+            Expr::bytes(developer_pk.clone()),
+            Expr::bytes(contribution_hash.clone()),
+            Expr::bytes(description_hash.clone()),
+            Expr::int(100),
+            Expr::int(5),
+            Expr::int(10_000),
+            Expr::int(1_000),
+            Expr::bytes(sig.clone()),
+            Expr::bytes(proposer_pk.clone()),
+        ],
+    );
+
+    let pending = compile_dev_incentive_pool_state(
+        &source,
+        dev_incentive_pool_state_args(2, 500_000, 1, developer_pk, contribution_hash, description_hash, 100, 5, 10_000, 10, 0, 605_800, false, false, 1, proposer_pk),
+    );
+    build_covenant_sigscript(
+        &pending,
+        "voteGrant",
+        vec![Expr::bool(true), Expr::int(1_200), Expr::bytes(sig), Expr::bytes(validator_pk)],
+    );
+    build_covenant_sigscript(&pending, "executeGrant", vec![Expr::int(605_800)]);
+}
+
+#[test]
+fn prometheus_dev_incentive_pool_propose_runtime_accepts_valid_transition() {
+    let contract_path = std::env::var("PROMETHEUS_DEV_INCENTIVE_POOL_STATE_CONTRACT")
+        .expect("PROMETHEUS_DEV_INCENTIVE_POOL_STATE_CONTRACT is set");
+    let source = std::fs::read_to_string(contract_path).expect("read Prometheus dev incentive pool contract fixture");
+    let developer_pk = keypair_from_seed(4).x_only_public_key().0.serialize().to_vec();
+    let proposer_keypair = keypair_from_seed(5);
+    let proposer_pk = proposer_keypair.x_only_public_key().0.serialize().to_vec();
+    let contribution_hash = vec![2u8; 32];
+    let description_hash = vec![3u8; 32];
+
+    let funded = compile_dev_incentive_pool_state(
+        &source,
+        dev_incentive_pool_state_args(1, 500_000, 0, developer_pk.clone(), zero32(), zero32(), 0, 1, 0, 0, 0, 0, false, false, 0, proposer_pk.clone()),
+    );
+    let pending = compile_dev_incentive_pool_state(
+        &source,
+        dev_incentive_pool_state_args(2, 500_000, 1, developer_pk.clone(), contribution_hash.clone(), description_hash.clone(), 100, 5, 10_000, 0, 0, 605_800, false, false, 1, proposer_pk.clone()),
+    );
+
+    let placeholder_sigscript = dev_incentive_pool_state_entry_sigscript(
+        &funded,
+        "proposeGrant",
+        vec![
+            Expr::bytes(developer_pk.clone()),
+            Expr::bytes(contribution_hash.clone()),
+            Expr::bytes(description_hash.clone()),
+            Expr::int(100),
+            Expr::int(5),
+            Expr::int(10_000),
+            Expr::int(1_000),
+            Expr::bytes(dummy_signature()),
+            Expr::bytes(proposer_pk.clone()),
+        ],
+    );
+    let outputs = vec![covenant_output(&pending, 0, COV_A)];
+    let entries = vec![covenant_utxo(&funded, COV_A)];
+    let mut tx = Transaction::new(
+        1,
+        vec![tx_input_with_sigops(0, placeholder_sigscript, 1)],
+        outputs,
+        0,
+        Default::default(),
+        0,
+        vec![],
+    );
+    let sig = sign_tx_input(&tx, &entries, 0, &proposer_keypair);
+    tx.inputs[0].signature_script = dev_incentive_pool_state_entry_sigscript(
+        &funded,
+        "proposeGrant",
+        vec![
+            Expr::bytes(developer_pk),
+            Expr::bytes(contribution_hash),
+            Expr::bytes(description_hash),
+            Expr::int(100),
+            Expr::int(5),
+            Expr::int(10_000),
+            Expr::int(1_000),
+            Expr::bytes(sig),
+            Expr::bytes(proposer_pk),
+        ],
+    );
+
+    let result = execute_input_with_covenants(tx, entries, 0);
+    assert!(
+        result.is_ok(),
+        "DevIncentivePool proposeGrant runtime should accept valid proposer signature/state transition: {:?}",
+        result.err()
+    );
+}
+
+#[test]
+fn prometheus_dev_incentive_pool_propose_runtime_rejects_amount_above_max_grant() {
+    let contract_path = std::env::var("PROMETHEUS_DEV_INCENTIVE_POOL_STATE_CONTRACT")
+        .expect("PROMETHEUS_DEV_INCENTIVE_POOL_STATE_CONTRACT is set");
+    let source = std::fs::read_to_string(contract_path).expect("read Prometheus dev incentive pool contract fixture");
+    let developer_pk = keypair_from_seed(4).x_only_public_key().0.serialize().to_vec();
+    let proposer_keypair = keypair_from_seed(5);
+    let proposer_pk = proposer_keypair.x_only_public_key().0.serialize().to_vec();
+    let contribution_hash = vec![2u8; 32];
+    let description_hash = vec![3u8; 32];
+
+    let funded = compile_dev_incentive_pool_state(
+        &source,
+        dev_incentive_pool_state_args(1, 500_000, 0, developer_pk.clone(), zero32(), zero32(), 0, 1, 0, 0, 0, 0, false, false, 0, proposer_pk.clone()),
+    );
+    let invalid_next = compile_dev_incentive_pool_state(
+        &source,
+        dev_incentive_pool_state_args(2, 500_000, 1, developer_pk.clone(), contribution_hash.clone(), description_hash.clone(), 100, 5, 100_001, 0, 0, 605_800, false, false, 1, proposer_pk.clone()),
+    );
+
+    let placeholder_sigscript = dev_incentive_pool_state_entry_sigscript(
+        &funded,
+        "proposeGrant",
+        vec![
+            Expr::bytes(developer_pk.clone()),
+            Expr::bytes(contribution_hash.clone()),
+            Expr::bytes(description_hash.clone()),
+            Expr::int(100),
+            Expr::int(5),
+            Expr::int(100_001),
+            Expr::int(1_000),
+            Expr::bytes(dummy_signature()),
+            Expr::bytes(proposer_pk.clone()),
+        ],
+    );
+    let outputs = vec![covenant_output(&invalid_next, 0, COV_A)];
+    let entries = vec![covenant_utxo(&funded, COV_A)];
+    let mut tx = Transaction::new(
+        1,
+        vec![tx_input_with_sigops(0, placeholder_sigscript, 1)],
+        outputs,
+        0,
+        Default::default(),
+        0,
+        vec![],
+    );
+    let sig = sign_tx_input(&tx, &entries, 0, &proposer_keypair);
+    tx.inputs[0].signature_script = dev_incentive_pool_state_entry_sigscript(
+        &funded,
+        "proposeGrant",
+        vec![
+            Expr::bytes(developer_pk),
+            Expr::bytes(contribution_hash),
+            Expr::bytes(description_hash),
+            Expr::int(100),
+            Expr::int(5),
+            Expr::int(100_001),
+            Expr::int(1_000),
+            Expr::bytes(sig),
+            Expr::bytes(proposer_pk),
+        ],
+    );
+
+    let err = execute_input_with_covenants(tx, entries, 0).expect_err("proposeGrant must reject amounts above MAX_GRANT_PROM");
+    common::assert_verify_like_error(err);
+}
+
+#[test]
+fn prometheus_dev_incentive_pool_vote_runtime_accepts_support_vote() {
+    let contract_path = std::env::var("PROMETHEUS_DEV_INCENTIVE_POOL_STATE_CONTRACT")
+        .expect("PROMETHEUS_DEV_INCENTIVE_POOL_STATE_CONTRACT is set");
+    let source = std::fs::read_to_string(contract_path).expect("read Prometheus dev incentive pool contract fixture");
+    let developer_pk = keypair_from_seed(4).x_only_public_key().0.serialize().to_vec();
+    let proposer_pk = keypair_from_seed(5).x_only_public_key().0.serialize().to_vec();
+    let validator_keypair = keypair_from_seed(7);
+    let validator_pk = validator_keypair.x_only_public_key().0.serialize().to_vec();
+    let contribution_hash = vec![2u8; 32];
+    let description_hash = vec![3u8; 32];
+
+    let pending = compile_dev_incentive_pool_state(
+        &source,
+        dev_incentive_pool_state_args(2, 500_000, 1, developer_pk.clone(), contribution_hash.clone(), description_hash.clone(), 100, 5, 10_000, 0, 0, 605_800, false, false, 1, proposer_pk.clone()),
+    );
+    let voted = compile_dev_incentive_pool_state(
+        &source,
+        dev_incentive_pool_state_args(2, 500_000, 1, developer_pk, contribution_hash, description_hash, 100, 5, 10_000, 1, 0, 605_800, false, false, 1, proposer_pk),
+    );
+
+    let placeholder_sigscript = dev_incentive_pool_state_entry_sigscript(
+        &pending,
+        "voteGrant",
+        vec![Expr::bool(true), Expr::int(1_200), Expr::bytes(dummy_signature()), Expr::bytes(validator_pk.clone())],
+    );
+    let outputs = vec![covenant_output(&voted, 0, COV_A)];
+    let entries = vec![covenant_utxo(&pending, COV_A)];
+    let mut tx = Transaction::new(
+        1,
+        vec![tx_input_with_sigops(0, placeholder_sigscript, 1)],
+        outputs,
+        0,
+        Default::default(),
+        0,
+        vec![],
+    );
+    let sig = sign_tx_input(&tx, &entries, 0, &validator_keypair);
+    tx.inputs[0].signature_script = dev_incentive_pool_state_entry_sigscript(
+        &pending,
+        "voteGrant",
+        vec![Expr::bool(true), Expr::int(1_200), Expr::bytes(sig), Expr::bytes(validator_pk)],
+    );
+
+    let result = execute_input_with_covenants(tx, entries, 0);
+    assert!(
+        result.is_ok(),
+        "DevIncentivePool voteGrant runtime should accept valid validator signature/state transition: {:?}",
+        result.err()
+    );
+}
+
+#[test]
+fn prometheus_dev_incentive_pool_vote_runtime_rejects_late_vote() {
+    let contract_path = std::env::var("PROMETHEUS_DEV_INCENTIVE_POOL_STATE_CONTRACT")
+        .expect("PROMETHEUS_DEV_INCENTIVE_POOL_STATE_CONTRACT is set");
+    let source = std::fs::read_to_string(contract_path).expect("read Prometheus dev incentive pool contract fixture");
+    let developer_pk = keypair_from_seed(4).x_only_public_key().0.serialize().to_vec();
+    let proposer_pk = keypair_from_seed(5).x_only_public_key().0.serialize().to_vec();
+    let validator_keypair = keypair_from_seed(7);
+    let validator_pk = validator_keypair.x_only_public_key().0.serialize().to_vec();
+    let contribution_hash = vec![2u8; 32];
+    let description_hash = vec![3u8; 32];
+
+    let pending = compile_dev_incentive_pool_state(
+        &source,
+        dev_incentive_pool_state_args(2, 500_000, 1, developer_pk.clone(), contribution_hash.clone(), description_hash.clone(), 100, 5, 10_000, 0, 0, 605_800, false, false, 1, proposer_pk.clone()),
+    );
+    let invalid_next = compile_dev_incentive_pool_state(
+        &source,
+        dev_incentive_pool_state_args(2, 500_000, 1, developer_pk, contribution_hash, description_hash, 100, 5, 10_000, 1, 0, 605_800, false, false, 1, proposer_pk),
+    );
+
+    let placeholder_sigscript = dev_incentive_pool_state_entry_sigscript(
+        &pending,
+        "voteGrant",
+        vec![Expr::bool(true), Expr::int(605_800), Expr::bytes(dummy_signature()), Expr::bytes(validator_pk.clone())],
+    );
+    let outputs = vec![covenant_output(&invalid_next, 0, COV_A)];
+    let entries = vec![covenant_utxo(&pending, COV_A)];
+    let mut tx = Transaction::new(
+        1,
+        vec![tx_input_with_sigops(0, placeholder_sigscript, 1)],
+        outputs,
+        0,
+        Default::default(),
+        0,
+        vec![],
+    );
+    let sig = sign_tx_input(&tx, &entries, 0, &validator_keypair);
+    tx.inputs[0].signature_script = dev_incentive_pool_state_entry_sigscript(
+        &pending,
+        "voteGrant",
+        vec![Expr::bool(true), Expr::int(605_800), Expr::bytes(sig), Expr::bytes(validator_pk)],
+    );
+
+    let err = execute_input_with_covenants(tx, entries, 0).expect_err("voteGrant must reject votes at or after voting_end_block");
+    common::assert_verify_like_error(err);
+}
+
+#[test]
+fn prometheus_dev_incentive_pool_execute_runtime_accepts_approved_grant() {
+    let contract_path = std::env::var("PROMETHEUS_DEV_INCENTIVE_POOL_STATE_CONTRACT")
+        .expect("PROMETHEUS_DEV_INCENTIVE_POOL_STATE_CONTRACT is set");
+    let source = std::fs::read_to_string(contract_path).expect("read Prometheus dev incentive pool contract fixture");
+    let developer_pk = keypair_from_seed(4).x_only_public_key().0.serialize().to_vec();
+    let proposer_pk = keypair_from_seed(5).x_only_public_key().0.serialize().to_vec();
+    let contribution_hash = vec![2u8; 32];
+    let description_hash = vec![3u8; 32];
+
+    let pending = compile_dev_incentive_pool_state(
+        &source,
+        dev_incentive_pool_state_args(2, 500_000, 1, developer_pk.clone(), contribution_hash.clone(), description_hash.clone(), 100, 5, 10_000, 10, 0, 605_800, false, false, 1, proposer_pk.clone()),
+    );
+    let executed = compile_dev_incentive_pool_state(
+        &source,
+        dev_incentive_pool_state_args(2, 490_000, 1, developer_pk, contribution_hash, description_hash, 100, 5, 10_000, 10, 0, 605_800, true, true, 2, proposer_pk),
+    );
+
+    let sigscript = dev_incentive_pool_state_entry_sigscript(&pending, "executeGrant", vec![Expr::int(605_800)]);
+    let outputs = vec![covenant_output(&executed, 0, COV_A)];
+    let entries = vec![covenant_utxo(&pending, COV_A)];
+    let tx = Transaction::new(
+        1,
+        vec![tx_input_with_sigops(0, sigscript, 1)],
+        outputs,
+        0,
+        Default::default(),
+        0,
+        vec![],
+    );
+
+    let result = execute_input_with_covenants(tx, entries, 0);
+    assert!(
+        result.is_ok(),
+        "DevIncentivePool executeGrant runtime should accept approved grant transition: {:?}",
+        result.err()
+    );
+}
+
+#[test]
+fn prometheus_dev_incentive_pool_execute_runtime_rejects_insufficient_quorum() {
+    let contract_path = std::env::var("PROMETHEUS_DEV_INCENTIVE_POOL_STATE_CONTRACT")
+        .expect("PROMETHEUS_DEV_INCENTIVE_POOL_STATE_CONTRACT is set");
+    let source = std::fs::read_to_string(contract_path).expect("read Prometheus dev incentive pool contract fixture");
+    let developer_pk = keypair_from_seed(4).x_only_public_key().0.serialize().to_vec();
+    let proposer_pk = keypair_from_seed(5).x_only_public_key().0.serialize().to_vec();
+    let contribution_hash = vec![2u8; 32];
+    let description_hash = vec![3u8; 32];
+
+    let pending = compile_dev_incentive_pool_state(
+        &source,
+        dev_incentive_pool_state_args(2, 500_000, 1, developer_pk.clone(), contribution_hash.clone(), description_hash.clone(), 100, 5, 10_000, 9, 0, 605_800, false, false, 1, proposer_pk.clone()),
+    );
+    let invalid_next = compile_dev_incentive_pool_state(
+        &source,
+        dev_incentive_pool_state_args(2, 490_000, 1, developer_pk, contribution_hash, description_hash, 100, 5, 10_000, 9, 0, 605_800, true, true, 2, proposer_pk),
+    );
+
+    let sigscript = dev_incentive_pool_state_entry_sigscript(&pending, "executeGrant", vec![Expr::int(605_800)]);
+    let outputs = vec![covenant_output(&invalid_next, 0, COV_A)];
+    let entries = vec![covenant_utxo(&pending, COV_A)];
+    let tx = Transaction::new(
+        1,
+        vec![tx_input_with_sigops(0, sigscript, 1)],
+        outputs,
+        0,
+        Default::default(),
+        0,
+        vec![],
+    );
+
+    let err = execute_input_with_covenants(tx, entries, 0).expect_err("executeGrant must reject votes below QUORUM_VOTES");
+    common::assert_verify_like_error(err);
+}
+
+#[test]
+fn prometheus_dev_incentive_pool_execute_runtime_rejects_insufficient_approval() {
+    let contract_path = std::env::var("PROMETHEUS_DEV_INCENTIVE_POOL_STATE_CONTRACT")
+        .expect("PROMETHEUS_DEV_INCENTIVE_POOL_STATE_CONTRACT is set");
+    let source = std::fs::read_to_string(contract_path).expect("read Prometheus dev incentive pool contract fixture");
+    let developer_pk = keypair_from_seed(4).x_only_public_key().0.serialize().to_vec();
+    let proposer_pk = keypair_from_seed(5).x_only_public_key().0.serialize().to_vec();
+    let contribution_hash = vec![2u8; 32];
+    let description_hash = vec![3u8; 32];
+
+    let pending = compile_dev_incentive_pool_state(
+        &source,
+        dev_incentive_pool_state_args(2, 500_000, 1, developer_pk.clone(), contribution_hash.clone(), description_hash.clone(), 100, 5, 10_000, 6, 4, 605_800, false, false, 1, proposer_pk.clone()),
+    );
+    let invalid_next = compile_dev_incentive_pool_state(
+        &source,
+        dev_incentive_pool_state_args(2, 490_000, 1, developer_pk, contribution_hash, description_hash, 100, 5, 10_000, 6, 4, 605_800, true, true, 2, proposer_pk),
+    );
+
+    let sigscript = dev_incentive_pool_state_entry_sigscript(&pending, "executeGrant", vec![Expr::int(605_800)]);
+    let outputs = vec![covenant_output(&invalid_next, 0, COV_A)];
+    let entries = vec![covenant_utxo(&pending, COV_A)];
+    let tx = Transaction::new(
+        1,
+        vec![tx_input_with_sigops(0, sigscript, 1)],
+        outputs,
+        0,
+        Default::default(),
+        0,
+        vec![],
+    );
+
+    let err = execute_input_with_covenants(tx, entries, 0).expect_err("executeGrant must reject approvals below VALIDATOR_QUORUM");
     common::assert_verify_like_error(err);
 }
 
@@ -2759,6 +3206,7 @@ def main() -> int:
     env["PROMETHEUS_GUARDIAN_STATE_CONTRACT"] = str(GUARDIAN_STATE_CONTRACT)
     env["PROMETHEUS_RULE_STORAGE_STATE_CONTRACT"] = str(RULE_STORAGE_STATE_CONTRACT)
     env["PROMETHEUS_COMMUNITY_DONATIONS_STATE_CONTRACT"] = str(COMMUNITY_DONATIONS_STATE_CONTRACT)
+    env["PROMETHEUS_DEV_INCENTIVE_POOL_STATE_CONTRACT"] = str(DEV_INCENTIVE_POOL_STATE_CONTRACT)
     try:
         run(
             [
@@ -2780,7 +3228,7 @@ def main() -> int:
         except FileNotFoundError:
             pass
 
-    print("H-001, ValidatorStakingState, GuardianReputationState, RuleStorageState, and CommunityDonationsState silverc fixture verification passed.")
+    print("H-001, ValidatorStakingState, GuardianReputationState, RuleStorageState, CommunityDonationsState, and DevIncentivePoolState silverc fixture verification passed.")
     print(f"Silverscript ref: {silver_ref}")
     print(
         "Note: current silverc uses signed int entrypoint arguments; deployment salt and block-height values are scoped to 0..=i64::MAX."

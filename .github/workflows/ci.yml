@@ -105,6 +105,25 @@ jobs:
             exit 1
           fi
           echo "CommunityDonationsState fixture keeps donation/disbursement state invariants."
+      - name: Verify DevIncentivePoolState current-silverc fixture exists
+        run: |
+          fixture="modules/contracts/silverc/DevIncentivePoolState.sil"
+          test -f "$fixture" || (echo "ERROR: missing $fixture" && exit 1)
+          grep -q 'MAX_GRANT_PROM = 100000' "$fixture"
+          grep -q 'QUORUM_VOTES = 10' "$fixture"
+          grep -q 'VALIDATOR_QUORUM = 6700' "$fixture"
+          grep -q 'pool_balance_prom' "$fixture"
+          grep -q 'proposeGrant' "$fixture"
+          grep -q 'executeGrant' "$fixture"
+          if grep -q 'transfer' "$fixture"; then
+            echo "ERROR: DevIncentivePoolState fixture must not pretend to transfer PROM in current Silverc."
+            exit 1
+          fi
+          if grep -q 'stake' "$fixture"; then
+            echo "ERROR: DevIncentivePoolState fixture must not introduce PROM staking."
+            exit 1
+          fi
+          echo "DevIncentivePoolState fixture keeps grant voting and PROM pool invariants."
 
   h001-silverc-runtime:
     name: H-001 + Validator State Silverc Runtime

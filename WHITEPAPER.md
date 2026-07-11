@@ -2,7 +2,7 @@
 
 **Whitepaper v4.0 — March 2026**
 
-**Status update — July 2026:** Kaspa Toccata is now treated as a post-fork deployment environment for Prometheus. The current Silverc verifier covers H-001 commit-reveal byte encoding, ValidatorStaking runtime transitions, GuardianReputation runtime/formula gates, RuleStorage runtime gates, and CommunityDonations runtime gates. Mainnet deployment remains gated by remaining current-Silverc contract/runtime ports, deploy smoke tests, Q-003 `fp_rate` oracle design, and release hardening.
+**Status update — July 2026:** Kaspa Toccata is now treated as a post-fork deployment environment for Prometheus. The current Silverc verifier covers H-001 commit-reveal byte encoding, ValidatorStaking runtime transitions, GuardianReputation runtime/formula gates, RuleStorage runtime gates, CommunityDonations runtime gates, and DevIncentivePool runtime gates. Mainnet deployment remains gated by the remaining GovernanceAutoTuning current-Silverc port, deploy smoke tests, Q-003 `fp_rate` oracle design, and release hardening.
 
 *The fire belongs to humanity, not to corporations.*
 
@@ -267,7 +267,8 @@ Current-Silverc verification status:
 - `GuardianReputationState.sil`: compile/ABI, runtime transition, and accepted-proposal formula gates pass.
 - `RuleStorageState.sil`: compile/ABI/runtime gates pass for submit/vote/finalize/deactivate, including low-confidence, late-vote, zero-vote, and pending-rule rejection paths.
 - `CommunityDonationsState.sil`: compile/ABI/runtime gates pass for donate/propose/vote/execute disbursement paths, including zero-donation, over-pool proposal, late-vote, and insufficient-quorum rejection paths.
-- `GovernanceAutoTuning` and `DevIncentivePool`: remaining deployment-scoped ports.
+- `DevIncentivePoolState.sil`: compile/ABI/runtime gates pass for propose/vote/execute grant paths, including max-grant, late-vote, quorum, and approval rejection paths.
+- `GovernanceAutoTuning`: remaining deployment-scoped port, blocked on Q-003 `fp_rate` oracle design.
 
 ---
 

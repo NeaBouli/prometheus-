@@ -74,7 +74,7 @@ Off-Chain:           Phi-3-mini (local AI) | LLaMA 3 (guardian AI) | Fed-DART (f
 | 8 — Public Site | ACCEPTED | Website, SEO, whitepaper, GitHub Pages |
 | 9 — Deploy Path | BLOCKED | Remaining current-Silverc contract ports and deployment smoke path |
 
-**Deployment status:** Kaspa Toccata is now in the post-fork verification phase for Prometheus. H-001 commit-reveal byte encoding, ValidatorStaking runtime transitions, GuardianReputation runtime/formula gates, RuleStorage runtime gates, and CommunityDonations runtime gates are covered by the current Silverc verifier. Deployment remains gated by remaining current-Silverc contract/runtime ports, the deploy smoke path, Q-003 `fp_rate` oracle design, and release hardening.
+**Deployment status:** Kaspa Toccata is now in the post-fork verification phase for Prometheus. H-001 commit-reveal byte encoding, ValidatorStaking runtime transitions, GuardianReputation runtime/formula gates, RuleStorage runtime gates, CommunityDonations runtime gates, and DevIncentivePool runtime gates are covered by the current Silverc verifier. Deployment remains gated by the remaining GovernanceAutoTuning current-Silverc port, the deploy smoke path, Q-003 `fp_rate` oracle design, and release hardening.
 
 ---
 

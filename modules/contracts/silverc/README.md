@@ -96,7 +96,42 @@ Current signed-int deployment boundary:
 
 Remaining deployment blockers:
 
-- remaining deployment-scoped contract ports
+- GovernanceAutoTuning current-Silverc port, blocked on Q-003 `fp_rate` oracle design
+- deployment smoke path against direct `ssc`/current Silverc tooling
+
+## DevIncentivePoolState.sil
+
+`DevIncentivePoolState.sil` is the current-`silverc` port fixture for the
+developer grant state machine. It models one active grant UTXO slot and PROM
+pool accounting.
+
+The fixture keeps the legacy grant invariants that are safe to express in the
+current covenant state model:
+
+- maximum grant is `MAX_GRANT_PROM = 100000`
+- grant voting period is `GRANT_VOTING_BLOCKS = 604800`
+- reward formula uses `REWARD_PER_LINE = 10`
+- complexity is bounded by `MIN_COMPLEXITY = 1` and `MAX_COMPLEXITY = 10`
+- execution quorum is `QUORUM_VOTES = 10`
+- validator approval threshold is `VALIDATOR_QUORUM = 6700`
+- pool accounting remains PROM-denominated, but PROM is not a staking asset
+
+The fixture intentionally does not pretend to support legacy global maps,
+string storage, `msg.sender`, event emission, cross-contract validator lookups,
+emission-contract deposits, or direct PROM `transfer(...)` in current Silverc.
+The known legacy `deposit()` ACL question remains a deployment/orchestration
+decision once the emission authority is finalized.
+
+The shared verifier currently compiles this fixture against the same pinned
+upstream Silverscript ref and runtime-tests covenant transitions for:
+
+- `proposeGrant`
+- `voteGrant`
+- `executeGrant`
+
+Verified rejection paths include grant amount above `MAX_GRANT_PROM`, voting at
+`voting_end_block`, execution below `QUORUM_VOTES`, and execution below
+`VALIDATOR_QUORUM`.
 
 ## CommunityDonationsState.sil
 

@@ -1,0 +1,174 @@
+pragma silverscript ^0.1.0;
+
+contract DevIncentivePoolState(
+    int init_next_grant_id,
+    int init_pool_balance_prom,
+    int init_grant_id,
+    pubkey init_developer_pk,
+    byte[32] init_contribution_hash,
+    byte[32] init_description_hash,
+    int init_lines_of_code,
+    int init_complexity,
+    int init_requested_amount_prom,
+    int init_votes_for,
+    int init_votes_against,
+    int init_voting_end_block,
+    bool init_executed,
+    bool init_paid,
+    int init_status,
+    pubkey init_last_proposer_pk
+) {
+    int constant MAX_GRANT_PROM = 100000;
+    int constant GRANT_VOTING_BLOCKS = 604800;
+    int constant REWARD_PER_LINE = 10;
+    int constant MIN_COMPLEXITY = 1;
+    int constant MAX_COMPLEXITY = 10;
+    int constant QUORUM_VOTES = 10;
+    int constant VALIDATOR_QUORUM = 6700;
+    int constant STATUS_NONE = 0;
+    int constant STATUS_PENDING = 1;
+    int constant STATUS_EXECUTED = 2;
+
+    int next_grant_id = init_next_grant_id;
+    int pool_balance_prom = init_pool_balance_prom;
+    int grant_id = init_grant_id;
+    pubkey developer_pk = init_developer_pk;
+    byte[32] contribution_hash = init_contribution_hash;
+    byte[32] description_hash = init_description_hash;
+    int lines_of_code = init_lines_of_code;
+    int complexity = init_complexity;
+    int requested_amount_prom = init_requested_amount_prom;
+    int votes_for = init_votes_for;
+    int votes_against = init_votes_against;
+    int voting_end_block = init_voting_end_block;
+    bool executed = init_executed;
+    bool paid = init_paid;
+    int status = init_status;
+    pubkey last_proposer_pk = init_last_proposer_pk;
+
+    function recommendedReward(int lines, int requested_complexity) : int {
+        require(lines >= 0);
+        require(requested_complexity >= MIN_COMPLEXITY);
+        require(requested_complexity <= MAX_COMPLEXITY);
+
+        int reward = lines * REWARD_PER_LINE * (100 + requested_complexity * 10) / 100;
+        int capped_reward = reward > MAX_GRANT_PROM ? MAX_GRANT_PROM : reward;
+        return(capped_reward);
+    }
+
+    #[covenant.singleton(mode = transition)]
+    function proposeGrant(
+        State prev_state,
+        pubkey new_developer_pk,
+        byte[32] new_contribution_hash,
+        byte[32] new_description_hash,
+        int lines,
+        int requested_complexity,
+        int amount,
+        int block_height,
+        sig proposer_sig,
+        pubkey proposer_pk
+    ) : State {
+        require(prev_state.status != STATUS_PENDING);
+        require(prev_state.next_grant_id >= 0);
+        require(prev_state.pool_balance_prom >= 0);
+        require(lines >= 0);
+        require(requested_complexity >= MIN_COMPLEXITY);
+        require(requested_complexity <= MAX_COMPLEXITY);
+        require(amount > 0);
+        require(amount <= MAX_GRANT_PROM);
+        require(amount <= prev_state.pool_balance_prom);
+        require(block_height >= 0);
+        require(checkSig(proposer_sig, proposer_pk));
+
+        return({
+            next_grant_id: prev_state.next_grant_id + 1,
+            pool_balance_prom: prev_state.pool_balance_prom,
+            grant_id: prev_state.next_grant_id,
+            developer_pk: new_developer_pk,
+            contribution_hash: new_contribution_hash,
+            description_hash: new_description_hash,
+            lines_of_code: lines,
+            complexity: requested_complexity,
+            requested_amount_prom: amount,
+            votes_for: 0,
+            votes_against: 0,
+            voting_end_block: block_height + GRANT_VOTING_BLOCKS,
+            executed: false,
+            paid: false,
+            status: STATUS_PENDING,
+            last_proposer_pk: proposer_pk
+        });
+    }
+
+    #[covenant.singleton(mode = transition)]
+    function voteGrant(State prev_state, bool support, int block_height, sig validator_sig, pubkey validator_pk) : State {
+        require(prev_state.status == STATUS_PENDING);
+        require(!prev_state.executed);
+        require(!prev_state.paid);
+        require(block_height >= 0);
+        require(block_height < prev_state.voting_end_block);
+        require(checkSig(validator_sig, validator_pk));
+
+        int next_votes_for = prev_state.votes_for;
+        int next_votes_against = prev_state.votes_against;
+        if (support) {
+            next_votes_for = next_votes_for + 1;
+        } else {
+            next_votes_against = next_votes_against + 1;
+        }
+
+        return({
+            next_grant_id: prev_state.next_grant_id,
+            pool_balance_prom: prev_state.pool_balance_prom,
+            grant_id: prev_state.grant_id,
+            developer_pk: prev_state.developer_pk,
+            contribution_hash: prev_state.contribution_hash,
+            description_hash: prev_state.description_hash,
+            lines_of_code: prev_state.lines_of_code,
+            complexity: prev_state.complexity,
+            requested_amount_prom: prev_state.requested_amount_prom,
+            votes_for: next_votes_for,
+            votes_against: next_votes_against,
+            voting_end_block: prev_state.voting_end_block,
+            executed: prev_state.executed,
+            paid: prev_state.paid,
+            status: prev_state.status,
+            last_proposer_pk: prev_state.last_proposer_pk
+        });
+    }
+
+    #[covenant.singleton(mode = transition)]
+    function executeGrant(State prev_state, int block_height) : State {
+        require(prev_state.status == STATUS_PENDING);
+        require(!prev_state.executed);
+        require(!prev_state.paid);
+        require(block_height >= prev_state.voting_end_block);
+
+        int total_votes = prev_state.votes_for + prev_state.votes_against;
+        require(total_votes >= QUORUM_VOTES);
+
+        int approval = prev_state.votes_for * 10000 / total_votes;
+        require(approval >= VALIDATOR_QUORUM);
+        require(prev_state.pool_balance_prom >= prev_state.requested_amount_prom);
+
+        return({
+            next_grant_id: prev_state.next_grant_id,
+            pool_balance_prom: prev_state.pool_balance_prom - prev_state.requested_amount_prom,
+            grant_id: prev_state.grant_id,
+            developer_pk: prev_state.developer_pk,
+            contribution_hash: prev_state.contribution_hash,
+            description_hash: prev_state.description_hash,
+            lines_of_code: prev_state.lines_of_code,
+            complexity: prev_state.complexity,
+            requested_amount_prom: prev_state.requested_amount_prom,
+            votes_for: prev_state.votes_for,
+            votes_against: prev_state.votes_against,
+            voting_end_block: prev_state.voting_end_block,
+            executed: true,
+            paid: true,
+            status: STATUS_EXECUTED,
+            last_proposer_pk: prev_state.last_proposer_pk
+        });
+    }
+}
