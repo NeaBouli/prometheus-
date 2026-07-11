@@ -223,6 +223,70 @@ jobs:
           assert "GovernanceAutoTuningState" in runbook
           assert "private keys" in runbook
           PY
+      - name: Build external deploy request set
+        run: |
+          python3 scripts/build_silverc_deploy_requests.py \
+            --archive /tmp/prometheus-silverc-artifacts.tar.gz \
+            --out-dir /tmp/prometheus-silverc-deploy-requests \
+            --network sandbox \
+            --rpc-url ws://127.0.0.1:17210 \
+            --deployer-address kaspatest:qptestpreflight000000000000000000000000000000000 \
+            --metrics-oracle-pubkey 1111111111111111111111111111111111111111111111111111111111111111 \
+            --request-set-out /tmp/prometheus-silverc-deploy-request-set.json \
+            --runbook-out /tmp/prometheus-silverc-deploy-requests.md
+          test -s /tmp/prometheus-silverc-deploy-request-set.json
+          test -s /tmp/prometheus-silverc-deploy-requests.md
+          test -s /tmp/prometheus-silverc-deploy-requests/01-ValidatorStakingH001.deploy-request.json
+          test -s /tmp/prometheus-silverc-deploy-requests/07-GovernanceAutoTuningState.deploy-request.json
+          python3 - <<'PY'
+          import json
+          import subprocess
+          from pathlib import Path
+
+          summary = json.loads(Path("/tmp/prometheus-silverc-deploy-request-set.json").read_text())
+          runbook = Path("/tmp/prometheus-silverc-deploy-requests.md").read_text()
+          first = json.loads(Path("/tmp/prometheus-silverc-deploy-requests/01-ValidatorStakingH001.deploy-request.json").read_text())
+
+          assert summary["status"] == "REQUESTS_READY_EXTERNAL_ORCHESTRATOR_REQUIRED"
+          assert summary["request_count"] == 7
+          assert len(summary["request_set_sha256"]) == 64
+          assert "missing approved external deploy orchestrator implementation" in summary["blockers"]
+          assert summary["safety"]["accepts_private_keys"] is False
+          assert summary["safety"]["signs_transactions"] is False
+          assert summary["safety"]["assembles_chain_transaction"] is False
+          assert summary["safety"]["broadcasts_transactions"] is False
+          assert summary["safety"]["deploys_contracts"] is False
+          assert summary["safety"]["updates_status_files"] is False
+          assert first["status"] == "READY_FOR_EXTERNAL_DEPLOY_ORCHESTRATOR"
+          assert first["contract"]["name"] == "ValidatorStakingH001"
+          assert len(first["request_sha256"]) == 64
+          assert first["safety"]["deploys_contracts"] is False
+          assert "external orchestrator" in runbook
+          assert "does not accept private keys" in runbook
+
+          proc = subprocess.run(
+              [
+                  "python3",
+                  "scripts/build_silverc_deploy_requests.py",
+                  "--archive",
+                  "/tmp/prometheus-silverc-artifacts.tar.gz",
+                  "--out-dir",
+                  "/tmp/prometheus-silverc-deploy-requests-bad",
+                  "--network",
+                  "sandbox",
+                  "--rpc-url",
+                  "https://user:password@example.invalid",
+                  "--deployer-address",
+                  "kaspatest:qptestpreflight000000000000000000000000000000000",
+                  "--metrics-oracle-pubkey",
+                  "1111111111111111111111111111111111111111111111111111111111111111",
+              ],
+              text=True,
+              capture_output=True,
+          )
+          assert proc.returncode != 0
+          assert "--rpc-url must not contain credentials" in proc.stderr
+          PY
       - name: Build unsigned metrics-oracle transaction request
         run: |
           python3 scripts/build_metrics_oracle_tx_request.py \
@@ -459,6 +523,8 @@ jobs:
           assert summary["status"] == "HANDOFF_BLOCKED"
           assert summary["network"] == "sandbox"
           assert summary["deploy_supported"] is False
+          assert summary["deploy_requests_status"] == "REQUESTS_READY_EXTERNAL_ORCHESTRATOR_REQUIRED"
+          assert summary["deploy_request_count"] == 7
           assert summary["ci_receipts_status"] == "CI_FIXTURE_VALID"
           assert summary["operator_receipts_status"] == "MISSING_OPERATOR_RECORD"
           assert summary["metrics_report_status"] == "READY_FOR_TX_BUILDER"
@@ -476,6 +542,8 @@ jobs:
           assert "does not accept private keys" in handoff
           assert "Real status updates require verified operator_record receipts" in handoff
           assert "prometheus-silverc-artifacts.tar.gz" in summary["included_files"]
+          assert "deploy-request-set.json" in summary["included_files"]
+          assert "deploy-requests/07-GovernanceAutoTuningState.deploy-request.json" in summary["included_files"]
           PY
 
   # ─── Rust Workspace Check ───────────────────────────────────────────────────

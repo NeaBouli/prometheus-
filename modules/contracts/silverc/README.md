@@ -36,6 +36,7 @@ SILVERSCRIPT_REPO=/path/to/silverscript python3 scripts/smoke_silverc_artifacts.
 PROMETHEUS_SILVERC_ARTIFACT_DIR=/tmp/out python3 scripts/smoke_silverc_artifacts.py
 python3 scripts/smoke_silverc_artifacts.py --out-dir /tmp/out --archive /tmp/prometheus-silverc-artifacts.tar.gz
 python3 scripts/preflight_silverc_deploy.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --network sandbox --rpc-url ws://127.0.0.1:17210 --deployer-address kaspatest:qptestpreflight000000000000000000000000000000000 --metrics-oracle-pubkey 1111111111111111111111111111111111111111111111111111111111111111 --plan-out /tmp/prometheus-silverc-deploy-preflight.json --runbook-out /tmp/prometheus-silverc-deploy-runbook.md
+python3 scripts/build_silverc_deploy_requests.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --out-dir /tmp/prometheus-silverc-deploy-requests --network sandbox --rpc-url ws://127.0.0.1:17210 --deployer-address kaspatest:qptestpreflight000000000000000000000000000000000 --metrics-oracle-pubkey 1111111111111111111111111111111111111111111111111111111111111111 --request-set-out /tmp/prometheus-silverc-deploy-request-set.json --runbook-out /tmp/prometheus-silverc-deploy-requests.md
 python3 scripts/verify_silverc_deploy_receipts.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --receipts modules/contracts/silverc/deploy-receipts.sample.json --summary-out /tmp/prometheus-silverc-deploy-receipts-summary.json --runbook-out /tmp/prometheus-silverc-deploy-receipts.md
 python3 scripts/stage_silverc_deployment_status.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --operator-receipts /path/to/operator-record-receipts.json --status-out /tmp/prometheus-silverc-status-draft.json --snippet-out /tmp/prometheus-silverc-status-draft.md
 python3 scripts/preflight_metrics_oracle_report.py --report modules/contracts/silverc/metrics-oracle-report.sample.json --plan-out /tmp/prometheus-metrics-oracle-preflight.json --runbook-out /tmp/prometheus-metrics-oracle-runbook.md
@@ -171,6 +172,20 @@ does not include private keys, seed phrases, wallet files, or keystore material.
 CI checks that the runbook remains generated, blocked while no upstream network
 deploy command exists, and explicit about not broadcasting transactions.
 
+## External deploy requests
+
+`scripts/build_silverc_deploy_requests.py` emits one public deploy-request JSON
+file per current-Silverc contract plus a request-set summary and Markdown
+runbook for an approved external deploy orchestrator. Each request is bound to
+the validated release-bundle manifest by source, constructor-args, artifact, and
+script hashes.
+
+The request builder intentionally does not accept private keys, sign, assemble
+chain transactions, broadcast, deploy contracts, or update status files. It also
+rejects RPC URLs with embedded credentials. The output status is
+`REQUESTS_READY_EXTERNAL_ORCHESTRATOR_REQUIRED` until an approved external
+orchestrator consumes the requests and returns real `operator_record` receipts.
+
 ## Deployment receipt verifier
 
 `scripts/verify_silverc_deploy_receipts.py` validates public deployment receipt
@@ -203,10 +218,10 @@ or release notes.
 
 `scripts/build_silverc_operator_handoff.py` builds a public handoff directory
 from an existing release archive. It copies the archive, runs deploy preflight,
-verifies the synthetic CI receipt fixture, optionally verifies real
-`operator_record` receipts, validates the metrics-oracle report, builds the
-unsigned metrics-oracle transaction request, and emits `HANDOFF.md` plus
-`operator-handoff-summary.json`.
+builds the external deploy request set, verifies the synthetic CI receipt
+fixture, optionally verifies real `operator_record` receipts, validates the
+metrics-oracle report, builds the unsigned metrics-oracle transaction request,
+and emits `HANDOFF.md` plus `operator-handoff-summary.json`.
 
 The package is intentionally blocked until real network deploy/orchestration
 tooling, verified `operator_record` receipts, and signer-ready contract instance

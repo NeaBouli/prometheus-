@@ -115,6 +115,35 @@ def run_deploy_preflight(args: argparse.Namespace, archive: Path, out_dir: Path)
     return load_json(plan_path)
 
 
+def run_deploy_requests(args: argparse.Namespace, archive: Path, out_dir: Path) -> dict[str, Any]:
+    requests_dir = out_dir / "deploy-requests"
+    summary_path = out_dir / "deploy-request-set.json"
+    runbook_path = out_dir / "deploy-requests.md"
+    run(
+        [
+            sys.executable,
+            "scripts/build_silverc_deploy_requests.py",
+            "--archive",
+            str(archive),
+            "--out-dir",
+            str(requests_dir),
+            "--network",
+            args.network,
+            "--rpc-url",
+            args.rpc_url,
+            "--deployer-address",
+            args.deployer_address,
+            "--metrics-oracle-pubkey",
+            args.metrics_oracle_pubkey,
+            "--request-set-out",
+            str(summary_path),
+            "--runbook-out",
+            str(runbook_path),
+        ]
+    )
+    return load_json(summary_path)
+
+
 def run_receipt_verification(
     archive: Path,
     receipts: Path,
@@ -203,6 +232,10 @@ def status_from_components(
     return status, blockers
 
 
+def included_files(out_dir: Path) -> list[str]:
+    return sorted(str(path.relative_to(out_dir)) for path in out_dir.rglob("*") if path.is_file())
+
+
 def write_handoff_markdown(out_dir: Path, summary: dict[str, Any]) -> None:
     lines = [
         "# Prometheus Silverc Operator Handoff",
@@ -228,6 +261,7 @@ def write_handoff_markdown(out_dir: Path, summary: dict[str, Any]) -> None:
     lines.extend(
         [
             f"- Deploy preflight: {'supported' if summary['deploy_supported'] else 'blocked'}",
+            f"- Deploy request set: {summary['deploy_requests_status']}",
             f"- CI receipt verification: {summary['ci_receipts_status']}",
             f"- Operator receipt verification: {summary['operator_receipts_status']}",
             f"- Metrics report preflight: {summary['metrics_report_status']}",
@@ -272,6 +306,7 @@ def main() -> int:
     shutil.copyfile(archive, packaged_archive)
 
     deploy_plan = run_deploy_preflight(args, packaged_archive, out_dir)
+    deploy_requests = run_deploy_requests(args, packaged_archive, out_dir)
     ci_receipts_summary = run_receipt_verification(
         packaged_archive,
         ci_receipts,
@@ -299,6 +334,8 @@ def main() -> int:
         "release_archive_sha256": sha256_file(packaged_archive),
         "silverscript_commit": deploy_plan["bundle"]["silverscript_commit"],
         "deploy_supported": deploy_plan["deploy_supported"],
+        "deploy_requests_status": deploy_requests["status"],
+        "deploy_request_count": deploy_requests["request_count"],
         "ci_receipts_status": ci_receipts_summary["status"],
         "operator_receipts_status": (
             operator_receipts_summary["status"] if operator_receipts_summary else "MISSING_OPERATOR_RECORD"
@@ -314,13 +351,13 @@ def main() -> int:
             "updates_status_files": False,
         },
         "blockers": blockers,
-        "included_files": sorted(path.name for path in out_dir.iterdir() if path.is_file()),
+        "included_files": included_files(out_dir),
     }
     write_json(out_dir / "operator-handoff-summary.json", summary)
-    summary["included_files"] = sorted(path.name for path in out_dir.iterdir() if path.is_file())
+    summary["included_files"] = included_files(out_dir)
     write_json(out_dir / "operator-handoff-summary.json", summary)
     write_handoff_markdown(out_dir, summary)
-    summary["included_files"] = sorted(path.name for path in out_dir.iterdir() if path.is_file())
+    summary["included_files"] = included_files(out_dir)
     write_json(out_dir / "operator-handoff-summary.json", summary)
     print(json.dumps(summary, indent=2, sort_keys=True))
     return 0
