@@ -4,9 +4,9 @@ Last updated: 2026-07-11 EEST
 Repo path: /Users/gio/Desktop/repos/prometheus
 Branch observed: main
 Latest product-code baseline observed: `3e53e29 feat: add rule storage silverc fixture`
-Current HEAD observed: `4b49d35 docs: record verified whitepaper refresh`
-Latest CI note: Prometheus CI, Security Audit, and Pages passed for `4b49d35`; local RuleStorage runtime gates passed on 2026-07-11 and are awaiting commit/CI verification.
-Latest public-docs note: README, `WHITEPAPER.md`, and `whitepaper.html` were refreshed to reflect post-Toccata deployment gating, verified current-Silverc H-001/Validator/Guardian/RuleStorage gates, target-only PROM-RULES asset orchestration, and the no-Kasplex-reputation rule.
+Current HEAD observed: `4029da2 test: add rule storage silverc runtime gates`
+Latest CI note: Prometheus CI, Security Audit, and Pages passed for `4029da2`; RuleStorage runtime gates are now verified locally and remotely in the pinned Silverc runtime job.
+Latest public-docs note: README, `WHITEPAPER.md`, and `whitepaper.html` were refreshed to reflect post-Toccata deployment gating, verified current-Silverc H-001/Validator/Guardian/RuleStorage runtime gates, target-only PROM-RULES asset orchestration, and the no-Kasplex-reputation rule.
 
 Purpose: This file is the local bridge for Codex/Claude Code handover. Read it before touching product code. It consolidates the project state, architecture rules, workflow logic, current open issues, the Reputation Badge decision, and the new direct Sandbox access note.
 
@@ -525,7 +525,7 @@ If asked to continue project work:
 
 ## 18. One-Line Decision Summary
 
-Prometheus does not need reputation badges; it needs readable, provable Kaspa L1 Guardian reputation. Codex has direct Sandbox access via `ssh sandbox`, upstream `silverc` works in CI, H-001 byte-core plus current-silverc `ValidatorStakingState.sil` runtime transitions pass, `GuardianReputationState.sil` compile/ABI/runtime/formula gates pass, `RuleStorageState.sil` compile/ABI/runtime gates pass locally, signed-int deployment bounds are documented/enforced, and Sprint 9 remains blocked until remaining deployment-scoped contract ports pass.
+Prometheus does not need reputation badges; it needs readable, provable Kaspa L1 Guardian reputation. Codex has direct Sandbox access via `ssh sandbox`, upstream `silverc` works in CI, H-001 byte-core plus current-silverc `ValidatorStakingState.sil` runtime transitions pass, `GuardianReputationState.sil` compile/ABI/runtime/formula gates pass, `RuleStorageState.sil` compile/ABI/runtime gates pass locally and in GitHub CI, signed-int deployment bounds are documented/enforced, and Sprint 9 remains blocked until remaining deployment-scoped contract ports pass.
 <!-- CODEX_CLAUDE_CODE_TERMINAL_BRIDGE_V1 -->
 ## Codex -> Claude Code Terminal Bridge
 

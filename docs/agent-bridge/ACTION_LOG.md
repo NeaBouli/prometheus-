@@ -2,6 +2,8 @@
 
 ## 2026-07-11
 
+- GitHub Prometheus CI, Security Audit, and Pages passed for `4029da2`; the H-001 + Validator State Silverc Runtime job now covers 32 upstream-injected tests including RuleStorage submit/vote/finalize/deactivate runtime paths.
+- Noted CI annotations: GitHub is forcing Node.js 24 for some Node 20-based actions. This is warning-only today; track action upgrades later, but it did not block CI.
 - Extended the pinned upstream `silverc` verifier with RuleStorageState runtime tests for `submitProposal`, `voteOnProposal`, `finalizeProposal`, and `deactivateRule`.
 - Verified accepted paths: valid guardian proposal submission, valid validator support vote, accepted proposal finalization, rejected proposal finalization, and active accepted rule deactivation.
 - Verified rejected paths: confidence below `MIN_CONFIDENCE`, vote at `voting_end_block`, zero-vote finalization, and deactivation of a pending/non-accepted rule.
