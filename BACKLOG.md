@@ -1,16 +1,17 @@
 # prometheus — Backlog
 
 ## 🔴 Aktiv (diese Session)
-- Latest product-code baseline is `f9d86a4` on `main`; run `git log --oneline -1` for the current bridge/docs HEAD.
-- CI, Security Audit, and GitHub Pages deployment were green for `f9d86a4`.
+- Latest documented green HEAD is `26b7aa1` on `main`; run `git log --oneline -1` for the current working HEAD.
+- CI, Security Audit, and GitHub Pages deployment were green for `26b7aa1`.
 - Runtime stub gates added for Rust client; current-Silverc contract gates now cover H-001, ValidatorStaking, GuardianReputation, RuleStorage, CommunityDonations, DevIncentivePool, and GovernanceAutoTuning.
-- Sprint 9 remains blocked by direct `ssc`/current-Silverc deployment smoke, oracle operator integration, and release hardening.
+- Local current-Silverc JSON artifact smoke now compiles all 7 fixtures through pinned upstream `silverc`; upstream `silverc` has no network deploy command.
+- Sprint 9 remains blocked by missing network deploy/orchestration tooling, oracle operator integration, and release hardening.
 
 ## 🟡 Nächste Session — STARTFLOW
 
 ### Pflicht VOR neuem Code:
 1. `cd /Users/gio/Desktop/repos/prometheus`
-2. `git log --oneline -5` — aktuellen HEAD prüfen; letzter dokumentierter Main-HEAD ist `f9d86a4`
+2. `git log --oneline -5` — aktuellen HEAD prüfen; letzter dokumentierter grüner Main-HEAD ist `26b7aa1`
 3. Lies `memory/CHECKPOINT.md` — vollständiger Projektstatus
 4. Lies `memory/AUDIT.md` ab Zeile 337 — Pre-Hardfork-Audit-Ergebnisse
 5. Lies `memory/ERRORS.md` — 12 bekannte Patterns
@@ -21,7 +22,7 @@
 - **H-002**: ~~Arc<Mutex<Phi3Model>>~~ → **FIXED** in Commit `6347b85`. Arc<Phi3Model> direkt.
 
 ### Nächste konkrete Tasks (Priorität):
-1. **[P0] Sprint 9 Vorbereitung** — direct `ssc`/current-Silverc deploy smoke für mindestens ein fixture beweisen und Deployment-Runbook ableiten.
+1. **[P0] Sprint 9 Vorbereitung** — current-Silverc network deploy/orchestration path klären; Artifact-Smoke ist lokal vorhanden, echter On-chain-Deploy fehlt mangels upstream deploy CLI.
 2. **[P1] Oracle Operator Integration** — signed metrics-oracle signer/process für `GovernanceAutoTuningState.sil` definieren und operationalisieren.
 3. **[P1] Sprint 10B: Guardian Decentralization** — Hybrid routing (8B/70B), Ensemble voting (5x 8B)
 4. **[P2] fp_rate Oracle** — Q-003 current-Silverc contract gate uses signed metrics input; production oracle operator/integration remains
@@ -30,7 +31,7 @@
 7. **[P3] L-001/L-003** — DevIncentivePool ACL, CEI borderline
 
 ### Wartet auf externe Events:
-- Direct `ssc`/current-Silverc deploy smoke → Sprint 9
+- Current-Silverc network deploy/orchestration tooling → Sprint 9
 - Phi-3-mini Download → Sprint 11
 - LLaMA 3 Fine-Tuning → Sprint 12
 - vProgs (DAGKnight) → Sprint 14
@@ -43,6 +44,7 @@
 ## ✅ Erledigt (letzte 7 Tage)
 - [x] H-002 PATTERN-010 fix: Arc<Phi3Model> statt Arc<Mutex<Phi3Model>> — `6347b85` (06.04.2026)
 - [x] GovernanceAutoTuning current-Silverc runtime gates with signed metrics `fp_rate` input — 11.07.2026
+- [x] Current-Silverc JSON artifact smoke for all 7 fixtures — 11.07.2026
 - [x] Post-Toccata docs/bridge status, Kaspa v2.0.1 pin, Security Audit gate, H-001 vectors, and runtime stub gates — `eeb4808` (08.07.2026)
 - [x] Upstream Silverscript `silverc` local build/test and temporary H-001 explicit-preimage probe — 08.07.2026
 - [x] Repo-tracked current-Silverscript H-001 fixture + verifier script + CI explicit-byte guard — 08.07.2026

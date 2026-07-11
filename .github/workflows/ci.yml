@@ -143,7 +143,7 @@ jobs:
           echo "GovernanceAutoTuningState fixture keeps signed metrics and deterministic tuning invariants."
 
   h001-silverc-runtime:
-    name: H-001 + Validator State Silverc Runtime
+    name: Current Silverc Runtime + Artifact Smoke
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -151,6 +151,8 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       - name: Verify H-001 vectors and validator state fixture against pinned silverc
         run: python3 scripts/verify_silverc_h001.py
+      - name: Smoke compile current-silverc JSON artifacts
+        run: python3 scripts/smoke_silverc_artifacts.py
 
   # ─── Rust Workspace Check ───────────────────────────────────────────────────
   rust-check:

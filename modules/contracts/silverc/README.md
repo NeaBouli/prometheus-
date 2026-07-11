@@ -23,6 +23,7 @@ Run from the Prometheus repo root:
 
 ```bash
 python3 scripts/verify_silverc_h001.py
+python3 scripts/smoke_silverc_artifacts.py
 ```
 
 The script uses `/tmp/prom-silverscript` and the pinned upstream ref
@@ -31,6 +32,8 @@ The script uses `/tmp/prom-silverscript` and the pinned upstream ref
 ```bash
 SILVERSCRIPT_REPO=/path/to/silverscript python3 scripts/verify_silverc_h001.py
 SILVERSCRIPT_REF=<commit-or-tag> python3 scripts/verify_silverc_h001.py
+SILVERSCRIPT_REPO=/path/to/silverscript python3 scripts/smoke_silverc_artifacts.py
+PROMETHEUS_SILVERC_ARTIFACT_DIR=/tmp/out python3 scripts/smoke_silverc_artifacts.py
 ```
 
 ## ValidatorStakingState.sil
@@ -96,7 +99,25 @@ Current signed-int deployment boundary:
 
 Remaining deployment blockers:
 
-- deployment smoke path against direct `ssc`/current Silverc tooling
+- no network deploy CLI is currently present in upstream `silverc`; deployment
+  smoke is therefore split into current-`silverc` JSON artifact smoke plus a
+  still-open network deploy/orchestration path once tooling exists
+
+## Silverc CLI artifact smoke
+
+`scripts/smoke_silverc_artifacts.py` compiles every current-Silverc fixture
+through the pinned upstream `silverc` binary and validates the resulting JSON
+artifact structure:
+
+- non-empty compiled script bytes
+- compiler version
+- state layout
+- expected ABI entrypoints for each Prometheus fixture
+
+Generated artifacts are written to `/tmp/prometheus-silverc-artifacts` by
+default and are not committed. This is a CI-safe deploy-readiness gate for the
+available current-Silverc CLI surface; it does not claim that contracts were
+deployed to a network.
 
 ## GovernanceAutoTuningState.sil
 

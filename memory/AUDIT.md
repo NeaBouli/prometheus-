@@ -411,9 +411,10 @@ Update:   Current-silverc fixture `ValidatorStakingH001.sil` now verifies
           deterministic weekly auto-tuning; valid signed metrics reports are
           accepted, `fp_rate > MAX_FP_RATE` is rejected, high-FP and zero-FP
           tuning paths are accepted, and early tuning is rejected.
-Action:   Prove direct `ssc`/current-Silverc deploy smoke and implement the
-          signed metrics-oracle operator before beta/mainnet governance.
-Severity: HIGH until deployment smoke and oracle operations are verified
+Action:   Prove the missing current-Silverc network deploy/orchestration path
+          and implement the signed metrics-oracle operator before beta/mainnet
+          governance.
+Severity: HIGH until network deployment/orchestration and oracle operations are verified
 ```
 
 **H-002: Arc<Mutex<Phi3Model>> unnecessary lock (Check 2.2, PATTERN-010)**
@@ -565,8 +566,9 @@ Audit confidence:       94%
  GuardianReputation current-silverc compile/ABI/runtime/formula gates are
  verified, RuleStorage, CommunityDonations, DevIncentivePool, and
  GovernanceAutoTuning current-silverc compile/ABI/runtime gates are verified
- locally/in CI,
- but deploy smoke, oracle operator integration, and LLM confidence extraction
+ locally/in CI, and all 7 current-Silverc fixtures compile through local JSON
+ artifact smoke,
+ but network deploy/orchestration tooling, oracle operator integration, and LLM confidence extraction
  remain open)
 ```
 
@@ -578,9 +580,10 @@ compiles/builds covenant sigscripts, and `commitVote`/`revealVote`/
 The signed-int/u64 boundary is resolved by constraining current-Silverc
 deployment inputs to `0..=i64::MAX`; GuardianReputationState runtime/formula
 gates, RuleStorageState runtime gates, CommunityDonationsState runtime gates,
-DevIncentivePoolState runtime gates, and GovernanceAutoTuningState signed
-metrics/auto-tune runtime gates now pass locally. Direct deploy smoke and
-oracle operator integration must pass before Sprint 9 deployment.
+DevIncentivePoolState runtime gates, GovernanceAutoTuningState signed
+metrics/auto-tune runtime gates, and all-fixture JSON artifact smoke now pass
+locally. Network deploy/orchestration tooling and oracle operator integration
+must pass before Sprint 9 deployment.
 M-001 and M-002 can wait until full release (Aug/Sep 2026).
 
 *Audit completed 2026-04-02 by Claude Code (5 parallel agents, 7 levels, 35 checks).*
