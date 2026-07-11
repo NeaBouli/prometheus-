@@ -34,6 +34,7 @@ SILVERSCRIPT_REPO=/path/to/silverscript python3 scripts/verify_silverc_h001.py
 SILVERSCRIPT_REF=<commit-or-tag> python3 scripts/verify_silverc_h001.py
 SILVERSCRIPT_REPO=/path/to/silverscript python3 scripts/smoke_silverc_artifacts.py
 PROMETHEUS_SILVERC_ARTIFACT_DIR=/tmp/out python3 scripts/smoke_silverc_artifacts.py
+python3 scripts/smoke_silverc_artifacts.py --out-dir /tmp/out --archive /tmp/prometheus-silverc-artifacts.tar.gz
 ```
 
 ## ValidatorStakingState.sil
@@ -116,9 +117,10 @@ artifact structure:
 - expected ABI entrypoints for each Prometheus fixture
 
 Generated artifacts are written to `/tmp/prometheus-silverc-artifacts` by
-default and are not committed. The script also writes
-`/tmp/prometheus-silverc-artifacts/manifest.json` with deterministic rollout
-metadata:
+default and are not committed. Use `--out-dir` to choose another output
+directory. Use `--archive /path/to/prometheus-silverc-artifacts.tar.gz` to
+produce a deterministic tarball for operator handoff. The script also writes
+`manifest.json` with deterministic rollout metadata:
 
 - pinned Silverscript ref and resolved commit
 - source SHA-256 for each fixture
@@ -128,9 +130,11 @@ metadata:
 - state layout and ABI entrypoints
 
 The script validates the manifest after writing it, and repeated local runs
-produce the same manifest for the same source tree and pinned Silverscript ref.
-This is a CI-safe release-bundle gate for the available current-Silverc CLI
-surface; it does not claim that contracts were deployed to a network.
+produce the same manifest and archive for the same source tree and pinned
+Silverscript ref. CI builds the manifest and checks that the optional archive
+contains the manifest. This is a CI-safe release-bundle gate for the available
+current-Silverc CLI surface; it does not claim that contracts were deployed to a
+network.
 
 ## GovernanceAutoTuningState.sil
 

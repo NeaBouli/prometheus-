@@ -33,7 +33,7 @@ Prometheus current-Silverc runtime gates now cover H-001, ValidatorStaking,
 GuardianReputation, RuleStorage, CommunityDonations, DevIncentivePool, and
 GovernanceAutoTuning. A local release-bundle smoke compiles all 7 current-Silverc
 fixtures through the pinned upstream `silverc` CLI and writes deterministic
-source/artifact/script hashes. The remaining deployment blockers are the missing
+source/artifact/script hashes plus an optional deterministic archive. The remaining deployment blockers are the missing
 network deploy/orchestration path, signed metrics-oracle operation, and release
 hardening.
 

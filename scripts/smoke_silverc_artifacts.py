@@ -1,13 +1,17 @@
 #!/usr/bin/env python3
-"""Compile Prometheus current-silverc fixtures through the silverc CLI."""
+"""Compile Prometheus current-silverc fixtures into a deterministic release bundle."""
 
 from __future__ import annotations
 
+import argparse
+import gzip
+import io
 import json
 import os
 import shutil
 import subprocess
 import sys
+import tarfile
 import tempfile
 from dataclasses import dataclass
 from hashlib import sha256
@@ -24,6 +28,7 @@ ROOT = Path(__file__).resolve().parents[1]
 CONTRACT_DIR = ROOT / "modules" / "contracts" / "silverc"
 DEFAULT_OUTPUT_DIR = Path("/tmp/prometheus-silverc-artifacts")
 MANIFEST_NAME = "manifest.json"
+ARCHIVE_MEMBER_PREFIX = "prometheus-silverc-artifacts"
 
 
 def expr_int(value: int) -> dict[str, Any]:
@@ -58,6 +63,36 @@ def sha256_file(path: Path) -> str:
 
 def canonical_json_bytes(value: Any) -> bytes:
     return json.dumps(value, sort_keys=True, separators=(",", ":")).encode("utf-8")
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description=(
+            "Build Prometheus current-Silverc JSON artifacts and a deterministic "
+            "release manifest. This does not deploy contracts to any network."
+        )
+    )
+    parser.add_argument(
+        "--silverscript-repo",
+        default=os.environ.get("SILVERSCRIPT_REPO", str(DEFAULT_SILVERSCRIPT_REPO)),
+        help="Path to a local kaspanet/silverscript checkout",
+    )
+    parser.add_argument(
+        "--silverscript-ref",
+        default=os.environ.get("SILVERSCRIPT_REF", DEFAULT_SILVERSCRIPT_REF),
+        help="Silverscript commit, tag, or branch to check out before building silverc",
+    )
+    parser.add_argument(
+        "--out-dir",
+        default=os.environ.get("PROMETHEUS_SILVERC_ARTIFACT_DIR", str(DEFAULT_OUTPUT_DIR)),
+        help="Directory for generated JSON artifacts and manifest",
+    )
+    parser.add_argument(
+        "--archive",
+        type=Path,
+        help="Optional .tar.gz path for a deterministic release bundle archive",
+    )
+    return parser.parse_args()
 
 
 @dataclass(frozen=True)
@@ -347,6 +382,32 @@ def write_manifest(
     return manifest_path
 
 
+def iter_bundle_files(output_dir: Path) -> list[Path]:
+    return sorted(path for path in output_dir.iterdir() if path.is_file() and path.suffix == ".json")
+
+
+def create_deterministic_archive(output_dir: Path, archive_path: Path) -> Path:
+    archive_path = archive_path.expanduser().resolve()
+    archive_path.parent.mkdir(parents=True, exist_ok=True)
+
+    with archive_path.open("wb") as raw:
+        with gzip.GzipFile(filename="", mode="wb", fileobj=raw, mtime=0) as gzip_file:
+            with tarfile.open(fileobj=gzip_file, mode="w", format=tarfile.PAX_FORMAT) as tar:
+                for path in iter_bundle_files(output_dir):
+                    data = path.read_bytes()
+                    info = tarfile.TarInfo(f"{ARCHIVE_MEMBER_PREFIX}/{path.name}")
+                    info.size = len(data)
+                    info.mtime = 0
+                    info.mode = 0o644
+                    info.uid = 0
+                    info.gid = 0
+                    info.uname = ""
+                    info.gname = ""
+                    tar.addfile(info, io.BytesIO(data))
+
+    return archive_path
+
+
 def validate_manifest(manifest_path: Path, output_dir: Path) -> None:
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     entries = manifest.get("fixtures")
@@ -378,17 +439,10 @@ def validate_manifest(manifest_path: Path, output_dir: Path) -> None:
 
 
 def main() -> int:
-    silver_repo = (
-        Path(os.environ.get("SILVERSCRIPT_REPO", str(DEFAULT_SILVERSCRIPT_REPO)))
-        .expanduser()
-        .resolve()
-    )
-    silver_ref = os.environ.get("SILVERSCRIPT_REF", DEFAULT_SILVERSCRIPT_REF)
-    output_dir = (
-        Path(os.environ.get("PROMETHEUS_SILVERC_ARTIFACT_DIR", str(DEFAULT_OUTPUT_DIR)))
-        .expanduser()
-        .resolve()
-    )
+    args = parse_args()
+    silver_repo = Path(args.silverscript_repo).expanduser().resolve()
+    silver_ref = args.silverscript_ref
+    output_dir = Path(args.out_dir).expanduser().resolve()
 
     ensure_silverscript_repo(silver_repo, silver_ref)
     silver_commit = git_rev_parse(silver_repo, "HEAD")
@@ -406,6 +460,10 @@ def main() -> int:
     manifest_path = write_manifest(output_dir, silver_ref, silver_commit, entries)
     print(f"Compiled {len(FIXTURES)} silverc artifacts into {output_dir}")
     print(f"Wrote release manifest: {manifest_path}")
+    if args.archive:
+        archive_path = create_deterministic_archive(output_dir, args.archive)
+        print(f"Wrote release archive: {archive_path}")
+        print(f"Archive SHA-256: {sha256_file(archive_path)}")
     return 0
 
 

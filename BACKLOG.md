@@ -4,7 +4,7 @@
 - Latest documented green product/tooling baseline is `5209414` on `main`; run `git log --oneline -1` for the current working HEAD.
 - CI, Security Audit, and GitHub Pages deployment were green for `5209414`.
 - Runtime stub gates added for Rust client; current-Silverc contract gates now cover H-001, ValidatorStaking, GuardianReputation, RuleStorage, CommunityDonations, DevIncentivePool, and GovernanceAutoTuning.
-- Local current-Silverc release-bundle smoke now compiles all 7 fixtures through pinned upstream `silverc` and writes a deterministic manifest with source/artifact/script hashes; upstream `silverc` has no network deploy command.
+- Local current-Silverc release-bundle smoke now compiles all 7 fixtures through pinned upstream `silverc` and writes a deterministic manifest plus optional archive with source/artifact/script hashes; upstream `silverc` has no network deploy command.
 - Sprint 9 remains blocked by missing network deploy/orchestration tooling, oracle operator integration, and release hardening.
 
 ## 🟡 Nächste Session — STARTFLOW
@@ -44,7 +44,7 @@
 ## ✅ Erledigt (letzte 7 Tage)
 - [x] H-002 PATTERN-010 fix: Arc<Phi3Model> statt Arc<Mutex<Phi3Model>> — `6347b85` (06.04.2026)
 - [x] GovernanceAutoTuning current-Silverc runtime gates with signed metrics `fp_rate` input — 11.07.2026
-- [x] Current-Silverc artifact smoke and deterministic release manifest for all 7 fixtures — 11.07.2026
+- [x] Current-Silverc artifact smoke plus deterministic release manifest/archive for all 7 fixtures — 11.07.2026
 - [x] Post-Toccata docs/bridge status, Kaspa v2.0.1 pin, Security Audit gate, H-001 vectors, and runtime stub gates — `eeb4808` (08.07.2026)
 - [x] Upstream Silverscript `silverc` local build/test and temporary H-001 explicit-preimage probe — 08.07.2026
 - [x] Repo-tracked current-Silverscript H-001 fixture + verifier script + CI explicit-byte guard — 08.07.2026
