@@ -31,13 +31,14 @@ E2E tests, documentation, landing page — all complete and on GitHub.
 Kaspa Toccata moved the ecosystem into the post-fork verification phase.
 Prometheus current-Silverc runtime gates now cover H-001, ValidatorStaking,
 GuardianReputation, RuleStorage, CommunityDonations, DevIncentivePool, and
-GovernanceAutoTuning. A local JSON artifact smoke compiles all 7 current-Silverc
-fixtures through the pinned upstream `silverc` CLI. The remaining deployment
-blockers are the missing network deploy/orchestration path, signed metrics-oracle
-operation, and release hardening.
+GovernanceAutoTuning. A local release-bundle smoke compiles all 7 current-Silverc
+fixtures through the pinned upstream `silverc` CLI and writes deterministic
+source/artifact/script hashes. The remaining deployment blockers are the missing
+network deploy/orchestration path, signed metrics-oracle operation, and release
+hardening.
 
 **Sprint 9 — Contracts Live + Real ZK-Proof**
-- Keep current-Silverscript runtime and JSON artifact smoke gates green
+- Keep current-Silverscript runtime and release-bundle manifest gates green
 - Compile and deploy all 6 contracts to Kaspa Mainnet only after verification passes
 - Integrate kaspa-zk-params crate (real Groth16, replacing stub)
 - Implement PROM emission contract (minting logic)

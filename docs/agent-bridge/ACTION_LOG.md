@@ -2,10 +2,12 @@
 
 ## 2026-07-11
 
+- Extended `scripts/smoke_silverc_artifacts.py` from compile-only artifact smoke into a deterministic release-bundle gate: it now writes and validates `/tmp/prometheus-silverc-artifacts/manifest.json` with source, constructor-args, artifact, and compiled-script SHA-256 hashes plus ABI/state-layout metadata.
+- Verified local release manifest determinism: two consecutive current-Silverc bundle builds produced identical manifests for the pinned Silverscript ref.
 - Added `scripts/smoke_silverc_artifacts.py`, which compiles all 7 current-Silverc fixtures through the pinned upstream `silverc` CLI and validates non-empty script bytes, compiler version, state layout, and expected ABI entries.
-- Local artifact smoke passed and generated JSON artifacts under `/tmp/prometheus-silverc-artifacts`; this proves the available current-Silverc CLI artifact path only.
+- Local release-bundle smoke passed and generated JSON artifacts plus manifest under `/tmp/prometheus-silverc-artifacts`; this proves the available current-Silverc CLI artifact path only.
 - Confirmed upstream `silverc` has no network deploy command (`silverc --help` exposes compile/AST-only artifact generation), so Sprint 9 remains blocked on a real network deploy/orchestration path plus signed metrics-oracle operator integration and release hardening.
-- GitHub Prometheus CI, Security Audit, and Pages passed for `14b89a1`; Prometheus CI now includes the current-Silverc artifact-smoke step.
+- GitHub Prometheus CI, Security Audit, and Pages passed for `14b89a1`; Prometheus CI includes the current-Silverc artifact-smoke step. The release-manifest extension is pending remote CI.
 - GitHub Prometheus CI, Security Audit, and Pages passed for `2bb7521`; the pinned Silverc runtime job now passes 55 upstream-injected tests and CI has a GovernanceAutoTuningState fixture guard.
 - Added current-Silverscript GovernanceAutoTuning state fixture `modules/contracts/silverc/GovernanceAutoTuningState.sil` and runtime gates for `reportMetrics` and `autoTune`.
 - Q-003 is resolved in the current-Silverc contract path as signed metrics-oracle input for `fp_rate`; the legacy `.ss` stub remains archival, and the remaining work is oracle operator/deploy integration.
@@ -33,7 +35,7 @@
 - Verified accepted paths: valid guardian proposal submission, valid validator support vote, accepted proposal finalization, rejected proposal finalization, and active accepted rule deactivation.
 - Verified rejected paths: confidence below `MIN_CONFIDENCE`, vote at `voting_end_block`, zero-vote finalization, and deactivation of a pending/non-accepted rule.
 - Local verifier passed: `python3 scripts/verify_silverc_h001.py` injected 32 upstream tests and all passed at Silverscript ref `d25bd3427a093c17327ca3d6b9e1aa5f7688c863`.
-- Sprint 9 remained blocked after RuleStorage runtime coverage; the blocker later narrowed through CommunityDonations, DevIncentivePool, GovernanceAutoTuning, and artifact-smoke gates to network deploy/orchestration tooling plus signed metrics-oracle operator integration.
+- Sprint 9 remained blocked after RuleStorage runtime coverage; the blocker later narrowed through CommunityDonations, DevIncentivePool, GovernanceAutoTuning, and release-bundle gates to network deploy/orchestration tooling plus signed metrics-oracle operator integration.
 
 ## 2026-07-09
 

@@ -72,9 +72,9 @@ Off-Chain:           Phi-3-mini (local AI) | LLaMA 3 (guardian AI) | Fed-DART (f
 | 6 — E2E | ACCEPTED | Full lifecycle test, Sybil + FP flood resistance |
 | 7 — Dashboard | ACCEPTED | Audit dashboard, documentation |
 | 8 — Public Site | ACCEPTED | Website, SEO, whitepaper, GitHub Pages |
-| 9 — Deploy Path | BLOCKED | Current-Silverc runtime gates and local JSON artifact smoke pass; network deploy/orchestration and release hardening remain |
+| 9 — Deploy Path | BLOCKED | Current-Silverc runtime gates and local release-bundle manifest pass; network deploy/orchestration and release hardening remain |
 
-**Deployment status:** Kaspa Toccata is now in the post-fork verification phase for Prometheus. H-001 commit-reveal byte encoding plus ValidatorStaking, GuardianReputation, RuleStorage, CommunityDonations, DevIncentivePool, and GovernanceAutoTuning runtime gates are covered by the current Silverc verifier. A local artifact smoke compiles all current-Silverc fixtures through the pinned upstream `silverc` CLI. GovernanceAutoTuning now uses a signed metrics-oracle input for Q-003 `fp_rate` instead of the legacy stub. Deployment remains gated by missing network deploy/orchestration tooling, oracle operator integration, and release hardening.
+**Deployment status:** Kaspa Toccata is now in the post-fork verification phase for Prometheus. H-001 commit-reveal byte encoding plus ValidatorStaking, GuardianReputation, RuleStorage, CommunityDonations, DevIncentivePool, and GovernanceAutoTuning runtime gates are covered by the current Silverc verifier. A local release-bundle smoke compiles all current-Silverc fixtures through the pinned upstream `silverc` CLI and writes deterministic source/artifact/script hashes. GovernanceAutoTuning now uses a signed metrics-oracle input for Q-003 `fp_rate` instead of the legacy stub. Deployment remains gated by missing network deploy/orchestration tooling, oracle operator integration, and release hardening.
 
 ---
 

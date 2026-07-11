@@ -5,8 +5,8 @@ Repo path: /Users/gio/Desktop/repos/prometheus
 Branch observed: main
 Latest product-code baseline observed: `14b89a1 ci: add current silverc artifact smoke`
 Latest verified feature baseline observed: `14b89a1 ci: add current silverc artifact smoke`
-Latest CI note: Prometheus CI, Security Audit, and Pages passed for `14b89a1`; pinned Silverc runtime job passes 55 upstream-injected tests and the new current-Silverc artifact-smoke CI step compiles all 7 fixtures through upstream `silverc`.
-Latest tooling note: `scripts/smoke_silverc_artifacts.py` compiles all 7 current-Silverc fixtures through the pinned upstream `silverc` CLI into JSON artifacts and validates script bytes, state layout, compiler version, and expected ABI entrypoints. No upstream network deploy CLI exists in `silverc`; real on-chain deploy/orchestration remains open.
+Latest CI note: Prometheus CI, Security Audit, and Pages passed for `14b89a1`; pinned Silverc runtime job passes 55 upstream-injected tests and the current-Silverc artifact-smoke CI step compiles all 7 fixtures through upstream `silverc`.
+Latest tooling note: `scripts/smoke_silverc_artifacts.py` compiles all 7 current-Silverc fixtures through the pinned upstream `silverc` CLI into JSON artifacts and now writes a deterministic `manifest.json` with source, constructor-args, artifact, and compiled-script SHA-256 hashes plus ABI/state-layout metadata. No upstream network deploy CLI exists in `silverc`; real on-chain deploy/orchestration remains open.
 Latest public-docs note: README, `WHITEPAPER.md`, and `whitepaper.html` were refreshed to reflect post-Toccata deployment gating, verified current-Silverc H-001/Validator/Guardian/RuleStorage/CommunityDonations/DevIncentivePool/GovernanceAutoTuning runtime gates, target-only PROM-RULES asset orchestration, and the no-Kasplex-reputation rule.
 
 Purpose: This file is the local bridge for Codex/Claude Code handover. Read it before touching product code. It consolidates the project state, architecture rules, workflow logic, current open issues, the Reputation Badge decision, and the new direct Sandbox access note.
@@ -37,7 +37,7 @@ Mandatory safety checks:
 - Do not start parallel feature work. One task goes to verification before the next begins.
 - Do not change security, crypto, contract, auth, multisig, key-management, tokenomics, or governance behavior without an explicit risk note and Gio approval.
 - Do not add external dependencies to contracts without architect approval.
-- Do not continue Sprint 9/Mainnet deploy work until current-Silverc JSON artifact smoke, the missing network deploy/orchestration path, signed metrics-oracle operator integration, and release hardening are proven.
+- Do not continue Sprint 9/Mainnet deploy work until current-Silverc runtime and release-bundle manifest gates, the missing network deploy/orchestration path, signed metrics-oracle operator integration, and release hardening are proven.
 
 ---
 
@@ -258,7 +258,7 @@ Mandatory checks by area:
 - Rust: `cargo fmt`, `cargo clippy -- -D warnings`, `cargo test`
 - HTML/static: verify structured data and links where relevant
 - Security: do not expose secrets; run targeted grep/gitleaks checks when touching configs/docs
-- Contracts: no Sprint 9 deploy until current-Silverc JSON artifact smoke, the missing network deploy/orchestration path, signed metrics-oracle operator integration, and release hardening are proven
+- Contracts: no Sprint 9 deploy until current-Silverc runtime and release-bundle manifest gates, the missing network deploy/orchestration path, signed metrics-oracle operator integration, and release hardening are proven
 - Before git add: verify files on disk with `git diff` and targeted reads
 
 No parallel open-ended work. No "finish later" state unless the user explicitly pauses the task and the bridge is updated.
@@ -298,7 +298,7 @@ Known consolidated status from memory/handover and user-provided synthesis:
 | 6 | E2E integration, 18 tests | ACCEPTED |
 | 7 | Dashboard and docs | ACCEPTED |
 | 8 | Contributing/wiki/site/SEO in older handover | ACCEPTED in older handover |
-| 9 | Contract deploy on Testnet/Mainnet path | BLOCKED until the missing network deploy/orchestration path, signed metrics-oracle operator integration, and release hardening pass. Current-Silverc runtime and JSON artifact-smoke gates are CI-verified. |
+| 9 | Contract deploy on Testnet/Mainnet path | BLOCKED until the missing network deploy/orchestration path, signed metrics-oracle operator integration, and release hardening pass. Current-Silverc runtime and release-bundle manifest gates pass locally. |
 | 10B | Guardian decentralization | Startable, but architecture-sensitive |
 
 Test status from user synthesis:
@@ -336,7 +336,7 @@ Known findings:
 - CommunityDonations current-Silverc port: `CommunityDonationsState.sil` compile/ABI/runtime gates pass locally and in CI for `donateKas`, `proposeDisbursement`, `voteDisbursement`, and `executeDisbursement`; valid donate/propose/vote/execute transitions are accepted, zero donation, over-pool proposal, late vote, and insufficient quorum are rejected. It keeps KAS-denominated pool accounting, `MIN_DONATION_KAS = 1`, `DISBURSEMENT_QUORUM = 10`, and `VALIDATOR_QUORUM = 6700` without pretending to support legacy maps, strings, `tx.value`, direct KAS transfer, or cross-contract validator lookups in current Silverc.
 - DevIncentivePool current-Silverc port: `DevIncentivePoolState.sil` compile/ABI/runtime gates pass locally and in CI for `proposeGrant`, `voteGrant`, and `executeGrant`; valid propose/vote/execute transitions are accepted, amount above `MAX_GRANT_PROM`, late vote, insufficient quorum, and insufficient approval are rejected. It keeps PROM-denominated grant pool accounting without introducing PROM staking or pretending to support legacy maps, strings, `msg.sender`, direct PROM transfer, or cross-contract validator lookups in current Silverc. Legacy `deposit()` ACL remains a deployment/orchestration decision once emission authority is finalized.
 - GovernanceAutoTuning current-Silverc port: `GovernanceAutoTuningState.sil` compile/ABI/runtime gates pass locally for `reportMetrics` and `autoTune`; valid signed metrics reports are accepted, `fp_rate > MAX_FP_RATE` is rejected, high-FP and zero-FP auto-tune paths are accepted, and early tuning is rejected. Q-003 is resolved in the contract gate as signed metrics input; oracle operator/deploy integration remains.
-- Current-Silverc artifact smoke: `scripts/smoke_silverc_artifacts.py` compiles `ValidatorStakingH001`, `ValidatorStakingState`, `GuardianReputationState`, `RuleStorageState`, `CommunityDonationsState`, `DevIncentivePoolState`, and `GovernanceAutoTuningState` through the pinned upstream `silverc` CLI and validates non-empty script bytes, compiler version, state layout, and expected ABI entries. This proves the available CLI artifact path only; upstream `silverc` currently has no network deploy command.
+- Current-Silverc release-bundle manifest: `scripts/smoke_silverc_artifacts.py` compiles `ValidatorStakingH001`, `ValidatorStakingState`, `GuardianReputationState`, `RuleStorageState`, `CommunityDonationsState`, `DevIncentivePoolState`, and `GovernanceAutoTuningState` through the pinned upstream `silverc` CLI and validates non-empty script bytes, compiler version, state layout, expected ABI entries, and deterministic source/artifact/script hashes. This proves the available CLI artifact path only; upstream `silverc` currently has no network deploy command.
 - H-002: unnecessary Mutex around Phi3Model. Fixed in commit `6347b85` according to memory/handover.
 - M-001: Guardian YARA generator confidence is heuristic, needs real LLM confidence or validated metric.
 - M-002: performance test flaky in debug mode, threshold/release gate needed.
@@ -530,7 +530,7 @@ If asked to continue project work:
 
 ## 18. One-Line Decision Summary
 
-Prometheus does not need reputation badges; it needs readable, provable Kaspa L1 Guardian reputation. Codex has direct Sandbox access via `ssh sandbox`, upstream `silverc` works in CI, H-001 byte-core plus current-silverc `ValidatorStakingState.sil` runtime transitions pass, `GuardianReputationState.sil` compile/ABI/runtime/formula gates pass, `RuleStorageState.sil` compile/ABI/runtime gates pass, `CommunityDonationsState.sil` compile/ABI/runtime gates pass, `DevIncentivePoolState.sil` compile/ABI/runtime gates pass, `GovernanceAutoTuningState.sil` signed metrics/auto-tune runtime gates pass locally, current-Silverc JSON artifact smoke passes locally for all 7 fixtures, signed-int deployment bounds are documented/enforced, and Sprint 9 remains blocked until the missing network deploy/orchestration path plus signed metrics-oracle operator integration pass.
+Prometheus does not need reputation badges; it needs readable, provable Kaspa L1 Guardian reputation. Codex has direct Sandbox access via `ssh sandbox`, upstream `silverc` works in CI, H-001 byte-core plus current-silverc `ValidatorStakingState.sil` runtime transitions pass, `GuardianReputationState.sil` compile/ABI/runtime/formula gates pass, `RuleStorageState.sil` compile/ABI/runtime gates pass, `CommunityDonationsState.sil` compile/ABI/runtime gates pass, `DevIncentivePoolState.sil` compile/ABI/runtime gates pass, `GovernanceAutoTuningState.sil` signed metrics/auto-tune runtime gates pass locally, current-Silverc release-bundle manifest passes locally for all 7 fixtures, signed-int deployment bounds are documented/enforced, and Sprint 9 remains blocked until the missing network deploy/orchestration path plus signed metrics-oracle operator integration pass.
 <!-- CODEX_CLAUDE_CODE_TERMINAL_BRIDGE_V1 -->
 ## Codex -> Claude Code Terminal Bridge
 

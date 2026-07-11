@@ -100,10 +100,11 @@ Current signed-int deployment boundary:
 Remaining deployment blockers:
 
 - no network deploy CLI is currently present in upstream `silverc`; deployment
-  smoke is therefore split into current-`silverc` JSON artifact smoke plus a
-  still-open network deploy/orchestration path once tooling exists
+  readiness is therefore split into current-`silverc` runtime tests, a
+  deterministic JSON artifact/release-manifest gate, and a still-open network
+  deploy/orchestration path once tooling exists
 
-## Silverc CLI artifact smoke
+## Silverc CLI release bundle smoke
 
 `scripts/smoke_silverc_artifacts.py` compiles every current-Silverc fixture
 through the pinned upstream `silverc` binary and validates the resulting JSON
@@ -115,9 +116,21 @@ artifact structure:
 - expected ABI entrypoints for each Prometheus fixture
 
 Generated artifacts are written to `/tmp/prometheus-silverc-artifacts` by
-default and are not committed. This is a CI-safe deploy-readiness gate for the
-available current-Silverc CLI surface; it does not claim that contracts were
-deployed to a network.
+default and are not committed. The script also writes
+`/tmp/prometheus-silverc-artifacts/manifest.json` with deterministic rollout
+metadata:
+
+- pinned Silverscript ref and resolved commit
+- source SHA-256 for each fixture
+- constructor-args SHA-256 for each fixture
+- artifact SHA-256
+- compiled script SHA-256 and byte length
+- state layout and ABI entrypoints
+
+The script validates the manifest after writing it, and repeated local runs
+produce the same manifest for the same source tree and pinned Silverscript ref.
+This is a CI-safe release-bundle gate for the available current-Silverc CLI
+surface; it does not claim that contracts were deployed to a network.
 
 ## GovernanceAutoTuningState.sil
 

@@ -566,8 +566,8 @@ Audit confidence:       94%
  GuardianReputation current-silverc compile/ABI/runtime/formula gates are
  verified, RuleStorage, CommunityDonations, DevIncentivePool, and
  GovernanceAutoTuning current-silverc compile/ABI/runtime gates are verified
- locally/in CI, and all 7 current-Silverc fixtures compile through local JSON
- artifact smoke,
+ locally/in CI, and all 7 current-Silverc fixtures compile through a local
+ release-bundle manifest gate,
  but network deploy/orchestration tooling, oracle operator integration, and LLM confidence extraction
  remain open)
 ```
@@ -581,7 +581,7 @@ The signed-int/u64 boundary is resolved by constraining current-Silverc
 deployment inputs to `0..=i64::MAX`; GuardianReputationState runtime/formula
 gates, RuleStorageState runtime gates, CommunityDonationsState runtime gates,
 DevIncentivePoolState runtime gates, GovernanceAutoTuningState signed
-metrics/auto-tune runtime gates, and all-fixture JSON artifact smoke now pass
+metrics/auto-tune runtime gates, and all-fixture release-bundle manifest now pass
 locally. Network deploy/orchestration tooling and oracle operator integration
 must pass before Sprint 9 deployment.
 M-001 and M-002 can wait until full release (Aug/Sep 2026).
