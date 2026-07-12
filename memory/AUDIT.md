@@ -476,8 +476,10 @@ Action:   Implement and document the oracle operator before beta/mainnet.
 Severity: LOW (contract gate exists; operational integration remains)
 Update:   2026-07-12 local tooling now requires real deployment receipts to be
           paired with public node/explorer receipt evidence before handoff
-          readiness can pass; external oracle transaction operation still
-          remains outside this repository and pending real deployment evidence.
+          readiness can pass, and verified oracle tx results to be paired with
+          public node/explorer tx evidence before readiness can pass; external
+          oracle transaction operation still remains outside this repository
+          and pending real deployment evidence.
 ```
 
 **L-003: revealVote CEI borderline (Check 6.4)**

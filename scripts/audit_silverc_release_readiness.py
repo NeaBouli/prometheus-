@@ -67,6 +67,9 @@ DEPLOY_RECEIPT_EVIDENCE_FILES = {
 METRICS_TX_RESULT_FILES = {
     "metrics-oracle-tx-result-summary.json",
     "metrics-oracle-tx-result.md",
+    "metrics-oracle-tx-public-evidence.json",
+    "metrics-oracle-tx-public-evidence-summary.json",
+    "metrics-oracle-tx-public-evidence.md",
     "metrics-oracle-status-draft.json",
     "metrics-oracle-status-draft.md",
 }
@@ -285,6 +288,20 @@ def validate_component_summaries(root: Path, handoff: dict[str, Any]) -> dict[st
     if handoff.get("metrics_tx_result_status") == "METRICS_ORACLE_TX_RESULT_VERIFIED":
         tx_result = require_json(root, "metrics-oracle-tx-result-summary.json")
         expect_status(tx_result, "status", "METRICS_ORACLE_TX_RESULT_VERIFIED", "metrics-oracle-tx-result-summary")
+        tx_evidence = require_json(root, "metrics-oracle-tx-public-evidence-summary.json")
+        expect_status(
+            tx_evidence,
+            "status",
+            "PUBLIC_METRICS_ORACLE_TX_EVIDENCE_VERIFIED",
+            "metrics-oracle-tx-public-evidence-summary",
+        )
+        if handoff.get("metrics_tx_evidence_status") != tx_evidence["status"]:
+            raise ValueError("metrics-oracle-tx-public-evidence-summary.status mismatch")
+        validate_safety(
+            tx_evidence,
+            OPERATOR_PROCEDURE_FALSE_SAFETY_FLAGS,
+            "metrics-oracle-tx-public-evidence-summary",
+        )
         status_draft = require_json(root, "metrics-oracle-status-draft.json")
         expect_status(
             status_draft,
@@ -294,9 +311,11 @@ def validate_component_summaries(root: Path, handoff: dict[str, Any]) -> dict[st
         )
         validate_safety(status_draft, OPERATOR_PROCEDURE_FALSE_SAFETY_FLAGS, "metrics-oracle-status-draft")
         statuses["metrics_tx_result"] = tx_result["status"]
+        statuses["metrics_tx_evidence"] = tx_evidence["status"]
         statuses["metrics_oracle_status_draft"] = status_draft["status"]
     else:
         statuses["metrics_tx_result"] = handoff.get("metrics_tx_result_status", "UNKNOWN")
+        statuses["metrics_tx_evidence"] = handoff.get("metrics_tx_evidence_status", "UNKNOWN")
         statuses["metrics_oracle_status_draft"] = handoff.get("metrics_oracle_status_draft_status", "UNKNOWN")
 
     if handoff.get("external_operator_capability_status") == "EXTERNAL_OPERATOR_CAPABILITY_VERIFIED":
@@ -350,6 +369,7 @@ def validate_handoff(root: Path) -> dict[str, Any]:
         and handoff.get("metrics_tx_request_status") == "READY_FOR_EXTERNAL_TX_ASSEMBLER"
         and handoff.get("metrics_operator_procedure_status") == "READY_FOR_EXTERNAL_ORACLE_OPERATOR"
         and handoff.get("metrics_tx_result_status") == "METRICS_ORACLE_TX_RESULT_VERIFIED"
+        and handoff.get("metrics_tx_evidence_status") == "PUBLIC_METRICS_ORACLE_TX_EVIDENCE_VERIFIED"
         and handoff.get("metrics_oracle_status_draft_status") == "READY_FOR_MANUAL_ORACLE_STATUS_UPDATE"
         and not readiness_blockers
     )
@@ -378,7 +398,7 @@ def validate_handoff(root: Path) -> dict[str, Any]:
         "operator_next_steps": [
             "Keep this audit green for every generated handoff package.",
             "Do not claim rollout readiness while blockers remain.",
-            "Use only verified operator_record deployment receipts, public node/explorer evidence, and verified metrics-oracle tx results for status updates.",
+            "Use only verified operator_record deployment receipts, public node/explorer evidence, verified metrics-oracle tx results, and public oracle tx evidence for status updates.",
             "Keep wallet keys, raw transactions, and signing material outside this repository.",
         ],
     }

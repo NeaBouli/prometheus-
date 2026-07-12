@@ -2,6 +2,12 @@
 
 ## 2026-07-12
 
+- Added `scripts/verify_metrics_oracle_tx_evidence.py`, a public-only verifier that binds verified GovernanceAutoTuning metrics-oracle transaction results to public node/explorer evidence snapshots. It checks release-bundle metadata, request/result hashes, contract binding, payload hashes, tx id, block hash, DAA score, confirmations, and rejects secret-like plus raw/serialized transaction fields without querying nodes, accepting keys, signing, assembling, broadcasting, deploying, or updating status files.
+- Extended `scripts/build_silverc_operator_handoff.py` with optional `--metrics-tx-evidence`; when a verified metrics-oracle tx result is present, missing public tx evidence is now a handoff blocker.
+- Extended `scripts/audit_silverc_release_readiness.py` so verified oracle tx results require safe public tx-evidence artifacts before `ROLLOUT_READY`.
+- Extended Prometheus CI with public oracle tx-evidence fixture generation, positive verification, secret/raw/tx/confirmation negative coverage, handoff missing-evidence blocker checks, readiness component assertions, and tx-evidence safety tamper coverage.
+- Updated README, Whitepaper, public `whitepaper.html`, roadmap, Silverc module docs, and llms.txt to describe public oracle tx-evidence verification as a release-hardening gate, not a deployment claim.
+- Local checks passed: Python syntax compile for the new/changed scripts, CI YAML parse, Autodidactic regression suite, Memory Integrity, `git diff --check`, fresh current-Silverc release archive build, signer-ready oracle tx-request generation, public oracle tx-result verification, and public oracle tx-evidence verification. Remote CI for this local hardening commit is still pending until push.
 - Hardened `scripts/autodidactic.py`, the local agent workflow helper: dependency checks and status updates now handle padded Markdown table cells, and `mark_completed` can close in-progress or blocked tasks.
 - Added `scripts/test_autodidactic.py`, a stdlib-only regression suite for memory loading, priority/dependency selection, task completion, status replacement, and blocker detection. Prometheus CI now runs this suite in the Memory Integrity job.
 - Local checks passed for the Autodidactic hardening: `python3 scripts/test_autodidactic.py` and `python3 -m py_compile scripts/autodidactic.py scripts/test_autodidactic.py`.

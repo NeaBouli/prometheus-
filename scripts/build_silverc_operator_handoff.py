@@ -63,6 +63,11 @@ def parse_args() -> argparse.Namespace:
         help="Optional public metrics-oracle transaction result JSON to verify against the generated tx request",
     )
     parser.add_argument(
+        "--metrics-tx-evidence",
+        type=Path,
+        help="Optional public node/explorer evidence snapshot for a verified metrics-oracle transaction result",
+    )
+    parser.add_argument(
         "--operator-capability",
         type=Path,
         help="Optional public external-operator capability record to bind to generated operator procedures",
@@ -348,6 +353,37 @@ def run_metrics_tx_result_verification(archive: Path, out_dir: Path, metrics_tx_
     return load_json(summary_path)
 
 
+def run_metrics_tx_evidence_verification(
+    archive: Path,
+    out_dir: Path,
+    metrics_tx_result: Path,
+    metrics_tx_evidence: Path,
+) -> dict[str, Any]:
+    evidence_path = out_dir / "metrics-oracle-tx-public-evidence.json"
+    shutil.copyfile(metrics_tx_evidence, evidence_path)
+    summary_path = out_dir / "metrics-oracle-tx-public-evidence-summary.json"
+    runbook_path = out_dir / "metrics-oracle-tx-public-evidence.md"
+    run(
+        [
+            sys.executable,
+            "scripts/verify_metrics_oracle_tx_evidence.py",
+            "--archive",
+            str(archive),
+            "--tx-request",
+            str(out_dir / "metrics-oracle-tx-request.json"),
+            "--tx-result",
+            str(metrics_tx_result),
+            "--evidence",
+            str(evidence_path),
+            "--summary-out",
+            str(summary_path),
+            "--runbook-out",
+            str(runbook_path),
+        ]
+    )
+    return load_json(summary_path)
+
+
 def run_metrics_oracle_status_staging(archive: Path, out_dir: Path, metrics_tx_result: Path) -> dict[str, Any]:
     status_path = out_dir / "metrics-oracle-status-draft.json"
     snippet_path = out_dir / "metrics-oracle-status-draft.md"
@@ -432,6 +468,7 @@ def status_from_components(
     deploy_receipt_evidence: dict[str, Any] | None,
     tx_request: dict[str, Any],
     tx_result: dict[str, Any] | None,
+    tx_evidence: dict[str, Any] | None,
 ) -> tuple[str, list[str]]:
     blockers = []
     if not deploy_plan["deploy_supported"]:
@@ -444,6 +481,8 @@ def status_from_components(
         blockers.extend(tx_request["blockers"])
     elif tx_result is None:
         blockers.append("missing verified metrics-oracle transaction result")
+    elif tx_evidence is None:
+        blockers.append("missing public node/explorer evidence for metrics-oracle transaction result")
 
     status = "READY_FOR_OPERATOR_DEPLOY" if not blockers else "HANDOFF_BLOCKED"
     return status, blockers
@@ -489,6 +528,7 @@ def write_handoff_markdown(out_dir: Path, summary: dict[str, Any]) -> None:
             f"- Metrics tx request: {summary['metrics_tx_request_status']}",
             f"- Metrics operator procedure: {summary['metrics_operator_procedure_status']}",
             f"- Metrics tx result: {summary['metrics_tx_result_status']}",
+            f"- Metrics tx public evidence: {summary['metrics_tx_evidence_status']}",
             f"- Metrics oracle status draft: {summary['metrics_oracle_status_draft_status']}",
             f"- External operator capability: {summary['external_operator_capability_status']}",
             "",
@@ -511,7 +551,8 @@ def write_handoff_markdown(out_dir: Path, summary: dict[str, Any]) -> None:
             "6. Use only verified operator_record contract IDs for signer-ready oracle transaction requests.",
             "7. Review `metrics-oracle-operator-procedure.md` before any external signing or broadcast.",
             "8. Sign and broadcast outside this repository through the approved wallet/vault process, then verify the public result with `--metrics-tx-result`.",
-            "9. Update `memory/STATUS.md` only after all real receipts, public evidence, and transaction receipts verify.",
+            "9. Bind the verified metrics-oracle transaction result to public node/explorer evidence with `--metrics-tx-evidence`.",
+            "10. Update `memory/STATUS.md` only after all real receipts, public evidence, and transaction receipts verify.",
         ]
     )
     (out_dir / "HANDOFF.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
@@ -530,6 +571,9 @@ def main() -> int:
     )
     metrics_tx_result_path = (
         ensure_public_file(args.metrics_tx_result, "metrics tx result") if args.metrics_tx_result else None
+    )
+    metrics_tx_evidence_path = (
+        ensure_public_file(args.metrics_tx_evidence, "metrics tx evidence") if args.metrics_tx_evidence else None
     )
     operator_capability_path = (
         ensure_public_file(args.operator_capability, "operator capability") if args.operator_capability else None
@@ -588,14 +632,24 @@ def main() -> int:
     if tx_request["status"] == "READY_FOR_EXTERNAL_TX_ASSEMBLER":
         metrics_operator_procedure = run_metrics_operator_procedure(packaged_archive, out_dir)
     tx_result_summary = None
+    tx_evidence_summary = None
     metrics_oracle_status_draft = None
     if metrics_tx_result_path:
         tx_result_summary = run_metrics_tx_result_verification(packaged_archive, out_dir, metrics_tx_result_path)
+        if metrics_tx_evidence_path:
+            tx_evidence_summary = run_metrics_tx_evidence_verification(
+                packaged_archive,
+                out_dir,
+                metrics_tx_result_path,
+                metrics_tx_evidence_path,
+            )
         metrics_oracle_status_draft = run_metrics_oracle_status_staging(
             packaged_archive,
             out_dir,
             metrics_tx_result_path,
         )
+    elif metrics_tx_evidence_path:
+        raise ValueError("--metrics-tx-evidence requires --metrics-tx-result")
     external_operator_capability = None
     if operator_capability_path:
         external_operator_capability = run_external_operator_capability_verification(
@@ -610,6 +664,7 @@ def main() -> int:
         deploy_receipt_evidence_summary,
         tx_request,
         tx_result_summary,
+        tx_evidence_summary,
     )
     summary = {
         "schema_version": 1,
@@ -638,6 +693,7 @@ def main() -> int:
             metrics_operator_procedure["status"] if metrics_operator_procedure else "NOT_READY_TX_REQUEST_BLOCKED"
         ),
         "metrics_tx_result_status": tx_result_summary["status"] if tx_result_summary else "NOT_PROVIDED",
+        "metrics_tx_evidence_status": tx_evidence_summary["status"] if tx_evidence_summary else "NOT_PROVIDED",
         "metrics_oracle_status_draft_status": (
             metrics_oracle_status_draft["status"] if metrics_oracle_status_draft else "NOT_PROVIDED"
         ),

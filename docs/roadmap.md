@@ -54,15 +54,17 @@ handoff builder now packages the release archive, preflight outputs, deploy
 requests, optional imported operator receipts, receipt checks, optional public
 receipt evidence, metrics report
 preflight, unsigned oracle request, deploy/oracle operator procedures, optional
-external-operator capability verification, and optional verified oracle tx result
-into one public handoff directory while preserving the real blocker list. A separate
+external-operator capability verification, optional verified oracle tx result,
+and optional public oracle tx evidence into one public handoff directory while preserving the real blocker list. A separate
 metrics-oracle report preflight validates public `reportMetrics` payloads, an
 unsigned oracle tx-request builder binds those payloads to the
 GovernanceAutoTuning artifact hashes for external assembly, an external
 oracle-operator procedure defines the public signing/broadcast checklist and
 required result evidence, and a public tx-result verifier checks confirmed
 transaction records against the request and release bundle without accepting
-signing material or raw transaction payloads. A metrics-oracle status staging
+signing material or raw transaction payloads. A public tx-evidence verifier
+binds verified metrics-oracle transaction results to public node/explorer
+snapshots before handoff readiness can pass. A metrics-oracle status staging
 guard emits only a manual status-update draft from verified public tx results
 and does not write status files. A public external-operator capability verifier
 binds capability records to the deploy/oracle procedures while rejecting
@@ -92,6 +94,7 @@ assembly/signing/broadcast/deploy operation, and final release hardening.
 - Keep the external oracle operator procedure green and free of signing/raw transaction material
 - Keep external-operator capability verification green and free of secrets/raw transaction material
 - Keep public oracle tx-result verification green and free of signing/raw transaction material
+- Keep public oracle tx-evidence verification green and free of secrets/raw transaction material
 - Keep public oracle status staging guarded against blocked requests, secrets, and raw transactions
 - Compile and deploy all 6 contracts to Kaspa Mainnet only after verification passes
 - Integrate kaspa-zk-params crate (real Groth16, replacing stub)
