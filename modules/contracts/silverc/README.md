@@ -49,7 +49,8 @@ python3 scripts/build_metrics_oracle_operator_procedure.py --archive /tmp/promet
 python3 scripts/verify_metrics_oracle_tx_result.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --tx-request /tmp/prometheus-metrics-oracle-tx-request.json --tx-result /path/to/public-metrics-oracle-tx-result.json --summary-out /tmp/prometheus-metrics-oracle-tx-result-summary.json --runbook-out /tmp/prometheus-metrics-oracle-tx-result.md
 python3 scripts/verify_metrics_oracle_tx_evidence.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --tx-request /tmp/prometheus-metrics-oracle-tx-request.json --tx-result /path/to/public-metrics-oracle-tx-result.json --evidence /path/to/public-metrics-oracle-tx-evidence.json --summary-out /tmp/prometheus-metrics-oracle-tx-public-evidence-summary.json --runbook-out /tmp/prometheus-metrics-oracle-tx-public-evidence.md
 python3 scripts/stage_metrics_oracle_status.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --tx-request /tmp/prometheus-metrics-oracle-tx-request.json --tx-result /path/to/public-metrics-oracle-tx-result.json --status-out /tmp/prometheus-metrics-oracle-status-draft.json --snippet-out /tmp/prometheus-metrics-oracle-status-draft.md
-python3 scripts/build_silverc_operator_handoff.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --out-dir /tmp/prometheus-silverc-operator-handoff --network sandbox --rpc-url ws://127.0.0.1:17210 --deployer-address kaspatest:qptestpreflight000000000000000000000000000000000 --metrics-oracle-pubkey 1111111111111111111111111111111111111111111111111111111111111111 --orchestrator-results /path/to/public-external-deploy-results.json --deploy-receipt-evidence /path/to/public-node-or-explorer-evidence.json --metrics-tx-result /path/to/public-metrics-oracle-tx-result.json --metrics-tx-evidence /path/to/public-metrics-oracle-tx-evidence.json
+python3 scripts/verify_release_hardening_evidence.py --evidence /path/to/public-release-hardening-evidence.json --expected-commit "$(git rev-parse HEAD)" --summary-out /tmp/prometheus-release-hardening-evidence-summary.json --runbook-out /tmp/prometheus-release-hardening-evidence.md
+python3 scripts/build_silverc_operator_handoff.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --out-dir /tmp/prometheus-silverc-operator-handoff --network sandbox --rpc-url ws://127.0.0.1:17210 --deployer-address kaspatest:qptestpreflight000000000000000000000000000000000 --metrics-oracle-pubkey 1111111111111111111111111111111111111111111111111111111111111111 --orchestrator-results /path/to/public-external-deploy-results.json --deploy-receipt-evidence /path/to/public-node-or-explorer-evidence.json --metrics-tx-result /path/to/public-metrics-oracle-tx-result.json --metrics-tx-evidence /path/to/public-metrics-oracle-tx-evidence.json --release-hardening-evidence /path/to/public-release-hardening-evidence.json
 python3 scripts/audit_silverc_release_readiness.py --handoff-dir /tmp/prometheus-silverc-operator-handoff --summary-out /tmp/prometheus-silverc-release-readiness.json --runbook-out /tmp/prometheus-silverc-release-readiness.md
 ```
 
@@ -293,8 +294,9 @@ node/explorer receipt evidence for those receipts, validates the
 metrics-oracle report, builds the unsigned metrics-oracle transaction request,
 can verify a public external-operator capability record, can verify a public
 metrics-oracle transaction result, can verify public node/explorer evidence for
-that transaction result, can stage a manual metrics-oracle status draft, and
-emits `HANDOFF.md` plus `operator-handoff-summary.json`.
+that transaction result, can stage a manual metrics-oracle status draft, can
+verify public release-hardening evidence for the exact release commit, and emits
+`HANDOFF.md` plus `operator-handoff-summary.json`.
 
 The package is intentionally blocked until real network deploy/orchestration
 tooling, verified `operator_record` receipts, and signer-ready contract instance
@@ -302,6 +304,7 @@ IDs exist. When real receipts are present, missing public receipt evidence is
 also a blocker. When a public metrics-oracle transaction result is present,
 missing public tx evidence is also a blocker. It does not accept private keys,
 sign, broadcast, deploy contracts, raw transactions, or update status files.
+Missing public release-hardening evidence is also a blocker before rollout.
 
 ## Release-readiness audit
 
@@ -311,7 +314,8 @@ operator handoff directory before any rollout claim. It checks:
 - the handoff summary status, blocker list, safety flags, and included-file list
 - required handoff files for deploy preflight, deploy requests, receipt checks,
   deploy operator procedure, optional public receipt evidence, metrics report
-  preflight, unsigned tx request, and optional oracle tx result/status draft
+  preflight, unsigned tx request, optional oracle tx result/status draft, and
+  optional release-hardening evidence
 - component summary statuses match the handoff summary
 - JSON artifacts do not contain secret-like keys or raw/serialized transaction
   fields
@@ -319,9 +323,9 @@ operator handoff directory before any rollout claim. It checks:
 The audit emits `ROLLOUT_BLOCKED` while real deploy/orchestration or oracle
 operation evidence is missing. `--require-ready` turns that into a failing gate,
 which should only pass after real operator receipts, public receipt evidence,
-verified oracle tx results, deploy tooling, and final release policy checks are
-complete. The audit does not accept keys, sign, assemble, broadcast, deploy, or
-update status files.
+verified oracle tx results, deploy tooling, and public release-hardening
+evidence for the exact rollout commit are complete. The audit does not accept
+keys, sign, assemble, broadcast, deploy, or update status files.
 
 ## GovernanceAutoTuningState.sil
 
@@ -502,6 +506,22 @@ block hash, confirmations, DAA score, contract instance ID, and payload hashes.
 When `--metrics-tx-result` is supplied, the handoff package includes the status
 draft and the release-readiness audit treats missing or unsafe draft files as a
 failed gate.
+
+## Release-hardening evidence
+
+`scripts/verify_release_hardening_evidence.py` validates a public
+release-hardening evidence document for the exact release commit. The evidence
+must bind the repository, protected branch, successful `Prometheus CI`,
+`Security Audit`, and `pages-build-deployment` checks, branch controls,
+rollback documentation, public Pages verification, and release-note
+requirements.
+
+The verifier rejects secret-like fields and raw or serialized transaction
+payloads. It does not query GitHub, accept credentials, change repository
+settings, deploy contracts, assemble transactions, sign, broadcast, or update
+status files. `scripts/build_silverc_operator_handoff.py` accepts this evidence
+via `--release-hardening-evidence`; missing evidence remains a handoff blocker
+until the final rollout commit has a verified public snapshot.
 
 ## DevIncentivePoolState.sil
 

@@ -70,12 +70,17 @@ and does not write status files. A public external-operator capability verifier
 binds capability records to the deploy/oracle procedures while rejecting
 secret-like fields, raw transactions, and repository-side signing/deploy/status
 writes.
+A public release-hardening evidence verifier binds successful CI, Pages,
+branch-control, rollback, and release-note checks to the exact release commit
+without querying GitHub, accepting credentials, changing repository settings,
+or touching chain material.
 A release-readiness auditor now checks the generated handoff package, required
 files, component summaries, safety flags, and JSON secret/raw-transaction
 hygiene before any rollout claim. The remaining deployment blockers are the
 missing network deploy/orchestration path, real public deploy results/receipts
 plus public node/explorer evidence from that path, external signed metrics-oracle transaction
-assembly/signing/broadcast/deploy operation, and final release hardening.
+assembly/signing/broadcast/deploy operation, and public release-hardening
+evidence for the exact rollout commit.
 
 **Sprint 9 — Contracts Live + Real ZK-Proof**
 - Keep current-Silverscript runtime and release-bundle manifest gates green
@@ -96,6 +101,7 @@ assembly/signing/broadcast/deploy operation, and final release hardening.
 - Keep public oracle tx-result verification green and free of signing/raw transaction material
 - Keep public oracle tx-evidence verification green and free of secrets/raw transaction material
 - Keep public oracle status staging guarded against blocked requests, secrets, and raw transactions
+- Keep public release-hardening evidence verification green and bound to the exact release commit
 - Compile and deploy all 6 contracts to Kaspa Mainnet only after verification passes
 - Integrate kaspa-zk-params crate (real Groth16, replacing stub)
 - Implement PROM emission contract (minting logic)

@@ -77,6 +77,11 @@ def parse_args() -> argparse.Namespace:
         type=Path,
         help="Optional public node/explorer evidence snapshot for verified operator_record deployment receipts",
     )
+    parser.add_argument(
+        "--release-hardening-evidence",
+        type=Path,
+        help="Optional public release-hardening evidence snapshot for CI, Pages, branch controls, and rollback readiness",
+    )
     return parser.parse_args()
 
 
@@ -462,6 +467,35 @@ def run_deploy_receipt_evidence_verification(
     return load_json(summary_path)
 
 
+def current_commit_sha() -> str:
+    return run(["git", "rev-parse", "HEAD"]).stdout.strip()
+
+
+def run_release_hardening_evidence_verification(
+    out_dir: Path,
+    release_hardening_evidence: Path,
+) -> dict[str, Any]:
+    evidence_path = out_dir / "release-hardening-evidence.json"
+    shutil.copyfile(release_hardening_evidence, evidence_path)
+    summary_path = out_dir / "release-hardening-evidence-summary.json"
+    runbook_path = out_dir / "release-hardening-evidence.md"
+    run(
+        [
+            sys.executable,
+            "scripts/verify_release_hardening_evidence.py",
+            "--evidence",
+            str(evidence_path),
+            "--expected-commit",
+            current_commit_sha(),
+            "--summary-out",
+            str(summary_path),
+            "--runbook-out",
+            str(runbook_path),
+        ]
+    )
+    return load_json(summary_path)
+
+
 def status_from_components(
     deploy_plan: dict[str, Any],
     operator_receipts: dict[str, Any] | None,
@@ -469,6 +503,7 @@ def status_from_components(
     tx_request: dict[str, Any],
     tx_result: dict[str, Any] | None,
     tx_evidence: dict[str, Any] | None,
+    release_hardening: dict[str, Any] | None,
 ) -> tuple[str, list[str]]:
     blockers = []
     if not deploy_plan["deploy_supported"]:
@@ -483,6 +518,8 @@ def status_from_components(
         blockers.append("missing verified metrics-oracle transaction result")
     elif tx_evidence is None:
         blockers.append("missing public node/explorer evidence for metrics-oracle transaction result")
+    if release_hardening is None:
+        blockers.append("missing public release hardening evidence")
 
     status = "READY_FOR_OPERATOR_DEPLOY" if not blockers else "HANDOFF_BLOCKED"
     return status, blockers
@@ -531,6 +568,7 @@ def write_handoff_markdown(out_dir: Path, summary: dict[str, Any]) -> None:
             f"- Metrics tx public evidence: {summary['metrics_tx_evidence_status']}",
             f"- Metrics oracle status draft: {summary['metrics_oracle_status_draft_status']}",
             f"- External operator capability: {summary['external_operator_capability_status']}",
+            f"- Release hardening evidence: {summary['release_hardening_status']}",
             "",
             "## Blockers",
             "",
@@ -552,7 +590,8 @@ def write_handoff_markdown(out_dir: Path, summary: dict[str, Any]) -> None:
             "7. Review `metrics-oracle-operator-procedure.md` before any external signing or broadcast.",
             "8. Sign and broadcast outside this repository through the approved wallet/vault process, then verify the public result with `--metrics-tx-result`.",
             "9. Bind the verified metrics-oracle transaction result to public node/explorer evidence with `--metrics-tx-evidence`.",
-            "10. Update `memory/STATUS.md` only after all real receipts, public evidence, and transaction receipts verify.",
+            "10. Bind CI, Pages, branch-control, rollback, and release-note checks with `--release-hardening-evidence`.",
+            "11. Update `memory/STATUS.md` only after all real receipts, public evidence, transaction receipts, and release-hardening evidence verify.",
         ]
     )
     (out_dir / "HANDOFF.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
@@ -581,6 +620,11 @@ def main() -> int:
     deploy_receipt_evidence_path = (
         ensure_public_file(args.deploy_receipt_evidence, "deploy receipt evidence")
         if args.deploy_receipt_evidence
+        else None
+    )
+    release_hardening_evidence_path = (
+        ensure_public_file(args.release_hardening_evidence, "release hardening evidence")
+        if args.release_hardening_evidence
         else None
     )
     out_dir = args.out_dir.expanduser().resolve()
@@ -657,6 +701,12 @@ def main() -> int:
             operator_capability_path,
             metrics_operator_procedure,
         )
+    release_hardening_evidence_summary = None
+    if release_hardening_evidence_path:
+        release_hardening_evidence_summary = run_release_hardening_evidence_verification(
+            out_dir,
+            release_hardening_evidence_path,
+        )
 
     status, blockers = status_from_components(
         deploy_plan,
@@ -665,6 +715,7 @@ def main() -> int:
         tx_request,
         tx_result_summary,
         tx_evidence_summary,
+        release_hardening_evidence_summary,
     )
     summary = {
         "schema_version": 1,
@@ -702,6 +753,11 @@ def main() -> int:
         ),
         "external_operator_id": (
             external_operator_capability["operator_id"] if external_operator_capability else "NOT_PROVIDED"
+        ),
+        "release_hardening_status": (
+            release_hardening_evidence_summary["status"]
+            if release_hardening_evidence_summary
+            else "NOT_PROVIDED"
         ),
         "safety": {
             "accepts_private_keys": False,

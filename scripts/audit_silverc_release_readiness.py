@@ -82,6 +82,11 @@ EXTERNAL_OPERATOR_CAPABILITY_FILES = {
     "external-operator-capability-summary.json",
     "external-operator-capability.md",
 }
+RELEASE_HARDENING_FILES = {
+    "release-hardening-evidence.json",
+    "release-hardening-evidence-summary.json",
+    "release-hardening-evidence.md",
+}
 
 
 def parse_args() -> argparse.Namespace:
@@ -185,6 +190,8 @@ def required_files_for_summary(summary: dict[str, Any]) -> set[str]:
         required |= METRICS_OPERATOR_PROCEDURE_FILES
     if summary.get("external_operator_capability_status") == "EXTERNAL_OPERATOR_CAPABILITY_VERIFIED":
         required |= EXTERNAL_OPERATOR_CAPABILITY_FILES
+    if summary.get("release_hardening_status") == "PUBLIC_RELEASE_HARDENING_EVIDENCE_VERIFIED":
+        required |= RELEASE_HARDENING_FILES
     return required
 
 
@@ -333,6 +340,21 @@ def validate_component_summaries(root: Path, handoff: dict[str, Any]) -> dict[st
     else:
         statuses["external_operator_capability"] = handoff.get("external_operator_capability_status", "NOT_PROVIDED")
 
+    if handoff.get("release_hardening_status") == "PUBLIC_RELEASE_HARDENING_EVIDENCE_VERIFIED":
+        hardening = require_json(root, "release-hardening-evidence-summary.json")
+        expect_status(
+            hardening,
+            "status",
+            "PUBLIC_RELEASE_HARDENING_EVIDENCE_VERIFIED",
+            "release-hardening-evidence-summary",
+        )
+        if hardening.get("status") != handoff.get("release_hardening_status"):
+            raise ValueError("release-hardening-evidence-summary.status mismatch")
+        validate_safety(hardening, OPERATOR_PROCEDURE_FALSE_SAFETY_FLAGS, "release-hardening-evidence-summary")
+        statuses["release_hardening"] = hardening["status"]
+    else:
+        statuses["release_hardening"] = handoff.get("release_hardening_status", "NOT_PROVIDED")
+
     return statuses
 
 
@@ -371,6 +393,7 @@ def validate_handoff(root: Path) -> dict[str, Any]:
         and handoff.get("metrics_tx_result_status") == "METRICS_ORACLE_TX_RESULT_VERIFIED"
         and handoff.get("metrics_tx_evidence_status") == "PUBLIC_METRICS_ORACLE_TX_EVIDENCE_VERIFIED"
         and handoff.get("metrics_oracle_status_draft_status") == "READY_FOR_MANUAL_ORACLE_STATUS_UPDATE"
+        and handoff.get("release_hardening_status") == "PUBLIC_RELEASE_HARDENING_EVIDENCE_VERIFIED"
         and not readiness_blockers
     )
 
@@ -398,7 +421,7 @@ def validate_handoff(root: Path) -> dict[str, Any]:
         "operator_next_steps": [
             "Keep this audit green for every generated handoff package.",
             "Do not claim rollout readiness while blockers remain.",
-            "Use only verified operator_record deployment receipts, public node/explorer evidence, verified metrics-oracle tx results, and public oracle tx evidence for status updates.",
+            "Use only verified operator_record deployment receipts, public node/explorer evidence, verified metrics-oracle tx results, public oracle tx evidence, and release-hardening evidence for status updates.",
             "Keep wallet keys, raw transactions, and signing material outside this repository.",
         ],
     }

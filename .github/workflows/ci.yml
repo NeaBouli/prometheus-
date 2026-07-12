@@ -1081,6 +1081,167 @@ jobs:
           assert capability_summary["safety"]["updates_status_files"] is False
           assert "public operator capability metadata only" in capability_runbook
 
+          current_commit = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
+          hardening_path = Path("/tmp/prometheus-release-hardening-evidence.json")
+          hardening = {
+              "schema_version": 1,
+              "evidence_type": "prometheus.release_hardening.public_evidence",
+              "provenance": {
+                  "type": "github_public_snapshot",
+                  "observer": "ci-public-release-hardening-fixture",
+                  "observed_at": "2026-07-12T00:00:00Z",
+              },
+              "repository": {
+                  "full_name": "NeaBouli/prometheus-",
+                  "default_branch": "main",
+                  "protected_branch": "main",
+                  "commit_sha": current_commit,
+              },
+              "checks": {
+                  "successful_workflows": ["Prometheus CI", "Security Audit", "pages-build-deployment"],
+                  "all_required_checks_green": True,
+                  "pages_deployment_green": True,
+                  "dependency_audit_green": True,
+                  "gitleaks_green": True,
+              },
+              "branch_rules": {
+                  "pull_request_required": True,
+                  "required_status_checks_enforced": True,
+                  "required_status_checks": ["Prometheus CI", "Security Audit", "pages-build-deployment"],
+                  "force_pushes_blocked": True,
+                  "branch_deletions_blocked": True,
+                  "admin_bypass_for_release": False,
+              },
+              "release_controls": {
+                  "operator_handoff_review_required": True,
+                  "rollback_plan_documented": True,
+                  "status_updates_manual_after_evidence": True,
+                  "public_pages_verified": True,
+                  "release_notes_required": True,
+              },
+          }
+          hardening_path.write_text(json.dumps(hardening, indent=2, sort_keys=True) + "\n")
+          subprocess.run(
+              [
+                  "python3",
+                  "scripts/verify_release_hardening_evidence.py",
+                  "--evidence",
+                  str(hardening_path),
+                  "--expected-commit",
+                  current_commit,
+                  "--summary-out",
+                  "/tmp/prometheus-release-hardening-evidence-summary.json",
+                  "--runbook-out",
+                  "/tmp/prometheus-release-hardening-evidence.md",
+              ],
+              check=True,
+          )
+          hardening_summary = json.loads(Path("/tmp/prometheus-release-hardening-evidence-summary.json").read_text())
+          hardening_runbook = Path("/tmp/prometheus-release-hardening-evidence.md").read_text()
+          assert hardening_summary["status"] == "PUBLIC_RELEASE_HARDENING_EVIDENCE_VERIFIED"
+          assert hardening_summary["repository"]["full_name"] == "NeaBouli/prometheus-"
+          assert hardening_summary["repository"]["protected_branch"] == "main"
+          assert hardening_summary["repository"]["commit_sha"] == current_commit
+          assert hardening_summary["required_workflows"] == [
+              "Prometheus CI",
+              "Security Audit",
+              "pages-build-deployment",
+          ]
+          assert hardening_summary["branch_rules"]["admin_bypass_for_release"] is False
+          assert hardening_summary["release_controls"]["rollback_plan_documented"] is True
+          assert hardening_summary["safety"]["accepts_private_keys"] is False
+          assert hardening_summary["safety"]["accepts_raw_transactions"] is False
+          assert hardening_summary["safety"]["signs_transactions"] is False
+          assert hardening_summary["safety"]["assembles_chain_transaction"] is False
+          assert hardening_summary["safety"]["broadcasts_transactions"] is False
+          assert hardening_summary["safety"]["deploys_contracts"] is False
+          assert hardening_summary["safety"]["updates_status_files"] is False
+          assert hardening_summary["safety"]["changes_repository_settings"] is False
+          assert "public release-hardening evidence only" in hardening_runbook
+
+          bad = dict(hardening)
+          bad["_".join(["private", "key"])] = "do-not-accept"
+          bad_path = Path("/tmp/prometheus-release-hardening-evidence-secret.json")
+          bad_path.write_text(json.dumps(bad, indent=2, sort_keys=True) + "\n")
+          proc = subprocess.run(
+              [
+                  "python3",
+                  "scripts/verify_release_hardening_evidence.py",
+                  "--evidence",
+                  str(bad_path),
+              ],
+              text=True,
+              capture_output=True,
+          )
+          assert proc.returncode != 0
+          assert "secret-like fields are not allowed" in proc.stderr
+
+          bad = dict(hardening)
+          bad["raw_transaction"] = "do-not-accept"
+          bad_path = Path("/tmp/prometheus-release-hardening-evidence-raw.json")
+          bad_path.write_text(json.dumps(bad, indent=2, sort_keys=True) + "\n")
+          proc = subprocess.run(
+              [
+                  "python3",
+                  "scripts/verify_release_hardening_evidence.py",
+                  "--evidence",
+                  str(bad_path),
+              ],
+              text=True,
+              capture_output=True,
+          )
+          assert proc.returncode != 0
+          assert "raw or serialized transaction fields are not allowed" in proc.stderr
+
+          bad = json.loads(hardening_path.read_text())
+          bad["checks"]["successful_workflows"] = ["Prometheus CI", "Security Audit"]
+          bad_path = Path("/tmp/prometheus-release-hardening-evidence-missing-workflow.json")
+          bad_path.write_text(json.dumps(bad, indent=2, sort_keys=True) + "\n")
+          proc = subprocess.run(
+              [
+                  "python3",
+                  "scripts/verify_release_hardening_evidence.py",
+                  "--evidence",
+                  str(bad_path),
+              ],
+              text=True,
+              capture_output=True,
+          )
+          assert proc.returncode != 0
+          assert "evidence.checks.successful_workflows missing: pages-build-deployment" in proc.stderr
+
+          bad = json.loads(hardening_path.read_text())
+          bad["branch_rules"]["admin_bypass_for_release"] = True
+          bad_path = Path("/tmp/prometheus-release-hardening-evidence-admin-bypass.json")
+          bad_path.write_text(json.dumps(bad, indent=2, sort_keys=True) + "\n")
+          proc = subprocess.run(
+              [
+                  "python3",
+                  "scripts/verify_release_hardening_evidence.py",
+                  "--evidence",
+                  str(bad_path),
+              ],
+              text=True,
+              capture_output=True,
+          )
+          assert proc.returncode != 0
+          assert "evidence.branch_rules.admin_bypass_for_release: expected false" in proc.stderr
+
+          proc = subprocess.run(
+              [
+                  "python3",
+                  "scripts/verify_release_hardening_evidence.py",
+                  "--evidence",
+                  str(hardening_path),
+                  "--expected-commit",
+                  "0" * 40,
+              ],
+              text=True,
+              capture_output=True,
+          )
+          assert proc.returncode != 0
+          assert "evidence.repository.commit_sha mismatch" in proc.stderr
+
           bad = dict(capability)
           bad["_".join(["private", "key"])] = "do-not-accept"
           bad_path = Path("/tmp/prometheus-external-operator-capability-secret.json")
@@ -1659,6 +1820,7 @@ jobs:
           assert summary["metrics_operator_procedure_status"] == "NOT_READY_TX_REQUEST_BLOCKED"
           assert summary["metrics_tx_result_status"] == "NOT_PROVIDED"
           assert summary["metrics_oracle_status_draft_status"] == "NOT_PROVIDED"
+          assert summary["release_hardening_status"] == "NOT_PROVIDED"
           assert summary["safety"]["accepts_private_keys"] is False
           assert summary["safety"]["signs_transactions"] is False
           assert summary["safety"]["assembles_chain_transaction"] is False
@@ -1668,6 +1830,7 @@ jobs:
           assert "upstream silverc exposes no network deploy command" in summary["blockers"]
           assert "missing verified operator_record deployment receipts" in summary["blockers"]
           assert "missing deployed GovernanceAutoTuningState contract instance id" in summary["blockers"]
+          assert "missing public release hardening evidence" in summary["blockers"]
           assert "public deployment artifacts only" in handoff
           assert "does not accept private keys" in handoff
           assert "Real status updates require verified operator_record receipts" in handoff
@@ -1701,6 +1864,7 @@ jobs:
           assert summary["deploy_receipt_evidence_status"] == "PUBLIC_DEPLOY_RECEIPT_EVIDENCE_VERIFIED"
           assert summary["metrics_tx_result_status"] == "NOT_PROVIDED"
           assert summary["metrics_oracle_status_draft_status"] == "NOT_PROVIDED"
+          assert summary["release_hardening_status"] == "NOT_PROVIDED"
           assert "operator-receipts.from-results.json" in summary["included_files"]
           assert "operator-receipts-import-summary.json" in summary["included_files"]
           assert "operator-receipts-import.md" in summary["included_files"]
@@ -1710,6 +1874,7 @@ jobs:
           assert "upstream silverc exposes no network deploy command" in summary["blockers"]
           assert "missing verified operator_record deployment receipts" not in summary["blockers"]
           assert "missing public node/explorer evidence for operator_record deployment receipts" not in summary["blockers"]
+          assert "missing public release hardening evidence" in summary["blockers"]
           PY
           python3 scripts/build_silverc_operator_handoff.py \
             --archive /tmp/prometheus-silverc-artifacts.tar.gz \
@@ -1732,7 +1897,9 @@ jobs:
           )
           assert summary["metrics_tx_result_status"] == "METRICS_ORACLE_TX_RESULT_VERIFIED"
           assert summary["metrics_tx_evidence_status"] == "NOT_PROVIDED"
+          assert summary["release_hardening_status"] == "NOT_PROVIDED"
           assert "missing public node/explorer evidence for metrics-oracle transaction result" in summary["blockers"]
+          assert "missing public release hardening evidence" in summary["blockers"]
           PY
           python3 scripts/build_silverc_operator_handoff.py \
             --archive /tmp/prometheus-silverc-artifacts.tar.gz \
@@ -1746,7 +1913,8 @@ jobs:
             --contract-instance-id sandbox:governance-auto-tuning-state-fixture-0001 \
             --metrics-tx-result /tmp/prometheus-metrics-oracle-tx-result.json \
             --metrics-tx-evidence /tmp/prometheus-metrics-oracle-tx-public-evidence.json \
-            --operator-capability /tmp/prometheus-external-operator-capability.json
+            --operator-capability /tmp/prometheus-external-operator-capability.json \
+            --release-hardening-evidence /tmp/prometheus-release-hardening-evidence.json
           python3 - <<'PY'
           import json
           from pathlib import Path
@@ -1764,6 +1932,7 @@ jobs:
           assert summary["metrics_oracle_status_draft_status"] == "READY_FOR_MANUAL_ORACLE_STATUS_UPDATE"
           assert summary["external_operator_capability_status"] == "EXTERNAL_OPERATOR_CAPABILITY_VERIFIED"
           assert summary["external_operator_id"] == "ci-public-external-operator-fixture"
+          assert summary["release_hardening_status"] == "PUBLIC_RELEASE_HARDENING_EVIDENCE_VERIFIED"
           assert "metrics-oracle-operator-procedure.json" in summary["included_files"]
           assert "metrics-oracle-operator-procedure.md" in summary["included_files"]
           assert "metrics-oracle-tx-result-summary.json" in summary["included_files"]
@@ -1779,11 +1948,15 @@ jobs:
           assert "deploy-receipt-public-evidence.json" in summary["included_files"]
           assert "deploy-receipt-public-evidence-summary.json" in summary["included_files"]
           assert "deploy-receipt-public-evidence.md" in summary["included_files"]
+          assert "release-hardening-evidence.json" in summary["included_files"]
+          assert "release-hardening-evidence-summary.json" in summary["included_files"]
+          assert "release-hardening-evidence.md" in summary["included_files"]
           assert "upstream silverc exposes no network deploy command" in summary["blockers"]
           assert "missing verified operator_record deployment receipts" not in summary["blockers"]
           assert "missing public node/explorer evidence for operator_record deployment receipts" not in summary["blockers"]
           assert "missing verified metrics-oracle transaction result" not in summary["blockers"]
           assert "missing public node/explorer evidence for metrics-oracle transaction result" not in summary["blockers"]
+          assert "missing public release hardening evidence" not in summary["blockers"]
           PY
           python3 scripts/audit_silverc_release_readiness.py \
             --handoff-dir /tmp/prometheus-silverc-operator-handoff-oracle-result \
@@ -1808,6 +1981,7 @@ jobs:
           assert summary["component_statuses"]["metrics_tx_evidence"] == "PUBLIC_METRICS_ORACLE_TX_EVIDENCE_VERIFIED"
           assert summary["component_statuses"]["metrics_oracle_status_draft"] == "READY_FOR_MANUAL_ORACLE_STATUS_UPDATE"
           assert summary["component_statuses"]["external_operator_capability"] == "EXTERNAL_OPERATOR_CAPABILITY_VERIFIED"
+          assert summary["component_statuses"]["release_hardening"] == "PUBLIC_RELEASE_HARDENING_EVIDENCE_VERIFIED"
           assert "upstream silverc exposes no network deploy command" in summary["blockers"]
           assert summary["safety"]["accepts_private_keys"] is False
           assert summary["safety"]["accepts_raw_transactions"] is False
@@ -1895,6 +2069,27 @@ jobs:
           )
           assert proc.returncode != 0
           assert "metrics-oracle-tx-public-evidence-summary.safety.accepts_raw_transactions: expected false" in proc.stderr
+
+          tampered = Path("/tmp/prometheus-silverc-operator-handoff-hardening-tamper")
+          if tampered.exists():
+              shutil.rmtree(tampered)
+          shutil.copytree("/tmp/prometheus-silverc-operator-handoff-oracle-result", tampered)
+          evidence_path = tampered / "release-hardening-evidence-summary.json"
+          evidence = json.loads(evidence_path.read_text())
+          evidence["safety"]["accepts_raw_transactions"] = True
+          evidence_path.write_text(json.dumps(evidence, indent=2, sort_keys=True) + "\n")
+          proc = subprocess.run(
+              [
+                  "python3",
+                  "scripts/audit_silverc_release_readiness.py",
+                  "--handoff-dir",
+                  str(tampered),
+              ],
+              text=True,
+              capture_output=True,
+          )
+          assert proc.returncode != 0
+          assert "release-hardening-evidence-summary.safety.accepts_raw_transactions: expected false" in proc.stderr
 
           tampered = Path("/tmp/prometheus-silverc-operator-handoff-procedure-tamper")
           if tampered.exists():
