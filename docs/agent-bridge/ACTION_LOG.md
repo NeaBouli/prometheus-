@@ -2,6 +2,13 @@
 
 ## 2026-07-12
 
+- Added `scripts/verify_silverc_deploy_receipt_evidence.py`, a public-only verifier that binds verified `operator_record` deployment receipts to public node/explorer evidence snapshots. It checks release-bundle metadata, receipts SHA-256, one confirmed observation per receipt, deploy transaction IDs, block hashes, confirmations, and rejects secret-like plus raw/serialized transaction fields without querying nodes, accepting keys, signing, broadcasting, deploying, or updating status files.
+- Extended `scripts/build_silverc_operator_handoff.py` with optional `--deploy-receipt-evidence`; when real operator receipts are present, missing public receipt evidence is now a blocker.
+- Extended `scripts/audit_silverc_release_readiness.py` so public receipt evidence files and safety flags are required before `ROLLOUT_READY`.
+- Extended Prometheus CI with public receipt-evidence fixture generation, positive verification, secret/raw/tamper/confirmation negative coverage, handoff inclusion, readiness component assertions, and receipt-evidence safety tamper coverage.
+- Updated README, Whitepaper, public `whitepaper.html`, roadmap, Silverc module docs, llms.txt, Memory, and Bridge to describe public receipt-evidence verification as a release-hardening gate, not a deployment claim.
+- Local checks passed: Python syntax compile, CI YAML parse, fresh release archive -> deploy requests -> deploy request verification -> public orchestrator-result import -> operator receipts -> public receipt-evidence verification -> operator handoff -> release-readiness smoke, plus evidence secret/raw/tx/confirmation negative tests and readiness safety tamper rejection.
+- Direct `ssh sandbox` probe from this Codex shell failed with `Permission denied (publickey)`; Bridge documents this as a current local SSH-agent/key issue and does not include secrets.
 - Added `scripts/stage_metrics_oracle_status.py`, a public-only metrics-oracle status staging guard. It validates a signer-ready unsigned request plus public `operator_record` tx result, emits JSON/Markdown manual status drafts, rejects blocked requests, secret-like fields, and raw/serialized transactions, and does not write `memory/STATUS.md`.
 - Extended `scripts/build_silverc_operator_handoff.py` so `--metrics-tx-result` also includes `metrics-oracle-status-draft.json/.md` and exposes `metrics_oracle_status_draft_status`.
 - Extended `scripts/audit_silverc_release_readiness.py` so verified oracle tx results require a safe oracle status draft before rollout readiness can be claimed.

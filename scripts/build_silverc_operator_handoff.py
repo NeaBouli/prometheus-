@@ -67,6 +67,11 @@ def parse_args() -> argparse.Namespace:
         type=Path,
         help="Optional public external-operator capability record to bind to generated operator procedures",
     )
+    parser.add_argument(
+        "--deploy-receipt-evidence",
+        type=Path,
+        help="Optional public node/explorer evidence snapshot for verified operator_record deployment receipts",
+    )
     return parser.parse_args()
 
 
@@ -392,9 +397,39 @@ def run_external_operator_capability_verification(
     return load_json(summary_path)
 
 
+def run_deploy_receipt_evidence_verification(
+    archive: Path,
+    out_dir: Path,
+    receipts: Path,
+    deploy_receipt_evidence: Path,
+) -> dict[str, Any]:
+    evidence_path = out_dir / "deploy-receipt-public-evidence.json"
+    shutil.copyfile(deploy_receipt_evidence, evidence_path)
+    summary_path = out_dir / "deploy-receipt-public-evidence-summary.json"
+    runbook_path = out_dir / "deploy-receipt-public-evidence.md"
+    run(
+        [
+            sys.executable,
+            "scripts/verify_silverc_deploy_receipt_evidence.py",
+            "--archive",
+            str(archive),
+            "--receipts",
+            str(receipts),
+            "--evidence",
+            str(evidence_path),
+            "--summary-out",
+            str(summary_path),
+            "--runbook-out",
+            str(runbook_path),
+        ]
+    )
+    return load_json(summary_path)
+
+
 def status_from_components(
     deploy_plan: dict[str, Any],
     operator_receipts: dict[str, Any] | None,
+    deploy_receipt_evidence: dict[str, Any] | None,
     tx_request: dict[str, Any],
     tx_result: dict[str, Any] | None,
 ) -> tuple[str, list[str]]:
@@ -403,6 +438,8 @@ def status_from_components(
         blockers.extend(deploy_plan["deploy_blockers"])
     if operator_receipts is None:
         blockers.append("missing verified operator_record deployment receipts")
+    elif deploy_receipt_evidence is None:
+        blockers.append("missing public node/explorer evidence for operator_record deployment receipts")
     if tx_request["status"] != "READY_FOR_EXTERNAL_TX_ASSEMBLER":
         blockers.extend(tx_request["blockers"])
     elif tx_result is None:
@@ -447,6 +484,7 @@ def write_handoff_markdown(out_dir: Path, summary: dict[str, Any]) -> None:
             f"- Operator receipt import: {summary['operator_receipt_import_status']}",
             f"- CI receipt verification: {summary['ci_receipts_status']}",
             f"- Operator receipt verification: {summary['operator_receipts_status']}",
+            f"- Deploy receipt public evidence: {summary['deploy_receipt_evidence_status']}",
             f"- Metrics report preflight: {summary['metrics_report_status']}",
             f"- Metrics tx request: {summary['metrics_tx_request_status']}",
             f"- Metrics operator procedure: {summary['metrics_operator_procedure_status']}",
@@ -469,10 +507,11 @@ def write_handoff_markdown(out_dir: Path, summary: dict[str, Any]) -> None:
             "2. Review `deploy-operator-procedure.md` before any external deploy orchestration.",
             "3. Deploy only through an approved external network deploy/orchestration tool.",
             "4. Import public external deploy results with `--orchestrator-results`, or provide verified `operator_record` receipts with `--operator-receipts`.",
-            "5. Use only verified operator_record contract IDs for signer-ready oracle transaction requests.",
-            "6. Review `metrics-oracle-operator-procedure.md` before any external signing or broadcast.",
-            "7. Sign and broadcast outside this repository through the approved wallet/vault process, then verify the public result with `--metrics-tx-result`.",
-            "8. Update `memory/STATUS.md` only after all real receipts and transaction receipts verify.",
+            "5. Bind real operator_record receipts to public node/explorer evidence with `--deploy-receipt-evidence`.",
+            "6. Use only verified operator_record contract IDs for signer-ready oracle transaction requests.",
+            "7. Review `metrics-oracle-operator-procedure.md` before any external signing or broadcast.",
+            "8. Sign and broadcast outside this repository through the approved wallet/vault process, then verify the public result with `--metrics-tx-result`.",
+            "9. Update `memory/STATUS.md` only after all real receipts, public evidence, and transaction receipts verify.",
         ]
     )
     (out_dir / "HANDOFF.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
@@ -494,6 +533,11 @@ def main() -> int:
     )
     operator_capability_path = (
         ensure_public_file(args.operator_capability, "operator capability") if args.operator_capability else None
+    )
+    deploy_receipt_evidence_path = (
+        ensure_public_file(args.deploy_receipt_evidence, "deploy receipt evidence")
+        if args.deploy_receipt_evidence
+        else None
     )
     out_dir = args.out_dir.expanduser().resolve()
     if out_dir.exists():
@@ -528,6 +572,16 @@ def main() -> int:
             "operator",
             require_operator_record=True,
         )
+    deploy_receipt_evidence_summary = None
+    if deploy_receipt_evidence_path:
+        if operator_receipts_path is None:
+            raise ValueError("--deploy-receipt-evidence requires --operator-receipts or --orchestrator-results")
+        deploy_receipt_evidence_summary = run_deploy_receipt_evidence_verification(
+            packaged_archive,
+            out_dir,
+            operator_receipts_path,
+            deploy_receipt_evidence_path,
+        )
     metrics_report_plan = run_metrics_report_preflight(report, out_dir)
     tx_request = run_tx_request(packaged_archive, report, out_dir, args.contract_instance_id)
     metrics_operator_procedure = None
@@ -550,7 +604,13 @@ def main() -> int:
             metrics_operator_procedure,
         )
 
-    status, blockers = status_from_components(deploy_plan, operator_receipts_summary, tx_request, tx_result_summary)
+    status, blockers = status_from_components(
+        deploy_plan,
+        operator_receipts_summary,
+        deploy_receipt_evidence_summary,
+        tx_request,
+        tx_result_summary,
+    )
     summary = {
         "schema_version": 1,
         "status": status,
@@ -568,6 +628,9 @@ def main() -> int:
         "ci_receipts_status": ci_receipts_summary["status"],
         "operator_receipts_status": (
             operator_receipts_summary["status"] if operator_receipts_summary else "MISSING_OPERATOR_RECORD"
+        ),
+        "deploy_receipt_evidence_status": (
+            deploy_receipt_evidence_summary["status"] if deploy_receipt_evidence_summary else "NOT_PROVIDED"
         ),
         "metrics_report_status": metrics_report_plan["status"],
         "metrics_tx_request_status": tx_request["status"],

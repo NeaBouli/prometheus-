@@ -518,6 +518,51 @@ jobs:
             --snippet-out /tmp/prometheus-silverc-operator-receipts-status.md
           python3 - <<'PY'
           import json
+          from pathlib import Path
+
+          receipts = json.loads(Path("/tmp/prometheus-silverc-operator-receipts.json").read_text())
+          verification = json.loads(Path("/tmp/prometheus-silverc-operator-receipts-verify.json").read_text())
+          evidence = {
+              "schema_version": 1,
+              "evidence_type": "prometheus_silverc_deploy_receipt_public_evidence",
+              "network": receipts["network"],
+              "provenance": {
+                  "type": "public_node_snapshot",
+                  "observer": "ci-public-node-fixture",
+                  "observed_at": "2026-07-11T00:10:00Z",
+              },
+              "release_bundle": receipts["release_bundle"],
+              "receipts_sha256": verification["receipts_sha256"],
+              "receipt_count": verification["receipt_count"],
+              "observations": [],
+          }
+          for receipt in receipts["receipts"]:
+              evidence["observations"].append(
+                  {
+                      "status": "confirmed",
+                      "contract_name": receipt["contract_name"],
+                      "deployed_instance_id": receipt["deployed_instance_id"],
+                      "deploy_tx_id": receipt["deploy_tx_id"],
+                      "block_hash": receipt["block_hash"],
+                      "deployer_address": receipt["deployer_address"],
+                      "confirmations": receipt["confirmations"] + 3,
+                      "block_daa_score": receipt["block_daa_score"],
+                      "observed_at": "2026-07-11T00:10:00Z",
+                      "explorer_url": f"https://explorer.example.invalid/tx/{receipt['deploy_tx_id']}",
+                  }
+              )
+          Path("/tmp/prometheus-silverc-deploy-receipt-public-evidence.json").write_text(
+              json.dumps(evidence, indent=2, sort_keys=True) + "\n"
+          )
+          PY
+          python3 scripts/verify_silverc_deploy_receipt_evidence.py \
+            --archive /tmp/prometheus-silverc-artifacts.tar.gz \
+            --receipts /tmp/prometheus-silverc-operator-receipts.json \
+            --evidence /tmp/prometheus-silverc-deploy-receipt-public-evidence.json \
+            --summary-out /tmp/prometheus-silverc-deploy-receipt-public-evidence-summary.json \
+            --runbook-out /tmp/prometheus-silverc-deploy-receipt-public-evidence.md
+          python3 - <<'PY'
+          import json
           import subprocess
           import tempfile
           from pathlib import Path
@@ -525,8 +570,10 @@ jobs:
           summary = json.loads(Path("/tmp/prometheus-silverc-operator-receipts-summary.json").read_text())
           receipts = json.loads(Path("/tmp/prometheus-silverc-operator-receipts.json").read_text())
           verification = json.loads(Path("/tmp/prometheus-silverc-operator-receipts-verify.json").read_text())
+          evidence_summary = json.loads(Path("/tmp/prometheus-silverc-deploy-receipt-public-evidence-summary.json").read_text())
           status = json.loads(Path("/tmp/prometheus-silverc-operator-receipts-status.json").read_text())
           runbook = Path("/tmp/prometheus-silverc-operator-receipts.md").read_text()
+          evidence_runbook = Path("/tmp/prometheus-silverc-deploy-receipt-public-evidence.md").read_text()
 
           assert summary["status"] == "OPERATOR_RECEIPTS_READY_FOR_STATUS_STAGING"
           assert summary["provenance_type"] == "operator_record"
@@ -542,8 +589,13 @@ jobs:
           assert receipts["provenance"]["type"] == "operator_record"
           assert len(receipts["provenance"]["source_result_sha256"]) == 64
           assert verification["status"] == "READY_FOR_STATUS_RECORDING"
+          assert evidence_summary["status"] == "PUBLIC_DEPLOY_RECEIPT_EVIDENCE_VERIFIED"
+          assert evidence_summary["receipt_count"] == 7
+          assert evidence_summary["safety"]["accepts_private_keys"] is False
+          assert evidence_summary["safety"]["accepts_raw_transactions"] is False
           assert status["status"] == "READY_FOR_MANUAL_STATUS_UPDATE"
           assert "does not sign" in runbook
+          assert "public receipt evidence only" in evidence_runbook
 
           results = json.loads(Path("/tmp/prometheus-silverc-external-deploy-results.json").read_text())
           results["_".join(["private", "key"])] = "do-not-accept"
@@ -616,6 +668,94 @@ jobs:
           )
           assert proc.returncode != 0
           assert "request_sha256 mismatch" in proc.stderr
+
+          evidence = json.loads(Path("/tmp/prometheus-silverc-deploy-receipt-public-evidence.json").read_text())
+          evidence["_".join(["private", "key"])] = "do-not-accept"
+          with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as handle:
+              json.dump(evidence, handle)
+              bad_evidence_secret_path = handle.name
+          proc = subprocess.run(
+              [
+                  "python3",
+                  "scripts/verify_silverc_deploy_receipt_evidence.py",
+                  "--archive",
+                  "/tmp/prometheus-silverc-artifacts.tar.gz",
+                  "--receipts",
+                  "/tmp/prometheus-silverc-operator-receipts.json",
+                  "--evidence",
+                  bad_evidence_secret_path,
+              ],
+              text=True,
+              capture_output=True,
+          )
+          assert proc.returncode != 0
+          assert "secret-like fields are not allowed" in proc.stderr
+
+          evidence = json.loads(Path("/tmp/prometheus-silverc-deploy-receipt-public-evidence.json").read_text())
+          evidence["observations"][0]["raw_transaction"] = "do-not-accept"
+          with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as handle:
+              json.dump(evidence, handle)
+              bad_evidence_raw_path = handle.name
+          proc = subprocess.run(
+              [
+                  "python3",
+                  "scripts/verify_silverc_deploy_receipt_evidence.py",
+                  "--archive",
+                  "/tmp/prometheus-silverc-artifacts.tar.gz",
+                  "--receipts",
+                  "/tmp/prometheus-silverc-operator-receipts.json",
+                  "--evidence",
+                  bad_evidence_raw_path,
+              ],
+              text=True,
+              capture_output=True,
+          )
+          assert proc.returncode != 0
+          assert "raw or serialized transaction fields are not allowed" in proc.stderr
+
+          evidence = json.loads(Path("/tmp/prometheus-silverc-deploy-receipt-public-evidence.json").read_text())
+          evidence["observations"][0]["deploy_tx_id"] = "0" * 64
+          with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as handle:
+              json.dump(evidence, handle)
+              bad_evidence_tx_path = handle.name
+          proc = subprocess.run(
+              [
+                  "python3",
+                  "scripts/verify_silverc_deploy_receipt_evidence.py",
+                  "--archive",
+                  "/tmp/prometheus-silverc-artifacts.tar.gz",
+                  "--receipts",
+                  "/tmp/prometheus-silverc-operator-receipts.json",
+                  "--evidence",
+                  bad_evidence_tx_path,
+              ],
+              text=True,
+              capture_output=True,
+          )
+          assert proc.returncode != 0
+          assert "deploy_tx_id: receipt/evidence mismatch" in proc.stderr
+
+          evidence = json.loads(Path("/tmp/prometheus-silverc-deploy-receipt-public-evidence.json").read_text())
+          evidence["observations"][0]["confirmations"] = 1
+          with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as handle:
+              json.dump(evidence, handle)
+              bad_evidence_confirmations_path = handle.name
+          proc = subprocess.run(
+              [
+                  "python3",
+                  "scripts/verify_silverc_deploy_receipt_evidence.py",
+                  "--archive",
+                  "/tmp/prometheus-silverc-artifacts.tar.gz",
+                  "--receipts",
+                  "/tmp/prometheus-silverc-operator-receipts.json",
+                  "--evidence",
+                  bad_evidence_confirmations_path,
+              ],
+              text=True,
+              capture_output=True,
+          )
+          assert proc.returncode != 0
+          assert "confirmations: expected >= receipt confirmations" in proc.stderr
           PY
       - name: Build unsigned metrics-oracle transaction request
         run: |
@@ -1353,6 +1493,7 @@ jobs:
           assert summary["operator_receipt_import_status"] == "NOT_PROVIDED"
           assert summary["ci_receipts_status"] == "CI_FIXTURE_VALID"
           assert summary["operator_receipts_status"] == "MISSING_OPERATOR_RECORD"
+          assert summary["deploy_receipt_evidence_status"] == "NOT_PROVIDED"
           assert summary["metrics_report_status"] == "READY_FOR_TX_BUILDER"
           assert summary["metrics_tx_request_status"] == "BLOCKED_UNTIL_CONTRACT_INSTANCE_ID"
           assert summary["metrics_operator_procedure_status"] == "NOT_READY_TX_REQUEST_BLOCKED"
@@ -1385,7 +1526,8 @@ jobs:
             --rpc-url ws://127.0.0.1:17210 \
             --deployer-address kaspatest:qptestpreflight000000000000000000000000000000000 \
             --metrics-oracle-pubkey 1111111111111111111111111111111111111111111111111111111111111111 \
-            --orchestrator-results /tmp/prometheus-silverc-external-deploy-results.json
+            --orchestrator-results /tmp/prometheus-silverc-external-deploy-results.json \
+            --deploy-receipt-evidence /tmp/prometheus-silverc-deploy-receipt-public-evidence.json
           python3 - <<'PY'
           import json
           from pathlib import Path
@@ -1396,13 +1538,18 @@ jobs:
           assert summary["deploy_operator_procedure_status"] == "READY_FOR_EXTERNAL_DEPLOY_OPERATOR"
           assert summary["operator_receipt_import_status"] == "OPERATOR_RECEIPTS_READY_FOR_STATUS_STAGING"
           assert summary["operator_receipts_status"] == "READY_FOR_STATUS_RECORDING"
+          assert summary["deploy_receipt_evidence_status"] == "PUBLIC_DEPLOY_RECEIPT_EVIDENCE_VERIFIED"
           assert summary["metrics_tx_result_status"] == "NOT_PROVIDED"
           assert summary["metrics_oracle_status_draft_status"] == "NOT_PROVIDED"
           assert "operator-receipts.from-results.json" in summary["included_files"]
           assert "operator-receipts-import-summary.json" in summary["included_files"]
           assert "operator-receipts-import.md" in summary["included_files"]
+          assert "deploy-receipt-public-evidence.json" in summary["included_files"]
+          assert "deploy-receipt-public-evidence-summary.json" in summary["included_files"]
+          assert "deploy-receipt-public-evidence.md" in summary["included_files"]
           assert "upstream silverc exposes no network deploy command" in summary["blockers"]
           assert "missing verified operator_record deployment receipts" not in summary["blockers"]
+          assert "missing public node/explorer evidence for operator_record deployment receipts" not in summary["blockers"]
           PY
           python3 scripts/build_silverc_operator_handoff.py \
             --archive /tmp/prometheus-silverc-artifacts.tar.gz \
@@ -1412,6 +1559,7 @@ jobs:
             --deployer-address kaspatest:qptestpreflight000000000000000000000000000000000 \
             --metrics-oracle-pubkey 1111111111111111111111111111111111111111111111111111111111111111 \
             --orchestrator-results /tmp/prometheus-silverc-external-deploy-results.json \
+            --deploy-receipt-evidence /tmp/prometheus-silverc-deploy-receipt-public-evidence.json \
             --contract-instance-id sandbox:governance-auto-tuning-state-fixture-0001 \
             --metrics-tx-result /tmp/prometheus-metrics-oracle-tx-result.json \
             --operator-capability /tmp/prometheus-external-operator-capability.json
@@ -1424,6 +1572,7 @@ jobs:
           assert summary["status"] == "HANDOFF_BLOCKED"
           assert summary["deploy_operator_procedure_status"] == "READY_FOR_EXTERNAL_DEPLOY_OPERATOR"
           assert summary["operator_receipts_status"] == "READY_FOR_STATUS_RECORDING"
+          assert summary["deploy_receipt_evidence_status"] == "PUBLIC_DEPLOY_RECEIPT_EVIDENCE_VERIFIED"
           assert summary["metrics_tx_request_status"] == "READY_FOR_EXTERNAL_TX_ASSEMBLER"
           assert summary["metrics_operator_procedure_status"] == "READY_FOR_EXTERNAL_ORACLE_OPERATOR"
           assert summary["metrics_tx_result_status"] == "METRICS_ORACLE_TX_RESULT_VERIFIED"
@@ -1439,8 +1588,12 @@ jobs:
           assert "external-operator-capability.json" in summary["included_files"]
           assert "external-operator-capability-summary.json" in summary["included_files"]
           assert "external-operator-capability.md" in summary["included_files"]
+          assert "deploy-receipt-public-evidence.json" in summary["included_files"]
+          assert "deploy-receipt-public-evidence-summary.json" in summary["included_files"]
+          assert "deploy-receipt-public-evidence.md" in summary["included_files"]
           assert "upstream silverc exposes no network deploy command" in summary["blockers"]
           assert "missing verified operator_record deployment receipts" not in summary["blockers"]
+          assert "missing public node/explorer evidence for operator_record deployment receipts" not in summary["blockers"]
           assert "missing verified metrics-oracle transaction result" not in summary["blockers"]
           PY
           python3 scripts/audit_silverc_release_readiness.py \
@@ -1458,6 +1611,7 @@ jobs:
           assert summary["status"] == "ROLLOUT_BLOCKED"
           assert summary["handoff_status"] == "HANDOFF_BLOCKED"
           assert summary["component_statuses"]["operator_receipts"] == "READY_FOR_STATUS_RECORDING"
+          assert summary["component_statuses"]["deploy_receipt_evidence"] == "PUBLIC_DEPLOY_RECEIPT_EVIDENCE_VERIFIED"
           assert summary["component_statuses"]["deploy_operator_procedure"] == "READY_FOR_EXTERNAL_DEPLOY_OPERATOR"
           assert summary["component_statuses"]["metrics_tx_request"] == "READY_FOR_EXTERNAL_TX_ASSEMBLER"
           assert summary["component_statuses"]["metrics_operator_procedure"] == "READY_FOR_EXTERNAL_ORACLE_OPERATOR"
@@ -1509,6 +1663,27 @@ jobs:
           )
           assert proc.returncode != 0
           assert "safety.accepts_private_keys: expected false" in proc.stderr
+
+          tampered = Path("/tmp/prometheus-silverc-operator-handoff-evidence-tamper")
+          if tampered.exists():
+              shutil.rmtree(tampered)
+          shutil.copytree("/tmp/prometheus-silverc-operator-handoff-oracle-result", tampered)
+          evidence_path = tampered / "deploy-receipt-public-evidence-summary.json"
+          evidence = json.loads(evidence_path.read_text())
+          evidence["safety"]["accepts_raw_transactions"] = True
+          evidence_path.write_text(json.dumps(evidence, indent=2, sort_keys=True) + "\n")
+          proc = subprocess.run(
+              [
+                  "python3",
+                  "scripts/audit_silverc_release_readiness.py",
+                  "--handoff-dir",
+                  str(tampered),
+              ],
+              text=True,
+              capture_output=True,
+          )
+          assert proc.returncode != 0
+          assert "deploy-receipt-public-evidence-summary.safety.accepts_raw_transactions: expected false" in proc.stderr
 
           tampered = Path("/tmp/prometheus-silverc-operator-handoff-procedure-tamper")
           if tampered.exists():

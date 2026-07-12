@@ -41,13 +41,14 @@ python3 scripts/verify_silverc_deploy_requests.py --archive /tmp/prometheus-silv
 python3 scripts/build_silverc_deploy_operator_procedure.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --request-set /tmp/prometheus-silverc-deploy-request-set.json --requests-dir /tmp/prometheus-silverc-deploy-requests --summary-out /tmp/prometheus-silverc-deploy-operator-procedure.json --runbook-out /tmp/prometheus-silverc-deploy-operator-procedure.md
 python3 scripts/build_silverc_operator_receipts.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --request-set /tmp/prometheus-silverc-deploy-request-set.json --requests-dir /tmp/prometheus-silverc-deploy-requests --orchestrator-results /path/to/public-external-deploy-results.json --operator-receipts-out /tmp/prometheus-silverc-operator-receipts.json --summary-out /tmp/prometheus-silverc-operator-receipts-summary.json --runbook-out /tmp/prometheus-silverc-operator-receipts.md
 python3 scripts/verify_silverc_deploy_receipts.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --receipts modules/contracts/silverc/deploy-receipts.sample.json --summary-out /tmp/prometheus-silverc-deploy-receipts-summary.json --runbook-out /tmp/prometheus-silverc-deploy-receipts.md
+python3 scripts/verify_silverc_deploy_receipt_evidence.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --receipts /path/to/operator-record-receipts.json --evidence /path/to/public-node-or-explorer-evidence.json --summary-out /tmp/prometheus-silverc-deploy-receipt-evidence-summary.json --runbook-out /tmp/prometheus-silverc-deploy-receipt-evidence.md
 python3 scripts/stage_silverc_deployment_status.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --operator-receipts /path/to/operator-record-receipts.json --status-out /tmp/prometheus-silverc-status-draft.json --snippet-out /tmp/prometheus-silverc-status-draft.md
 python3 scripts/preflight_metrics_oracle_report.py --report modules/contracts/silverc/metrics-oracle-report.sample.json --plan-out /tmp/prometheus-metrics-oracle-preflight.json --runbook-out /tmp/prometheus-metrics-oracle-runbook.md
 python3 scripts/build_metrics_oracle_tx_request.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --report modules/contracts/silverc/metrics-oracle-report.sample.json --contract-instance-id sandbox:governance-auto-tuning-state-fixture-0001 --tx-request-out /tmp/prometheus-metrics-oracle-tx-request.json --runbook-out /tmp/prometheus-metrics-oracle-tx-request.md
 python3 scripts/build_metrics_oracle_operator_procedure.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --tx-request /tmp/prometheus-metrics-oracle-tx-request.json --summary-out /tmp/prometheus-metrics-oracle-operator-procedure.json --runbook-out /tmp/prometheus-metrics-oracle-operator-procedure.md
 python3 scripts/verify_metrics_oracle_tx_result.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --tx-request /tmp/prometheus-metrics-oracle-tx-request.json --tx-result /path/to/public-metrics-oracle-tx-result.json --summary-out /tmp/prometheus-metrics-oracle-tx-result-summary.json --runbook-out /tmp/prometheus-metrics-oracle-tx-result.md
 python3 scripts/stage_metrics_oracle_status.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --tx-request /tmp/prometheus-metrics-oracle-tx-request.json --tx-result /path/to/public-metrics-oracle-tx-result.json --status-out /tmp/prometheus-metrics-oracle-status-draft.json --snippet-out /tmp/prometheus-metrics-oracle-status-draft.md
-python3 scripts/build_silverc_operator_handoff.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --out-dir /tmp/prometheus-silverc-operator-handoff --network sandbox --rpc-url ws://127.0.0.1:17210 --deployer-address kaspatest:qptestpreflight000000000000000000000000000000000 --metrics-oracle-pubkey 1111111111111111111111111111111111111111111111111111111111111111 --orchestrator-results /path/to/public-external-deploy-results.json --metrics-tx-result /path/to/public-metrics-oracle-tx-result.json
+python3 scripts/build_silverc_operator_handoff.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --out-dir /tmp/prometheus-silverc-operator-handoff --network sandbox --rpc-url ws://127.0.0.1:17210 --deployer-address kaspatest:qptestpreflight000000000000000000000000000000000 --metrics-oracle-pubkey 1111111111111111111111111111111111111111111111111111111111111111 --orchestrator-results /path/to/public-external-deploy-results.json --deploy-receipt-evidence /path/to/public-node-or-explorer-evidence.json --metrics-tx-result /path/to/public-metrics-oracle-tx-result.json
 python3 scripts/audit_silverc_release_readiness.py --handoff-dir /tmp/prometheus-silverc-operator-handoff --summary-out /tmp/prometheus-silverc-release-readiness.json --runbook-out /tmp/prometheus-silverc-release-readiness.md
 ```
 
@@ -252,6 +253,21 @@ CI. Real deployment status may be recorded only from verified
 `operator_record` receipts; use `--require-operator-record` before copying any
 contract instance IDs into `memory/STATUS.md`.
 
+## Public receipt-evidence verifier
+
+`scripts/verify_silverc_deploy_receipt_evidence.py` validates a public
+node/explorer evidence snapshot against verified `operator_record` deployment
+receipts. The evidence must reference the verified receipts SHA-256, the
+release-bundle metadata, one confirmed public observation per contract, matching
+deploy transaction IDs, matching block hashes, and confirmations greater than
+or equal to the receipt confirmations.
+
+The verifier rejects secret-like fields and raw/serialized transaction fields.
+It does not query nodes, accept keys, assemble transactions, sign, broadcast,
+deploy contracts, or update status files. The operator handoff builder accepts
+this evidence via `--deploy-receipt-evidence`; once real operator receipts are
+present, missing public receipt evidence remains a handoff blocker.
+
 ## Deployment status staging
 
 `scripts/stage_silverc_deployment_status.py` builds a manual deployment-status
@@ -271,7 +287,8 @@ from an existing release archive. It copies the archive, runs deploy preflight,
 builds and verifies the external deploy request set, adds the deploy operator
 procedure, can import public external orchestrator results into
 `operator_record` receipts, verifies the synthetic CI receipt fixture,
-optionally verifies real `operator_record` receipts, validates the
+optionally verifies real `operator_record` receipts, optionally verifies public
+node/explorer receipt evidence for those receipts, validates the
 metrics-oracle report, builds the unsigned metrics-oracle transaction request,
 can verify a public external-operator capability record, can verify a public
 metrics-oracle transaction result, can stage a manual metrics-oracle status
@@ -279,8 +296,9 @@ draft, and emits `HANDOFF.md` plus `operator-handoff-summary.json`.
 
 The package is intentionally blocked until real network deploy/orchestration
 tooling, verified `operator_record` receipts, and signer-ready contract instance
-IDs exist. It does not accept private keys, sign, broadcast, deploy contracts,
-raw transactions, or update status files.
+IDs exist. When real receipts are present, missing public receipt evidence is
+also a blocker. It does not accept private keys, sign, broadcast, deploy
+contracts, raw transactions, or update status files.
 
 ## Release-readiness audit
 
@@ -289,17 +307,18 @@ operator handoff directory before any rollout claim. It checks:
 
 - the handoff summary status, blocker list, safety flags, and included-file list
 - required handoff files for deploy preflight, deploy requests, receipt checks,
-  deploy operator procedure, metrics report preflight, unsigned tx request, and
-  optional oracle tx result/status draft
+  deploy operator procedure, optional public receipt evidence, metrics report
+  preflight, unsigned tx request, and optional oracle tx result/status draft
 - component summary statuses match the handoff summary
 - JSON artifacts do not contain secret-like keys or raw/serialized transaction
   fields
 
 The audit emits `ROLLOUT_BLOCKED` while real deploy/orchestration or oracle
 operation evidence is missing. `--require-ready` turns that into a failing gate,
-which should only pass after real operator receipts, verified oracle tx results,
-deploy tooling, and final release policy checks are complete. The audit does
-not accept keys, sign, assemble, broadcast, deploy, or update status files.
+which should only pass after real operator receipts, public receipt evidence,
+verified oracle tx results, deploy tooling, and final release policy checks are
+complete. The audit does not accept keys, sign, assemble, broadcast, deploy, or
+update status files.
 
 ## GovernanceAutoTuningState.sil
 

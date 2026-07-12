@@ -59,6 +59,11 @@ OPERATOR_RECEIPT_IMPORT_FILES = {
     "operator-receipts-import-summary.json",
     "operator-receipts-import.md",
 }
+DEPLOY_RECEIPT_EVIDENCE_FILES = {
+    "deploy-receipt-public-evidence.json",
+    "deploy-receipt-public-evidence-summary.json",
+    "deploy-receipt-public-evidence.md",
+}
 METRICS_TX_RESULT_FILES = {
     "metrics-oracle-tx-result-summary.json",
     "metrics-oracle-tx-result.md",
@@ -167,6 +172,8 @@ def required_files_for_summary(summary: dict[str, Any]) -> set[str]:
     required = set(BASE_REQUIRED_FILES)
     if summary.get("operator_receipts_status") == "READY_FOR_STATUS_RECORDING":
         required |= OPERATOR_RECEIPT_FILES
+    if summary.get("deploy_receipt_evidence_status") == "PUBLIC_DEPLOY_RECEIPT_EVIDENCE_VERIFIED":
+        required |= DEPLOY_RECEIPT_EVIDENCE_FILES
     if summary.get("operator_receipt_import_status") != "NOT_PROVIDED":
         required |= OPERATOR_RECEIPT_IMPORT_FILES
     if summary.get("metrics_tx_result_status") == "METRICS_ORACLE_TX_RESULT_VERIFIED":
@@ -250,6 +257,19 @@ def validate_component_summaries(root: Path, handoff: dict[str, Any]) -> dict[st
     else:
         statuses["operator_receipts"] = handoff.get("operator_receipts_status", "UNKNOWN")
 
+    if handoff.get("deploy_receipt_evidence_status") == "PUBLIC_DEPLOY_RECEIPT_EVIDENCE_VERIFIED":
+        evidence = require_json(root, "deploy-receipt-public-evidence-summary.json")
+        expect_status(
+            evidence,
+            "status",
+            "PUBLIC_DEPLOY_RECEIPT_EVIDENCE_VERIFIED",
+            "deploy-receipt-public-evidence-summary",
+        )
+        validate_safety(evidence, OPERATOR_PROCEDURE_FALSE_SAFETY_FLAGS, "deploy-receipt-public-evidence-summary")
+        statuses["deploy_receipt_evidence"] = evidence["status"]
+    else:
+        statuses["deploy_receipt_evidence"] = handoff.get("deploy_receipt_evidence_status", "NOT_PROVIDED")
+
     if handoff.get("operator_receipt_import_status") != "NOT_PROVIDED":
         receipt_import = require_json(root, "operator-receipts-import-summary.json")
         expect_status(
@@ -326,6 +346,7 @@ def validate_handoff(root: Path) -> dict[str, Any]:
         and handoff.get("deploy_supported") is True
         and handoff.get("deploy_operator_procedure_status") == "READY_FOR_EXTERNAL_DEPLOY_OPERATOR"
         and handoff.get("operator_receipts_status") == "READY_FOR_STATUS_RECORDING"
+        and handoff.get("deploy_receipt_evidence_status") == "PUBLIC_DEPLOY_RECEIPT_EVIDENCE_VERIFIED"
         and handoff.get("metrics_tx_request_status") == "READY_FOR_EXTERNAL_TX_ASSEMBLER"
         and handoff.get("metrics_operator_procedure_status") == "READY_FOR_EXTERNAL_ORACLE_OPERATOR"
         and handoff.get("metrics_tx_result_status") == "METRICS_ORACLE_TX_RESULT_VERIFIED"
@@ -357,7 +378,7 @@ def validate_handoff(root: Path) -> dict[str, Any]:
         "operator_next_steps": [
             "Keep this audit green for every generated handoff package.",
             "Do not claim rollout readiness while blockers remain.",
-            "Use only verified operator_record deployment receipts and verified metrics-oracle tx results for status updates.",
+            "Use only verified operator_record deployment receipts, public node/explorer evidence, and verified metrics-oracle tx results for status updates.",
             "Keep wallet keys, raw transactions, and signing material outside this repository.",
         ],
     }

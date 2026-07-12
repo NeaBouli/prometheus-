@@ -46,10 +46,13 @@ deploy results into verified `operator_record` receipts without accepting
 signing material or raw/serialized transaction fields. A
 deployment receipt verifier validates public receipt records against the release
 bundle, rejects secret-like and raw/serialized transaction fields, and keeps synthetic CI fixtures separate from real `operator_record`
-receipts. A status staging guard rejects CI fixtures and emits only a manual
+receipts. A public node/explorer receipt-evidence verifier binds real
+`operator_record` receipts to observed public chain data before handoff
+readiness can pass. A status staging guard rejects CI fixtures and emits only a manual
 status-update draft from verified `operator_record` receipts. A CI-safe operator
 handoff builder now packages the release archive, preflight outputs, deploy
-requests, optional imported operator receipts, receipt checks, metrics report
+requests, optional imported operator receipts, receipt checks, optional public
+receipt evidence, metrics report
 preflight, unsigned oracle request, deploy/oracle operator procedures, optional
 external-operator capability verification, and optional verified oracle tx result
 into one public handoff directory while preserving the real blocker list. A separate
@@ -69,7 +72,7 @@ A release-readiness auditor now checks the generated handoff package, required
 files, component summaries, safety flags, and JSON secret/raw-transaction
 hygiene before any rollout claim. The remaining deployment blockers are the
 missing network deploy/orchestration path, real public deploy results/receipts
-from that path, external signed metrics-oracle transaction
+plus public node/explorer evidence from that path, external signed metrics-oracle transaction
 assembly/signing/broadcast/deploy operation, and final release hardening.
 
 **Sprint 9 — Contracts Live + Real ZK-Proof**
@@ -80,6 +83,7 @@ assembly/signing/broadcast/deploy operation, and final release hardening.
 - Keep the external deploy operator procedure green and free of signing/raw transaction material
 - Keep public orchestrator-result receipt import green and free of signing/raw transaction material
 - Keep deployment receipt verification green and free of signing/raw transaction material
+- Keep public receipt-evidence verification green and free of secrets/raw transaction material
 - Keep deployment status staging guarded against CI fixture receipts
 - Keep the generated operator handoff package green and free of signing material
 - Keep the release-readiness audit green and blocked until real external evidence exists
