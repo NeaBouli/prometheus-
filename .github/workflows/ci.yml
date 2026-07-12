@@ -398,6 +398,16 @@ jobs:
           assert procedure["request_count"] == 7
           assert procedure["contracts"][0]["contract_name"] == "ValidatorStakingH001"
           assert procedure["contracts"][-1]["contract_name"] == "GovernanceAutoTuningState"
+          assert procedure["required_genesis_profile"] == {
+              "transaction_version": 1,
+              "script_public_key_builder": "kaspa_txscript::pay_to_script_hash_script",
+              "script_public_key_source": "compiled_contract_script",
+              "covenant_id_builder": "kaspa_consensus_core::hashing::covenant_id",
+              "covenant_id_preimage": "funding_outpoint_and_unbound_genesis_outputs",
+              "authorizing_input_source": "funding_input_index",
+              "binding_order": "derive_id_before_setting_covenant_binding",
+              "runtime_ref": "rusty-kaspa-v2.0.1",
+          }
           assert procedure["required_public_result_fields"]["result_type"] == "prometheus_silverc_external_deploy_results"
           assert procedure["required_public_result_fields"]["results[].status"] == "confirmed"
           assert procedure["safety"]["accepts_private_keys"] is False
@@ -409,6 +419,7 @@ jobs:
           assert procedure["safety"]["updates_status_files"] is False
           assert "public deploy operator checklist" in runbook
           assert "does not sign" in runbook
+          assert "Required Covenant Genesis Profile" in runbook
 
           bad = json.loads(Path("/tmp/prometheus-silverc-deploy-request-set.json").read_text())
           bad["_".join(["wallet", "token"])] = "do-not-accept"
@@ -1022,6 +1033,7 @@ jobs:
                   "request_set_sha256": deploy_procedure["request_set_sha256"],
                   "request_count": deploy_procedure["request_count"],
                   "result_type": deploy_procedure["required_public_result_fields"]["result_type"],
+                  "genesis_profile": deploy_procedure["required_genesis_profile"],
               },
               "metrics_oracle_operator": {
                   "procedure_kind": procedure["kind"],
@@ -1071,6 +1083,7 @@ jobs:
           assert capability_summary["deploy_operator_status"] == "READY_FOR_EXTERNAL_DEPLOY_OPERATOR"
           assert capability_summary["metrics_operator_status"] == "READY_FOR_EXTERNAL_ORACLE_OPERATOR"
           assert capability_summary["request_set_sha256"] == deploy_procedure["request_set_sha256"]
+          assert capability_summary["genesis_profile"] == deploy_procedure["required_genesis_profile"]
           assert capability_summary["tx_request_sha256"] == procedure["tx_request_sha256"]
           assert capability_summary["safety"]["accepts_private_keys"] is False
           assert capability_summary["safety"]["accepts_raw_transactions"] is False
@@ -1080,6 +1093,7 @@ jobs:
           assert capability_summary["safety"]["deploys_contracts"] is False
           assert capability_summary["safety"]["updates_status_files"] is False
           assert "public operator capability metadata only" in capability_runbook
+          assert "Genesis transaction version: `1`" in capability_runbook
 
           current_commit = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
           hardening_path = Path("/tmp/prometheus-release-hardening-evidence.json")
@@ -1304,6 +1318,34 @@ jobs:
           )
           assert proc.returncode != 0
           assert "capability.deploy_operator.request_set_sha256 mismatch" in proc.stderr
+
+          genesis_tampers = {
+              "transaction_version": 0,
+              "script_public_key_builder": "custom_script_builder",
+              "covenant_id_builder": "custom_covenant_id",
+              "binding_order": "bind_before_deriving_id",
+          }
+          for field, value in genesis_tampers.items():
+              bad = json.loads(capability_path.read_text())
+              bad["deploy_operator"]["genesis_profile"][field] = value
+              bad_path = Path(f"/tmp/prometheus-external-operator-capability-genesis-{field}.json")
+              bad_path.write_text(json.dumps(bad, indent=2, sort_keys=True) + "\n")
+              proc = subprocess.run(
+                  [
+                      "python3",
+                      "scripts/verify_external_operator_capability.py",
+                      "--capability",
+                      str(bad_path),
+                      "--deploy-procedure",
+                      "/tmp/prometheus-silverc-deploy-operator-procedure.json",
+                      "--metrics-procedure",
+                      "/tmp/prometheus-metrics-oracle-operator-procedure.json",
+                  ],
+                  text=True,
+                  capture_output=True,
+              )
+              assert proc.returncode != 0
+              assert f"capability.deploy_operator.genesis_profile.{field} mismatch" in proc.stderr
 
           bad = json.loads(capability_path.read_text())
           bad["metrics_oracle_operator"]["tx_request_sha256"] = "0" * 64
