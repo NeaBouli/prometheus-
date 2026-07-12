@@ -225,7 +225,7 @@ manifest order.
 
 The importer validates the release bundle, re-validates the deploy request set,
 checks every result against the verified request hash, rejects secret-like field
-names, writes `operator_record` receipts, and then immediately runs the same
+names and raw/serialized transaction fields, writes `operator_record` receipts, and then immediately runs the same
 receipt verifier used by status staging. It does not accept keys, sign, assemble
 chain transactions, broadcast, deploy contracts, or update status files.
 
@@ -245,7 +245,7 @@ manifest contract order plus source, constructor-args, artifact, and script
 hashes, and emits a JSON summary plus optional Markdown operator runbook.
 
 The verifier intentionally does not accept private keys, sign, broadcast, or
-update status files. It also rejects secret-like field names in receipt JSON.
+update status files. It also rejects secret-like field names and raw/serialized transaction fields in receipt JSON.
 `modules/contracts/silverc/deploy-receipts.sample.json` is a synthetic
 `ci_fixture` document used only to keep the schema and negative checks green in
 CI. Real deployment status may be recorded only from verified

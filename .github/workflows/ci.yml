@@ -570,6 +570,30 @@ jobs:
           assert "secret-like fields are not allowed" in proc.stderr
 
           results = json.loads(Path("/tmp/prometheus-silverc-external-deploy-results.json").read_text())
+          results["results"][0]["raw_transaction"] = "do-not-accept"
+          with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as handle:
+              json.dump(results, handle)
+              bad_raw_path = handle.name
+          proc = subprocess.run(
+              [
+                  "python3",
+                  "scripts/build_silverc_operator_receipts.py",
+                  "--archive",
+                  "/tmp/prometheus-silverc-artifacts.tar.gz",
+                  "--request-set",
+                  "/tmp/prometheus-silverc-deploy-request-set.json",
+                  "--requests-dir",
+                  "/tmp/prometheus-silverc-deploy-requests",
+                  "--orchestrator-results",
+                  bad_raw_path,
+              ],
+              text=True,
+              capture_output=True,
+          )
+          assert proc.returncode != 0
+          assert "raw or serialized transaction fields are not allowed" in proc.stderr
+
+          results = json.loads(Path("/tmp/prometheus-silverc-external-deploy-results.json").read_text())
           results["results"][0]["request_sha256"] = "0" * 64
           with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as handle:
               json.dump(results, handle)
@@ -1204,6 +1228,26 @@ jobs:
           )
           assert proc.returncode != 0
           assert "secret-like fields are not allowed" in proc.stderr
+
+          bad = json.loads(receipt_path.read_text())
+          bad["receipts"][0]["raw_transaction"] = "do-not-accept"
+          with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as handle:
+              json.dump(bad, handle)
+              raw_path = handle.name
+          proc = subprocess.run(
+              [
+                  "python3",
+                  "scripts/verify_silverc_deploy_receipts.py",
+                  "--archive",
+                  "/tmp/prometheus-silverc-artifacts.tar.gz",
+                  "--receipts",
+                  raw_path,
+              ],
+              text=True,
+              capture_output=True,
+          )
+          assert proc.returncode != 0
+          assert "raw or serialized transaction fields are not allowed" in proc.stderr
 
           bad = json.loads(receipt_path.read_text())
           bad["receipts"][0]["artifact_sha256"] = "0" * 64

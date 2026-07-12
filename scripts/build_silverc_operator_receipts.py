@@ -23,6 +23,10 @@ SECRET_LIKE_RE = re.compile(
     r"(private|secret|seed|mnemonic|password|passwd|wallet|keystore|token)",
     re.IGNORECASE,
 )
+RAW_TX_KEY_RE = re.compile(
+    r"(raw|signed|serialized).*transaction|transaction_(hex|bytes)",
+    re.IGNORECASE,
+)
 UTC_TIMESTAMP_RE = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
 
 
@@ -58,15 +62,18 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def reject_secret_fields(value: Any, path: str = "$") -> None:
+def reject_forbidden_fields(value: Any, path: str = "$") -> None:
     if isinstance(value, dict):
         for key, item in value.items():
-            if SECRET_LIKE_RE.search(str(key)):
+            key_text = str(key)
+            if SECRET_LIKE_RE.search(key_text):
                 raise ValueError(f"{path}.{key}: secret-like fields are not allowed in orchestrator results")
-            reject_secret_fields(item, f"{path}.{key}")
+            if RAW_TX_KEY_RE.search(key_text):
+                raise ValueError(f"{path}.{key}: raw or serialized transaction fields are not allowed")
+            reject_forbidden_fields(item, f"{path}.{key}")
     elif isinstance(value, list):
         for index, item in enumerate(value):
-            reject_secret_fields(item, f"{path}[{index}]")
+            reject_forbidden_fields(item, f"{path}[{index}]")
 
 
 def require_dict(value: Any, key: str) -> dict[str, Any]:
@@ -98,7 +105,7 @@ def validate_results_header(
     manifest: dict[str, Any],
     request_summary: dict[str, Any],
 ) -> tuple[dict[str, Any], dict[str, Any]]:
-    reject_secret_fields(results_doc)
+    reject_forbidden_fields(results_doc)
 
     if results_doc.get("schema_version") != 1:
         raise ValueError("schema_version: expected 1")
@@ -224,7 +231,7 @@ def write_runbook(path: Path | None, summary: dict[str, Any]) -> None:
         "## Safety Rules",
         "",
         "- This importer accepts public external deploy results only.",
-        "- This importer rejects secret-like fields and does not accept keys.",
+        "- This importer rejects secret-like and raw/serialized transaction fields.",
         "- This importer does not sign, assemble chain transactions, broadcast, deploy, or update status files.",
         "- Generated receipts are re-validated as `operator_record` receipts before status staging.",
         "",

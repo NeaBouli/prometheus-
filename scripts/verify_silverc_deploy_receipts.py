@@ -29,6 +29,10 @@ SECRET_KEY_RE = re.compile(
     r"(private|secret|seed|mnemonic|password|passwd|wallet|keystore|token)",
     re.IGNORECASE,
 )
+RAW_TX_KEY_RE = re.compile(
+    r"(raw|signed|serialized).*transaction|transaction_(hex|bytes)",
+    re.IGNORECASE,
+)
 
 
 def parse_args() -> argparse.Namespace:
@@ -58,15 +62,18 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def reject_secret_fields(value: Any, path: str = "$") -> None:
+def reject_forbidden_fields(value: Any, path: str = "$") -> None:
     if isinstance(value, dict):
         for key, item in value.items():
-            if SECRET_KEY_RE.search(str(key)):
+            key_text = str(key)
+            if SECRET_KEY_RE.search(key_text):
                 raise ValueError(f"{path}.{key}: secret-like fields are not allowed in deployment receipts")
-            reject_secret_fields(item, f"{path}.{key}")
+            if RAW_TX_KEY_RE.search(key_text):
+                raise ValueError(f"{path}.{key}: raw or serialized transaction fields are not allowed")
+            reject_forbidden_fields(item, f"{path}.{key}")
     elif isinstance(value, list):
         for index, item in enumerate(value):
-            reject_secret_fields(item, f"{path}[{index}]")
+            reject_forbidden_fields(item, f"{path}[{index}]")
 
 
 def require_int(data: dict[str, Any], key: str, *, minimum: int = 0) -> int:
@@ -99,7 +106,7 @@ def validate_receipts_document(
     manifest: dict[str, Any],
     require_operator_record: bool,
 ) -> dict[str, Any]:
-    reject_secret_fields(receipts_doc)
+    reject_forbidden_fields(receipts_doc)
 
     if receipts_doc.get("schema_version") != 1:
         raise ValueError("schema_version: expected 1")
@@ -253,6 +260,7 @@ def write_runbook(path: Path | None, summary: dict[str, Any]) -> None:
         "## Safety Rules",
         "",
         "- This verifier accepts public deployment receipts only.",
+        "- This verifier rejects secret-like and raw/serialized transaction fields.",
         "- This verifier does not accept private keys, sign transactions, broadcast transactions, or update status files.",
         "- ci_fixture receipts are test fixtures and must not be used as release status claims.",
         "- Only operator_record receipts verified against a real node/explorer may be copied into deployment status.",

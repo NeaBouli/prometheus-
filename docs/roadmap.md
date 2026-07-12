@@ -43,9 +43,9 @@ operator procedure converts the verified request set into a deploy checklist
 and required public result-evidence contract without accepting keys or raw
 transactions. A public orchestrator-result importer converts confirmed external
 deploy results into verified `operator_record` receipts without accepting
-signing material. A
+signing material or raw/serialized transaction fields. A
 deployment receipt verifier validates public receipt records against the release
-bundle and keeps synthetic CI fixtures separate from real `operator_record`
+bundle, rejects secret-like and raw/serialized transaction fields, and keeps synthetic CI fixtures separate from real `operator_record`
 receipts. A status staging guard rejects CI fixtures and emits only a manual
 status-update draft from verified `operator_record` receipts. A CI-safe operator
 handoff builder now packages the release archive, preflight outputs, deploy
@@ -78,8 +78,8 @@ assembly/signing/broadcast/deploy operation, and final release hardening.
 - Keep the generated deploy operator runbook green and free of signing material
 - Keep the external deploy request set green and free of signing material
 - Keep the external deploy operator procedure green and free of signing/raw transaction material
-- Keep public orchestrator-result receipt import green and free of signing material
-- Keep deployment receipt verification green and free of signing material
+- Keep public orchestrator-result receipt import green and free of signing/raw transaction material
+- Keep deployment receipt verification green and free of signing/raw transaction material
 - Keep deployment status staging guarded against CI fixture receipts
 - Keep the generated operator handoff package green and free of signing material
 - Keep the release-readiness audit green and blocked until real external evidence exists
