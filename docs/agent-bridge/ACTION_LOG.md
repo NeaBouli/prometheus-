@@ -221,3 +221,17 @@ Rules for all dev agents:
 - If a probe returns `401 Invalid authentication credentials`, the integration is using the wrong path: API instead of terminal.
 - Keep secrets, tokens, passwords, private keys, and keychain material out of bridge files.
 <!-- /CODEX_CLAUDE_CODE_TERMINAL_BRIDGE_V1 -->
+
+## 2026-07-12
+
+- Added public external-operator capability verification path:
+  - `scripts/verify_external_operator_capability.py`
+  - optional `--operator-capability` support in `scripts/build_silverc_operator_handoff.py`
+  - capability-file validation in `scripts/audit_silverc_release_readiness.py`
+  - CI positive and negative coverage for secret-like fields, raw transaction fields, deploy hash tamper, and metrics tx-request hash tamper.
+- Updated public docs (`README.md`, `WHITEPAPER.md`, `whitepaper.html`, `docs/roadmap.md`, `modules/contracts/silverc/README.md`, `llms.txt`) to describe the new public capability gate without claiming rollout readiness.
+- Local verification completed:
+  - `python3 -m py_compile scripts/verify_external_operator_capability.py scripts/build_silverc_operator_handoff.py scripts/audit_silverc_release_readiness.py`
+  - `.github/workflows/ci.yml` YAML parse
+  - capability end-to-end smoke through release archive, deploy procedure, metrics procedure, capability verifier, operator handoff, and release-readiness audit.
+- Secrets note: no private keys, tokens, raw transactions, keystores, wallets, or credentials were added. Existing local untracked `Prometheus-1.png` remains untouched and uncommitted.

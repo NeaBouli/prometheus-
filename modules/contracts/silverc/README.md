@@ -273,14 +273,14 @@ procedure, can import public external orchestrator results into
 `operator_record` receipts, verifies the synthetic CI receipt fixture,
 optionally verifies real `operator_record` receipts, validates the
 metrics-oracle report, builds the unsigned metrics-oracle transaction request,
-can verify a public metrics-oracle transaction result, can stage a manual
-metrics-oracle status draft, and emits `HANDOFF.md` plus
-`operator-handoff-summary.json`.
+can verify a public external-operator capability record, can verify a public
+metrics-oracle transaction result, can stage a manual metrics-oracle status
+draft, and emits `HANDOFF.md` plus `operator-handoff-summary.json`.
 
 The package is intentionally blocked until real network deploy/orchestration
 tooling, verified `operator_record` receipts, and signer-ready contract instance
 IDs exist. It does not accept private keys, sign, broadcast, deploy contracts,
-or update status files.
+raw transactions, or update status files.
 
 ## Release-readiness audit
 
@@ -399,6 +399,34 @@ The handoff package includes `metrics-oracle-operator-procedure.json/.md`
 whenever the tx request is signer-ready. This reduces the oracle-operations
 blocker to an explicit external wallet/orchestrator execution step while keeping
 all sensitive material outside the repository.
+
+## External operator capability verification
+
+`scripts/verify_external_operator_capability.py` validates a public
+external-operator capability record against the generated deploy operator
+procedure and, when available, the metrics-oracle operator procedure. It checks:
+
+- `schema_version = 1`, `kind = prometheus.external_operator.public_capability`,
+  and `status = PUBLIC_CAPABILITY_ATTESTED`
+- network, deploy request-set hash, deploy request count, and public deploy
+  result type match the deploy operator procedure
+- metrics tx-request hash, contract instance id, and public oracle result type
+  match the metrics-oracle operator procedure when supplied
+- repository-boundary flags state public artifacts, operator records, external
+  chain payloads, and manual status updates only
+- safety flags prove the verifier does not accept keys, raw transactions, sign,
+  assemble, broadcast, deploy, or update status files
+- JSON inputs reject secret-like field names and raw/serialized transaction
+  fields
+
+`scripts/build_silverc_operator_handoff.py --operator-capability <file>` copies
+the public capability record into the handoff directory, writes
+`external-operator-capability-summary.json/.md`, and exposes
+`external_operator_capability_status` in `operator-handoff-summary.json`.
+`scripts/audit_silverc_release_readiness.py` validates those files whenever the
+status is `EXTERNAL_OPERATOR_CAPABILITY_VERIFIED`. This makes the external tool
+boundary auditable without putting keys, raw transactions, or deployment actions
+inside the repository.
 
 ## Metrics-oracle transaction result verifier
 

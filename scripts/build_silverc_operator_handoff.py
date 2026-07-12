@@ -62,6 +62,11 @@ def parse_args() -> argparse.Namespace:
         type=Path,
         help="Optional public metrics-oracle transaction result JSON to verify against the generated tx request",
     )
+    parser.add_argument(
+        "--operator-capability",
+        type=Path,
+        help="Optional public external-operator capability record to bind to generated operator procedures",
+    )
     return parser.parse_args()
 
 
@@ -360,6 +365,33 @@ def run_metrics_oracle_status_staging(archive: Path, out_dir: Path, metrics_tx_r
     return load_json(status_path)
 
 
+def run_external_operator_capability_verification(
+    out_dir: Path,
+    operator_capability: Path,
+    metrics_operator_procedure: dict[str, Any] | None,
+) -> dict[str, Any]:
+    capability_path = out_dir / "external-operator-capability.json"
+    shutil.copyfile(operator_capability, capability_path)
+    summary_path = out_dir / "external-operator-capability-summary.json"
+    runbook_path = out_dir / "external-operator-capability.md"
+    cmd = [
+        sys.executable,
+        "scripts/verify_external_operator_capability.py",
+        "--capability",
+        str(capability_path),
+        "--deploy-procedure",
+        str(out_dir / "deploy-operator-procedure.json"),
+        "--summary-out",
+        str(summary_path),
+        "--runbook-out",
+        str(runbook_path),
+    ]
+    if metrics_operator_procedure is not None:
+        cmd.extend(["--metrics-procedure", str(out_dir / "metrics-oracle-operator-procedure.json")])
+    run(cmd)
+    return load_json(summary_path)
+
+
 def status_from_components(
     deploy_plan: dict[str, Any],
     operator_receipts: dict[str, Any] | None,
@@ -420,6 +452,7 @@ def write_handoff_markdown(out_dir: Path, summary: dict[str, Any]) -> None:
             f"- Metrics operator procedure: {summary['metrics_operator_procedure_status']}",
             f"- Metrics tx result: {summary['metrics_tx_result_status']}",
             f"- Metrics oracle status draft: {summary['metrics_oracle_status_draft_status']}",
+            f"- External operator capability: {summary['external_operator_capability_status']}",
             "",
             "## Blockers",
             "",
@@ -458,6 +491,9 @@ def main() -> int:
     )
     metrics_tx_result_path = (
         ensure_public_file(args.metrics_tx_result, "metrics tx result") if args.metrics_tx_result else None
+    )
+    operator_capability_path = (
+        ensure_public_file(args.operator_capability, "operator capability") if args.operator_capability else None
     )
     out_dir = args.out_dir.expanduser().resolve()
     if out_dir.exists():
@@ -506,6 +542,13 @@ def main() -> int:
             out_dir,
             metrics_tx_result_path,
         )
+    external_operator_capability = None
+    if operator_capability_path:
+        external_operator_capability = run_external_operator_capability_verification(
+            out_dir,
+            operator_capability_path,
+            metrics_operator_procedure,
+        )
 
     status, blockers = status_from_components(deploy_plan, operator_receipts_summary, tx_request, tx_result_summary)
     summary = {
@@ -535,8 +578,15 @@ def main() -> int:
         "metrics_oracle_status_draft_status": (
             metrics_oracle_status_draft["status"] if metrics_oracle_status_draft else "NOT_PROVIDED"
         ),
+        "external_operator_capability_status": (
+            external_operator_capability["status"] if external_operator_capability else "NOT_PROVIDED"
+        ),
+        "external_operator_id": (
+            external_operator_capability["operator_id"] if external_operator_capability else "NOT_PROVIDED"
+        ),
         "safety": {
             "accepts_private_keys": False,
+            "accepts_raw_transactions": False,
             "signs_transactions": False,
             "assembles_chain_transaction": False,
             "broadcasts_transactions": False,

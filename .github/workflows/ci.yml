@@ -773,6 +773,166 @@ jobs:
           assert "public operator checklist" in procedure_runbook
           assert "does not sign" in procedure_runbook
 
+          deploy_procedure = json.loads(Path("/tmp/prometheus-silverc-deploy-operator-procedure.json").read_text())
+          capability_path = Path("/tmp/prometheus-external-operator-capability.json")
+          capability = {
+              "schema_version": 1,
+              "kind": "prometheus.external_operator.public_capability",
+              "status": "PUBLIC_CAPABILITY_ATTESTED",
+              "network": ready["network"],
+              "operator": {
+                  "id": "ci-public-external-operator-fixture",
+                  "recorded_at": "2026-07-11T00:00:00Z",
+              },
+              "deploy_operator": {
+                  "procedure_kind": deploy_procedure["kind"],
+                  "procedure_status": deploy_procedure["status"],
+                  "request_set_sha256": deploy_procedure["request_set_sha256"],
+                  "request_count": deploy_procedure["request_count"],
+                  "result_type": deploy_procedure["required_public_result_fields"]["result_type"],
+              },
+              "metrics_oracle_operator": {
+                  "procedure_kind": procedure["kind"],
+                  "procedure_status": procedure["status"],
+                  "tx_request_sha256": procedure["tx_request_sha256"],
+                  "contract_instance_id": procedure["contract"]["instance_id"],
+                  "result_type": procedure["required_public_result_fields"]["result_type"],
+              },
+              "repository_boundary": {
+                  "public_artifacts_only": True,
+                  "operator_records_only": True,
+                  "chain_payloads_external": True,
+                  "status_updates_manual": True,
+              },
+              "safety": {
+                  "accepts_private_keys": False,
+                  "accepts_raw_transactions": False,
+                  "signs_transactions": False,
+                  "assembles_chain_transaction": False,
+                  "broadcasts_transactions": False,
+                  "deploys_contracts": False,
+                  "updates_status_files": False,
+              },
+          }
+          capability_path.write_text(json.dumps(capability, indent=2, sort_keys=True) + "\n")
+          subprocess.run(
+              [
+                  "python3",
+                  "scripts/verify_external_operator_capability.py",
+                  "--capability",
+                  str(capability_path),
+                  "--deploy-procedure",
+                  "/tmp/prometheus-silverc-deploy-operator-procedure.json",
+                  "--metrics-procedure",
+                  "/tmp/prometheus-metrics-oracle-operator-procedure.json",
+                  "--summary-out",
+                  "/tmp/prometheus-external-operator-capability-summary.json",
+                  "--runbook-out",
+                  "/tmp/prometheus-external-operator-capability.md",
+              ],
+              check=True,
+          )
+          capability_summary = json.loads(Path("/tmp/prometheus-external-operator-capability-summary.json").read_text())
+          capability_runbook = Path("/tmp/prometheus-external-operator-capability.md").read_text()
+          assert capability_summary["status"] == "EXTERNAL_OPERATOR_CAPABILITY_VERIFIED"
+          assert capability_summary["operator_id"] == "ci-public-external-operator-fixture"
+          assert capability_summary["deploy_operator_status"] == "READY_FOR_EXTERNAL_DEPLOY_OPERATOR"
+          assert capability_summary["metrics_operator_status"] == "READY_FOR_EXTERNAL_ORACLE_OPERATOR"
+          assert capability_summary["request_set_sha256"] == deploy_procedure["request_set_sha256"]
+          assert capability_summary["tx_request_sha256"] == procedure["tx_request_sha256"]
+          assert capability_summary["safety"]["accepts_private_keys"] is False
+          assert capability_summary["safety"]["accepts_raw_transactions"] is False
+          assert capability_summary["safety"]["signs_transactions"] is False
+          assert capability_summary["safety"]["assembles_chain_transaction"] is False
+          assert capability_summary["safety"]["broadcasts_transactions"] is False
+          assert capability_summary["safety"]["deploys_contracts"] is False
+          assert capability_summary["safety"]["updates_status_files"] is False
+          assert "public operator capability metadata only" in capability_runbook
+
+          bad = dict(capability)
+          bad["_".join(["private", "key"])] = "do-not-accept"
+          bad_path = Path("/tmp/prometheus-external-operator-capability-secret.json")
+          bad_path.write_text(json.dumps(bad, indent=2, sort_keys=True) + "\n")
+          proc = subprocess.run(
+              [
+                  "python3",
+                  "scripts/verify_external_operator_capability.py",
+                  "--capability",
+                  str(bad_path),
+                  "--deploy-procedure",
+                  "/tmp/prometheus-silverc-deploy-operator-procedure.json",
+                  "--metrics-procedure",
+                  "/tmp/prometheus-metrics-oracle-operator-procedure.json",
+              ],
+              text=True,
+              capture_output=True,
+          )
+          assert proc.returncode != 0
+          assert "secret-like fields are not allowed" in proc.stderr
+
+          bad = dict(capability)
+          bad["raw_transaction"] = "do-not-accept"
+          bad_path = Path("/tmp/prometheus-external-operator-capability-raw.json")
+          bad_path.write_text(json.dumps(bad, indent=2, sort_keys=True) + "\n")
+          proc = subprocess.run(
+              [
+                  "python3",
+                  "scripts/verify_external_operator_capability.py",
+                  "--capability",
+                  str(bad_path),
+                  "--deploy-procedure",
+                  "/tmp/prometheus-silverc-deploy-operator-procedure.json",
+                  "--metrics-procedure",
+                  "/tmp/prometheus-metrics-oracle-operator-procedure.json",
+              ],
+              text=True,
+              capture_output=True,
+          )
+          assert proc.returncode != 0
+          assert "raw or serialized transaction fields are not allowed" in proc.stderr
+
+          bad = json.loads(capability_path.read_text())
+          bad["deploy_operator"]["request_set_sha256"] = "0" * 64
+          bad_path = Path("/tmp/prometheus-external-operator-capability-deploy-tamper.json")
+          bad_path.write_text(json.dumps(bad, indent=2, sort_keys=True) + "\n")
+          proc = subprocess.run(
+              [
+                  "python3",
+                  "scripts/verify_external_operator_capability.py",
+                  "--capability",
+                  str(bad_path),
+                  "--deploy-procedure",
+                  "/tmp/prometheus-silverc-deploy-operator-procedure.json",
+                  "--metrics-procedure",
+                  "/tmp/prometheus-metrics-oracle-operator-procedure.json",
+              ],
+              text=True,
+              capture_output=True,
+          )
+          assert proc.returncode != 0
+          assert "capability.deploy_operator.request_set_sha256 mismatch" in proc.stderr
+
+          bad = json.loads(capability_path.read_text())
+          bad["metrics_oracle_operator"]["tx_request_sha256"] = "0" * 64
+          bad_path = Path("/tmp/prometheus-external-operator-capability-metrics-tamper.json")
+          bad_path.write_text(json.dumps(bad, indent=2, sort_keys=True) + "\n")
+          proc = subprocess.run(
+              [
+                  "python3",
+                  "scripts/verify_external_operator_capability.py",
+                  "--capability",
+                  str(bad_path),
+                  "--deploy-procedure",
+                  "/tmp/prometheus-silverc-deploy-operator-procedure.json",
+                  "--metrics-procedure",
+                  "/tmp/prometheus-metrics-oracle-operator-procedure.json",
+              ],
+              text=True,
+              capture_output=True,
+          )
+          assert proc.returncode != 0
+          assert "capability.metrics_oracle_operator.tx_request_sha256 mismatch" in proc.stderr
+
           proc = subprocess.run(
               [
                   "python3",
@@ -1209,7 +1369,8 @@ jobs:
             --metrics-oracle-pubkey 1111111111111111111111111111111111111111111111111111111111111111 \
             --orchestrator-results /tmp/prometheus-silverc-external-deploy-results.json \
             --contract-instance-id sandbox:governance-auto-tuning-state-fixture-0001 \
-            --metrics-tx-result /tmp/prometheus-metrics-oracle-tx-result.json
+            --metrics-tx-result /tmp/prometheus-metrics-oracle-tx-result.json \
+            --operator-capability /tmp/prometheus-external-operator-capability.json
           python3 - <<'PY'
           import json
           from pathlib import Path
@@ -1223,12 +1384,17 @@ jobs:
           assert summary["metrics_operator_procedure_status"] == "READY_FOR_EXTERNAL_ORACLE_OPERATOR"
           assert summary["metrics_tx_result_status"] == "METRICS_ORACLE_TX_RESULT_VERIFIED"
           assert summary["metrics_oracle_status_draft_status"] == "READY_FOR_MANUAL_ORACLE_STATUS_UPDATE"
+          assert summary["external_operator_capability_status"] == "EXTERNAL_OPERATOR_CAPABILITY_VERIFIED"
+          assert summary["external_operator_id"] == "ci-public-external-operator-fixture"
           assert "metrics-oracle-operator-procedure.json" in summary["included_files"]
           assert "metrics-oracle-operator-procedure.md" in summary["included_files"]
           assert "metrics-oracle-tx-result-summary.json" in summary["included_files"]
           assert "metrics-oracle-tx-result.md" in summary["included_files"]
           assert "metrics-oracle-status-draft.json" in summary["included_files"]
           assert "metrics-oracle-status-draft.md" in summary["included_files"]
+          assert "external-operator-capability.json" in summary["included_files"]
+          assert "external-operator-capability-summary.json" in summary["included_files"]
+          assert "external-operator-capability.md" in summary["included_files"]
           assert "upstream silverc exposes no network deploy command" in summary["blockers"]
           assert "missing verified operator_record deployment receipts" not in summary["blockers"]
           assert "missing verified metrics-oracle transaction result" not in summary["blockers"]
@@ -1253,6 +1419,7 @@ jobs:
           assert summary["component_statuses"]["metrics_operator_procedure"] == "READY_FOR_EXTERNAL_ORACLE_OPERATOR"
           assert summary["component_statuses"]["metrics_tx_result"] == "METRICS_ORACLE_TX_RESULT_VERIFIED"
           assert summary["component_statuses"]["metrics_oracle_status_draft"] == "READY_FOR_MANUAL_ORACLE_STATUS_UPDATE"
+          assert summary["component_statuses"]["external_operator_capability"] == "EXTERNAL_OPERATOR_CAPABILITY_VERIFIED"
           assert "upstream silverc exposes no network deploy command" in summary["blockers"]
           assert summary["safety"]["accepts_private_keys"] is False
           assert summary["safety"]["accepts_raw_transactions"] is False

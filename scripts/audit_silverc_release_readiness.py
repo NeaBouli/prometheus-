@@ -27,8 +27,10 @@ EXPECTED_FALSE_SAFETY_FLAGS = {
     "broadcasts_transactions",
     "updates_status_files",
 }
-HANDOFF_FALSE_SAFETY_FLAGS = EXPECTED_FALSE_SAFETY_FLAGS | {"deploys_contracts"}
-OPERATOR_PROCEDURE_FALSE_SAFETY_FLAGS = HANDOFF_FALSE_SAFETY_FLAGS | {"accepts_raw_transactions"}
+HANDOFF_FALSE_SAFETY_FLAGS = OPERATOR_PROCEDURE_FALSE_SAFETY_FLAGS = EXPECTED_FALSE_SAFETY_FLAGS | {
+    "accepts_raw_transactions",
+    "deploys_contracts",
+}
 BASE_REQUIRED_FILES = {
     HANDOFF_SUMMARY,
     "HANDOFF.md",
@@ -66,6 +68,11 @@ METRICS_TX_RESULT_FILES = {
 METRICS_OPERATOR_PROCEDURE_FILES = {
     "metrics-oracle-operator-procedure.json",
     "metrics-oracle-operator-procedure.md",
+}
+EXTERNAL_OPERATOR_CAPABILITY_FILES = {
+    "external-operator-capability.json",
+    "external-operator-capability-summary.json",
+    "external-operator-capability.md",
 }
 
 
@@ -166,6 +173,8 @@ def required_files_for_summary(summary: dict[str, Any]) -> set[str]:
         required |= METRICS_TX_RESULT_FILES
     if summary.get("metrics_tx_request_status") == "READY_FOR_EXTERNAL_TX_ASSEMBLER":
         required |= METRICS_OPERATOR_PROCEDURE_FILES
+    if summary.get("external_operator_capability_status") == "EXTERNAL_OPERATOR_CAPABILITY_VERIFIED":
+        required |= EXTERNAL_OPERATOR_CAPABILITY_FILES
     return required
 
 
@@ -269,6 +278,21 @@ def validate_component_summaries(root: Path, handoff: dict[str, Any]) -> dict[st
     else:
         statuses["metrics_tx_result"] = handoff.get("metrics_tx_result_status", "UNKNOWN")
         statuses["metrics_oracle_status_draft"] = handoff.get("metrics_oracle_status_draft_status", "UNKNOWN")
+
+    if handoff.get("external_operator_capability_status") == "EXTERNAL_OPERATOR_CAPABILITY_VERIFIED":
+        capability = require_json(root, "external-operator-capability-summary.json")
+        expect_status(
+            capability,
+            "status",
+            "EXTERNAL_OPERATOR_CAPABILITY_VERIFIED",
+            "external-operator-capability-summary",
+        )
+        if capability.get("operator_id") != handoff.get("external_operator_id"):
+            raise ValueError("external-operator-capability-summary.operator_id mismatch")
+        validate_safety(capability, OPERATOR_PROCEDURE_FALSE_SAFETY_FLAGS, "external-operator-capability-summary")
+        statuses["external_operator_capability"] = capability["status"]
+    else:
+        statuses["external_operator_capability"] = handoff.get("external_operator_capability_status", "NOT_PROVIDED")
 
     return statuses
 
