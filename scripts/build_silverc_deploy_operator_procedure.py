@@ -15,6 +15,16 @@ from verify_silverc_h001 import DEFAULT_SILVERSCRIPT_REF
 
 PROCEDURE_KIND = "prometheus.silverc.deploy.operator_procedure"
 PROCEDURE_STATUS = "READY_FOR_EXTERNAL_DEPLOY_OPERATOR"
+GENESIS_PROFILE = {
+    "transaction_version": 1,
+    "script_public_key_builder": "kaspa_txscript::pay_to_script_hash_script",
+    "script_public_key_source": "compiled_contract_script",
+    "covenant_id_builder": "kaspa_consensus_core::hashing::covenant_id",
+    "covenant_id_preimage": "funding_outpoint_and_unbound_genesis_outputs",
+    "authorizing_input_source": "funding_input_index",
+    "binding_order": "derive_id_before_setting_covenant_binding",
+    "runtime_ref": "rusty-kaspa-v2.0.1",
+}
 
 
 def parse_args() -> argparse.Namespace:
@@ -49,6 +59,7 @@ def build_procedure(request_summary: dict[str, Any]) -> dict[str, Any]:
         "request_set_sha256": request_summary["request_set_sha256"],
         "silverscript_commit": request_summary["silverscript_commit"],
         "request_count": request_summary["request_count"],
+        "required_genesis_profile": GENESIS_PROFILE,
         "contracts": [
             {
                 "order": request["order"],
@@ -152,6 +163,9 @@ def write_runbook(path: Path | None, procedure: dict[str, Any]) -> None:
                 script_hash=contract["script_sha256"],
             )
         )
+    lines.extend(["", "## Required Covenant Genesis Profile", ""])
+    for key, value in procedure["required_genesis_profile"].items():
+        lines.append(f"- `{key}`: `{value}`")
     lines.extend(["", "## External Operator Sequence", ""])
     lines.extend(f"{index}. {step}" for index, step in enumerate(procedure["external_operator_sequence"], start=1))
     lines.extend(["", "## Required Public Result Evidence", ""])

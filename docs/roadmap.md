@@ -69,7 +69,10 @@ guard emits only a manual status-update draft from verified public tx results
 and does not write status files. A public external-operator capability verifier
 binds capability records to the deploy/oracle procedures while rejecting
 secret-like fields, raw transactions, and repository-side signing/deploy/status
-writes.
+writes. The deploy capability must also attest the official SilverScript
+covenant-genesis profile: transaction version 1, P2SH from the compiled script,
+official covenant-ID derivation from the funding outpoint plus unbound outputs,
+and funding-input binding after ID derivation.
 A public release-hardening evidence verifier binds successful CI, Pages,
 branch-control, rollback, and release-note checks to the exact release commit
 without querying GitHub, accepting credentials, changing repository settings,

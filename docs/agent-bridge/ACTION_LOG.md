@@ -250,6 +250,15 @@ Rules for all dev agents:
 
 ## 2026-07-12
 
+- Started GitHub issue #1 and branch `feature/GH-1-silverc-genesis-capability` to reduce the external deploy-orchestrator ambiguity without moving keys, signing, transaction payloads, or broadcast into the repository.
+- Verified official `kaspanet/silverscript` state: pinned commit `d25bd3427a093c17327ca3d6b9e1aa5f7688c863` differs from current `master` only by README commit `77ebf01`; current `silverc --help` still exposes compile/AST only and no network deploy command.
+- Verified server access: direct `ssh sandbox` still rejects the configured key, while `ssh hub-sandbox` succeeds as `deploy`; no secret or key material was read, copied, or changed.
+- Added the official covenant-genesis profile to the public deploy procedure and made external capability verification require an exact attestation for transaction version 1, compiled-script P2SH, official funding-outpoint/unbound-output covenant-ID derivation, and post-derivation funding-input binding.
+- Added CI positive assertions and tamper rejection for transaction version, P2SH builder, covenant-ID builder, and binding order.
+- Local verification passed: Python compile, CI YAML parse, 55 pinned upstream Silverc tests, seven-artifact deterministic release archive, deploy preflight/request verification/procedure generation, positive capability verification, and all four genesis-profile tamper checks.
+- Updated README, Whitepaper, public HTML, roadmap, Silverc operator docs, `llms.txt`, Bridge, Memory, and this action log. Remote PR CI remains pending.
+- Security note: no private keys, tokens, credentials, raw transactions, keystores, wallet files, or secrets were added. Foreign untracked `Prometheus-1.png` remains untouched.
+
 - Remote verification update:
   - `181cde2 ci: reject raw deploy receipt payloads`
   - Prometheus CI: success

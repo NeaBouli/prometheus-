@@ -15,6 +15,7 @@ from build_metrics_oracle_operator_procedure import PROCEDURE_KIND as METRICS_PR
 from build_metrics_oracle_operator_procedure import PROCEDURE_STATUS as METRICS_PROCEDURE_STATUS
 from build_silverc_deploy_operator_procedure import PROCEDURE_KIND as DEPLOY_PROCEDURE_KIND
 from build_silverc_deploy_operator_procedure import PROCEDURE_STATUS as DEPLOY_PROCEDURE_STATUS
+from build_silverc_deploy_operator_procedure import GENESIS_PROFILE
 from smoke_silverc_artifacts import canonical_json_bytes
 
 CAPABILITY_KIND = "prometheus.external_operator.public_capability"
@@ -149,6 +150,9 @@ def validate_deploy_procedure(procedure: dict[str, Any]) -> dict[str, Any]:
     request_count = require_int(procedure, "request_count", "deploy_procedure", minimum=1)
     result_fields = require_dict(procedure.get("required_public_result_fields"), "deploy_procedure.required_public_result_fields")
     result_type = require_str(result_fields, "result_type", "deploy_procedure.required_public_result_fields")
+    genesis_profile = require_dict(procedure.get("required_genesis_profile"), "deploy_procedure.required_genesis_profile")
+    if genesis_profile != GENESIS_PROFILE:
+        raise ValueError("deploy_procedure.required_genesis_profile mismatch")
     return {
         "network": require_str(procedure, "network", "deploy_procedure"),
         "status": procedure["status"],
@@ -156,6 +160,7 @@ def validate_deploy_procedure(procedure: dict[str, Any]) -> dict[str, Any]:
         "request_set_sha256": request_set_sha256,
         "request_count": request_count,
         "result_type": result_type,
+        "genesis_profile": genesis_profile,
         "procedure_sha256": sha256_json(procedure),
     }
 
@@ -225,6 +230,15 @@ def validate_capability(
         raise ValueError("capability.deploy_operator.request_count mismatch")
     if deploy_capability.get("result_type") != deploy["result_type"]:
         raise ValueError("capability.deploy_operator.result_type mismatch")
+    genesis_profile = require_dict(
+        deploy_capability.get("genesis_profile"),
+        "capability.deploy_operator.genesis_profile",
+    )
+    if set(genesis_profile) != set(deploy["genesis_profile"]):
+        raise ValueError("capability.deploy_operator.genesis_profile fields mismatch")
+    for key, expected in deploy["genesis_profile"].items():
+        if genesis_profile.get(key) != expected:
+            raise ValueError(f"capability.deploy_operator.genesis_profile.{key} mismatch")
 
     metrics_status = "NOT_PROVIDED"
     if metrics is not None:
@@ -254,6 +268,7 @@ def validate_capability(
         "deploy_procedure_sha256": deploy["procedure_sha256"],
         "request_set_sha256": deploy["request_set_sha256"],
         "request_count": deploy["request_count"],
+        "genesis_profile": deploy["genesis_profile"],
         "metrics_operator_status": metrics_status,
         "metrics_procedure_sha256": metrics["procedure_sha256"] if metrics else None,
         "tx_request_sha256": metrics["tx_request_sha256"] if metrics else None,
@@ -301,6 +316,10 @@ def write_runbook(path: Path | None, summary: dict[str, Any]) -> None:
         f"- Deploy operator procedure: `{summary['deploy_operator_status']}`",
         f"- Deploy request set SHA-256: `{summary['request_set_sha256']}`",
         f"- Deploy request count: `{summary['request_count']}`",
+        f"- Genesis transaction version: `{summary['genesis_profile']['transaction_version']}`",
+        f"- Genesis script builder: `{summary['genesis_profile']['script_public_key_builder']}`",
+        f"- Genesis covenant-ID builder: `{summary['genesis_profile']['covenant_id_builder']}`",
+        f"- Genesis binding order: `{summary['genesis_profile']['binding_order']}`",
         f"- Metrics operator procedure: `{summary['metrics_operator_status']}`",
     ]
     if summary["tx_request_sha256"]:

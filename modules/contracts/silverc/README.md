@@ -436,6 +436,11 @@ procedure and, when available, the metrics-oracle operator procedure. It checks:
   and `status = PUBLIC_CAPABILITY_ATTESTED`
 - network, deploy request-set hash, deploy request count, and public deploy
   result type match the deploy operator procedure
+- the external operator attests transaction version 1,
+  `kaspa_txscript::pay_to_script_hash_script` over the compiled contract script,
+  official `kaspa_consensus_core::hashing::covenant_id` derivation from the
+  funding outpoint and unbound genesis outputs, and funding-input binding only
+  after the covenant ID is derived
 - metrics tx-request hash, contract instance id, and public oracle result type
   match the metrics-oracle operator procedure when supplied
 - repository-boundary flags state public artifacts, operator records, external
