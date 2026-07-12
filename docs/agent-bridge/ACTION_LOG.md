@@ -7,7 +7,8 @@
 - Extended `scripts/audit_silverc_release_readiness.py` so verified oracle tx results require a safe oracle status draft before rollout readiness can be claimed.
 - Extended Prometheus CI with oracle status staging positive coverage plus blocked-request, request-secret, result-secret, raw-transaction, handoff, readiness, and status-draft safety-tamper assertions.
 - Updated README, Whitepaper, public `whitepaper.html`, roadmap, Silverc module docs, llms.txt, Backlog, Memory, and Bridge to describe oracle status-draft staging as a guard, not a deploy/status claim.
-- Local checks passed: bytecode-free Python syntax compile, CI YAML parse, `git diff --check`, memory integrity, positive oracle status staging, blocked-request/secret/raw negative staging, generated handoff with status draft, release-readiness audit, and status-draft safety tamper rejection. Remote CI is pending until this change is pushed.
+- Local checks passed: bytecode-free Python syntax compile, CI YAML parse, `git diff --check`, memory integrity, positive oracle status staging, blocked-request/secret/raw negative staging, generated handoff with status draft, release-readiness audit, and status-draft safety tamper rejection.
+- GitHub Prometheus CI, Security Audit, and Pages passed for `3d02326`; live GitHub Pages `whitepaper.html` includes public oracle status-draft staging wording.
 
 ## 2026-07-11
 
