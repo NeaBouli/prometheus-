@@ -42,6 +42,7 @@ If criterion 1, 2, or 3 is NOT met: automatic REJECTED (no NEEDS_CHANGES).
 | Sprint-5 Voting       | 1.0     | 2026-03-22 | Claude  | ACCEPTED        | 3 modules, 29 tests, no fixes                        |
 | Sprint-6 E2E          | 1.0     | 2026-03-22 | Claude  | ACCEPTED        | 4 test suites, 18 tests, no fixes                    |
 | Sprint-7 Dashboard    | 1.0     | 2026-03-22 | Claude  | ACCEPTED        | Dashboard, README, WHITEPAPER.md                     |
+| scripts/autodidactic.py | 1.1   | 2026-07-12 | Codex   | ACCEPTED        | Regression suite added for memory loading, padded dependency/status table handling, task completion, and blocker detection |
 
 ---
 

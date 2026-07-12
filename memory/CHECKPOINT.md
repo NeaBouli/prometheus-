@@ -13,8 +13,8 @@
 | Repo | https://github.com/NeaBouli/prometheus- |
 | Branch | main |
 | Lokaler Pfad | ~/Desktop/prometheus |
-| Letzter grün verifizierter Produkt-/Tooling-Commit | 4d7a6b8 — ci: verify public deploy receipt evidence |
-| Aktuelle lokale Tooling-Erweiterung | Public node/explorer receipt-evidence verifier lokal und remote grün |
+| Letzter grün verifizierter Produkt-/Tooling-Commit | ffbad55 — docs: record receipt evidence ci |
+| Aktuelle lokale Tooling-Erweiterung | Autodidactic workflow helper hardened and stdlib regression suite wired into CI; remote confirmation pending until next push |
 | Aktueller HEAD | Mit `git log --oneline -1` prüfen; Bridge-/Status-Commits können neuer sein |
 | Rollback-Tag | `pre-session-20260413` → `6347b85` |
 | Whitepaper | WHITEPAPER.md (root) + whitepaper.html (styled), status refreshed and verified 2026-07-11 |
@@ -112,7 +112,7 @@
 **STARTFLOW — Lies dies zuerst:**
 ```
 1. cd /Users/gio/Desktop/repos/prometheus
-2. git log --oneline -5              → aktuellen HEAD prüfen; letzter dokumentierter grün verifizierter Produkt-/Tooling-Commit = 4d7a6b8
+2. git log --oneline -5              → aktuellen HEAD prüfen; letzter dokumentierter grün verifizierter Produkt-/Tooling-Commit = ffbad55
 3. git tag -l                        → Rollback: pre-session-20260413
 4. cargo test 2>&1 | tail -5         → Muss grün sein
 5. Lies BACKLOG.md                   → Priorisierte Task-Liste

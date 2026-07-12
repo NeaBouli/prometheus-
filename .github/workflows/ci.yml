@@ -18,6 +18,8 @@ jobs:
           python-version: '3.11'
       - name: Check Memory Files
         run: python3 scripts/check_memory_integrity.py
+      - name: Test Autodidactic Workflow Helper
+        run: python3 scripts/test_autodidactic.py
 
   # ─── Silverscript Contract Lint ─────────────────────────────────────────────
   contract-check:

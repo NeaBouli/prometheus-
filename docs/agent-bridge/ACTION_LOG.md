@@ -2,6 +2,9 @@
 
 ## 2026-07-12
 
+- Hardened `scripts/autodidactic.py`, the local agent workflow helper: dependency checks and status updates now handle padded Markdown table cells, and `mark_completed` can close in-progress or blocked tasks.
+- Added `scripts/test_autodidactic.py`, a stdlib-only regression suite for memory loading, priority/dependency selection, task completion, status replacement, and blocker detection. Prometheus CI now runs this suite in the Memory Integrity job.
+- Local checks passed for the Autodidactic hardening: `python3 scripts/test_autodidactic.py` and `python3 -m py_compile scripts/autodidactic.py scripts/test_autodidactic.py`.
 - Added `scripts/verify_silverc_deploy_receipt_evidence.py`, a public-only verifier that binds verified `operator_record` deployment receipts to public node/explorer evidence snapshots. It checks release-bundle metadata, receipts SHA-256, one confirmed observation per receipt, deploy transaction IDs, block hashes, confirmations, and rejects secret-like plus raw/serialized transaction fields without querying nodes, accepting keys, signing, broadcasting, deploying, or updating status files.
 - Extended `scripts/build_silverc_operator_handoff.py` with optional `--deploy-receipt-evidence`; when real operator receipts are present, missing public receipt evidence is now a blocker.
 - Extended `scripts/audit_silverc_release_readiness.py` so public receipt evidence files and safety flags are required before `ROLLOUT_READY`.

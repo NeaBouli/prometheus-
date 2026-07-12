@@ -141,8 +141,10 @@ class PrometheusAutodidactic:
         for dep in required:
             if not dep:
                 continue
-            # Prüfe ob Dependency in STATUS.md als DONE oder ACCEPTED markiert
-            pattern = rf'\| {re.escape(dep)} \| (DONE|ACCEPTED) \|'
+            # Prüfe ob Dependency in STATUS.md als DONE oder ACCEPTED markiert.
+            # Markdown tables in STATUS.md use padded cells, so match whitespace
+            # around cell contents instead of requiring exact single spaces.
+            pattern = rf'\|\s*{re.escape(dep)}\s*\|\s*(DONE|ACCEPTED)\s*\|'
             if not re.search(pattern, status_content):
                 return False
         return True
@@ -174,9 +176,9 @@ class PrometheusAutodidactic:
         """Markiert eine Task in TODO.md als erledigt."""
         todo_content = self._read_file(self.memory_files["todo"])
 
-        # Ersetze [ ] durch [x]
+        # Ersetze offene/in-progress/blockierte Task mit [x]
         new_content = re.sub(
-            rf'- \[ \] (\[P[0-3]\] {re.escape(task_desc)}.*?)$',
+            rf'- \[[ ~!]\] (\[P[0-3]\] {re.escape(task_desc)}.*?)$',
             rf'- [x] \1 | Completed: {datetime.now().strftime("%Y-%m-%d")}',
             todo_content,
             flags=re.MULTILINE
@@ -228,11 +230,14 @@ class PrometheusAutodidactic:
         today = datetime.now().strftime('%Y-%m-%d')
 
         # Prüfe ob Modul bereits existiert
-        pattern = rf'\| {re.escape(module)} \| \S+ \| \d+% \| .+ \| .+ \|'
+        pattern = (
+            rf'^\|\s*{re.escape(module)}\s*\|\s*[^|]+\|\s*\d+%\s*\|'
+            rf'\s*[^|]+\|\s*[^|]+\|\s*[^|]+\|$'
+        )
         new_row = f"| {module} | {status} | {progress}% | {today} | PENDING_AUDIT | {address} |"
 
-        if re.search(pattern, status_content):
-            new_content = re.sub(pattern, new_row, status_content)
+        if re.search(pattern, status_content, flags=re.MULTILINE):
+            new_content = re.sub(pattern, new_row, status_content, flags=re.MULTILINE)
         else:
             # Finde richtige Tabellen-Sektion und füge ein
             new_content = status_content + f"\n{new_row}"
