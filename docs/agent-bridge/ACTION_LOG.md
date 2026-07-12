@@ -1,5 +1,14 @@
 # Action Log
 
+## 2026-07-12
+
+- Added `scripts/stage_metrics_oracle_status.py`, a public-only metrics-oracle status staging guard. It validates a signer-ready unsigned request plus public `operator_record` tx result, emits JSON/Markdown manual status drafts, rejects blocked requests, secret-like fields, and raw/serialized transactions, and does not write `memory/STATUS.md`.
+- Extended `scripts/build_silverc_operator_handoff.py` so `--metrics-tx-result` also includes `metrics-oracle-status-draft.json/.md` and exposes `metrics_oracle_status_draft_status`.
+- Extended `scripts/audit_silverc_release_readiness.py` so verified oracle tx results require a safe oracle status draft before rollout readiness can be claimed.
+- Extended Prometheus CI with oracle status staging positive coverage plus blocked-request, request-secret, result-secret, raw-transaction, handoff, readiness, and status-draft safety-tamper assertions.
+- Updated README, Whitepaper, public `whitepaper.html`, roadmap, Silverc module docs, llms.txt, Backlog, Memory, and Bridge to describe oracle status-draft staging as a guard, not a deploy/status claim.
+- Local checks passed: bytecode-free Python syntax compile, CI YAML parse, `git diff --check`, memory integrity, positive oracle status staging, blocked-request/secret/raw negative staging, generated handoff with status draft, release-readiness audit, and status-draft safety tamper rejection. Remote CI is pending until this change is pushed.
+
 ## 2026-07-11
 
 - Added `scripts/build_silverc_deploy_operator_procedure.py`, a public-only deploy operator procedure builder for verified Silverc deploy request sets. It emits the external deploy checklist, per-contract request bindings, and required public `operator_record` result fields without accepting keys, raw transactions, signing material, deployment, or status writes.

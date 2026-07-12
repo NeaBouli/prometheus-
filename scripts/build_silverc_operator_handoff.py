@@ -338,6 +338,28 @@ def run_metrics_tx_result_verification(archive: Path, out_dir: Path, metrics_tx_
     return load_json(summary_path)
 
 
+def run_metrics_oracle_status_staging(archive: Path, out_dir: Path, metrics_tx_result: Path) -> dict[str, Any]:
+    status_path = out_dir / "metrics-oracle-status-draft.json"
+    snippet_path = out_dir / "metrics-oracle-status-draft.md"
+    run(
+        [
+            sys.executable,
+            "scripts/stage_metrics_oracle_status.py",
+            "--archive",
+            str(archive),
+            "--tx-request",
+            str(out_dir / "metrics-oracle-tx-request.json"),
+            "--tx-result",
+            str(metrics_tx_result),
+            "--status-out",
+            str(status_path),
+            "--snippet-out",
+            str(snippet_path),
+        ]
+    )
+    return load_json(status_path)
+
+
 def status_from_components(
     deploy_plan: dict[str, Any],
     operator_receipts: dict[str, Any] | None,
@@ -397,6 +419,7 @@ def write_handoff_markdown(out_dir: Path, summary: dict[str, Any]) -> None:
             f"- Metrics tx request: {summary['metrics_tx_request_status']}",
             f"- Metrics operator procedure: {summary['metrics_operator_procedure_status']}",
             f"- Metrics tx result: {summary['metrics_tx_result_status']}",
+            f"- Metrics oracle status draft: {summary['metrics_oracle_status_draft_status']}",
             "",
             "## Blockers",
             "",
@@ -475,8 +498,14 @@ def main() -> int:
     if tx_request["status"] == "READY_FOR_EXTERNAL_TX_ASSEMBLER":
         metrics_operator_procedure = run_metrics_operator_procedure(packaged_archive, out_dir)
     tx_result_summary = None
+    metrics_oracle_status_draft = None
     if metrics_tx_result_path:
         tx_result_summary = run_metrics_tx_result_verification(packaged_archive, out_dir, metrics_tx_result_path)
+        metrics_oracle_status_draft = run_metrics_oracle_status_staging(
+            packaged_archive,
+            out_dir,
+            metrics_tx_result_path,
+        )
 
     status, blockers = status_from_components(deploy_plan, operator_receipts_summary, tx_request, tx_result_summary)
     summary = {
@@ -503,6 +532,9 @@ def main() -> int:
             metrics_operator_procedure["status"] if metrics_operator_procedure else "NOT_READY_TX_REQUEST_BLOCKED"
         ),
         "metrics_tx_result_status": tx_result_summary["status"] if tx_result_summary else "NOT_PROVIDED",
+        "metrics_oracle_status_draft_status": (
+            metrics_oracle_status_draft["status"] if metrics_oracle_status_draft else "NOT_PROVIDED"
+        ),
         "safety": {
             "accepts_private_keys": False,
             "signs_transactions": False,

@@ -59,7 +59,9 @@ GovernanceAutoTuning artifact hashes for external assembly, an external
 oracle-operator procedure defines the public signing/broadcast checklist and
 required result evidence, and a public tx-result verifier checks confirmed
 transaction records against the request and release bundle without accepting
-signing material or raw transaction payloads.
+signing material or raw transaction payloads. A metrics-oracle status staging
+guard emits only a manual status-update draft from verified public tx results
+and does not write status files.
 A release-readiness auditor now checks the generated handoff package, required
 files, component summaries, safety flags, and JSON secret/raw-transaction
 hygiene before any rollout claim. The remaining deployment blockers are the
@@ -82,6 +84,7 @@ assembly/signing/broadcast/deploy operation, and final release hardening.
 - Keep the unsigned metrics-oracle tx-request builder green and free of signing material
 - Keep the external oracle operator procedure green and free of signing/raw transaction material
 - Keep public oracle tx-result verification green and free of signing/raw transaction material
+- Keep public oracle status staging guarded against blocked requests, secrets, and raw transactions
 - Compile and deploy all 6 contracts to Kaspa Mainnet only after verification passes
 - Integrate kaspa-zk-params crate (real Groth16, replacing stub)
 - Implement PROM emission contract (minting logic)

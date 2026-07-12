@@ -60,6 +60,8 @@ OPERATOR_RECEIPT_IMPORT_FILES = {
 METRICS_TX_RESULT_FILES = {
     "metrics-oracle-tx-result-summary.json",
     "metrics-oracle-tx-result.md",
+    "metrics-oracle-status-draft.json",
+    "metrics-oracle-status-draft.md",
 }
 METRICS_OPERATOR_PROCEDURE_FILES = {
     "metrics-oracle-operator-procedure.json",
@@ -254,9 +256,19 @@ def validate_component_summaries(root: Path, handoff: dict[str, Any]) -> dict[st
     if handoff.get("metrics_tx_result_status") == "METRICS_ORACLE_TX_RESULT_VERIFIED":
         tx_result = require_json(root, "metrics-oracle-tx-result-summary.json")
         expect_status(tx_result, "status", "METRICS_ORACLE_TX_RESULT_VERIFIED", "metrics-oracle-tx-result-summary")
+        status_draft = require_json(root, "metrics-oracle-status-draft.json")
+        expect_status(
+            status_draft,
+            "status",
+            handoff["metrics_oracle_status_draft_status"],
+            "metrics-oracle-status-draft",
+        )
+        validate_safety(status_draft, OPERATOR_PROCEDURE_FALSE_SAFETY_FLAGS, "metrics-oracle-status-draft")
         statuses["metrics_tx_result"] = tx_result["status"]
+        statuses["metrics_oracle_status_draft"] = status_draft["status"]
     else:
         statuses["metrics_tx_result"] = handoff.get("metrics_tx_result_status", "UNKNOWN")
+        statuses["metrics_oracle_status_draft"] = handoff.get("metrics_oracle_status_draft_status", "UNKNOWN")
 
     return statuses
 
@@ -293,6 +305,7 @@ def validate_handoff(root: Path) -> dict[str, Any]:
         and handoff.get("metrics_tx_request_status") == "READY_FOR_EXTERNAL_TX_ASSEMBLER"
         and handoff.get("metrics_operator_procedure_status") == "READY_FOR_EXTERNAL_ORACLE_OPERATOR"
         and handoff.get("metrics_tx_result_status") == "METRICS_ORACLE_TX_RESULT_VERIFIED"
+        and handoff.get("metrics_oracle_status_draft_status") == "READY_FOR_MANUAL_ORACLE_STATUS_UPDATE"
         and not readiness_blockers
     )
 
