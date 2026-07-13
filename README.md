@@ -78,6 +78,8 @@ Off-Chain:           Phi-3-mini (local AI) | LLaMA 3 (guardian AI) | Fed-DART (f
 
 **Covenant genesis compatibility:** The public deploy procedure now requires an external operator to attest the official SilverScript genesis shape: Kaspa transaction version 1, P2SH from the compiled contract script, covenant-ID derivation from the funding outpoint plus unbound genesis outputs, and binding to the funding input only after that ID is derived. CI rejects any capability record that changes these invariants; signing and broadcast remain outside this repository.
 
+**Release governance:** `main` is PR-only with strict up-to-date branches, linear history, resolved conversations, nine required CI/Security checks, admin enforcement, and blocked force pushes/deletion. While the repository has only one collaborator, formal approvals are set to zero because GitHub does not permit self-approval; the required approval count returns to one when a second collaborator is added.
+
 ---
 
 ## Links
