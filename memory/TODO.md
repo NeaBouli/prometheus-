@@ -18,7 +18,7 @@
 - [x] [P0] GH-7 official public-resolver mode + funding-free testnet-10 probe | Codex | PR #8 merged as `288ea18`; main CI `29408432584`, Security `29408432511`, and Pages `29408431512` pass
 - [x] [P0] GH-17 Genesis-Operator Signed-Shape Fee/Mass-Härtung | Codex | PR #18 merged as `9477fab`; exact-main CI/Security/Pages green; schema-v2 request rebuilt deterministically
 - [x] [P0] GH-9 kanonischen Public-Signature-Import härten | Codex | PR #23 merged as `f79150d`; 38 focused tests, independent review, exact-main CI/Security/Pages, and live Whitepaper pass
-- [~] [P0] GH-25 keyless GovernanceAutoTuning `reportMetrics` operator | Codex | Two-input value-preserving Rust transition, separate P2PK fee sponsor, dual external BIP340 verification, complete input execution, live UTXO checks, acknowledged journaled broadcast, successor observation, 49 deployer tests, full local CI job, and independent review pass; PR/exact-main verification pending
+- [x] [P0] GH-25 keyless GovernanceAutoTuning `reportMetrics` operator | Codex | Two-input value-preserving Rust transition, separate P2PK fee sponsor, dual external BIP340 verification, complete input execution, live UTXO checks, acknowledged journaled broadcast, successor observation, 49 deployer tests, independent review, PR #26, exact-main CI/Security/Pages, and live Whitepaper pass at `072f04a`; real chain operation/evidence continues under rollout execution gates
 - [!] [P0] GH-9 `ValidatorStakingH001` Canary auf testnet-10 ausführen | Codex + externer Signer | Funding/identity and exact-main schema-v2 request/digest confirmed; explicit external BIP340 response, operator verification, one-shot broadcast, confirmation, receipt, and independent evidence remain
 - [x] [P0] rusty-kaspa als Dependency in Cargo.toml einbinden | Claude Code | 2026-03-21; pinned to v2.0.1 on 2026-07-07
 - [x] [P0] autodidactic.py vollständig testen (alle Memory-Operationen) | Codex | 2026-07-12; stdlib regression suite covers memory loading, next-task priority/dependency selection, in-progress completion, padded STATUS row replacement, and blocker detection; wired into Prometheus CI Memory Integrity job
@@ -167,7 +167,7 @@
 - [ ] [P1] LLaMA 3 8B LoRA Fine-Tuning auf Security-Datensätzen | Claude Code | Datensätze
 - [ ] [P1] LLaMA 3 70B Fine-Tuning | Claude Code | 8B done
 - [ ] [P2] Fed-DART echte Implementierung (Gradient-Aggregation) | Claude Code | -
-- [~] [P2] fp_rate Oracle Contract + Integration | Codex | Current-Silverc contract gate and repository-owned two-input keyless transition operator pass locally with dual external BIP340 verification, value preservation, separate P2PK fee sponsor, guarded broadcast, and successor observation; GH-25 PR/exact-main checks plus real public inputs/signatures/confirmation/evidence remain
+- [~] [P2] fp_rate Oracle Contract + Integration | Codex | Current-Silverc contract gate and repository-owned two-input keyless transition operator are merged and exact-main verified at `072f04a` with dual external BIP340 verification, value preservation, separate P2PK fee sponsor, guarded broadcast, and successor observation; real public inputs/signatures/confirmation/evidence remain
 
 ---
 

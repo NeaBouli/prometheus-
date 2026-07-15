@@ -423,3 +423,13 @@ Rules for all dev agents:
 - Local verification passed: 49 deployer tests including 11 focused metrics-transition tests, warning-free workspace Clippy, full workspace tests, Rustfmt, Python compilation, Memory Integrity, six Autodidactic tests, CI YAML parsing, 55 pinned upstream Silverc tests, seven-artifact deterministic release build, and every executable step of the Current Silverc Runtime + Artifact Smoke job.
 - Updated README, Whitepaper Markdown/HTML, roadmap, Silverc operator docs, `llms.txt`, Bridge, Memory, and this action log. Core rollout estimate is now 68-72%; real UTXOs, external oracle/sponsor signatures, confirmed successor evidence, remaining deployments, and exact-commit release evidence remain open.
 - No wallet file, private key, secret, signature, raw transaction, or real broadcast was accessed or produced. PR, remote checks, merge, and exact-main verification remain pending.
+
+## 2026-07-16 GH-25 merge and exact-main evidence
+
+- PR #26 merged normally by squash without admin bypass as `072f04a7b6dbdb77970b9d51c6bb13ff79b3ee72`; issue #25 closed automatically.
+- All nine branch-protected PR contexts passed. Optional CodeRabbit remained stale in `Review in progress` without a review thread or finding; the independent Terra review and full automated gates supplied the substantive review evidence.
+- The first exact-main Prometheus CI, Security Audit, and Pages attempts froze concurrently in unrelated long-running steps for about ten hours. They were cancelled and rerun for the same merge SHA; no test failure was recorded.
+- Exact-main attempt 2 passed: Prometheus CI `29453756167`, Security Audit `29453756135`, and Pages `29453755086`.
+- Live `whitepaper.html` was fetched successfully and contains the merged `reportMetrics`, fee-sponsor, BIP340, keyless, and Kaspa-L1 wording.
+- GH-25 software, documentation, and CI are accepted. Real predecessor/sponsor UTXOs, two external signatures, acknowledged broadcast, confirmation, successor evidence, and exact-rollout release evidence remain operational gates.
+- No wallet file, private key, secret, signature, raw transaction, or broadcast was accessed or produced. Foreign untracked `Prometheus-1.png` remained untouched and uninspected.

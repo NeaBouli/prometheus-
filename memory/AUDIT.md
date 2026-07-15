@@ -44,7 +44,7 @@ If criterion 1, 2, or 3 is NOT met: automatic REJECTED (no NEEDS_CHANGES).
 | Sprint-7 Dashboard    | 1.0     | 2026-03-22 | Claude  | ACCEPTED        | Dashboard, README, WHITEPAPER.md                     |
 | scripts/autodidactic.py | 1.1   | 2026-07-12 | Codex   | ACCEPTED        | Regression suite added for memory loading, padded dependency/status table handling, task completion, and blocker detection |
 | Miner Companion Foundation | 0.1 | 2026-07-16 | Codex + Terra + Spark | ACCEPTED | Safe Phase-1 boundary and all review findings resolved; PR #14 plus exact-merge CI/Security/Pages and live Whitepaper verification pass |
-| Keyless reportMetrics Operator | 0.1 | 2026-07-16 | Codex + Terra | PENDING_AUDIT | Local implementation and independent review pass: exact state/value binding, separate P2PK fee sponsor, dual external BIP340 verification, full input execution, UTXO revalidation, collision guards, journal recovery, 49 deployer tests, and full local Silverc CI job; PR/exact-main CI/Security/Pages pending |
+| Keyless reportMetrics Operator | 0.1 | 2026-07-16 | Codex + Terra | ACCEPTED | Exact state/value binding, separate P2PK fee sponsor, dual external BIP340 verification, full input execution, UTXO revalidation, collision guards, journal recovery, 49 deployer tests, independent review, PR #26, exact-main CI/Security/Pages, and live Whitepaper pass at `072f04a`; real chain operation/evidence remains gated |
 
 ---
 
@@ -694,6 +694,20 @@ and independent Terra review pass. PR #23 merged as exact main
 Security Audit `29449066352`, Pages `29449065192`, and live Whitepaper
 verification pass. No wallet, private material, signature, raw signed
 transaction, or broadcast was used.
+
+**AUDIT UPDATE 2026-07-16:** GH-25 merged normally through PR #26 as exact main
+`072f04a7b6dbdb77970b9d51c6bb13ff79b3ee72`. The protected PR checks and
+independent Terra review passed after the stale Handoff instruction was fixed.
+Optional CodeRabbit remained stuck without emitting a review, thread, or
+finding. The first exact-main CI/Security/Pages attempts froze concurrently in
+unrelated steps and were cancelled after about ten hours; rerun attempt 2 for
+the same SHA passed as Prometheus CI `29453756167`, Security Audit
+`29453756135`, and Pages `29453755086`. Live Whitepaper verification contains
+the merged keyless metrics-transition boundaries. GH-25 software/docs/CI are
+accepted. Real state and sponsor UTXOs, two external BIP340 signatures,
+acknowledged broadcast, confirmation, successor evidence, and exact-rollout
+release evidence remain operational gates. No wallet, private material,
+signature, raw transaction, or broadcast was used.
 
 *Audit completed 2026-04-02 by Claude Code (5 parallel agents, 7 levels, 35 checks).*
 *The fire belongs to humanity.*
