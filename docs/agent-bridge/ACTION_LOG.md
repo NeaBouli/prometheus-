@@ -393,3 +393,7 @@ Rules for all dev agents:
 - Local verification passed: Memory Integrity, six Autodidactic tests, JSON-LD parsing for all four structured public pages, SEO marker checks, stale-status scan, `git diff --check`, and staged Gitleaks v8.30.1 with no findings.
 - Responsive browser verification passed at 1440x1000 and 390x844 with no document overflow. A pre-existing mobile overflow in the roadmap hardware table/footer was fixed with contained table scrolling and wrapped footer links.
 - Preserved the signing boundary: no wallet access, private material, signature, raw signed transaction, or broadcast occurred. Foreign untracked `Prometheus-1.png` remains untouched.
+- CodeRabbit's only actionable finding was valid: the new section initially interrupted an older action-log entry. It was moved intact to the file end before merge; all rerun PR checks passed.
+- PR #21 merged normally without admin bypass as `9e28629d81ca19a8716618034d5117922e8bfb8f`; issue #20 closed.
+- Exact-main Prometheus CI `29446061787`, Security Audit `29446061842`, and Pages `29446060342` passed. Live `index.html` and `roadmap.html` contain the merged readiness-gated status and progress estimates.
+- The Bridge header now records a merge-safe verified baseline rather than a transient documentation branch. The next real blocker is unchanged: explicit external BIP340 signing approval and verified H-001 canary execution/evidence.
