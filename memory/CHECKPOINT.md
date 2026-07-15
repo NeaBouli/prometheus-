@@ -11,10 +11,10 @@
 |------|------|
 | Projekt | Prometheus — Decentralized AI Threat Intelligence |
 | Repo | https://github.com/NeaBouli/prometheus- |
-| Branch | `docs/GH-7-closeout` from merged baseline `288ea18` |
+| Branch | `main` at merged baseline `6213c559` (create a task branch before edits) |
 | Lokaler Pfad | /Users/gio/Desktop/repos/prometheus |
 | Letzter grün verifizierter Produkt-/Tooling-Commit | `4176093` — GH-4 closeout baseline; main CI `29406057800`, Security `29406057729`, Pages `29406056965` green |
-| Aktuelle Tooling-Baseline | GH-7 TLS-only official public resolver plus funding-free testnet-10 node/Toccata probe merged as `288ea18`; 30 Rust tests and main CI/Security/Pages pass |
+| Aktuelle Tooling-Baseline | GH-9 manifest-bound, non-promotable H-001 testnet-10 canary profile merged as `6213c559`; 32 focused deployer tests and exact-merge CI/Security/Pages pass |
 | Aktueller HEAD | Mit `git log --oneline -1` prüfen; Bridge-/Status-Commits können neuer sein |
 | Rollback-Tag | `pre-session-20260413` → `6347b85` |
 | Whitepaper | WHITEPAPER.md (root) + whitepaper.html (styled), status refreshed and verified 2026-07-11 |
@@ -46,7 +46,7 @@
 - Offizielles PSKT/PSKB bleibt ausgeschlossen, solange dessen v1-Inputpfad Sigop- statt Compute-Budget-Commitments erzeugt. Pinned v2.0.1 unterstützt testnet-10, nicht testnet-12.
 - Lokal grün: Rust fmt/clippy/tests; frischer sieben-Contract Silverc-Release-Build; Python deploy preflight, request builder/verifier, operator procedure und external capability verifier.
 - GH-7 gemergt: `kaspa-resolver://public` ist TLS-only und testnet-10-only; der funding-freie Probe bestätigt einen synchronisierten, UTXO-indexierten `rusty-kaspa 2.0.1` Node über Toccata-DAA. Main CI/Security/Pages sind grün.
-- GH-9 in Arbeit: `full` bleibt das sieben-Fixture-Profil mit öffentlichem Metrics-Oracle-Key; `testnet-10-validator-staking-h001` isoliert genau einen H-001-Canary auf dem TLS-only Resolver ohne Oracle-Key. Canary-Status ist durchgehend non-promotable.
+- GH-9 Software-Handoff gemergt: PR #11 landete als `6213c559`; `full` bleibt das sieben-Fixture-Profil mit öffentlichem Metrics-Oracle-Key, während `testnet-10-validator-staking-h001` genau einen H-001-Canary auf dem TLS-only Resolver ohne Oracle-Key isoliert. Canary-Status ist durchgehend non-promotable; Prometheus CI `29412667386`, Security Audit `29412667410`, Pages `29412666483` und die Live-Whitepaper-Prüfung bestehen für den Merge.
 - Offen in Issue #9: funded public P2PK outpoint, passende öffentliche Deployer-Identität, externe BIP340-Signatur, Bestätigung und unabhängige Chain-Evidence für den Canary. Danach bleiben sechs State-Contracts, Metrics-Oracle-Transaktion und Release-Hardening für den vollständigen Rollout offen.
 
 ---
@@ -137,7 +137,7 @@
 7. Lies memory/ERRORS.md             → 12 bekannte Patterns
 ```
 
-**Status: Feature-complete through Sprint 7. Kaspa Toccata and all seven current-Silverc compile/ABI/runtime gates pass locally and in CI. GH-7 is merged and the live read-only testnet-10 resolver probe passes. GH-9 now has a closed, manifest-bound H-001 canary profile that omits the unrelated oracle key and cannot promote full readiness; 32 focused deployer tests plus the end-to-end canary regression pass locally. The immediate external gates are a funded public P2PK outpoint, matching public deployer identity, external BIP340 signature, confirmation, and independent evidence. Full rollout still requires all seven release fixtures, six state-contract deployments, the metrics-oracle transaction, and exact-commit release hardening.**
+**Status: Feature-complete through Sprint 7. Kaspa Toccata and all seven current-Silverc compile/ABI/runtime gates pass locally and in CI. GH-7 is merged and the live read-only testnet-10 resolver probe passes. GH-9's closed, manifest-bound H-001 canary profile is merged as `6213c559`, omits the unrelated oracle key, and cannot promote full readiness; 32 focused deployer tests, the end-to-end canary regression, main CI/Security/Pages, and the live whitepaper verification pass. The immediate external gates are a funded public P2PK outpoint, matching public deployer identity, external BIP340 signature, confirmation, and independent evidence. Full rollout still requires all seven release fixtures, six state-contract deployments, the metrics-oracle transaction, and exact-commit release hardening.**
 
 **Offene Tasks (priorisiert):**
 - [x] PATTERN-010 fix: Arc<Phi3Model> statt Arc<Mutex<Phi3Model>> — DONE `6347b85`
@@ -288,4 +288,4 @@ Leistungsbasierte Emission. Guardians = "Miner" (KI statt GPU).
 
 - VERDICT update 2026-07-15: H-002 is fixed; all seven current-Silverc compile/ABI/runtime gates, signed-int deployment guards, deterministic release handoff, and the merged repository-owned keyless Toccata-v1 genesis operator pass locally and in main CI. Exact contextual storage mass, compute budget 10, covenant derivation/binding, dual live-UTXO validation, digest-only external signing, full verification, fee bounds, exclusive intent journaling, retry reconciliation, RPC deadlines, and source-bound observation are covered by 27 tests plus a seven-contract integration. Funded testnet-10 signatures/receipts, independent chain evidence, the external metrics-oracle transaction, and exact-commit release evidence remain Sprint 9 blockers.
 
-*Prometheus v4.0 · Checkpoint 2026-07-15 · Last updated: seven current-Silverc runtime gates + deterministic release handoff + crash-consistent keyless Toccata-v1 genesis operator + 30 local unit/security tests + TLS-only official testnet-10 resolver probe + seven-contract integration + public receipts/evidence/status staging + metrics-oracle handoff + exact-commit release-hardening gates · The fire belongs to humanity.*
+*Prometheus v4.0 · Checkpoint 2026-07-15 · Last updated: seven current-Silverc runtime gates + deterministic release handoff + crash-consistent keyless Toccata-v1 genesis operator + 32 focused unit/security tests + manifest-bound non-promotable H-001 testnet-10 profile + TLS-only official resolver probe + seven-contract integration + public receipts/evidence/status staging + metrics-oracle handoff + exact-commit release-hardening gates · The fire belongs to humanity.*
