@@ -1,14 +1,16 @@
 use std::path::PathBuf;
+use std::str::FromStr;
 
 use anyhow::Result;
 use clap::{Parser, Subcommand, ValueEnum};
+use kaspa_consensus_core::network::NetworkId;
 use kaspa_wrpc_client::WrpcEncoding;
 use prometheus_silverc_deployer::{
     acquire_broadcast_lock, broadcast_journal_path, broadcast_verified_transaction,
     create_public_json, finalize_broadcast_journal, load_artifact, load_broadcast_journal,
     load_broadcast_result, load_deploy_request, load_funding_spec, load_signature_response,
-    load_signing_request, observe_deployed_utxo, preflight_deploy_node, prepare_broadcast_journal,
-    prepare_genesis, verify_signature_response, write_public_json,
+    load_signing_request, observe_deployed_utxo, preflight_deploy_node, preflight_node,
+    prepare_broadcast_journal, prepare_genesis, verify_signature_response, write_public_json,
 };
 
 #[derive(Debug, Clone, Copy, ValueEnum)]
@@ -38,6 +40,17 @@ struct Cli {
 
 #[derive(Debug, Subcommand)]
 enum Command {
+    /// Verify a read-only node, UTXO index, and live Toccata state without funding.
+    Probe {
+        #[arg(long)]
+        rpc_url: String,
+        #[arg(long)]
+        network_id: String,
+        #[arg(long, value_enum, default_value_t = Encoding::Borsh)]
+        encoding: Encoding,
+        #[arg(long)]
+        evidence_out: PathBuf,
+    },
     /// Verify node network, sync state, UTXO index, and live Toccata activation.
     Preflight {
         #[arg(long)]
@@ -136,6 +149,17 @@ fn rebuild_and_verify(
 #[tokio::main]
 async fn main() -> Result<()> {
     match Cli::parse().command {
+        Command::Probe {
+            rpc_url,
+            network_id,
+            encoding,
+            evidence_out,
+        } => {
+            let network_id = NetworkId::from_str(&network_id)?;
+            let evidence = preflight_node(&rpc_url, network_id, encoding.into(), true).await?;
+            write_public_json(&evidence_out, &evidence)?;
+            println!("{}", serde_json::to_string_pretty(&evidence)?);
+        }
         Command::Preflight {
             request,
             funding,

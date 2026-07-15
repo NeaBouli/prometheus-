@@ -29,7 +29,7 @@ use kaspa_consensus_core::tx::{
 use kaspa_rpc_core::{api::rpc::RpcApi, RpcError, RpcUtxosByAddressesEntry};
 use kaspa_txscript::{extract_script_pub_key_address, pay_to_script_hash_script};
 use kaspa_wrpc_client::client::{ConnectOptions, ConnectStrategy};
-use kaspa_wrpc_client::{KaspaRpcClient, WrpcEncoding};
+use kaspa_wrpc_client::{KaspaRpcClient, Resolver, WrpcEncoding};
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use serde_json::Value;
 use sha2::{Digest, Sha256};
@@ -42,6 +42,7 @@ pub const CONTRACT_OUTPUT_INDEX: u32 = 0;
 pub const FUNDING_INPUT_INDEX: u16 = 0;
 pub const SIGNING_REQUEST_KIND: &str = "prometheus.silverc.genesis.signing_request";
 pub const SIGNATURE_RESPONSE_KIND: &str = "prometheus.silverc.genesis.signature_response";
+pub const PUBLIC_TESTNET_RESOLVER: &str = "kaspa-resolver://public";
 
 const SCHNORR_SCRIPT_LEN: usize = 66;
 const RPC_REQUEST_TIMEOUT: Duration = Duration::from_secs(20);
@@ -292,6 +293,7 @@ pub struct NodePreflight {
     pub status: String,
     pub network: String,
     pub network_id: String,
+    pub rpc_target: String,
     pub rpc_url: String,
     pub server_version: String,
     pub rpc_api_version: u16,
@@ -462,6 +464,22 @@ fn consensus_params(network_id: NetworkId) -> Result<Params> {
 }
 
 fn validate_rpc_url(value: &str) -> Result<()> {
+    if value == PUBLIC_TESTNET_RESOLVER {
+        return Ok(());
+    }
+    let normalized = value.to_ascii_lowercase();
+    if SECRET_MARKERS
+        .iter()
+        .any(|marker| normalized.contains(marker))
+    {
+        bail!("rpc_url must not contain secret-like text");
+    }
+    let (_, authority) = value
+        .split_once("://")
+        .ok_or_else(|| anyhow!("rpc_url must use ws:// or wss:// for Kaspa wRPC"))?;
+    if authority.is_empty() || authority.starts_with('/') {
+        bail!("rpc_url must include a host");
+    }
     let url = Url::parse(value).context("invalid rpc_url")?;
     if !matches!(url.scheme(), "ws" | "wss") {
         bail!("rpc_url must use ws:// or wss:// for Kaspa wRPC");
@@ -469,8 +487,18 @@ fn validate_rpc_url(value: &str) -> Result<()> {
     if !url.username().is_empty() || url.password().is_some() {
         bail!("rpc_url must not contain credentials");
     }
+    if url.host_str().is_none() {
+        bail!("rpc_url must include a host");
+    }
     if url.query().is_some() || url.fragment().is_some() {
         bail!("rpc_url must not contain query strings or fragments");
+    }
+    Ok(())
+}
+
+fn validate_resolver_network(network_id: NetworkId) -> Result<()> {
+    if network_id.network_type() != NetworkType::Testnet || network_id.suffix() != Some(10) {
+        bail!("the official public resolver is restricted to testnet-10 deployments");
     }
     Ok(())
 }
@@ -612,6 +640,9 @@ pub fn load_deploy_request(path: &Path) -> Result<DeployRequest> {
         bail!("unsupported deploy request schema/type/status/safety_scope");
     }
     validate_rpc_url(&request.rpc_url)?;
+    if request.rpc_url == PUBLIC_TESTNET_RESOLVER && request.network != "testnet" {
+        bail!("the official public resolver is restricted to testnet requests");
+    }
     Ok(request)
 }
 
@@ -681,6 +712,9 @@ pub fn validate_signing_request(request: &SigningRequest) -> Result<()> {
     }
     validate_rpc_url(&request.rpc_url)?;
     let network_id = NetworkId::from_str(&request.network_id)?;
+    if request.rpc_url == PUBLIC_TESTNET_RESOLVER {
+        validate_resolver_network(network_id)?;
+    }
     let params = consensus_params(network_id)?;
     if request.network != request_network_for(network_id) {
         bail!("signing request network does not match network_id");
@@ -791,6 +825,9 @@ pub fn prepare_genesis(
         bail!("request, artifact, and funding contract bindings do not match");
     }
     let network_id = NetworkId::from_str(&funding.network_id).context("invalid network_id")?;
+    if request.rpc_url == PUBLIC_TESTNET_RESOLVER {
+        validate_resolver_network(network_id)?;
+    }
     let params = consensus_params(network_id)?;
     if request.network != request_network_for(network_id) {
         bail!("request network does not match funding network_id");
@@ -1064,7 +1101,19 @@ async fn connect_rpc(
     encoding: WrpcEncoding,
 ) -> Result<KaspaRpcClient> {
     validate_rpc_url(rpc_url)?;
-    let client = KaspaRpcClient::new(encoding, Some(rpc_url), None, Some(network_id), None)?;
+    let resolved_url = if rpc_url == PUBLIC_TESTNET_RESOLVER {
+        validate_resolver_network(network_id)?;
+        let resolver = Resolver::new(None, true);
+        let resolved = timeout(RPC_REQUEST_TIMEOUT, resolver.get_url(encoding, network_id))
+            .await
+            .map_err(|_| rpc_timeout("resolve official public endpoint"))?
+            .context("failed to resolve official public Kaspa wRPC endpoint")?;
+        validate_resolved_public_rpc_url(&resolved)?;
+        resolved
+    } else {
+        rpc_url.to_string()
+    };
+    let client = KaspaRpcClient::new(encoding, Some(&resolved_url), None, Some(network_id), None)?;
     let options = ConnectOptions {
         block_async_connect: true,
         connect_timeout: Some(Duration::from_secs(15)),
@@ -1078,8 +1127,18 @@ async fn connect_rpc(
     Ok(client)
 }
 
+fn validate_resolved_public_rpc_url(value: &str) -> Result<()> {
+    validate_rpc_url(value)?;
+    let url = Url::parse(value).context("invalid resolved public rpc_url")?;
+    if url.scheme() != "wss" {
+        bail!("official public resolver must return a wss:// endpoint");
+    }
+    Ok(())
+}
+
 async fn inspect_node(
     client: &KaspaRpcClient,
+    rpc_target: &str,
     expected_network_id: NetworkId,
     params: &Params,
     require_utxo_index: bool,
@@ -1110,10 +1169,18 @@ async fn inspect_node(
     Ok(NodePreflight {
         schema_version: 1,
         evidence_type: "prometheus_silverc_toccata_node_preflight".to_string(),
-        status: "TOCCATA_NODE_READY".to_string(),
+        status: if rpc_target == PUBLIC_TESTNET_RESOLVER {
+            "TOCCATA_PUBLIC_RESOLVER_NODE_READY"
+        } else {
+            "TOCCATA_NODE_READY"
+        }
+        .to_string(),
         network: request_network_for(expected_network_id).to_string(),
         network_id: expected_network_id.to_string(),
-        rpc_url: client.url().unwrap_or_default(),
+        rpc_target: rpc_target.to_string(),
+        rpc_url: client.url().ok_or_else(|| {
+            anyhow!("connected Kaspa client did not expose its resolved wRPC URL")
+        })?,
         server_version: info.server_version,
         rpc_api_version: info.rpc_api_version,
         rpc_api_revision: info.rpc_api_revision,
@@ -1134,7 +1201,7 @@ pub async fn preflight_node(
 ) -> Result<NodePreflight> {
     let params = consensus_params(network_id)?;
     let client = connect_rpc(rpc_url, network_id, encoding).await?;
-    let result = inspect_node(&client, network_id, &params, require_utxo_index).await;
+    let result = inspect_node(&client, rpc_url, network_id, &params, require_utxo_index).await;
     let _ = client.disconnect().await;
     result
 }
@@ -1161,7 +1228,7 @@ pub async fn preflight_deploy_node(
     let funding_outpoint = funding.funding_outpoint.to_outpoint()?;
     let params = consensus_params(network_id)?;
     let client = connect_rpc(&request.rpc_url, network_id, encoding).await?;
-    let node = match inspect_node(&client, network_id, &params, true).await {
+    let node = match inspect_node(&client, &request.rpc_url, network_id, &params, true).await {
         Ok(node) => node,
         Err(error) => {
             let _ = client.disconnect().await;
@@ -1467,7 +1534,9 @@ pub async fn broadcast_verified_transaction(
     let contract_address = Address::try_from(signing_request.contract_address.as_str())?;
     let expected_tx_id = TransactionId::from_str(&signing_request.unsigned_transaction_id)?;
     let client = connect_rpc(&signing_request.rpc_url, network_id, encoding).await?;
-    if let Err(error) = inspect_node(&client, network_id, &params, true).await {
+    if let Err(error) =
+        inspect_node(&client, &signing_request.rpc_url, network_id, &params, true).await
+    {
         let _ = client.disconnect().await;
         return Err(error);
     }
@@ -1590,7 +1659,9 @@ pub async fn observe_deployed_utxo(
         bail!("contract address prefix does not match network_id");
     }
     let client = connect_rpc(&signing_request.rpc_url, network_id, encoding).await?;
-    if let Err(error) = inspect_node(&client, network_id, &params, true).await {
+    if let Err(error) =
+        inspect_node(&client, &signing_request.rpc_url, network_id, &params, true).await
+    {
         let _ = client.disconnect().await;
         return Err(error);
     }
@@ -2098,6 +2169,50 @@ mod tests {
         let error =
             prepare_genesis(&request, &artifact, &funding).expect_err("simnet must fail closed");
         assert!(error.to_string().contains("does not activate Toccata"));
+    }
+
+    #[test]
+    fn accepts_only_the_exact_public_testnet_resolver_target() {
+        validate_rpc_url(PUBLIC_TESTNET_RESOLVER).unwrap();
+        validate_resolver_network(NetworkId::from_str("testnet-10").unwrap()).unwrap();
+
+        for target in [
+            "kaspa-resolver://public/extra",
+            "kaspa-resolver://user@public",
+            "kaspa-resolver://public?node=other",
+            "https://resolver.example.invalid",
+            "ws:///missing-host",
+            "wss://node.example.invalid/token-path",
+        ] {
+            assert!(validate_rpc_url(target).is_err(), "accepted {target}");
+        }
+    }
+
+    #[test]
+    fn public_resolver_is_restricted_to_testnet_10() {
+        assert!(NetworkId::from_str("testnet").is_err());
+        for network in ["mainnet", "testnet-11", "testnet-12", "devnet"] {
+            let network_id = NetworkId::from_str(network).unwrap();
+            let error = validate_resolver_network(network_id)
+                .expect_err("public resolver must remain testnet-10-only");
+            assert!(error.to_string().contains("restricted to testnet-10"));
+        }
+    }
+
+    #[test]
+    fn resolved_public_endpoint_must_remain_tls_and_public() {
+        validate_resolved_public_rpc_url("wss://node.example.invalid/kaspa/testnet-10/wrpc/borsh")
+            .unwrap();
+        for endpoint in [
+            "ws://node.example.invalid/kaspa/testnet-10/wrpc/borsh",
+            "wss://user@node.example.invalid/kaspa/testnet-10/wrpc/borsh",
+            "wss://node.example.invalid/kaspa/testnet-10/wrpc/borsh?token=value",
+        ] {
+            assert!(
+                validate_resolved_public_rpc_url(endpoint).is_err(),
+                "accepted {endpoint}"
+            );
+        }
     }
 
     #[test]

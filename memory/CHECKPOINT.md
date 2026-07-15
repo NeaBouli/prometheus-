@@ -11,10 +11,10 @@
 |------|------|
 | Projekt | Prometheus — Decentralized AI Threat Intelligence |
 | Repo | https://github.com/NeaBouli/prometheus- |
-| Branch | `main` (`ea67b93`; GH-4 merged via PR #5 on 2026-07-15) |
+| Branch | `feature/GH-7-public-resolver-probe` from merged baseline `4176093` |
 | Lokaler Pfad | /Users/gio/Desktop/repos/prometheus |
-| Letzter grün verifizierter Produkt-/Tooling-Commit | ea67b93 — GH-4 keyless Toccata-v1 operator; main CI/Security/Pages green |
-| Aktuelle lokale Tooling-Erweiterung | Repository-owned keyless Toccata-v1 SilverScript genesis operator; 27 unit/security tests, crash-recovery journal, source-bound observation, RPC deadlines, clippy, seven-contract archive/request/procedure integration, and capability handoff pass locally and in main CI |
+| Letzter grün verifizierter Produkt-/Tooling-Commit | `4176093` — GH-4 closeout baseline; main CI `29406057800`, Security `29406057729`, Pages `29406056965` green |
+| Aktuelle lokale Tooling-Erweiterung | GH-7 TLS-only official public resolver plus funding-free testnet-10 node/Toccata probe; 30 Rust tests, clippy, Python target validation, and a real read-only resolver probe pass locally |
 | Aktueller HEAD | Mit `git log --oneline -1` prüfen; Bridge-/Status-Commits können neuer sein |
 | Rollback-Tag | `pre-session-20260413` → `6347b85` |
 | Whitepaper | WHITEPAPER.md (root) + whitepaper.html (styled), status refreshed and verified 2026-07-11 |
@@ -42,10 +42,11 @@
 - Der exakte live unspent Funding-UTXO wird im Preflight und unmittelbar vor Broadcast geprüft.
 - Nur der 32-Byte-`SIG_HASH_ALL`-Digest verlässt den Repository-Operator; ein externer Vault/HSM liefert die öffentliche BIP340-Signaturantwort.
 - Fee-Minimum/-Maximum, Netzwerk, P2PK-Funding, P2SH-Contract, Request-Hash, vollständige Signatur und Transaktion werden fail-closed validiert.
-- 24 Tests enthalten feste öffentliche Transaction-/Covenant-/Sighash-/Request-/Storage-Mass-Werte und einen dateibasierten Python-Request/Rust-Signatur-Handoff.
+- 27 gemergte GH-4 Tests enthalten feste öffentliche Transaction-/Covenant-/Sighash-/Request-/Storage-Mass-Werte, Secret-/Recovery-Gates und einen dateibasierten Python-Request/Rust-Signatur-Handoff; GH-7 erweitert lokal auf 30 Tests mit Resolver- und aufgelöster-TLS-Endpoint-Fail-Closed-Coverage.
 - Offizielles PSKT/PSKB bleibt ausgeschlossen, solange dessen v1-Inputpfad Sigop- statt Compute-Budget-Commitments erzeugt. Pinned v2.0.1 unterstützt testnet-10, nicht testnet-12.
 - Lokal grün: Rust fmt/clippy/tests; frischer sieben-Contract Silverc-Release-Build; Python deploy preflight, request builder/verifier, operator procedure und external capability verifier.
-- Offen: PR/Remote-CI, real finanzierter testnet-10-Run, externe Signaturen, bestätigte `operator_record` Receipts, unabhängige Chain-Evidence, Metrics-Oracle-Transaktion und Release-Hardening für den exakten Rollout-Commit.
+- GH-7 lokal: `kaspa-resolver://public` ist TLS-only und testnet-10-only; der funding-freie Probe bestätigt einen synchronisierten, UTXO-indexierten `rusty-kaspa 2.0.1` Node über Toccata-DAA.
+- Offen: GH-7 PR/Remote-CI, real finanzierter testnet-10-Run, externe Signaturen, bestätigte `operator_record` Receipts, unabhängige Chain-Evidence, Metrics-Oracle-Transaktion und Release-Hardening für den exakten Rollout-Commit.
 
 ---
 
@@ -135,7 +136,7 @@
 7. Lies memory/ERRORS.md             → 12 bekannte Patterns
 ```
 
-**Status: Feature-complete through Sprint 7. Kaspa Toccata status researched 2026-07-07; all seven current-Silverc compile/ABI/runtime gates and signed-int deployment bounds pass locally and in CI. The deterministic release archive, deploy preflight/requests/procedure, merged repository-owned keyless transaction-v1 genesis operator, receipt/evidence/status staging, operator handoff, release-readiness audit, metrics-oracle handoff, and exact-commit release-hardening gates are implemented. The genesis operator uses compute budget 10, exact contextual `storage_mass`, official covenant-ID derivation, exact live funding-UTXO checks, external digest-only BIP340 signing, full verification, an exclusive crash-recovery journal, transaction-ID reconciliation, 20-second wRPC deadlines, and source-bound covenant-output observation; 27 unit/security tests and the seven-contract integration pass locally and on merged main. Deployment now depends on real funded testnet-10 signatures and confirmed receipts, independent public node/explorer evidence, the external signed metrics-oracle transaction, and release-hardening evidence for the exact rollout commit.**
+**Status: Feature-complete through Sprint 7. Kaspa Toccata status researched 2026-07-07; all seven current-Silverc compile/ABI/runtime gates and signed-int deployment bounds pass locally and in CI. The deterministic release archive, deploy preflight/requests/procedure, merged repository-owned keyless transaction-v1 genesis operator, receipt/evidence/status staging, operator handoff, release-readiness audit, metrics-oracle handoff, and exact-commit release-hardening gates are implemented. The genesis operator uses compute budget 10, exact contextual `storage_mass`, official covenant-ID derivation, exact live funding-UTXO checks, external digest-only BIP340 signing, full verification, an exclusive crash-recovery journal, transaction-ID reconciliation, 20-second wRPC deadlines, and source-bound covenant-output observation; 27 merged GH-4 tests and the seven-contract integration pass on main, while GH-7 adds two locally passing TLS-resolver fail-closed tests plus a successful live read-only testnet-10 probe. Deployment now depends on real funded testnet-10 signatures and confirmed receipts, independent public node/explorer evidence, the external signed metrics-oracle transaction, and release-hardening evidence for the exact rollout commit.**
 
 **Offene Tasks (priorisiert):**
 - [x] PATTERN-010 fix: Arc<Phi3Model> statt Arc<Mutex<Phi3Model>> — DONE `6347b85`
@@ -286,4 +287,4 @@ Leistungsbasierte Emission. Guardians = "Miner" (KI statt GPU).
 
 - VERDICT update 2026-07-15: H-002 is fixed; all seven current-Silverc compile/ABI/runtime gates, signed-int deployment guards, deterministic release handoff, and the merged repository-owned keyless Toccata-v1 genesis operator pass locally and in main CI. Exact contextual storage mass, compute budget 10, covenant derivation/binding, dual live-UTXO validation, digest-only external signing, full verification, fee bounds, exclusive intent journaling, retry reconciliation, RPC deadlines, and source-bound observation are covered by 27 tests plus a seven-contract integration. Funded testnet-10 signatures/receipts, independent chain evidence, the external metrics-oracle transaction, and exact-commit release evidence remain Sprint 9 blockers.
 
-*Prometheus v4.0 · Checkpoint 2026-07-15 · Last updated: seven current-Silverc runtime gates + deterministic release handoff + crash-consistent keyless Toccata-v1 genesis operator + 27 unit/security tests + seven-contract integration + public receipts/evidence/status staging + metrics-oracle handoff + exact-commit release-hardening gates · The fire belongs to humanity.*
+*Prometheus v4.0 · Checkpoint 2026-07-15 · Last updated: seven current-Silverc runtime gates + deterministic release handoff + crash-consistent keyless Toccata-v1 genesis operator + 30 local unit/security tests + TLS-only official testnet-10 resolver probe + seven-contract integration + public receipts/evidence/status staging + metrics-oracle handoff + exact-commit release-hardening gates · The fire belongs to humanity.*

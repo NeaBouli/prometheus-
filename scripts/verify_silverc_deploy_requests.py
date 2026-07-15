@@ -11,7 +11,12 @@ from hashlib import sha256
 from pathlib import Path
 from typing import Any
 
-from preflight_silverc_deploy import bundle_root_from_args, load_json, validate_manifest
+from preflight_silverc_deploy import (
+    bundle_root_from_args,
+    load_json,
+    validate_deploy_rpc_url,
+    validate_manifest,
+)
 from smoke_silverc_artifacts import FIXTURES, canonical_json_bytes
 from verify_silverc_h001 import DEFAULT_SILVERSCRIPT_REF
 
@@ -242,6 +247,10 @@ def validate_request_set(
 ) -> dict[str, Any]:
     reject_secret_fields(request_set)
     validate_request_set_hash(request_set)
+    validate_deploy_rpc_url(
+        request_set.get("rpc_url") or "",
+        request_set.get("network") or "",
+    )
 
     if request_set.get("schema_version") != 1:
         raise ValueError("schema_version: expected 1")

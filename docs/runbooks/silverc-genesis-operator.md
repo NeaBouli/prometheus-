@@ -35,6 +35,13 @@ testnet-10. Calendar dates alone are not accepted as proof. `preflight` and
 a live DAA score at or above the network's Toccata activation, and exact live
 funding UTXO state. `broadcast` repeats this exact funding validation.
 
+The exact target `kaspa-resolver://public` selects the public resolver bundled
+with pinned `rusty-kaspa`. This mode enforces TLS and is restricted to
+`testnet-10`; resolver lookalikes, credentials, query strings, fragments,
+HTTP(S) URLs, other testnet suffixes, and mainnet resolver use fail closed.
+Direct `ws://` and `wss://` node URLs remain supported. Public resolver nodes
+are best-effort infrastructure and do not replace independent chain evidence.
+
 ## Build
 
 ```bash
@@ -45,6 +52,23 @@ Use the release binary at
 `target/release/prometheus-silverc-deployer`. Generate the verified deploy
 request and deterministic Silverc artifact bundle with the existing scripts in
 `modules/contracts/silverc/README.md` before continuing.
+
+## Funding-Free Node Probe
+
+Before preparing any funding, verify live testnet-10 connectivity, sync state,
+UTXO-index availability, and Toccata activation through the official resolver:
+
+```bash
+target/release/prometheus-silverc-deployer probe \
+  --rpc-url kaspa-resolver://public \
+  --network-id testnet-10 \
+  --evidence-out /path/to/testnet-10.node-probe.json
+```
+
+The public evidence records both the resolver target and the resolved TLS wRPC
+endpoint. This read-only probe does not inspect a funding outpoint and is not
+permission to sign or broadcast. The funding-bound `preflight` and the second
+live UTXO validation immediately before broadcast remain mandatory.
 
 ## Public Funding Input
 
@@ -204,9 +228,10 @@ checks outpoint, amount, covenant ID, contract script, and DAA depth. The
 existing public receipt-evidence flow still requires independent explorer/block
 evidence before rollout status can become ready.
 
-The local suite contains 27 unit/security tests. It includes fixed public
+The local suite contains 30 unit/security tests. It includes fixed public
 transaction ID, covenant ID, sighash, signing-request hash, and storage-mass
-values plus a file-based deploy-request/artifact/signing-response roundtrip.
+values, resolver fail-closed coverage, plus a file-based
+deploy-request/artifact/signing-response roundtrip.
 
 ## PSKT Compatibility Note
 

@@ -1,5 +1,14 @@
 # Action Log
 
+## 2026-07-15 — GH-7 public resolver probe started
+
+- PR #6 merged normally as `4176093`; main Prometheus CI `29406057800`, Security Audit `29406057729`, and Pages `29406056965` passed.
+- Opened issue #7 and branch `feature/GH-7-public-resolver-probe` for an official public-resolver target plus funding-free node/Toccata probe.
+- Direct `ssh sandbox` still fails public-key authentication. `ssh hub-sandbox` works with passwordless sudo, but the host has only about 1.9 GiB available RAM, no swap, 20 GiB free disk, and many active workloads, so no Kaspa node was installed there.
+- Added exact `kaspa-resolver://public` handling with mandatory TLS and testnet-10-only enforcement, standalone read-only `probe`, shared Python target validation, independent verifier checks, and CI artifact coverage. Resolver lookalikes, HTTP(S), credentials, queries, fragments, and unsupported networks fail closed.
+- Local 30-test Rust suite, workspace tests/clippy, Python compile/target checks, CI YAML parse, and checksum-verified Actionlint v1.7.12 pass. A real read-only probe confirmed `rusty-kaspa 2.0.1`, synced testnet-10, UTXO index, and DAA above Toccata activation. No funding, wallet, key, signature, or broadcast was used.
+- Final verification passed 135 workspace tests with two intentional live-test ignores, warning-free workspace Clippy, Memory Integrity, six Autodidactic tests, `git diff --check`, and a second read-only resolver probe at virtual DAA `517522160`. The seven-contract resolver request set independently verified with SHA-256 `f9b4838d116ff931ec5fd02ed3e119b1570b62c6836684e4d822c73166e82e2d`; an independent Terra review reported no remaining findings. Resolver availability remains best-effort and does not replace funded deployment or chain evidence.
+
 ## 2026-07-15
 
 - PR #5 merged normally without admin bypass as `ea67b93b155afcf822821304593ab0fe9f815492`; GitHub issue #4 closed automatically. Main verification passed: Prometheus CI `29404986657`, Security Audit `29404986665`, and Pages `29404985747` all succeeded.
