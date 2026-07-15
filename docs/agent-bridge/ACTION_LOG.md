@@ -471,3 +471,12 @@ Rules for all dev agents:
 - Browser verification found and fixed a pre-existing mobile Whitepaper grid overflow by allowing the content column to shrink and tables to scroll within the viewport. Public Homepage/FAQ token wording was synchronized with the separate L1 reputation model.
 - No chain, wallet, private key, signature, raw transaction, broadcast, or foreign untracked file was accessed. `Prometheus-1.png` remains untouched and uncommitted.
 - PR checks, merge, exact-main CI/Security/Pages, and live Pages verification remain pending.
+
+## 2026-07-16 GH-33 merge and exact-main closeout
+
+- PR #34 merged normally without admin bypass as `ce1d2137adef70addcd493747590053bad0439ce`; issue #33 closed automatically.
+- All nine protected PR contexts passed. CodeRabbit's status check completed but its content review was rate-limited; the three-round independent Terra review supplied the substantive review and ended with no remaining high/medium finding.
+- Exact-main Prometheus CI `29459533780`, Security Audit `29459533770`, and Pages `29459533175` passed.
+- Live GitHub Pages verification confirms the Sprint 10B roadmap card, 8B-default/70B-escalation Whitepaper wording, and separate Kaspa-L1 Guardian-reputation wording in FAQ.
+- GH-33 software/docs/CI are accepted. Live 8B/70B service wiring, model-calibrated confidence, P2P integration, and 5+ Guardian ensemble voting remain open.
+- No wallet file, private key, secret, signature, raw transaction, broadcast, or foreign untracked file was accessed. `Prometheus-1.png` remains untouched and uncommitted.

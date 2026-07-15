@@ -747,8 +747,11 @@ keeps that path on fail-closed escalation. Final review reports no remaining
 high/medium finding. Local verification passes
 47 tests with three intentional live-model skips, Black, and Pylint 9.69/10.
 No live-model, P2P, chain, wallet, signing, or broadcast behavior is introduced.
-Live 8B/70B wiring, calibrated model confidence, ensemble voting, PR checks,
-merge, and exact-main evidence remain pending.
+PR #34 merged normally as exact main
+`ce1d2137adef70addcd493747590053bad0439ce`; Prometheus CI `29459533780`,
+Security Audit `29459533770`, and Pages `29459533175` passed. Live Roadmap,
+Whitepaper, and FAQ markers were verified. Live 8B/70B wiring, calibrated model
+confidence, ensemble voting, and production evidence remain open.
 
 *Audit completed 2026-04-02 by Claude Code (5 parallel agents, 7 levels, 35 checks).*
 *The fire belongs to humanity.*
