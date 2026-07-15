@@ -633,5 +633,18 @@ and the live Whitepaper check pass. The foundation is accepted; production
 scanning, proofs, rule distribution, rewards, and miner-specific integration
 remain separately gated future work.
 
+**AUDIT UPDATE 2026-07-16:** GH-9 now has independently verified public TN10
+funding. Faucet transaction
+`24e81339f3656689643ca86e3c53c4c5336e4273bb127d25bdaf328e5da241c7`
+is accepted; output `0` is an unspent, non-coinbase P2PK output holding
+`100100000000` sompi at DAA `517772692`. Its script commits to x-only public key
+`e5a39b02e8bad5dbe8d793425e2590b008a4517696c756ccf18dfa9f16c1f1cf`
+and matches the public deployer address recorded in issue #9. This resolves only
+the funding and public-identity gates. Exact-commit artifact/request binding,
+the 32-byte digest, approved external BIP340 signing, one-shot broadcast,
+confirmation, receipt, and independent deployment evidence remain mandatory.
+No private wallet data or raw signed transaction entered the repository or
+GitHub. Canary evidence remains non-promotable to full or metrics readiness.
+
 *Audit completed 2026-04-02 by Claude Code (5 parallel agents, 7 levels, 35 checks).*
 *The fire belongs to humanity.*

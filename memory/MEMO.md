@@ -168,10 +168,13 @@ Dies ist nicht optional. Es ist Teil jeder Task-Definition.
 
 ## BLOCKADEN (aktuell)
 
-Sprint 9 ist nicht mehr durch Toccata oder H-001-Verifikation blockiert. Der
-non-promotable H-001 testnet-10 Canary wartet auf funded P2PK Input, externe
-BIP340-Signatur, Bestätigung und öffentliche Evidence; der Full-Rollout wartet
-zusätzlich auf die übrigen State-Contracts, Metrics Oracle und Release Hardening.
+Sprint 9 ist nicht mehr durch Toccata, H-001-Verifikation oder Funding blockiert.
+Der öffentliche non-promotable H-001 testnet-10 P2PK-Outpoint und die passende
+öffentliche Deployer-Identität sind bestätigt. Der Canary wartet auf den
+exact-commit Request/Digest, eine externe BIP340-Signatur, Broadcast,
+Bestätigung, `operator_record`-Receipt-Erfassung/-Verifikation und öffentliche
+Evidence; der Full-Rollout wartet zusätzlich auf die übrigen State-Contracts,
+Metrics Oracle und Release Hardening.
 Rusty-Kaspa Workspace-Dependencies sind seit 2026-07-07 auf `v2.0.1` gepinnt.
 Core Dev benötigt: Apple Developer Account + Google Play Account (vor Sprint 13).
 
