@@ -1,5 +1,12 @@
 # Action Log
 
+## 2026-07-15 — GH-9 deployment-profile closeout
+
+- PR https://github.com/NeaBouli/prometheus-/pull/11 merged normally as `6213c559508d3322b8660aed308df1a696ac5576`; no direct-main push or admin bypass was used.
+- Exact-merge verification passed: Prometheus CI `29412667386`, Security Audit `29412667410`, and Pages `29412666483`. The live whitepaper contains `testnet-10-validator-staking-h001`, the 32-test operator baseline, and the non-promotable canary boundary.
+- The software handoff is complete. Issue https://github.com/NeaBouli/prometheus-/issues/9 remains open for the real funded testnet-10 execution, external BIP340 signature, confirmation, and independent public chain evidence. The H-001 canary still requires no metrics-oracle key and cannot promote full rollout readiness.
+- No product code, secrets, signing material, raw transactions, or foreign untracked files were touched during this closeout.
+
 ## 2026-07-15 — GH-9 H-001 canary handoff
 
 - Reframed issue #9 from obsolete `ssc deploy`/Hello-World wording to the audited 58-byte `ValidatorStakingH001` genesis canary on testnet-10. H-001 remains a proof/canary fixture, not a seventh production-state contract.
