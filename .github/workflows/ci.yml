@@ -259,6 +259,10 @@ jobs:
           assert "GovernanceAutoTuningState" in runbook
           assert "private keys" in runbook
           PY
+      - name: Verify non-promotable H-001 canary deployment profile
+        run: |
+          python3 scripts/test_silverc_canary_profile.py \
+            --archive /tmp/prometheus-silverc-artifacts.tar.gz
       - name: Build keyless genesis deploy request set
         run: |
           python3 scripts/build_silverc_deploy_requests.py \
@@ -533,6 +537,7 @@ jobs:
           runbook = Path("/tmp/prometheus-silverc-deploy-operator-procedure.md").read_text()
 
           assert procedure["status"] == "READY_FOR_KEYLESS_GENESIS_OPERATION"
+          assert procedure["deployment_profile"]["kind"] == "full"
           assert procedure["request_set_sha256"] == request_set["request_set_sha256"]
           assert procedure["request_count"] == 7
           assert procedure["contracts"][0]["contract_name"] == "ValidatorStakingH001"
@@ -618,6 +623,7 @@ jobs:
               "schema_version": 1,
               "result_type": "prometheus_silverc_external_deploy_results",
               "network": verification["network"],
+              "deployment_profile": verification["deployment_profile"],
               "provenance": {
                   "type": "operator_record",
                   "orchestrator": "ci-public-orchestrator-fixture",

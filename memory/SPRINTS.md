@@ -96,57 +96,28 @@ cargo build --release -p kaspad
 
 ---
 
-### Tag 3: Silverscript Compiler
+### Tag 3: Pinned Silverc Release-Bundle
 
-```bash
-# Schritt 1: ssc installieren (aus rusty-kaspa Repository)
-cd rusty-kaspa
-cargo build --release -p ssc
+Build all seven current-Silverc release fixtures through the pinned upstream
+compiler and verify the deterministic manifest/archive. The seven fixtures are
+the H-001 proof fixture plus six state contracts; H-001 is not a seventh
+production-state contract.
 
-# Schritt 2: PATH setzen
-export PATH=$PATH:$(pwd)/target/release
-echo 'export PATH=$PATH:/path/to/rusty-kaspa/target/release' >> ~/.bashrc
-
-# Schritt 3: Hello-World Contract schreiben
-cat > /tmp/hello.ss << 'EOF'
-contract HelloWorld {
-    function greet() -> string {
-        return "Prometheus is live";
-    }
-}
-EOF
-
-# Schritt 4: Kompilieren
-ssc compile --testnet /tmp/hello.ss
-
-# Erwartet: Kompilierung erfolgreich, output: hello.kas
-```
-
-**Erwartetes Ergebnis:** ssc Compiler funktioniert, Hello-World kompiliert.
+**Erwartetes Ergebnis:** source, constructor, artifact, script, ABI, and state
+layout hashes verify against the pinned manifest.
 
 ---
 
-### Tag 4: Erster Contract auf Testnet
+### Tag 4: H-001 Canary auf Testnet-10
 
-```bash
-# Schritt 1: Testnet-Wallet erstellen
-./target/release/kaspa-wallet create --testnet
+Use deployment profile `testnet-10-validator-staking-h001` with network
+`testnet` and exact target `kaspa-resolver://public`. The profile contains only
+`ValidatorStakingH001`, forbids the metrics-oracle key, and requires the
+repository keyless genesis operator plus an external BIP340 signature.
 
-# Schritt 2: Testnet-KAS holen (Faucet)
-# https://faucet-testnet-10.kaspa.org (falls verfügbar)
-# Alternativ: Mining auf Testnet
-
-# Schritt 3: Hello-World Contract deployen
-ssc deploy --testnet --node ws://127.0.0.1:16210 hello.kas
-
-# Schritt 4: Contract-Adresse in STATUS.md eintragen
-python3 scripts/autodidactic.py --action update_status \
-    --module "Hello-World Contract" \
-    --status DONE \
-    --address "<contract-adresse>"
-```
-
-**Erwartetes Ergebnis:** Erster Contract on-chain auf Testnet-10.
+**Erwartetes Ergebnis:** confirmed public canary receipt and independent chain
+evidence. Record only canary status. Never mark the full seven-fixture release,
+six production-state contracts, or metrics oracle ready from this result.
 
 ---
 
@@ -209,9 +180,9 @@ jobs:
 [ ] Repository-Struktur auf GitHub
 [ ] Alle memory/-Dateien committed
 [ ] Testnet-10-Node läuft und synct
-[ ] ssc Compiler funktioniert
-[ ] Hello-World Contract auf Testnet deployed
-[ ] Contract-Adresse in STATUS.md
+[x] Pinned `silverc` release-bundle/runtime gates funktionieren
+[ ] Non-promotable `ValidatorStakingH001` Canary auf testnet-10 bestätigt
+[ ] Canary Receipt + unabhängige Evidence in STATUS.md referenziert
 [ ] GitHub Actions CI/CD grün
 [ ] AUDIT.md: Sprint 0 als PENDING_AUDIT markiert
 ```

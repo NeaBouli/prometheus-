@@ -12,12 +12,19 @@ from pathlib import Path
 from typing import Any
 
 from preflight_silverc_deploy import NETWORKS, bundle_root_from_args, load_json, validate_manifest
+from silverc_deployment_profiles import (
+    CANARY_SCOPE_NOTICE,
+    FULL_PROFILE,
+    evidence_status,
+    expected_profile,
+    is_canary,
+    validate_profile_document,
+)
 from smoke_silverc_artifacts import canonical_json_bytes
 from verify_silverc_deploy_receipts import validate_receipts_document
 from verify_silverc_h001 import DEFAULT_SILVERSCRIPT_REF
 
 EVIDENCE_TYPE = "prometheus_silverc_deploy_receipt_public_evidence"
-EVIDENCE_STATUS = "PUBLIC_DEPLOY_RECEIPT_EVIDENCE_VERIFIED"
 UTC_TIMESTAMP_RE = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
 SECRET_KEY_RE = re.compile(
     r"(private|secret|seed|mnemonic|password|passwd|wallet|keystore|token)",
@@ -133,6 +140,14 @@ def validate_evidence_document(
     if bundle.get("fixture_count") != manifest["fixture_count"]:
         raise ValueError("evidence.release_bundle.fixture_count mismatch")
 
+    profile_document = evidence_doc.get("deployment_profile")
+    if profile_document is None:
+        deployment_profile = expected_profile(FULL_PROFILE, manifest)
+    else:
+        deployment_profile, _ = validate_profile_document(profile_document, manifest)
+    if deployment_profile != receipt_summary["deployment_profile"]:
+        raise ValueError("evidence.deployment_profile: receipt/evidence mismatch")
+
     expected_receipts_sha = receipt_summary["receipts_sha256"]
     if evidence_doc.get("receipts_sha256") != expected_receipts_sha:
         raise ValueError("evidence.receipts_sha256 mismatch")
@@ -174,10 +189,11 @@ def validate_evidence_document(
             }
         )
 
-    return {
+    summary = {
         "schema_version": 1,
-        "status": EVIDENCE_STATUS,
+        "status": evidence_status(deployment_profile),
         "network": network,
+        "deployment_profile": deployment_profile,
         "provenance_type": provenance["type"],
         "observer": observer,
         "observed_at": observed_at,
@@ -201,6 +217,14 @@ def validate_evidence_document(
             "Record contract IDs in status files only after receipt, evidence, and readiness audits pass.",
         ],
     }
+    if is_canary(deployment_profile):
+        summary["operator_next_steps"] = [
+            "Retain this public H-001 canary evidence with the operator record.",
+            "Stage only a manual canary-status draft.",
+            "Do not use canary evidence for full release or metrics-oracle readiness.",
+            CANARY_SCOPE_NOTICE,
+        ]
+    return summary
 
 
 def write_json(path: Path | None, value: dict[str, Any]) -> None:
@@ -219,6 +243,7 @@ def write_runbook(path: Path | None, summary: dict[str, Any]) -> None:
         "",
         f"Status: {summary['status']}",
         f"Network: {summary['network']}",
+        f"Deployment profile: `{summary['deployment_profile']['name']}`",
         f"Provenance: {summary['provenance_type']}",
         f"Observer: `{summary['observer']}`",
         f"Observed at: `{summary['observed_at']}`",

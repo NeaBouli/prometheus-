@@ -17,9 +17,17 @@ from preflight_silverc_deploy import (
     NETWORKS,
     SECRET_LIKE_RE,
     bundle_root_from_args,
-    load_json,
     validate_deploy_rpc_url,
     validate_manifest,
+)
+from silverc_deployment_profiles import (
+    CANARY_SCOPE_NOTICE,
+    DEPLOYMENT_PROFILES,
+    FULL_PROFILE,
+    expected_profile,
+    request_set_status,
+    request_status,
+    validate_profile_inputs,
 )
 from smoke_silverc_artifacts import FIXTURES, canonical_json_bytes
 from verify_silverc_h001 import DEFAULT_SILVERSCRIPT_REF
@@ -43,13 +51,18 @@ def parse_args() -> argparse.Namespace:
     source = parser.add_mutually_exclusive_group(required=True)
     source.add_argument("--bundle-dir", type=Path, help="Directory containing manifest.json and artifacts")
     source.add_argument("--archive", type=Path, help="Release .tar.gz archive to validate")
+    parser.add_argument(
+        "--deployment-profile",
+        choices=DEPLOYMENT_PROFILES,
+        default=FULL_PROFILE,
+        help="Closed deployment scope; defaults to the complete seven-contract release",
+    )
     parser.add_argument("--out-dir", type=Path, default=DEFAULT_OUT_DIR, help="Directory for per-contract requests")
     parser.add_argument("--network", choices=NETWORKS, required=True)
     parser.add_argument("--rpc-url", required=True, help="Public Kaspa RPC/wRPC endpoint; credentials are rejected")
     parser.add_argument("--deployer-address", required=True, help="Public deployer address")
     parser.add_argument(
         "--metrics-oracle-pubkey",
-        required=True,
         help="32-byte x-only metrics-oracle public key hex; never pass private keys",
     )
     parser.add_argument(
@@ -75,9 +88,15 @@ def reject_secret_fields(value: Any, path: str = "$") -> None:
 
 def validate_public_inputs(args: argparse.Namespace) -> None:
     validate_deploy_rpc_url(args.rpc_url, args.network)
+    validate_profile_inputs(
+        profile_name=args.deployment_profile,
+        network=args.network,
+        rpc_url=args.rpc_url,
+        metrics_oracle_pubkey=args.metrics_oracle_pubkey,
+    )
     if not KASPA_ADDRESS_RE.match(args.deployer_address):
         raise ValueError("--deployer-address must be a public Kaspa address")
-    if not HEX_32_BYTES_RE.match(args.metrics_oracle_pubkey):
+    if args.metrics_oracle_pubkey and not HEX_32_BYTES_RE.match(args.metrics_oracle_pubkey):
         raise ValueError("--metrics-oracle-pubkey must be a 32-byte public key hex string")
 
 
@@ -101,16 +120,17 @@ def build_request(
     entry: dict[str, Any],
     order: int,
     constructor_args: Any,
+    deployment_profile: dict[str, Any],
 ) -> dict[str, Any]:
     reject_secret_fields(constructor_args, "$.constructor_args")
     request = {
         "schema_version": 1,
         "request_type": "prometheus_silverc_deploy_request",
-        "status": "READY_FOR_KEYLESS_GENESIS_OPERATOR",
+        "status": request_status(deployment_profile),
         "network": args.network,
         "rpc_url": args.rpc_url,
         "deployer_address": args.deployer_address,
-        "metrics_oracle_pubkey": args.metrics_oracle_pubkey,
+        "deployment_profile": deployment_profile,
         "silverscript": {
             "ref": manifest["silverscript_ref"],
             "commit": manifest["silverscript_commit"],
@@ -148,6 +168,8 @@ def build_request(
         },
         "safety_scope": REQUEST_SAFETY_SCOPE,
     }
+    if args.metrics_oracle_pubkey is not None:
+        request["metrics_oracle_pubkey"] = args.metrics_oracle_pubkey
     request["request_sha256"] = request_hash(request)
     return request
 
@@ -160,6 +182,7 @@ def write_runbook(path: Path | None, summary: dict[str, Any]) -> None:
         "",
         f"Status: {summary['status']}",
         f"Network: {summary['network']}",
+        f"Deployment profile: `{summary['deployment_profile']['name']}`",
         f"Silverscript commit: `{summary['silverscript_commit']}`",
         f"Request set SHA-256: `{summary['request_set_sha256']}`",
         "",
@@ -175,6 +198,11 @@ def write_runbook(path: Path | None, summary: dict[str, Any]) -> None:
         "| Order | Contract | Request file | Request SHA-256 | Script SHA-256 |",
         "|------:|----------|--------------|-----------------|----------------|",
     ]
+    if summary["deployment_profile"]["kind"] == "canary":
+        lines.insert(
+            lines.index("## Requests") - 1,
+            "- This H-001 canary cannot authorize a full release or metrics-oracle readiness.",
+        )
     for request in summary["requests"]:
         lines.append(
             "| {order} | `{contract}` | `{file}` | `{request_hash}` | `{script_hash}` |".format(
@@ -209,6 +237,8 @@ def main() -> int:
     bundle_dir, tmp = bundle_root_from_args(args)
     try:
         manifest = validate_manifest(bundle_dir, args.silverscript_ref)
+        deployment_profile = expected_profile(args.deployment_profile, manifest)
+        selected_contracts = set(deployment_profile["selected_contracts"])
         constructor_args = fixture_args_by_contract()
         out_dir = args.out_dir.expanduser().resolve()
         if out_dir.exists():
@@ -218,6 +248,8 @@ def main() -> int:
         request_entries = []
         for order, entry in enumerate(manifest["fixtures"], start=1):
             contract_name = entry["contract_name"]
+            if contract_name not in selected_contracts:
+                continue
             if contract_name not in constructor_args:
                 raise ValueError(f"{contract_name}: missing constructor args")
             request = build_request(
@@ -226,6 +258,7 @@ def main() -> int:
                 entry=entry,
                 order=order,
                 constructor_args=constructor_args[contract_name],
+                deployment_profile=deployment_profile,
             )
             filename = f"{order:02d}-{contract_name}.deploy-request.json"
             write_json(out_dir / filename, request)
@@ -242,11 +275,11 @@ def main() -> int:
 
         summary = {
             "schema_version": 1,
-            "status": "REQUESTS_READY_FOR_KEYLESS_GENESIS_OPERATOR",
+            "status": request_set_status(deployment_profile),
             "network": args.network,
             "rpc_url": args.rpc_url,
             "deployer_address": args.deployer_address,
-            "metrics_oracle_pubkey": args.metrics_oracle_pubkey,
+            "deployment_profile": deployment_profile,
             "silverscript_ref": manifest["silverscript_ref"],
             "silverscript_commit": manifest["silverscript_commit"],
             "request_count": len(request_entries),
@@ -262,6 +295,10 @@ def main() -> int:
             },
             "safety_scope": REQUEST_SAFETY_SCOPE,
         }
+        if args.metrics_oracle_pubkey is not None:
+            summary["metrics_oracle_pubkey"] = args.metrics_oracle_pubkey
+        if deployment_profile["kind"] == "canary":
+            summary["blockers"].append(CANARY_SCOPE_NOTICE)
         summary["request_set_sha256"] = sha256(canonical_json_bytes(summary)).hexdigest()
         if args.request_set_out:
             write_json(args.request_set_out.expanduser().resolve(), summary)

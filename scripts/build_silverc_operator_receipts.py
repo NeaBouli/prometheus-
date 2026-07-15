@@ -12,13 +12,13 @@ from pathlib import Path
 from typing import Any
 
 from preflight_silverc_deploy import NETWORKS, bundle_root_from_args, load_json, validate_manifest
+from silverc_deployment_profiles import is_canary, receipt_import_status
 from smoke_silverc_artifacts import canonical_json_bytes
 from verify_silverc_deploy_receipts import validate_receipts_document
 from verify_silverc_deploy_requests import validate_request_set
 from verify_silverc_h001 import DEFAULT_SILVERSCRIPT_REF
 
 RESULT_TYPE = "prometheus_silverc_external_deploy_results"
-RESULT_STATUS = "OPERATOR_RECEIPTS_READY_FOR_STATUS_STAGING"
 SECRET_LIKE_RE = re.compile(
     r"(private|secret|seed|mnemonic|password|passwd|wallet|keystore|token)",
     re.IGNORECASE,
@@ -135,6 +135,8 @@ def validate_results_header(
 
     if results_doc.get("request_set_sha256") != request_summary["request_set_sha256"]:
         raise ValueError("request_set_sha256 mismatch")
+    if results_doc.get("deployment_profile") != request_summary["deployment_profile"]:
+        raise ValueError("deployment_profile mismatch")
 
     return provenance, bundle
 
@@ -151,12 +153,18 @@ def build_receipts(
         request_summary=request_summary,
     )
     results = require_list(results_doc.get("results"), "results")
-    if len(results) != manifest["fixture_count"]:
-        raise ValueError("results: expected one result per manifest contract")
+    if len(results) != request_summary["request_count"]:
+        raise ValueError("results: expected one result per deployment-profile contract")
+
+    manifest_by_name = {entry["contract_name"]: entry for entry in manifest["fixtures"]}
+    manifest_entries = [
+        manifest_by_name[entry["contract_name"]]
+        for entry in request_summary["requests"]
+    ]
 
     receipts = []
     for index, (result, manifest_entry, request_entry) in enumerate(
-        zip(results, manifest["fixtures"], request_summary["requests"]),
+        zip(results, manifest_entries, request_summary["requests"]),
         start=1,
     ):
         if not isinstance(result, dict):
@@ -190,6 +198,7 @@ def build_receipts(
     return {
         "schema_version": 1,
         "network": results_doc["network"],
+        "deployment_profile": request_summary["deployment_profile"],
         "provenance": {
             "type": "operator_record",
             "description": "Generated from public external deploy-orchestrator results after request-set verification.",
@@ -223,6 +232,7 @@ def write_runbook(path: Path | None, summary: dict[str, Any]) -> None:
         "",
         f"Status: {summary['status']}",
         f"Network: {summary['network']}",
+        f"Deployment profile: `{summary['deployment_profile']['name']}`",
         f"Silverscript commit: `{summary['silverscript_commit']}`",
         f"Request set SHA-256: `{summary['request_set_sha256']}`",
         f"Source result SHA-256: `{summary['source_result_sha256']}`",
@@ -283,11 +293,12 @@ def build_summary(
             }
         )
 
-    return {
+    summary = {
         "schema_version": 1,
-        "status": RESULT_STATUS,
+        "status": receipt_import_status(request_summary["deployment_profile"]),
         "network": receipt_summary["network"],
         "provenance_type": receipt_summary["provenance_type"],
+        "deployment_profile": request_summary["deployment_profile"],
         "orchestrator": receipts_doc["provenance"]["orchestrator"],
         "silverscript_commit": receipt_summary["silverscript_commit"],
         "request_set_sha256": receipts_doc["provenance"]["request_set_sha256"],
@@ -310,6 +321,14 @@ def build_summary(
             "updates_status_files": False,
         },
     }
+    if is_canary(request_summary["deployment_profile"]):
+        summary["operator_next_steps"] = [
+            "Verify the H-001 deploy transaction against a trusted node or explorer.",
+            "Build and verify public canary evidence for this receipt.",
+            "Stage only a manual canary-status draft.",
+            "Do not promote full release or metrics-oracle readiness from this canary.",
+        ]
+    return summary
 
 
 def main() -> int:

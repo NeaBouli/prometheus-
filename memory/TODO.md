@@ -16,7 +16,7 @@
 - [x] [P0] GH-1 offiziellen SilverScript Covenant-Genesis-Mechanikvertrag im externen Operator-Gate erzwingen | Codex | Merged via PR #2 as `9d74c0c`; main CI, Security Audit, and Pages pass for transaction v1, compiled-script P2SH, official covenant-ID derivation, and post-derivation funding-input binding
 - [x] [P0] GH-4 keyless Toccata-v1 SilverScript Genesis Operator | Codex | Merged via PR #5 as `ea67b93`; exact v1 contextual storage mass, compute budget 10, covenant ID, live UTXO checks, external BIP340 verification, fee caps, exclusive intent journal, retry reconciliation, RPC deadlines, source-bound observation, 27 tests, main CI/Security/Pages all pass
 - [x] [P0] GH-7 official public-resolver mode + funding-free testnet-10 probe | Codex | PR #8 merged as `288ea18`; main CI `29408432584`, Security `29408432511`, and Pages `29408431512` pass
-- [!] [P0] GH-9 Hello-World Silverscript Contract auf Testnet deployen | Codex | Issue #9; repository path ready, externally blocked on real funded testnet-10 P2PK UTXO and vault/HSM signature response; then collect confirmed receipt plus independent node/explorer evidence
+- [!] [P0] GH-9 `ValidatorStakingH001` Canary auf testnet-10 ausführen | Codex + externer Signer | Closed non-promotable profile ready; externally blocked on funded public P2PK outpoint, matching public deployer identity, vault/HSM BIP340 response, confirmation, and independent evidence
 - [x] [P0] rusty-kaspa als Dependency in Cargo.toml einbinden | Claude Code | 2026-03-21; pinned to v2.0.1 on 2026-07-07
 - [x] [P0] autodidactic.py vollständig testen (alle Memory-Operationen) | Codex | 2026-07-12; stdlib regression suite covers memory loading, next-task priority/dependency selection, in-progress completion, padded STATUS row replacement, and blocker detection; wired into Prometheus CI Memory Integrity job
 - [x] [P0] .gitignore konfigurieren (.secrets/, /tmp/, target/, __pycache__) | Claude Code | 2026-03-21
@@ -123,7 +123,9 @@
 
 ## ═══ SPRINT 9: CONTRACTS LIVE (Mai 2026) ═══
 
-- [ ] [P0] ssc compile + deploy alle 6 Contracts auf Kaspa Mainnet | Claude Code | Covenant-Hardfork
+- [~] [P0] GH-9: manifest-gebundenes H-001 testnet-10 Canary-Handoff mergen | Codex | GH-7 Resolver + Operator
+- [!] [P0] `ValidatorStakingH001` Canary real ausführen; nie als Full-/Metrics-Readiness promoten | Core Dev + externer Signer | funded public P2PK outpoint + matching public identity + BIP340 response
+- [!] [P0] Full-Profil: sieben Release-Fixtures auf testnet-10 verifizieren und sechs State-Contracts erst danach auf Mainnet ausrollen | Core Dev + Codex | Canary-Evidence + Metrics Oracle + Release Hardening
 - [ ] [P0] kaspa-zk-params Crate integrieren, echte Groth16 in zk_proof.rs | Claude Code | ssc live
 - [ ] [P0] PROM Emission Contract schreiben + deployen | Claude Code | ssc live
 - [ ] [P0] KAS/PROM Liquiditätspool auf Kasplex DEX eröffnen | Core Dev | Mainnet live

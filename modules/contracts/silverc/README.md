@@ -166,8 +166,9 @@ checks:
 - manifest schema and expected fixture order
 - source, constructor-args, artifact, and compiled-script SHA-256 hashes
 - non-empty ABI and state layout metadata
-- public operator inputs: network, RPC URL, deployer address, and metrics-oracle
-  public key
+- public operator inputs selected by a closed deployment profile: the `full`
+  profile requires the metrics-oracle public key, while the H-001 canary
+  forbids that field and fixes network/resolver scope
 - whether upstream `silverc` exposes a network deploy command and whether the
   repository Toccata-v1 genesis operator is present
 
@@ -187,6 +188,30 @@ does not include private keys, seed phrases, wallet files, or keystore material.
 CI checks that the runbook recognizes the repository operator, remains explicit
 that the Python preflight itself does not broadcast, and contains no signing
 material.
+
+## Closed deployment profiles
+
+Every newly generated deploy request, procedure, operator receipt, public
+receipt-evidence summary, and status draft carries an exact deployment profile
+bound to the deterministic release-manifest SHA-256.
+
+| Profile | Contract selection | Network/RPC | Metrics-oracle key | Promotion scope |
+|---------|--------------------|-------------|--------------------|-----------------|
+| `full` | All seven release fixtures in manifest order | Operator-selected validated target | Required public x-only key | Eligible for the existing full handoff/readiness gates after all external evidence passes |
+| `testnet-10-validator-staking-h001` | `ValidatorStakingH001` only | `testnet` plus exact `kaspa-resolver://public` | Forbidden and omitted | Canary evidence only; never full release, production, or metrics-oracle readiness |
+
+The H-001 canary is the first real genesis-path check. It deliberately avoids
+requiring an unrelated GovernanceAutoTuning oracle identity, but it does not
+reduce the seven-contract full-release requirements. Unknown profile names,
+changed contract selections, manifest mismatches, mainnet/direct-RPC canary
+targets, and attempted canary promotion fail closed.
+
+```bash
+python3 scripts/preflight_silverc_deploy.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --deployment-profile testnet-10-validator-staking-h001 --network testnet --rpc-url kaspa-resolver://public --deployer-address <public-deployer-address> --plan-out /tmp/prometheus-h001-canary-preflight.json --runbook-out /tmp/prometheus-h001-canary-preflight.md
+python3 scripts/build_silverc_deploy_requests.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --deployment-profile testnet-10-validator-staking-h001 --out-dir /tmp/prometheus-h001-canary-requests --network testnet --rpc-url kaspa-resolver://public --deployer-address <public-deployer-address> --request-set-out /tmp/prometheus-h001-canary-request-set.json --runbook-out /tmp/prometheus-h001-canary-requests.md
+python3 scripts/verify_silverc_deploy_requests.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --request-set /tmp/prometheus-h001-canary-request-set.json --requests-dir /tmp/prometheus-h001-canary-requests --summary-out /tmp/prometheus-h001-canary-verification.json
+python3 scripts/build_silverc_deploy_operator_procedure.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --request-set /tmp/prometheus-h001-canary-request-set.json --requests-dir /tmp/prometheus-h001-canary-requests --summary-out /tmp/prometheus-h001-canary-procedure.json --runbook-out /tmp/prometheus-h001-canary-procedure.md
+```
 
 ## Keyless Toccata-v1 genesis operator
 
@@ -212,16 +237,17 @@ for schemas, commands, safety gates, and rollback handling.
 ## External deploy requests
 
 `scripts/build_silverc_deploy_requests.py` emits one public deploy-request JSON
-file per current-Silverc contract plus a request-set summary and Markdown
+file per contract selected by the closed profile plus a request-set summary and Markdown
 runbook for the repository genesis operator and its external signer boundary.
 Each request is bound to the validated release-bundle manifest by source,
 constructor-args, artifact, and script hashes.
 
 The request builder intentionally does not accept private keys, sign, assemble
 chain transactions, broadcast, deploy contracts, or update status files. It also
-rejects RPC URLs with embedded credentials. The output status is
-`REQUESTS_READY_FOR_KEYLESS_GENESIS_OPERATOR` until the repository keyless
-orchestrator consumes the requests and returns real `operator_record` receipts.
+rejects RPC URLs with embedded credentials. The full profile emits
+`REQUESTS_READY_FOR_KEYLESS_GENESIS_OPERATOR`; the H-001 profile emits the
+distinct `CANARY_REQUEST_READY_FOR_KEYLESS_GENESIS_OPERATOR`. Canary statuses
+cannot satisfy full handoff or release-readiness consumers.
 
 `scripts/verify_silverc_deploy_requests.py` independently verifies the request
 set before operator handoff. It checks the request-set hash, every per-contract
@@ -250,8 +276,8 @@ failed gate.
 deploy-orchestrator results into canonical `operator_record` receipts. The
 input must use `result_type:
 prometheus_silverc_external_deploy_results`, must reference the verified
-request-set SHA-256, and must contain one confirmed result per contract in
-manifest order.
+request-set SHA-256 and exact deployment profile, and must contain one confirmed
+result per selected contract in manifest order.
 
 The importer validates the release bundle, re-validates the deploy request set,
 checks every result against the verified request hash, rejects secret-like field
@@ -269,7 +295,8 @@ evidence, and the other release gates are actually proven.
 ## Deployment receipt verifier
 
 `scripts/verify_silverc_deploy_receipts.py` validates public deployment receipt
-records against a previously built current-Silverc release bundle. It accepts
+records against a previously built current-Silverc release bundle and the exact
+deployment profile. It accepts
 either `--bundle-dir` or `--archive`, checks that every receipt matches the
 manifest contract order plus source, constructor-args, artifact, and script
 hashes, and emits a JSON summary plus optional Markdown operator runbook.
@@ -304,7 +331,9 @@ draft from verified `operator_record` receipts. It reuses the release-bundle
 manifest validation and receipt verifier, rejects `ci_fixture` receipts, and can
 emit a JSON status draft plus a Markdown snippet for review.
 
-The script intentionally does not update `memory/STATUS.md`. Operators must
+The script intentionally does not update `memory/STATUS.md`. Canary receipts
+produce only `READY_FOR_MANUAL_CANARY_STATUS_UPDATE` and explicitly forbid full
+release or metrics-oracle promotion. Operators must
 first verify the public deploy transaction IDs and deployed instance IDs against
 a trusted node or explorer, then copy only public contract IDs into status files
 or release notes.
@@ -325,8 +354,13 @@ that transaction result, can stage a manual metrics-oracle status draft, can
 verify public release-hardening evidence for the exact release commit, and emits
 `HANDOFF.md` plus `operator-handoff-summary.json`.
 
-The package is intentionally blocked until real network deploy/orchestration
-tooling, verified `operator_record` receipts, and signer-ready contract instance
+This composite handoff/readiness path remains the `full` seven-fixture path.
+The standalone H-001 canary pipeline stops at canary-specific receipt,
+evidence, and manual status artifacts and is intentionally rejected by full
+readiness status checks.
+
+The package is intentionally blocked until real funded operator execution,
+verified `operator_record` receipts, and signer-ready contract instance
 IDs exist. When real receipts are present, missing public receipt evidence is
 also a blocker. When a public metrics-oracle transaction result is present,
 missing public tx evidence is also a blocker. It does not accept private keys,

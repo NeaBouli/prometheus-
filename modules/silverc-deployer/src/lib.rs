@@ -4,7 +4,7 @@
 //! a public Schnorr digest. An external vault or HSM returns the signature. No
 //! private-key, seed, wallet, keystore, token, or password input exists here.
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 use std::fs::{self, File, OpenOptions};
 use std::io::Write;
 use std::path::{Path, PathBuf};
@@ -43,6 +43,20 @@ pub const FUNDING_INPUT_INDEX: u16 = 0;
 pub const SIGNING_REQUEST_KIND: &str = "prometheus.silverc.genesis.signing_request";
 pub const SIGNATURE_RESPONSE_KIND: &str = "prometheus.silverc.genesis.signature_response";
 pub const PUBLIC_TESTNET_RESOLVER: &str = "kaspa-resolver://public";
+pub const FULL_DEPLOYMENT_PROFILE: &str = "full";
+pub const H001_CANARY_DEPLOYMENT_PROFILE: &str = "testnet-10-validator-staking-h001";
+pub const H001_CANARY_CONTRACT: &str = "ValidatorStakingH001";
+pub const FULL_BUNDLE_MANIFEST_SHA256: &str =
+    "e6cec2aa5d740c47c972fe92d4607ffd8a7a3c3f26b353475451d50b2670aefd";
+pub const FULL_DEPLOYMENT_CONTRACTS: [&str; 7] = [
+    "ValidatorStakingH001",
+    "ValidatorStakingState",
+    "GuardianReputationState",
+    "RuleStorageState",
+    "CommunityDonationsState",
+    "DevIncentivePoolState",
+    "GovernanceAutoTuningState",
+];
 
 const SCHNORR_SCRIPT_LEN: usize = 66;
 const RPC_REQUEST_TIMEOUT: Duration = Duration::from_secs(20);
@@ -147,6 +161,16 @@ pub struct ContractRequest {
     pub script_len: usize,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub struct DeploymentProfile {
+    pub name: String,
+    pub kind: String,
+    pub network_id: String,
+    pub selected_contracts: Vec<String>,
+    pub full_bundle_fixture_count: usize,
+    pub full_bundle_manifest_sha256: String,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DeployRequest {
     pub schema_version: u32,
@@ -155,6 +179,7 @@ pub struct DeployRequest {
     pub network: String,
     pub rpc_url: String,
     pub deployer_address: String,
+    pub deployment_profile: DeploymentProfile,
     pub contract: ContractRequest,
     pub safety_scope: String,
     pub request_sha256: String,
@@ -603,6 +628,60 @@ fn read_public_json<T: DeserializeOwned>(path: &Path) -> Result<(T, Value)> {
     Ok((serde_json::from_value(value.clone())?, value))
 }
 
+fn validate_deployment_profile(request: &DeployRequest) -> Result<()> {
+    let profile = &request.deployment_profile;
+    validate_lower_hex(
+        &profile.full_bundle_manifest_sha256,
+        32,
+        "deployment_profile.full_bundle_manifest_sha256",
+    )?;
+    let selected: BTreeSet<_> = profile.selected_contracts.iter().collect();
+    if profile.full_bundle_fixture_count == 0
+        || profile.selected_contracts.is_empty()
+        || selected.len() != profile.selected_contracts.len()
+        || !profile.selected_contracts.contains(&request.contract.name)
+    {
+        bail!("deployment profile contract selection is invalid");
+    }
+    if profile.full_bundle_fixture_count != FULL_DEPLOYMENT_CONTRACTS.len()
+        || profile.full_bundle_manifest_sha256 != FULL_BUNDLE_MANIFEST_SHA256
+    {
+        bail!("deployment profile release-manifest binding mismatch");
+    }
+
+    match profile.name.as_str() {
+        FULL_DEPLOYMENT_PROFILE => {
+            if profile.kind != "full"
+                || profile.network_id != "operator-selected"
+                || !profile
+                    .selected_contracts
+                    .iter()
+                    .map(String::as_str)
+                    .eq(FULL_DEPLOYMENT_CONTRACTS.iter().copied())
+                || request.status != "READY_FOR_KEYLESS_GENESIS_OPERATOR"
+            {
+                bail!("full deployment profile/status mismatch");
+            }
+        }
+        H001_CANARY_DEPLOYMENT_PROFILE => {
+            if profile.kind != "canary"
+                || profile.network_id != "testnet-10"
+                || profile.full_bundle_fixture_count != 7
+                || profile.selected_contracts.len() != 1
+                || profile.selected_contracts[0] != H001_CANARY_CONTRACT
+                || request.contract.name != H001_CANARY_CONTRACT
+                || request.status != "CANARY_READY_FOR_KEYLESS_GENESIS_OPERATOR"
+                || request.network != "testnet"
+                || request.rpc_url != PUBLIC_TESTNET_RESOLVER
+            {
+                bail!("H-001 canary deployment profile/status/network mismatch");
+            }
+        }
+        _ => bail!("unsupported deployment profile"),
+    }
+    Ok(())
+}
+
 pub fn load_deploy_request(path: &Path) -> Result<DeployRequest> {
     let bytes = fs::read(path).with_context(|| format!("failed to read {}", path.display()))?;
     let mut value: Value = serde_json::from_slice(&bytes)
@@ -634,11 +713,11 @@ pub fn load_deploy_request(path: &Path) -> Result<DeployRequest> {
     let request: DeployRequest = serde_json::from_value(value)?;
     if request.schema_version != 1
         || request.request_type != "prometheus_silverc_deploy_request"
-        || request.status != "READY_FOR_KEYLESS_GENESIS_OPERATOR"
         || request.safety_scope != DEPLOY_REQUEST_SAFETY_SCOPE
     {
         bail!("unsupported deploy request schema/type/status/safety_scope");
     }
+    validate_deployment_profile(&request)?;
     validate_rpc_url(&request.rpc_url)?;
     if request.rpc_url == PUBLIC_TESTNET_RESOLVER && request.network != "testnet" {
         bail!("the official public resolver is restricted to testnet requests");
@@ -1776,6 +1855,20 @@ mod tests {
     use super::*;
     use kaspa_bip32::secp256k1::{rand::thread_rng, Keypair};
 
+    fn full_deployment_profile() -> DeploymentProfile {
+        DeploymentProfile {
+            name: FULL_DEPLOYMENT_PROFILE.to_string(),
+            kind: "full".to_string(),
+            network_id: "operator-selected".to_string(),
+            selected_contracts: FULL_DEPLOYMENT_CONTRACTS
+                .iter()
+                .map(|name| (*name).to_string())
+                .collect(),
+            full_bundle_fixture_count: FULL_DEPLOYMENT_CONTRACTS.len(),
+            full_bundle_manifest_sha256: FULL_BUNDLE_MANIFEST_SHA256.to_string(),
+        }
+    }
+
     fn fixture() -> (DeployRequest, SilvercArtifact, GenesisFundingSpec, Keypair) {
         let keypair = Keypair::new(SECP256K1, &mut thread_rng());
         let address = Address::new(
@@ -1792,8 +1885,9 @@ mod tests {
             network: "testnet".to_string(),
             rpc_url: "ws://127.0.0.1:17210".to_string(),
             deployer_address: address.to_string(),
+            deployment_profile: full_deployment_profile(),
             contract: ContractRequest {
-                name: "Fixture".to_string(),
+                name: H001_CANARY_CONTRACT.to_string(),
                 artifact_sha256: "a".repeat(64),
                 script_sha256: sha256_hex(&script),
                 script_len: script.len(),
@@ -1802,7 +1896,7 @@ mod tests {
             request_sha256: "b".repeat(64),
         };
         let artifact = SilvercArtifact {
-            contract_name: "Fixture".to_string(),
+            contract_name: H001_CANARY_CONTRACT.to_string(),
             compiler_version: "test".to_string(),
             script,
         };
@@ -1847,8 +1941,9 @@ mod tests {
             network: "testnet".to_string(),
             rpc_url: "wss://tn10.example.invalid".to_string(),
             deployer_address: address.to_string(),
+            deployment_profile: full_deployment_profile(),
             contract: ContractRequest {
-                name: "DeterministicFixture".to_string(),
+                name: H001_CANARY_CONTRACT.to_string(),
                 artifact_sha256: "aa".repeat(32),
                 script_sha256: sha256_hex(&script),
                 script_len: script.len(),
@@ -1978,7 +2073,7 @@ mod tests {
         );
         assert_eq!(
             prepared.signing_request.signing_request_sha256,
-            "35284bb7bbe7229a8bb9c8705d46f1a17c4baf7f64581665e0bb050eec91481c"
+            "39871130d3566f55a28587f7cb57412651aa8263e13fcc682d2ee45869c59403"
         );
         assert_eq!(prepared.signing_request.storage_mass, 95_555_555);
     }
@@ -2197,6 +2292,119 @@ mod tests {
                 .expect_err("public resolver must remain testnet-10-only");
             assert!(error.to_string().contains("restricted to testnet-10"));
         }
+    }
+
+    #[test]
+    fn h001_canary_profile_is_exact_and_non_promotable() {
+        let (mut request, _, _, _) = fixture();
+        request.status = "CANARY_READY_FOR_KEYLESS_GENESIS_OPERATOR".to_string();
+        request.rpc_url = PUBLIC_TESTNET_RESOLVER.to_string();
+        request.contract.name = H001_CANARY_CONTRACT.to_string();
+        request.deployment_profile = DeploymentProfile {
+            name: H001_CANARY_DEPLOYMENT_PROFILE.to_string(),
+            kind: "canary".to_string(),
+            network_id: "testnet-10".to_string(),
+            selected_contracts: vec![H001_CANARY_CONTRACT.to_string()],
+            full_bundle_fixture_count: 7,
+            full_bundle_manifest_sha256: FULL_BUNDLE_MANIFEST_SHA256.to_string(),
+        };
+        validate_deployment_profile(&request).unwrap();
+
+        let mut promoted = request.clone();
+        promoted.status = "READY_FOR_KEYLESS_GENESIS_OPERATOR".to_string();
+        assert!(validate_deployment_profile(&promoted).is_err());
+
+        let mut fabricated_full = request.clone();
+        fabricated_full.status = "READY_FOR_KEYLESS_GENESIS_OPERATOR".to_string();
+        fabricated_full.deployment_profile.name = FULL_DEPLOYMENT_PROFILE.to_string();
+        fabricated_full.deployment_profile.kind = "full".to_string();
+        fabricated_full.deployment_profile.network_id = "operator-selected".to_string();
+        assert!(validate_deployment_profile(&fabricated_full).is_err());
+
+        fabricated_full.deployment_profile.selected_contracts = FULL_DEPLOYMENT_CONTRACTS
+            .iter()
+            .map(|name| (*name).to_string())
+            .collect();
+        validate_deployment_profile(&fabricated_full).unwrap();
+
+        let mut wrong_manifest = fabricated_full.clone();
+        wrong_manifest
+            .deployment_profile
+            .full_bundle_manifest_sha256 = "dd".repeat(32);
+        assert!(validate_deployment_profile(&wrong_manifest).is_err());
+
+        let mut wrong_order = fabricated_full;
+        wrong_order.deployment_profile.selected_contracts.swap(0, 1);
+        assert!(validate_deployment_profile(&wrong_order).is_err());
+
+        let mut wrong_contract = request.clone();
+        wrong_contract.contract.name = "ValidatorStakingState".to_string();
+        assert!(validate_deployment_profile(&wrong_contract).is_err());
+
+        let mut wrong_network = request;
+        wrong_network.network = "mainnet".to_string();
+        assert!(validate_deployment_profile(&wrong_network).is_err());
+    }
+
+    #[test]
+    fn h001_canary_public_request_file_round_trip_is_profile_bound() {
+        let (mut request, _, _, _) = fixture();
+        request.status = "CANARY_READY_FOR_KEYLESS_GENESIS_OPERATOR".to_string();
+        request.rpc_url = PUBLIC_TESTNET_RESOLVER.to_string();
+        request.contract.name = H001_CANARY_CONTRACT.to_string();
+        request.deployment_profile = DeploymentProfile {
+            name: H001_CANARY_DEPLOYMENT_PROFILE.to_string(),
+            kind: "canary".to_string(),
+            network_id: "testnet-10".to_string(),
+            selected_contracts: vec![H001_CANARY_CONTRACT.to_string()],
+            full_bundle_fixture_count: 7,
+            full_bundle_manifest_sha256: FULL_BUNDLE_MANIFEST_SHA256.to_string(),
+        };
+        let temp_dir = std::env::temp_dir().join(format!(
+            "prometheus-h001-canary-request-{}-{}",
+            std::process::id(),
+            SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        fs::create_dir_all(&temp_dir).unwrap();
+
+        let mut value = serde_json::to_value(&request).unwrap();
+        value.as_object_mut().unwrap().insert(
+            "safety".to_string(),
+            serde_json::json!({
+                "accepts_private_keys": false,
+                "signs_transactions": false,
+                "assembles_chain_transaction": false,
+                "broadcasts_transactions": false,
+                "deploys_contracts": false,
+                "updates_status_files": false
+            }),
+        );
+        value.as_object_mut().unwrap().remove("request_sha256");
+        let request_hash = sha256_hex(&canonical_json(&value).unwrap());
+        value
+            .as_object_mut()
+            .unwrap()
+            .insert("request_sha256".to_string(), Value::String(request_hash));
+        let request_path = temp_dir.join("canary.deploy-request.json");
+        write_public_json(&request_path, &value).unwrap();
+        let loaded = load_deploy_request(&request_path).unwrap();
+        assert_eq!(loaded.deployment_profile, request.deployment_profile);
+
+        value["deployment_profile"]["selected_contracts"] =
+            serde_json::json!(["ValidatorStakingState"]);
+        value.as_object_mut().unwrap().remove("request_sha256");
+        let tampered_hash = sha256_hex(&canonical_json(&value).unwrap());
+        value
+            .as_object_mut()
+            .unwrap()
+            .insert("request_sha256".to_string(), Value::String(tampered_hash));
+        let tampered_path = temp_dir.join("tampered.deploy-request.json");
+        write_public_json(&tampered_path, &value).unwrap();
+        assert!(load_deploy_request(&tampered_path).is_err());
+        fs::remove_dir_all(temp_dir).unwrap();
     }
 
     #[test]

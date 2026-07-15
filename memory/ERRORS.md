@@ -121,6 +121,19 @@ Check:    Before mainnet: verify at least 50 active 8B Guardians
           and ensemble voting protocol deployed
 ```
 
+### PATTERN-013: Canary Evidence Promoted As Full Rollout
+```
+Problem:  A single-contract canary can accidentally inherit full-release
+          status strings, fixture counts, or metrics-oracle claims.
+Symptom:  One confirmed H-001 receipt appears sufficient for rollout readiness.
+Solution: Use only closed, manifest-bound deployment profiles. The H-001
+          profile requires testnet + kaspa-resolver://public, forbids the
+          metrics-oracle key, and emits distinct non-promotable statuses.
+Check:    Reject unknown/changed profiles, rehashed profile tampering, oracle
+          input on H-001, missing oracle input on full, and any canary status
+          consumed by full handoff/readiness.
+```
+
 ---
 
 ## ERROR LOG (populated during development)

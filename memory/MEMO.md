@@ -168,7 +168,10 @@ Dies ist nicht optional. Es ist Teil jeder Task-Definition.
 
 ## BLOCKADEN (aktuell)
 
-Sprint 9 bleibt blockiert, bis lokale Silverscript/TN12-Tooling-Tests und H-001 Commit-Reveal-Bytevektoren gegen ssc verifiziert sind.
+Sprint 9 ist nicht mehr durch Toccata oder H-001-Verifikation blockiert. Der
+non-promotable H-001 testnet-10 Canary wartet auf funded P2PK Input, externe
+BIP340-Signatur, Bestätigung und öffentliche Evidence; der Full-Rollout wartet
+zusätzlich auf die übrigen State-Contracts, Metrics Oracle und Release Hardening.
 Rusty-Kaspa Workspace-Dependencies sind seit 2026-07-07 auf `v2.0.1` gepinnt.
 Core Dev benötigt: Apple Developer Account + Google Play Account (vor Sprint 13).
 
@@ -186,3 +189,4 @@ Core Dev benötigt: Apple Developer Account + Google Play Account (vor Sprint 13
 | 2026-03-22 | Deployment-Ziel Aug/Sep 2026          | Core Dev   | Tägliche Arbeit, kein Zwischenstopp |
 | 2026-03-22 | Mobile: Flutter (nicht React Native)  | Architect  | Hintergrund-Scanning braucht native Integration |
 | 2026-03-22 | Guardian Installer: curl one-click script | Architect | Niedrigste Einstiegshürde für Server-Betreiber |
+| 2026-07-15 | Geschlossene Deployment-Profile | Codex Audit | `full` bindet sieben Release-Fixtures und Metrics Oracle; H-001 bindet nur den non-promotable testnet-10 Canary ohne Oracle-Key |

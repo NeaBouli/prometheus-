@@ -18,6 +18,14 @@ from preflight_silverc_deploy import (
     load_json,
     validate_manifest,
 )
+from silverc_deployment_profiles import (
+    FULL_PROFILE,
+    CANARY_SCOPE_NOTICE,
+    expected_profile,
+    is_canary,
+    receipt_verification_status,
+    validate_profile_document,
+)
 from smoke_silverc_artifacts import canonical_json_bytes
 from verify_silverc_h001 import DEFAULT_SILVERSCRIPT_REF
 
@@ -133,12 +141,19 @@ def validate_receipts_document(
     if bundle.get("fixture_count") != manifest["fixture_count"]:
         raise ValueError("release_bundle.fixture_count mismatch")
 
+    profile_document = receipts_doc.get("deployment_profile")
+    if profile_document is None:
+        deployment_profile = expected_profile(FULL_PROFILE, manifest)
+        manifest_entries = manifest["fixtures"]
+    else:
+        deployment_profile, manifest_entries = validate_profile_document(profile_document, manifest)
+
     receipts = receipts_doc.get("receipts")
     if not isinstance(receipts, list):
         raise ValueError("receipts: expected list")
 
     manifest_by_name = {entry["contract_name"]: entry for entry in manifest["fixtures"]}
-    expected_names = [entry["contract_name"] for entry in manifest["fixtures"]]
+    expected_names = [entry["contract_name"] for entry in manifest_entries]
     if len(receipts) != len(expected_names):
         raise ValueError("receipts: expected one receipt per manifest contract")
 
@@ -153,12 +168,13 @@ def validate_receipts_document(
     if actual_names != expected_names:
         raise ValueError("receipts: contract order/name mismatch")
 
-    status = "READY_FOR_STATUS_RECORDING" if provenance_type == "operator_record" else "CI_FIXTURE_VALID"
+    status = receipt_verification_status(deployment_profile, provenance_type)
     summary = {
         "schema_version": 1,
         "status": status,
         "network": network,
         "provenance_type": provenance_type,
+        "deployment_profile": deployment_profile,
         "silverscript_commit": manifest["silverscript_commit"],
         "receipt_count": len(normalized_receipts),
         "contracts": normalized_receipts,
@@ -175,6 +191,13 @@ def validate_receipts_document(
             "Keep ci_fixture receipts out of release status claims.",
         ],
     }
+    if is_canary(deployment_profile):
+        summary["operator_next_steps"] = [
+            "Verify the H-001 deploy transaction against a trusted node or explorer.",
+            "Use the canary evidence verifier before recording any canary result.",
+            "Do not use canary receipts for full release or metrics-oracle status.",
+            CANARY_SCOPE_NOTICE,
+        ]
     summary["receipts_sha256"] = sha256(canonical_json_bytes(receipts_doc)).hexdigest()
     return summary
 
@@ -253,6 +276,7 @@ def write_runbook(path: Path | None, summary: dict[str, Any]) -> None:
         "",
         f"Status: {summary['status']}",
         f"Network: {summary['network']}",
+        f"Deployment profile: `{summary['deployment_profile']['name']}`",
         f"Provenance: {summary['provenance_type']}",
         f"Silverscript commit: `{summary['silverscript_commit']}`",
         f"Receipts SHA-256: `{summary['receipts_sha256']}`",

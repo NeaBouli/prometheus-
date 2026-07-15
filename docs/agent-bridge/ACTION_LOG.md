@@ -1,5 +1,17 @@
 # Action Log
 
+## 2026-07-15 — GH-9 H-001 canary handoff
+
+- Reframed issue #9 from obsolete `ssc deploy`/Hello-World wording to the audited 58-byte `ValidatorStakingH001` genesis canary on testnet-10. H-001 remains a proof/canary fixture, not a seventh production-state contract.
+- Added closed, deterministic release-manifest-bound deployment profiles: `full` retains all seven release fixtures and the public metrics-oracle key; `testnet-10-validator-staking-h001` selects only H-001, fixes `testnet` plus exact `kaspa-resolver://public`, and forbids/omits the oracle key.
+- Propagated the profile through request, procedure, external-result import, receipt, evidence, and status artifacts. Canary statuses are distinct and cannot satisfy full handoff, production, or metrics-oracle readiness.
+- Added Rust profile validation plus end-to-end Python regression coverage for the canary, full seven-fixture compatibility, missing/forbidden oracle inputs, wrong network, manifest/profile tampering after rehashing, and unscoped canary receipt rejection.
+- Independent review found that the direct Rust loader initially accepted only the shape of a `full` profile. The operator now pins the canonical manifest SHA-256 `e6cec2aa5d740c47c972fe92d4607ffd8a7a3c3f26b353475451d50b2670aefd`, exact seven-fixture count/order, and rejects fabricated single-contract full profiles, wrong manifest hashes, and reordered selections. CI cross-checks the Rust constant against the generated Python profile.
+- Focused local checks pass: 32 `prometheus-silverc-deployer` tests, warning-free deployer Clippy, Rustfmt, Python compile/Ruff, full handoff/readiness regression, and the H-001 canary pipeline. Public docs, runbook, roadmap, Bridge, and Memory now distinguish canary evidence from rollout evidence.
+- Final verification after independent review passed 137 workspace tests with two intentional live-test ignores, warning-free workspace Clippy, Rustfmt, Ruff/Python compile, the end-to-end canary and full-path regressions, Memory Integrity, six Autodidactic tests, Actionlint v1.7.12, public whitepaper HTML/JSON-LD checks, `git diff --check`, and Gitleaks over the complete tracked diff. Terra confirmed the direct-loader finding resolved within the seven-receipt full-readiness threat model.
+- Real GH-9 execution still requires a funded public testnet-10 P2PK outpoint, matching public deployer identity, external vault/HSM BIP340 signature response, confirmation, and independent public chain evidence. No secrets, keys, raw signed transactions, or foreign untracked files were used.
+- Committed the handoff as `4fb547a` and opened PR https://github.com/NeaBouli/prometheus-/pull/11. The first remote Silverc job exposed a removed public Full-status alias imported by `verify_external_operator_capability.py`; `PROCEDURE_STATUS = READY_FOR_KEYLESS_GENESIS_OPERATION` is restored while Canary keeps its distinct status. Ruff, Python compile/import, capability `--help`, and the Canary regression pass locally before the CI-fix push.
+
 ## 2026-07-15 — GH-7 public resolver probe started
 
 - PR #6 merged normally as `4176093`; main Prometheus CI `29406057800`, Security Audit `29406057729`, and Pages `29406056965` passed.
