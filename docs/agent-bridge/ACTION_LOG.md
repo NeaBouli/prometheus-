@@ -350,6 +350,11 @@ Rules for all dev agents:
 - Spark handled only the bounded operator documentation slice; Sol reviewed and integrated the diff. Foreign untracked `Prometheus-1.png` remains untouched.
 - Commit `126659c` was pushed through PR #18. Prometheus CI and Security Audit are green across Rust Workspace, Current Silverc Runtime + Artifact Smoke, Silverscript Contracts, Python Guardian, Memory Integrity, HTML Pages, Secret Detection, Dependency Audit, and Security Summary.
 - CodeRabbit completed its review. Its one actionable wording finding was addressed by making `MEMO`, `TODO`, and `CHECKPOINT` explicit that funding/identity are confirmed while canary execution/evidence remain blocked through GH-17 merge and exact-main verification. The repository-wide docstring coverage warning is non-blocking and does not justify unrelated comment churn.
+- PR #18 merged normally without admin bypass as `9477fabb8a9abb41e0ee82f7e240a99436452d2c`; issue #17 closed. Exact-main Prometheus CI `29442211087`, Security Audit `29442210829`, and Pages `29442209299` passed.
+- Rebuilt all seven release artifacts and the one-request non-promotable H-001 profile from exact main. The live keyless preflight revalidated the public funding outpoint as unspent/non-coinbase against a synced `rusty-kaspa 2.0.1` node above Toccata activation.
+- Prepared deterministic signing-request schema v2 outside the repository. Signing-request hash is `6b8e65065ca5ae2ca561ddd3fcb9659c384496fd31db32c137fcc9d811fa5323`; sighash is `174ccbe80d1d37e62d2bbabfbfba48245372df2bcf9e6724ac79ebc16b4e0bcd`. A second prepare was byte-identical and the public handoff directory passed Gitleaks.
+- No signature, wallet access, raw signed transaction, or broadcast occurred. External BIP340 signing now requires explicit approval; full operator verification remains mandatory before any one-shot broadcast.
+- Preserved the reproducible public handoff outside Git at `/Users/gio/Desktop/repos/prometheus-handoffs/9477fab` with owner-only permissions; the repository still contains no signing response, wallet material, or raw transaction.
 
 - Remote verification update:
   - `181cde2 ci: reject raw deploy receipt payloads`

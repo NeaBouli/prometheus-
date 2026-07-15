@@ -67,19 +67,20 @@ the profile and non-promotable boundary.
 The public testnet-10 P2PK outpoint and matching deployer identity are now
 confirmed at transaction `24e81339f3656689643ca86e3c53c4c5336e4273bb127d25bdaf328e5da241c7`,
 output `0`, for `100100000000` sompi. The official TN10 API reports it accepted,
-unspent, and non-coinbase. The real canary still needs an exact-commit rebuild
-and request/digest, external BIP340 signature, broadcast, confirmation, receipt,
-and independent chain evidence. Canary success cannot mark the full
+unspent, and non-coinbase. GH-17 is merged and exact-main verified; the schema-v2
+request/digest was rebuilt deterministically from commit `9477fab` after a live
+funding preflight. The real canary still needs an explicitly approved external
+BIP340 signature, full operator verification, one-shot broadcast, confirmation,
+receipt, and independent chain evidence. Canary success cannot mark the full
 seven-fixture rollout, six production-state contracts, or metrics oracle ready.
 
-GH-17 hardens the operator before external signing. The in-progress branch
+GH-17 hardens the operator before external signing. The merged implementation
 models the final 66-byte Schnorr signature-script shape, binds compute,
 transient, storage, normalized non-contextual/overall mass and both pinned fee
 floors into signing-request schema v2, and rejects underpriced transactions
-before digest export. A live funding-bound candidate preflight passed with a
-10-TKAS covenant output and 500000-sompi fee; 35 focused Rust tests pass. This
-candidate must not be signed and will be rebuilt only from the exact merged
-commit after remote CI. No signature or broadcast occurred.
+before digest export. PR #18, exact-main CI/Security/Pages, 35 focused Rust tests,
+the exact funding preflight, and a byte-identical two-pass signing-request build
+all pass. No signature or broadcast occurred.
 
 ## GH-13 EXPERIMENTAL MINER COMPANION STATUS
 
@@ -119,9 +120,9 @@ Whitepaper verification pass. GH-13 is accepted as development-only foundation.
 | **SPRINT 0 – SETUP**         |                 |          |             |              |                 |
 | Testnet-10-Node              | DONE            | 100%     | 2026-03-21  | -            | wrpc://127.0.0.1:17210 |
 | Silverscript tooling (silverc/ssc) | IN_PROGRESS | 99%      | 2026-07-15  | -            | Upstream `silverc` builds/tests in CI; H-001 fixture verifies; ValidatorStaking state fixture compiles; `commitVote`, `revealVote`, `slashInvalidReveal`, `requestWithdraw`, `completeWithdraw`, and signed-int deployment-bound runtime tests pass; GuardianReputationState compile/ABI/runtime/formula gates pass; RuleStorageState, CommunityDonationsState, DevIncentivePoolState, and GovernanceAutoTuningState compile/ABI/runtime gates pass locally; all 7 current-Silverc fixtures compile through the CLI artifact smoke locally and in CI; deterministic release manifest/archive, deploy preflight, operator runbook, external deploy request set/verifier, public deploy operator procedure, public orchestrator-result receipt import with raw-transaction rejection, deployment receipt verifier, public receipt-evidence verifier, deployment status staging guard, operator handoff package, release-readiness audit, public metrics-oracle report preflight, unsigned metrics-oracle tx-request builder, external oracle operator procedure, public external-operator capability verifier, public oracle tx-result verifier, public oracle tx-evidence verifier, public oracle status-draft staging, and public release-hardening evidence verification pass; upstream `silverc` remains compile-only while the repository Toccata-v1 operator supplies the keyless network path |
-| prometheus-silverc-deployer | IN_PROGRESS | 99% | 2026-07-16 | LOCAL PASS | GH-17 signing-request schema-v2 fee/mass hardening passes 35 focused tests and live candidate preflight; merge, exact-main CI, and exact-commit request rebuild remain |
-| ValidatorStakingH001 Canary | IN_PROGRESS | 93% | 2026-07-16 | FUNDING VERIFIED | Public TN10 P2PK outpoint and matching identity confirmed; exact-commit request/digest, external BIP340 signature, one-shot broadcast, confirmation, receipt, and independent evidence remain; non-promotable by design |
-| GitHub Actions CI/CD         | ACCEPTED        | 100%     | 2026-07-15  | ACCEPTED     | Prometheus CI `29412667386`, Security Audit `29412667410`, and Pages `29412666483` green for merged commit `6213c559`; live GitHub Pages `whitepaper.html` contains the manifest-bound H-001 profile, 32-test operator baseline, and non-promotable boundary; current-Silverc runtime, release-bundle manifest/archive, deploy preflight, operator runbook, keyless deploy request set/verifier, public deploy operator procedure, public orchestrator-result receipt import with raw-transaction rejection, deployment receipt verifier, public receipt-evidence verifier, deployment status staging guard, operator handoff package, release-readiness audit, metrics-oracle report preflight, unsigned oracle tx-request, external oracle operator procedure, public external-operator capability verifier, public oracle tx-result, public oracle tx-evidence, public oracle status-draft staging, public release-hardening evidence verification, and Autodidactic regression gates are CI-verified; workflow actions use Node 24-compatible majors |
+| prometheus-silverc-deployer | ACCEPTED | 100% | 2026-07-16 | REMOTE PASS | GH-17 merged as `9477fab`; schema-v2 fee/mass hardening, 35 focused tests, exact-main CI/Security/Pages, live funding preflight, and deterministic request rebuild pass |
+| ValidatorStakingH001 Canary | IN_PROGRESS | 96% | 2026-07-16 | SIGNING HANDOFF READY | Public funding/identity and exact-main schema-v2 request/digest confirmed; external BIP340 signature, operator verification, one-shot broadcast, confirmation, receipt, and independent evidence remain; non-promotable by design |
+| GitHub Actions CI/CD         | ACCEPTED        | 100%     | 2026-07-16  | ACCEPTED     | Prometheus CI `29442211087`, Security Audit `29442210829`, and Pages `29442209299` green for exact merged commit `9477fab`; current-Silverc runtime, Rust/Python, Memory, HTML, Gitleaks, cargo/pip audit, and security summary pass |
 | Sprint-1 Pre-Check           | ACCEPTED        | 100%     | 2026-03-21  | ACCEPTED     | V-001, V-002, V-003 alle genehmigt |
 | **SPRINT 1 – CONTRACTS**     |                 |          |             |              |                 |
 | ValidatorStaking.ss          | ACCEPTED        | 100%     | 2026-03-21  | ACCEPTED     | v1.2: slash ACL, bond return, test patches |

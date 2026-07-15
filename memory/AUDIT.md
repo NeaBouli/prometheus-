@@ -661,5 +661,22 @@ candidate preflight passes all derived floors and 35 focused tests. The
 candidate is intentionally non-authoritative until merge and
 exact-main CI; no signature or broadcast occurred.
 
+**AUDIT UPDATE 2026-07-16:** GH-17 merged normally through PR #18 as exact main
+commit `9477fabb8a9abb41e0ee82f7e240a99436452d2c`; Prometheus CI
+`29442211087`, Security Audit `29442210829`, and Pages `29442209299` pass. The
+pre-merge candidate was discarded. All seven release artifacts, the
+manifest-bound one-request H-001 canary profile, public funding spec, live
+funding preflight, and schema-v2 signing request were rebuilt outside the
+repository from that commit. Live preflight reconfirmed the exact P2PK outpoint
+as unspent/non-coinbase on a synced, UTXO-indexed rusty-kaspa `2.0.1` node above
+Toccata activation. Two independent prepare runs emitted byte-identical JSON;
+the public handoff directory passed Gitleaks. Signing-request hash
+`6b8e65065ca5ae2ca561ddd3fcb9659c384496fd31db32c137fcc9d811fa5323`
+binds sighash
+`174ccbe80d1d37e62d2bbabfbfba48245372df2bcf9e6724ac79ebc16b4e0bcd`.
+No signature, wallet access, raw signed transaction, or broadcast occurred.
+External signing requires explicit approval and complete operator verification
+before the one-shot canary broadcast.
+
 *Audit completed 2026-04-02 by Claude Code (5 parallel agents, 7 levels, 35 checks).*
 *The fire belongs to humanity.*

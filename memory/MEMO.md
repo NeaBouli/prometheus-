@@ -171,11 +171,12 @@ Dies ist nicht optional. Es ist Teil jeder Task-Definition.
 Sprint 9 ist nicht mehr durch Toccata, H-001-Verifikation oder das
 Funding-/Identitäts-Gate blockiert. Der öffentliche non-promotable H-001
 testnet-10 P2PK-Outpoint und die passende öffentliche Deployer-Identität sind
-bestätigt. Canary-Ausführung und Evidence bleiben bis zum Merge der GH-17
-Signed-Shape-Fee/Mass-Härtung und der exact-main Verifikation blockiert. Danach
-folgen der exact-commit Request/Digest, eine externe BIP340-Signatur, Broadcast,
+bestätigt. GH-17 ist auf exact main `9477fab` gemergt und remote grün; der
+deterministische schema-v2 Request/Digest wurde daraus neu gebaut und live
+preflight-verifiziert. Offen sind die explizit freizugebende externe
+BIP340-Signatur, vollständige Operator-Verifikation, One-shot-Broadcast,
 Bestätigung, `operator_record`-Receipt-Erfassung/-Verifikation und öffentliche
-Evidence; der Full-Rollout wartet zusätzlich auf die übrigen State-Contracts,
+Evidence. Der Full-Rollout wartet zusätzlich auf die übrigen State-Contracts,
 Metrics Oracle und Release Hardening.
 Rusty-Kaspa Workspace-Dependencies sind seit 2026-07-07 auf `v2.0.1` gepinnt.
 Core Dev benötigt: Apple Developer Account + Google Play Account (vor Sprint 13).

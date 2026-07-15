@@ -16,8 +16,8 @@
 - [x] [P0] GH-1 offiziellen SilverScript Covenant-Genesis-Mechanikvertrag im externen Operator-Gate erzwingen | Codex | Merged via PR #2 as `9d74c0c`; main CI, Security Audit, and Pages pass for transaction v1, compiled-script P2SH, official covenant-ID derivation, and post-derivation funding-input binding
 - [x] [P0] GH-4 keyless Toccata-v1 SilverScript Genesis Operator | Codex | Merged via PR #5 as `ea67b93`; exact v1 contextual storage mass, compute budget 10, covenant ID, live UTXO checks, external BIP340 verification, fee caps, exclusive intent journal, retry reconciliation, RPC deadlines, source-bound observation, 27 tests, main CI/Security/Pages all pass
 - [x] [P0] GH-7 official public-resolver mode + funding-free testnet-10 probe | Codex | PR #8 merged as `288ea18`; main CI `29408432584`, Security `29408432511`, and Pages `29408431512` pass
-- [~] [P0] GH-17 Genesis-Operator Signed-Shape Fee/Mass-Härtung | Codex | 35 Rust-Tests und realer funding-bound Candidate-Preflight lokal grün; PR/merge/exact-main-CI offen; Candidate niemals signieren
-- [!] [P0] GH-9 `ValidatorStakingH001` Canary auf testnet-10 ausführen | Codex + externer Signer | Public P2PK outpoint and matching identity confirmed; exact-commit request/digest, external BIP340 response, broadcast, confirmation, receipt, and independent evidence remain
+- [x] [P0] GH-17 Genesis-Operator Signed-Shape Fee/Mass-Härtung | Codex | PR #18 merged as `9477fab`; exact-main CI/Security/Pages green; schema-v2 request rebuilt deterministically
+- [!] [P0] GH-9 `ValidatorStakingH001` Canary auf testnet-10 ausführen | Codex + externer Signer | Funding/identity and exact-main schema-v2 request/digest confirmed; explicit external BIP340 response, operator verification, one-shot broadcast, confirmation, receipt, and independent evidence remain
 - [x] [P0] rusty-kaspa als Dependency in Cargo.toml einbinden | Claude Code | 2026-03-21; pinned to v2.0.1 on 2026-07-07
 - [x] [P0] autodidactic.py vollständig testen (alle Memory-Operationen) | Codex | 2026-07-12; stdlib regression suite covers memory loading, next-task priority/dependency selection, in-progress completion, padded STATUS row replacement, and blocker detection; wired into Prometheus CI Memory Integrity job
 - [x] [P0] .gitignore konfigurieren (.secrets/, /tmp/, target/, __pycache__) | Claude Code | 2026-03-21
@@ -126,8 +126,9 @@
 ## ═══ SPRINT 9: CONTRACTS LIVE (Mai 2026) ═══
 
 - [x] [P0] GH-9: manifest-gebundenes H-001 testnet-10 Canary-Handoff mergen | Codex | PR #11 merged as `6213c559`; public funding recorded via PR #16 at `1e6e15c`
-- [~] [P0] GH-17 Fee/Mass-Härtung vor H-001-Signatur mergen und auf Main verifizieren | Codex | Issue #17; schema-v2 Candidate lokal grün, aber nicht signierbar
-- [!] [P0] `ValidatorStakingH001` Canary real ausführen; nie als Full-/Metrics-Readiness promoten | Core Dev + externer Signer | Funding/identity confirmed; execution/evidence blocked until GH-17 merge and exact-main verification; exact-commit request/digest + external BIP340 response + one-shot broadcast + confirmation + operator_record receipt capture/verification + independent evidence remain
+- [x] [P0] GH-17 Fee/Mass-Härtung vor H-001-Signatur mergen und auf Main verifizieren | Codex | PR #18 merged as `9477fab`; exact-main Prometheus CI `29442211087`, Security `29442210829`, Pages `29442209299` green
+- [x] [P0] H-001 schema-v2 Request/Digest vom exact-main Commit neu bauen | Codex | Deterministic rebuild and live funding preflight pass; signing-request `6b8e6506...a5323`; no signature/broadcast
+- [!] [P0] `ValidatorStakingH001` Canary real ausführen; nie als Full-/Metrics-Readiness promoten | Core Dev + externer Signer | Explicit external BIP340 response + operator verification + one-shot broadcast + confirmation + operator_record receipt capture/verification + independent evidence remain
 - [!] [P0] Full-Profil: sieben Release-Fixtures auf testnet-10 verifizieren und sechs State-Contracts erst danach auf Mainnet ausrollen | Core Dev + Codex | Canary-Evidence + Metrics Oracle + Release Hardening
 - [ ] [P0] kaspa-zk-params Crate integrieren, echte Groth16 in zk_proof.rs | Claude Code | ssc live
 - [ ] [P0] PROM Emission Contract schreiben + deployen | Claude Code | ssc live
