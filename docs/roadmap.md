@@ -78,7 +78,9 @@ The repository-owned `prometheus-silverc-deployer` now executes that genesis
 profile: it assembles the transaction, exports only the 32-byte digest for
 external BIP340 signing, verifies the returned signature and complete
 transaction, revalidates the exact live funding UTXO, broadcasts, and observes
-the covenant output. Real funded testnet-10 evidence remains required.
+the covenant output. Its funding-free TLS-only official-resolver probe now
+confirms a synced, UTXO-indexed post-Toccata testnet-10 node while preserving
+the mandatory funding-bound preflight. Real funded testnet-10 evidence remains required.
 A public release-hardening evidence verifier binds successful CI, Pages,
 branch-control, rollback, and release-note checks to the exact release commit
 without querying GitHub, accepting credentials, changing repository settings,

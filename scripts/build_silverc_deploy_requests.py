@@ -5,27 +5,26 @@ from __future__ import annotations
 
 import argparse
 import json
-import re
 import shutil
 import sys
 from hashlib import sha256
 from pathlib import Path
 from typing import Any
-from urllib.parse import urlparse
 
 from preflight_silverc_deploy import (
     HEX_32_BYTES_RE,
     KASPA_ADDRESS_RE,
     NETWORKS,
+    SECRET_LIKE_RE,
     bundle_root_from_args,
     load_json,
+    validate_deploy_rpc_url,
     validate_manifest,
 )
 from smoke_silverc_artifacts import FIXTURES, canonical_json_bytes
 from verify_silverc_h001 import DEFAULT_SILVERSCRIPT_REF
 
 DEFAULT_OUT_DIR = Path("/tmp/prometheus-silverc-deploy-requests")
-SECRET_LIKE_RE = re.compile(r"(private|secret|seed|mnemonic|password|passwd|wallet|keystore|token)", re.IGNORECASE)
 REQUEST_BLOCKER = (
     "real funded UTXO, external Schnorr signer response, and public chain evidence are required before repository broadcast"
 )
@@ -75,15 +74,7 @@ def reject_secret_fields(value: Any, path: str = "$") -> None:
 
 
 def validate_public_inputs(args: argparse.Namespace) -> None:
-    parsed = urlparse(args.rpc_url)
-    if parsed.scheme not in {"ws", "wss", "http", "https"}:
-        raise ValueError("--rpc-url must start with ws://, wss://, http://, or https://")
-    if parsed.username or parsed.password:
-        raise ValueError("--rpc-url must not contain credentials")
-    if parsed.query or parsed.fragment:
-        raise ValueError("--rpc-url must not contain query strings or fragments")
-    if SECRET_LIKE_RE.search(args.rpc_url):
-        raise ValueError("--rpc-url contains secret-like text")
+    validate_deploy_rpc_url(args.rpc_url, args.network)
     if not KASPA_ADDRESS_RE.match(args.deployer_address):
         raise ValueError("--deployer-address must be a public Kaspa address")
     if not HEX_32_BYTES_RE.match(args.metrics_oracle_pubkey):

@@ -15,6 +15,7 @@ import tomllib
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlparse
 
 from smoke_silverc_artifacts import (
     ARCHIVE_MEMBER_PREFIX,
@@ -34,6 +35,11 @@ from verify_silverc_h001 import (
 NETWORKS = ("sandbox", "testnet", "mainnet")
 HEX_32_BYTES_RE = re.compile(r"^(0x)?[0-9a-fA-F]{64}$")
 KASPA_ADDRESS_RE = re.compile(r"^(kaspa|kaspatest|kaspadev):[a-z0-9]{20,}$")
+SECRET_LIKE_RE = re.compile(
+    r"(private|secret|seed|mnemonic|password|passwd|wallet|keystore|token)",
+    re.IGNORECASE,
+)
+PUBLIC_RESOLVER_URL = "kaspa-resolver://public"
 
 
 @dataclass(frozen=True)
@@ -214,13 +220,34 @@ def validate_operator_inputs(args: argparse.Namespace) -> list[str]:
     if not args.metrics_oracle_pubkey:
         missing.append("metrics_oracle_pubkey")
 
-    if args.rpc_url and not args.rpc_url.startswith(("ws://", "wss://", "http://", "https://")):
-        raise ValueError("--rpc-url must start with ws://, wss://, http://, or https://")
+    if args.rpc_url:
+        validate_deploy_rpc_url(args.rpc_url, args.network)
     if args.deployer_address and not KASPA_ADDRESS_RE.match(args.deployer_address):
         raise ValueError("--deployer-address must be a public Kaspa address")
     if args.metrics_oracle_pubkey and not HEX_32_BYTES_RE.match(args.metrics_oracle_pubkey):
         raise ValueError("--metrics-oracle-pubkey must be a 32-byte public key hex string")
     return missing
+
+
+def validate_deploy_rpc_url(rpc_url: str, network: str) -> None:
+    if not isinstance(rpc_url, str) or not rpc_url:
+        raise ValueError("--rpc-url must be a non-empty string")
+    if rpc_url == PUBLIC_RESOLVER_URL:
+        if network != "testnet":
+            raise ValueError("--rpc-url public resolver is restricted to --network testnet")
+        return
+
+    parsed = urlparse(rpc_url)
+    if parsed.scheme not in {"ws", "wss"}:
+        raise ValueError("--rpc-url must use ws:// or wss://")
+    if parsed.username or parsed.password:
+        raise ValueError("--rpc-url must not contain credentials")
+    if not parsed.hostname:
+        raise ValueError("--rpc-url must include a host")
+    if parsed.query or parsed.fragment:
+        raise ValueError("--rpc-url must not contain query strings or fragments")
+    if SECRET_LIKE_RE.search(rpc_url):
+        raise ValueError("--rpc-url contains secret-like text")
 
 
 def inspect_silverc(silverscript_repo: Path, silverscript_ref: str) -> ToolingStatus:
