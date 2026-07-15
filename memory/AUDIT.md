@@ -593,5 +593,19 @@ locally. Network deploy/orchestration tooling and oracle operator integration
 must pass before Sprint 9 deployment.
 M-001 and M-002 can wait until full release (Aug/Sep 2026).
 
+**AUDIT UPDATE 2026-07-15:** GH-9 no longer uses the obsolete Hello-World/
+`ssc deploy` path. The repository defines two closed deployment profiles bound
+to the deterministic release manifest. `full` retains all seven fixtures and
+requires the public metrics-oracle key. `testnet-10-validator-staking-h001`
+selects exactly the H-001 proof fixture, requires the TLS-only official resolver,
+forbids the oracle key, and uses distinct request/procedure/receipt/evidence/
+status values that cannot satisfy full readiness. Local Rust and Python
+regressions cover profile tampering after rehashing, wrong network, forbidden or
+missing oracle inputs, receipt scope, and full-path compatibility. This closes
+the avoidable software dependency between the first H-001 canary and the
+GovernanceAutoTuning oracle identity; it does not close the external funding,
+signature, confirmation, public evidence, remaining-contract, oracle-operation,
+or exact-commit hardening gates.
+
 *Audit completed 2026-04-02 by Claude Code (5 parallel agents, 7 levels, 35 checks).*
 *The fire belongs to humanity.*

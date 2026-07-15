@@ -12,16 +12,24 @@ from pathlib import Path
 from typing import Any
 
 from preflight_silverc_deploy import (
+    HEX_32_BYTES_RE,
     bundle_root_from_args,
     load_json,
     validate_deploy_rpc_url,
     validate_manifest,
 )
+from silverc_deployment_profiles import (
+    CANARY_SCOPE_NOTICE,
+    FULL_PROFILE,
+    request_set_status,
+    request_status,
+    request_verification_status,
+    validate_profile_document,
+    validate_profile_inputs,
+)
 from smoke_silverc_artifacts import FIXTURES, canonical_json_bytes
 from verify_silverc_h001 import DEFAULT_SILVERSCRIPT_REF
 
-REQUEST_SET_STATUS = "REQUESTS_READY_FOR_KEYLESS_GENESIS_OPERATOR"
-REQUEST_STATUS = "READY_FOR_KEYLESS_GENESIS_OPERATOR"
 REQUEST_TYPE = "prometheus_silverc_deploy_request"
 SECRET_LIKE_RE = re.compile(r"(private|secret|seed|mnemonic|password|passwd|wallet|keystore|token)", re.IGNORECASE)
 ALLOWED_SECRET_WORD_KEYS = {"accepts_private_keys"}
@@ -193,6 +201,7 @@ def validate_request_file(
     manifest_entry: dict[str, Any],
     constructor_args: Any,
     order: int,
+    deployment_profile: dict[str, Any],
 ) -> dict[str, Any]:
     reject_secret_fields(request)
     validate_request_hash(request, path)
@@ -201,12 +210,19 @@ def validate_request_file(
         raise ValueError(f"{path.name}: schema_version expected 1")
     if request.get("request_type") != REQUEST_TYPE:
         raise ValueError(f"{path.name}: request_type mismatch")
-    if request.get("status") != REQUEST_STATUS:
+    if request.get("status") != request_status(deployment_profile):
         raise ValueError(f"{path.name}: status mismatch")
     require_safety_scope(request, path.name)
-    for key in ("network", "rpc_url", "deployer_address", "metrics_oracle_pubkey"):
+    for key in ("network", "rpc_url", "deployer_address"):
         if request.get(key) != request_set[key]:
             raise ValueError(f"{path.name}: {key} mismatch")
+    if request.get("deployment_profile") != deployment_profile:
+        raise ValueError(f"{path.name}: deployment_profile mismatch")
+    if deployment_profile["name"] == FULL_PROFILE:
+        if request.get("metrics_oracle_pubkey") != request_set["metrics_oracle_pubkey"]:
+            raise ValueError(f"{path.name}: metrics_oracle_pubkey mismatch")
+    elif "metrics_oracle_pubkey" in request:
+        raise ValueError(f"{path.name}: metrics_oracle_pubkey is forbidden for canary requests")
 
     silverscript = require_dict(request.get("silverscript"), f"{path.name}.silverscript")
     if silverscript.get("ref") != request_set["silverscript_ref"]:
@@ -251,16 +267,32 @@ def validate_request_set(
         request_set.get("rpc_url") or "",
         request_set.get("network") or "",
     )
+    deployment_profile, manifest_entries = validate_profile_document(
+        request_set.get("deployment_profile"),
+        manifest,
+    )
+    metrics_oracle_pubkey = request_set.get("metrics_oracle_pubkey")
+    validate_profile_inputs(
+        profile_name=deployment_profile["name"],
+        network=request_set.get("network") or "",
+        rpc_url=request_set.get("rpc_url") or "",
+        metrics_oracle_pubkey=metrics_oracle_pubkey,
+    )
+    if metrics_oracle_pubkey is not None and (
+        not isinstance(metrics_oracle_pubkey, str)
+        or not HEX_32_BYTES_RE.match(metrics_oracle_pubkey)
+    ):
+        raise ValueError("metrics_oracle_pubkey: expected 32-byte public key hex")
 
     if request_set.get("schema_version") != 1:
         raise ValueError("schema_version: expected 1")
-    if request_set.get("status") != REQUEST_SET_STATUS:
-        raise ValueError("status: expected REQUESTS_READY_FOR_KEYLESS_GENESIS_OPERATOR")
+    if request_set.get("status") != request_set_status(deployment_profile):
+        raise ValueError("status: deployment-profile status mismatch")
     if request_set.get("silverscript_ref") != manifest["silverscript_ref"]:
         raise ValueError("silverscript_ref mismatch")
     if request_set.get("silverscript_commit") != manifest["silverscript_commit"]:
         raise ValueError("silverscript_commit mismatch")
-    if request_set.get("request_count") != manifest["fixture_count"]:
+    if request_set.get("request_count") != len(manifest_entries):
         raise ValueError("request_count mismatch")
     expected_blocker = (
         REQUEST_BLOCKER
@@ -271,19 +303,23 @@ def validate_request_set(
     require_safety_scope(require_dict(request_set, "request_set"), "request_set")
 
     request_entries = require_list(request_set.get("requests"), "requests")
-    manifest_entries = manifest["fixtures"]
     constructor_args = fixture_args_by_contract()
     if len(request_entries) != len(manifest_entries):
-        raise ValueError("requests: expected one request per manifest contract")
+        raise ValueError("requests: expected one request per deployment-profile contract")
 
     verified = []
+    manifest_order = {
+        entry["contract_name"]: index
+        for index, entry in enumerate(manifest["fixtures"], start=1)
+    }
     for index, (request_entry, manifest_entry) in enumerate(zip(request_entries, manifest_entries), start=1):
         if not isinstance(request_entry, dict):
             raise ValueError(f"requests[{index - 1}]: expected object")
-        if request_entry.get("order") != index:
+        order = manifest_order[manifest_entry["contract_name"]]
+        if request_entry.get("order") != order:
             raise ValueError(f"requests[{index - 1}].order mismatch")
         filename = require_str(request_entry, "file")
-        expected_filename = f"{index:02d}-{manifest_entry['contract_name']}.deploy-request.json"
+        expected_filename = f"{order:02d}-{manifest_entry['contract_name']}.deploy-request.json"
         if filename != expected_filename:
             raise ValueError(f"requests[{index - 1}].file mismatch")
         path = requests_dir / filename
@@ -298,14 +334,16 @@ def validate_request_set(
                 request_entry=request_entry,
                 manifest_entry=manifest_entry,
                 constructor_args=constructor_args[manifest_entry["contract_name"]],
-                order=index,
+                order=order,
+                deployment_profile=deployment_profile,
             )
         )
 
-    return {
+    summary = {
         "schema_version": 1,
-        "status": "DEPLOY_REQUEST_SET_VERIFIED",
+        "status": request_verification_status(deployment_profile),
         "network": request_set["network"],
+        "deployment_profile": deployment_profile,
         "silverscript_commit": manifest["silverscript_commit"],
         "request_count": len(verified),
         "request_set_sha256": request_set["request_set_sha256"],
@@ -323,6 +361,9 @@ def validate_request_set(
         },
         "safety_scope": REQUEST_SAFETY_SCOPE,
     }
+    if deployment_profile["kind"] == "canary":
+        summary["blockers"].append(CANARY_SCOPE_NOTICE)
+    return summary
 
 
 def write_json(path: Path | None, value: dict[str, Any]) -> None:
@@ -341,6 +382,7 @@ def write_runbook(path: Path | None, summary: dict[str, Any]) -> None:
         "",
         f"Status: {summary['status']}",
         f"Network: {summary['network']}",
+        f"Deployment profile: `{summary['deployment_profile']['name']}`",
         f"Silverscript commit: `{summary['silverscript_commit']}`",
         f"Request set SHA-256: `{summary['request_set_sha256']}`",
         "",
@@ -355,6 +397,11 @@ def write_runbook(path: Path | None, summary: dict[str, Any]) -> None:
         "| Order | Contract | File | Request SHA-256 | Script SHA-256 |",
         "|------:|----------|------|-----------------|----------------|",
     ]
+    if summary["deployment_profile"]["kind"] == "canary":
+        lines.insert(
+            lines.index("## Requests") - 1,
+            "- Canary verification cannot authorize full release or metrics-oracle readiness.",
+        )
     for request in summary["requests"]:
         lines.append(
             "| {order} | `{contract}` | `{file}` | `{request_hash}` | `{script_hash}` |".format(

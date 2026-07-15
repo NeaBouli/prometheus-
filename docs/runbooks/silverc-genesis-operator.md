@@ -42,6 +42,56 @@ HTTP(S) URLs, other testnet suffixes, and mainnet resolver use fail closed.
 Direct `ws://` and `wss://` node URLs remain supported. Public resolver nodes
 are best-effort infrastructure and do not replace independent chain evidence.
 
+## Select The Deployment Profile
+
+The Python handoff layer accepts exactly two release-manifest-bound profiles:
+
+- `full`: all seven current-Silverc fixtures; requires the public
+  metrics-oracle x-only key and remains the only path that can eventually pass
+  the full operator-handoff/readiness audit.
+- `testnet-10-validator-staking-h001`: only `ValidatorStakingH001`; requires
+  `--network testnet` and the exact `kaspa-resolver://public` target; forbids and
+  omits `--metrics-oracle-pubkey`.
+
+The H-001 profile is stricter than the Rust operator's general direct-node
+capability. Its receipt, evidence, and status values remain canary-specific and
+must never be copied into full-release, production, or metrics-oracle status.
+Changing the profile object, contract selection, or release-manifest binding
+invalidates the request hash and is rejected after rehashing as well.
+
+Prepare and verify the canary handoff only after building the deterministic
+release archive:
+
+```bash
+python3 scripts/preflight_silverc_deploy.py \
+  --archive /tmp/prometheus-silverc-artifacts.tar.gz \
+  --deployment-profile testnet-10-validator-staking-h001 \
+  --network testnet \
+  --rpc-url kaspa-resolver://public \
+  --deployer-address <public-deployer-address> \
+  --plan-out /tmp/prometheus-h001-canary-preflight.json
+
+python3 scripts/build_silverc_deploy_requests.py \
+  --archive /tmp/prometheus-silverc-artifacts.tar.gz \
+  --deployment-profile testnet-10-validator-staking-h001 \
+  --out-dir /tmp/prometheus-h001-canary-requests \
+  --network testnet \
+  --rpc-url kaspa-resolver://public \
+  --deployer-address <public-deployer-address> \
+  --request-set-out /tmp/prometheus-h001-canary-request-set.json
+
+python3 scripts/verify_silverc_deploy_requests.py \
+  --archive /tmp/prometheus-silverc-artifacts.tar.gz \
+  --request-set /tmp/prometheus-h001-canary-request-set.json \
+  --requests-dir /tmp/prometheus-h001-canary-requests \
+  --summary-out /tmp/prometheus-h001-canary-verification.json
+```
+
+Expected canary scope: one request file named
+`01-ValidatorStakingH001.deploy-request.json`, no metrics-oracle key, and
+`CANARY_DEPLOY_REQUEST_VERIFIED`. A successful real transaction remains one
+canary observation, not a full rollout claim.
+
 ## Build
 
 ```bash
@@ -228,10 +278,11 @@ checks outpoint, amount, covenant ID, contract script, and DAA depth. The
 existing public receipt-evidence flow still requires independent explorer/block
 evidence before rollout status can become ready.
 
-The local suite contains 30 unit/security tests. It includes fixed public
+The local suite contains 32 unit/security tests. It includes fixed public
 transaction ID, covenant ID, sighash, signing-request hash, and storage-mass
 values, resolver fail-closed coverage, plus a file-based
-deploy-request/artifact/signing-response roundtrip.
+deploy-request/artifact/signing-response roundtrip and closed H-001 canary
+profile/tamper guards.
 
 ## PSKT Compatibility Note
 

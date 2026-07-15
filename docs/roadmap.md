@@ -38,7 +38,13 @@ preflight validates release-bundle integrity and public operator inputs, emits a
 Markdown operator runbook with contract hashes and safety rules, and confirms
 upstream `silverc` still exposes no network deploy command. An external deploy
 request builder emits per-contract public request JSON for an approved
-orchestrator, with request hashes bound to the release bundle. A public deploy
+orchestrator, with request hashes bound to the release bundle. Requests use one
+of two closed profiles. `full` selects all seven release fixtures and requires
+the public metrics-oracle key. `testnet-10-validator-staking-h001` selects only
+the H-001 proof fixture, fixes the target to the TLS-only official testnet-10
+resolver, omits the oracle key, and can never advance full rollout or metrics
+readiness. The seven fixtures are one H-001 encoding/proof fixture plus six
+state contracts; H-001 is not a seventh production-state contract. A public deploy
 operator procedure converts the verified request set into a deploy checklist
 and required public result-evidence contract without accepting keys or raw
 transactions. A public orchestrator-result importer converts confirmed external
@@ -95,6 +101,10 @@ public release-hardening evidence for the exact rollout commit.
 
 **Sprint 9 — Contracts Live + Real ZK-Proof**
 - Keep current-Silverscript runtime and release-bundle manifest gates green
+- Keep both closed deployment profiles manifest-bound and fail-closed
+- Execute the non-promotable `ValidatorStakingH001` testnet-10 canary first
+- Require a funded public P2PK outpoint, matching public deployer identity, external BIP340 signature, confirmation, and independent public evidence for that canary
+- Preserve all seven-fixture, metrics-oracle, and release-hardening gates after the canary; canary success is not rollout readiness
 - Keep release-bundle deploy preflight green
 - Keep the generated deploy operator runbook green and free of signing material
 - Keep the keyless genesis deploy request set green and free of signing material
@@ -115,7 +125,7 @@ public release-hardening evidence for the exact rollout commit.
 - Keep public release-hardening evidence verification green and bound to the exact release commit
 - Keep the keyless Toccata-v1 genesis operator tests, deterministic public vectors, public-file handoff, CLI secret-boundary checks, contextual storage-mass commitment, exact live funding-UTXO checks, fee caps, and broadcast acknowledgement gates green
 - Produce real testnet-10 funding, external-signature, deployment-receipt, and independent chain-observation evidence
-- Compile and deploy all 6 contracts to Kaspa Mainnet only after verification passes
+- Compile and deploy all six state contracts to Kaspa Mainnet only after the full seven-fixture verification path passes; H-001 remains a proof/canary fixture
 - Integrate kaspa-zk-params crate (real Groth16, replacing stub)
 - Implement PROM emission contract (minting logic)
 - Deploy first KAS/PROM liquidity pool on Kasplex DEX

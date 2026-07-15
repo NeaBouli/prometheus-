@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Any
 
 from preflight_silverc_deploy import bundle_root_from_args, load_json, validate_manifest
+from silverc_deployment_profiles import CANARY_SCOPE_NOTICE, is_canary, status_draft_status
 from verify_silverc_deploy_receipts import validate_receipts_document
 from verify_silverc_h001 import DEFAULT_SILVERSCRIPT_REF
 
@@ -53,6 +54,7 @@ def write_snippet(path: Path | None, status: dict[str, Any]) -> None:
         "",
         f"Status: {status['status']}",
         f"Network: {status['network']}",
+        f"Deployment profile: `{status['deployment_profile']['name']}`",
         f"Silverscript commit: `{status['silverscript_commit']}`",
         f"Receipts SHA-256: `{status['receipts_sha256']}`",
         "",
@@ -94,6 +96,7 @@ def write_snippet(path: Path | None, status: dict[str, Any]) -> None:
 
 
 def build_status(summary: dict[str, Any]) -> dict[str, Any]:
+    deployment_profile = summary["deployment_profile"]
     contracts = []
     for contract in summary["contracts"]:
         contracts.append(
@@ -109,11 +112,12 @@ def build_status(summary: dict[str, Any]) -> dict[str, Any]:
             }
         )
 
-    return {
+    status = {
         "schema_version": 1,
-        "status": "READY_FOR_MANUAL_STATUS_UPDATE",
+        "status": status_draft_status(deployment_profile),
         "network": summary["network"],
         "provenance_type": summary["provenance_type"],
+        "deployment_profile": deployment_profile,
         "silverscript_commit": summary["silverscript_commit"],
         "receipts_sha256": summary["receipts_sha256"],
         "contract_count": len(contracts),
@@ -133,6 +137,15 @@ def build_status(summary: dict[str, Any]) -> dict[str, Any]:
             "updates_status_files": False,
         },
     }
+    if is_canary(deployment_profile):
+        status["manual_checks"] = [
+            "Verify the H-001 deploy transaction ID against a trusted node or explorer.",
+            "Verify the deployed outpoint belongs to the exact H-001 artifact and script hashes.",
+            "Record this only as testnet-10 canary evidence.",
+            "Do not mark the full release, remaining contracts, or metrics oracle as deployed.",
+            CANARY_SCOPE_NOTICE,
+        ]
+    return status
 
 
 def main() -> int:

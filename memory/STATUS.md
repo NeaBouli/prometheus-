@@ -51,6 +51,21 @@ above activation. PR #8 merged normally as `288ea18`; main Prometheus CI
 GH-7 software/CI is complete. Real funding/signing/evidence gates continue in
 issue #9.
 
+## GH-9 H-001 CANARY STATUS
+
+Branch `feature/GH-9-canary-handoff` implements closed deployment profiles
+bound to the exact release-manifest SHA-256. `full` keeps all seven release
+fixtures and requires the public metrics-oracle key.
+`testnet-10-validator-staking-h001` selects only `ValidatorStakingH001`,
+requires `testnet` plus exact `kaspa-resolver://public`, forbids the oracle key,
+and emits non-promotable canary statuses through requests, procedure, receipts,
+public evidence, and manual status staging. Local focused checks pass with 32
+deployer tests, warning-free Clippy, and an end-to-end Python canary regression.
+The real canary still needs a funded public testnet-10 P2PK outpoint, matching
+public deployer identity, external BIP340 signature, confirmation, and
+independent chain evidence. Canary success cannot mark the full seven-fixture
+rollout, six production-state contracts, or metrics oracle ready.
+
 ---
 
 ## MODULE STATUS TABLE
@@ -73,8 +88,8 @@ issue #9.
 | **SPRINT 0 – SETUP**         |                 |          |             |              |                 |
 | Testnet-10-Node              | DONE            | 100%     | 2026-03-21  | -            | wrpc://127.0.0.1:17210 |
 | Silverscript tooling (silverc/ssc) | IN_PROGRESS | 99%      | 2026-07-15  | -            | Upstream `silverc` builds/tests in CI; H-001 fixture verifies; ValidatorStaking state fixture compiles; `commitVote`, `revealVote`, `slashInvalidReveal`, `requestWithdraw`, `completeWithdraw`, and signed-int deployment-bound runtime tests pass; GuardianReputationState compile/ABI/runtime/formula gates pass; RuleStorageState, CommunityDonationsState, DevIncentivePoolState, and GovernanceAutoTuningState compile/ABI/runtime gates pass locally; all 7 current-Silverc fixtures compile through the CLI artifact smoke locally and in CI; deterministic release manifest/archive, deploy preflight, operator runbook, external deploy request set/verifier, public deploy operator procedure, public orchestrator-result receipt import with raw-transaction rejection, deployment receipt verifier, public receipt-evidence verifier, deployment status staging guard, operator handoff package, release-readiness audit, public metrics-oracle report preflight, unsigned metrics-oracle tx-request builder, external oracle operator procedure, public external-operator capability verifier, public oracle tx-result verifier, public oracle tx-evidence verifier, public oracle status-draft staging, and public release-hardening evidence verification pass; upstream `silverc` remains compile-only while the repository Toccata-v1 operator supplies the keyless network path |
-| prometheus-silverc-deployer | ACCEPTED | 100% | 2026-07-15 | REMOTE PASS | Merged via PR #5 as `ea67b93`; exact v1 contextual storage mass, compute budget 10, covenant ID, live funding-UTXO checks, external signature verification, fee caps, exclusive intent journal, retry reconciliation, RPC deadlines, source-bound observation, 27 tests, seven-contract integration, main CI/Security/Pages pass; real deployment evidence tracked separately in Sprint 9 |
-| Hello-World Contract         | PENDING         | 0%       | 2026-03-21  | -            | Deployment nach ssc-Release |
+| prometheus-silverc-deployer | ACCEPTED | 100% | 2026-07-15 | REMOTE PASS + GH-9 LOCAL PASS | Merged operator baseline plus GH-9 profile validation; 32 focused tests, seven-fixture full regression, and single H-001 canary regression pass; real deployment evidence tracked separately in Sprint 9 |
+| ValidatorStakingH001 Canary | IN_PROGRESS | 90% | 2026-07-15 | LOCAL PASS | Software handoff ready; blocked only on funded public P2PK outpoint, matching public deployer identity, external BIP340 signature, confirmation, and independent public evidence; non-promotable by design |
 | GitHub Actions CI/CD         | ACCEPTED        | 100%     | 2026-07-15  | ACCEPTED     | Prometheus CI `29404986657`, Security Audit `29404986665`, and Pages `29404985747` green for merged commit `ea67b93`; live GitHub Pages `whitepaper.html` contains public release-hardening evidence wording; current-Silverc runtime, release-bundle manifest/archive, deploy preflight, operator runbook, keyless deploy request set/verifier, public deploy operator procedure, public orchestrator-result receipt import with raw-transaction rejection, deployment receipt verifier, public receipt-evidence verifier, deployment status staging guard, operator handoff package, release-readiness audit, metrics-oracle report preflight, unsigned oracle tx-request, external oracle operator procedure, public external-operator capability verifier, public oracle tx-result, public oracle tx-evidence, public oracle status-draft staging, public release-hardening evidence verification, and Autodidactic regression gates are CI-verified; workflow actions use Node 24-compatible majors |
 | Sprint-1 Pre-Check           | ACCEPTED        | 100%     | 2026-03-21  | ACCEPTED     | V-001, V-002, V-003 alle genehmigt |
 | **SPRINT 1 – CONTRACTS**     |                 |          |             |              |                 |

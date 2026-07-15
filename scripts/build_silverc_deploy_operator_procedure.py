@@ -10,11 +10,11 @@ from pathlib import Path
 from typing import Any
 
 from preflight_silverc_deploy import bundle_root_from_args, load_json, validate_manifest
+from silverc_deployment_profiles import CANARY_SCOPE_NOTICE, is_canary, procedure_status
 from verify_silverc_deploy_requests import validate_request_set
 from verify_silverc_h001 import DEFAULT_SILVERSCRIPT_REF
 
 PROCEDURE_KIND = "prometheus.silverc.deploy.operator_procedure"
-PROCEDURE_STATUS = "READY_FOR_KEYLESS_GENESIS_OPERATION"
 GENESIS_PROFILE = {
     "transaction_version": 1,
     "funding_input_compute_budget": 10,
@@ -53,11 +53,13 @@ def parse_args() -> argparse.Namespace:
 
 
 def build_procedure(request_summary: dict[str, Any]) -> dict[str, Any]:
-    return {
+    deployment_profile = request_summary["deployment_profile"]
+    procedure = {
         "schema_version": 1,
         "kind": PROCEDURE_KIND,
-        "status": PROCEDURE_STATUS,
+        "status": procedure_status(deployment_profile),
         "network": request_summary["network"],
+        "deployment_profile": deployment_profile,
         "request_set_sha256": request_summary["request_set_sha256"],
         "silverscript_commit": request_summary["silverscript_commit"],
         "request_count": request_summary["request_count"],
@@ -118,7 +120,8 @@ def build_procedure(request_summary: dict[str, Any]) -> dict[str, Any]:
             "provenance.type": "operator_record",
             "request_set_sha256": request_summary["request_set_sha256"],
             "release_bundle.silverscript_commit": request_summary["silverscript_commit"],
-            "release_bundle.fixture_count": request_summary["request_count"],
+            "release_bundle.fixture_count": deployment_profile["full_bundle_fixture_count"],
+            "deployment_profile": deployment_profile,
             "results[].status": "confirmed",
             "results[].contract_name": "contract name from deploy request set",
             "results[].request_sha256": "request hash from deploy request set",
@@ -142,6 +145,12 @@ def build_procedure(request_summary: dict[str, Any]) -> dict[str, Any]:
         "safety_scope": "procedure_builder_only",
         "blockers": [],
     }
+    if is_canary(deployment_profile):
+        procedure["blockers"].append(CANARY_SCOPE_NOTICE)
+        procedure["execution_sequence"].append(
+            "Treat the confirmed result only as H-001 canary evidence; do not promote full release or metrics-oracle status."
+        )
+    return procedure
 
 
 def write_json(path: Path | None, value: dict[str, Any]) -> None:
@@ -160,6 +169,7 @@ def write_runbook(path: Path | None, procedure: dict[str, Any]) -> None:
         "",
         f"Status: {procedure['status']}",
         f"Network: {procedure['network']}",
+        f"Deployment profile: `{procedure['deployment_profile']['name']}`",
         f"Request set SHA-256: `{procedure['request_set_sha256']}`",
         "",
         "## Boundary",
@@ -175,6 +185,11 @@ def write_runbook(path: Path | None, procedure: dict[str, Any]) -> None:
         "| Order | Contract | Request SHA-256 | Script SHA-256 |",
         "|------:|----------|-----------------|----------------|",
     ]
+    if is_canary(procedure["deployment_profile"]):
+        lines.insert(
+            lines.index("## Contracts") - 1,
+            "- This canary procedure cannot authorize full release or metrics-oracle readiness.",
+        )
     for contract in procedure["contracts"]:
         lines.append(
             "| {order} | `{contract}` | `{request_hash}` | `{script_hash}` |".format(

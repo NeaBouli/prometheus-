@@ -26,6 +26,13 @@ from smoke_silverc_artifacts import (
     sha256_bytes,
     sha256_file,
 )
+from silverc_deployment_profiles import (
+    DEPLOYMENT_PROFILES,
+    FULL_PROFILE,
+    H001_CANARY_PROFILE,
+    PUBLIC_RESOLVER_URL,
+    expected_profile,
+)
 from verify_silverc_h001 import (
     DEFAULT_SILVERSCRIPT_REF,
     DEFAULT_SILVERSCRIPT_REPO,
@@ -39,7 +46,6 @@ SECRET_LIKE_RE = re.compile(
     r"(private|secret|seed|mnemonic|password|passwd|wallet|keystore|token)",
     re.IGNORECASE,
 )
-PUBLIC_RESOLVER_URL = "kaspa-resolver://public"
 
 
 @dataclass(frozen=True)
@@ -62,6 +68,12 @@ def parse_args() -> argparse.Namespace:
     source = parser.add_mutually_exclusive_group(required=True)
     source.add_argument("--bundle-dir", type=Path, help="Directory containing manifest.json and artifacts")
     source.add_argument("--archive", type=Path, help="Release .tar.gz archive to validate")
+    parser.add_argument(
+        "--deployment-profile",
+        choices=DEPLOYMENT_PROFILES,
+        default=FULL_PROFILE,
+        help="Closed deployment scope; the H-001 canary cannot authorize a full rollout",
+    )
     parser.add_argument("--network", choices=NETWORKS, default="sandbox")
     parser.add_argument("--rpc-url", help="Public Kaspa RPC/wRPC endpoint intended for deployment")
     parser.add_argument("--deployer-address", help="Public deployer address; never pass private keys")
@@ -217,7 +229,7 @@ def validate_operator_inputs(args: argparse.Namespace) -> list[str]:
         missing.append("rpc_url")
     if not args.deployer_address:
         missing.append("deployer_address")
-    if not args.metrics_oracle_pubkey:
+    if args.deployment_profile == FULL_PROFILE and not args.metrics_oracle_pubkey:
         missing.append("metrics_oracle_pubkey")
 
     if args.rpc_url:
@@ -226,6 +238,17 @@ def validate_operator_inputs(args: argparse.Namespace) -> list[str]:
         raise ValueError("--deployer-address must be a public Kaspa address")
     if args.metrics_oracle_pubkey and not HEX_32_BYTES_RE.match(args.metrics_oracle_pubkey):
         raise ValueError("--metrics-oracle-pubkey must be a 32-byte public key hex string")
+    if args.deployment_profile == H001_CANARY_PROFILE:
+        if args.network != "testnet":
+            raise ValueError("the H-001 canary deployment profile is restricted to --network testnet")
+        if args.rpc_url and args.rpc_url != PUBLIC_RESOLVER_URL:
+            raise ValueError(
+                "the H-001 canary deployment profile requires --rpc-url kaspa-resolver://public"
+            )
+        if args.metrics_oracle_pubkey is not None:
+            raise ValueError(
+                "--metrics-oracle-pubkey is forbidden for the H-001 canary deployment profile"
+            )
     return missing
 
 
@@ -301,9 +324,11 @@ def write_plan(
     missing_inputs: list[str],
     tooling: ToolingStatus,
 ) -> dict[str, Any]:
+    deployment_profile = expected_profile(args.deployment_profile, manifest)
     plan = {
         "schema_version": 1,
         "network": args.network,
+        "deployment_profile": deployment_profile,
         "bundle": {
             "silverscript_ref": manifest["silverscript_ref"],
             "silverscript_commit": manifest["silverscript_commit"],
@@ -349,12 +374,18 @@ def write_runbook(args: argparse.Namespace, manifest: dict[str, Any], plan: dict
     if not args.runbook_out:
         return
 
-    status = "READY_FOR_NETWORK_DEPLOY_TOOL" if plan["deploy_supported"] else "BLOCKED"
+    if not plan["deploy_supported"]:
+        status = "BLOCKED"
+    elif plan["deployment_profile"]["kind"] == "canary":
+        status = "CANARY_READY_FOR_NETWORK_DEPLOY_TOOL"
+    else:
+        status = "READY_FOR_NETWORK_DEPLOY_TOOL"
     lines = [
         "# Prometheus Silverc Deploy Preflight Runbook",
         "",
         f"Status: {status}",
         f"Network: {plan['network']}",
+        f"Deployment profile: `{plan['deployment_profile']['name']}`",
         f"Silverscript ref: `{plan['bundle']['silverscript_ref']}`",
         f"Silverscript commit: `{plan['bundle']['silverscript_commit']}`",
         f"Fixture count: {plan['bundle']['fixture_count']}",
@@ -386,7 +417,10 @@ def write_runbook(args: argparse.Namespace, manifest: dict[str, Any], plan: dict
         "| Order | Contract | Artifact | Script SHA-256 | Script bytes |",
         "|------:|----------|----------|----------------|-------------:|",
     ]
+    selected_contracts = set(plan["deployment_profile"]["selected_contracts"])
     for index, entry in enumerate(manifest["fixtures"], start=1):
+        if entry["contract_name"] not in selected_contracts:
+            continue
         lines.append(
             "| {index} | `{contract}` | `{artifact}` | `{script_hash}` | {script_len} |".format(
                 index=index,
