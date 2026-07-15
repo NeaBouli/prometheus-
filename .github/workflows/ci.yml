@@ -201,7 +201,7 @@ jobs:
           cargo build -p prometheus-silverc-deployer
           operator=target/debug/prometheus-silverc-deployer
           "$operator" --help > /tmp/prometheus-silverc-deployer-help.txt
-          for command in probe preflight prepare import-signature verify-signature broadcast observe; do
+          for command in probe preflight prepare import-signature verify-signature broadcast observe report-metrics-preflight report-metrics-prepare report-metrics-import-signatures report-metrics-broadcast report-metrics-observe; do
             "$operator" "$command" --help >> /tmp/prometheus-silverc-deployer-help.txt
           done
           "$operator" probe --help > /tmp/prometheus-silverc-deployer-probe-help.txt
@@ -214,6 +214,10 @@ jobs:
           grep -q -- '--signature-hex-file' /tmp/prometheus-silverc-deployer-import-signature-help.txt
           grep -q -- '--signature-response-out' /tmp/prometheus-silverc-deployer-import-signature-help.txt
           grep -q -- '--acknowledge-signing-request-sha256' /tmp/prometheus-silverc-deployer-help.txt
+          grep -q -- '--transition-spec' /tmp/prometheus-silverc-deployer-help.txt
+          grep -q -- '--metrics-tx-request' /tmp/prometheus-silverc-deployer-help.txt
+          grep -q -- '--oracle-signature-hex-file' /tmp/prometheus-silverc-deployer-help.txt
+          grep -q -- '--sponsor-signature-hex-file' /tmp/prometheus-silverc-deployer-help.txt
           "$operator" observe --help > /tmp/prometheus-silverc-deployer-observe-help.txt
           grep -q -- '--request' /tmp/prometheus-silverc-deployer-observe-help.txt
           grep -q -- '--artifact' /tmp/prometheus-silverc-deployer-observe-help.txt
@@ -947,6 +951,9 @@ jobs:
           assert request["safety"]["signs_transactions"] is False
           assert request["safety"]["assembles_chain_transaction"] is False
           assert request["safety"]["broadcasts_transactions"] is False
+          assert request["safety_scope"] == "metrics_tx_request_builder_only"
+          assert request["repository_operator"]["assembles_transaction_in_memory"] is True
+          assert request["repository_operator"]["requires_external_fee_sponsor_signature"] is True
           assert "missing deployed GovernanceAutoTuningState contract instance id" in request["blockers"]
           assert "unsigned operator request, not a serialized Kaspa transaction" in runbook
 
@@ -960,7 +967,7 @@ jobs:
                   "--report",
                   "modules/contracts/silverc/metrics-oracle-report.sample.json",
                   "--contract-instance-id",
-                  "sandbox:governance-auto-tuning-state-fixture-0001",
+                  "7777777777777777777777777777777777777777777777777777777777777777:0",
                   "--require-contract-instance-id",
                   "--tx-request-out",
                   ready_path,
@@ -968,7 +975,7 @@ jobs:
               check=True,
           )
           ready = json.loads(Path(ready_path).read_text())
-          assert ready["status"] == "READY_FOR_EXTERNAL_TX_ASSEMBLER"
+          assert ready["status"] == "READY_FOR_KEYLESS_REPORT_METRICS_OPERATOR"
           assert ready["blockers"] == []
 
           tx_result_path = Path("/tmp/prometheus-metrics-oracle-tx-result.json")
@@ -1027,7 +1034,7 @@ jobs:
           assert tx_summary["status"] == "METRICS_ORACLE_TX_RESULT_VERIFIED"
           assert tx_summary["provenance_type"] == "operator_record"
           assert tx_summary["tx_request_sha256"] == ready["request_sha256"]
-          assert tx_summary["contract"]["instance_id"] == "sandbox:governance-auto-tuning-state-fixture-0001"
+          assert tx_summary["contract"]["instance_id"] == "7777777777777777777777777777777777777777777777777777777777777777:0"
           assert tx_summary["safety"]["accepts_private_keys"] is False
           assert tx_summary["safety"]["accepts_raw_transactions"] is False
           assert tx_summary["safety"]["signs_transactions"] is False
@@ -1125,7 +1132,7 @@ jobs:
           assert status_draft["tx_request_sha256"] == ready["request_sha256"]
           assert status_draft["tx_result_sha256"] == tx_summary["tx_result_sha256"]
           assert status_draft["transaction"]["tx_id"] == "3" * 64
-          assert status_draft["contract"]["instance_id"] == "sandbox:governance-auto-tuning-state-fixture-0001"
+          assert status_draft["contract"]["instance_id"] == "7777777777777777777777777777777777777777777777777777777777777777:0"
           assert status_draft["safety"]["accepts_private_keys"] is False
           assert status_draft["safety"]["accepts_raw_transactions"] is False
           assert status_draft["safety"]["signs_transactions"] is False
@@ -1153,9 +1160,9 @@ jobs:
           )
           procedure = json.loads(Path("/tmp/prometheus-metrics-oracle-operator-procedure.json").read_text())
           procedure_runbook = Path("/tmp/prometheus-metrics-oracle-operator-procedure.md").read_text()
-          assert procedure["status"] == "READY_FOR_EXTERNAL_ORACLE_OPERATOR"
+          assert procedure["status"] == "READY_FOR_KEYLESS_REPORT_METRICS_OPERATION"
           assert procedure["tx_request_sha256"] == ready["request_sha256"]
-          assert procedure["contract"]["instance_id"] == "sandbox:governance-auto-tuning-state-fixture-0001"
+          assert procedure["contract"]["instance_id"] == "7777777777777777777777777777777777777777777777777777777777777777:0"
           assert procedure["required_public_result_fields"]["tx_request_sha256"] == ready["request_sha256"]
           assert procedure["safety"]["accepts_private_keys"] is False
           assert procedure["safety"]["accepts_raw_transactions"] is False
@@ -1164,8 +1171,11 @@ jobs:
           assert procedure["safety"]["broadcasts_transactions"] is False
           assert procedure["safety"]["deploys_contracts"] is False
           assert procedure["safety"]["updates_status_files"] is False
+          assert procedure["safety_scope"] == "operator_procedure_builder_only"
+          assert procedure["repository_operator"]["preserves_covenant_state_value"] is True
+          assert procedure["repository_operator"]["fee_paid_by_separate_p2pk_sponsor"] is True
           assert "public operator checklist" in procedure_runbook
-          assert "does not sign" in procedure_runbook
+          assert "never signs" in procedure_runbook
 
           deploy_procedure = json.loads(Path("/tmp/prometheus-silverc-deploy-operator-procedure.json").read_text())
           capability_path = Path("/tmp/prometheus-external-operator-capability.json")
@@ -1233,7 +1243,7 @@ jobs:
           assert capability_summary["status"] == "EXTERNAL_OPERATOR_CAPABILITY_VERIFIED"
           assert capability_summary["operator_id"] == "ci-public-external-operator-fixture"
           assert capability_summary["deploy_operator_status"] == "READY_FOR_KEYLESS_GENESIS_OPERATION"
-          assert capability_summary["metrics_operator_status"] == "READY_FOR_EXTERNAL_ORACLE_OPERATOR"
+          assert capability_summary["metrics_operator_status"] == "READY_FOR_KEYLESS_REPORT_METRICS_OPERATION"
           assert capability_summary["request_set_sha256"] == deploy_procedure["request_set_sha256"]
           assert capability_summary["genesis_profile"] == deploy_procedure["required_genesis_profile"]
           assert capability_summary["tx_request_sha256"] == procedure["tx_request_sha256"]
@@ -1540,6 +1550,23 @@ jobs:
           proc = subprocess.run(
               [
                   "python3",
+                  "scripts/build_metrics_oracle_tx_request.py",
+                  "--archive",
+                  "/tmp/prometheus-silverc-artifacts.tar.gz",
+                  "--report",
+                  "modules/contracts/silverc/metrics-oracle-report.sample.json",
+                  "--contract-instance-id",
+                  "sandbox:free-form-instance",
+              ],
+              text=True,
+              capture_output=True,
+          )
+          assert proc.returncode != 0
+          assert "exact lowercase Kaspa outpoint" in proc.stderr
+
+          proc = subprocess.run(
+              [
+                  "python3",
                   "scripts/verify_metrics_oracle_tx_result.py",
                   "--archive",
                   "/tmp/prometheus-silverc-artifacts.tar.gz",
@@ -1552,7 +1579,7 @@ jobs:
               capture_output=True,
           )
           assert proc.returncode != 0
-          assert "tx_request.status: expected READY_FOR_EXTERNAL_TX_ASSEMBLER" in proc.stderr
+          assert "tx_request.status: expected READY_FOR_KEYLESS_REPORT_METRICS_OPERATOR" in proc.stderr
 
           proc = subprocess.run(
               [
@@ -1569,7 +1596,7 @@ jobs:
               capture_output=True,
           )
           assert proc.returncode != 0
-          assert "tx_request.status: expected READY_FOR_EXTERNAL_TX_ASSEMBLER" in proc.stderr
+          assert "tx_request.status: expected READY_FOR_KEYLESS_REPORT_METRICS_OPERATOR" in proc.stderr
 
           proc = subprocess.run(
               [
@@ -1584,7 +1611,7 @@ jobs:
               capture_output=True,
           )
           assert proc.returncode != 0
-          assert "tx_request.status: expected READY_FOR_EXTERNAL_TX_ASSEMBLER" in proc.stderr
+          assert "tx_request.status: expected READY_FOR_KEYLESS_REPORT_METRICS_OPERATOR" in proc.stderr
 
           bad = json.loads(Path(ready_path).read_text())
           bad["_".join(["wallet", "token"])] = "do-not-accept"
@@ -2080,7 +2107,7 @@ jobs:
             --metrics-oracle-pubkey 1111111111111111111111111111111111111111111111111111111111111111 \
             --orchestrator-results /tmp/prometheus-silverc-external-deploy-results.json \
             --deploy-receipt-evidence /tmp/prometheus-silverc-deploy-receipt-public-evidence.json \
-            --contract-instance-id sandbox:governance-auto-tuning-state-fixture-0001 \
+            --contract-instance-id 7777777777777777777777777777777777777777777777777777777777777777:0 \
             --metrics-tx-result /tmp/prometheus-metrics-oracle-tx-result.json \
             --operator-capability /tmp/prometheus-external-operator-capability.json
           python3 - <<'PY'
@@ -2105,7 +2132,7 @@ jobs:
             --metrics-oracle-pubkey 1111111111111111111111111111111111111111111111111111111111111111 \
             --orchestrator-results /tmp/prometheus-silverc-external-deploy-results.json \
             --deploy-receipt-evidence /tmp/prometheus-silverc-deploy-receipt-public-evidence.json \
-            --contract-instance-id sandbox:governance-auto-tuning-state-fixture-0001 \
+            --contract-instance-id 7777777777777777777777777777777777777777777777777777777777777777:0 \
             --metrics-tx-result /tmp/prometheus-metrics-oracle-tx-result.json \
             --metrics-tx-evidence /tmp/prometheus-metrics-oracle-tx-public-evidence.json \
             --operator-capability /tmp/prometheus-external-operator-capability.json \
@@ -2120,8 +2147,8 @@ jobs:
           assert summary["deploy_operator_procedure_status"] == "READY_FOR_KEYLESS_GENESIS_OPERATION"
           assert summary["operator_receipts_status"] == "READY_FOR_STATUS_RECORDING"
           assert summary["deploy_receipt_evidence_status"] == "PUBLIC_DEPLOY_RECEIPT_EVIDENCE_VERIFIED"
-          assert summary["metrics_tx_request_status"] == "READY_FOR_EXTERNAL_TX_ASSEMBLER"
-          assert summary["metrics_operator_procedure_status"] == "READY_FOR_EXTERNAL_ORACLE_OPERATOR"
+          assert summary["metrics_tx_request_status"] == "READY_FOR_KEYLESS_REPORT_METRICS_OPERATOR"
+          assert summary["metrics_operator_procedure_status"] == "READY_FOR_KEYLESS_REPORT_METRICS_OPERATION"
           assert summary["metrics_tx_result_status"] == "METRICS_ORACLE_TX_RESULT_VERIFIED"
           assert summary["metrics_tx_evidence_status"] == "PUBLIC_METRICS_ORACLE_TX_EVIDENCE_VERIFIED"
           assert summary["metrics_oracle_status_draft_status"] == "READY_FOR_MANUAL_ORACLE_STATUS_UPDATE"
@@ -2170,8 +2197,8 @@ jobs:
           assert summary["component_statuses"]["operator_receipts"] == "READY_FOR_STATUS_RECORDING"
           assert summary["component_statuses"]["deploy_receipt_evidence"] == "PUBLIC_DEPLOY_RECEIPT_EVIDENCE_VERIFIED"
           assert summary["component_statuses"]["deploy_operator_procedure"] == "READY_FOR_KEYLESS_GENESIS_OPERATION"
-          assert summary["component_statuses"]["metrics_tx_request"] == "READY_FOR_EXTERNAL_TX_ASSEMBLER"
-          assert summary["component_statuses"]["metrics_operator_procedure"] == "READY_FOR_EXTERNAL_ORACLE_OPERATOR"
+          assert summary["component_statuses"]["metrics_tx_request"] == "READY_FOR_KEYLESS_REPORT_METRICS_OPERATOR"
+          assert summary["component_statuses"]["metrics_operator_procedure"] == "READY_FOR_KEYLESS_REPORT_METRICS_OPERATION"
           assert summary["component_statuses"]["metrics_tx_result"] == "METRICS_ORACLE_TX_RESULT_VERIFIED"
           assert summary["component_statuses"]["metrics_tx_evidence"] == "PUBLIC_METRICS_ORACLE_TX_EVIDENCE_VERIFIED"
           assert summary["component_statuses"]["metrics_oracle_status_draft"] == "READY_FOR_MANUAL_ORACLE_STATUS_UPDATE"

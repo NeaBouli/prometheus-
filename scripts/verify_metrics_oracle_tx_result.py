@@ -20,7 +20,7 @@ RESULT_TYPE = "prometheus.metrics_oracle.report_metrics.tx_result"
 RESULT_STATUS = "METRICS_ORACLE_TX_RESULT_VERIFIED"
 CONFIRMED_STATUS = "confirmed"
 HEX_32_BYTES_RE = re.compile(r"^(0x)?[0-9a-fA-F]{64}$")
-PUBLIC_ID_RE = re.compile(r"^[A-Za-z0-9:._/-]{4,200}$")
+CONTRACT_OUTPOINT_RE = re.compile(r"^[0-9a-f]{64}:(?:0|[1-9][0-9]*)$")
 UTC_TIMESTAMP_RE = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
 SECRET_KEY_RE = re.compile(
     r"(private|secret|seed|mnemonic|password|passwd|wallet|keystore|token)",
@@ -135,8 +135,8 @@ def validate_request(tx_request: dict[str, Any], manifest: dict[str, Any]) -> di
         raise ValueError("tx_request.schema_version: expected 1")
     if tx_request.get("kind") != "prometheus.metrics_oracle.report_metrics.tx_request":
         raise ValueError("tx_request.kind mismatch")
-    if tx_request.get("status") != "READY_FOR_EXTERNAL_TX_ASSEMBLER":
-        raise ValueError("tx_request.status: expected READY_FOR_EXTERNAL_TX_ASSEMBLER")
+    if tx_request.get("status") != "READY_FOR_KEYLESS_REPORT_METRICS_OPERATOR":
+        raise ValueError("tx_request.status: expected READY_FOR_KEYLESS_REPORT_METRICS_OPERATOR")
     if tx_request.get("network") not in NETWORKS:
         raise ValueError(f"tx_request.network: expected one of {', '.join(NETWORKS)}")
     if tx_request.get("blockers") != []:
@@ -150,8 +150,10 @@ def validate_request(tx_request: dict[str, Any], manifest: dict[str, Any]) -> di
     if contract.get("abi_entrypoint") != ABI_ENTRYPOINT:
         raise ValueError(f"tx_request.contract.abi_entrypoint: expected {ABI_ENTRYPOINT}")
     instance_id = require_str(contract, "instance_id", "tx_request.contract")
-    if instance_id == "deployment_receipt_required" or not PUBLIC_ID_RE.match(instance_id):
-        raise ValueError("tx_request.contract.instance_id: expected public deployed instance id")
+    if instance_id == "deployment_receipt_required" or not CONTRACT_OUTPOINT_RE.fullmatch(instance_id):
+        raise ValueError("tx_request.contract.instance_id: expected exact lowercase Kaspa outpoint txid:index")
+    if int(instance_id.rsplit(":", 1)[1]) > 0xFFFFFFFF:
+        raise ValueError("tx_request.contract.instance_id: output index exceeds uint32")
 
     bundle = require_dict(tx_request.get("release_bundle"), "tx_request.release_bundle")
     manifest_entry = governance_manifest_entry(manifest)
@@ -192,6 +194,20 @@ def validate_request(tx_request: dict[str, Any], manifest: dict[str, Any]) -> di
     for key in expected_flags:
         if safety[key] is not False:
             raise ValueError(f"tx_request.safety.{key}: expected false")
+    if tx_request.get("safety_scope") != "metrics_tx_request_builder_only":
+        raise ValueError("tx_request.safety_scope: expected metrics_tx_request_builder_only")
+
+    repository_operator = require_dict(tx_request.get("repository_operator"), "tx_request.repository_operator")
+    expected_operator = {
+        "assembles_transaction_in_memory": True,
+        "accepts_private_keys": False,
+        "signs_transactions": False,
+        "requires_external_oracle_signature": True,
+        "requires_external_fee_sponsor_signature": True,
+        "broadcast_requires_exact_signing_request_hash_acknowledgement": True,
+    }
+    if repository_operator != expected_operator:
+        raise ValueError("tx_request.repository_operator: capability profile mismatch")
 
     return {
         "network": tx_request["network"],

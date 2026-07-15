@@ -157,10 +157,11 @@ def build_plan(payload: dict[str, Any]) -> dict[str, Any]:
             "broadcasts_transactions": False,
         },
         "operator_next_steps": [
-            "Build the GovernanceAutoTuningState reportMetrics transaction with these public entrypoint arguments.",
-            "Sign the transaction input with the metrics-oracle wallet outside this repository.",
-            "Broadcast only through the release deploy/orchestration path after network tooling is available.",
-            "Record verified transaction receipts before updating deployment status files.",
+            "Build the GovernanceAutoTuningState reportMetrics request and closed transition spec from these public arguments.",
+            "Use the repository keyless operator to preflight the exact state and fee-sponsor UTXOs and export both sighashes.",
+            "Produce the oracle and fee-sponsor signatures outside this repository.",
+            "Import and fully verify both signatures before an explicitly acknowledged one-shot broadcast.",
+            "Observe the successor UTXO and record verified public evidence before updating status files.",
         ],
     }
 
