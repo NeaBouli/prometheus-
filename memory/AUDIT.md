@@ -43,7 +43,7 @@ If criterion 1, 2, or 3 is NOT met: automatic REJECTED (no NEEDS_CHANGES).
 | Sprint-6 E2E          | 1.0     | 2026-03-22 | Claude  | ACCEPTED        | 4 test suites, 18 tests, no fixes                    |
 | Sprint-7 Dashboard    | 1.0     | 2026-03-22 | Claude  | ACCEPTED        | Dashboard, README, WHITEPAPER.md                     |
 | scripts/autodidactic.py | 1.1   | 2026-07-12 | Codex   | ACCEPTED        | Regression suite added for memory loading, padded dependency/status table handling, task completion, and blocker detection |
-| Miner Companion Foundation | 0.1 | 2026-07-16 | Codex + Terra + Spark | PENDING_AUDIT | Safe Phase-1 boundary and review findings resolved; 153 workspace tests plus full local security/docs gates pass; remote PR CI/Security/Pages required before acceptance |
+| Miner Companion Foundation | 0.1 | 2026-07-16 | Codex + Terra + Spark | ACCEPTED | Safe Phase-1 boundary and all review findings resolved; PR #14 plus exact-merge CI/Security/Pages and live Whitepaper verification pass |
 
 ---
 
@@ -622,12 +622,16 @@ its missing-file, malformed/oversized-config, failed-connect redaction, and
 no-args test gaps were added. Final local verification passes 153 workspace
 tests with two intentional live ignores, warning-free Clippy, Rustfmt, Memory,
 Pages/JSON-LD, Actionlint, Cargo Audit without vulnerabilities, and staged-diff
-Gitleaks. Final acceptance waits on PR CI/Security and live Pages verification.
+Gitleaks. Final acceptance required PR CI/Security and live Pages verification.
 PR #14's first ten remote contexts passed. Six CodeRabbit comments were then
 addressed: bounded config reads, transient RPC retry behavior, exact reporter
 pool eligibility wording, checkpoint path/baseline hygiene, Whitepaper grammar,
-and expanded public Rustdoc. The follow-up client and Memory gates pass locally;
-the exact follow-up commit still requires the repeated remote contexts.
+and expanded public Rustdoc. All six review threads were resolved, all ten
+repeated PR contexts passed, and PR #14 merged normally as `2e4b4ec`. Exact-merge
+Prometheus CI `29422667384`, Security Audit `29422667792`, Pages `29422666363`,
+and the live Whitepaper check pass. The foundation is accepted; production
+scanning, proofs, rule distribution, rewards, and miner-specific integration
+remain separately gated future work.
 
 *Audit completed 2026-04-02 by Claude Code (5 parallel agents, 7 levels, 35 checks).*
 *The fire belongs to humanity.*

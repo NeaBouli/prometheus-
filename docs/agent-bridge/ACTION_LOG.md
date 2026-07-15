@@ -1,14 +1,18 @@
 # Action Log
 
-## 2026-07-16 — GH-13 experimental miner companion started
+## 2026-07-16 — GH-13 experimental miner companion completed
 
 - Opened issue https://github.com/NeaBouli/prometheus-/issues/13 and branch `feature/GH-13-miner-companion` from clean merged baseline `72c9717`; foreign untracked `Prometheus-1.png` remains untouched.
 - Evaluated the proposal against the actual client and current Kaspa mining architecture. ASIC/pool miners normally use Stratum while Prometheus uses Kaspa wRPC; current Phi-3, ZK, rule-reader, and federated-learning paths are development stubs guarded out of beta/mainnet.
 - Implemented strict, opt-in `miner-companion preflight` and `miner-companion run` commands. The profile accepts only light/Testnet-10/credential-free loopback wRPC and rejects remote or credential-bearing endpoints, beta/mainnet, scanning, reporting, validator/honeypot roles, and unknown wallet/reward fields.
 - The runtime observes BlockDAG health only. It does not inspect the host, transmit miner telemetry, control ASIC firmware, intercept Stratum, manage wallets, or award PROM. Reporter allocation remains conditional on future consensus-verified security work.
 - Updated README, Markdown Whitepaper, published Whitepaper HTML, User Guide, FAQ, Roadmap, `llms.txt`, Bridge, and Memory to distinguish target architecture from current implementation and remove passive-miner-reward implications.
-- Final local verification passes: 153 workspace tests with two intentional live-test ignores, Rustfmt, warning-free workspace Clippy, Memory Integrity, six Autodidactic tests, Pages/JSON-LD, workflow YAML parsing, checksum-verified Actionlint v1.7.12, Cargo Audit with no vulnerabilities, and staged-diff Gitleaks v8.30.1. Terra's tracked-diff finding was resolved by staging the three new files and correcting local-wRPC wording; Spark found no code defect, and its four practical test gaps were added. Remote PR CI/Security/Pages remain before acceptance and merge.
+- At the pre-PR checkpoint, 153 workspace tests with two intentional live-test ignores, Rustfmt, warning-free workspace Clippy, Memory Integrity, six Autodidactic tests, Pages/JSON-LD, workflow YAML parsing, checksum-verified Actionlint v1.7.12, Cargo Audit with no vulnerabilities, and staged-diff Gitleaks v8.30.1 passed. Terra's tracked-diff finding was resolved by staging the three new files and correcting local-wRPC wording; Spark found no code defect, and its four practical test gaps were added.
 - Opened PR https://github.com/NeaBouli/prometheus-/pull/14. Its first remote pass completed all ten CI/Security/CodeRabbit contexts successfully. CodeRabbit posted six actionable comments: bound the config read itself, survive transient DAG query failures, clarify the 15% Light Client plus 5% Honeypot aggregate reporter pool, neutralize the local checkpoint path, reconcile the green product/tooling baseline, and fix one Whitepaper phrase. All six are addressed in a separate review-fix commit; public Rustdoc coverage was also expanded above the reported warning threshold. Client Clippy/tests, Memory, and diff hygiene pass before the follow-up push.
+- All six review threads were resolved and all ten repeated PR contexts passed. PR #14 merged normally as `2e4b4ecc7c565f69700826122f15a5ff418b8cbe`; issue #13 is closed. No direct-main push or admin bypass was used.
+- Exact-merge verification passed: Prometheus CI `29422667384`, Security Audit `29422667792`, and Pages `29422666363`. The live Whitepaper exposes the merged companion boundary, distinguishes Stratum from wRPC, rejects passive uptime rewards, and reports `dateModified` 2026-07-16.
+- GH-13 is accepted as a development-only foundation. Production host scanning, real Phi-3 inference, ZK generation, canonical rule distribution, privacy/resource enforcement, security-contribution rewards, and miner-specific firmware/Stratum integrations remain future separately reviewed work.
+- No secrets, signing material, raw transactions, wallets, or private keys were introduced. The foreign untracked `Prometheus-1.png` remains untouched and untracked.
 
 ## 2026-07-15 — GH-9 deployment-profile closeout
 

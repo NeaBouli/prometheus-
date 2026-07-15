@@ -11,13 +11,13 @@
 |------|------|
 | Projekt | Prometheus — Decentralized AI Threat Intelligence |
 | Repo | https://github.com/NeaBouli/prometheus- |
-| Branch | `feature/GH-13-miner-companion` from merged baseline `72c9717` |
+| Branch | `docs/GH-13-closeout` from merged product baseline `2e4b4ec` |
 | Lokaler Pfad | `$REPO_ROOT` |
-| Letzter grün verifizierter Produkt-/Tooling-Commit | `6213c559` — GH-9 product/tooling baseline; main CI `29412667386`, Security `29412667410`, Pages `29412666483` green; later docs closeout baseline `72c9717` is recorded separately |
-| Aktuelle Tooling-Baseline | GH-9 manifest-bound, non-promotable H-001 testnet-10 canary profile remains merged; docs closeout baseline is `72c9717`; GH-13 miner companion is under local review |
+| Letzter grün verifizierter Produkt-/Tooling-Commit | `2e4b4ec` — GH-13 safe experimental miner companion foundation; main CI `29422667384`, Security `29422667792`, Pages `29422666363` green |
+| Aktuelle Tooling-Baseline | GH-9 manifest-bound, non-promotable H-001 testnet-10 canary profile remains merged; GH-13 development-only miner companion is accepted at `2e4b4ec` |
 | Aktueller HEAD | Mit `git log --oneline -1` prüfen; Bridge-/Status-Commits können neuer sein |
 | Rollback-Tag | `pre-session-20260413` → `6347b85` |
-| Whitepaper | WHITEPAPER.md (root) + whitepaper.html (styled), status refreshed and verified 2026-07-11 |
+| Whitepaper | WHITEPAPER.md (root) + whitepaper.html (styled), miner companion and reward boundaries live-verified 2026-07-16 |
 | Status | Feature-complete through Sprint 7. Post-Toccata deployment verification active. |
 | GitHub Pages | https://neabouli.github.io/prometheus-/ |
 | Google Search Console | Verified: googleaa2902079481c7a8 |
@@ -48,7 +48,7 @@
 - GH-7 gemergt: `kaspa-resolver://public` ist TLS-only und testnet-10-only; der funding-freie Probe bestätigt einen synchronisierten, UTXO-indexierten `rusty-kaspa 2.0.1` Node über Toccata-DAA. Main CI/Security/Pages sind grün.
 - GH-9 Software-Handoff gemergt: PR #11 landete als `6213c559`; `full` bleibt das sieben-Fixture-Profil mit öffentlichem Metrics-Oracle-Key, während `testnet-10-validator-staking-h001` genau einen H-001-Canary auf dem TLS-only Resolver ohne Oracle-Key isoliert. Canary-Status ist durchgehend non-promotable; Prometheus CI `29412667386`, Security Audit `29412667410`, Pages `29412666483` und die Live-Whitepaper-Prüfung bestehen für den Merge.
 - Offen in Issue #9: funded public P2PK outpoint, passende öffentliche Deployer-Identität, externe BIP340-Signatur, Bestätigung und unabhängige Chain-Evidence für den Canary. Danach bleiben sechs State-Contracts, Metrics-Oracle-Transaktion und Release-Hardening für den vollständigen Rollout offen.
-- GH-13 in Arbeit: experimenteller opt-in Miner Companion mit strict TOML, credential-freiem loopback Testnet-10 wRPC, network-free default preflight und DAG-Healthloop. Kein Stratum/Firmware-Zugriff, keine Host-Scans, keine Reports, keine Rewards, kein Validator/Honeypot. 153 workspace tests, Rustfmt/Clippy, Memory, Pages, Actionlint, Cargo Audit, Gitleaks und unabhängige Reviews bestehen lokal; PR CI/Security/Pages pending.
+- GH-13 abgeschlossen: PR #14 wurde normal als `2e4b4ec` gemergt. Der experimentelle opt-in Miner Companion bietet strict TOML, credential-freies loopback Testnet-10 wRPC, standardmäßig keinen Remote-Netzwerkzugriff im Preflight und einen fehlertoleranten DAG-Healthloop. Kein Stratum/Firmware-Zugriff, keine Host-Scans, Reports, Rewards, Validator- oder Honeypot-Rolle. 153 Workspace-Tests, lokale Security-/Docs-Gates, alle PR-Kontexte sowie exakte Merge-Commit-CI/Security/Pages und die Live-Whitepaper-Prüfung bestehen.
 
 ---
 
@@ -130,7 +130,7 @@
 **STARTFLOW — Lies dies zuerst:**
 ```
 1. cd /Users/gio/Desktop/repos/prometheus
-2. git log --oneline -5              → aktuellen HEAD prüfen; letzter dokumentierter grün verifizierter Produkt-/Tooling-Commit = ea67b93
+2. git log --oneline -5              → aktuellen HEAD prüfen; letzter dokumentierter grün verifizierter Produkt-/Tooling-Commit = 2e4b4ec
 3. git tag -l                        → Rollback: pre-session-20260413
 4. cargo test 2>&1 | tail -5         → Muss grün sein
 5. Lies BACKLOG.md                   → Priorisierte Task-Liste
@@ -138,7 +138,7 @@
 7. Lies memory/ERRORS.md             → 12 bekannte Patterns
 ```
 
-**Status: Feature-complete through Sprint 7. Kaspa Toccata and all seven current-Silverc compile/ABI/runtime gates pass locally and in CI. GH-7 is merged and the live read-only testnet-10 resolver probe passes. GH-9's closed, manifest-bound H-001 canary profile is merged as `6213c559`, omits the unrelated oracle key, and cannot promote full readiness; 32 focused deployer tests, the end-to-end canary regression, main CI/Security/Pages, and the live whitepaper verification pass. The immediate external gates are a funded public P2PK outpoint, matching public deployer identity, external BIP340 signature, confirmation, and independent evidence. Full rollout still requires all seven release fixtures, six state-contract deployments, the metrics-oracle transaction, and exact-commit release hardening.**
+**Status: Feature-complete through Sprint 7. Kaspa Toccata and all seven current-Silverc compile/ABI/runtime gates pass locally and in CI. GH-7 is merged and the live read-only testnet-10 resolver probe passes. GH-9's closed, manifest-bound H-001 canary profile is merged as `6213c559`, omits the unrelated oracle key, and cannot promote full readiness; 32 focused deployer tests, the end-to-end canary regression, main CI/Security/Pages, and the live whitepaper verification pass. GH-13 is accepted at `2e4b4ec` as a development-only local Testnet-10 wRPC observer; it does not yet scan, report, reward, run validator/honeypot roles, integrate Stratum, or control miner firmware. The immediate rollout gates are a funded public P2PK outpoint, matching public deployer identity, external BIP340 signature, confirmation, and independent evidence. Full rollout still requires all seven release fixtures, six state-contract deployments, the metrics-oracle transaction, and exact-commit release hardening.**
 
 **Offene Tasks (priorisiert):**
 - [x] PATTERN-010 fix: Arc<Phi3Model> statt Arc<Mutex<Phi3Model>> — DONE `6347b85`
@@ -289,4 +289,4 @@ Leistungsbasierte Emission. Guardians = "Miner" (KI statt GPU).
 
 - VERDICT update 2026-07-15: H-002 is fixed; all seven current-Silverc compile/ABI/runtime gates, signed-int deployment guards, deterministic release handoff, and the merged repository-owned keyless Toccata-v1 genesis operator pass locally and in main CI. Exact contextual storage mass, compute budget 10, covenant derivation/binding, dual live-UTXO validation, digest-only external signing, full verification, fee bounds, exclusive intent journaling, retry reconciliation, RPC deadlines, and source-bound observation are covered by 27 tests plus a seven-contract integration. Funded testnet-10 signatures/receipts, independent chain evidence, the external metrics-oracle transaction, and exact-commit release evidence remain Sprint 9 blockers.
 
-*Prometheus v4.0 · Checkpoint 2026-07-16 · Last updated: GH-13 experimental local miner companion under review + seven current-Silverc runtime gates + deterministic release handoff + crash-consistent keyless Toccata-v1 genesis operator + manifest-bound non-promotable H-001 testnet-10 profile + TLS-only official resolver probe + seven-contract integration + public receipts/evidence/status staging + metrics-oracle handoff + exact-commit release-hardening gates · The fire belongs to humanity.*
+*Prometheus v4.0 · Checkpoint 2026-07-16 · Last updated: GH-13 experimental local miner companion accepted at `2e4b4ec` + seven current-Silverc runtime gates + deterministic release handoff + crash-consistent keyless Toccata-v1 genesis operator + manifest-bound non-promotable H-001 testnet-10 profile + TLS-only official resolver probe + seven-contract integration + public receipts/evidence/status staging + metrics-oracle handoff + exact-commit release-hardening gates · The fire belongs to humanity.*
