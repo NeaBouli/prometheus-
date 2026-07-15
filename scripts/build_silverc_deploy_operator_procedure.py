@@ -14,9 +14,11 @@ from verify_silverc_deploy_requests import validate_request_set
 from verify_silverc_h001 import DEFAULT_SILVERSCRIPT_REF
 
 PROCEDURE_KIND = "prometheus.silverc.deploy.operator_procedure"
-PROCEDURE_STATUS = "READY_FOR_EXTERNAL_DEPLOY_OPERATOR"
+PROCEDURE_STATUS = "READY_FOR_KEYLESS_GENESIS_OPERATION"
 GENESIS_PROFILE = {
     "transaction_version": 1,
+    "funding_input_compute_budget": 10,
+    "storage_mass_commitment": "contextual_storage_mass",
     "script_public_key_builder": "kaspa_txscript::pay_to_script_hash_script",
     "script_public_key_source": "compiled_contract_script",
     "covenant_id_builder": "kaspa_consensus_core::hashing::covenant_id",
@@ -71,8 +73,24 @@ def build_procedure(request_summary: dict[str, Any]) -> dict[str, Any]:
             }
             for request in request_summary["requests"]
         ],
-        "repository_boundary": {
-            "role": "prepare_and_verify_public_artifacts_only",
+        "execution_boundary": {
+            "repository_operator": [
+                "assemble transaction v1 in memory",
+                "export the canonical public sighash",
+                "verify the external signature and complete transaction",
+                "broadcast only after exact hash acknowledgement",
+                "observe the confirmed covenant UTXO",
+            ],
+            "external_signer": [
+                "hold all private signing material outside the repository",
+                "sign only the canonical 32-byte sighash",
+                "return only the public BIP340 signature response",
+            ],
+            "public_evidence_path": [
+                "record confirmed public operator results",
+                "verify receipts and independent node/explorer evidence",
+                "update status manually only after readiness gates pass",
+            ],
             "forbidden_material": [
                 "private keys",
                 "seed phrases",
@@ -82,11 +100,12 @@ def build_procedure(request_summary: dict[str, Any]) -> dict[str, Any]:
                 "serialized transactions",
             ],
         },
-        "external_operator_sequence": [
+        "execution_sequence": [
             "Verify request_set_sha256 against the handoff package.",
-            "Import each deploy-request JSON into the approved external deploy orchestrator.",
-            "Validate every per-contract request_sha256 before assembly.",
-            "Assemble, sign, and broadcast outside this repository through the approved wallet/vault process.",
+            "Import each deploy-request JSON into the repository Toccata-v1 genesis operator.",
+            "Run live node and exact funding-UTXO preflight for every contract.",
+            "Prepare each transaction and send only its canonical sighash to the approved external vault/HSM.",
+            "Return each public signature response to the repository operator for full verification and acknowledged broadcast.",
             "Wait for network confirmation for every deployed contract instance.",
             "Record only public operator_record deploy results.",
             "Convert public deploy results with scripts/build_silverc_operator_receipts.py.",
@@ -120,6 +139,7 @@ def build_procedure(request_summary: dict[str, Any]) -> dict[str, Any]:
             "deploys_contracts": False,
             "updates_status_files": False,
         },
+        "safety_scope": "procedure_builder_only",
         "blockers": [],
     }
 
@@ -145,9 +165,10 @@ def write_runbook(path: Path | None, procedure: dict[str, Any]) -> None:
         "## Boundary",
         "",
         "- This procedure is a public deploy operator checklist, not a chain transaction.",
-        "- This repository prepares and verifies public artifacts only.",
+        "- This procedure builder only prepares and verifies public procedure artifacts.",
+        "- The Rust repository operator assembles and broadcasts keyless transactions in memory; the external vault/HSM alone signs the digest.",
         "- Private keys, seed phrases, wallet files, keystore material, raw transactions, and serialized transactions must remain outside this repository.",
-        "- The repository does not sign, assemble, broadcast, deploy, or update status files.",
+        "- This procedure builder does not sign, assemble, broadcast, deploy, or update status files.",
         "",
         "## Contracts",
         "",
@@ -167,7 +188,7 @@ def write_runbook(path: Path | None, procedure: dict[str, Any]) -> None:
     for key, value in procedure["required_genesis_profile"].items():
         lines.append(f"- `{key}`: `{value}`")
     lines.extend(["", "## External Operator Sequence", ""])
-    lines.extend(f"{index}. {step}" for index, step in enumerate(procedure["external_operator_sequence"], start=1))
+    lines.extend(f"{index}. {step}" for index, step in enumerate(procedure["execution_sequence"], start=1))
     lines.extend(["", "## Required Public Result Evidence", ""])
     for key, value in procedure["required_public_result_fields"].items():
         lines.append(f"- `{key}`: `{value}`")

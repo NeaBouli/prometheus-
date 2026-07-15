@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+
 jobs:
   # ─── Memory Integrity Check ─────────────────────────────────────────────────
   memory-check:
@@ -187,8 +190,33 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@1.95.0
+        with:
+          components: rustfmt, clippy
       - uses: Swatinem/rust-cache@v2
+      - name: Verify keyless Toccata-v1 genesis operator
+        run: |
+          cargo test -p prometheus-silverc-deployer
+          cargo clippy -p prometheus-silverc-deployer --all-targets -- -D warnings
+          cargo build -p prometheus-silverc-deployer
+          operator=target/debug/prometheus-silverc-deployer
+          "$operator" --help > /tmp/prometheus-silverc-deployer-help.txt
+          for command in preflight prepare verify-signature broadcast observe; do
+            "$operator" "$command" --help >> /tmp/prometheus-silverc-deployer-help.txt
+          done
+          grep -q -- '--signing-request-out' /tmp/prometheus-silverc-deployer-help.txt
+          grep -q -- '--signature-response' /tmp/prometheus-silverc-deployer-help.txt
+          grep -q -- '--acknowledge-signing-request-sha256' /tmp/prometheus-silverc-deployer-help.txt
+          "$operator" observe --help > /tmp/prometheus-silverc-deployer-observe-help.txt
+          grep -q -- '--request' /tmp/prometheus-silverc-deployer-observe-help.txt
+          grep -q -- '--artifact' /tmp/prometheus-silverc-deployer-observe-help.txt
+          grep -q -- '--funding' /tmp/prometheus-silverc-deployer-observe-help.txt
+          grep -q -- '--signing-request' /tmp/prometheus-silverc-deployer-observe-help.txt
+          grep -q -- '--signature-response' /tmp/prometheus-silverc-deployer-observe-help.txt
+          if grep -Eiq -- '--(private-key|seed|mnemonic|password|wallet|keystore|raw-transaction|signed-transaction)' /tmp/prometheus-silverc-deployer-help.txt; then
+            echo "ERROR: Silverc deployer CLI exposes forbidden signing or secret input"
+            exit 1
+          fi
       - name: Verify H-001 vectors and validator state fixture against pinned silverc
         run: python3 scripts/verify_silverc_h001.py
       - name: Build current-silverc release bundle archive
@@ -217,15 +245,17 @@ jobs:
           runbook = Path("/tmp/prometheus-silverc-deploy-runbook.md").read_text()
           assert plan["bundle"]["fixture_count"] == 7
           assert plan["operator_inputs"]["missing"] == []
-          assert plan["deploy_supported"] is False
-          assert "upstream silverc exposes no network deploy command" in plan["deploy_blockers"]
-          assert "Status: BLOCKED" in runbook
+          assert plan["deploy_supported"] is True
+          assert plan["tooling"]["upstream_silverc_has_network_deploy_command"] is False
+          assert plan["tooling"]["has_repository_toccata_v1_genesis_operator"] is True
+          assert plan["deploy_blockers"] == []
+          assert "Status: READY_FOR_NETWORK_DEPLOY_TOOL" in runbook
           assert "This preflight does not deploy or broadcast transactions." in runbook
           assert "ValidatorStakingH001" in runbook
           assert "GovernanceAutoTuningState" in runbook
           assert "private keys" in runbook
           PY
-      - name: Build external deploy request set
+      - name: Build keyless genesis deploy request set
         run: |
           python3 scripts/build_silverc_deploy_requests.py \
             --archive /tmp/prometheus-silverc-artifacts.tar.gz \
@@ -250,22 +280,24 @@ jobs:
           runbook = Path("/tmp/prometheus-silverc-deploy-requests.md").read_text()
           first = json.loads(Path("/tmp/prometheus-silverc-deploy-requests/01-ValidatorStakingH001.deploy-request.json").read_text())
 
-          assert summary["status"] == "REQUESTS_READY_EXTERNAL_ORCHESTRATOR_REQUIRED"
+          assert summary["status"] == "REQUESTS_READY_FOR_KEYLESS_GENESIS_OPERATOR"
           assert summary["request_count"] == 7
           assert len(summary["request_set_sha256"]) == 64
-          assert "missing approved external deploy orchestrator implementation" in summary["blockers"]
+          assert "real funded UTXO, external Schnorr signer response, and public chain evidence are required before repository broadcast" in summary["blockers"]
+          assert summary["safety_scope"] == "deploy_request_builder_only"
           assert summary["safety"]["accepts_private_keys"] is False
           assert summary["safety"]["signs_transactions"] is False
           assert summary["safety"]["assembles_chain_transaction"] is False
           assert summary["safety"]["broadcasts_transactions"] is False
           assert summary["safety"]["deploys_contracts"] is False
           assert summary["safety"]["updates_status_files"] is False
-          assert first["status"] == "READY_FOR_EXTERNAL_DEPLOY_ORCHESTRATOR"
+          assert first["status"] == "READY_FOR_KEYLESS_GENESIS_OPERATOR"
           assert first["contract"]["name"] == "ValidatorStakingH001"
           assert len(first["request_sha256"]) == 64
           assert first["safety"]["deploys_contracts"] is False
-          assert "external orchestrator" in runbook
-          assert "does not accept private keys" in runbook
+          assert first["safety_scope"] == "deploy_request_builder_only"
+          assert "repository keyless genesis operator" in runbook
+          assert "request-builder artifacts do not accept private keys" in runbook
 
           proc = subprocess.run(
               [
@@ -290,7 +322,7 @@ jobs:
           assert proc.returncode != 0
           assert "--rpc-url must not contain credentials" in proc.stderr
           PY
-      - name: Verify external deploy request set
+      - name: Verify keyless genesis deploy request set
         run: |
           python3 scripts/verify_silverc_deploy_requests.py \
             --archive /tmp/prometheus-silverc-artifacts.tar.gz \
@@ -321,6 +353,7 @@ jobs:
           assert summary["safety"]["broadcasts_transactions"] is False
           assert summary["safety"]["deploys_contracts"] is False
           assert summary["safety"]["updates_status_files"] is False
+          assert summary["safety_scope"] == "deploy_request_builder_only"
           assert "does not accept private keys" in runbook
 
           with tempfile.TemporaryDirectory(prefix="prometheus-request-verify-negative.") as tmp:
@@ -345,6 +378,32 @@ jobs:
               )
               assert proc.returncode != 0
               assert "request_set_sha256 mismatch" in proc.stderr
+
+              bad_scope_set = tmp / "bad-scope-request-set.json"
+              request_set = json.loads(Path("/tmp/prometheus-silverc-deploy-request-set.json").read_text())
+              request_set["safety_scope"] = "repository_operator"
+              clone = dict(request_set)
+              clone.pop("request_set_sha256", None)
+              request_set["request_set_sha256"] = hashlib.sha256(
+                  json.dumps(clone, sort_keys=True, separators=(",", ":")).encode()
+              ).hexdigest()
+              bad_scope_set.write_text(json.dumps(request_set, indent=2, sort_keys=True) + "\n")
+              proc = subprocess.run(
+                  [
+                      "python3",
+                      "scripts/verify_silverc_deploy_requests.py",
+                      "--archive",
+                      "/tmp/prometheus-silverc-artifacts.tar.gz",
+                      "--request-set",
+                      str(bad_scope_set),
+                      "--requests-dir",
+                      "/tmp/prometheus-silverc-deploy-requests",
+                  ],
+                  text=True,
+                  capture_output=True,
+              )
+              assert proc.returncode != 0
+              assert "safety_scope" in proc.stderr
 
               bad_dir = tmp / "bad-requests"
               shutil.copytree("/tmp/prometheus-silverc-deploy-requests", bad_dir)
@@ -393,13 +452,15 @@ jobs:
           request_set = json.loads(Path("/tmp/prometheus-silverc-deploy-request-set.json").read_text())
           runbook = Path("/tmp/prometheus-silverc-deploy-operator-procedure.md").read_text()
 
-          assert procedure["status"] == "READY_FOR_EXTERNAL_DEPLOY_OPERATOR"
+          assert procedure["status"] == "READY_FOR_KEYLESS_GENESIS_OPERATION"
           assert procedure["request_set_sha256"] == request_set["request_set_sha256"]
           assert procedure["request_count"] == 7
           assert procedure["contracts"][0]["contract_name"] == "ValidatorStakingH001"
           assert procedure["contracts"][-1]["contract_name"] == "GovernanceAutoTuningState"
           assert procedure["required_genesis_profile"] == {
               "transaction_version": 1,
+              "funding_input_compute_budget": 10,
+              "storage_mass_commitment": "contextual_storage_mass",
               "script_public_key_builder": "kaspa_txscript::pay_to_script_hash_script",
               "script_public_key_source": "compiled_contract_script",
               "covenant_id_builder": "kaspa_consensus_core::hashing::covenant_id",
@@ -417,6 +478,7 @@ jobs:
           assert procedure["safety"]["broadcasts_transactions"] is False
           assert procedure["safety"]["deploys_contracts"] is False
           assert procedure["safety"]["updates_status_files"] is False
+          assert procedure["safety_scope"] == "procedure_builder_only"
           assert "public deploy operator checklist" in runbook
           assert "does not sign" in runbook
           assert "Required Covenant Genesis Profile" in runbook
@@ -1045,7 +1107,7 @@ jobs:
               "repository_boundary": {
                   "public_artifacts_only": True,
                   "operator_records_only": True,
-                  "chain_payloads_external": True,
+                  "signing_material_external": True,
                   "status_updates_manual": True,
               },
               "safety": {
@@ -1057,6 +1119,7 @@ jobs:
                   "deploys_contracts": False,
                   "updates_status_files": False,
               },
+              "safety_scope": "capability_record_only",
           }
           capability_path.write_text(json.dumps(capability, indent=2, sort_keys=True) + "\n")
           subprocess.run(
@@ -1080,7 +1143,7 @@ jobs:
           capability_runbook = Path("/tmp/prometheus-external-operator-capability.md").read_text()
           assert capability_summary["status"] == "EXTERNAL_OPERATOR_CAPABILITY_VERIFIED"
           assert capability_summary["operator_id"] == "ci-public-external-operator-fixture"
-          assert capability_summary["deploy_operator_status"] == "READY_FOR_EXTERNAL_DEPLOY_OPERATOR"
+          assert capability_summary["deploy_operator_status"] == "READY_FOR_KEYLESS_GENESIS_OPERATION"
           assert capability_summary["metrics_operator_status"] == "READY_FOR_EXTERNAL_ORACLE_OPERATOR"
           assert capability_summary["request_set_sha256"] == deploy_procedure["request_set_sha256"]
           assert capability_summary["genesis_profile"] == deploy_procedure["required_genesis_profile"]
@@ -1092,6 +1155,7 @@ jobs:
           assert capability_summary["safety"]["broadcasts_transactions"] is False
           assert capability_summary["safety"]["deploys_contracts"] is False
           assert capability_summary["safety"]["updates_status_files"] is False
+          assert capability_summary["safety_scope"] == "capability_verifier_only"
           assert "public operator capability metadata only" in capability_runbook
           assert "Genesis transaction version: `1`" in capability_runbook
 
@@ -1848,11 +1912,11 @@ jobs:
 
           assert summary["status"] == "HANDOFF_BLOCKED"
           assert summary["network"] == "sandbox"
-          assert summary["deploy_supported"] is False
-          assert summary["deploy_requests_status"] == "REQUESTS_READY_EXTERNAL_ORCHESTRATOR_REQUIRED"
+          assert summary["deploy_supported"] is True
+          assert summary["deploy_requests_status"] == "REQUESTS_READY_FOR_KEYLESS_GENESIS_OPERATOR"
           assert summary["deploy_request_count"] == 7
           assert summary["deploy_request_verification_status"] == "DEPLOY_REQUEST_SET_VERIFIED"
-          assert summary["deploy_operator_procedure_status"] == "READY_FOR_EXTERNAL_DEPLOY_OPERATOR"
+          assert summary["deploy_operator_procedure_status"] == "READY_FOR_KEYLESS_GENESIS_OPERATION"
           assert summary["operator_receipt_import_status"] == "NOT_PROVIDED"
           assert summary["ci_receipts_status"] == "CI_FIXTURE_VALID"
           assert summary["operator_receipts_status"] == "MISSING_OPERATOR_RECORD"
@@ -1869,7 +1933,7 @@ jobs:
           assert summary["safety"]["broadcasts_transactions"] is False
           assert summary["safety"]["deploys_contracts"] is False
           assert summary["safety"]["updates_status_files"] is False
-          assert "upstream silverc exposes no network deploy command" in summary["blockers"]
+          assert "sandbox handoff is validation-only and cannot prove testnet/mainnet rollout" in summary["blockers"]
           assert "missing verified operator_record deployment receipts" in summary["blockers"]
           assert "missing deployed GovernanceAutoTuningState contract instance id" in summary["blockers"]
           assert "missing public release hardening evidence" in summary["blockers"]
@@ -1900,7 +1964,7 @@ jobs:
           root = Path("/tmp/prometheus-silverc-operator-handoff-import")
           summary = json.loads((root / "operator-handoff-summary.json").read_text())
           assert summary["status"] == "HANDOFF_BLOCKED"
-          assert summary["deploy_operator_procedure_status"] == "READY_FOR_EXTERNAL_DEPLOY_OPERATOR"
+          assert summary["deploy_operator_procedure_status"] == "READY_FOR_KEYLESS_GENESIS_OPERATION"
           assert summary["operator_receipt_import_status"] == "OPERATOR_RECEIPTS_READY_FOR_STATUS_STAGING"
           assert summary["operator_receipts_status"] == "READY_FOR_STATUS_RECORDING"
           assert summary["deploy_receipt_evidence_status"] == "PUBLIC_DEPLOY_RECEIPT_EVIDENCE_VERIFIED"
@@ -1913,7 +1977,7 @@ jobs:
           assert "deploy-receipt-public-evidence.json" in summary["included_files"]
           assert "deploy-receipt-public-evidence-summary.json" in summary["included_files"]
           assert "deploy-receipt-public-evidence.md" in summary["included_files"]
-          assert "upstream silverc exposes no network deploy command" in summary["blockers"]
+          assert "sandbox handoff is validation-only and cannot prove testnet/mainnet rollout" in summary["blockers"]
           assert "missing verified operator_record deployment receipts" not in summary["blockers"]
           assert "missing public node/explorer evidence for operator_record deployment receipts" not in summary["blockers"]
           assert "missing public release hardening evidence" in summary["blockers"]
@@ -1964,7 +2028,7 @@ jobs:
           root = Path("/tmp/prometheus-silverc-operator-handoff-oracle-result")
           summary = json.loads((root / "operator-handoff-summary.json").read_text())
           assert summary["status"] == "HANDOFF_BLOCKED"
-          assert summary["deploy_operator_procedure_status"] == "READY_FOR_EXTERNAL_DEPLOY_OPERATOR"
+          assert summary["deploy_operator_procedure_status"] == "READY_FOR_KEYLESS_GENESIS_OPERATION"
           assert summary["operator_receipts_status"] == "READY_FOR_STATUS_RECORDING"
           assert summary["deploy_receipt_evidence_status"] == "PUBLIC_DEPLOY_RECEIPT_EVIDENCE_VERIFIED"
           assert summary["metrics_tx_request_status"] == "READY_FOR_EXTERNAL_TX_ASSEMBLER"
@@ -1993,7 +2057,7 @@ jobs:
           assert "release-hardening-evidence.json" in summary["included_files"]
           assert "release-hardening-evidence-summary.json" in summary["included_files"]
           assert "release-hardening-evidence.md" in summary["included_files"]
-          assert "upstream silverc exposes no network deploy command" in summary["blockers"]
+          assert "sandbox handoff is validation-only and cannot prove testnet/mainnet rollout" in summary["blockers"]
           assert "missing verified operator_record deployment receipts" not in summary["blockers"]
           assert "missing public node/explorer evidence for operator_record deployment receipts" not in summary["blockers"]
           assert "missing verified metrics-oracle transaction result" not in summary["blockers"]
@@ -2016,7 +2080,7 @@ jobs:
           assert summary["handoff_status"] == "HANDOFF_BLOCKED"
           assert summary["component_statuses"]["operator_receipts"] == "READY_FOR_STATUS_RECORDING"
           assert summary["component_statuses"]["deploy_receipt_evidence"] == "PUBLIC_DEPLOY_RECEIPT_EVIDENCE_VERIFIED"
-          assert summary["component_statuses"]["deploy_operator_procedure"] == "READY_FOR_EXTERNAL_DEPLOY_OPERATOR"
+          assert summary["component_statuses"]["deploy_operator_procedure"] == "READY_FOR_KEYLESS_GENESIS_OPERATION"
           assert summary["component_statuses"]["metrics_tx_request"] == "READY_FOR_EXTERNAL_TX_ASSEMBLER"
           assert summary["component_statuses"]["metrics_operator_procedure"] == "READY_FOR_EXTERNAL_ORACLE_OPERATOR"
           assert summary["component_statuses"]["metrics_tx_result"] == "METRICS_ORACLE_TX_RESULT_VERIFIED"
@@ -2024,7 +2088,7 @@ jobs:
           assert summary["component_statuses"]["metrics_oracle_status_draft"] == "READY_FOR_MANUAL_ORACLE_STATUS_UPDATE"
           assert summary["component_statuses"]["external_operator_capability"] == "EXTERNAL_OPERATOR_CAPABILITY_VERIFIED"
           assert summary["component_statuses"]["release_hardening"] == "PUBLIC_RELEASE_HARDENING_EVIDENCE_VERIFIED"
-          assert "upstream silverc exposes no network deploy command" in summary["blockers"]
+          assert "sandbox handoff is validation-only and cannot prove testnet/mainnet rollout" in summary["blockers"]
           assert summary["safety"]["accepts_private_keys"] is False
           assert summary["safety"]["accepts_raw_transactions"] is False
           assert summary["safety"]["signs_transactions"] is False
@@ -2203,7 +2267,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@1.95.0
         with:
           components: rustfmt, clippy
       - uses: Swatinem/rust-cache@v2

@@ -2,6 +2,7 @@
 resolver = "2"
 members = [
     "modules/client",
+    "modules/silverc-deployer",
     "modules/validator-node",
 ]
 
@@ -19,6 +20,8 @@ kaspa-rpc-core = { git = "https://github.com/kaspanet/rusty-kaspa.git", tag = "v
 kaspa-wrpc-client = { git = "https://github.com/kaspanet/rusty-kaspa.git", tag = "v2.0.1" }
 kaspa-hashes = { git = "https://github.com/kaspanet/rusty-kaspa.git", tag = "v2.0.1" }
 kaspa-addresses = { git = "https://github.com/kaspanet/rusty-kaspa.git", tag = "v2.0.1" }
+kaspa-bip32 = { git = "https://github.com/kaspanet/rusty-kaspa.git", tag = "v2.0.1" }
+kaspa-txscript = { git = "https://github.com/kaspanet/rusty-kaspa.git", tag = "v2.0.1" }
 
 # Common dependencies
 tokio = { version = "1", features = ["full"] }
@@ -28,3 +31,6 @@ anyhow = "1"
 log = "0.4"
 env_logger = "0.10"
 sha2 = "0.10"
+clap = { version = "4", features = ["derive"] }
+hex = "0.4"
+url = "2"

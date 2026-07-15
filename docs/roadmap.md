@@ -67,12 +67,18 @@ binds verified metrics-oracle transaction results to public node/explorer
 snapshots before handoff readiness can pass. A metrics-oracle status staging
 guard emits only a manual status-update draft from verified public tx results
 and does not write status files. A public external-operator capability verifier
-binds capability records to the deploy/oracle procedures while rejecting
-secret-like fields, raw transactions, and repository-side signing/deploy/status
-writes. The deploy capability must also attest the official SilverScript
-covenant-genesis profile: transaction version 1, P2SH from the compiled script,
+binds capability records to the deploy/oracle procedures while its verifier
+rejects secret-like fields and raw transactions and performs no signing,
+deployment, broadcast, or status writes. The deploy capability must also attest
+the official SilverScript covenant-genesis profile: transaction version 1,
+funding-input compute budget 10, contextual storage mass, P2SH from the compiled script,
 official covenant-ID derivation from the funding outpoint plus unbound outputs,
 and funding-input binding after ID derivation.
+The repository-owned `prometheus-silverc-deployer` now executes that genesis
+profile: it assembles the transaction, exports only the 32-byte digest for
+external BIP340 signing, verifies the returned signature and complete
+transaction, revalidates the exact live funding UTXO, broadcasts, and observes
+the covenant output. Real funded testnet-10 evidence remains required.
 A public release-hardening evidence verifier binds successful CI, Pages,
 branch-control, rollback, and release-note checks to the exact release commit
 without querying GitHub, accepting credentials, changing repository settings,
@@ -80,17 +86,17 @@ or touching chain material.
 A release-readiness auditor now checks the generated handoff package, required
 files, component summaries, safety flags, and JSON secret/raw-transaction
 hygiene before any rollout claim. The remaining deployment blockers are the
-missing network deploy/orchestration path, real public deploy results/receipts
-plus public node/explorer evidence from that path, external signed metrics-oracle transaction
-assembly/signing/broadcast/deploy operation, and public release-hardening
-evidence for the exact rollout commit.
+real funded testnet-10 run through the repository Toccata-v1 genesis operator,
+external Schnorr signatures, confirmed public deploy receipts plus independent
+node/explorer evidence, the external signed metrics-oracle transaction, and
+public release-hardening evidence for the exact rollout commit.
 
 **Sprint 9 — Contracts Live + Real ZK-Proof**
 - Keep current-Silverscript runtime and release-bundle manifest gates green
 - Keep release-bundle deploy preflight green
 - Keep the generated deploy operator runbook green and free of signing material
-- Keep the external deploy request set green and free of signing material
-- Keep the external deploy operator procedure green and free of signing/raw transaction material
+- Keep the keyless genesis deploy request set green and free of signing material
+- Keep the keyless genesis operation procedure green and free of signing/raw transaction material
 - Keep public orchestrator-result receipt import green and free of signing/raw transaction material
 - Keep deployment receipt verification green and free of signing/raw transaction material
 - Keep public receipt-evidence verification green and free of secrets/raw transaction material
@@ -105,6 +111,8 @@ evidence for the exact rollout commit.
 - Keep public oracle tx-evidence verification green and free of secrets/raw transaction material
 - Keep public oracle status staging guarded against blocked requests, secrets, and raw transactions
 - Keep public release-hardening evidence verification green and bound to the exact release commit
+- Keep the keyless Toccata-v1 genesis operator tests, deterministic public vectors, public-file handoff, CLI secret-boundary checks, contextual storage-mass commitment, exact live funding-UTXO checks, fee caps, and broadcast acknowledgement gates green
+- Produce real testnet-10 funding, external-signature, deployment-receipt, and independent chain-observation evidence
 - Compile and deploy all 6 contracts to Kaspa Mainnet only after verification passes
 - Integrate kaspa-zk-params crate (real Groth16, replacing stub)
 - Implement PROM emission contract (minting logic)

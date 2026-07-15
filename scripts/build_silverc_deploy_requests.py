@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build public Silverc deploy requests for an external orchestrator."""
+"""Build public Silverc deploy requests for the keyless genesis operator."""
 
 from __future__ import annotations
 
@@ -26,6 +26,10 @@ from verify_silverc_h001 import DEFAULT_SILVERSCRIPT_REF
 
 DEFAULT_OUT_DIR = Path("/tmp/prometheus-silverc-deploy-requests")
 SECRET_LIKE_RE = re.compile(r"(private|secret|seed|mnemonic|password|passwd|wallet|keystore|token)", re.IGNORECASE)
+REQUEST_BLOCKER = (
+    "real funded UTXO, external Schnorr signer response, and public chain evidence are required before repository broadcast"
+)
+REQUEST_SAFETY_SCOPE = "deploy_request_builder_only"
 
 
 def parse_args() -> argparse.Namespace:
@@ -111,7 +115,7 @@ def build_request(
     request = {
         "schema_version": 1,
         "request_type": "prometheus_silverc_deploy_request",
-        "status": "READY_FOR_EXTERNAL_DEPLOY_ORCHESTRATOR",
+        "status": "READY_FOR_KEYLESS_GENESIS_OPERATOR",
         "network": args.network,
         "rpc_url": args.rpc_url,
         "deployer_address": args.deployer_address,
@@ -137,7 +141,9 @@ def build_request(
         "constructor_args": constructor_args,
         "orchestrator_requirements": [
             "Validate this request hash before signing or broadcasting.",
-            "Assemble, sign, and broadcast outside this repository through the approved wallet/vault process.",
+            "Use prometheus-silverc-deployer to assemble and verify the keyless transaction in memory.",
+            "Send only the canonical 32-byte sighash to the approved external vault/HSM signer.",
+            "Return the public signature response to prometheus-silverc-deployer for verification and broadcast.",
             "Return public operator_record receipts that match this request and the release-bundle manifest.",
             "Never copy private keys, seed phrases, wallet files, or keystore material into this repository.",
         ],
@@ -149,6 +155,7 @@ def build_request(
             "deploys_contracts": False,
             "updates_status_files": False,
         },
+        "safety_scope": REQUEST_SAFETY_SCOPE,
     }
     request["request_sha256"] = request_hash(request)
     return request
@@ -158,7 +165,7 @@ def write_runbook(path: Path | None, summary: dict[str, Any]) -> None:
     if not path:
         return
     lines = [
-        "# Prometheus Silverc External Deploy Requests",
+        "# Prometheus Silverc Keyless Genesis Deploy Requests",
         "",
         f"Status: {summary['status']}",
         f"Network: {summary['network']}",
@@ -167,8 +174,8 @@ def write_runbook(path: Path | None, summary: dict[str, Any]) -> None:
         "",
         "## Safety Rules",
         "",
-        "- These are public deploy requests for an external orchestrator.",
-        "- This repository does not accept private keys, sign transactions, assemble chain transactions, broadcast, deploy, or update status files.",
+        "- These are public deploy requests for the repository keyless genesis operator.",
+        "- These request-builder artifacts do not accept private keys, sign transactions, assemble chain transactions, broadcast, deploy, or update status files.",
         "- Operator secrets must remain in the approved wallet/vault process.",
         "- Real deployment status still requires verified `operator_record` receipts.",
         "",
@@ -194,9 +201,9 @@ def write_runbook(path: Path | None, summary: dict[str, Any]) -> None:
             "",
             "1. Build and verify the release archive.",
             "2. Build this deploy-request set with public RPC/deployer/oracle inputs only.",
-            "3. Import each request into the approved external deploy orchestrator.",
+            "3. Import each request into `prometheus-silverc-deployer` with public funding data.",
             "4. Verify every request SHA-256 before signing.",
-            "5. Sign and broadcast outside this repository.",
+            "5. Sign only the digest externally; verify and broadcast with the repository operator.",
             "6. Feed public `operator_record` receipts back into the receipt verifier and status staging guard.",
         ]
     )
@@ -244,7 +251,7 @@ def main() -> int:
 
         summary = {
             "schema_version": 1,
-            "status": "REQUESTS_READY_EXTERNAL_ORCHESTRATOR_REQUIRED",
+            "status": "REQUESTS_READY_FOR_KEYLESS_GENESIS_OPERATOR",
             "network": args.network,
             "rpc_url": args.rpc_url,
             "deployer_address": args.deployer_address,
@@ -253,7 +260,7 @@ def main() -> int:
             "silverscript_commit": manifest["silverscript_commit"],
             "request_count": len(request_entries),
             "requests": request_entries,
-            "blockers": ["missing approved external deploy orchestrator implementation"],
+            "blockers": [REQUEST_BLOCKER],
             "safety": {
                 "accepts_private_keys": False,
                 "signs_transactions": False,
@@ -262,6 +269,7 @@ def main() -> int:
                 "deploys_contracts": False,
                 "updates_status_files": False,
             },
+            "safety_scope": REQUEST_SAFETY_SCOPE,
         }
         summary["request_set_sha256"] = sha256(canonical_json_bytes(summary)).hexdigest()
         if args.request_set_out:

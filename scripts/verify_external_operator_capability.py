@@ -42,7 +42,7 @@ EXPECTED_FALSE_SAFETY_FLAGS = {
 EXPECTED_BOUNDARY_FLAGS = {
     "public_artifacts_only",
     "operator_records_only",
-    "chain_payloads_external",
+    "signing_material_external",
     "status_updates_manual",
 }
 
@@ -146,6 +146,8 @@ def validate_deploy_procedure(procedure: dict[str, Any]) -> dict[str, Any]:
     if procedure.get("status") != DEPLOY_PROCEDURE_STATUS:
         raise ValueError(f"deploy_procedure.status: expected {DEPLOY_PROCEDURE_STATUS}")
     require_false_safety_flags(procedure, "deploy_procedure")
+    if procedure.get("safety_scope") != "procedure_builder_only":
+        raise ValueError("deploy_procedure.safety_scope: expected procedure_builder_only")
     request_set_sha256 = require_str(procedure, "request_set_sha256", "deploy_procedure")
     request_count = require_int(procedure, "request_count", "deploy_procedure", minimum=1)
     result_fields = require_dict(procedure.get("required_public_result_fields"), "deploy_procedure.required_public_result_fields")
@@ -209,6 +211,8 @@ def validate_capability(
     if capability.get("network") != deploy["network"]:
         raise ValueError("capability.network mismatch")
     require_false_safety_flags(capability, "capability")
+    if capability.get("safety_scope") != "capability_record_only":
+        raise ValueError("capability.safety_scope: expected capability_record_only")
     require_true_boundary_flags(capability)
 
     operator = require_dict(capability.get("operator"), "capability.operator")
@@ -282,6 +286,7 @@ def validate_capability(
             "deploys_contracts": False,
             "updates_status_files": False,
         },
+        "safety_scope": "capability_verifier_only",
         "blockers": [],
     }
 
@@ -307,8 +312,10 @@ def write_runbook(path: Path | None, summary: dict[str, Any]) -> None:
         "",
         "## Boundary",
         "",
+        "- The safety flags below describe this capability verifier, not the Rust execution operator.",
         "- This verifier accepts public operator capability metadata only.",
-        "- The repository still does not accept keys, raw transactions, signing material, deployment, broadcast, or status writes.",
+        "- This verifier does not accept keys, raw transactions, signing material, deployment, broadcast, or status writes.",
+        "- The repository genesis operator may assemble and broadcast verified transactions in memory; private signing material remains external.",
         "- This check binds the capability record to the public deploy and optional metrics-oracle operator procedures.",
         "",
         "## Bound Procedures",
