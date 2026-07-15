@@ -385,7 +385,7 @@ def validate_handoff(root: Path) -> dict[str, Any]:
     ready = (
         handoff["status"] == "READY_FOR_OPERATOR_DEPLOY"
         and handoff.get("deploy_supported") is True
-        and handoff.get("deploy_operator_procedure_status") == "READY_FOR_EXTERNAL_DEPLOY_OPERATOR"
+        and handoff.get("deploy_operator_procedure_status") == "READY_FOR_KEYLESS_GENESIS_OPERATION"
         and handoff.get("operator_receipts_status") == "READY_FOR_STATUS_RECORDING"
         and handoff.get("deploy_receipt_evidence_status") == "PUBLIC_DEPLOY_RECEIPT_EVIDENCE_VERIFIED"
         and handoff.get("metrics_tx_request_status") == "READY_FOR_EXTERNAL_TX_ASSEMBLER"

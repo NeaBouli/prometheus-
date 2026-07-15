@@ -1,5 +1,20 @@
 # Action Log
 
+## 2026-07-15
+
+- GH-4 genesis hardening now commits the exact contextual v1 `storage_mass` instead of the maximum mass component, validates the exact live funding UTXO during preflight and immediately before broadcast, and binds the signing request to fee limits, P2SH, covenant, transaction, and request hashes.
+- Added 24 Rust unit/security tests, including fixed public interoperability vectors and a file-based Python/Rust signing handoff. After the final keyless-operator schema naming correction, a fresh seven-contract integration passed with `request_set_sha256=06dd8ca9299120551c062b01c0dfcf974f5cb75983a91521290c431f3a1d42f6`.
+- Corrected GitHub issue #4 to the verified Toccata-v1/testnet-10 implementation path. Real funded testnet-10 signatures, receipts, independent evidence, and remote CI remain open. No secrets were introduced; the foreign untracked file remains untouched.
+- Hardened Prometheus CI with workflow-level `contents: read` token permissions and pinned both Rust jobs to the locally verified Rust `1.95.0` toolchain instead of floating `stable`. Live-chain acceptance remains an explicit external rollout gate.
+- Renamed the unmerged deploy-request schema statuses from the stale external-orchestrator wording to `READY_FOR_KEYLESS_GENESIS_OPERATOR` / `REQUESTS_READY_FOR_KEYLESS_GENESIS_OPERATOR`; the repository operator executes the transaction path while only BIP340 signing remains external.
+- Renamed the deploy procedure status/key to `READY_FOR_KEYLESS_GENESIS_OPERATION` / `execution_sequence`; the metrics-oracle procedure remains explicitly external because that transaction path is not yet repository-owned.
+- Final local verification passed: 129 workspace tests passed with 2 intentional live-network tests ignored, workspace clippy passed with `-D warnings`, Rustfmt passed, Python syntax and 6 Autodidactic tests passed, Memory Integrity passed, Actionlint passed, CI YAML parsed, the seven-contract keyless schema/capability handoff passed, `cargo audit` reported 0 known vulnerabilities (8 transitive maintenance/yank warnings), and staged Gitleaks found no leaks.
+- Added project-local Codex role orchestration in `AGENTS.md`, `.codex/config.toml`, and `.codex/agents/`: GPT-5.6 Sol owns architecture, security, integration, and final verification; GPT-5.3-Codex-Spark handles bounded low-risk patches; GPT-5.6-Terra performs broad read-only analysis.
+- Capped concurrency at three threads and one delegation level, prohibited concurrent writes to the same file, and required Sol to review delegated diffs and run the complete relevant checks.
+- Kept delegation selective because subagent threads consume additional tokens even when they reduce main-thread context or use a lower-cost model.
+- Verified all TOML files with Python `tomllib`, confirmed all three model slugs in the local Codex catalog, passed `git diff --check`, and completed a strict-config live Spark delegation smoke with result `SPARK_AGENT_OK`.
+- Security note: no secrets or credentials were added. Existing local untracked `Prometheus-1.png` remains untouched and uncommitted.
+
 ## 2026-07-12
 
 - Added `scripts/verify_release_hardening_evidence.py`, a public-only verifier for release-hardening evidence. It binds successful Prometheus CI, Security Audit, Pages deployment, branch-control, rollback, public Pages verification, and release-note checks to the exact release commit while rejecting secret-like fields plus raw/serialized transaction fields. It does not query GitHub, accept credentials, change repository settings, sign, assemble, broadcast, deploy, or update status files.

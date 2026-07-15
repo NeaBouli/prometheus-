@@ -104,6 +104,10 @@ Current runtime coverage:
 - `completeWithdraw` accepts zero-output termination after cooldown
 - `completeWithdraw` rejects before the cooldown expires
 
+Current operator coverage is 24 unit/security tests, including a fixed public
+interoperability vector for transaction ID, covenant ID, sighash,
+signing-request hash, and contextual storage-mass commitment.
+
 Current signed-int deployment boundary:
 
 - upstream Silverc entrypoint numeric arguments are signed `int`
@@ -117,10 +121,9 @@ Current signed-int deployment boundary:
 
 Remaining deployment blockers:
 
-- no network deploy CLI is currently present in upstream `silverc`; deployment
-  readiness is therefore split into current-`silverc` runtime tests, a
-  deterministic JSON artifact/release-manifest gate, and a still-open network
-  deploy/orchestration path once tooling exists
+- real funded testnet-10 operator inputs and external BIP340 signatures
+- confirmed `operator_record` receipts plus independent node/explorer evidence
+- the external signed metrics-oracle transaction and exact-commit release evidence
 
 ## Silverc CLI release bundle smoke
 
@@ -165,13 +168,15 @@ checks:
 - non-empty ABI and state layout metadata
 - public operator inputs: network, RPC URL, deployer address, and metrics-oracle
   public key
-- whether the pinned upstream `silverc` CLI exposes a network deploy command
+- whether upstream `silverc` exposes a network deploy command and whether the
+  repository Toccata-v1 genesis operator is present
 
 The preflight intentionally does not accept private keys and does not deploy.
-Today it reports `deploy_supported: false` because upstream `silverc` exposes
-compile/AST artifact generation but no network deploy command. This turns the
-remaining Sprint 9 deploy blocker into a concrete, CI-visible capability gap
-instead of a vague manual step.
+Upstream `silverc` still exposes compile/AST artifact generation only, but the
+preflight now reports `deploy_supported: true` when the workspace-registered
+`prometheus-silverc-deployer` binary is present and all public inputs exist.
+This distinguishes the upstream CLI limitation from Prometheus' implemented
+network operator.
 
 Use `--runbook-out <path>` to emit a Markdown operator handoff next to the JSON
 plan. The runbook is generated only after bundle and public-input validation
@@ -179,21 +184,43 @@ passes. It lists the inspected network, missing public inputs, the deploy-tool
 capability status, each contract artifact with script SHA-256 and script byte
 length, the safe operator sequence, and the remaining deploy blockers. It still
 does not include private keys, seed phrases, wallet files, or keystore material.
-CI checks that the runbook remains generated, blocked while no upstream network
-deploy command exists, and explicit about not broadcasting transactions.
+CI checks that the runbook recognizes the repository operator, remains explicit
+that the Python preflight itself does not broadcast, and contains no signing
+material.
+
+## Keyless Toccata-v1 genesis operator
+
+`modules/silverc-deployer` implements the network transaction path that upstream
+`silverc` does not provide. It uses official pinned `rusty-kaspa` v2.0.1 APIs to
+build transaction version 1 with compute budget 10, derive and bind the covenant
+ID, calculate and commit contextual storage mass, export the public
+`SIG_HASH_ALL` digest, verify an
+external BIP340 signature and complete transaction, run a live synced-node and
+Toccata-activation preflight, broadcast only after exact signing-request hash
+acknowledgement, and observe the deployed covenant UTXO. `testnet-10` is the
+pinned supported testnet; `testnet-12` remains unsupported because v2.0.1 has no
+parameters for it.
+
+The CLI has no private-key, seed, wallet, keystore, password, or raw transaction
+input. Official PSKT/PSKB is not used because its audited input builder creates
+legacy sigop-count commitments where Toccata transaction v1 requires an explicit
+compute-budget commitment. Contextual storage mass is a separate v1 transaction
+commitment and is calculated through the official consensus API.
+See [`docs/runbooks/silverc-genesis-operator.md`](../../../docs/runbooks/silverc-genesis-operator.md)
+for schemas, commands, safety gates, and rollback handling.
 
 ## External deploy requests
 
 `scripts/build_silverc_deploy_requests.py` emits one public deploy-request JSON
 file per current-Silverc contract plus a request-set summary and Markdown
-runbook for an approved external deploy orchestrator. Each request is bound to
-the validated release-bundle manifest by source, constructor-args, artifact, and
-script hashes.
+runbook for the repository genesis operator and its external signer boundary.
+Each request is bound to the validated release-bundle manifest by source,
+constructor-args, artifact, and script hashes.
 
 The request builder intentionally does not accept private keys, sign, assemble
 chain transactions, broadcast, deploy contracts, or update status files. It also
 rejects RPC URLs with embedded credentials. The output status is
-`REQUESTS_READY_EXTERNAL_ORCHESTRATOR_REQUIRED` until an approved external
+`REQUESTS_READY_FOR_KEYLESS_GENESIS_OPERATOR` until the repository keyless
 orchestrator consumes the requests and returns real `operator_record` receipts.
 
 `scripts/verify_silverc_deploy_requests.py` independently verifies the request
@@ -236,8 +263,8 @@ chain transactions, broadcast, deploy contracts, or update status files.
 include this import path in the public handoff package. When real public results
 are supplied, the handoff can include `operator-receipts.from-results.json`,
 `operator-receipts-import-summary.json`, and `operator-receipts-import.md`; the
-handoff still remains blocked until the network deploy/orchestration path and
-other release gates are actually proven.
+handoff remains blocked until real funded deployment receipts, public chain
+evidence, and the other release gates are actually proven.
 
 ## Deployment receipt verifier
 
@@ -286,8 +313,8 @@ or release notes.
 
 `scripts/build_silverc_operator_handoff.py` builds a public handoff directory
 from an existing release archive. It copies the archive, runs deploy preflight,
-builds and verifies the external deploy request set, adds the deploy operator
-procedure, can import public external orchestrator results into
+builds and verifies the keyless genesis deploy request set, adds the deploy operator
+procedure, can import public confirmed operator results into
 `operator_record` receipts, verifies the synthetic CI receipt fixture,
 optionally verifies real `operator_record` receipts, optionally verifies public
 node/explorer receipt evidence for those receipts, validates the

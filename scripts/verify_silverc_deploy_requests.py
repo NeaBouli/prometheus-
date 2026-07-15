@@ -15,8 +15,8 @@ from preflight_silverc_deploy import bundle_root_from_args, load_json, validate_
 from smoke_silverc_artifacts import FIXTURES, canonical_json_bytes
 from verify_silverc_h001 import DEFAULT_SILVERSCRIPT_REF
 
-REQUEST_SET_STATUS = "REQUESTS_READY_EXTERNAL_ORCHESTRATOR_REQUIRED"
-REQUEST_STATUS = "READY_FOR_EXTERNAL_DEPLOY_ORCHESTRATOR"
+REQUEST_SET_STATUS = "REQUESTS_READY_FOR_KEYLESS_GENESIS_OPERATOR"
+REQUEST_STATUS = "READY_FOR_KEYLESS_GENESIS_OPERATOR"
 REQUEST_TYPE = "prometheus_silverc_deploy_request"
 SECRET_LIKE_RE = re.compile(r"(private|secret|seed|mnemonic|password|passwd|wallet|keystore|token)", re.IGNORECASE)
 ALLOWED_SECRET_WORD_KEYS = {"accepts_private_keys"}
@@ -235,15 +235,18 @@ def validate_request_set(
     if request_set.get("schema_version") != 1:
         raise ValueError("schema_version: expected 1")
     if request_set.get("status") != REQUEST_SET_STATUS:
-        raise ValueError("status: expected REQUESTS_READY_EXTERNAL_ORCHESTRATOR_REQUIRED")
+        raise ValueError("status: expected REQUESTS_READY_FOR_KEYLESS_GENESIS_OPERATOR")
     if request_set.get("silverscript_ref") != manifest["silverscript_ref"]:
         raise ValueError("silverscript_ref mismatch")
     if request_set.get("silverscript_commit") != manifest["silverscript_commit"]:
         raise ValueError("silverscript_commit mismatch")
     if request_set.get("request_count") != manifest["fixture_count"]:
         raise ValueError("request_count mismatch")
-    if "missing approved external deploy orchestrator implementation" not in request_set.get("blockers", []):
-        raise ValueError("blockers: expected missing approved external deploy orchestrator implementation")
+    expected_blocker = (
+        "real funded UTXO, external Schnorr signature, and public chain evidence are required"
+    )
+    if expected_blocker not in request_set.get("blockers", []):
+        raise ValueError("blockers: expected real funding, signer, and chain evidence requirement")
     require_false_flags(require_dict(request_set.get("safety"), "$.safety"), "$.safety")
 
     request_entries = require_list(request_set.get("requests"), "requests")
@@ -286,7 +289,9 @@ def validate_request_set(
         "request_count": len(verified),
         "request_set_sha256": request_set["request_set_sha256"],
         "requests": verified,
-        "blockers": ["approved external deploy orchestrator still required for signing and broadcast"],
+        "blockers": [
+            "real funding, external Schnorr signer response, and public chain evidence are required"
+        ],
         "safety": {
             "accepts_private_keys": False,
             "signs_transactions": False,
@@ -321,7 +326,7 @@ def write_runbook(path: Path | None, summary: dict[str, Any]) -> None:
         "",
         "- This verifier accepts public deploy-request JSON only.",
         "- This verifier does not accept private keys, sign transactions, assemble chain transactions, broadcast, deploy, or update status files.",
-        "- A verified request set is still blocked until an approved external deploy orchestrator signs and broadcasts outside this repository.",
+        "- A verified request set still requires real funding, an external Schnorr signer response, repository-operator broadcast, and public chain evidence.",
         "",
         "## Requests",
         "",

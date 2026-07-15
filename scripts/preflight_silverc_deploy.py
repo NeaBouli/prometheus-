@@ -11,6 +11,7 @@ import subprocess
 import sys
 import tarfile
 import tempfile
+import tomllib
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -39,6 +40,8 @@ KASPA_ADDRESS_RE = re.compile(r"^(kaspa|kaspatest|kaspadev):[a-z0-9]{20,}$")
 class ToolingStatus:
     silverc_path: str
     has_deploy_command: bool
+    repository_operator_manifest: str
+    has_repository_genesis_operator: bool
     help_excerpt: str
 
 
@@ -46,7 +49,8 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=(
             "Preflight-check a Prometheus current-Silverc release bundle. "
-            "The script validates artifacts and operator inputs only; it does not deploy."
+            "The script validates artifacts, public inputs, and available deploy tooling; "
+            "it does not deploy."
         )
     )
     source = parser.add_mutually_exclusive_group(required=True)
@@ -74,7 +78,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--require-network-deploy-tool",
         action="store_true",
-        help="Fail unless the inspected silverc CLI exposes a network deploy command",
+        help="Fail unless upstream silverc or the repository genesis operator provides a deploy path",
     )
     return parser.parse_args()
 
@@ -231,9 +235,35 @@ def inspect_silverc(silverscript_repo: Path, silverscript_ref: str) -> ToolingSt
     deploy_tokens = {"deploy", "publish", "broadcast", "submit"}
     commands = {token.strip(" ,;:.").lower() for token in help_text.split()}
     has_deploy = bool(deploy_tokens & commands)
+    operator_manifest = ROOT / "modules" / "silverc-deployer" / "Cargo.toml"
+    has_repository_operator = False
+    if operator_manifest.is_file():
+        manifest = tomllib.loads(operator_manifest.read_text(encoding="utf-8"))
+        metadata = json.loads(
+            run(["cargo", "metadata", "--no-deps", "--format-version", "1"], ROOT).stdout
+        )
+        package = next(
+            (
+                item
+                for item in metadata.get("packages", [])
+                if item.get("name") == "prometheus-silverc-deployer"
+            ),
+            None,
+        )
+        targets = package.get("targets", []) if package else []
+        has_repository_operator = (
+            manifest.get("package", {}).get("name") == "prometheus-silverc-deployer"
+            and any(
+                target.get("name") == "prometheus-silverc-deployer"
+                and "bin" in target.get("kind", [])
+                for target in targets
+            )
+        )
     return ToolingStatus(
         silverc_path=str(silverc),
         has_deploy_command=has_deploy,
+        repository_operator_manifest=str(operator_manifest),
+        has_repository_genesis_operator=has_repository_operator,
         help_excerpt="\n".join(help_text.splitlines()[:20]),
     )
 
@@ -261,15 +291,22 @@ def write_plan(
         },
         "tooling": {
             "silverc_path": tooling.silverc_path,
-            "has_network_deploy_command": tooling.has_deploy_command,
+            "upstream_silverc_has_network_deploy_command": tooling.has_deploy_command,
+            "repository_operator_manifest": tooling.repository_operator_manifest,
+            "has_repository_toccata_v1_genesis_operator": tooling.has_repository_genesis_operator,
         },
-        "deploy_supported": tooling.has_deploy_command and not missing_inputs,
+        "deploy_supported": (
+            tooling.has_deploy_command or tooling.has_repository_genesis_operator
+        )
+        and not missing_inputs,
         "deploy_blockers": [],
     }
     if missing_inputs:
         plan["deploy_blockers"].append("missing public operator inputs: " + ", ".join(missing_inputs))
-    if not tooling.has_deploy_command:
-        plan["deploy_blockers"].append("upstream silverc exposes no network deploy command")
+    if not tooling.has_deploy_command and not tooling.has_repository_genesis_operator:
+        plan["deploy_blockers"].append(
+            "no upstream or repository network deploy operator is available"
+        )
 
     if args.plan_out:
         plan_path = args.plan_out.expanduser().resolve()
@@ -313,7 +350,9 @@ def write_runbook(args: argparse.Namespace, manifest: dict[str, Any], plan: dict
         "## Tooling",
         "",
         f"- silverc path inspected: `{plan['tooling']['silverc_path']}`",
-        f"- Network deploy command available: {str(plan['tooling']['has_network_deploy_command']).lower()}",
+        f"- Upstream silverc network deploy command: {str(plan['tooling']['upstream_silverc_has_network_deploy_command']).lower()}",
+        f"- Repository Toccata-v1 genesis operator: {str(plan['tooling']['has_repository_toccata_v1_genesis_operator']).lower()}",
+        f"- Repository operator manifest: `{plan['tooling']['repository_operator_manifest']}`",
         "",
         "## Contracts",
         "",
@@ -339,8 +378,8 @@ def write_runbook(args: argparse.Namespace, manifest: dict[str, Any], plan: dict
             "1. Build the release archive with `scripts/smoke_silverc_artifacts.py --archive <path>`.",
             "2. Run this preflight against the archive with public RPC/deployer/oracle inputs only.",
             "3. Confirm every source, constructor-args, artifact, and script hash is covered by the generated manifest.",
-            "4. Confirm a network deploy/broadcast tool exists before attempting Sprint 9 deployment.",
-            "5. Use a separate wallet/vault process for signing; never store signing material in the repository.",
+            "4. Follow `docs/runbooks/silverc-genesis-operator.md` and run the live Toccata node preflight.",
+            "5. Use a separate vault/HSM process for signing the public digest; never store signing material in the repository.",
             "6. Record deployed contract IDs/addresses in `memory/STATUS.md` only after a real network receipt is verified.",
             "",
             "## Deploy Blockers",
@@ -370,8 +409,8 @@ def main() -> int:
         write_runbook(args, manifest, plan)
         print(json.dumps(plan, indent=2, sort_keys=True))
 
-        if args.require_network_deploy_tool and not tooling.has_deploy_command:
-            raise RuntimeError("required network deploy tool is unavailable in upstream silverc")
+        if args.require_network_deploy_tool and not plan["deploy_supported"]:
+            raise RuntimeError("required network deploy tool is unavailable")
         return 0
     finally:
         if tmp is not None:

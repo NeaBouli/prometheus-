@@ -506,6 +506,8 @@ def status_from_components(
     release_hardening: dict[str, Any] | None,
 ) -> tuple[str, list[str]]:
     blockers = []
+    if deploy_plan["network"] == "sandbox":
+        blockers.append("sandbox handoff is validation-only and cannot prove testnet/mainnet rollout")
     if not deploy_plan["deploy_supported"]:
         blockers.extend(deploy_plan["deploy_blockers"])
     if operator_receipts is None:
