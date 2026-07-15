@@ -100,9 +100,11 @@ response fields from the validated request and rejecting path collisions before
 output. It revalidates the exact live funding UTXO, broadcasts, and observes
 the covenant output. Its funding-free TLS-only official-resolver probe now
 confirms a synced, UTXO-indexed post-Toccata testnet-10 node while preserving
-the mandatory funding-bound preflight. Public H-001 funding and the exact-main
-schema-v2 request/digest are confirmed; external signature, verified broadcast,
-receipt, and independent testnet-10 evidence remain required.
+the mandatory funding-bound preflight. Public H-001 funding and the schema-v2
+request/digest were rebuilt from exact main `205e1ca`; the live UTXO remained
+unspent/non-coinbase and two builds were byte-identical to each other and the
+earlier baseline. External signature, verified broadcast, receipt, and
+independent testnet-10 evidence remain required.
 A public release-hardening evidence verifier binds successful CI, Pages,
 branch-control, rollback, and release-note checks to the exact release commit
 without querying GitHub, accepting credentials, changing repository settings,
@@ -283,7 +285,7 @@ This is the final architectural milestone described in the whitepaper.
 | Date | Milestone |
 |------|-----------|
 | March 2026 | All sprints 0-8 accepted. Foundation complete. |
-| July 2026 | Toccata runtime/release gates, public H-001 funding, and exact-main schema-v2 signing handoff verified; external canary execution remains. |
+| July 2026 | Toccata runtime/release gates, public H-001 funding, exact-main `205e1ca` schema-v2 signing handoff, live UTXO revalidation, and byte-identical rebuild verified; external canary execution remains. |
 | After H-001 evidence | Deploy the remaining state contracts, execute the metrics-oracle transaction, and complete exact-commit release hardening. |
 | After core-network rollout | Real Groth16, PROM emission, P2P rule distribution, production Phi-3, and operated Guardian/Validator network. |
 | After production AI/P2P | Desktop client beta and signed installers for Windows, macOS, and Linux. |

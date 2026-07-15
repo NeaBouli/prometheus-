@@ -709,5 +709,20 @@ acknowledged broadcast, confirmation, successor evidence, and exact-rollout
 release evidence remain operational gates. No wallet, private material,
 signature, raw transaction, or broadcast was used.
 
+**AUDIT UPDATE 2026-07-16:** The non-promotable GH-9 H-001 handoff was rebuilt
+from clean exact main `205e1ca928d3048109575cf7a21810c9e6609120` after
+Prometheus CI `29454591518`, Security Audit `29454591555`, and Pages
+`29454590793` passed. Seven artifacts, the one-request canary set, procedure,
+funding spec, and schema-v2 signing request reproduced. Live read-only preflight
+reconfirmed the public funding output unspent/non-coinbase through a synced,
+UTXO-indexed `rusty-kaspa 2.0.1` node at DAA `517950805`, above activation.
+Two prepare runs were byte-identical to each other and the earlier `9477fab`
+baseline; signing-request hash and sighash remain unchanged. The owner-only
+handoff at `/Users/gio/Desktop/repos/prometheus-handoffs/205e1ca` passed 0700/
+0600 mode checks and a full-directory Gitleaks scan. No wallet, private key,
+signature, raw transaction, or broadcast was accessed or produced. External
+BIP340 signing, complete import verification, separately approved broadcast,
+confirmation, receipt, and independent evidence remain mandatory.
+
 *Audit completed 2026-04-02 by Claude Code (5 parallel agents, 7 levels, 35 checks).*
 *The fire belongs to humanity.*
