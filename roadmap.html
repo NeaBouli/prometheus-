@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Prometheus — Roadmap</title>
 <!-- SEO Meta -->
-<meta name="description" content="Complete deployment roadmap: Kaspa Toccata post-fork verification, desktop August 2026, mobile September 2026, vProgs Q4 2026.">
+<meta name="description" content="Readiness-gated Prometheus roadmap: H-001 testnet canary, core-network rollout, production AI and P2P, desktop and mobile clients, and vProgs.">
 <meta name="keywords" content="Prometheus roadmap, Kaspa Covenant-Hardfork, PROM launch, desktop client, mobile app, Silverscript deployment">
 <meta name="author" content="Prometheus Protocol">
 <meta name="robots" content="index, follow">
@@ -15,15 +15,15 @@
 <link rel="canonical" href="https://neabouli.github.io/prometheus-/roadmap.html">
 <!-- Open Graph -->
 <meta property="og:type" content="website">
-<meta property="og:title" content="Prometheus Roadmap — Full deployment by August/September 2026">
-<meta property="og:description" content="Complete deployment roadmap: Kaspa Toccata post-fork verification, desktop August 2026, mobile September 2026, vProgs Q4 2026.">
+<meta property="og:title" content="Prometheus Roadmap — Readiness-gated deployment">
+<meta property="og:description" content="Current engineering status from the funded H-001 canary through core-network rollout, production clients, and the complete protocol vision.">
 <meta property="og:url" content="https://neabouli.github.io/prometheus-/roadmap.html">
 <meta property="og:image" content="https://neabouli.github.io/prometheus-/logo/Prometheus.png">
 <meta property="og:site_name" content="Prometheus Protocol">
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Prometheus Roadmap — Full deployment by August/September 2026">
-<meta name="twitter:description" content="Contracts deploy after current-Silverscript runtime transition and H-001 verification. Desktop August 2026. Mobile September 2026.">
+<meta name="twitter:title" content="Prometheus Roadmap — Readiness-gated deployment">
+<meta name="twitter:description" content="H-001 canary preparation is nearly complete; full rollout remains gated by real chain evidence, production protocol components, and release hardening.">
 <meta name="twitter:image" content="https://neabouli.github.io/prometheus-/logo/Prometheus.png">
 <!-- GEO: AI-readable -->
 <meta name="ai-summary" content="Prometheus deployment roadmap: Phase A post-Toccata verification covers current-Silverscript validator-state runtime transitions, H-001 LE encoding, and contract deploy gates; Phase B LLaMA fine-tuning; Phase C Tauri desktop; Phase D Flutter mobile; Phase E server tooling; Phase F vProgs.">
@@ -156,8 +156,12 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
   .timeline-overview{grid-template-columns:1fr 1fr}
   .sprints-grid{grid-template-columns:1fr}
   .devices-grid{grid-template-columns:1fr 1fr}
-  footer{grid-template-columns:1fr;gap:16px;padding:24px}
-  .f-links{justify-content:flex-start}
+  .hw-section{overflow-x:auto}
+  .hw-table{min-width:620px}
+  footer{grid-template-columns:minmax(0,1fr);gap:16px;padding:24px}
+  .f-left,.f-center,.f-links{min-width:0;width:100%}
+  .f-center{text-align:left}
+  .f-links{justify-content:flex-start;flex-wrap:wrap;gap:12px 18px}
 }
 /* MOBILE NAV */
 .nav-burger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:8px;z-index:600}
@@ -208,13 +212,13 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
   <div class="page-header-inner">
     <div class="breadcrumb r"><a href="index.html">Prometheus</a><span>/</span>Roadmap</div>
     <h1 class="page-title r">Full deployment<br>roadmap.</h1>
-    <p class="page-desc r d1">Target: full public release August / September 2026. Working daily. No shortcuts.</p>
+    <p class="page-desc r d1">Readiness-gated delivery. H-001 canary preparation: 96%. Core-network rollout: 65–70%. Complete roadmap vision: 35–40%. No fixed release date is claimed.</p>
   </div>
 </div>
 
 <!-- TIMELINE OVERVIEW -->
 <div class="overview">
-  <div class="overview-title r">Timeline overview</div>
+  <div class="overview-title r">Readiness overview · engineering estimates, not release guarantees</div>
   <div class="timeline-overview r d1">
     <div class="to-item done">
       <div class="to-date">Mar 2026</div>
@@ -222,33 +226,33 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
       <div class="to-status">✓ done</div>
     </div>
     <div class="to-item done">
-      <div class="to-date">Jun 30, 2026</div>
-      <div class="to-label">Toccata · post-fork deploy verification</div>
-      <div class="to-status">verifying</div>
+      <div class="to-date">Jul 2026</div>
+      <div class="to-label">Toccata runtime + exact signing handoff</div>
+      <div class="to-status">✓ verified</div>
     </div>
     <div class="to-item active">
-      <div class="to-date">May–Jun 2026</div>
-      <div class="to-label">ZK-Proof · P2P · Phi-3 real</div>
-      <div class="to-status">→ next</div>
+      <div class="to-date">Current</div>
+      <div class="to-label">H-001 external signature · broadcast · evidence</div>
+      <div class="to-status">→ next gate</div>
     </div>
     <div class="to-item planned">
-      <div class="to-date">Jun 2026</div>
-      <div class="to-label">LLaMA fine-tuning · Fed-DART</div>
+      <div class="to-date">After canary</div>
+      <div class="to-label">Six state deployments · oracle · release evidence</div>
+      <div class="to-status">gated</div>
+    </div>
+    <div class="to-item planned">
+      <div class="to-date">After core</div>
+      <div class="to-label">Real ZK · P2P · Phi-3 · LLaMA · Fed-DART</div>
       <div class="to-status">planned</div>
     </div>
     <div class="to-item planned">
-      <div class="to-date">Jul 2026</div>
-      <div class="to-label">Desktop client beta</div>
+      <div class="to-date">After AI/P2P</div>
+      <div class="to-label">Desktop beta · signed installers · operations</div>
       <div class="to-status">planned</div>
     </div>
     <div class="to-item planned">
-      <div class="to-date">Aug 2026</div>
-      <div class="to-label">Full desktop release · Guardian installer</div>
-      <div class="to-status">planned</div>
-    </div>
-    <div class="to-item planned">
-      <div class="to-date">Sep 2026</div>
-      <div class="to-label">iOS + Android mobile</div>
+      <div class="to-date">After desktop</div>
+      <div class="to-label">iOS + Android · mobile security review</div>
       <div class="to-status">planned</div>
     </div>
   </div>
@@ -322,18 +326,19 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
       <div class="phase-letter">A</div>
       <div class="phase-meta">
         <span class="phase-tag">Phase A · Post-Toccata Verification</span>
-        <div><span class="phase-title">Current-Silverscript transitions, H-001 vectors, deploy gate.</span>
-        <span class="phase-date">July 2026</span>
+        <div><span class="phase-title">Runtime gates pass; funded H-001 execution and evidence are next.</span>
+        <span class="phase-date">Current · readiness-gated</span>
         <span class="phase-status s-active">Active</span></div>
       </div>
     </div>
     <div class="sprints-grid">
       <div class="sprint">
         <div class="sprint-num">Sprint 9</div>
-        <div class="sprint-title">Contracts on Mainnet + Real ZK-Proof</div>
+        <div class="sprint-title">Canary, State Contracts + Real ZK-Proof</div>
         <ul class="sprint-items">
-          <li>Verify current-Silverscript validator-state transitions and H-001 LE encoding before deploy</li>
-          <li>Compile + deploy all 6 contracts only after verification passes</li>
+          <li class="done-item">Current-Silverscript runtime transitions and H-001 LE encoding verified</li>
+          <li>Externally sign, verify, broadcast, confirm, and independently observe the H-001 testnet-10 canary</li>
+          <li>Deploy all 6 state contracts only after canary evidence passes</li>
           <li>Integrate kaspa-zk-params (real Groth16, replaces stub)</li>
           <li>PROM emission contract: minting logic</li>
           <li>First KAS/PROM liquidity pool on Kasplex DEX</li>
@@ -361,7 +366,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
       <div class="phase-meta">
         <span class="phase-tag">Phase B · AI Production</span>
         <div><span class="phase-title">Real Phi-3. Fine-tuned LLaMA 3. Fed-DART live.</span>
-        <span class="phase-date">May – June 2026</span>
+        <span class="phase-date">After core-network gates</span>
         <span class="phase-status s-planned">Planned</span></div>
       </div>
     </div>
@@ -419,7 +424,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
       <div class="phase-meta">
         <span class="phase-tag">Phase C · Desktop Release</span>
         <div><span class="phase-title">Full desktop client. Public beta.</span>
-        <span class="phase-date">July – August 2026</span>
+        <span class="phase-date">After production AI/P2P</span>
         <span class="phase-status s-planned">Planned</span></div>
       </div>
     </div>
@@ -478,7 +483,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
       <div class="phase-meta">
         <span class="phase-tag">Phase D · Mobile</span>
         <div><span class="phase-title">iOS + Android. Full public release.</span>
-        <span class="phase-date">August – September 2026</span>
+        <span class="phase-date">After desktop beta + security review</span>
         <span class="phase-status s-planned">Planned</span></div>
       </div>
     </div>
@@ -515,7 +520,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
       <div class="phase-meta">
         <span class="phase-tag">Phase E · vProgs</span>
         <div><span class="phase-title">Complete architectural vision.</span>
-        <span class="phase-date">Q4 2026</span>
+        <span class="phase-date">After upstream capability is stable</span>
         <span class="phase-status s-planned">Planned</span></div>
       </div>
     </div>
@@ -524,7 +529,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
         <div class="sprint-num">Sprint 20</div>
         <div class="sprint-title">vProgs Integration</div>
         <ul class="sprint-items">
-          <li>vProgs ships after DAGKnight deployment (Q4 2026)</li>
+          <li>vProgs ships only after upstream DAGKnight/vProgs readiness is independently verified</li>
           <li>AI analysis results anchored to L1 via ZK-proofs</li>
           <li>Federated learning auditable on-chain via CDAG</li>
           <li>Guardian compute resource tracking transparent</li>
@@ -555,49 +560,49 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
       <div class="device-card">
         <div class="device-icon">01 · Desktop</div>
         <div class="device-name">Windows</div>
-        <div class="device-when">August 2026</div>
+        <div class="device-when">After desktop beta gates</div>
         <div class="device-how">MSI installer. Download, run, done.</div>
       </div>
       <div class="device-card">
         <div class="device-icon">02 · Desktop</div>
         <div class="device-name">macOS</div>
-        <div class="device-when">August 2026</div>
+        <div class="device-when">After desktop beta gates</div>
         <div class="device-how">DMG with Gatekeeper signing. Intel + Apple Silicon.</div>
       </div>
       <div class="device-card">
         <div class="device-icon">03 · Desktop</div>
         <div class="device-name">Linux</div>
-        <div class="device-when">August 2026</div>
+        <div class="device-when">After desktop beta gates</div>
         <div class="device-how">.deb, .AppImage, Flatpak. x86_64 + ARM.</div>
       </div>
       <div class="device-card">
         <div class="device-icon">04 · Server</div>
         <div class="device-name">Ubuntu Server</div>
-        <div class="device-when">August 2026</div>
+        <div class="device-when">After Guardian operations proof</div>
         <div class="device-how">One-click guardian installer script.</div>
       </div>
       <div class="device-card">
         <div class="device-icon">05 · Mobile</div>
         <div class="device-name">iPhone / iPad</div>
-        <div class="device-when">September 2026</div>
+        <div class="device-when">After mobile security review</div>
         <div class="device-how">App Store. Phi-3 via Core ML. Background scanning.</div>
       </div>
       <div class="device-card">
         <div class="device-icon">06 · Mobile</div>
         <div class="device-name">Android</div>
-        <div class="device-when">September 2026</div>
+        <div class="device-when">After mobile security review</div>
         <div class="device-how">Google Play + F-Droid. ONNX Runtime Mobile.</div>
       </div>
       <div class="device-card">
         <div class="device-icon">07 · Cloud</div>
         <div class="device-name">Any VPS</div>
-        <div class="device-when">Post-verification</div>
+        <div class="device-when">After core-network evidence</div>
         <div class="device-how">Docker Compose. Guardian or Validator node.</div>
       </div>
       <div class="device-card">
         <div class="device-icon">08 · Edge</div>
         <div class="device-name">Raspberry Pi</div>
-        <div class="device-when">August 2026</div>
+        <div class="device-when">After resource validation</div>
         <div class="device-how">ARM Linux client. Light Client or Honeypot.</div>
       </div>
     </div>
