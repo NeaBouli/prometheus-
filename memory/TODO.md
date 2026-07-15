@@ -2,7 +2,7 @@
 # Format: - [ ] [PRIO] Beschreibung | Verantwortlich | Dependencies
 # PRIO: P0=Kritisch, P1=Hoch, P2=Mittel, P3=Niedrig
 # Status: [ ]=offen, [~]=in Arbeit, [x]=erledigt, [!]=blockiert
-# Last Updated: 2026-07-15
+# Last Updated: 2026-07-16
 
 ---
 
@@ -51,6 +51,7 @@
 - [ ] [P2] ZK-Proof-Generierung (zk_proof.rs, Groth16) | Claude Code | -
 - [ ] [P2] Tauri-App Grundgerüst (UI-Shell, System-Tray) | Claude Code | Rust-Client
 - [ ] [P2] Integration-Tests Client ↔ Testnet | Claude Code | Alle Client-Module
+- [x] [P2] GH-13 experimentellen opt-in Miner Companion als lokalen Testnet-10 wRPC Observer implementieren | Codex | Strict TOML, credential-free loopback, Development-only, scanning/reporting/rewards/validator/honeypot disabled; targeted Rust/CLI tests pass, PR CI pending
 
 ---
 

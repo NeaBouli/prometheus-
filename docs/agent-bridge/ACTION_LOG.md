@@ -1,5 +1,14 @@
 # Action Log
 
+## 2026-07-16 — GH-13 experimental miner companion started
+
+- Opened issue https://github.com/NeaBouli/prometheus-/issues/13 and branch `feature/GH-13-miner-companion` from clean merged baseline `72c9717`; foreign untracked `Prometheus-1.png` remains untouched.
+- Evaluated the proposal against the actual client and current Kaspa mining architecture. ASIC/pool miners normally use Stratum while Prometheus uses Kaspa wRPC; current Phi-3, ZK, rule-reader, and federated-learning paths are development stubs guarded out of beta/mainnet.
+- Implemented strict, opt-in `miner-companion preflight` and `miner-companion run` commands. The profile accepts only light/Testnet-10/credential-free loopback wRPC and rejects remote or credential-bearing endpoints, beta/mainnet, scanning, reporting, validator/honeypot roles, and unknown wallet/reward fields.
+- The runtime observes BlockDAG health only. It does not inspect the host, transmit miner telemetry, control ASIC firmware, intercept Stratum, manage wallets, or award PROM. Reporter allocation remains conditional on future consensus-verified security work.
+- Updated README, Markdown Whitepaper, published Whitepaper HTML, User Guide, FAQ, Roadmap, `llms.txt`, Bridge, and Memory to distinguish target architecture from current implementation and remove passive-miner-reward implications.
+- Final local verification passes: 153 workspace tests with two intentional live-test ignores, Rustfmt, warning-free workspace Clippy, Memory Integrity, six Autodidactic tests, Pages/JSON-LD, workflow YAML parsing, checksum-verified Actionlint v1.7.12, Cargo Audit with no vulnerabilities, and staged-diff Gitleaks v8.30.1. Terra's tracked-diff finding was resolved by staging the three new files and correcting local-wRPC wording; Spark found no code defect, and its four practical test gaps were added. Remote PR CI/Security/Pages remain before acceptance and merge.
+
 ## 2026-07-15 — GH-9 deployment-profile closeout
 
 - PR https://github.com/NeaBouli/prometheus-/pull/11 merged normally as `6213c559508d3322b8660aed308df1a696ac5576`; no direct-main push or admin bypass was used.

@@ -31,7 +31,7 @@
 <meta name="ai-status" content="v4.0, audited, deployment-gated">
 <!-- Schema.org -->
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"TechArticle","name":"Prometheus Whitepaper v4.0","headline":"Decentralized AI-Powered Threat Intelligence on Kaspa","description":"Full technical specification covering architecture, tokenomics, AI models, smart contracts, security analysis, and audit findings.","url":"https://neabouli.github.io/prometheus-/whitepaper.html","datePublished":"2026-03-22","dateModified":"2026-07-15","version":"4.0","author":{"@type":"Organization","name":"Prometheus Protocol Community"},"publisher":{"@type":"Organization","name":"Prometheus Protocol"},"license":"https://opensource.org/licenses/MIT"}
+{"@context":"https://schema.org","@type":"TechArticle","name":"Prometheus Whitepaper v4.0","headline":"Decentralized AI-Powered Threat Intelligence on Kaspa","description":"Full technical specification covering architecture, tokenomics, AI models, smart contracts, security analysis, and audit findings.","url":"https://neabouli.github.io/prometheus-/whitepaper.html","datePublished":"2026-03-22","dateModified":"2026-07-16","version":"4.0","author":{"@type":"Organization","name":"Prometheus Protocol Community"},"publisher":{"@type":"Organization","name":"Prometheus Protocol"},"license":"https://opensource.org/licenses/MIT"}
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -282,6 +282,8 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
         <tr><td>Mainnet Launch</td><td>Operator implementation complete; the first H-001 canary still needs real funding, an external signature, confirmation, and independent evidence. Canary success cannot authorize mainnet; full seven-fixture evidence, the external signed metrics-oracle transaction, and exact-commit release hardening remain required.</td></tr>
         <tr><td>License</td><td>MIT / Apache 2.0</td></tr>
       </table>
+
+      <div class="callout"><p><strong>Current implementation boundary:</strong> The first miner-facing feature is an experimental, opt-in <code>prometheus-client miner-companion</code> sidecar. It observes only a credential-free local Testnet-10 wRPC endpoint. <a href="https://wiki.kaspa.org/mining">Kaspa ASIC/pool mining normally uses Stratum</a>, a separate protocol; this code does not modify firmware, reuse a Stratum session, scan the host, submit threat reports, run validators or honeypots, or award PROM. Beta/mainnet remain blocked by the real Phi-3, ZK, rule-distribution, and transport work.</p></div>
     </div>
 
     <!-- PROBLEM -->
@@ -449,6 +451,7 @@ lora_config = LoraConfig(
         <tr><td>Year 5</td><td>12,000,000</td><td>4,800,000</td><td>3,600,000</td><td>2,400,000</td><td>600,000</td><td>600,000</td></tr>
         <tr><td><strong>Total</strong></td><td><strong>80,000,000</strong></td><td>32,000,000</td><td>24,000,000</td><td>16,000,000</td><td>4,000,000</td><td>4,000,000</td></tr>
       </table>
+      <p>Reporter percentages are protocol allocation targets, not passive uptime rewards. A miner-side companion earns no PROM merely by running; rewards require a future implemented and consensus-verified security contribution path.</p>
       <div class="callout"><p><strong>0% Pre-mine — absolute and unchangeable.</strong> Not a single PROM token is issued before mainnet launch. No founder allocation. No investor tranche. No team reserve. Developers are compensated exclusively through DAO grants from the 5% Dev Pool — only for work performed.</p></div>
     </div>
 
@@ -594,6 +597,7 @@ async def training_round(self):
         <tr><th>Phase</th><th>Timeline</th><th>Milestone</th></tr>
         <tr><td>Foundation</td><td>March 2026</td><td>Sprints 0–8 complete. 6 contracts, 160+ tests, landing page live.</td></tr>
         <tr><td>Kaspa Toccata</td><td>June/July 2026</td><td>Current-Silverc runtime/release gates and the keyless Toccata-v1 genesis operator are implemented. A closed, non-promotable ValidatorStakingH001 profile is ready for the first funded testnet-10 canary through the TLS-only official resolver. Funding, external signature, confirmation, and independent public evidence remain; full seven-fixture and oracle gates follow.</td></tr>
+        <tr><td>Miner Companion</td><td>July 2026</td><td>Experimental opt-in local Testnet-10 wRPC observer and strict preflight implemented. Scanning, reporting, rewards, validator/honeypot roles, Stratum integration, and miner firmware integration remain disabled.</td></tr>
         <tr><td>AI Production</td><td>Post-verification</td><td>Real ZK-proof, P2P, Phi-3, LLaMA fine-tuned, Fed-DART live.</td></tr>
         <tr><td>Desktop Release</td><td>July–August 2026</td><td>Windows / macOS / Linux installers. One-click Guardian setup.</td></tr>
         <tr><td>Mobile Release</td><td>September 2026</td><td>iOS (App Store) + Android (Google Play + F-Droid).</td></tr>

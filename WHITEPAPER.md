@@ -126,6 +126,8 @@ Light Client (Phi-3-mini)          Guardian (LLaMA 3)           Kaspa L1
 | Community | 5% | 1,000,000 PROM |
 | **Total** | **100%** | **20,000,000 PROM** |
 
+Reporter percentages are protocol allocation targets, not passive uptime rewards. A miner-side companion receives no PROM merely for running; rewards require a future implemented and consensus-verified contribution path.
+
 No foundation allocation. No founder tokens. No pre-mine. Identical to Kaspa's launch philosophy.
 
 ---
@@ -193,12 +195,14 @@ Quadratic voting (Architecture Decision #14) provides mathematical Sybil resista
 
 ## 8. Light Client
 
+This section describes the target Light Client architecture. The current Rust client contains development implementations and fail-closed runtime guards: beta/mainnet reject the Phi-3 heuristic, SHA-256 ZK placeholder, cached rule reader, and federated-learning placeholder. These components must not be presented as a production threat-reporting pipeline.
+
 ### 8.1 Phi-3-mini Integration
 
 - Model: Phi-3-mini 3.8B, 4-bit quantized (Architecture Decision #8)
 - Runtime: ONNX Runtime (ort crate when available)
 - Requirements: 4 GB RAM, no GPU
-- Graceful degradation: runs in stub mode without model file
+- Current implementation: development-only heuristic/stub; real ONNX inference remains open
 
 ### 8.2 YARA Scanner
 
@@ -209,10 +213,18 @@ Quadratic voting (Architecture Decision #14) provides mathematical Sybil resista
 
 ### 8.3 ZK Proofs
 
-- Anonymous threat reporting via Groth16 ZK proofs
+- Target: anonymous threat reporting via Groth16 ZK proofs
 - Parameters from kaspa-zk-params crate (post Covenant-Hardfork)
 - Current: stub implementation with SHA-256 commitments
 - Public input: threat hash; Private input: reporter identity
+
+### 8.4 Experimental Miner Companion
+
+The first miner-facing integration is an opt-in sidecar in `prometheus-client`. It reads health data from an explicitly configured, credential-free local Testnet-10 wRPC endpoint. [Kaspa ASICs and pool miners normally use Stratum](https://wiki.kaspa.org/mining), which is a separate protocol; the companion does not intercept or reuse a Stratum connection and does not modify miner firmware.
+
+The current companion is a development-only RPC observer. Its strict TOML profile rejects remote endpoints, embedded credentials, scanning, reporting, validator operation, honeypot operation, and unknown reward or wallet fields. It starts no host scan and transmits no miner telemetry. Production scanning/reporting requires real Phi-3 inference, real ZK proofs, canonical rule distribution, a reviewed P2P transport, explicit scan scopes, and resource enforcement.
+
+Running the companion does not automatically earn PROM. The reporter allocation applies only to future protocol-verified security contributions after the corresponding reward path is implemented and audited. Validator participation remains a separate role backed by KAS stake; honeypots require isolated infrastructure and a separate threat model.
 
 ---
 

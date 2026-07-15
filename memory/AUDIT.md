@@ -2,7 +2,7 @@
 # Every completed module is audited by Claude (Architect) before proceeding to the next sprint.
 # Format: | Module | Version | Date | Auditor | Result | Notes |
 # Result: ACCEPTED | REJECTED | NEEDS_CHANGES
-# Last Updated: 2026-04-02
+# Last Updated: 2026-07-16
 
 ---
 
@@ -43,6 +43,7 @@ If criterion 1, 2, or 3 is NOT met: automatic REJECTED (no NEEDS_CHANGES).
 | Sprint-6 E2E          | 1.0     | 2026-03-22 | Claude  | ACCEPTED        | 4 test suites, 18 tests, no fixes                    |
 | Sprint-7 Dashboard    | 1.0     | 2026-03-22 | Claude  | ACCEPTED        | Dashboard, README, WHITEPAPER.md                     |
 | scripts/autodidactic.py | 1.1   | 2026-07-12 | Codex   | ACCEPTED        | Regression suite added for memory loading, padded dependency/status table handling, task completion, and blocker detection |
+| Miner Companion Foundation | 0.1 | 2026-07-16 | Codex + Terra + Spark | PENDING_AUDIT | Safe Phase-1 boundary and review findings resolved; 153 workspace tests plus full local security/docs gates pass; remote PR CI/Security/Pages required before acceptance |
 
 ---
 
@@ -606,6 +607,22 @@ the avoidable software dependency between the first H-001 canary and the
 GovernanceAutoTuning oracle identity; it does not close the external funding,
 signature, confirmation, public evidence, remaining-contract, oracle-operation,
 or exact-commit hardening gates.
+
+**AUDIT UPDATE 2026-07-16:** The proposed miner integration is feasible only
+as an opt-in companion boundary at this stage. Current Kaspa ASIC/pool mining
+normally uses Stratum while the Prometheus client uses Kaspa wRPC; the existing
+Phi-3, ZK, KRC-20 cache, and federated-learning paths are development stubs and
+cannot support production scanning/reporting or passive rewards. GH-13 therefore
+accepts only a credential-free loopback Testnet-10 RPC observer, rejects
+beta/mainnet and unsupported roles/features, redacts endpoint data, and adds no
+wallet, tokenomics, firmware, remote-network, host-process, or filesystem
+access. An independent read-only review confirmed this boundary after the
+local-wRPC wording was corrected. A bounded Spark review found no code defect;
+its missing-file, malformed/oversized-config, failed-connect redaction, and
+no-args test gaps were added. Final local verification passes 153 workspace
+tests with two intentional live ignores, warning-free Clippy, Rustfmt, Memory,
+Pages/JSON-LD, Actionlint, Cargo Audit without vulnerabilities, and staged-diff
+Gitleaks. Final acceptance waits on PR CI/Security and live Pages verification.
 
 *Audit completed 2026-04-02 by Claude Code (5 parallel agents, 7 levels, 35 checks).*
 *The fire belongs to humanity.*

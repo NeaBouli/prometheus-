@@ -40,7 +40,6 @@ pub struct BlockDagInfo {
 /// Uses tokio::sync::Mutex (PATTERN-003) for async safety.
 pub struct KaspaConnection {
     client: Arc<Mutex<KaspaRpcClient>>,
-    url: String,
     connected: Arc<Mutex<bool>>,
 }
 
@@ -55,7 +54,6 @@ impl KaspaConnection {
 
         Ok(Self {
             client: Arc::new(Mutex::new(client)),
-            url: url.to_string(),
             connected: Arc::new(Mutex::new(false)),
         })
     }
@@ -79,7 +77,7 @@ impl KaspaConnection {
         let mut connected = self.connected.lock().await;
         *connected = true;
 
-        info!("Connected to Kaspa node at {}", self.url);
+        info!("Connected to configured Kaspa node");
         Ok(())
     }
 
