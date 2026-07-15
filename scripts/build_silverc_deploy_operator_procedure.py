@@ -15,6 +15,7 @@ from verify_silverc_deploy_requests import validate_request_set
 from verify_silverc_h001 import DEFAULT_SILVERSCRIPT_REF
 
 PROCEDURE_KIND = "prometheus.silverc.deploy.operator_procedure"
+PROCEDURE_STATUS = "READY_FOR_KEYLESS_GENESIS_OPERATION"
 GENESIS_PROFILE = {
     "transaction_version": 1,
     "funding_input_compute_budget": 10,
