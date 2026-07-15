@@ -11,10 +11,10 @@
 |------|------|
 | Projekt | Prometheus — Decentralized AI Threat Intelligence |
 | Repo | https://github.com/NeaBouli/prometheus- |
-| Branch | `feature/GH-7-public-resolver-probe` from merged baseline `4176093` |
+| Branch | `docs/GH-7-closeout` from merged baseline `288ea18` |
 | Lokaler Pfad | /Users/gio/Desktop/repos/prometheus |
 | Letzter grün verifizierter Produkt-/Tooling-Commit | `4176093` — GH-4 closeout baseline; main CI `29406057800`, Security `29406057729`, Pages `29406056965` green |
-| Aktuelle lokale Tooling-Erweiterung | GH-7 TLS-only official public resolver plus funding-free testnet-10 node/Toccata probe; 30 Rust tests, clippy, Python target validation, and a real read-only resolver probe pass locally |
+| Aktuelle Tooling-Baseline | GH-7 TLS-only official public resolver plus funding-free testnet-10 node/Toccata probe merged as `288ea18`; 30 Rust tests and main CI/Security/Pages pass |
 | Aktueller HEAD | Mit `git log --oneline -1` prüfen; Bridge-/Status-Commits können neuer sein |
 | Rollback-Tag | `pre-session-20260413` → `6347b85` |
 | Whitepaper | WHITEPAPER.md (root) + whitepaper.html (styled), status refreshed and verified 2026-07-11 |
@@ -42,11 +42,11 @@
 - Der exakte live unspent Funding-UTXO wird im Preflight und unmittelbar vor Broadcast geprüft.
 - Nur der 32-Byte-`SIG_HASH_ALL`-Digest verlässt den Repository-Operator; ein externer Vault/HSM liefert die öffentliche BIP340-Signaturantwort.
 - Fee-Minimum/-Maximum, Netzwerk, P2PK-Funding, P2SH-Contract, Request-Hash, vollständige Signatur und Transaktion werden fail-closed validiert.
-- 27 gemergte GH-4 Tests enthalten feste öffentliche Transaction-/Covenant-/Sighash-/Request-/Storage-Mass-Werte, Secret-/Recovery-Gates und einen dateibasierten Python-Request/Rust-Signatur-Handoff; GH-7 erweitert lokal auf 30 Tests mit Resolver- und aufgelöster-TLS-Endpoint-Fail-Closed-Coverage.
+- 27 gemergte GH-4 Tests enthalten feste öffentliche Transaction-/Covenant-/Sighash-/Request-/Storage-Mass-Werte, Secret-/Recovery-Gates und einen dateibasierten Python-Request/Rust-Signatur-Handoff; das gemergte GH-7 erweitert auf 30 Tests mit Resolver- und aufgelöster-TLS-Endpoint-Fail-Closed-Coverage.
 - Offizielles PSKT/PSKB bleibt ausgeschlossen, solange dessen v1-Inputpfad Sigop- statt Compute-Budget-Commitments erzeugt. Pinned v2.0.1 unterstützt testnet-10, nicht testnet-12.
 - Lokal grün: Rust fmt/clippy/tests; frischer sieben-Contract Silverc-Release-Build; Python deploy preflight, request builder/verifier, operator procedure und external capability verifier.
-- GH-7 lokal: `kaspa-resolver://public` ist TLS-only und testnet-10-only; der funding-freie Probe bestätigt einen synchronisierten, UTXO-indexierten `rusty-kaspa 2.0.1` Node über Toccata-DAA.
-- Offen: GH-7 PR/Remote-CI, real finanzierter testnet-10-Run, externe Signaturen, bestätigte `operator_record` Receipts, unabhängige Chain-Evidence, Metrics-Oracle-Transaktion und Release-Hardening für den exakten Rollout-Commit.
+- GH-7 gemergt: `kaspa-resolver://public` ist TLS-only und testnet-10-only; der funding-freie Probe bestätigt einen synchronisierten, UTXO-indexierten `rusty-kaspa 2.0.1` Node über Toccata-DAA. Main CI/Security/Pages sind grün.
+- Offen in Issue #9: real finanzierter testnet-10-Run, externe Signaturen, bestätigte `operator_record` Receipts, unabhängige Chain-Evidence, Metrics-Oracle-Transaktion und Release-Hardening für den exakten Rollout-Commit.
 
 ---
 
@@ -136,7 +136,7 @@
 7. Lies memory/ERRORS.md             → 12 bekannte Patterns
 ```
 
-**Status: Feature-complete through Sprint 7. Kaspa Toccata status researched 2026-07-07; all seven current-Silverc compile/ABI/runtime gates and signed-int deployment bounds pass locally and in CI. The deterministic release archive, deploy preflight/requests/procedure, merged repository-owned keyless transaction-v1 genesis operator, receipt/evidence/status staging, operator handoff, release-readiness audit, metrics-oracle handoff, and exact-commit release-hardening gates are implemented. The genesis operator uses compute budget 10, exact contextual `storage_mass`, official covenant-ID derivation, exact live funding-UTXO checks, external digest-only BIP340 signing, full verification, an exclusive crash-recovery journal, transaction-ID reconciliation, 20-second wRPC deadlines, and source-bound covenant-output observation; 27 merged GH-4 tests and the seven-contract integration pass on main, while GH-7 adds two locally passing TLS-resolver fail-closed tests plus a successful live read-only testnet-10 probe. Deployment now depends on real funded testnet-10 signatures and confirmed receipts, independent public node/explorer evidence, the external signed metrics-oracle transaction, and release-hardening evidence for the exact rollout commit.**
+**Status: Feature-complete through Sprint 7. Kaspa Toccata status researched 2026-07-07; all seven current-Silverc compile/ABI/runtime gates and signed-int deployment bounds pass locally and in CI. The deterministic release archive, deploy preflight/requests/procedure, merged repository-owned keyless transaction-v1 genesis operator, receipt/evidence/status staging, operator handoff, release-readiness audit, metrics-oracle handoff, and exact-commit release-hardening gates are implemented. The genesis operator uses compute budget 10, exact contextual `storage_mass`, official covenant-ID derivation, exact live funding-UTXO checks, external digest-only BIP340 signing, full verification, an exclusive crash-recovery journal, transaction-ID reconciliation, 20-second wRPC deadlines, and source-bound covenant-output observation. GH-7 is merged as `288ea18`; all 30 operator tests, the seven-contract integration, main CI/Security/Pages, and the successful live read-only testnet-10 resolver probe pass. Issue #9 now tracks the real funded testnet-10 signatures and confirmed receipts, independent public node/explorer evidence, the external signed metrics-oracle transaction, and release-hardening evidence for the exact rollout commit.**
 
 **Offene Tasks (priorisiert):**
 - [x] PATTERN-010 fix: Arc<Phi3Model> statt Arc<Mutex<Phi3Model>> — DONE `6347b85`
