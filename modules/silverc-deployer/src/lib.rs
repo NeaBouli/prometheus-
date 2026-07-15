@@ -900,6 +900,21 @@ pub fn load_signature_response(path: &Path) -> Result<SignatureResponse> {
     Ok(response)
 }
 
+pub fn load_external_signature_hex(path: &Path) -> Result<String> {
+    let bytes = fs::read(path).with_context(|| format!("failed to read {}", path.display()))?;
+    if bytes.len() > 130 {
+        bail!("external signature file must contain only 128 lowercase hex characters");
+    }
+    let text = std::str::from_utf8(&bytes)
+        .with_context(|| format!("external signature in {} is not UTF-8", path.display()))?;
+    let signature = text
+        .strip_suffix("\r\n")
+        .or_else(|| text.strip_suffix('\n'))
+        .unwrap_or(text);
+    validate_lower_hex(signature, 64, "external Schnorr signature")?;
+    Ok(signature.to_string())
+}
+
 fn validate_signature_response(response: &SignatureResponse) -> Result<()> {
     if response.schema_version != 1
         || response.kind != SIGNATURE_RESPONSE_KIND
@@ -1238,6 +1253,111 @@ pub fn verify_signature_response(
             safety: safety_map(),
         },
     })
+}
+
+pub fn bind_external_signature(
+    prepared: PreparedGenesis,
+    signing_request: &SigningRequest,
+    schnorr_signature_hex: &str,
+) -> Result<(SignatureResponse, VerifiedSignedTransaction)> {
+    validate_lower_hex(schnorr_signature_hex, 64, "external Schnorr signature")?;
+    let response = SignatureResponse {
+        schema_version: 1,
+        kind: SIGNATURE_RESPONSE_KIND.to_string(),
+        status: "SIGNED_BY_EXTERNAL_OPERATOR".to_string(),
+        request_sha256: signing_request.request_sha256.clone(),
+        signing_request_sha256: signing_request.signing_request_sha256.clone(),
+        contract_name: signing_request.contract_name.clone(),
+        transaction_id: signing_request.unsigned_transaction_id.clone(),
+        input_index: FUNDING_INPUT_INDEX,
+        sighash_type: signing_request.sighash_type.clone(),
+        sighash_hex: signing_request.sighash_hex.clone(),
+        xonly_public_key_hex: signing_request.expected_xonly_public_key_hex.clone(),
+        schnorr_signature_hex: schnorr_signature_hex.to_string(),
+    };
+    let verified = verify_signature_response(prepared, signing_request, &response)?;
+    Ok((response, verified))
+}
+
+fn normalized_import_path(path: &Path) -> Result<PathBuf> {
+    if path.try_exists()? {
+        return fs::canonicalize(path)
+            .with_context(|| format!("failed to resolve {}", path.display()));
+    }
+    let parent = path
+        .parent()
+        .filter(|parent| !parent.as_os_str().is_empty());
+    let parent = parent.unwrap_or_else(|| Path::new("."));
+    let filename = path
+        .file_name()
+        .ok_or_else(|| anyhow!("import path has no filename: {}", path.display()))?;
+    Ok(fs::canonicalize(parent)
+        .with_context(|| format!("failed to resolve parent of {}", path.display()))?
+        .join(filename))
+}
+
+fn reject_import_output_collisions(
+    inputs: &[(&str, &Path)],
+    outputs: &[(&str, &Path)],
+) -> Result<()> {
+    let resolved_inputs = inputs
+        .iter()
+        .map(|(label, path)| Ok((*label, normalized_import_path(path)?)))
+        .collect::<Result<Vec<_>>>()?;
+    let mut resolved_outputs = Vec::with_capacity(outputs.len());
+    for (output_label, output_path) in outputs {
+        let resolved = normalized_import_path(output_path)?;
+        if let Some((input_label, _)) = resolved_inputs
+            .iter()
+            .find(|(_, input_path)| *input_path == resolved)
+        {
+            bail!("{output_label} collides with {input_label}");
+        }
+        if let Some((other_label, _)) = resolved_outputs
+            .iter()
+            .find(|(_, other_path)| *other_path == resolved)
+        {
+            bail!("{output_label} collides with {other_label}");
+        }
+        resolved_outputs.push((*output_label, resolved));
+    }
+    Ok(())
+}
+
+#[allow(clippy::too_many_arguments)]
+pub fn import_external_signature_files(
+    request_path: &Path,
+    artifact_path: &Path,
+    funding_path: &Path,
+    signing_request_path: &Path,
+    signature_hex_path: &Path,
+    signature_response_out: &Path,
+    verification_out: &Path,
+) -> Result<SignatureVerification> {
+    reject_import_output_collisions(
+        &[
+            ("request input", request_path),
+            ("artifact input", artifact_path),
+            ("funding input", funding_path),
+            ("signing-request input", signing_request_path),
+            ("signature input", signature_hex_path),
+        ],
+        &[
+            ("signature-response output", signature_response_out),
+            ("verification output", verification_out),
+        ],
+    )?;
+
+    let request = load_deploy_request(request_path)?;
+    let artifact = load_artifact(artifact_path, &request)?;
+    let funding = load_funding_spec(funding_path)?;
+    let prepared = prepare_genesis(&request, &artifact, &funding)?;
+    let signing_request = load_signing_request(signing_request_path)?;
+    let signature_hex = load_external_signature_hex(signature_hex_path)?;
+    let (response, verified) = bind_external_signature(prepared, &signing_request, &signature_hex)?;
+    write_public_json(signature_response_out, &response)?;
+    write_public_json(verification_out, &verified.verification)?;
+    Ok(verified.verification)
 }
 
 fn validate_verified_transaction_binding(
@@ -2251,6 +2371,68 @@ mod tests {
     }
 
     #[test]
+    fn binds_plain_external_signature_only_after_full_verification() {
+        let (request, artifact, funding, keypair) = fixture();
+        let prepared = prepare_genesis(&request, &artifact, &funding).unwrap();
+        let signing_request = prepared.signing_request.clone();
+        let signed = sign(&prepared, &keypair);
+
+        let (response, verified) =
+            bind_external_signature(prepared, &signing_request, &signed.schnorr_signature_hex)
+                .unwrap();
+
+        assert_eq!(
+            response.signing_request_sha256,
+            signing_request.signing_request_sha256
+        );
+        assert_eq!(
+            response.xonly_public_key_hex,
+            signing_request.expected_xonly_public_key_hex
+        );
+        assert_eq!(
+            verified.verification.status,
+            "EXTERNAL_SIGNATURE_AND_TRANSACTION_VERIFIED"
+        );
+    }
+
+    #[test]
+    fn rejects_noncanonical_plain_external_signature() {
+        let (request, artifact, funding, _) = fixture();
+        let prepared = prepare_genesis(&request, &artifact, &funding).unwrap();
+        let signing_request = prepared.signing_request.clone();
+        let error = bind_external_signature(prepared, &signing_request, &"AA".repeat(64))
+            .expect_err("uppercase signature hex must fail");
+        assert!(error
+            .to_string()
+            .contains("canonical lowercase 64-byte hex"));
+    }
+
+    #[test]
+    fn loads_plain_external_signature_with_one_trailing_newline() {
+        let temp_dir = std::env::temp_dir().join(format!(
+            "prometheus-silverc-signature-{}-{}",
+            std::process::id(),
+            SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        fs::create_dir_all(&temp_dir).unwrap();
+        let path = temp_dir.join("signature.hex");
+        let expected = "ab".repeat(64);
+        fs::write(&path, format!("{expected}\n")).unwrap();
+
+        assert_eq!(load_external_signature_hex(&path).unwrap(), expected);
+
+        fs::write(&path, format!("{}\r\n", "ab".repeat(64))).unwrap();
+        assert_eq!(load_external_signature_hex(&path).unwrap(), "ab".repeat(64));
+
+        fs::write(&path, format!("{}\n\n", "ab".repeat(64))).unwrap();
+        assert!(load_external_signature_hex(&path).is_err());
+        fs::remove_dir_all(temp_dir).unwrap();
+    }
+
+    #[test]
     fn rejects_signature_from_wrong_key() {
         let (request, artifact, funding, _) = fixture();
         let prepared = prepare_genesis(&request, &artifact, &funding).unwrap();
@@ -2995,6 +3177,73 @@ mod tests {
         );
         assert_eq!(
             verified.verification.signing_request_sha256,
+            signing_request.signing_request_sha256
+        );
+
+        let signature_hex_path = temp_dir.join("signature.hex");
+        let imported_response_path = temp_dir.join("imported-signature-response.json");
+        let imported_verification_path = temp_dir.join("imported-signature-verification.json");
+
+        fs::write(&signature_hex_path, format!("{}\n", "00".repeat(64))).unwrap();
+        let error = import_external_signature_files(
+            &request_path,
+            &artifact_path,
+            &funding_path,
+            &signing_request_path,
+            &signature_hex_path,
+            &imported_response_path,
+            &imported_verification_path,
+        )
+        .expect_err("invalid signature must fail before outputs are written");
+        assert!(error.to_string().contains("signature verification failed"));
+        assert!(!imported_response_path.exists());
+        assert!(!imported_verification_path.exists());
+
+        fs::write(
+            &signature_hex_path,
+            format!("{}\n", response.schnorr_signature_hex),
+        )
+        .unwrap();
+        let alias_dir = temp_dir.join("alias");
+        fs::create_dir(&alias_dir).unwrap();
+        let aliased_request_path = alias_dir.join("..").join("deploy-request.json");
+        let collision_verification_path = temp_dir.join("collision-verification.json");
+        let error = import_external_signature_files(
+            &request_path,
+            &artifact_path,
+            &funding_path,
+            &signing_request_path,
+            &signature_hex_path,
+            &aliased_request_path,
+            &collision_verification_path,
+        )
+        .expect_err("normalized output/input collision must fail");
+        assert!(error
+            .to_string()
+            .contains("signature-response output collides with request input"));
+        assert!(!collision_verification_path.exists());
+        load_deploy_request(&request_path).unwrap();
+
+        let imported = import_external_signature_files(
+            &request_path,
+            &artifact_path,
+            &funding_path,
+            &signing_request_path,
+            &signature_hex_path,
+            &imported_response_path,
+            &imported_verification_path,
+        )
+        .unwrap();
+        assert_eq!(
+            imported.status,
+            "EXTERNAL_SIGNATURE_AND_TRANSACTION_VERIFIED"
+        );
+        assert!(imported_response_path.exists());
+        assert!(imported_verification_path.exists());
+        assert_eq!(
+            load_signature_response(&imported_response_path)
+                .unwrap()
+                .signing_request_sha256,
             signing_request.signing_request_sha256
         );
 

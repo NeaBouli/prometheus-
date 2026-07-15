@@ -7,10 +7,11 @@ use kaspa_consensus_core::network::NetworkId;
 use kaspa_wrpc_client::WrpcEncoding;
 use prometheus_silverc_deployer::{
     acquire_broadcast_lock, broadcast_journal_path, broadcast_verified_transaction,
-    create_public_json, finalize_broadcast_journal, load_artifact, load_broadcast_journal,
-    load_broadcast_result, load_deploy_request, load_funding_spec, load_signature_response,
-    load_signing_request, observe_deployed_utxo, preflight_deploy_node, preflight_node,
-    prepare_broadcast_journal, prepare_genesis, verify_signature_response, write_public_json,
+    create_public_json, finalize_broadcast_journal, import_external_signature_files, load_artifact,
+    load_broadcast_journal, load_broadcast_result, load_deploy_request, load_funding_spec,
+    load_signature_response, load_signing_request, observe_deployed_utxo, preflight_deploy_node,
+    preflight_node, prepare_broadcast_journal, prepare_genesis, verify_signature_response,
+    write_public_json,
 };
 
 #[derive(Debug, Clone, Copy, ValueEnum)]
@@ -72,6 +73,23 @@ enum Command {
         funding: PathBuf,
         #[arg(long)]
         signing_request_out: PathBuf,
+    },
+    /// Bind a plain external BIP340 signature and verify the complete transaction.
+    ImportSignature {
+        #[arg(long)]
+        request: PathBuf,
+        #[arg(long)]
+        artifact: PathBuf,
+        #[arg(long)]
+        funding: PathBuf,
+        #[arg(long)]
+        signing_request: PathBuf,
+        #[arg(long)]
+        signature_hex_file: PathBuf,
+        #[arg(long)]
+        signature_response_out: PathBuf,
+        #[arg(long)]
+        verification_out: PathBuf,
     },
     /// Verify an externally produced BIP340 signature and the complete transaction.
     VerifySignature {
@@ -187,6 +205,26 @@ async fn main() -> Result<()> {
                 "{}",
                 serde_json::to_string_pretty(&prepared.signing_request)?
             );
+        }
+        Command::ImportSignature {
+            request,
+            artifact,
+            funding,
+            signing_request,
+            signature_hex_file,
+            signature_response_out,
+            verification_out,
+        } => {
+            let verification = import_external_signature_files(
+                &request,
+                &artifact,
+                &funding,
+                &signing_request,
+                &signature_hex_file,
+                &signature_response_out,
+                &verification_out,
+            )?;
+            println!("{}", serde_json::to_string_pretty(&verification)?);
         }
         Command::VerifySignature {
             request,

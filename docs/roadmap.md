@@ -95,7 +95,9 @@ and funding-input binding after ID derivation.
 The repository-owned `prometheus-silverc-deployer` now executes that genesis
 profile: it assembles the transaction, exports only the 32-byte digest for
 external BIP340 signing, verifies the returned signature and complete
-transaction, revalidates the exact live funding UTXO, broadcasts, and observes
+transaction, or canonically imports a plain public signature while deriving all
+response fields from the validated request and rejecting path collisions before
+output. It revalidates the exact live funding UTXO, broadcasts, and observes
 the covenant output. Its funding-free TLS-only official-resolver probe now
 confirms a synced, UTXO-indexed post-Toccata testnet-10 node while preserving
 the mandatory funding-bound preflight. Public H-001 funding and the exact-main

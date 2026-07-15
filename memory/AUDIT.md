@@ -678,5 +678,19 @@ No signature, wallet access, raw signed transaction, or broadcast occurred.
 External signing requires explicit approval and complete operator verification
 before the one-shot canary broadcast.
 
+**AUDIT UPDATE 2026-07-16:** The GH-9 signing handoff now has a locally verified
+canonical public-signature import candidate. `import-signature` accepts only a
+64-byte BIP340 signature encoded as 128 lowercase hex characters with at most
+one trailing line ending, derives all response identity/digest fields from the
+validated schema-v2 request, resolves paths before I/O, rejects output/input and
+output/output aliases, and writes outputs only after BIP340 plus full Kaspa
+transaction verification. The existing full-JSON response path remains
+compatible. The runbook explicitly forbids wallet `message sign` because its
+personal-message domain hash is not the transaction sighash. Thirty-eight
+focused tests, warning-free Clippy, workspace tests, CLI smoke, YAML parsing,
+and independent Terra review pass locally. PR/exact-main verification remains
+pending. No wallet, private material, signature, raw signed transaction, or
+broadcast was used.
+
 *Audit completed 2026-04-02 by Claude Code (5 parallel agents, 7 levels, 35 checks).*
 *The fire belongs to humanity.*

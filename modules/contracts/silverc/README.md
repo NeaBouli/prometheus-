@@ -104,10 +104,11 @@ Current runtime coverage:
 - `completeWithdraw` accepts zero-output termination after cooldown
 - `completeWithdraw` rejects before the cooldown expires
 
-Current operator coverage is 35 unit/security tests, including a fixed public
+Current operator coverage is 38 unit/security tests, including a fixed public
 interoperability vector for transaction ID, covenant ID, sighash,
 signing-request hash, contextual storage-mass commitment, and signed-shape
-fee/mass tamper guards.
+fee/mass tamper guards, plus canonical public-signature import failure and
+normalized path-collision guards.
 
 Current signed-int deployment boundary:
 
