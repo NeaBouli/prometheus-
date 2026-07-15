@@ -390,7 +390,7 @@ This is a deliberate design decision, not an oversight. Architecture Decision #3
 | Sprint 6: E2E | March 2026 | ACCEPTED |
 | Sprint 7: Dashboard | March 2026 | ACCEPTED |
 | Sprint 8: Public Site | March/July 2026 | ACCEPTED / ongoing documentation maintenance |
-| **Kaspa Toccata / post-fork verification** | **June/July 2026** | **Runtime/release gates and the keyless Toccata-v1 genesis operator are verified locally; remote CI verification follows this branch.** |
+| **Kaspa Toccata / post-fork verification** | **June/July 2026** | **Runtime/release gates and the merged keyless Toccata-v1 genesis operator pass local and remote CI; funded testnet-10 execution evidence remains.** |
 | Mainnet Launch | Post-verification | PLANNED; gated by a real funded testnet-10 deployment, external signatures, confirmed receipts plus independent chain evidence, external signed oracle transaction integration, and public release-hardening evidence for the exact rollout commit |
 
 ---
