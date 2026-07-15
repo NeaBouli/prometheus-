@@ -119,9 +119,10 @@ Scope-weighted status estimate on 2026-07-16: H-001 canary preparation is about
 96% complete; rollout-capable core-network work is about 68-72% complete; the
 complete roadmap vision is about 35-40% complete. These values distinguish
 prepared software from real chain operation and are not release guarantees.
-Latest verified exact main `205e1ca928d3048109575cf7a21810c9e6609120`
-passed Prometheus CI `29454591518`, Security Audit `29454591555`, and Pages
-`29454590793` before the live GH-9 handoff rebuild.
+Latest verified public-status main `e9a970a9d3dbaa98cd754a4149075c0cca866001`
+passed Prometheus CI `29455597727`, Security Audit `29455597677`, and Pages
+`29455597066`; live README/index/roadmap/whitepaper verification passed. The
+unchanged execution-artifact baseline remains exact main `205e1ca`.
 
 ## GH-13 EXPERIMENTAL MINER COMPANION STATUS
 
