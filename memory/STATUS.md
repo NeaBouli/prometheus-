@@ -37,7 +37,7 @@ release evidence remain rollout blockers.
 
 ## GH-7 PUBLIC RESOLVER PROBE STATUS
 
-`feature/GH-7-public-resolver-probe` adds the exact
+Merged GH-7 PR #8 adds the exact
 `kaspa-resolver://public` target to the public request pipeline and Rust
 operator. Resolver mode enforces TLS, is restricted to `testnet-10`, records
 the resolved endpoint, and rejects lookalikes, HTTP(S), credentials, query
@@ -46,8 +46,10 @@ requires a synced UTXO-indexed node above Toccata activation but does not inspec
 funding, sign, or broadcast. Local Rust tests increased from 27 to 30; clippy and
 Python RPC-target checks pass. A live probe on 2026-07-15 reached
 `rusty-kaspa 2.0.1`, confirmed `testnet-10`, sync, UTXO index, and virtual DAA
-above activation. Commit `3cea782` is in PR #8; remote CI/review remain pending. Real funding/signing/evidence
-gates are unchanged.
+above activation. PR #8 merged normally as `288ea18`; main Prometheus CI
+`29408432584`, Security Audit `29408432511`, and Pages `29408431512` passed.
+GH-7 software/CI is complete. Real funding/signing/evidence gates continue in
+issue #9.
 
 ---
 
