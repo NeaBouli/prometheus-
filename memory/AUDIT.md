@@ -732,5 +732,23 @@ signature, raw transaction, or broadcast was accessed or produced. External
 BIP340 signing, complete import verification, separately approved broadcast,
 confirmation, receipt, and independent evidence remain mandatory.
 
+**AUDIT UPDATE 2026-07-16:** GH-33 implements the first bounded Sprint 10B
+Guardian-decentralization slice as a dependency-injected local hybrid router.
+The router always invokes 8B first, keeps the exact `0.70` boundary on the
+primary route, and escalates lower confidence or an invalid primary safety
+envelope to 70B. It preserves `MIN_CONFIDENCE = 0.85` and fails closed for a
+failed/invalid 70B result. Independent Terra review found two medium issues in
+the first draft: missing threat-hash binding and permissive runtime submission
+types. Both were fixed by binding analysis and YARA-rule hashes to the input,
+requiring finite range-checked confidence, a real bool decision, a real
+`YaraRule`, and consistent rule/result confidence. Recheck found one further
+medium malformed-adapter path; an `isinstance` guard plus regression test now
+keeps that path on fail-closed escalation. Final review reports no remaining
+high/medium finding. Local verification passes
+47 tests with three intentional live-model skips, Black, and Pylint 9.69/10.
+No live-model, P2P, chain, wallet, signing, or broadcast behavior is introduced.
+Live 8B/70B wiring, calibrated model confidence, ensemble voting, PR checks,
+merge, and exact-main evidence remain pending.
+
 *Audit completed 2026-04-02 by Claude Code (5 parallel agents, 7 levels, 35 checks).*
 *The fire belongs to humanity.*

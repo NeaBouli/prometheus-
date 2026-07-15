@@ -459,3 +459,15 @@ Rules for all dev agents:
 - Exact-main Prometheus CI `29457601210`, Security Audit `29457601183`, and Pages `29457600490` passed. All nine protected contexts are explicitly bounded; Dependency Audit completed in 2m54s and Current Silverc Runtime in 2m35s.
 - Optional CodeRabbit remained pending without review threads. The independent Terra review found one medium evidence-wording issue, which was fixed before commit; no blocking/high finding remained.
 - GH-30 is complete. The next rollout gate returns to the external BIP340 response for GH-9; no signature or broadcast occurred during this task.
+
+## 2026-07-16 GH-33 Guardian hybrid routing implementation
+
+- Reconfirmed that official `rusty-kaspa` v2.0.1 and current master `78257f2` still serialize PSKT v1 inputs with legacy sigop-count commitments and retain an explicit compute-budget TODO. No official wallet-compatible shortcut replaces the GH-9 external BIP340 response path.
+- Opened issue #33 and branch `feat/GH-33-guardian-hybrid-routing` for the highest-priority software task independent of the external canary signature.
+- Added a dependency-injected, stateless hybrid Guardian router: 8B first, 70B escalation below exact confidence `0.70`, unchanged network submission threshold `0.85`, and generic fail-closed output.
+- Independent Terra review found missing threat/rule hash binding and permissive runtime decision types in the first draft; recheck found a malformed-adapter exception path. All were fixed with input-hash binding, finite range checks, strict bool/`YaraRule` validation, rule/result confidence consistency, and total primary-result handling. Final review reports no remaining high/medium finding.
+- Added boundary, escalation, failure, NaN/infinity/range/bool, malformed-adapter, hash-mismatch, unsafe-submission, and malformed-rule coverage. Local Guardian result: 47 passed and three intentional live-model skips; Black clean; Pylint 9.69/10.
+- Updated README, Guardian docs, Whitepaper Markdown/HTML, roadmap Markdown/HTML, `llms.txt`, Backlog, Memory, and Bridge without claiming live model or rollout readiness. PROM remains earned-only rewards/governance; canonical Guardian reputation remains a separate Kaspa-L1 state.
+- Browser verification found and fixed a pre-existing mobile Whitepaper grid overflow by allowing the content column to shrink and tables to scroll within the viewport. Public Homepage/FAQ token wording was synchronized with the separate L1 reputation model.
+- No chain, wallet, private key, signature, raw transaction, broadcast, or foreign untracked file was accessed. `Prometheus-1.png` remains untouched and uncommitted.
+- PR checks, merge, exact-main CI/Security/Pages, and live Pages verification remain pending.

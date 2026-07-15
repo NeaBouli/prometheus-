@@ -1,8 +1,8 @@
 # prometheus — Backlog
 
 ## 🔴 Aktiv (diese Session)
-- Latest documented green baseline is exact main `529fc2f4a82717005011f0b8af66814b6d40c676`; run `git log --oneline -1` for the current working HEAD.
-- Prometheus CI `29443646026`, Security Audit `29443645464`, and GitHub Pages `29443644198` are green for exact main. Current-Silverc CI validates the keyless Toccata-v1 operator, operator runbook, request/receipt/evidence pipeline, release-readiness audit, metrics-oracle handoff, and exact-commit hardening gates.
+- Latest documented green baseline is exact main `bb213308a765cbb6f3d37f38e3d3be0bad7b56f9`; run `git log --oneline -1` for the current working HEAD.
+- Prometheus CI `29458095658`, Security Audit `29458095645`, and GitHub Pages `29458094879` are green for exact main. Current-Silverc CI validates the keyless Toccata-v1 operator, operator runbook, request/receipt/evidence pipeline, release-readiness audit, metrics-oracle handoff, and exact-commit hardening gates.
 - Runtime stub gates added for Rust client; current-Silverc contract gates now cover H-001, ValidatorStaking, GuardianReputation, RuleStorage, CommunityDonations, DevIncentivePool, and GovernanceAutoTuning.
 - Local current-Silverc release-bundle smoke now compiles all 7 fixtures through pinned upstream `silverc` and writes a deterministic manifest plus optional archive with source/artifact/script hashes; deploy preflight validates the bundle/operator public inputs, emits a Markdown operator runbook, and confirms upstream `silverc` has no network deploy command.
 - Deployment receipt verifier validates public receipt records against the release bundle, rejects secret-like fields, and keeps synthetic `ci_fixture` receipts separate from real `operator_record` deployment evidence.
@@ -13,6 +13,7 @@
 - Operator handoff builder packages the release archive, deploy preflight, verified deploy request set, deploy operator procedure, optional imported operator receipts, receipt checks, metrics report preflight, unsigned oracle tx request, external oracle operator procedure, optional verified oracle tx result, and optional oracle status draft into a public handoff directory while preserving real blocker status; release-readiness audit validates the handoff package and keeps rollout blocked until external evidence exists.
 - Metrics-oracle report preflight validates public GovernanceAutoTuning `reportMetrics` payloads and rejects secret-like fields; unsigned oracle tx-request builder binds public reports to GovernanceAutoTuning artifacts for external assembly/signing; the external oracle operator procedure defines the public signing/broadcast checklist and required result evidence; public oracle tx-result verifier checks confirmed operator records against the request and release bundle while rejecting signing material and raw transaction payloads; public oracle status-draft staging emits manual status-update drafts from verified public tx results without writing status files.
 - Sprint 9 tooling is implemented. It remains blocked by the explicitly approved external H-001 signature, verified one-shot canary broadcast/confirmation/evidence, the remaining six state deployments, real metrics-oracle operation, real Groth16/PROM emission/P2P integration, production node evidence, and exact-commit release hardening.
+- GH-33 implements the first Sprint 10B slice: a local dependency-injected 8B-first/70B-escalation router with exact `0.70` routing, fail-closed safety checks, and unchanged `0.85` submission policy. Live model wiring/calibration and ensemble voting remain open.
 
 ## 🟡 Nächste Session — STARTFLOW
 
@@ -31,7 +32,7 @@
 ### Nächste konkrete Tasks (Priorität):
 1. **[P0] H-001 Canary ausführen** — exakt vorbereiteten schema-v2 Digest extern per BIP340 signieren, Antwort vollständig verifizieren, einmalig senden, Bestätigung abwarten und unabhängige öffentliche Chain-Evidenz erfassen. Kein Private Key, Seed oder Wallet-Material gehört ins Repository oder in Agent-Chats.
 2. **[P1] Oracle Operator Integration** — external signed metrics-oracle transaction assembly/signer/broadcast process für `GovernanceAutoTuningState.sil` operationalisieren; public report preflight, unsigned tx-request builder, operator procedure, public tx-result verifier, and public status-draft staging are local- and CI-covered.
-3. **[P1] Sprint 10B: Guardian Decentralization** — Hybrid routing (8B/70B), Ensemble voting (5x 8B)
+3. **[P1] Sprint 10B: Guardian Decentralization** — Hybrid routing software is implemented under GH-33; next is the separately scoped Ensemble voting protocol (5+ independent 8B Guardians)
 4. **[P2] fp_rate Oracle** — Q-003 current-Silverc contract gate uses signed metrics input; public report/request/result verification is covered; production external transaction assembly/signing/broadcast/deploy operation remains
 5. **[P2] M-001** — Heuristic confidence in yara_generator.py durch LLM-Confidence ersetzen
 6. **[P2] M-002** — Performance test threshold (1ms → 2ms) oder --release gate

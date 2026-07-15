@@ -263,7 +263,7 @@ Priority tasks:
 - Sprint 9: run the merged keyless operator against a real funded testnet-10 UTXO and collect confirmed public receipt plus independent node/explorer evidence records
 - H-001: keep LE encoding and signed-boundary verification gated in CI
 - Oracle: execute the merged/exact-main keyless GovernanceAutoTuning transition operator with real public state/sponsor UTXOs, external oracle/sponsor signatures, confirmed successor evidence, and existing result/evidence/status gates before beta/mainnet governance
-- Sprint 10B: Guardian Decentralization (hybrid routing, ensemble voting)
+- Sprint 10B: GH-33 hybrid routing software is implemented and locally verified; ensemble voting, live model wiring/calibration, and production evidence remain
 - M-001/M-002: Medium findings (can wait until Aug/Sep)
 ```
 
@@ -281,6 +281,21 @@ RuleStorage:                   TBD
 
 All seven release fixtures pass their documented compile/ABI/runtime gates;
 those gates are readiness evidence and must not be presented as deployed addresses.
+```
+
+## GUARDIAN HYBRID ROUTING (GH-33)
+
+```
+Status: local fail-closed router implemented; PR/exact-main evidence pending
+Primary route: injected LLaMA 3 8B analyzer
+Escalation: injected LLaMA 3 70B analyzer when confidence < 0.70
+Submission policy: unchanged MIN_CONFIDENCE = 0.85
+Safety: threat/rule hash binding, finite [0,1] confidence, strict bool/rule types,
+        generic failure notes, no mutable per-request router state
+Local evidence: 47 passed, 3 intentionally skipped live-model tests; Black clean;
+                Pylint 9.69/10
+Not yet proven: live 8B/70B services, calibrated model confidence, P2P transport,
+                5+ Guardian ensemble voting, production operation
 ```
 
 ## MAINNET CONTRACT ADDRESSES (post-verification)

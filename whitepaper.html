@@ -87,7 +87,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:500;padding:0 48px;height:56px;d
 .sb-links li a.active{color:var(--mint)}
 
 /* CONTENT */
-.wp-content{padding:64px 0 120px 64px}
+.wp-content{min-width:0;max-width:100%;overflow-x:clip;padding:64px 0 120px 64px}
 
 /* SECTION */
 .wp-section{margin-bottom:80px;padding-bottom:80px;border-bottom:1px solid var(--line)}
@@ -157,6 +157,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
   .wp-layout{grid-template-columns:1fr;padding:0 24px}
   .sidebar{display:none}
   .wp-content{padding:48px 0 80px}
+  .wp-table{display:block;max-width:100%;overflow-x:auto}
   footer{grid-template-columns:1fr;gap:16px;padding:24px}
   .f-links{justify-content:flex-start}
 }
@@ -272,8 +273,8 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
         <tr><td>Smart Contracts</td><td>Silverscript — H-001 plus ValidatorStaking, GuardianReputation, RuleStorage, CommunityDonations, DevIncentivePool, and GovernanceAutoTuning current-Silverc gates verified</td></tr>
         <tr><td>Genesis Operator</td><td>Keyless Toccata-v1 assembly with exact contextual storage mass, final 66-byte Schnorr-script mass modeling, signed-request schema-v2 relay/operator fee floors, exact live funding-UTXO validation before preparation and broadcast, external BIP340 digest signing, canonical public signature import with path-collision guards, full verification before output, crash-consistent acknowledged broadcast, transaction-ID retry reconciliation, source-bound covenant UTXO observation, and per-request wRPC deadlines; 38 unit/security tests; testnet-10/mainnet supported by pinned v2.0.1 while resolver mode is testnet-10-only</td></tr>
         <tr><td>Deployment Profiles</td><td><code>full</code> binds all seven release fixtures and the public metrics-oracle key. <code>testnet-10-validator-staking-h001</code> binds only ValidatorStakingH001 to the TLS-only official resolver, omits the oracle key, and cannot promote full or metrics readiness.</td></tr>
-        <tr><td>Guardian AI (primary)</td><td>LLaMA 3 70B (Meta, open source)</td></tr>
-        <tr><td>Guardian AI (fallback)</td><td>LLaMA 3 8B (RTX 4070 Ti+, 16 GB VRAM)</td></tr>
+        <tr><td>Guardian AI (default)</td><td>LLaMA 3 8B (RTX 4070 Ti+, 16 GB VRAM)</td></tr>
+        <tr><td>Guardian AI (escalation)</td><td>LLaMA 3 70B (Meta, open source)</td></tr>
         <tr><td>Client AI</td><td>Phi-3-mini 3.8B, 4-bit quantized (4 GB RAM, no GPU)</td></tr>
         <tr><td>Federated Learning</td><td>Fed-DART (Fraunhofer Institute)</td></tr>
         <tr><td>Staking Token</td><td>KAS (Kaspa native, 0% pre-mine)</td></tr>
@@ -372,8 +373,8 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
         <tr><td>Honeypot Node</td><td>Any internet-exposed server</td><td>Zero-day detection via decoy services</td><td>5%</td></tr>
       </table>
 
-      <div class="sec-sub">Guardian Node — LLaMA 3 8B as fallback</div>
-      <p>LLaMA 3 70B requires 4× NVIDIA A100/H100 (~$30,000–50,000). This excludes many potential Guardian operators. LLaMA 3 8B runs on a single consumer GPU (e.g. RTX 4070 Ti) — dramatically lower entry barrier. The reputation system automatically filters out poor-quality outputs: incorrect proposals halve reputation and automatically revoke voting rights.</p>
+      <div class="sec-sub">Guardian Node — 8B default, 70B escalation</div>
+      <p>LLaMA 3 70B requires 4× NVIDIA A100/H100 (~$30,000–50,000). This excludes many potential Guardian operators. LLaMA 3 8B runs on a single consumer GPU (e.g. RTX 4070 Ti), dramatically lowering the entry barrier. The implemented local router runs 8B first and escalates to an independent 70B analyzer below confidence 0.70. Invalid confidence, mismatched threat hashes, malformed submission decisions, or a failed 70B route fail closed. The network submission threshold remains 0.85. Live model wiring, calibrated confidence, and 5+ Guardian ensemble voting remain open.</p>
     </div>
 
     <!-- AI -->
@@ -439,7 +440,7 @@ lora_config = LoraConfig(
       <table class="wp-table">
         <tr><th>Token</th><th>Role</th><th>Source</th><th>Value basis</th></tr>
         <tr><td>KAS</td><td>Validator staking + slashing</td><td>Kaspa network (existing asset)</td><td>Kaspa network usage, $1B+ market cap</td></tr>
-        <tr><td>PROM</td><td>Reputation + governance</td><td>Earned through accepted security work (0% pre-mine)</td><td>Utility in Prometheus ecosystem</td></tr>
+        <tr><td>PROM</td><td>Rewards + governance</td><td>Earned through accepted security work (0% pre-mine)</td><td>Utility in Prometheus ecosystem</td></tr>
       </table>
 
       <div class="sec-sub">PROM emission — first 5 years</div>
@@ -486,8 +487,9 @@ lora_config = LoraConfig(
         <tr><td>On rejected proposal</td><td>reputation × 0.5 (halving)</td></tr>
         <tr><td>Voting power formula</td><td>(reputation / 100)² × compute_power / 1,000</td></tr>
         <tr><td>Anti-Sybil</td><td>PoW registration + quadratic voting</td></tr>
-        <tr><td>Model auto-assignment</td><td>≥ 500 GFLOPS → 70B, &lt; 500 GFLOPS → 8B</td></tr>
+        <tr><td>Model eligibility</td><td>≥ 500 GFLOPS may serve 70B escalation; all hybrid routes start with 8B</td></tr>
       </table>
+      <p>Guardian reputation is canonical Kaspa L1 state in <code>GuardianReputationState</code>. It is separate from PROM balances and is not a badge or NFT.</p>
     </div>
 
     <!-- VOTING -->
