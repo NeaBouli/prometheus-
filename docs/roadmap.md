@@ -218,6 +218,15 @@ on both iOS and Android.
 
 ---
 
+## Experimental Miner Companion Foundation
+**July 2026**
+
+- Opt-in `prometheus-client miner-companion` sidecar
+- Strict TOML preflight with credential-free loopback Testnet-10 wRPC
+- Local BlockDAG health observation only
+- No Stratum interception, miner firmware changes, host scanning, reporting, rewards, validator mode, or honeypot mode
+- Production expansion waits for real Phi-3, ZK proofs, canonical rule distribution, reviewed transport/privacy scopes, and enforceable resource controls
+
 ## Phase E — Server Tooling Simplified
 **August 2026**
 

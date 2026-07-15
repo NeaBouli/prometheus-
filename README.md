@@ -33,6 +33,20 @@ cargo build --release
 
 ---
 
+## Experimental Miner Companion
+
+[Kaspa mining is ASIC-dominated and normally uses Stratum](https://wiki.kaspa.org/mining), while Prometheus reads Kaspa node state through wRPC. The first integration is therefore an opt-in sidecar for operators who already run a local Testnet-10 node; it is not ASIC firmware and does not reuse a Stratum session.
+
+```bash
+cargo run -p prometheus-client -- \
+  miner-companion preflight \
+  --config modules/client/miner-companion.example.toml
+```
+
+The companion currently validates a strict credential-free, loopback-only configuration and can monitor local BlockDAG health. It is development-only: host scanning, threat reporting, validator/honeypot modes, and PROM rewards are disabled. Reporter allocation is reserved for future verified security contributions, not passive mining uptime.
+
+---
+
 ## Architecture
 
 ```

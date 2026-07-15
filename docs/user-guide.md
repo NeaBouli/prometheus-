@@ -1,13 +1,14 @@
 # Prometheus Light Client — User Guide
 
-## What Does the Light Client Do?
+## Current Implementation Status
 
-The Light Client runs on your device and provides real-time threat detection using:
-- **YARA pattern matching** against on-chain threat rules
-- **Phi-3-mini AI** (optional) for anomaly detection
-- **Zero-knowledge proofs** for anonymous threat reporting
+The repository currently provides development components for:
+- YARA-style pattern matching
+- a Phi-3 placeholder/heuristic
+- a SHA-256 ZK-proof placeholder
+- cached rule-reader and federated-learning placeholders
 
-Your data never leaves your device. Only mathematical proofs are transmitted.
+These security-critical placeholders are rejected when `PROMETHEUS_RUNTIME` is `beta`, `mainnet`, `production`, or `prod`. The binary does not yet run an end-to-end scan/report pipeline.
 
 ## System Requirements
 
@@ -29,28 +30,34 @@ cargo build --release -p prometheus-client
 
 The binary is at `target/release/prometheus-client`.
 
-## Running
+## Running the Experimental Miner Companion
 
 ```bash
-# Basic start (connects to public Kaspa nodes via resolver)
-RUST_LOG=info ./target/release/prometheus-client
+# Validate the strict local sidecar profile without network activity
+./target/release/prometheus-client miner-companion preflight \
+  --config modules/client/miner-companion.example.toml
 
-# Connect to a specific node
-KASPA_RPC=ws://127.0.0.1:17210 ./target/release/prometheus-client
+# Optionally verify the configured local Testnet-10 wRPC endpoint
+RUST_LOG=info ./target/release/prometheus-client miner-companion preflight \
+  --config modules/client/miner-companion.example.toml --connect
+
+# Observe local BlockDAG health until Ctrl-C
+RUST_LOG=info ./target/release/prometheus-client miner-companion run \
+  --config modules/client/miner-companion.example.toml
 ```
 
-## How It Works
+The companion is opt-in, loopback-only, credential-free, and development-only. It does not control an ASIC or miner, does not connect to Stratum, does not scan files/processes/network traffic, and does not report threats or earn PROM.
 
-1. The client connects to the Kaspa network and loads threat rules from KRC-20 assets
-2. Files on your system are scanned against loaded YARA rules
-3. If a threat is detected with confidence > 85%, a ZK proof is generated
-4. The anonymous threat hint is submitted to the P2P network
-5. Guardian nodes analyze the threat and propose new rules
-6. Validators vote — accepted rules are distributed to all clients
+## Target Threat Lifecycle
 
-## Privacy
+The steps below are the target architecture, not current binary behavior:
 
-- Raw files are **never** uploaded or transmitted
-- Only SHA-256 hashes and ZK proofs leave your device
-- Your identity is anonymized via Groth16 proofs
-- Federated learning transmits gradients only, never data
+1. The client connects to the Kaspa network and loads canonical threat rules
+2. Explicitly authorized data is scanned against loaded rules
+3. A real local model evaluates suspicious results
+4. A real ZK proof protects an eligible threat hint
+5. Guardians and validators process the contribution under consensus rules
+
+## Privacy Boundary
+
+The current miner companion emits no miner telemetry and does not start scanning or reporting. Future scanning/reporting needs explicit scan scopes, data minimization, real proof generation, transport review, and operator consent before any privacy guarantee can be made.

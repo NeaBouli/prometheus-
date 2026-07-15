@@ -1,7 +1,7 @@
 # PROMETHEUS – MODULE STATUS
 # Format: | Module | Status | Progress | Last Update | Audit | Testnet Address |
 # Status: PENDING | IN_PROGRESS | DONE | BLOCKED | PENDING_AUDIT | ACCEPTED | REJECTED
-# Last Updated: 2026-07-15
+# Last Updated: 2026-07-16
 
 ---
 
@@ -69,6 +69,20 @@ public deployer identity, external BIP340 signature, confirmation, and
 independent chain evidence. Canary success cannot mark the full seven-fixture
 rollout, six production-state contracts, or metrics oracle ready.
 
+## GH-13 EXPERIMENTAL MINER COMPANION STATUS
+
+Issue #13 adds a bounded Phase-1 integration to the existing Rust client. The
+strict, opt-in TOML profile accepts only the light role, Testnet-10, and a
+credential-free loopback wRPC endpoint. Preflight is network-free unless the
+operator supplies `--connect`; `run` observes BlockDAG health only. Beta/mainnet,
+remote endpoints, credential-bearing URLs, scanning, reporting, validator and
+honeypot roles, unknown wallet/reward fields, and passive PROM rewards fail
+closed. Kaspa Stratum sessions and ASIC firmware remain outside this repository.
+Full local verification passes: 153 workspace tests with two intentional live
+ignores, warning-free workspace Clippy, Rustfmt, Memory/Autodidactic, Pages,
+Actionlint, Cargo Audit with no vulnerabilities, staged-diff Gitleaks, and
+independent Terra/Spark review. PR CI, Security, and Pages remain before merge.
+
 ---
 
 ## MODULE STATUS TABLE
@@ -106,6 +120,7 @@ rollout, six production-state contracts, or metrics oracle ready.
 | client/blockchain/connection.rs | ACCEPTED      | 100%     | 2026-03-21  | ACCEPTED     | 4 tests, PATTERN-003 applied |
 | client/blockchain/krc20.rs   | ACCEPTED        | 100%     | 2026-03-21  | ACCEPTED     | 6 tests, cache-based pre-Covenant |
 | client/security/scanner.rs   | ACCEPTED        | 100%     | 2026-03-21  | ACCEPTED     | 10 tests, YARA pattern matching |
+| client/miner_companion.rs    | PENDING_AUDIT   | 98%      | 2026-07-16  | LOCAL FULL PASS | GH-13 opt-in development-only local Testnet-10 wRPC observer; strict secret-safe preflight, no scanning/reporting/rewards/validator/honeypot/Stratum or firmware control; 153 workspace tests and full local gates pass, PR CI pending |
 | client/security/heuristic.rs | PENDING         | 0%       | -           | -            | Sprint 2 Phase 2 |
 | client/security/quarantine.rs| PENDING         | 0%       | -           | -            | Sprint 2 Phase 2 |
 | client/network/p2p.rs        | PENDING         | 0%       | -           | -            | Sprint 2 Phase 2 |
@@ -130,8 +145,8 @@ rollout, six production-state contracts, or metrics oracle ready.
 | tests/security_fp_flood      | ACCEPTED        | 100%     | 2026-03-22  | ACCEPTED     | 500 flood blocked |
 | **SPRINT 7 – DASHBOARD**     |                 |          |             |              |                 |
 | web/audit/index.html         | ACCEPTED        | 100%     | 2026-03-22  | ACCEPTED     | Dark theme, logo path fixed |
-| README.md                    | ACCEPTED        | 100%     | 2026-07-09  | ACCEPTED     | English, badges, quickstart; post-Toccata deployment-gated status refreshed |
-| WHITEPAPER.md                | ACCEPTED        | 100%     | 2026-07-09  | ACCEPTED     | Full v4 English, 16 sections; July 2026 Silverc/RuleStorage/Kasplex status refreshed |
+| README.md                    | PENDING_AUDIT   | 100%     | 2026-07-16  | LOCAL PASS   | Experimental miner companion boundary and no-passive-reward wording added; PR/Pages pending |
+| WHITEPAPER.md                | PENDING_AUDIT   | 100%     | 2026-07-16  | LOCAL PASS   | Target architecture separated from current stubs; miner companion, Stratum/wRPC, privacy, and reward boundaries added; PR/Pages pending |
 
 ---
 

@@ -1,0 +1,11 @@
+# Experimental, opt-in Testnet-10 RPC observer for a local Kaspa node.
+# This profile does not scan, report threats, control a miner, or earn PROM.
+enabled = true
+role = "light"
+network = "testnet10"
+rpc_url = "ws://127.0.0.1:17210"
+poll_interval_secs = 30
+
+[features]
+scanning = false
+reporting = false

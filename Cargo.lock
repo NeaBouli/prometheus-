@@ -2945,6 +2945,7 @@ name = "prometheus-client"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "clap",
  "env_logger",
  "hex",
  "kaspa-addresses",
@@ -2958,6 +2959,8 @@ dependencies = [
  "sha2",
  "tempfile",
  "tokio",
+ "toml",
+ "url",
 ]
 
 [[package]]

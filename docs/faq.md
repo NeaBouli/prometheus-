@@ -26,6 +26,15 @@ closest equivalent to "miners": they run LLaMA 3 AI to analyze
 threats and generate rules. Instead of GPU hashrate, they contribute
 AI compute and threat intelligence.
 
+**Q: Does running Prometheus beside a Kaspa miner automatically earn PROM?**
+No. The current miner companion is a development-only local Testnet-10
+wRPC observer. It does not scan, report threats, control mining, or award
+PROM. The aggregate future reporter pool is split into 15% for verified Light
+Client contributions and 5% for verified Honeypot contributions. The current
+companion is eligible for neither allocation and cannot claim the full 20%.
+Kaspa mining uses Stratum in most ASIC/pool setups; Prometheus wRPC observation
+is separate.
+
 **Q: What is the PROM emission schedule?**
 Year 1: 20,000,000 PROM. Each subsequent year: -10%.
 Year 2: 18M. Year 3: 16M. Year 4: 14M. Year 5: 12M.
@@ -72,6 +81,12 @@ voting. Invalid reveals result in immediate bond slashing.
 ---
 
 ## Technical
+
+**Q: Which Light Client features work today?**
+The Rust workspace contains tested development components, but Phi-3
+inference, Groth16 proofs, canonical rule loading, P2P submission, and the
+complete report pipeline are not production implementations yet. Runtime
+guards reject those placeholders in beta and mainnet profiles.
 
 **Q: Why Kaspa and not Ethereum?**
 Kaspa's DAGKnight consensus achieves 100 blocks per second with
