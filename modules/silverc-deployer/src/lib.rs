@@ -5,8 +5,9 @@
 //! private-key, seed, wallet, keystore, token, or password input exists here.
 
 use std::collections::BTreeMap;
-use std::fs;
-use std::path::Path;
+use std::fs::{self, File, OpenOptions};
+use std::io::Write;
+use std::path::{Path, PathBuf};
 use std::str::FromStr;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
@@ -25,13 +26,14 @@ use kaspa_consensus_core::tx::{
     CovenantBinding, ScriptPublicKey, SignableTransaction, Transaction, TransactionId,
     TransactionInput, TransactionOutpoint, TransactionOutput, UtxoEntry,
 };
-use kaspa_rpc_core::{api::rpc::RpcApi, RpcUtxosByAddressesEntry};
+use kaspa_rpc_core::{api::rpc::RpcApi, RpcError, RpcUtxosByAddressesEntry};
 use kaspa_txscript::{extract_script_pub_key_address, pay_to_script_hash_script};
 use kaspa_wrpc_client::client::{ConnectOptions, ConnectStrategy};
 use kaspa_wrpc_client::{KaspaRpcClient, WrpcEncoding};
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use serde_json::Value;
 use sha2::{Digest, Sha256};
+use tokio::time::timeout;
 use url::Url;
 
 pub const TRANSACTION_VERSION: u16 = 1;
@@ -42,6 +44,7 @@ pub const SIGNING_REQUEST_KIND: &str = "prometheus.silverc.genesis.signing_reque
 pub const SIGNATURE_RESPONSE_KIND: &str = "prometheus.silverc.genesis.signature_response";
 
 const SCHNORR_SCRIPT_LEN: usize = 66;
+const RPC_REQUEST_TIMEOUT: Duration = Duration::from_secs(20);
 const SECRET_MARKERS: &[&str] = &[
     "private", "secret", "seed", "mnemonic", "password", "passwd", "wallet", "keystore", "token",
 ];
@@ -58,6 +61,7 @@ const DEPLOY_REQUEST_SAFETY_FIELDS: &[&str] = &[
     "deploys_contracts",
     "updates_status_files",
 ];
+const DEPLOY_REQUEST_SAFETY_SCOPE: &str = "deploy_request_builder_only";
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub struct ScriptSpec {
@@ -151,6 +155,7 @@ pub struct DeployRequest {
     pub rpc_url: String,
     pub deployer_address: String,
     pub contract: ContractRequest,
+    pub safety_scope: String,
     pub request_sha256: String,
 }
 
@@ -234,7 +239,11 @@ pub struct SignatureVerification {
     pub safety: BTreeMap<String, bool>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+fn legacy_broadcast_record_source() -> String {
+    "local_rpc_submission".to_string()
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub struct BroadcastResult {
     pub schema_version: u32,
     pub result_type: String,
@@ -249,7 +258,31 @@ pub struct BroadcastResult {
     pub deploy_tx_id: String,
     pub covenant_id: String,
     pub submitted_at_unix_seconds: u64,
+    #[serde(default = "legacy_broadcast_record_source")]
+    pub record_source: String,
     pub confirmation_required: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub struct BroadcastJournal {
+    pub schema_version: u32,
+    pub journal_type: String,
+    pub status: String,
+    pub network: String,
+    pub network_id: String,
+    pub request_sha256: String,
+    pub signing_request_sha256: String,
+    pub contract_name: String,
+    pub deployer_address: String,
+    pub deployed_instance_id: String,
+    pub expected_deploy_tx_id: String,
+    pub covenant_id: String,
+    pub acknowledged_signing_request_sha256: String,
+    pub created_at_unix_seconds: u64,
+    pub updated_at_unix_seconds: u64,
+    #[serde(default)]
+    pub submission_started_at_unix_seconds: Option<u64>,
+    pub result: Option<BroadcastResult>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -574,8 +607,9 @@ pub fn load_deploy_request(path: &Path) -> Result<DeployRequest> {
     if request.schema_version != 1
         || request.request_type != "prometheus_silverc_deploy_request"
         || request.status != "READY_FOR_KEYLESS_GENESIS_OPERATOR"
+        || request.safety_scope != DEPLOY_REQUEST_SAFETY_SCOPE
     {
-        bail!("unsupported deploy request schema/type/status");
+        bail!("unsupported deploy request schema/type/status/safety_scope");
     }
     validate_rpc_url(&request.rpc_url)?;
     Ok(request)
@@ -597,7 +631,10 @@ pub fn load_artifact(path: &Path, request: &DeployRequest) -> Result<SilvercArti
     if sha256_hex(&bytes) != request.contract.artifact_sha256 {
         bail!("Silverc artifact_sha256 mismatch");
     }
-    let artifact: SilvercArtifact = serde_json::from_slice(&bytes)?;
+    let value: Value = serde_json::from_slice(&bytes)
+        .with_context(|| format!("invalid JSON in {}", path.display()))?;
+    reject_secret_fields(&value, "$")?;
+    let artifact: SilvercArtifact = serde_json::from_value(value)?;
     if artifact.contract_name != request.contract.name {
         bail!("Silverc artifact contract_name mismatch");
     }
@@ -985,6 +1022,42 @@ pub fn verify_signature_response(
     })
 }
 
+fn validate_verified_transaction_binding(
+    verified: &VerifiedSignedTransaction,
+    signing_request: &SigningRequest,
+) -> Result<()> {
+    validate_signing_request(signing_request)?;
+    if verified.transaction.entries.len() != verified.transaction.tx.inputs.len()
+        || verified.transaction.entries.iter().any(Option::is_none)
+    {
+        bail!("verified transaction is missing required UTXO entries");
+    }
+    if verified.verification.schema_version != 1
+        || verified.verification.kind != "prometheus.silverc.genesis.signature_verification"
+        || verified.verification.status != "EXTERNAL_SIGNATURE_AND_TRANSACTION_VERIFIED"
+        || verified.verification.request_sha256 != signing_request.request_sha256
+        || verified.verification.signing_request_sha256 != signing_request.signing_request_sha256
+        || verified.verification.transaction_id != signing_request.unsigned_transaction_id
+        || verified.verification.covenant_id != signing_request.covenant_id
+        || verified.verification.signature_validation != "bip340_schnorr_passed"
+        || verified.verification.transaction_validation != "kaspa_consensus_sign_verify_passed"
+        || verified.verification.safety != safety_map()
+        || verified.transaction.tx.id().to_string() != signing_request.unsigned_transaction_id
+    {
+        bail!("verified transaction is not bound to signing request");
+    }
+    kaspa_consensus_core::sign::verify(&verified.transaction.as_verifiable())
+        .context("signed transaction verification failed before network access")?;
+    Ok(())
+}
+
+fn rpc_timeout(operation: &str) -> anyhow::Error {
+    anyhow!(
+        "Kaspa wRPC {operation} timed out after {} seconds",
+        RPC_REQUEST_TIMEOUT.as_secs()
+    )
+}
+
 async fn connect_rpc(
     rpc_url: &str,
     network_id: NetworkId,
@@ -1011,9 +1084,9 @@ async fn inspect_node(
     params: &Params,
     require_utxo_index: bool,
 ) -> Result<NodePreflight> {
-    let info = client
-        .get_server_info()
+    let info = timeout(RPC_REQUEST_TIMEOUT, client.get_server_info())
         .await
+        .map_err(|_| rpc_timeout("get_server_info"))?
         .context("failed to query Kaspa server information")?;
     if info.network_id != expected_network_id {
         bail!(
@@ -1095,9 +1168,12 @@ pub async fn preflight_deploy_node(
             return Err(error);
         }
     };
-    let entries_result = client
-        .get_utxos_by_addresses(vec![deployer_address.clone()])
-        .await;
+    let entries_result = timeout(
+        RPC_REQUEST_TIMEOUT,
+        client.get_utxos_by_addresses(vec![deployer_address.clone()]),
+    )
+    .await
+    .map_err(|_| rpc_timeout("get_utxos_by_addresses for funding preflight"))?;
     let _ = client.disconnect().await;
     let entry = validate_live_funding_utxo(
         entries_result.context("failed to query funding UTXO")?,
@@ -1127,41 +1203,341 @@ pub async fn preflight_deploy_node(
     })
 }
 
+fn deployed_contract_entry(
+    entries: Vec<RpcUtxosByAddressesEntry>,
+    signing_request: &SigningRequest,
+) -> Result<Option<RpcUtxosByAddressesEntry>> {
+    let expected_tx_id = TransactionId::from_str(&signing_request.unsigned_transaction_id)?;
+    let Some(entry) = entries.into_iter().find(|entry| {
+        entry.outpoint.transaction_id == expected_tx_id
+            && entry.outpoint.index == signing_request.contract_output_index
+    }) else {
+        return Ok(None);
+    };
+    if entry.utxo_entry.amount != signing_request.genesis_output_value
+        || entry.utxo_entry.covenant_id.map(|value| value.to_string())
+            != Some(signing_request.covenant_id.clone())
+        || ScriptSpec::from_script_public_key(&entry.utxo_entry.script_public_key)
+            != signing_request.contract_script_public_key
+    {
+        bail!("node UTXO does not match verified amount, covenant ID, or contract script");
+    }
+    Ok(Some(entry))
+}
+
+fn broadcast_result(
+    signing_request: &SigningRequest,
+    status: &str,
+    record_source: &str,
+    confirmation_required: bool,
+    submitted_at_unix_seconds: u64,
+) -> BroadcastResult {
+    BroadcastResult {
+        schema_version: 1,
+        result_type: "prometheus_silverc_genesis_submission".to_string(),
+        status: status.to_string(),
+        network: signing_request.network.clone(),
+        network_id: signing_request.network_id.clone(),
+        request_sha256: signing_request.request_sha256.clone(),
+        signing_request_sha256: signing_request.signing_request_sha256.clone(),
+        contract_name: signing_request.contract_name.clone(),
+        deployer_address: signing_request.deployer_address.clone(),
+        deployed_instance_id: signing_request.deployed_instance_id.clone(),
+        deploy_tx_id: signing_request.unsigned_transaction_id.clone(),
+        covenant_id: signing_request.covenant_id.clone(),
+        submitted_at_unix_seconds,
+        record_source: record_source.to_string(),
+        confirmation_required,
+    }
+}
+
+pub fn prepare_broadcast_journal(
+    verified: &VerifiedSignedTransaction,
+    signing_request: &SigningRequest,
+    acknowledgement: &str,
+) -> Result<BroadcastJournal> {
+    validate_verified_transaction_binding(verified, signing_request)?;
+    if acknowledgement != signing_request.signing_request_sha256 {
+        bail!("broadcast acknowledgement must equal signing_request_sha256");
+    }
+    let now = unix_seconds()?;
+    Ok(BroadcastJournal {
+        schema_version: 1,
+        journal_type: "prometheus_silverc_genesis_broadcast_journal".to_string(),
+        status: "verified_pending_submission".to_string(),
+        network: signing_request.network.clone(),
+        network_id: signing_request.network_id.clone(),
+        request_sha256: signing_request.request_sha256.clone(),
+        signing_request_sha256: signing_request.signing_request_sha256.clone(),
+        contract_name: signing_request.contract_name.clone(),
+        deployer_address: signing_request.deployer_address.clone(),
+        deployed_instance_id: signing_request.deployed_instance_id.clone(),
+        expected_deploy_tx_id: signing_request.unsigned_transaction_id.clone(),
+        covenant_id: signing_request.covenant_id.clone(),
+        acknowledged_signing_request_sha256: acknowledgement.to_string(),
+        created_at_unix_seconds: now,
+        updated_at_unix_seconds: now,
+        submission_started_at_unix_seconds: None,
+        result: None,
+    })
+}
+
+fn validate_broadcast_result_binding(
+    result: &BroadcastResult,
+    journal: &BroadcastJournal,
+) -> Result<()> {
+    let valid_state = matches!(
+        (
+            result.status.as_str(),
+            result.record_source.as_str(),
+            result.confirmation_required
+        ),
+        ("submitted_unconfirmed", "local_rpc_submission", true)
+            | ("reconciled_mempool", "known_transaction_mempool", true)
+            | (
+                "reconciled_confirmed",
+                "known_transaction_contract_utxo",
+                false
+            )
+    );
+    if result.schema_version != 1
+        || result.result_type != "prometheus_silverc_genesis_submission"
+        || !valid_state
+        || result.network != journal.network
+        || result.network_id != journal.network_id
+        || result.request_sha256 != journal.request_sha256
+        || result.signing_request_sha256 != journal.signing_request_sha256
+        || result.contract_name != journal.contract_name
+        || result.deployer_address != journal.deployer_address
+        || result.deployed_instance_id != journal.deployed_instance_id
+        || result.deploy_tx_id != journal.expected_deploy_tx_id
+        || result.covenant_id != journal.covenant_id
+        || result.signing_request_sha256 != journal.acknowledged_signing_request_sha256
+    {
+        bail!("broadcast result is not bound to the verified broadcast journal");
+    }
+    Ok(())
+}
+
+fn validate_broadcast_journal_binding(
+    journal: &BroadcastJournal,
+    expected: &BroadcastJournal,
+) -> Result<()> {
+    if journal.schema_version != 1
+        || journal.journal_type != "prometheus_silverc_genesis_broadcast_journal"
+        || journal.network != expected.network
+        || journal.network_id != expected.network_id
+        || journal.request_sha256 != expected.request_sha256
+        || journal.signing_request_sha256 != expected.signing_request_sha256
+        || journal.contract_name != expected.contract_name
+        || journal.deployer_address != expected.deployer_address
+        || journal.deployed_instance_id != expected.deployed_instance_id
+        || journal.expected_deploy_tx_id != expected.expected_deploy_tx_id
+        || journal.covenant_id != expected.covenant_id
+        || journal.acknowledged_signing_request_sha256
+            != expected.acknowledged_signing_request_sha256
+        || journal.updated_at_unix_seconds < journal.created_at_unix_seconds
+        || journal
+            .submission_started_at_unix_seconds
+            .is_some_and(|started| started < journal.created_at_unix_seconds)
+    {
+        bail!("existing broadcast journal does not match the verified transaction");
+    }
+    match (
+        journal.status.as_str(),
+        journal.submission_started_at_unix_seconds,
+        journal.result.as_ref(),
+    ) {
+        ("verified_pending_submission", None, None) => Ok(()),
+        ("submission_in_progress", Some(_), None) => Ok(()),
+        ("submission_recorded", _, Some(result)) => {
+            validate_broadcast_result_binding(result, journal)
+        }
+        _ => bail!("broadcast journal status/result state is invalid"),
+    }
+}
+
+pub fn broadcast_journal_path(result_out: &Path) -> PathBuf {
+    let mut path = result_out.as_os_str().to_os_string();
+    path.push(".intent.json");
+    path.into()
+}
+
+fn broadcast_lock_path(result_out: &Path) -> PathBuf {
+    let mut path = result_out.as_os_str().to_os_string();
+    path.push(".lock");
+    path.into()
+}
+
+pub fn acquire_broadcast_lock(result_out: &Path) -> Result<File> {
+    let path = broadcast_lock_path(result_out);
+    let parent = path.parent().unwrap_or_else(|| Path::new("."));
+    fs::create_dir_all(parent)?;
+    let file = OpenOptions::new()
+        .read(true)
+        .write(true)
+        .create(true)
+        .truncate(false)
+        .open(&path)
+        .with_context(|| format!("failed to open broadcast lock {}", path.display()))?;
+    file.try_lock().map_err(|error| {
+        anyhow!(
+            "another broadcast process holds {}: {error}",
+            path.display()
+        )
+    })?;
+    Ok(file)
+}
+
+pub fn load_broadcast_journal(
+    path: &Path,
+    expected: &BroadcastJournal,
+) -> Result<BroadcastJournal> {
+    let (journal, _): (BroadcastJournal, Value) = read_public_json(path)?;
+    validate_broadcast_journal_binding(&journal, expected)?;
+    Ok(journal)
+}
+
+pub fn load_broadcast_result(path: &Path, journal: &BroadcastJournal) -> Result<BroadcastResult> {
+    let (result, _): (BroadcastResult, Value) = read_public_json(path)?;
+    validate_broadcast_result_binding(&result, journal)?;
+    Ok(result)
+}
+
+pub fn finalize_broadcast_journal(
+    mut journal: BroadcastJournal,
+    result: BroadcastResult,
+) -> Result<BroadcastJournal> {
+    validate_broadcast_result_binding(&result, &journal)?;
+    journal.status = "submission_recorded".to_string();
+    journal.updated_at_unix_seconds = unix_seconds()?;
+    journal.result = Some(result);
+    Ok(journal)
+}
+
+fn mark_submission_in_progress(journal: &mut BroadcastJournal, path: &Path) -> Result<u64> {
+    if journal.status != "verified_pending_submission"
+        || journal.submission_started_at_unix_seconds.is_some()
+        || journal.result.is_some()
+    {
+        bail!("broadcast journal is not eligible for a first submission attempt");
+    }
+    let started_at = unix_seconds()?;
+    journal.status = "submission_in_progress".to_string();
+    journal.updated_at_unix_seconds = started_at;
+    journal.submission_started_at_unix_seconds = Some(started_at);
+    write_public_json(path, journal)?;
+    Ok(started_at)
+}
+
+fn require_first_submission_attempt(journal: &BroadcastJournal) -> Result<()> {
+    if journal.status == "submission_in_progress" {
+        bail!(
+            "prior submission state is ambiguous; expected transaction is not yet visible in the configured node mempool or covenant UTXO set, so automatic resubmission is forbidden"
+        );
+    }
+    if journal.status != "verified_pending_submission" {
+        bail!("broadcast journal is not eligible for transaction submission");
+    }
+    Ok(())
+}
+
 pub async fn broadcast_verified_transaction(
     verified: VerifiedSignedTransaction,
     signing_request: &SigningRequest,
     acknowledgement: &str,
     encoding: WrpcEncoding,
+    journal: &mut BroadcastJournal,
+    journal_path: &Path,
 ) -> Result<BroadcastResult> {
-    validate_signing_request(signing_request)?;
+    validate_verified_transaction_binding(&verified, signing_request)?;
     if acknowledgement != signing_request.signing_request_sha256 {
         bail!("broadcast acknowledgement must equal signing_request_sha256");
     }
+    let expected_journal = prepare_broadcast_journal(&verified, signing_request, acknowledgement)?;
+    validate_broadcast_journal_binding(journal, &expected_journal)?;
     let network_id = NetworkId::from_str(&signing_request.network_id)?;
     let params = consensus_params(network_id)?;
-    if verified.verification.request_sha256 != signing_request.request_sha256
-        || verified.verification.signing_request_sha256 != signing_request.signing_request_sha256
-        || verified.verification.transaction_id != signing_request.unsigned_transaction_id
-        || verified.transaction.tx.id().to_string() != signing_request.unsigned_transaction_id
-    {
-        bail!("verified transaction is not bound to signing request");
-    }
-    kaspa_consensus_core::sign::verify(&verified.transaction.as_verifiable())
-        .context("signed transaction verification failed before broadcast")?;
     let (deployer_address, funding_script_public_key) = deployer_address_and_funding_script(
         &signing_request.deployer_address,
         network_id,
         &signing_request.funding_script_public_key,
     )?;
     let funding_outpoint = signing_request.funding_outpoint.to_outpoint()?;
+    let contract_address = Address::try_from(signing_request.contract_address.as_str())?;
+    let expected_tx_id = TransactionId::from_str(&signing_request.unsigned_transaction_id)?;
     let client = connect_rpc(&signing_request.rpc_url, network_id, encoding).await?;
     if let Err(error) = inspect_node(&client, network_id, &params, true).await {
         let _ = client.disconnect().await;
         return Err(error);
     }
-    let funding_entries = client
-        .get_utxos_by_addresses(vec![deployer_address.clone()])
-        .await;
+
+    let deployed_entries = timeout(
+        RPC_REQUEST_TIMEOUT,
+        client.get_utxos_by_addresses(vec![contract_address]),
+    )
+    .await
+    .map_err(|_| rpc_timeout("get_utxos_by_addresses for broadcast reconciliation"))?;
+    let deployed_entry = deployed_entries
+        .context("failed to reconcile deployed contract UTXO")
+        .and_then(|entries| deployed_contract_entry(entries, signing_request));
+    match deployed_entry {
+        Ok(Some(_)) => {
+            let _ = client.disconnect().await;
+            return Ok(broadcast_result(
+                signing_request,
+                "reconciled_confirmed",
+                "known_transaction_contract_utxo",
+                false,
+                journal
+                    .submission_started_at_unix_seconds
+                    .unwrap_or(journal.created_at_unix_seconds),
+            ));
+        }
+        Ok(None) => {}
+        Err(error) => {
+            let _ = client.disconnect().await;
+            return Err(error);
+        }
+    }
+
+    let mempool_result = timeout(
+        RPC_REQUEST_TIMEOUT,
+        client.get_mempool_entry(expected_tx_id, true, false),
+    )
+    .await
+    .map_err(|_| rpc_timeout("get_mempool_entry for broadcast reconciliation"))?;
+    match mempool_result {
+        Ok(_) => {
+            let _ = client.disconnect().await;
+            return Ok(broadcast_result(
+                signing_request,
+                "reconciled_mempool",
+                "known_transaction_mempool",
+                true,
+                journal
+                    .submission_started_at_unix_seconds
+                    .unwrap_or(journal.created_at_unix_seconds),
+            ));
+        }
+        Err(RpcError::TransactionNotFound(_)) => {}
+        Err(error) => {
+            let _ = client.disconnect().await;
+            return Err(error).context("failed to reconcile expected transaction in mempool");
+        }
+    }
+
+    if let Err(error) = require_first_submission_attempt(journal) {
+        let _ = client.disconnect().await;
+        return Err(error);
+    }
+
+    let funding_entries = timeout(
+        RPC_REQUEST_TIMEOUT,
+        client.get_utxos_by_addresses(vec![deployer_address.clone()]),
+    )
+    .await
+    .map_err(|_| rpc_timeout("get_utxos_by_addresses before broadcast"))?;
     let funding_validation = funding_entries
         .context("failed to query funding UTXO before broadcast")
         .and_then(|entries| {
@@ -1179,38 +1555,34 @@ pub async fn broadcast_verified_transaction(
         let _ = client.disconnect().await;
         return Err(error);
     }
-    let result = client
-        .submit_transaction((&verified.transaction.tx).into(), false)
-        .await
-        .context("Kaspa transaction submission failed");
+    let submission_started_at = mark_submission_in_progress(journal, journal_path)?;
+    let result = timeout(
+        RPC_REQUEST_TIMEOUT,
+        client.submit_transaction((&verified.transaction.tx).into(), false),
+    )
+    .await
+    .map_err(|_| rpc_timeout("submit_transaction"))?
+    .context("Kaspa transaction submission failed");
     let _ = client.disconnect().await;
     let submitted_id = result?.to_string();
     if submitted_id != signing_request.unsigned_transaction_id {
         bail!("RPC returned a transaction ID different from the verified transaction");
     }
-    Ok(BroadcastResult {
-        schema_version: 1,
-        result_type: "prometheus_silverc_genesis_submission".to_string(),
-        status: "submitted_unconfirmed".to_string(),
-        network: signing_request.network.clone(),
-        network_id: signing_request.network_id.clone(),
-        request_sha256: signing_request.request_sha256.clone(),
-        signing_request_sha256: signing_request.signing_request_sha256.clone(),
-        contract_name: signing_request.contract_name.clone(),
-        deployer_address: signing_request.deployer_address.clone(),
-        deployed_instance_id: signing_request.deployed_instance_id.clone(),
-        deploy_tx_id: submitted_id,
-        covenant_id: signing_request.covenant_id.clone(),
-        submitted_at_unix_seconds: unix_seconds()?,
-        confirmation_required: true,
-    })
+    Ok(broadcast_result(
+        signing_request,
+        "submitted_unconfirmed",
+        "local_rpc_submission",
+        true,
+        submission_started_at,
+    ))
 }
 
 pub async fn observe_deployed_utxo(
+    verified: &VerifiedSignedTransaction,
     signing_request: &SigningRequest,
     encoding: WrpcEncoding,
 ) -> Result<NodeObservation> {
-    validate_signing_request(signing_request)?;
+    validate_verified_transaction_binding(verified, signing_request)?;
     let network_id = NetworkId::from_str(&signing_request.network_id)?;
     let params = consensus_params(network_id)?;
     let address = Address::try_from(signing_request.contract_address.as_str())?;
@@ -1222,27 +1594,20 @@ pub async fn observe_deployed_utxo(
         let _ = client.disconnect().await;
         return Err(error);
     }
-    let entries_result = client.get_utxos_by_addresses(vec![address]).await;
-    let dag_result = client.get_block_dag_info().await;
+    let entries_result = timeout(
+        RPC_REQUEST_TIMEOUT,
+        client.get_utxos_by_addresses(vec![address]),
+    )
+    .await
+    .map_err(|_| rpc_timeout("get_utxos_by_addresses for deployment observation"))?;
+    let dag_result = timeout(RPC_REQUEST_TIMEOUT, client.get_block_dag_info())
+        .await
+        .map_err(|_| rpc_timeout("get_block_dag_info for deployment observation"))?;
     let _ = client.disconnect().await;
     let entries = entries_result.context("failed to query deployed contract UTXO")?;
     let dag = dag_result.context("failed to query virtual DAA score")?;
-    let expected_tx_id = TransactionId::from_str(&signing_request.unsigned_transaction_id)?;
-    let entry = entries
-        .into_iter()
-        .find(|entry| {
-            entry.outpoint.transaction_id == expected_tx_id
-                && entry.outpoint.index == signing_request.contract_output_index
-        })
+    let entry = deployed_contract_entry(entries, signing_request)?
         .ok_or_else(|| anyhow!("deployed contract UTXO is not visible on the configured node"))?;
-    if entry.utxo_entry.amount != signing_request.genesis_output_value
-        || entry.utxo_entry.covenant_id.map(|value| value.to_string())
-            != Some(signing_request.covenant_id.clone())
-        || ScriptSpec::from_script_public_key(&entry.utxo_entry.script_public_key)
-            != signing_request.contract_script_public_key
-    {
-        bail!("node UTXO does not match prepared amount, covenant ID, or contract script");
-    }
     Ok(NodeObservation {
         schema_version: 1,
         evidence_type: "prometheus_silverc_genesis_node_observation".to_string(),
@@ -1268,13 +1633,71 @@ pub async fn observe_deployed_utxo(
     })
 }
 
-pub fn write_public_json<T: Serialize>(path: &Path, value: &T) -> Result<()> {
-    if let Some(parent) = path.parent() {
-        fs::create_dir_all(parent)?;
-    }
+fn public_json_bytes<T: Serialize>(value: &T) -> Result<Vec<u8>> {
     let mut bytes = serde_json::to_vec_pretty(value)?;
     bytes.push(b'\n');
-    fs::write(path, bytes).with_context(|| format!("failed to write {}", path.display()))
+    Ok(bytes)
+}
+
+fn write_synced_temporary(path: &Path, bytes: &[u8]) -> Result<(PathBuf, PathBuf)> {
+    let parent = path.parent().unwrap_or_else(|| Path::new("."));
+    fs::create_dir_all(parent)?;
+    let mut temporary = path.as_os_str().to_os_string();
+    temporary.push(format!(
+        ".tmp-{}-{}",
+        std::process::id(),
+        SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .context("system clock is before UNIX epoch")?
+            .as_nanos()
+    ));
+    let temporary = PathBuf::from(temporary);
+    let write_result = (|| -> Result<(PathBuf, PathBuf)> {
+        let mut file = OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .open(&temporary)
+            .with_context(|| format!("failed to create {}", temporary.display()))?;
+        file.write_all(bytes)?;
+        file.sync_all()?;
+        Ok((temporary.clone(), parent.to_path_buf()))
+    })();
+    if write_result.is_err() {
+        let _ = fs::remove_file(&temporary);
+    }
+    write_result
+}
+
+pub fn create_public_json<T: Serialize>(path: &Path, value: &T) -> Result<bool> {
+    let bytes = public_json_bytes(value)?;
+    let (temporary, parent) = write_synced_temporary(path, &bytes)?;
+    let linked = match fs::hard_link(&temporary, path) {
+        Ok(()) => true,
+        Err(error) if error.kind() == std::io::ErrorKind::AlreadyExists => false,
+        Err(error) => {
+            let _ = fs::remove_file(&temporary);
+            return Err(error)
+                .with_context(|| format!("failed to exclusively create {}", path.display()));
+        }
+    };
+    fs::remove_file(&temporary)?;
+    if linked {
+        File::open(parent)?.sync_all()?;
+    }
+    Ok(linked)
+}
+
+pub fn write_public_json<T: Serialize>(path: &Path, value: &T) -> Result<()> {
+    let bytes = public_json_bytes(value)?;
+    let (temporary, parent) = write_synced_temporary(path, &bytes)?;
+    let rename_result = fs::rename(&temporary, path)
+        .with_context(|| format!("failed to atomically replace {}", path.display()));
+    if rename_result.is_err() {
+        let _ = fs::remove_file(&temporary);
+    }
+    rename_result?;
+    File::open(parent)?.sync_all()?;
+    Ok(())
 }
 
 #[cfg(test)]
@@ -1304,6 +1727,7 @@ mod tests {
                 script_sha256: sha256_hex(&script),
                 script_len: script.len(),
             },
+            safety_scope: DEPLOY_REQUEST_SAFETY_SCOPE.to_string(),
             request_sha256: "b".repeat(64),
         };
         let artifact = SilvercArtifact {
@@ -1358,6 +1782,7 @@ mod tests {
                 script_sha256: sha256_hex(&script),
                 script_len: script.len(),
             },
+            safety_scope: DEPLOY_REQUEST_SAFETY_SCOPE.to_string(),
             request_sha256: "bb".repeat(32),
         };
         let artifact = SilvercArtifact {
@@ -1766,15 +2191,40 @@ mod tests {
         let response = sign(&prepared, &keypair);
         let mut verified =
             verify_signature_response(prepared, &signing_request, &response).unwrap();
+        let mut journal = prepare_broadcast_journal(
+            &verified,
+            &signing_request,
+            &signing_request.signing_request_sha256,
+        )
+        .unwrap();
         verified.verification.request_sha256 = "c".repeat(64);
         let error = broadcast_verified_transaction(
             verified,
             &signing_request,
             &signing_request.signing_request_sha256,
             WrpcEncoding::Borsh,
+            &mut journal,
+            Path::new("/tmp/prometheus-unused-broadcast-journal.json"),
         )
         .await
         .expect_err("mismatched broadcast binding must fail");
+        assert!(error
+            .to_string()
+            .contains("verified transaction is not bound"));
+    }
+
+    #[tokio::test]
+    async fn observe_rejects_verified_binding_before_network_access() {
+        let (request, artifact, funding, keypair) = fixture();
+        let prepared = prepare_genesis(&request, &artifact, &funding).unwrap();
+        let signing_request = prepared.signing_request.clone();
+        let response = sign(&prepared, &keypair);
+        let mut verified =
+            verify_signature_response(prepared, &signing_request, &response).unwrap();
+        verified.verification.request_sha256 = "c".repeat(64);
+        let error = observe_deployed_utxo(&verified, &signing_request, WrpcEncoding::Borsh)
+            .await
+            .expect_err("mismatched observation binding must fail before RPC access");
         assert!(error
             .to_string()
             .contains("verified transaction is not bound"));
@@ -1805,6 +2255,130 @@ mod tests {
         assert!(error
             .to_string()
             .contains("secret-like fields are forbidden"));
+    }
+
+    #[test]
+    fn artifact_loader_rejects_secret_like_extra_fields() {
+        let (mut request, artifact, _, _) = fixture();
+        let temp_dir = std::env::temp_dir().join(format!(
+            "prometheus-silverc-secret-artifact-{}-{}",
+            std::process::id(),
+            SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        fs::create_dir_all(&temp_dir).unwrap();
+        let artifact_path = temp_dir.join("artifact.json");
+        let mut value = serde_json::to_value(artifact).unwrap();
+        value.as_object_mut().unwrap().insert(
+            "private_key".to_string(),
+            Value::String("forbidden".to_string()),
+        );
+        write_public_json(&artifact_path, &value).unwrap();
+        request.contract.artifact_sha256 = sha256_hex(&fs::read(&artifact_path).unwrap());
+
+        let error = load_artifact(&artifact_path, &request)
+            .expect_err("secret-like artifact field must fail closed");
+        assert!(error
+            .to_string()
+            .contains("secret-like fields are forbidden"));
+        fs::remove_dir_all(temp_dir).unwrap();
+    }
+
+    #[test]
+    fn broadcast_journal_is_exclusive_bound_and_recoverable() {
+        let (request, artifact, funding, keypair) = fixture();
+        let prepared = prepare_genesis(&request, &artifact, &funding).unwrap();
+        let signing_request = prepared.signing_request.clone();
+        let response = sign(&prepared, &keypair);
+        let verified = verify_signature_response(prepared, &signing_request, &response).unwrap();
+        let journal = prepare_broadcast_journal(
+            &verified,
+            &signing_request,
+            &signing_request.signing_request_sha256,
+        )
+        .unwrap();
+        let temp_dir = std::env::temp_dir().join(format!(
+            "prometheus-silverc-journal-{}-{}",
+            std::process::id(),
+            SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        fs::create_dir_all(&temp_dir).unwrap();
+        let result_path = temp_dir.join("broadcast-result.json");
+        let journal_path = broadcast_journal_path(&result_path);
+
+        let lock = acquire_broadcast_lock(&result_path).unwrap();
+        let lock_error =
+            acquire_broadcast_lock(&result_path).expect_err("concurrent broadcast lock must fail");
+        assert!(lock_error
+            .to_string()
+            .contains("another broadcast process holds"));
+        drop(lock);
+        drop(acquire_broadcast_lock(&result_path).unwrap());
+
+        assert!(create_public_json(&journal_path, &journal).unwrap());
+        assert!(!create_public_json(&journal_path, &journal).unwrap());
+        let mut loaded = load_broadcast_journal(&journal_path, &journal).unwrap();
+        assert_eq!(loaded, journal);
+        let submission_started_at =
+            mark_submission_in_progress(&mut loaded, &journal_path).unwrap();
+        assert_eq!(loaded.status, "submission_in_progress");
+        assert_eq!(
+            loaded.submission_started_at_unix_seconds,
+            Some(submission_started_at)
+        );
+        let retry_error = require_first_submission_attempt(&loaded)
+            .expect_err("ambiguous retry must never authorize a second submission");
+        assert!(retry_error
+            .to_string()
+            .contains("automatic resubmission is forbidden"));
+        let loaded = load_broadcast_journal(&journal_path, &journal).unwrap();
+
+        let result = broadcast_result(
+            &signing_request,
+            "submitted_unconfirmed",
+            "local_rpc_submission",
+            true,
+            submission_started_at,
+        );
+        let finalized = finalize_broadcast_journal(loaded, result.clone()).unwrap();
+        write_public_json(&journal_path, &finalized).unwrap();
+        write_public_json(&result_path, &result).unwrap();
+        assert_eq!(
+            load_broadcast_journal(&journal_path, &journal).unwrap(),
+            finalized
+        );
+        assert_eq!(
+            load_broadcast_result(&result_path, &finalized).unwrap(),
+            result
+        );
+
+        let legacy_result_path = temp_dir.join("legacy-broadcast-result.json");
+        let mut legacy_value = serde_json::to_value(&result).unwrap();
+        legacy_value
+            .as_object_mut()
+            .unwrap()
+            .remove("record_source");
+        write_public_json(&legacy_result_path, &legacy_value).unwrap();
+        assert_eq!(
+            load_broadcast_result(&legacy_result_path, &finalized)
+                .unwrap()
+                .record_source,
+            "local_rpc_submission"
+        );
+
+        let mut mismatched = journal.clone();
+        mismatched.expected_deploy_tx_id = "ff".repeat(32);
+        let error = load_broadcast_journal(&journal_path, &mismatched)
+            .expect_err("mismatched journal binding must fail");
+        assert!(error
+            .to_string()
+            .contains("does not match the verified transaction"));
+        fs::remove_dir_all(temp_dir).unwrap();
     }
 
     #[test]

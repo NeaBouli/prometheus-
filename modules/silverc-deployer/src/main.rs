@@ -4,8 +4,10 @@ use anyhow::Result;
 use clap::{Parser, Subcommand, ValueEnum};
 use kaspa_wrpc_client::WrpcEncoding;
 use prometheus_silverc_deployer::{
-    broadcast_verified_transaction, load_artifact, load_deploy_request, load_funding_spec,
-    load_signature_response, load_signing_request, observe_deployed_utxo, preflight_deploy_node,
+    acquire_broadcast_lock, broadcast_journal_path, broadcast_verified_transaction,
+    create_public_json, finalize_broadcast_journal, load_artifact, load_broadcast_journal,
+    load_broadcast_result, load_deploy_request, load_funding_spec, load_signature_response,
+    load_signing_request, observe_deployed_utxo, preflight_deploy_node, prepare_broadcast_journal,
     prepare_genesis, verify_signature_response, write_public_json,
 };
 
@@ -95,7 +97,15 @@ enum Command {
     /// Query the request-bound node for the deployed covenant UTXO.
     Observe {
         #[arg(long)]
+        request: PathBuf,
+        #[arg(long)]
+        artifact: PathBuf,
+        #[arg(long)]
+        funding: PathBuf,
+        #[arg(long)]
         signing_request: PathBuf,
+        #[arg(long)]
+        signature_response: PathBuf,
         #[arg(long, value_enum, default_value_t = Encoding::Borsh)]
         encoding: Encoding,
         #[arg(long)]
@@ -189,23 +199,72 @@ async fn main() -> Result<()> {
                 &signing_request,
                 &signature_response,
             )?;
+            let expected_journal = prepare_broadcast_journal(
+                &verified,
+                &signing_request,
+                &acknowledge_signing_request_sha256,
+            )?;
+            let _broadcast_lock = acquire_broadcast_lock(&result_out)?;
+            let journal_path = broadcast_journal_path(&result_out);
+            let mut journal = if create_public_json(&journal_path, &expected_journal)? {
+                expected_journal
+            } else {
+                load_broadcast_journal(&journal_path, &expected_journal)?
+            };
+
+            if let Some(recorded_result) = journal.result.as_ref() {
+                if result_out.try_exists()? {
+                    let existing_result = load_broadcast_result(&result_out, &journal)?;
+                    if existing_result != *recorded_result {
+                        anyhow::bail!("broadcast result differs from the finalized intent journal");
+                    }
+                } else {
+                    write_public_json(&result_out, recorded_result)?;
+                }
+                println!("{}", serde_json::to_string_pretty(recorded_result)?);
+                return Ok(());
+            }
+
+            if result_out.try_exists()? {
+                let result = load_broadcast_result(&result_out, &journal)?;
+                let journal = finalize_broadcast_journal(journal, result.clone())?;
+                write_public_json(&journal_path, &journal)?;
+                println!("{}", serde_json::to_string_pretty(&result)?);
+                return Ok(());
+            }
+
             let result = broadcast_verified_transaction(
                 verified,
                 &signing_request,
                 &acknowledge_signing_request_sha256,
                 encoding.into(),
+                &mut journal,
+                &journal_path,
             )
             .await?;
+            let journal = finalize_broadcast_journal(journal, result.clone())?;
+            write_public_json(&journal_path, &journal)?;
             write_public_json(&result_out, &result)?;
             println!("{}", serde_json::to_string_pretty(&result)?);
         }
         Command::Observe {
+            request,
+            artifact,
+            funding,
             signing_request,
+            signature_response,
             encoding,
             evidence_out,
         } => {
-            let signing_request = load_signing_request(&signing_request)?;
-            let evidence = observe_deployed_utxo(&signing_request, encoding.into()).await?;
+            let (verified, signing_request) = rebuild_and_verify(
+                &request,
+                &artifact,
+                &funding,
+                &signing_request,
+                &signature_response,
+            )?;
+            let evidence =
+                observe_deployed_utxo(&verified, &signing_request, encoding.into()).await?;
             write_public_json(&evidence_out, &evidence)?;
             println!("{}", serde_json::to_string_pretty(&evidence)?);
         }

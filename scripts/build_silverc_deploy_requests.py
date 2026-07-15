@@ -26,6 +26,10 @@ from verify_silverc_h001 import DEFAULT_SILVERSCRIPT_REF
 
 DEFAULT_OUT_DIR = Path("/tmp/prometheus-silverc-deploy-requests")
 SECRET_LIKE_RE = re.compile(r"(private|secret|seed|mnemonic|password|passwd|wallet|keystore|token)", re.IGNORECASE)
+REQUEST_BLOCKER = (
+    "real funded UTXO, external Schnorr signer response, and public chain evidence are required before repository broadcast"
+)
+REQUEST_SAFETY_SCOPE = "deploy_request_builder_only"
 
 
 def parse_args() -> argparse.Namespace:
@@ -151,6 +155,7 @@ def build_request(
             "deploys_contracts": False,
             "updates_status_files": False,
         },
+        "safety_scope": REQUEST_SAFETY_SCOPE,
     }
     request["request_sha256"] = request_hash(request)
     return request
@@ -160,7 +165,7 @@ def write_runbook(path: Path | None, summary: dict[str, Any]) -> None:
     if not path:
         return
     lines = [
-        "# Prometheus Silverc External Deploy Requests",
+        "# Prometheus Silverc Keyless Genesis Deploy Requests",
         "",
         f"Status: {summary['status']}",
         f"Network: {summary['network']}",
@@ -170,7 +175,7 @@ def write_runbook(path: Path | None, summary: dict[str, Any]) -> None:
         "## Safety Rules",
         "",
         "- These are public deploy requests for the repository keyless genesis operator.",
-        "- This repository does not accept private keys, sign transactions, assemble chain transactions, broadcast, deploy, or update status files.",
+        "- These request-builder artifacts do not accept private keys, sign transactions, assemble chain transactions, broadcast, deploy, or update status files.",
         "- Operator secrets must remain in the approved wallet/vault process.",
         "- Real deployment status still requires verified `operator_record` receipts.",
         "",
@@ -255,9 +260,7 @@ def main() -> int:
             "silverscript_commit": manifest["silverscript_commit"],
             "request_count": len(request_entries),
             "requests": request_entries,
-            "blockers": [
-                "real funded UTXO, external Schnorr signature, and public chain evidence are required"
-            ],
+            "blockers": [REQUEST_BLOCKER],
             "safety": {
                 "accepts_private_keys": False,
                 "signs_transactions": False,
@@ -266,6 +269,7 @@ def main() -> int:
                 "deploys_contracts": False,
                 "updates_status_files": False,
             },
+            "safety_scope": REQUEST_SAFETY_SCOPE,
         }
         summary["request_set_sha256"] = sha256(canonical_json_bytes(summary)).hexdigest()
         if args.request_set_out:

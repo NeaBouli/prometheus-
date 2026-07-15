@@ -174,19 +174,37 @@ Kaspa transaction:
   --result-out /path/to/Contract.broadcast-result.json
 ```
 
-6. Observe the exact contract output on the synced indexed node:
+Before any RPC submission, the operator atomically writes
+`Contract.broadcast-result.json.intent.json` with the verified transaction ID
+and acknowledgement. An OS-managed `Contract.broadcast-result.json.lock`
+prevents concurrent processes and is released automatically on exit or crash. A
+retry validates the journal and reconciles the known transaction ID against the
+covenant UTXO and mempool before it can submit. The journal is finalized before
+the public result file is written, so an interruption cannot trigger a blind
+resubmission. Once a submission attempt has started, a later run may only
+reconcile; if the node cannot yet prove mempool or covenant-UTXO presence, the
+operator fails closed and requires later/public evidence instead of sending
+again.
+
+6. Rebuild and verify the complete signed transaction again, then observe its
+exact contract output on the synced indexed node:
 
 ```bash
 "$OP" observe \
+  --request "$REQUEST" \
+  --artifact "$ARTIFACT" \
+  --funding "$FUNDING" \
   --signing-request /path/to/Contract.signing-request.json \
+  --signature-response /path/to/Contract.signature-response.json \
   --evidence-out /path/to/Contract.node-observation.json
 ```
 
-The observation checks outpoint, amount, covenant ID, contract script, and DAA
-depth. The existing public receipt-evidence flow still requires independent
-explorer/block evidence before rollout status can become ready.
+The observation first verifies the source-bound BIP340-signed transaction, then
+checks outpoint, amount, covenant ID, contract script, and DAA depth. The
+existing public receipt-evidence flow still requires independent explorer/block
+evidence before rollout status can become ready.
 
-The local suite contains 24 unit/security tests. It includes fixed public
+The local suite contains 27 unit/security tests. It includes fixed public
 transaction ID, covenant ID, sighash, signing-request hash, and storage-mass
 values plus a file-based deploy-request/artifact/signing-response roundtrip.
 

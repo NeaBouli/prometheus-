@@ -21,15 +21,18 @@ Goal:     All sprints 0-7 accepted. Post-Toccata deployment verification.
 Toccata-v1 covenant transaction assembly with exact contextual storage mass,
 external BIP340 digest-signature verification, exact live funding-UTXO checks
 during preflight and immediately before broadcast, hash-acknowledged broadcast,
-and exact covenant-UTXO observation without accepting private keys or raw
-transaction files. Twenty-four Rust unit/security tests include fixed public
-interoperability values and a file-based Python-request/Rust-operator handoff;
-warning-free clippy passes. The seven-contract release archive, Python preflight,
-request builder/verifier, operator procedure, and capability handoff pass locally.
-The public Python preflight reports `deploy_supported: true` through this operator;
-upstream `silverc` remains compile-only. Real testnet-10 funding/signatures,
-confirmed receipts, independent chain evidence, the metrics-oracle transaction,
-exact-commit release evidence, PR review, and remote CI remain rollout blockers.
+an exclusive crash-recovery journal, transaction-ID retry reconciliation,
+20-second per-request wRPC deadlines, and source-bound covenant-UTXO observation
+without accepting private keys or raw transaction files. Twenty-seven Rust
+unit/security tests include fixed public interoperability values, secret-field
+rejection, journal recovery, and a file-based Python-request/Rust-operator
+handoff; warning-free clippy passes. The seven-contract release archive, Python
+preflight, request builder/verifier, operator procedure, and capability handoff
+pass locally. The public Python preflight reports `deploy_supported: true`
+through this operator; upstream `silverc` remains compile-only. Real testnet-10
+funding/signatures, confirmed receipts, independent chain evidence, the
+metrics-oracle transaction, exact-commit release evidence, and PR #5 follow-up
+CI remain rollout blockers.
 
 ---
 
@@ -53,7 +56,7 @@ exact-commit release evidence, PR review, and remote CI remain rollout blockers.
 | **SPRINT 0 – SETUP**         |                 |          |             |              |                 |
 | Testnet-10-Node              | DONE            | 100%     | 2026-03-21  | -            | wrpc://127.0.0.1:17210 |
 | Silverscript tooling (silverc/ssc) | IN_PROGRESS | 99%      | 2026-07-15  | -            | Upstream `silverc` builds/tests in CI; H-001 fixture verifies; ValidatorStaking state fixture compiles; `commitVote`, `revealVote`, `slashInvalidReveal`, `requestWithdraw`, `completeWithdraw`, and signed-int deployment-bound runtime tests pass; GuardianReputationState compile/ABI/runtime/formula gates pass; RuleStorageState, CommunityDonationsState, DevIncentivePoolState, and GovernanceAutoTuningState compile/ABI/runtime gates pass locally; all 7 current-Silverc fixtures compile through the CLI artifact smoke locally and in CI; deterministic release manifest/archive, deploy preflight, operator runbook, external deploy request set/verifier, public deploy operator procedure, public orchestrator-result receipt import with raw-transaction rejection, deployment receipt verifier, public receipt-evidence verifier, deployment status staging guard, operator handoff package, release-readiness audit, public metrics-oracle report preflight, unsigned metrics-oracle tx-request builder, external oracle operator procedure, public external-operator capability verifier, public oracle tx-result verifier, public oracle tx-evidence verifier, public oracle status-draft staging, and public release-hardening evidence verification pass; upstream `silverc` remains compile-only while the repository Toccata-v1 operator supplies the keyless network path |
-| prometheus-silverc-deployer | IN_PROGRESS | 98% | 2026-07-15 | LOCAL PASS | Exact v1 contextual storage mass, compute budget 10, covenant ID, live funding-UTXO preflight/revalidation, external signature verification, fee caps, acknowledged broadcast, and observation implemented; 24 tests, clippy, deterministic vector, public-file handoff, seven-contract Python integration, and capability handoff pass; PR/remote CI and real testnet-10 evidence pending |
+| prometheus-silverc-deployer | IN_PROGRESS | 99% | 2026-07-15 | LOCAL PASS | Exact v1 contextual storage mass, compute budget 10, covenant ID, live funding-UTXO preflight/revalidation, external signature verification, fee caps, exclusive intent journal, retry reconciliation, RPC deadlines, and source-bound observation implemented; 27 tests, clippy, deterministic vector, journal recovery, public-file handoff, seven-contract Python integration, and capability handoff pass; PR #5 follow-up CI and real testnet-10 evidence pending |
 | Hello-World Contract         | PENDING         | 0%       | 2026-03-21  | -            | Deployment nach ssc-Release |
 | GitHub Actions CI/CD         | ACCEPTED        | 100%     | 2026-07-12  | ACCEPTED     | Prometheus CI, Security Audit, and Pages green for `40bb9a0`; live GitHub Pages `whitepaper.html` contains public release-hardening evidence wording; current-Silverc runtime, release-bundle manifest/archive, deploy preflight, operator runbook, external deploy request set/verifier, public deploy operator procedure, public orchestrator-result receipt import with raw-transaction rejection, deployment receipt verifier, public receipt-evidence verifier, deployment status staging guard, operator handoff package, release-readiness audit, metrics-oracle report preflight, unsigned oracle tx-request, external oracle operator procedure, public external-operator capability verifier, public oracle tx-result, public oracle tx-evidence, public oracle status-draft staging, public release-hardening evidence verification, and Autodidactic regression gates are CI-verified; workflow actions use Node 24-compatible majors |
 | Sprint-1 Pre-Check           | ACCEPTED        | 100%     | 2026-03-21  | ACCEPTED     | V-001, V-002, V-003 alle genehmigt |

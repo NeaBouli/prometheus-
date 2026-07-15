@@ -207,6 +207,12 @@ jobs:
           grep -q -- '--signing-request-out' /tmp/prometheus-silverc-deployer-help.txt
           grep -q -- '--signature-response' /tmp/prometheus-silverc-deployer-help.txt
           grep -q -- '--acknowledge-signing-request-sha256' /tmp/prometheus-silverc-deployer-help.txt
+          "$operator" observe --help > /tmp/prometheus-silverc-deployer-observe-help.txt
+          grep -q -- '--request' /tmp/prometheus-silverc-deployer-observe-help.txt
+          grep -q -- '--artifact' /tmp/prometheus-silverc-deployer-observe-help.txt
+          grep -q -- '--funding' /tmp/prometheus-silverc-deployer-observe-help.txt
+          grep -q -- '--signing-request' /tmp/prometheus-silverc-deployer-observe-help.txt
+          grep -q -- '--signature-response' /tmp/prometheus-silverc-deployer-observe-help.txt
           if grep -Eiq -- '--(private-key|seed|mnemonic|password|wallet|keystore|raw-transaction|signed-transaction)' /tmp/prometheus-silverc-deployer-help.txt; then
             echo "ERROR: Silverc deployer CLI exposes forbidden signing or secret input"
             exit 1
@@ -277,7 +283,8 @@ jobs:
           assert summary["status"] == "REQUESTS_READY_FOR_KEYLESS_GENESIS_OPERATOR"
           assert summary["request_count"] == 7
           assert len(summary["request_set_sha256"]) == 64
-          assert "real funded UTXO, external Schnorr signature, and public chain evidence are required" in summary["blockers"]
+          assert "real funded UTXO, external Schnorr signer response, and public chain evidence are required before repository broadcast" in summary["blockers"]
+          assert summary["safety_scope"] == "deploy_request_builder_only"
           assert summary["safety"]["accepts_private_keys"] is False
           assert summary["safety"]["signs_transactions"] is False
           assert summary["safety"]["assembles_chain_transaction"] is False
@@ -288,8 +295,9 @@ jobs:
           assert first["contract"]["name"] == "ValidatorStakingH001"
           assert len(first["request_sha256"]) == 64
           assert first["safety"]["deploys_contracts"] is False
+          assert first["safety_scope"] == "deploy_request_builder_only"
           assert "repository keyless genesis operator" in runbook
-          assert "does not accept private keys" in runbook
+          assert "request-builder artifacts do not accept private keys" in runbook
 
           proc = subprocess.run(
               [
@@ -345,6 +353,7 @@ jobs:
           assert summary["safety"]["broadcasts_transactions"] is False
           assert summary["safety"]["deploys_contracts"] is False
           assert summary["safety"]["updates_status_files"] is False
+          assert summary["safety_scope"] == "deploy_request_builder_only"
           assert "does not accept private keys" in runbook
 
           with tempfile.TemporaryDirectory(prefix="prometheus-request-verify-negative.") as tmp:
@@ -369,6 +378,32 @@ jobs:
               )
               assert proc.returncode != 0
               assert "request_set_sha256 mismatch" in proc.stderr
+
+              bad_scope_set = tmp / "bad-scope-request-set.json"
+              request_set = json.loads(Path("/tmp/prometheus-silverc-deploy-request-set.json").read_text())
+              request_set["safety_scope"] = "repository_operator"
+              clone = dict(request_set)
+              clone.pop("request_set_sha256", None)
+              request_set["request_set_sha256"] = hashlib.sha256(
+                  json.dumps(clone, sort_keys=True, separators=(",", ":")).encode()
+              ).hexdigest()
+              bad_scope_set.write_text(json.dumps(request_set, indent=2, sort_keys=True) + "\n")
+              proc = subprocess.run(
+                  [
+                      "python3",
+                      "scripts/verify_silverc_deploy_requests.py",
+                      "--archive",
+                      "/tmp/prometheus-silverc-artifacts.tar.gz",
+                      "--request-set",
+                      str(bad_scope_set),
+                      "--requests-dir",
+                      "/tmp/prometheus-silverc-deploy-requests",
+                  ],
+                  text=True,
+                  capture_output=True,
+              )
+              assert proc.returncode != 0
+              assert "safety_scope" in proc.stderr
 
               bad_dir = tmp / "bad-requests"
               shutil.copytree("/tmp/prometheus-silverc-deploy-requests", bad_dir)

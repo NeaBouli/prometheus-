@@ -20,6 +20,10 @@ REQUEST_STATUS = "READY_FOR_KEYLESS_GENESIS_OPERATOR"
 REQUEST_TYPE = "prometheus_silverc_deploy_request"
 SECRET_LIKE_RE = re.compile(r"(private|secret|seed|mnemonic|password|passwd|wallet|keystore|token)", re.IGNORECASE)
 ALLOWED_SECRET_WORD_KEYS = {"accepts_private_keys"}
+REQUEST_BLOCKER = (
+    "real funded UTXO, external Schnorr signer response, and public chain evidence are required before repository broadcast"
+)
+REQUEST_SAFETY_SCOPE = "deploy_request_builder_only"
 
 
 def parse_args() -> argparse.Namespace:
@@ -102,6 +106,12 @@ def require_false_flags(data: dict[str, Any], path: str) -> None:
     for key in expected:
         if data[key] is not False:
             raise ValueError(f"{path}.{key}: expected false")
+
+
+def require_safety_scope(data: dict[str, Any], path: str) -> None:
+    value = data.get("safety_scope")
+    if value != REQUEST_SAFETY_SCOPE:
+        raise ValueError(f"{path}.safety_scope: expected {REQUEST_SAFETY_SCOPE!r}")
 
 
 def hash_without_key(data: dict[str, Any], key: str) -> str:
@@ -188,6 +198,7 @@ def validate_request_file(
         raise ValueError(f"{path.name}: request_type mismatch")
     if request.get("status") != REQUEST_STATUS:
         raise ValueError(f"{path.name}: status mismatch")
+    require_safety_scope(request, path.name)
     for key in ("network", "rpc_url", "deployer_address", "metrics_oracle_pubkey"):
         if request.get(key) != request_set[key]:
             raise ValueError(f"{path.name}: {key} mismatch")
@@ -243,11 +254,12 @@ def validate_request_set(
     if request_set.get("request_count") != manifest["fixture_count"]:
         raise ValueError("request_count mismatch")
     expected_blocker = (
-        "real funded UTXO, external Schnorr signature, and public chain evidence are required"
+        REQUEST_BLOCKER
     )
     if expected_blocker not in request_set.get("blockers", []):
         raise ValueError("blockers: expected real funding, signer, and chain evidence requirement")
     require_false_flags(require_dict(request_set.get("safety"), "$.safety"), "$.safety")
+    require_safety_scope(require_dict(request_set, "request_set"), "request_set")
 
     request_entries = require_list(request_set.get("requests"), "requests")
     manifest_entries = manifest["fixtures"]
@@ -290,7 +302,7 @@ def validate_request_set(
         "request_set_sha256": request_set["request_set_sha256"],
         "requests": verified,
         "blockers": [
-            "real funding, external Schnorr signer response, and public chain evidence are required"
+            REQUEST_BLOCKER,
         ],
         "safety": {
             "accepts_private_keys": False,
@@ -300,6 +312,7 @@ def validate_request_set(
             "deploys_contracts": False,
             "updates_status_files": False,
         },
+        "safety_scope": REQUEST_SAFETY_SCOPE,
     }
 
 
