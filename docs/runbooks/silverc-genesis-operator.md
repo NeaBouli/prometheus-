@@ -22,6 +22,10 @@ genesis profile is:
 - contract script: official `pay_to_script_hash_script(compiled_script)`
 - covenant ID: official funding-outpoint plus unbound contract-output derivation
 - covenant binding: applied only after covenant-ID derivation
+- schnorr signature script form: finalized 66-byte operator script
+- Signing request fields: `compute_mass`, `transient_mass`, `normalized_non_contextual_mass`,
+  `normalized_overall_mass`, `pinned_fee_rate_sompi_per_kg`, `minimum_relay_fee_sompi`,
+  `minimum_operator_fee_sompi`
 
 ## Supported Networks
 
@@ -124,7 +128,8 @@ live UTXO validation immediately before broadcast remain mandatory.
 
 Create the funding specification outside the repository. It contains public
 chain data only and must match one deploy request and the deployer's Schnorr P2PK
-address. Both minimum and maximum fee bounds are mandatory.
+address. Both minimum and maximum fee bounds are mandatory. This is a
+testnet-canary template and is mass-aware by design.
 
 ```json
 {
@@ -138,7 +143,7 @@ address. Both minimum and maximum fee bounds are mandatory.
     "index": 0
   },
   "funding_utxo": {
-    "amount": 100000,
+    "amount": 100100000000,
     "script_public_key": {
       "version": 0,
       "script_hex": "<public funding script hex>"
@@ -146,11 +151,11 @@ address. Both minimum and maximum fee bounds are mandatory.
     "block_daa_score": 467579700,
     "is_coinbase": false
   },
-  "genesis_output_value": 80000,
-  "minimum_fee_sompi": 1000,
-  "maximum_fee_sompi": 3000,
+  "genesis_output_value": 1000000000,
+  "minimum_fee_sompi": 400000,
+  "maximum_fee_sompi": 1000000,
   "change_output": {
-    "value": 18000,
+    "value": 99099500000,
     "script_public_key": {
       "version": 0,
       "script_hex": "<same deployer P2PK script hex>"
@@ -167,8 +172,18 @@ outpoint mismatch, credentialed RPC URLs, and unsupported network profiles fail
 closed.
 
 The signing request binds and validates all funding context returned by the live
-node, including `block_daa_score`, `is_coinbase = false`, and both
-`minimum_fee_sompi` / `maximum_fee_sompi`.
+node, including `block_daa_score`, `is_coinbase = false`, both
+`minimum_fee_sompi` / `maximum_fee_sompi`, and mass-aware relay constraints:
+`compute_mass`, `transient_mass`, `normalized_non_contextual_mass`,
+`normalized_overall_mass`, `pinned_fee_rate_sompi_per_kg`,
+`minimum_relay_fee_sompi`, and `minimum_operator_fee_sompi`.
+The signing request uses schema version `2`; pre-hardening schema-v1 signing
+requests must be discarded and rebuilt rather than migrated or signed.
+
+`rusty-kaspa` v2.0.1 relay floor is based on **normalized non-contextual mass**.
+Prometheus enforces the same baseline conservatively on **normalized overall mass**
+including storage, so miner relay prioritization stays comparable under testnet
+mass changes.
 
 ## Operator Flow
 
@@ -278,7 +293,7 @@ checks outpoint, amount, covenant ID, contract script, and DAA depth. The
 existing public receipt-evidence flow still requires independent explorer/block
 evidence before rollout status can become ready.
 
-The local suite contains 32 unit/security tests. It includes fixed public
+The local suite contains 35 unit/security tests. It includes fixed public
 transaction ID, covenant ID, sighash, signing-request hash, and storage-mass
 values, resolver fail-closed coverage, plus a file-based
 deploy-request/artifact/signing-response roundtrip and closed H-001 canary

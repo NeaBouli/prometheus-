@@ -646,5 +646,20 @@ confirmation, receipt, and independent deployment evidence remain mandatory.
 No private wallet data or raw signed transaction entered the repository or
 GitHub. Canary evidence remains non-promotable to full or metrics readiness.
 
+**AUDIT UPDATE 2026-07-16:** The first real funding-bound GH-9 dry run found a
+pre-sign reliability defect in the old operator example: an `80000`-sompi
+covenant output produced `storage_mass=50000000`, while the operator enforced
+only caller-provided absolute fee bounds. GH-17 now calculates the final
+66-byte Schnorr signature-script shape, binds compute/transient/storage and
+normalized non-contextual/overall mass into signing-request schema v2, mirrors
+the pinned rusty-kaspa v2.0.1 `100000` sompi/kg relay baseline, and applies the
+same rate conservatively to overall mass for miner prioritization. Rehashed
+fee/mass tampering, unknown schema fields, and below-floor funding fail before
+digest export. The signature integration test also recomputes the final signed
+shape and matches every bound mass and fee floor. A 10-TKAS/500000-sompi live
+candidate preflight passes all derived floors and 35 focused tests. The
+candidate is intentionally non-authoritative until merge and
+exact-main CI; no signature or broadcast occurred.
+
 *Audit completed 2026-04-02 by Claude Code (5 parallel agents, 7 levels, 35 checks).*
 *The fire belongs to humanity.*

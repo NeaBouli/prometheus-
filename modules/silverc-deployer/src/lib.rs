@@ -19,7 +19,7 @@ use kaspa_consensus_core::hashing::sighash::{
     calc_schnorr_signature_hash, SigHashReusedValuesUnsync,
 };
 use kaspa_consensus_core::hashing::sighash_type::SIG_HASH_ALL;
-use kaspa_consensus_core::mass::MassCalculator;
+use kaspa_consensus_core::mass::{ContextualMasses, Mass, MassCalculator, NonContextualMasses};
 use kaspa_consensus_core::network::{NetworkId, NetworkType};
 use kaspa_consensus_core::subnets::SUBNETWORK_ID_NATIVE;
 use kaspa_consensus_core::tx::{
@@ -40,6 +40,9 @@ pub const TRANSACTION_VERSION: u16 = 1;
 pub const FUNDING_COMPUTE_BUDGET: u16 = 10;
 pub const CONTRACT_OUTPUT_INDEX: u32 = 0;
 pub const FUNDING_INPUT_INDEX: u16 = 0;
+pub const SIGNING_REQUEST_SCHEMA_VERSION: u32 = 2;
+// Matches the post-Toccata default in the pinned rusty-kaspa v2.0.1 mempool.
+pub const PINNED_FEE_RATE_SOMPI_PER_KG: u64 = 100_000;
 pub const SIGNING_REQUEST_KIND: &str = "prometheus.silverc.genesis.signing_request";
 pub const SIGNATURE_RESPONSE_KIND: &str = "prometheus.silverc.genesis.signature_response";
 pub const PUBLIC_TESTNET_RESOLVER: &str = "kaspa-resolver://public";
@@ -193,6 +196,7 @@ pub struct SilvercArtifact {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct SigningRequest {
     pub schema_version: u32,
     pub kind: String,
@@ -216,7 +220,14 @@ pub struct SigningRequest {
     pub transaction_version: u16,
     pub compute_budget: u16,
     pub toccata_activation_daa_score: u64,
+    pub compute_mass: u64,
+    pub transient_mass: u64,
     pub storage_mass: u64,
+    pub normalized_non_contextual_mass: u64,
+    pub normalized_overall_mass: u64,
+    pub pinned_fee_rate_sompi_per_kg: u64,
+    pub minimum_relay_fee_sompi: u64,
+    pub minimum_operator_fee_sompi: u64,
     pub authorizing_input: u16,
     pub contract_output_index: u32,
     pub unsigned_transaction_id: String,
@@ -769,7 +780,7 @@ fn signing_request_hash(request: &SigningRequest) -> Result<String> {
 }
 
 pub fn validate_signing_request(request: &SigningRequest) -> Result<()> {
-    if request.schema_version != 1
+    if request.schema_version != SIGNING_REQUEST_SCHEMA_VERSION
         || request.kind != SIGNING_REQUEST_KIND
         || request.status != "READY_FOR_EXTERNAL_SCHNORR_SIGNATURE"
     {
@@ -800,6 +811,20 @@ pub fn validate_signing_request(request: &SigningRequest) -> Result<()> {
     }
     if request.toccata_activation_daa_score != params.toccata_activation.daa_score() {
         bail!("signing request Toccata activation does not match consensus parameters");
+    }
+    let fee_mass = fee_mass_profile(
+        request.compute_mass,
+        request.transient_mass,
+        request.storage_mass,
+        &params,
+    )?;
+    if request.normalized_non_contextual_mass != fee_mass.normalized_non_contextual_mass
+        || request.normalized_overall_mass != fee_mass.normalized_overall_mass
+        || request.pinned_fee_rate_sompi_per_kg != PINNED_FEE_RATE_SOMPI_PER_KG
+        || request.minimum_relay_fee_sompi != fee_mass.minimum_relay_fee_sompi
+        || request.minimum_operator_fee_sompi != fee_mass.minimum_operator_fee_sompi
+    {
+        bail!("signing request fee/mass profile mismatch");
     }
     let (deployer_address, _) = deployer_address_and_funding_script(
         &request.deployer_address,
@@ -856,6 +881,7 @@ pub fn validate_signing_request(request: &SigningRequest) -> Result<()> {
         || request.maximum_fee_sompi < request.minimum_fee_sompi
         || fee < request.minimum_fee_sompi
         || fee > request.maximum_fee_sompi
+        || fee < request.minimum_operator_fee_sompi
     {
         bail!("signing request value/fee profile mismatch");
     }
@@ -890,6 +916,67 @@ fn expected_storage_mass(transaction: &SignableTransaction, params: &Params) -> 
         .calc_contextual_masses(&transaction.as_verifiable())
         .map(|mass| mass.storage_mass)
         .ok_or_else(|| anyhow!("transaction storage mass is incomputable"))
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+struct FeeMassProfile {
+    compute_mass: u64,
+    transient_mass: u64,
+    normalized_non_contextual_mass: u64,
+    normalized_overall_mass: u64,
+    minimum_relay_fee_sompi: u64,
+    minimum_operator_fee_sompi: u64,
+}
+
+fn minimum_fee_for_mass(mass: u64) -> Result<u64> {
+    let mut fee = mass
+        .checked_mul(PINNED_FEE_RATE_SOMPI_PER_KG)
+        .ok_or_else(|| anyhow!("fee/mass multiplication overflow"))?
+        / 1_000;
+    if fee == 0 {
+        fee = PINNED_FEE_RATE_SOMPI_PER_KG;
+    }
+    Ok(fee)
+}
+
+fn fee_mass_profile(
+    compute_mass: u64,
+    transient_mass: u64,
+    storage_mass: u64,
+    params: &Params,
+) -> Result<FeeMassProfile> {
+    let non_contextual = NonContextualMasses::new(compute_mass, transient_mass);
+    let cofactors = params.mempool_block_mass_cofactors().raw_post();
+    let normalized_non_contextual_mass = non_contextual.normalized_max(&cofactors);
+    let normalized_overall_mass =
+        Mass::new(non_contextual, ContextualMasses::new(storage_mass)).normalized_max(&cofactors);
+    Ok(FeeMassProfile {
+        compute_mass,
+        transient_mass,
+        normalized_non_contextual_mass,
+        normalized_overall_mass,
+        minimum_relay_fee_sompi: minimum_fee_for_mass(normalized_non_contextual_mass)?,
+        minimum_operator_fee_sompi: minimum_fee_for_mass(normalized_overall_mass)?,
+    })
+}
+
+fn expected_fee_mass_profile(
+    transaction: &SignableTransaction,
+    params: &Params,
+) -> Result<FeeMassProfile> {
+    if transaction.tx.inputs.len() != 1 {
+        bail!("genesis transaction must contain exactly one funding input");
+    }
+    let mut signed_shape = transaction.tx.clone();
+    signed_shape.inputs[0].signature_script = vec![0; SCHNORR_SCRIPT_LEN];
+    let masses =
+        MassCalculator::new_with_consensus_params(params).calc_non_contextual_masses(&signed_shape);
+    fee_mass_profile(
+        masses.compute_mass,
+        masses.transient_mass,
+        transaction.tx.storage_mass(),
+        params,
+    )
 }
 
 pub fn prepare_genesis(
@@ -1007,6 +1094,14 @@ pub fn prepare_genesis(
     let transaction = SignableTransaction::with_entries(tx, vec![funding_utxo]);
     let storage_mass = expected_storage_mass(&transaction, &params)?;
     transaction.tx.set_storage_mass(storage_mass);
+    let fee_mass = expected_fee_mass_profile(&transaction, &params)?;
+    if fee_sompi < fee_mass.minimum_operator_fee_sompi {
+        bail!(
+            "implicit transaction fee is below pinned operator fee/mass floor: {} < {}",
+            fee_sompi,
+            fee_mass.minimum_operator_fee_sompi
+        );
+    }
     let unsigned_transaction_id = transaction.tx.id().to_string();
     let sighash = calc_schnorr_signature_hash(
         &transaction.as_verifiable(),
@@ -1018,7 +1113,7 @@ pub fn prepare_genesis(
         extract_script_pub_key_address(&contract_script_public_key, Prefix::from(network_id))?;
 
     let mut signing_request = SigningRequest {
-        schema_version: 1,
+        schema_version: SIGNING_REQUEST_SCHEMA_VERSION,
         kind: SIGNING_REQUEST_KIND.to_string(),
         status: "READY_FOR_EXTERNAL_SCHNORR_SIGNATURE".to_string(),
         request_sha256: request.request_sha256.clone(),
@@ -1040,7 +1135,14 @@ pub fn prepare_genesis(
         transaction_version: TRANSACTION_VERSION,
         compute_budget: FUNDING_COMPUTE_BUDGET,
         toccata_activation_daa_score: params.toccata_activation.daa_score(),
+        compute_mass: fee_mass.compute_mass,
+        transient_mass: fee_mass.transient_mass,
         storage_mass,
+        normalized_non_contextual_mass: fee_mass.normalized_non_contextual_mass,
+        normalized_overall_mass: fee_mass.normalized_overall_mass,
+        pinned_fee_rate_sompi_per_kg: PINNED_FEE_RATE_SOMPI_PER_KG,
+        minimum_relay_fee_sompi: fee_mass.minimum_relay_fee_sompi,
+        minimum_operator_fee_sompi: fee_mass.minimum_operator_fee_sompi,
         authorizing_input: FUNDING_INPUT_INDEX,
         contract_output_index: CONTRACT_OUTPUT_INDEX,
         unsigned_transaction_id: unsigned_transaction_id.clone(),
@@ -1911,16 +2013,16 @@ mod tests {
                 index: 3,
             },
             funding_utxo: FundingUtxoSpec {
-                amount: 100_000,
+                amount: 2_000_000_000,
                 script_public_key: ScriptSpec::from_script_public_key(&funding_spk),
                 block_daa_score: 10,
                 is_coinbase: false,
             },
-            genesis_output_value: 80_000,
-            minimum_fee_sompi: 1_000,
-            maximum_fee_sompi: 3_000,
+            genesis_output_value: 1_000_000_000,
+            minimum_fee_sompi: 400_000,
+            maximum_fee_sompi: 1_000_000,
             change_output: Some(ChangeOutputSpec {
-                value: 18_000,
+                value: 999_500_000,
                 script_public_key: ScriptSpec::from_script_public_key(&funding_spk),
             }),
         };
@@ -1967,16 +2069,16 @@ mod tests {
                 index: 3,
             },
             funding_utxo: FundingUtxoSpec {
-                amount: 100_000,
+                amount: 2_000_000_000,
                 script_public_key: ScriptSpec::from_script_public_key(&funding_spk),
                 block_daa_score: 467_579_700,
                 is_coinbase: false,
             },
-            genesis_output_value: 80_000,
-            minimum_fee_sompi: 1_000,
-            maximum_fee_sompi: 3_000,
+            genesis_output_value: 1_000_000_000,
+            minimum_fee_sompi: 400_000,
+            maximum_fee_sompi: 1_000_000,
             change_output: Some(ChangeOutputSpec {
-                value: 18_000,
+                value: 999_500_000,
                 script_public_key: ScriptSpec::from_script_public_key(&funding_spk),
             }),
         };
@@ -2034,7 +2136,19 @@ mod tests {
         assert_eq!(prepared.signing_request.compute_budget, 10);
         assert_eq!(prepared.signing_request.authorizing_input, 0);
         assert_eq!(prepared.signing_request.contract_output_index, 0);
-        assert_eq!(prepared.signing_request.fee_sompi, 2_000);
+        assert_eq!(prepared.signing_request.fee_sompi, 500_000);
+        assert_eq!(
+            prepared.signing_request.pinned_fee_rate_sompi_per_kg,
+            PINNED_FEE_RATE_SOMPI_PER_KG
+        );
+        assert!(
+            prepared.signing_request.minimum_operator_fee_sompi
+                >= prepared.signing_request.minimum_relay_fee_sompi
+        );
+        assert!(
+            prepared.signing_request.fee_sompi
+                >= prepared.signing_request.minimum_operator_fee_sompi
+        );
         assert_eq!(
             prepared.transaction.tx.inputs[0]
                 .compute_commit
@@ -2061,21 +2175,30 @@ mod tests {
         let prepared = prepare_genesis(&request, &artifact, &funding).unwrap();
         assert_eq!(
             prepared.signing_request.unsigned_transaction_id,
-            "fd07b8003c95aa36ed49f5dff112364a85575fe9416983dedd5d68822a3f2a4e"
+            "ed712e28099236861820dda3b9fa251bad57e7f343fff9e38f687d3304d5badc"
         );
         assert_eq!(
             prepared.signing_request.covenant_id,
-            "f9f4da7d12907c13258922f4356cea9f4b2c796d7699221424ca41e565f7d506"
+            "3a81b23246d64864e295fb5aa5e1cc36d45711fd402a602fb7ef765ec8d21b8a"
         );
         assert_eq!(
             prepared.signing_request.sighash_hex,
-            "d157a37034df308150a88d66dd1fbd91f7f6a0fbb6d256842400c8215bf9d15b"
+            "84740c02b031ffee442514a59f5641d448fdd620a3f354a773756979070ea9c2"
         );
         assert_eq!(
             prepared.signing_request.signing_request_sha256,
-            "39871130d3566f55a28587f7cb57412651aa8263e13fcc682d2ee45869c59403"
+            "cc3eb54db55bcf5c96a6361c525f2679b16414577ba2ccbce17642b99ad1cc30"
         );
-        assert_eq!(prepared.signing_request.storage_mass, 95_555_555);
+        assert_eq!(prepared.signing_request.compute_mass, 2_083);
+        assert_eq!(prepared.signing_request.transient_mass, 1_412);
+        assert_eq!(prepared.signing_request.storage_mass, 4_500);
+        assert_eq!(
+            prepared.signing_request.normalized_non_contextual_mass,
+            2_083
+        );
+        assert_eq!(prepared.signing_request.normalized_overall_mass, 4_500);
+        assert_eq!(prepared.signing_request.minimum_relay_fee_sompi, 208_300);
+        assert_eq!(prepared.signing_request.minimum_operator_fee_sompi, 450_000);
     }
 
     #[test]
@@ -2096,6 +2219,34 @@ mod tests {
         assert_eq!(
             verified.verification.signature_validation,
             "bip340_schnorr_passed"
+        );
+        let params = consensus_params(NetworkId::from_str("testnet-10").unwrap()).unwrap();
+        let masses = MassCalculator::new_with_consensus_params(&params)
+            .calc_non_contextual_masses(&verified.transaction.tx);
+        let final_profile = fee_mass_profile(
+            masses.compute_mass,
+            masses.transient_mass,
+            verified.transaction.tx.storage_mass(),
+            &params,
+        )
+        .unwrap();
+        assert_eq!(final_profile.compute_mass, signing_request.compute_mass);
+        assert_eq!(final_profile.transient_mass, signing_request.transient_mass);
+        assert_eq!(
+            final_profile.normalized_non_contextual_mass,
+            signing_request.normalized_non_contextual_mass
+        );
+        assert_eq!(
+            final_profile.normalized_overall_mass,
+            signing_request.normalized_overall_mass
+        );
+        assert_eq!(
+            final_profile.minimum_relay_fee_sompi,
+            signing_request.minimum_relay_fee_sompi
+        );
+        assert_eq!(
+            final_profile.minimum_operator_fee_sompi,
+            signing_request.minimum_operator_fee_sompi
         );
     }
 
@@ -2138,6 +2289,34 @@ mod tests {
     }
 
     #[test]
+    fn rejects_unknown_signing_request_fields() {
+        let (request, artifact, funding, _) = fixture();
+        let signing_request = prepare_genesis(&request, &artifact, &funding)
+            .unwrap()
+            .signing_request;
+        let mut value = serde_json::to_value(signing_request).unwrap();
+        value
+            .as_object_mut()
+            .unwrap()
+            .insert("display_fee_sompi".to_string(), serde_json::json!(500_000));
+        let temp_dir = std::env::temp_dir().join(format!(
+            "prometheus-signing-request-unknown-field-{}-{}",
+            std::process::id(),
+            SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        fs::create_dir_all(&temp_dir).unwrap();
+        let path = temp_dir.join("signing-request.json");
+        write_public_json(&path, &value).unwrap();
+        let error = load_signing_request(&path)
+            .expect_err("unknown signing-request fields must fail closed");
+        assert!(error.to_string().contains("display_fee_sompi"));
+        fs::remove_dir_all(temp_dir).unwrap();
+    }
+
+    #[test]
     fn rejects_rehashed_signing_request_network_mismatch() {
         let (request, artifact, funding, _) = fixture();
         let mut signing_request = prepare_genesis(&request, &artifact, &funding)
@@ -2161,6 +2340,19 @@ mod tests {
         let error = validate_signing_request(&signing_request)
             .expect_err("self-consistent fee-cap violation must fail");
         assert!(error.to_string().contains("value/fee profile mismatch"));
+    }
+
+    #[test]
+    fn rejects_rehashed_signing_request_fee_mass_tamper() {
+        let (request, artifact, funding, _) = fixture();
+        let mut signing_request = prepare_genesis(&request, &artifact, &funding)
+            .unwrap()
+            .signing_request;
+        signing_request.normalized_overall_mass += 1;
+        signing_request.signing_request_sha256 = signing_request_hash(&signing_request).unwrap();
+        let error = validate_signing_request(&signing_request)
+            .expect_err("self-consistent fee/mass tamper must fail");
+        assert!(error.to_string().contains("fee/mass profile mismatch"));
     }
 
     #[test]
@@ -2229,7 +2421,7 @@ mod tests {
     #[test]
     fn rejects_underfunded_fee() {
         let (request, artifact, mut funding, _) = fixture();
-        funding.minimum_fee_sompi = 2_001;
+        funding.minimum_fee_sompi = 500_001;
         let error =
             prepare_genesis(&request, &artifact, &funding).expect_err("underfunded fee must fail");
         assert!(error.to_string().contains("below minimum_fee_sompi"));
@@ -2238,7 +2430,7 @@ mod tests {
     #[test]
     fn rejects_fee_above_operator_cap() {
         let (request, artifact, mut funding, _) = fixture();
-        funding.maximum_fee_sompi = 1_999;
+        funding.maximum_fee_sompi = 499_999;
         let error = prepare_genesis(&request, &artifact, &funding)
             .expect_err("fee above operator cap must fail");
         assert!(error.to_string().contains("exceeds maximum_fee_sompi"));
@@ -2247,13 +2439,26 @@ mod tests {
     #[test]
     fn rejects_inverted_fee_bounds() {
         let (request, artifact, mut funding, _) = fixture();
-        funding.minimum_fee_sompi = 3_001;
-        funding.maximum_fee_sompi = 3_000;
+        funding.minimum_fee_sompi = 1_000_001;
+        funding.maximum_fee_sompi = 1_000_000;
         let error = prepare_genesis(&request, &artifact, &funding)
             .expect_err("inverted fee bounds must fail");
         assert!(error
             .to_string()
             .contains("maximum_fee_sompi must not be below"));
+    }
+
+    #[test]
+    fn rejects_fee_below_pinned_mass_floor() {
+        let (request, artifact, mut funding, _) = fixture();
+        funding.minimum_fee_sompi = 1;
+        funding.change_output.as_mut().unwrap().value =
+            funding.funding_utxo.amount - funding.genesis_output_value - 1;
+        let error = prepare_genesis(&request, &artifact, &funding)
+            .expect_err("mass-underpriced transaction must fail before signing");
+        assert!(error
+            .to_string()
+            .contains("below pinned operator fee/mass floor"));
     }
 
     #[test]
