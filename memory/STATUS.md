@@ -46,7 +46,7 @@ requires a synced UTXO-indexed node above Toccata activation but does not inspec
 funding, sign, or broadcast. Local Rust tests increased from 27 to 30; clippy and
 Python RPC-target checks pass. A live probe on 2026-07-15 reached
 `rusty-kaspa 2.0.1`, confirmed `testnet-10`, sync, UTXO index, and virtual DAA
-above activation. PR and remote CI remain pending; real funding/signing/evidence
+above activation. Commit `3cea782` is in PR #8; remote CI/review remain pending. Real funding/signing/evidence
 gates are unchanged.
 
 ---

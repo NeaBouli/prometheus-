@@ -8,6 +8,7 @@
 - Added exact `kaspa-resolver://public` handling with mandatory TLS and testnet-10-only enforcement, standalone read-only `probe`, shared Python target validation, independent verifier checks, and CI artifact coverage. Resolver lookalikes, HTTP(S), credentials, queries, fragments, and unsupported networks fail closed.
 - Local 30-test Rust suite, workspace tests/clippy, Python compile/target checks, CI YAML parse, and checksum-verified Actionlint v1.7.12 pass. A real read-only probe confirmed `rusty-kaspa 2.0.1`, synced testnet-10, UTXO index, and DAA above Toccata activation. No funding, wallet, key, signature, or broadcast was used.
 - Final verification passed 135 workspace tests with two intentional live-test ignores, warning-free workspace Clippy, Memory Integrity, six Autodidactic tests, `git diff --check`, and a second read-only resolver probe at virtual DAA `517522160`. The seven-contract resolver request set independently verified with SHA-256 `f9b4838d116ff931ec5fd02ed3e119b1570b62c6836684e4d822c73166e82e2d`; an independent Terra review reported no remaining findings. Resolver availability remains best-effort and does not replace funded deployment or chain evidence.
+- Committed GH-7 as `3cea782` and opened PR https://github.com/NeaBouli/prometheus-/pull/8 linked to issue #7. Remote CI/review is pending; no admin bypass or direct-main push is used.
 
 ## 2026-07-15
 
