@@ -99,6 +99,14 @@ when ssc becomes available. Sprint 1 is NOT blocked — proceed with code writin
 and unit tests in Rust.
 ```
 
+**RESOLUTION UPDATE (2026-07-16):** The historical `ssc` name and implied
+compiler-side deploy command were incorrect. The project now pins upstream
+`silverc` commit `d25bd3427a093c17327ca3d6b9e1aa5f7688c863` for deterministic
+compilation and uses the repository-owned keyless Toccata-v1 operator for
+network preflight, transaction assembly, verification, journaled broadcast,
+and observation. Q-001 is resolved as a tooling blocker; external signatures,
+confirmed receipts/evidence, and remaining deployments are rollout gates.
+
 ### Q-002: float64 support verification not possible (2026-03-21)
 ```
 Context:  Sprint 0, Task 4 — float64 verification in ssc

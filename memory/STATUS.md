@@ -238,8 +238,8 @@ Repo current-Silverc release-readiness audit: `scripts/audit_silverc_release_rea
 Repo current-Silverc public release-hardening evidence verifier: `scripts/verify_release_hardening_evidence.py` validates a public snapshot of Prometheus CI, Security Audit, Pages deployment, protected-branch controls, rollback documentation, public Pages verification, and release-note requirements for the exact release commit. It rejects secret-like and raw/serialized transaction fields, does not query GitHub or change repository settings, and is wired into the operator handoff/readiness path as a remaining rollout gate.
 Signed-int boundary decision: current upstream Silverc entrypoint `int` values are deployable only in the nonnegative signed range `0..=i64::MAX`; Rust retains raw `u64` H-001 vectors for byte compatibility and uses `build_silverc_checked` / `validate_silverc_commitment_bounds` for deployment calls.
 Rusty-Kaspa workspace dependencies pinned to `v2.0.1`; `cargo audit` now reports no vulnerabilities, only allowed warnings.
-GitHub Security Audit workflow re-enabled and dependency audits now fail on findings instead of using `|| true`; after `c673766`, Dependency Audit was hardened with explicit job/step timeouts and split cargo-audit install/run steps, and green reruns passed through `a11545b`.
-Remote verification baseline: Prometheus CI `29454591518`, Security Audit `29454591555`, and Pages `29454590793` passed for exact main `205e1ca` on 2026-07-16 before the latest GH-9 handoff rebuild. Earlier GH-9 profile CI `29412667386`, Security Audit `29412667410`, and Pages `29412666483` passed for `6213c559`. The prior official SilverScript covenant-genesis capability baseline `9d74c0c` passed on 2026-07-12. The prior `40bb9a0` baseline passed after adding public release-hardening evidence verification; live GitHub Pages contains both release-hardening and genesis-capability wording. The prior `48a6743` baseline passed after adding public oracle tx-evidence verification. The prior `9a1ac59` baseline passed after recording the Autodidactic workflow-helper regression suite CI run. The prior `4816444` baseline passed after adding the Autodidactic workflow-helper regression suite to CI. The prior `ffbad55` baseline passed after the public receipt-evidence verifier documentation follow-up. The prior `4d7a6b8` baseline passed after adding public node/explorer deployment receipt-evidence verification. The prior `181cde2` baseline passed after adding raw/serialized transaction field rejection to public deploy-result import and deployment receipt verification. The prior `6cc000c` baseline passed after adding public external-operator capability verification. The prior `3d02326` baseline passed after adding public oracle status-draft staging. The prior `a86c1b5` baseline passed after adding the public deploy operator procedure gate for verified Silverc deploy request sets. The prior `442853f` baseline passed after public external oracle operator procedure coverage for signer-ready metrics tx requests. The prior `8bf6a14` baseline passed after public release-readiness audit coverage for generated handoff packages. The prior `fa719fc` baseline passed after public oracle tx-result verification, generated operator receipt verification/status staging, operator handoff import mode, and public result handoff mode; the interim `119fa89` CI failure was workflow-only missing `hashlib` import in the metrics-oracle tx-result fixture block and is fixed by `fa719fc`.
+GitHub Security Audit workflow re-enabled and dependency audits now fail on findings instead of using `|| true`; after `c673766`, Dependency Audit was hardened with explicit job/step timeouts and split cargo-audit install/run steps. GH-30 extends explicit job-level runtime bounds to every required CI/Security context and pins observed `cargo-audit 0.22.2`, `pip-audit 2.10.1`, Rust 1.95.0, and Python 3.11 component versions as the target baseline without renaming protected contexts. Combined PR/exact-main evidence for that new Security Audit environment is pending.
+Remote verification baseline: Prometheus CI `29456156122` attempt 2, Security Audit `29456155263` attempt 2, and Pages `29456154432` passed for exact operational main `3ba90a9` on 2026-07-16. The first CI/Security attempts were cancelled after remaining in progress in runtime/dependency paths and then passed unchanged on the same SHA. Exact public-status main `e9a970a` passed Prometheus CI `29455597727`, Security Audit `29455597677`, and Pages `29455597066`; live GitHub Pages exposes the `205e1ca` handoff and unchanged rollout gates. Earlier exact artifact baseline `205e1ca` passed Prometheus CI `29454591518`, Security Audit `29454591555`, and Pages `29454590793`. Earlier GH-9 profile CI `29412667386`, Security Audit `29412667410`, and Pages `29412666483` passed for `6213c559`. The prior official SilverScript covenant-genesis capability baseline `9d74c0c` passed on 2026-07-12. The prior `40bb9a0` baseline passed after adding public release-hardening evidence verification; live GitHub Pages contains both release-hardening and genesis-capability wording. The prior `48a6743` baseline passed after adding public oracle tx-evidence verification. The prior `9a1ac59` baseline passed after recording the Autodidactic workflow-helper regression suite CI run. The prior `4816444` baseline passed after adding the Autodidactic workflow-helper regression suite to CI. The prior `ffbad55` baseline passed after the public receipt-evidence verifier documentation follow-up. The prior `4d7a6b8` baseline passed after adding public node/explorer deployment receipt-evidence verification. The prior `181cde2` baseline passed after adding raw/serialized transaction field rejection to public deploy-result import and deployment receipt verification. The prior `6cc000c` baseline passed after adding public external-operator capability verification. The prior `3d02326` baseline passed after adding public oracle status-draft staging. The prior `a86c1b5` baseline passed after adding the public deploy operator procedure gate for verified Silverc deploy request sets. The prior `442853f` baseline passed after public external oracle operator procedure coverage for signer-ready metrics tx requests. The prior `8bf6a14` baseline passed after public release-readiness audit coverage for generated handoff packages. The prior `fa719fc` baseline passed after public oracle tx-result verification, generated operator receipt verification/status staging, operator handoff import mode, and public result handoff mode; the interim `119fa89` CI failure was workflow-only missing `hashlib` import in the metrics-oracle tx-result fixture block and is fixed by `fa719fc`.
 GitHub branch governance: `main` requires pull requests, strict up-to-date branches, linear history, resolved conversations, and nine successful CI/Security contexts. Admin enforcement is enabled; force pushes and deletion are disabled. Solo-maintainer mode uses zero formal approvals because only one collaborator exists and self-approval is impossible; raise the count to one when a second collaborator is added.
 Public docs refreshed by 2026-07-16: README, WHITEPAPER.md, whitepaper.html, docs/roadmap.md, roadmap.html, index.html, modules/contracts/silverc/README.md, and llms.txt state deployment-gated post-Toccata status, verified seven-contract runtime gates, the repository-owned keyless genesis execution boundary, public request/receipt/evidence/status guards, metrics-oracle and exact-commit release gates, target-only PROM-RULES asset orchestration, and no Kasplex dependency for Guardian reputation. Expired June-September launch promises are replaced by readiness gates.
 Rust client runtime gate added: `PROMETHEUS_RUNTIME=beta|mainnet|production|prod` rejects ZK/Phi-3/KRC-20/Fed-DART stubs; development mode remains testable.
@@ -248,7 +248,7 @@ Rollback tag: pre-session-20260413 → 6347b85
 
 ## BLOCKED
 
-Sprint 9 remains blocked until a real funded testnet-10 deployment, external Schnorr signatures, confirmed public `operator_record` receipts plus independent node/explorer evidence, a confirmed externally signed keyless metrics transition with successor evidence, and public release-hardening evidence for the exact rollout commit are proven. The repository keyless genesis and metrics-transition paths close the transaction assembly/broadcast tooling gaps; only GH-25 merge verification plus real execution/evidence gates remain.
+Sprint 9 remains blocked until the already funded H-001 request receives its explicitly approved external Schnorr signature, passes canonical import/full transaction verification, and is separately authorized for one-shot broadcast; confirmation, a public `operator_record` receipt, and independent node/explorer evidence must follow. Full rollout additionally requires the remaining contract deployments, a confirmed externally signed keyless metrics transition with successor evidence, and public release-hardening evidence for the exact rollout commit. GH-25 software/merge verification is complete; real execution/evidence gates remain.
 
 ## NEXT ACTIONS (for Claude Code)
 
@@ -256,7 +256,7 @@ Sprint 9 remains blocked until a real funded testnet-10 deployment, external Sch
 STARTFLOW — Read in this order:
 1. BACKLOG.md → Priorisierte Tasks mit Startflow
 2. memory/AUDIT.md (line 337+) → Pre-Hardfork Findings (H-001 open, H-002 fixed)
-3. memory/ERRORS.md → 12 known patterns
+3. memory/ERRORS.md → 13 known patterns
 
 Priority tasks:
 - Sprint 9: run the merged keyless operator against a real funded testnet-10 UTXO and collect confirmed public receipt plus independent node/explorer evidence records
@@ -269,13 +269,17 @@ Priority tasks:
 ## TESTNET CONTRACT ADDRESSES
 
 ```
-(to be filled after deployment)
-ValidatorStaking:    TBD
-GuardianReputation:  TBD
-GovernanceAutoTuning: current-Silverc state fixture compile/ABI/runtime gates pass
-DevIncentivePool:    current-Silverc state fixture compile/ABI/runtime gates pass
-CommunityDonations:  TBD
-RuleStorage:         TBD
+(to be filled only from confirmed operator receipts)
+ValidatorStaking H-001 canary: TBD
+ValidatorStaking:              TBD
+GuardianReputation:            TBD
+GovernanceAutoTuning:          TBD
+DevIncentivePool:              TBD
+CommunityDonations:            TBD
+RuleStorage:                   TBD
+
+All seven release fixtures pass their documented compile/ABI/runtime gates;
+those gates are readiness evidence and must not be presented as deployed addresses.
 ```
 
 ## MAINNET CONTRACT ADDRESSES (post-verification)

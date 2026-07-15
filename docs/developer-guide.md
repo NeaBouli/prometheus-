@@ -83,7 +83,7 @@ PYTHONPATH=. pytest tests/ -v
 
 All 15 Architecture Decisions are documented in `memory/MEMO.md`. The most important for developers:
 
-1. **KAS = staking, PROM = reputation** — Never mix these in contracts
+1. **KAS = validator staking, PROM = earned-only reward/governance** — Canonical Guardian reputation is separate Kaspa L1 state; never mix these fields in contracts
 2. **No emergency stop** — The protocol cannot be paused by anyone
 3. **uint64 with 10000x scaling** — No float64 in on-chain contracts
 4. **tokio::sync::Mutex** — Never use std::sync::Mutex in async Rust code

@@ -14,6 +14,7 @@ jobs:
   memory-check:
     name: Memory Integrity
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v6
@@ -28,6 +29,7 @@ jobs:
   contract-check:
     name: Silverscript Contracts
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v7
       - name: Verify KAS/PROM separation (PATTERN-001)
@@ -188,6 +190,7 @@ jobs:
   h001-silverc-runtime:
     name: Current Silverc Runtime + Artifact Smoke
     runs-on: ubuntu-latest
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v7
       - uses: dtolnay/rust-toolchain@1.95.0
@@ -2381,6 +2384,7 @@ jobs:
   rust-check:
     name: Rust Workspace
     runs-on: ubuntu-latest
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@v7
       - uses: dtolnay/rust-toolchain@1.95.0
@@ -2399,6 +2403,7 @@ jobs:
   python-check:
     name: Python Guardian
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v6
@@ -2417,6 +2422,7 @@ jobs:
   pages-check:
     name: HTML Pages
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v7
       - name: Verify key pages exist

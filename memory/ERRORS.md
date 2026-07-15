@@ -2,7 +2,7 @@
 # Known errors and their solutions. Claude Code reads this before every action.
 # Format: | Date | Module | Error | Solution | Status |
 # Status: OPEN | RESOLVED | PATTERN (recurring pattern)
-# Last Updated: 2026-03-22
+# Last Updated: 2026-07-16
 
 ---
 
@@ -19,13 +19,17 @@ Solution: ALWAYS use MIN_STAKE_KAS (KAS) for validators
 Check:    Before every Silverscript commit: grep -n "MIN_STAKE" to verify
 ```
 
-### PATTERN-002: Silverscript Compilation Error
+### PATTERN-002: Obsolete Silverscript Compiler Invocation
 ```
-Problem:  ssc compile without --testnet flag on testnet contracts
-Symptom:  Contract deployed but incompatible with Testnet-10
-Solution: Testnet: ssc compile --testnet --network testnet-10
-          Mainnet: ssc compile (no flag)
-Check:    Always verify network flag
+Problem:  Historical docs invoke the nonexistent pre-Toccata `ssc` CLI or
+          assume a compiler command also performs network deployment.
+Symptom:  Builds cannot be reproduced, or compilation is mistaken for a
+          funded/signature-backed covenant transaction.
+Solution: Build through the pinned upstream `silverc` compiler using
+          `scripts/smoke_silverc_artifacts.py`; use the repository keyless
+          operator for testnet-10 preflight/assembly/verification/broadcast.
+Check:    Verify the pinned Silverc commit, release-manifest hashes, closed
+          deployment profile, exact network target, and external signature gate.
 ```
 
 ### PATTERN-003: Rust Borrow-Checker in async
@@ -140,7 +144,7 @@ Check:    Reject unknown/changed profiles, rehashed profile tampering, oracle
 
 | Date | Module | Error | Solution | Status |
 |------|--------|-------|----------|--------|
-| 2026-03-21 | Sprint 0 / ssc | CRITICAL: `ssc` (Silverscript Compiler) does not exist in rusty-kaspa repo. No "ssc" package in workspace. Silverscript is not a production tool in the Kaspa ecosystem (as of March 2026). | BLOCKED — Core Dev must clarify: (a) Write own compiler, (b) KRC-20/WASM contracts as alternative, (c) Kaspa community fork with ssc. See AUDIT.md QUESTION FOR CLAUDE. | OPEN |
+| 2026-03-21 | Sprint 0 / ssc | CRITICAL: `ssc` did not exist in the audited rusty-kaspa workspace, so the original compile/deploy instructions were invalid. | Resolved after Toccata with pinned upstream `silverc` commit `d25bd3427a093c17327ca3d6b9e1aa5f7688c863`, deterministic seven-fixture release gates, and the repository-owned keyless testnet-10 covenant operator. Real signatures and chain evidence remain separate rollout gates, not a compiler blocker. | RESOLVED |
 | 2026-03-21 | Sprint 0 / Testnet | MEDIUM: Testnet-12 does not exist in rusty-kaspa v1.1.0. Only Testnet-10 (netsuffix=10) is supported. Panic in params.rs:519. | Testnet-10 used instead. All references in MEMO.md and contracts changed to Testnet-10. | RESOLVED |
 | 2026-03-21 | Sprint 0 / kaspad | LOW: `--netsuffix 12` syntax error. kaspad expects `--netsuffix=12` (equals sign). | Correct syntax: `--netsuffix=10` with equals sign. | RESOLVED |
 
