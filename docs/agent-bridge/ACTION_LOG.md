@@ -433,3 +433,12 @@ Rules for all dev agents:
 - Live `whitepaper.html` was fetched successfully and contains the merged `reportMetrics`, fee-sponsor, BIP340, keyless, and Kaspa-L1 wording.
 - GH-25 software, documentation, and CI are accepted. Real predecessor/sponsor UTXOs, two external signatures, acknowledged broadcast, confirmation, successor evidence, and exact-rollout release evidence remain operational gates.
 - No wallet file, private key, secret, signature, raw transaction, or broadcast was accessed or produced. Foreign untracked `Prometheus-1.png` remained untouched and uninspected.
+
+## 2026-07-16 GH-9 exact-main H-001 handoff rebuild
+
+- Rebuilt all seven deterministic Silverc artifacts, the closed one-request H-001 canary set, verification, procedure, and funding-bound schema-v2 request from clean exact main `205e1ca928d3048109575cf7a21810c9e6609120`.
+- Exact-main Prometheus CI `29454591518`, Security Audit `29454591555`, and Pages `29454590793` passed before the rebuild.
+- Live read-only preflight revalidated public outpoint `24e81339f3656689643ca86e3c53c4c5336e4273bb127d25bdaf328e5da241c7:0` as unspent/non-coinbase through a synced, UTXO-indexed `rusty-kaspa 2.0.1` node at DAA `517950805`, above Toccata activation.
+- Two prepare runs were byte-identical to each other and the prior `9477fab` request. Signing-request hash remains `6b8e65065ca5ae2ca561ddd3fcb9659c384496fd31db32c137fcc9d811fa5323`; sighash remains `174ccbe80d1d37e62d2bbabfbfba48245372df2bcf9e6724ac79ebc16b4e0bcd`.
+- Preserved the public handoff outside Git at `/Users/gio/Desktop/repos/prometheus-handoffs/205e1ca` with 0700 directories and 0600 files. Full-directory Gitleaks v8.30.1 scanned about 1.27 MB and found no leaks.
+- No wallet file, private key, secret, signature, raw transaction, or broadcast was accessed or produced. The next gate is an explicitly approved external BIP340 signature response, not repository-side signing.
