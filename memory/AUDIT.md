@@ -771,6 +771,13 @@ passes 96 tests with three intentional live-model skips, Black, CI-scope Pylint
 9.87/10, focused Pylint 10.00/10, and the Rust workspace regression. Trusted
 membership, signed P2P votes, replay/Sybil resistance, and on-chain ensemble
 attestation remain open and must not be inferred from this local gate.
+PR #37 merged normally without admin bypass as exact main
+`f8ebaacea8b36ebe45ac6ec5419d294431716362`; issue #36 closed automatically.
+All protected contexts passed. Exact-main Prometheus CI `29461803530`, Security
+Audit `29461803531`, and Pages `29461802700` succeeded, and the live Roadmap,
+Whitepaper, and GitHub README contain the merged boundary. CodeRabbit's content
+review was rate-limited, so the independent multi-round review and automated
+gates remain the substantive review evidence.
 
 *Audit completed 2026-04-02 by Claude Code (5 parallel agents, 7 levels, 35 checks).*
 *The fire belongs to humanity.*

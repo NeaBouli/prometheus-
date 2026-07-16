@@ -263,7 +263,7 @@ Priority tasks:
 - Sprint 9: run the merged keyless operator against a real funded testnet-10 UTXO and collect confirmed public receipt plus independent node/explorer evidence records
 - H-001: keep LE encoding and signed-boundary verification gated in CI
 - Oracle: execute the merged/exact-main keyless GovernanceAutoTuning transition operator with real public state/sponsor UTXOs, external oracle/sponsor signatures, confirmed successor evidence, and existing result/evidence/status gates before beta/mainnet governance
-- Sprint 10B: GH-33 hybrid routing software is merged/exact-main verified at `ce1d213`; GH-36 local 5+ complete-ballot validation is implemented and independently re-reviewed with no remaining high/medium finding. Trusted membership, signed P2P votes/replay protection, Sybil resistance, on-chain attestation, live model wiring/calibration, and production evidence remain
+- Sprint 10B: GH-33 hybrid routing software is merged/exact-main verified at `ce1d213`; GH-36 local 5+ complete-ballot validation is merged/exact-main verified at `f8ebaac` and independently re-reviewed with no remaining high/medium finding. Trusted membership, signed P2P votes/replay protection, Sybil resistance, on-chain attestation, live model wiring/calibration, and production evidence remain
 - M-001/M-002: Medium findings (can wait until Aug/Sep)
 ```
 
@@ -304,7 +304,7 @@ Not yet proven: live 8B/70B services, calibrated model confidence, P2P transport
 ## GUARDIAN ENSEMBLE VALIDATION (GH-36)
 
 ```
-Status: local protocol implemented on branch feat/GH-36-guardian-ensemble-voting
+Status: merged/exact-main verified in PR #37 at f8ebaac; issue #36 closed
 Candidate: domain-separated canonical JSON binds protocol, threat hash, exact YARA
            bytes/metadata, exact integer-bps source confidence, policy, and 8B artifact
 Membership: immutable sorted snapshot, 5+ unique canonical Guardian IDs, explicit
@@ -318,6 +318,8 @@ Local evidence: 96 passed, 3 intentionally skipped Guardian tests; focused ensem
                 focused Pylint 10.00/10; Rust workspace 170 passed/2 ignored
 Review: initial medium source-confidence binding and recheck float-rounding findings
         fixed; final independent re-review reports no remaining high/medium finding
+Remote evidence: Prometheus CI 29461803530; Security Audit 29461803531;
+                 Pages 29461802700; live Roadmap/Whitepaper and README verified
 Not yet proven: trusted membership source, signed P2P collection, replay protection,
                 Sybil resistance, on-chain ensemble attestation, production operation
 ```
