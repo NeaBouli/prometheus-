@@ -24,7 +24,7 @@ from preflight_silverc_deploy import bundle_root_from_args, validate_manifest
 from verify_silverc_h001 import DEFAULT_SILVERSCRIPT_REF
 
 ABI_ENTRYPOINT = "__covenant_entrypoint_auth_reportMetrics"
-PUBLIC_INSTANCE_ID_RE = re.compile(r"^[A-Za-z0-9:._/-]{4,160}$")
+CONTRACT_OUTPOINT_RE = re.compile(r"^[0-9a-f]{64}:(?:0|[1-9][0-9]*)$")
 
 
 def parse_args() -> argparse.Namespace:
@@ -32,8 +32,8 @@ def parse_args() -> argparse.Namespace:
         description=(
             "Build a deterministic unsigned operator request for "
             "GovernanceAutoTuningState.reportMetrics. This validates the public "
-            "report and release bundle, but does not assemble, sign, or broadcast "
-            "a Kaspa transaction."
+            "report and release bundle for the repository-owned keyless Rust operator. "
+            "This request builder does not assemble, sign, or broadcast a Kaspa transaction."
         )
     )
     source = parser.add_mutually_exclusive_group(required=True)
@@ -43,7 +43,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--contract-instance-id",
         help=(
-            "Public deployed GovernanceAutoTuningState contract instance/outpoint/ID. "
+            "Exact deployed GovernanceAutoTuningState outpoint as lowercase txid:index. "
             "Do not pass wallet secrets."
         ),
     )
@@ -71,8 +71,11 @@ def validate_contract_instance_id(value: str | None, required: bool) -> str | No
         if required:
             raise ValueError("--contract-instance-id is required for signer-ready requests")
         return None
-    if not PUBLIC_INSTANCE_ID_RE.match(value):
-        raise ValueError("--contract-instance-id must be a public identifier, outpoint, or address-like value")
+    if not CONTRACT_OUTPOINT_RE.fullmatch(value):
+        raise ValueError("--contract-instance-id must be an exact lowercase Kaspa outpoint txid:index")
+    output_index = int(value.rsplit(":", 1)[1])
+    if output_index > 0xFFFFFFFF:
+        raise ValueError("--contract-instance-id output index exceeds uint32")
     return value
 
 
@@ -99,7 +102,7 @@ def build_request(
     request: dict[str, Any] = {
         "schema_version": 1,
         "kind": "prometheus.metrics_oracle.report_metrics.tx_request",
-        "status": "READY_FOR_EXTERNAL_TX_ASSEMBLER" if not blockers else "BLOCKED_UNTIL_CONTRACT_INSTANCE_ID",
+        "status": "READY_FOR_KEYLESS_REPORT_METRICS_OPERATOR" if not blockers else "BLOCKED_UNTIL_CONTRACT_INSTANCE_ID",
         "network": payload["network"],
         "contract": {
             "name": CONTRACT_NAME,
@@ -140,13 +143,24 @@ def build_request(
             "assembles_chain_transaction": False,
             "broadcasts_transactions": False,
         },
+        "safety_scope": "metrics_tx_request_builder_only",
+        "repository_operator": {
+            "assembles_transaction_in_memory": True,
+            "accepts_private_keys": False,
+            "signs_transactions": False,
+            "requires_external_oracle_signature": True,
+            "requires_external_fee_sponsor_signature": True,
+            "broadcast_requires_exact_signing_request_hash_acknowledgement": True,
+        },
         "blockers": blockers,
         "operator_next_steps": [
             "Verify the contract instance id from a real deployment receipt before signing.",
-            "Map this request into the network transaction assembler outside this repository.",
-            "Sign the transaction input with the metrics-oracle wallet outside this repository.",
-            "Broadcast through the approved deploy/orchestration path only after network tooling exists.",
-            "Record the verified transaction receipt before updating deployment status files.",
+            "Create a closed transition spec with the exact covenant state UTXO and a separate public P2PK fee-sponsor UTXO.",
+            "Run report-metrics-preflight and report-metrics-prepare with the repository Rust operator.",
+            "Produce the oracle and fee-sponsor BIP340 signatures outside this repository.",
+            "Import both signatures and require complete covenant plus P2PK input verification.",
+            "Acknowledge the exact signing_request_sha256 before the guarded one-shot broadcast.",
+            "Observe the successor covenant UTXO and verify public evidence before updating status files.",
         ],
     }
     request["request_sha256"] = sha256_hex(request)
@@ -178,8 +192,10 @@ def write_runbook(path: Path | None, request: dict[str, Any]) -> None:
         "## Safety Rules",
         "",
         "- This artifact is an unsigned operator request, not a serialized Kaspa transaction.",
+        "- The safety flags describe this request builder, not the Rust execution operator.",
         "- This artifact does not accept private keys, sign transactions, assemble chain transactions, or broadcast transactions.",
-        "- The `oracle_sig` value must be produced by the metrics-oracle wallet outside this repository.",
+        "- The Rust operator assembles only in memory and requires external oracle and fee-sponsor signatures.",
+        "- Both signatures must be produced outside this repository.",
         "- Signing material must remain in an external wallet/keychain or deployment vault.",
         "",
         "## Contract Binding",

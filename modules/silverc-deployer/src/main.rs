@@ -5,6 +5,13 @@ use anyhow::Result;
 use clap::{Parser, Subcommand, ValueEnum};
 use kaspa_consensus_core::network::NetworkId;
 use kaspa_wrpc_client::WrpcEncoding;
+use prometheus_silverc_deployer::oracle::{
+    broadcast_verified_oracle_transition, finalize_oracle_broadcast_journal,
+    import_oracle_signature_files, load_oracle_broadcast_journal, load_oracle_broadcast_result,
+    load_transition_spec, observe_oracle_successor, preflight_oracle_transition,
+    prepare_oracle_broadcast_journal, prepare_oracle_transition,
+    rebuild_verified_oracle_transition, reject_oracle_output_collisions,
+};
 use prometheus_silverc_deployer::{
     acquire_broadcast_lock, broadcast_journal_path, broadcast_verified_transaction,
     create_public_json, finalize_broadcast_journal, import_external_signature_files, load_artifact,
@@ -32,7 +39,7 @@ impl From<Encoding> for WrpcEncoding {
 #[derive(Debug, Parser)]
 #[command(
     name = "prometheus-silverc-deployer",
-    about = "Keyless Prometheus SilverScript genesis operator for Toccata transaction v1"
+    about = "Keyless Prometheus SilverScript genesis and state-transition operator for Toccata transaction v1"
 )]
 struct Cli {
     #[command(subcommand)]
@@ -137,6 +144,87 @@ enum Command {
         signing_request: PathBuf,
         #[arg(long)]
         signature_response: PathBuf,
+        #[arg(long, value_enum, default_value_t = Encoding::Borsh)]
+        encoding: Encoding,
+        #[arg(long)]
+        evidence_out: PathBuf,
+    },
+    /// Build a dual-signature request for a value-preserving reportMetrics transition.
+    ReportMetricsPrepare {
+        #[arg(long)]
+        transition_spec: PathBuf,
+        #[arg(long)]
+        metrics_tx_request: PathBuf,
+        #[arg(long)]
+        contract_source: PathBuf,
+        #[arg(long)]
+        signing_request_out: PathBuf,
+    },
+    /// Verify the exact live state and fee-sponsor UTXOs without signing or broadcasting.
+    ReportMetricsPreflight {
+        #[arg(long)]
+        transition_spec: PathBuf,
+        #[arg(long)]
+        metrics_tx_request: PathBuf,
+        #[arg(long)]
+        contract_source: PathBuf,
+        #[arg(long, value_enum, default_value_t = Encoding::Borsh)]
+        encoding: Encoding,
+        #[arg(long)]
+        evidence_out: PathBuf,
+    },
+    /// Import canonical oracle and sponsor signatures and verify every transaction input.
+    ReportMetricsImportSignatures {
+        #[arg(long)]
+        transition_spec: PathBuf,
+        #[arg(long)]
+        metrics_tx_request: PathBuf,
+        #[arg(long)]
+        contract_source: PathBuf,
+        #[arg(long)]
+        signing_request: PathBuf,
+        #[arg(long)]
+        oracle_signature_hex_file: PathBuf,
+        #[arg(long)]
+        sponsor_signature_hex_file: PathBuf,
+        #[arg(long)]
+        verification_out: PathBuf,
+    },
+    /// Rebuild, fully verify, acknowledge, and submit the reportMetrics transition once.
+    ReportMetricsBroadcast {
+        #[arg(long)]
+        transition_spec: PathBuf,
+        #[arg(long)]
+        metrics_tx_request: PathBuf,
+        #[arg(long)]
+        contract_source: PathBuf,
+        #[arg(long)]
+        signing_request: PathBuf,
+        #[arg(long)]
+        oracle_signature_hex_file: PathBuf,
+        #[arg(long)]
+        sponsor_signature_hex_file: PathBuf,
+        #[arg(long)]
+        acknowledge_signing_request_sha256: String,
+        #[arg(long, value_enum, default_value_t = Encoding::Borsh)]
+        encoding: Encoding,
+        #[arg(long)]
+        result_out: PathBuf,
+    },
+    /// Observe the exact confirmed successor covenant UTXO.
+    ReportMetricsObserve {
+        #[arg(long)]
+        transition_spec: PathBuf,
+        #[arg(long)]
+        metrics_tx_request: PathBuf,
+        #[arg(long)]
+        contract_source: PathBuf,
+        #[arg(long)]
+        signing_request: PathBuf,
+        #[arg(long)]
+        oracle_signature_hex_file: PathBuf,
+        #[arg(long)]
+        sponsor_signature_hex_file: PathBuf,
         #[arg(long, value_enum, default_value_t = Encoding::Borsh)]
         encoding: Encoding,
         #[arg(long)]
@@ -327,6 +415,185 @@ async fn main() -> Result<()> {
             )?;
             let evidence =
                 observe_deployed_utxo(&verified, &signing_request, encoding.into()).await?;
+            write_public_json(&evidence_out, &evidence)?;
+            println!("{}", serde_json::to_string_pretty(&evidence)?);
+        }
+        Command::ReportMetricsPrepare {
+            transition_spec,
+            metrics_tx_request,
+            contract_source,
+            signing_request_out,
+        } => {
+            reject_oracle_output_collisions(
+                &[
+                    ("transition-spec input", &transition_spec),
+                    ("metrics-tx-request input", &metrics_tx_request),
+                    ("contract-source input", &contract_source),
+                ],
+                &[("signing-request output", &signing_request_out)],
+            )?;
+            let spec = load_transition_spec(&transition_spec)?;
+            let source = std::fs::read_to_string(&contract_source)?;
+            let prepared = prepare_oracle_transition(&spec, &metrics_tx_request, &source)?;
+            write_public_json(&signing_request_out, &prepared.signing_request)?;
+            println!(
+                "{}",
+                serde_json::to_string_pretty(&prepared.signing_request)?
+            );
+        }
+        Command::ReportMetricsPreflight {
+            transition_spec,
+            metrics_tx_request,
+            contract_source,
+            encoding,
+            evidence_out,
+        } => {
+            reject_oracle_output_collisions(
+                &[
+                    ("transition-spec input", &transition_spec),
+                    ("metrics-tx-request input", &metrics_tx_request),
+                    ("contract-source input", &contract_source),
+                ],
+                &[("preflight evidence output", &evidence_out)],
+            )?;
+            let spec = load_transition_spec(&transition_spec)?;
+            let source = std::fs::read_to_string(&contract_source)?;
+            let evidence =
+                preflight_oracle_transition(&spec, &metrics_tx_request, &source, encoding.into())
+                    .await?;
+            write_public_json(&evidence_out, &evidence)?;
+            println!("{}", serde_json::to_string_pretty(&evidence)?);
+        }
+        Command::ReportMetricsImportSignatures {
+            transition_spec,
+            metrics_tx_request,
+            contract_source,
+            signing_request,
+            oracle_signature_hex_file,
+            sponsor_signature_hex_file,
+            verification_out,
+        } => {
+            let verification = import_oracle_signature_files(
+                &transition_spec,
+                &metrics_tx_request,
+                &contract_source,
+                &signing_request,
+                &oracle_signature_hex_file,
+                &sponsor_signature_hex_file,
+                &verification_out,
+            )?;
+            println!("{}", serde_json::to_string_pretty(&verification)?);
+        }
+        Command::ReportMetricsBroadcast {
+            transition_spec,
+            metrics_tx_request,
+            contract_source,
+            signing_request,
+            oracle_signature_hex_file,
+            sponsor_signature_hex_file,
+            acknowledge_signing_request_sha256,
+            encoding,
+            result_out,
+        } => {
+            let journal_path = broadcast_journal_path(&result_out);
+            reject_oracle_output_collisions(
+                &[
+                    ("transition-spec input", &transition_spec),
+                    ("metrics-tx-request input", &metrics_tx_request),
+                    ("contract-source input", &contract_source),
+                    ("signing-request input", &signing_request),
+                    ("oracle-signature input", &oracle_signature_hex_file),
+                    ("sponsor-signature input", &sponsor_signature_hex_file),
+                ],
+                &[
+                    ("broadcast result output", &result_out),
+                    ("broadcast journal output", &journal_path),
+                ],
+            )?;
+            let (spec, signing_request, verified) = rebuild_verified_oracle_transition(
+                &transition_spec,
+                &metrics_tx_request,
+                &contract_source,
+                &signing_request,
+                &oracle_signature_hex_file,
+                &sponsor_signature_hex_file,
+            )?;
+            let expected_journal = prepare_oracle_broadcast_journal(
+                &verified,
+                &signing_request,
+                &acknowledge_signing_request_sha256,
+            )?;
+            let _broadcast_lock = acquire_broadcast_lock(&result_out)?;
+            let mut journal = if create_public_json(&journal_path, &expected_journal)? {
+                expected_journal
+            } else {
+                load_oracle_broadcast_journal(&journal_path, &expected_journal)?
+            };
+            if let Some(recorded_result) = journal.result.as_ref() {
+                if result_out.try_exists()? {
+                    let existing_result = load_oracle_broadcast_result(&result_out, &journal)?;
+                    if existing_result != *recorded_result {
+                        anyhow::bail!("oracle result differs from finalized intent journal");
+                    }
+                } else {
+                    write_public_json(&result_out, recorded_result)?;
+                }
+                println!("{}", serde_json::to_string_pretty(recorded_result)?);
+                return Ok(());
+            }
+            if result_out.try_exists()? {
+                let result = load_oracle_broadcast_result(&result_out, &journal)?;
+                let journal = finalize_oracle_broadcast_journal(journal, result.clone())?;
+                write_public_json(&journal_path, &journal)?;
+                println!("{}", serde_json::to_string_pretty(&result)?);
+                return Ok(());
+            }
+            let result = broadcast_verified_oracle_transition(
+                verified,
+                &signing_request,
+                &spec,
+                &acknowledge_signing_request_sha256,
+                encoding.into(),
+                &mut journal,
+                &journal_path,
+            )
+            .await?;
+            let journal = finalize_oracle_broadcast_journal(journal, result.clone())?;
+            write_public_json(&journal_path, &journal)?;
+            write_public_json(&result_out, &result)?;
+            println!("{}", serde_json::to_string_pretty(&result)?);
+        }
+        Command::ReportMetricsObserve {
+            transition_spec,
+            metrics_tx_request,
+            contract_source,
+            signing_request,
+            oracle_signature_hex_file,
+            sponsor_signature_hex_file,
+            encoding,
+            evidence_out,
+        } => {
+            reject_oracle_output_collisions(
+                &[
+                    ("transition-spec input", &transition_spec),
+                    ("metrics-tx-request input", &metrics_tx_request),
+                    ("contract-source input", &contract_source),
+                    ("signing-request input", &signing_request),
+                    ("oracle-signature input", &oracle_signature_hex_file),
+                    ("sponsor-signature input", &sponsor_signature_hex_file),
+                ],
+                &[("observation evidence output", &evidence_out)],
+            )?;
+            let (_, signing_request, verified) = rebuild_verified_oracle_transition(
+                &transition_spec,
+                &metrics_tx_request,
+                &contract_source,
+                &signing_request,
+                &oracle_signature_hex_file,
+                &sponsor_signature_hex_file,
+            )?;
+            let evidence =
+                observe_oracle_successor(&verified, &signing_request, encoding.into()).await?;
             write_public_json(&evidence_out, &evidence)?;
             println!("{}", serde_json::to_string_pretty(&evidence)?);
         }

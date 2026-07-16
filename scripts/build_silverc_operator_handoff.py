@@ -514,7 +514,7 @@ def status_from_components(
         blockers.append("missing verified operator_record deployment receipts")
     elif deploy_receipt_evidence is None:
         blockers.append("missing public node/explorer evidence for operator_record deployment receipts")
-    if tx_request["status"] != "READY_FOR_EXTERNAL_TX_ASSEMBLER":
+    if tx_request["status"] != "READY_FOR_KEYLESS_REPORT_METRICS_OPERATOR":
         blockers.extend(tx_request["blockers"])
     elif tx_result is None:
         blockers.append("missing verified metrics-oracle transaction result")
@@ -589,8 +589,8 @@ def write_handoff_markdown(out_dir: Path, summary: dict[str, Any]) -> None:
             "4. Import public external deploy results with `--orchestrator-results`, or provide verified `operator_record` receipts with `--operator-receipts`.",
             "5. Bind real operator_record receipts to public node/explorer evidence with `--deploy-receipt-evidence`.",
             "6. Use only verified operator_record contract IDs for signer-ready oracle transaction requests.",
-            "7. Review `metrics-oracle-operator-procedure.md` before any external signing or broadcast.",
-            "8. Sign and broadcast outside this repository through the approved wallet/vault process, then verify the public result with `--metrics-tx-result`.",
+            "7. Review `metrics-oracle-operator-procedure.md`, then use the repository Rust operator to preflight and prepare the exact transition and both sighashes.",
+            "8. Produce only the oracle and fee-sponsor BIP340 signatures outside this repository, import and fully verify them with `report-metrics-import-signatures`, then use the acknowledged `report-metrics-broadcast` path and verify the public result with `--metrics-tx-result`.",
             "9. Bind the verified metrics-oracle transaction result to public node/explorer evidence with `--metrics-tx-evidence`.",
             "10. Bind CI, Pages, branch-control, rollback, and release-note checks with `--release-hardening-evidence`.",
             "11. Update `memory/STATUS.md` only after all real receipts, public evidence, transaction receipts, and release-hardening evidence verify.",
@@ -675,7 +675,7 @@ def main() -> int:
     metrics_report_plan = run_metrics_report_preflight(report, out_dir)
     tx_request = run_tx_request(packaged_archive, report, out_dir, args.contract_instance_id)
     metrics_operator_procedure = None
-    if tx_request["status"] == "READY_FOR_EXTERNAL_TX_ASSEMBLER":
+    if tx_request["status"] == "READY_FOR_KEYLESS_REPORT_METRICS_OPERATOR":
         metrics_operator_procedure = run_metrics_operator_procedure(packaged_archive, out_dir)
     tx_result_summary = None
     tx_evidence_summary = None

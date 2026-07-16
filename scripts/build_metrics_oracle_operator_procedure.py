@@ -14,16 +14,15 @@ from verify_metrics_oracle_tx_result import load_json, validate_request
 from verify_silverc_h001 import DEFAULT_SILVERSCRIPT_REF
 
 PROCEDURE_KIND = "prometheus.metrics_oracle.report_metrics.operator_procedure"
-PROCEDURE_STATUS = "READY_FOR_EXTERNAL_ORACLE_OPERATOR"
+PROCEDURE_STATUS = "READY_FOR_KEYLESS_REPORT_METRICS_OPERATION"
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=(
             "Build a public operator procedure for a signer-ready GovernanceAutoTuning "
-            "metrics-oracle transaction request. This validates public artifacts only; "
-            "it does not accept keys, assemble raw transactions, sign, broadcast, "
-            "deploy, or update status files."
+            "metrics-oracle transaction request. This procedure builder validates public "
+            "artifacts only and documents the repository-owned keyless Rust workflow."
         )
     )
     source = parser.add_mutually_exclusive_group(required=True)
@@ -60,7 +59,7 @@ def build_procedure(request_summary: dict[str, Any]) -> dict[str, Any]:
             "entrypoint_args_sha256": request_summary["entrypoint_args_sha256"],
         },
         "repository_boundary": {
-            "role": "prepare_and_verify_public_artifacts_only",
+            "role": "keyless_transaction_assembly_verification_and_guarded_broadcast",
             "forbidden_material": [
                 "private keys",
                 "seed phrases",
@@ -70,16 +69,27 @@ def build_procedure(request_summary: dict[str, Any]) -> dict[str, Any]:
                 "serialized transactions",
             ],
         },
-        "external_operator_sequence": [
+        "operator_sequence": [
             "Verify the tx_request_sha256 against the handoff package.",
             "Load the public contract instance id from verified operator_record deployment receipts.",
-            "Map the entrypoint arguments into the approved external transaction assembler.",
-            "Produce the oracle_sig with the metrics-oracle wallet outside this repository.",
-            "Assemble and sign the Kaspa transaction outside this repository.",
-            "Broadcast through the approved network deploy/orchestration process.",
-            "Wait for confirmation and record only public operator_record evidence.",
+            "Create a closed transition spec with exact predecessor state and a separate public P2PK fee-sponsor UTXO.",
+            "Run report-metrics-preflight, then report-metrics-prepare to build the transaction and both sighashes in memory.",
+            "Produce the oracle and fee-sponsor BIP340 signatures outside this repository.",
+            "Run report-metrics-import-signatures and require both BIP340 checks plus complete covenant and P2PK execution.",
+            "Acknowledge the exact signing_request_sha256 and run report-metrics-broadcast once.",
+            "Run report-metrics-observe and record only public successor-UTXO evidence.",
             "Verify the public result with scripts/verify_metrics_oracle_tx_result.py before any status update.",
         ],
+        "repository_operator": {
+            "assembles_transaction_in_memory": True,
+            "accepts_private_keys": False,
+            "signs_transactions": False,
+            "requires_external_oracle_signature": True,
+            "requires_external_fee_sponsor_signature": True,
+            "broadcast_requires_exact_signing_request_hash_acknowledgement": True,
+            "preserves_covenant_state_value": True,
+            "fee_paid_by_separate_p2pk_sponsor": True,
+        },
         "required_public_result_fields": {
             "schema_version": 1,
             "result_type": "prometheus.metrics_oracle.report_metrics.tx_result",
@@ -102,6 +112,7 @@ def build_procedure(request_summary: dict[str, Any]) -> dict[str, Any]:
             "deploys_contracts": False,
             "updates_status_files": False,
         },
+        "safety_scope": "operator_procedure_builder_only",
         "blockers": [],
     }
     return procedure
@@ -129,9 +140,10 @@ def write_runbook(path: Path | None, procedure: dict[str, Any]) -> None:
         "## Boundary",
         "",
         "- This procedure is a public operator checklist, not a chain transaction.",
-        "- This repository prepares and verifies public artifacts only.",
+        "- The safety flags below describe this procedure builder, not the Rust execution operator.",
         "- Private keys, seed phrases, wallet files, keystore material, raw transactions, and serialized transactions must remain outside this repository.",
-        "- The repository does not sign, assemble, broadcast, deploy, or update status files.",
+        "- The Rust operator assembles in memory, verifies both external signatures and all inputs, and broadcasts only after exact hash acknowledgement.",
+        "- The repository never signs, accepts private keys, deploys from this procedure builder, or updates status files automatically.",
         "",
         "## Contract Binding",
         "",
@@ -140,10 +152,10 @@ def write_runbook(path: Path | None, procedure: dict[str, Any]) -> None:
         f"- Instance ID: `{contract['instance_id']}`",
         f"- Script SHA-256: `{contract['script_sha256']}`",
         "",
-        "## External Operator Sequence",
+        "## Operator Sequence",
         "",
     ]
-    lines.extend(f"{index}. {step}" for index, step in enumerate(procedure["external_operator_sequence"], start=1))
+    lines.extend(f"{index}. {step}" for index, step in enumerate(procedure["operator_sequence"], start=1))
     lines.extend(["", "## Required Public Result Evidence", ""])
     for key, value in procedure["required_public_result_fields"].items():
         lines.append(f"- `{key}`: `{value}`")

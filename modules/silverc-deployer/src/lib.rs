@@ -4,6 +4,8 @@
 //! a public Schnorr digest. An external vault or HSM returns the signature. No
 //! private-key, seed, wallet, keystore, token, or password input exists here.
 
+pub mod oracle;
+
 use std::collections::{BTreeMap, BTreeSet};
 use std::fs::{self, File, OpenOptions};
 use std::io::Write;

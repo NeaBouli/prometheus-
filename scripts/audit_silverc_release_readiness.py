@@ -186,7 +186,7 @@ def required_files_for_summary(summary: dict[str, Any]) -> set[str]:
         required |= OPERATOR_RECEIPT_IMPORT_FILES
     if summary.get("metrics_tx_result_status") == "METRICS_ORACLE_TX_RESULT_VERIFIED":
         required |= METRICS_TX_RESULT_FILES
-    if summary.get("metrics_tx_request_status") == "READY_FOR_EXTERNAL_TX_ASSEMBLER":
+    if summary.get("metrics_tx_request_status") == "READY_FOR_KEYLESS_REPORT_METRICS_OPERATOR":
         required |= METRICS_OPERATOR_PROCEDURE_FILES
     if summary.get("external_operator_capability_status") == "EXTERNAL_OPERATOR_CAPABILITY_VERIFIED":
         required |= EXTERNAL_OPERATOR_CAPABILITY_FILES
@@ -243,7 +243,7 @@ def validate_component_summaries(root: Path, handoff: dict[str, Any]) -> dict[st
         "metrics_tx_request": metrics_tx_request["status"],
     }
 
-    if handoff.get("metrics_tx_request_status") == "READY_FOR_EXTERNAL_TX_ASSEMBLER":
+    if handoff.get("metrics_tx_request_status") == "READY_FOR_KEYLESS_REPORT_METRICS_OPERATOR":
         operator_procedure = require_json(root, "metrics-oracle-operator-procedure.json")
         expect_status(
             operator_procedure,
@@ -388,8 +388,8 @@ def validate_handoff(root: Path) -> dict[str, Any]:
         and handoff.get("deploy_operator_procedure_status") == "READY_FOR_KEYLESS_GENESIS_OPERATION"
         and handoff.get("operator_receipts_status") == "READY_FOR_STATUS_RECORDING"
         and handoff.get("deploy_receipt_evidence_status") == "PUBLIC_DEPLOY_RECEIPT_EVIDENCE_VERIFIED"
-        and handoff.get("metrics_tx_request_status") == "READY_FOR_EXTERNAL_TX_ASSEMBLER"
-        and handoff.get("metrics_operator_procedure_status") == "READY_FOR_EXTERNAL_ORACLE_OPERATOR"
+        and handoff.get("metrics_tx_request_status") == "READY_FOR_KEYLESS_REPORT_METRICS_OPERATOR"
+        and handoff.get("metrics_operator_procedure_status") == "READY_FOR_KEYLESS_REPORT_METRICS_OPERATION"
         and handoff.get("metrics_tx_result_status") == "METRICS_ORACLE_TX_RESULT_VERIFIED"
         and handoff.get("metrics_tx_evidence_status") == "PUBLIC_METRICS_ORACLE_TX_EVIDENCE_VERIFIED"
         and handoff.get("metrics_oracle_status_draft_status") == "READY_FOR_MANUAL_ORACLE_STATUS_UPDATE"

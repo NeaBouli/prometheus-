@@ -7,7 +7,7 @@
 | Scope | Estimated complete | Estimated remaining | Current gate |
 |-------|-------------------:|--------------------:|--------------|
 | H-001 testnet-10 canary preparation | 96% | 4% | External BIP340 signature, verification, one-shot broadcast, confirmation, receipt, independent evidence |
-| Rollout-capable core network | 65–70% | 30–35% | Six state deployments, real Groth16, PROM emission, metrics oracle, P2P/rule distribution, production node evidence |
+| Rollout-capable core network | 68–72% | 28–32% | Six state deployments, real Groth16, PROM emission, real metrics-oracle execution/evidence, P2P/rule distribution, production node evidence |
 | Complete roadmap vision | 35–40% | 60–65% | Production AI, desktop/mobile clients, installers, operated network, vProgs, plus all core-network gates |
 
 Percentages are scope-weighted engineering estimates. They are not release dates,
@@ -112,7 +112,7 @@ files, component summaries, safety flags, and JSON secret/raw-transaction
 hygiene before any rollout claim. The remaining deployment blockers are the
 real funded testnet-10 run through the repository Toccata-v1 genesis operator,
 external Schnorr signatures, confirmed public deploy receipts plus independent
-node/explorer evidence, the external signed metrics-oracle transaction, and
+node/explorer evidence, the externally signed keyless metrics-oracle transition, and
 public release-hardening evidence for the exact rollout commit.
 
 **Sprint 9 — Contracts Live + Real ZK-Proof**
@@ -132,8 +132,8 @@ public release-hardening evidence for the exact rollout commit.
 - Keep the generated operator handoff package green and free of signing material
 - Keep the release-readiness audit green and blocked until real external evidence exists
 - Keep the metrics-oracle report preflight green and free of signing material
-- Keep the unsigned metrics-oracle tx-request builder green and free of signing material
-- Keep the external oracle operator procedure green and free of signing/raw transaction material
+- Keep the metrics-oracle request builder and keyless Rust transition operator green and free of private signing material
+- Keep the keyless oracle operation procedure and Rust transition operator green and free of private signing/raw transaction material
 - Keep external-operator capability verification green and free of secrets/raw transaction material
 - Keep public oracle tx-result verification green and free of signing/raw transaction material
 - Keep public oracle tx-evidence verification green and free of secrets/raw transaction material

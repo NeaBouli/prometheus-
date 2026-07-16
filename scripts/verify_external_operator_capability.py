@@ -178,6 +178,24 @@ def validate_metrics_procedure(procedure: dict[str, Any], network: str) -> dict[
     if procedure.get("network") != network:
         raise ValueError("metrics_procedure.network mismatch")
     require_false_safety_flags(procedure, "metrics_procedure")
+    if procedure.get("safety_scope") != "operator_procedure_builder_only":
+        raise ValueError("metrics_procedure.safety_scope: expected operator_procedure_builder_only")
+    repository_operator = require_dict(
+        procedure.get("repository_operator"),
+        "metrics_procedure.repository_operator",
+    )
+    expected_operator = {
+        "assembles_transaction_in_memory": True,
+        "accepts_private_keys": False,
+        "signs_transactions": False,
+        "requires_external_oracle_signature": True,
+        "requires_external_fee_sponsor_signature": True,
+        "broadcast_requires_exact_signing_request_hash_acknowledgement": True,
+        "preserves_covenant_state_value": True,
+        "fee_paid_by_separate_p2pk_sponsor": True,
+    }
+    if repository_operator != expected_operator:
+        raise ValueError("metrics_procedure.repository_operator: capability profile mismatch")
     tx_request_sha256 = require_str(procedure, "tx_request_sha256", "metrics_procedure")
     contract = require_dict(procedure.get("contract"), "metrics_procedure.contract")
     result_fields = require_dict(

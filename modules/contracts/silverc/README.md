@@ -44,7 +44,7 @@ python3 scripts/verify_silverc_deploy_receipts.py --archive /tmp/prometheus-silv
 python3 scripts/verify_silverc_deploy_receipt_evidence.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --receipts /path/to/operator-record-receipts.json --evidence /path/to/public-node-or-explorer-evidence.json --summary-out /tmp/prometheus-silverc-deploy-receipt-evidence-summary.json --runbook-out /tmp/prometheus-silverc-deploy-receipt-evidence.md
 python3 scripts/stage_silverc_deployment_status.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --operator-receipts /path/to/operator-record-receipts.json --status-out /tmp/prometheus-silverc-status-draft.json --snippet-out /tmp/prometheus-silverc-status-draft.md
 python3 scripts/preflight_metrics_oracle_report.py --report modules/contracts/silverc/metrics-oracle-report.sample.json --plan-out /tmp/prometheus-metrics-oracle-preflight.json --runbook-out /tmp/prometheus-metrics-oracle-runbook.md
-python3 scripts/build_metrics_oracle_tx_request.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --report modules/contracts/silverc/metrics-oracle-report.sample.json --contract-instance-id sandbox:governance-auto-tuning-state-fixture-0001 --tx-request-out /tmp/prometheus-metrics-oracle-tx-request.json --runbook-out /tmp/prometheus-metrics-oracle-tx-request.md
+python3 scripts/build_metrics_oracle_tx_request.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --report modules/contracts/silverc/metrics-oracle-report.sample.json --contract-instance-id 7777777777777777777777777777777777777777777777777777777777777777:0 --tx-request-out /tmp/prometheus-metrics-oracle-tx-request.json --runbook-out /tmp/prometheus-metrics-oracle-tx-request.md
 python3 scripts/build_metrics_oracle_operator_procedure.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --tx-request /tmp/prometheus-metrics-oracle-tx-request.json --summary-out /tmp/prometheus-metrics-oracle-operator-procedure.json --runbook-out /tmp/prometheus-metrics-oracle-operator-procedure.md
 python3 scripts/verify_metrics_oracle_tx_result.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --tx-request /tmp/prometheus-metrics-oracle-tx-request.json --tx-result /path/to/public-metrics-oracle-tx-result.json --summary-out /tmp/prometheus-metrics-oracle-tx-result-summary.json --runbook-out /tmp/prometheus-metrics-oracle-tx-result.md
 python3 scripts/verify_metrics_oracle_tx_evidence.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --tx-request /tmp/prometheus-metrics-oracle-tx-request.json --tx-result /path/to/public-metrics-oracle-tx-result.json --evidence /path/to/public-metrics-oracle-tx-evidence.json --summary-out /tmp/prometheus-metrics-oracle-tx-public-evidence-summary.json --runbook-out /tmp/prometheus-metrics-oracle-tx-public-evidence.md
@@ -125,7 +125,7 @@ Remaining deployment blockers:
 
 - exact merged-commit testnet-10 requests and external BIP340 signatures
 - confirmed `operator_record` receipts plus independent node/explorer evidence
-- the external signed metrics-oracle transaction and exact-commit release evidence
+- the externally signed keyless metrics transition, successor evidence, and exact-commit release evidence
 
 ## Silverc CLI release bundle smoke
 
@@ -456,12 +456,12 @@ It emits a JSON preflight plan with the exact public `reportMetrics` argument
 mapping and can emit a Markdown operator runbook. CI checks the sample report,
 the generated plan/runbook, and a negative secret-field rejection case.
 
-## Metrics-oracle unsigned transaction request
+## Metrics-oracle keyless transition request
 
 `scripts/build_metrics_oracle_tx_request.py` binds a validated public metrics
 report to the validated current-Silverc release bundle and the
 `GovernanceAutoTuningState` artifact metadata. It emits a deterministic,
-unsigned operator request for the external deploy/transaction assembler.
+unsigned request consumed by the repository-owned keyless Rust operator.
 
 The request includes:
 
@@ -471,32 +471,80 @@ The request includes:
 - the exact public `reportMetrics` arguments
 - the metrics-oracle public key and external `oracle_sig` requirement
 - a request SHA-256 for operator handoff/review
-- safety flags proving the script does not accept private keys, sign, assemble
-  a chain transaction, or broadcast
+- builder-scoped safety flags plus an explicit repository-operator capability
+  profile; the Python builder itself does not accept private keys, sign,
+  assemble a chain transaction, or broadcast
 
 Without `--contract-instance-id`, the request status remains
 `BLOCKED_UNTIL_CONTRACT_INSTANCE_ID`. With a public deployed contract instance
-ID or outpoint, the status becomes `READY_FOR_EXTERNAL_TX_ASSEMBLER`; signing
-and broadcast still remain outside this repository. CI checks both states and a
-negative `--require-contract-instance-id` failure path.
+ID or outpoint, the status becomes
+`READY_FOR_KEYLESS_REPORT_METRICS_OPERATOR`. Transaction assembly and full
+verification occur in the Rust operator; only the oracle and fee-sponsor
+BIP340 signatures remain external. CI checks both states, strict lowercase
+`txid:index` validation, and negative `--require-contract-instance-id` paths.
 
 ## Metrics-oracle operator procedure
 
 `scripts/build_metrics_oracle_operator_procedure.py` turns a signer-ready
-metrics-oracle tx request into a public external-operator checklist. It
+metrics-oracle tx request into a public keyless-operation checklist. It
 re-validates the request against the release bundle and emits:
 
 - the request hash, contract instance binding, artifact hash, and script hash
 - the public result fields required by `verify_metrics_oracle_tx_result.py`
-- the external sequence for assembler mapping, wallet signature, broadcast,
-  confirmation, and operator-record evidence
-- safety flags proving the repository does not accept keys, raw transactions,
-  signing material, transaction assembly, broadcast, deploy, or status writes
+- the sequence for closed transition-spec review, Rust preflight/prepare,
+  external oracle and sponsor signatures, complete transaction verification,
+  acknowledged broadcast, observation, and operator-record evidence
+- builder-scoped safety flags and the exact Rust operator capabilities; the
+  procedure builder itself does not accept keys, raw transactions, sign,
+  assemble, broadcast, deploy, or write status
 
 The handoff package includes `metrics-oracle-operator-procedure.json/.md`
 whenever the tx request is signer-ready. This reduces the oracle-operations
-blocker to an explicit external wallet/orchestrator execution step while keeping
-all sensitive material outside the repository.
+blocker to reviewed public UTXOs, two external signatures, guarded execution,
+and public successor evidence while keeping all sensitive material outside the
+repository.
+
+## Metrics-oracle Rust operator
+
+`prometheus-silverc-deployer` owns the deterministic `reportMetrics`
+transaction path. The reviewed transition spec binds the complete predecessor
+state, exact covenant UTXO, covenant ID, release source hash, pinned Silverc
+commit, public metrics request hash, and a separate public P2PK sponsor UTXO.
+The sponsor alone pays the bounded fee; output 0 preserves the covenant amount
+exactly and carries the compiled successor state.
+
+```bash
+cargo run -p prometheus-silverc-deployer -- report-metrics-preflight \
+  --transition-spec /path/to/public-transition-spec.json \
+  --metrics-tx-request /tmp/prometheus-metrics-oracle-tx-request.json \
+  --contract-source modules/contracts/silverc/GovernanceAutoTuningState.sil \
+  --evidence-out /tmp/prometheus-metrics-oracle-preflight.json
+
+cargo run -p prometheus-silverc-deployer -- report-metrics-prepare \
+  --transition-spec /path/to/public-transition-spec.json \
+  --metrics-tx-request /tmp/prometheus-metrics-oracle-tx-request.json \
+  --contract-source modules/contracts/silverc/GovernanceAutoTuningState.sil \
+  --signing-request-out /tmp/prometheus-metrics-oracle-signing-request.json
+
+cargo run -p prometheus-silverc-deployer -- report-metrics-import-signatures \
+  --transition-spec /path/to/public-transition-spec.json \
+  --metrics-tx-request /tmp/prometheus-metrics-oracle-tx-request.json \
+  --contract-source modules/contracts/silverc/GovernanceAutoTuningState.sil \
+  --signing-request /tmp/prometheus-metrics-oracle-signing-request.json \
+  --oracle-signature-hex-file /path/to/public-oracle-signature.hex \
+  --sponsor-signature-hex-file /path/to/public-sponsor-signature.hex \
+  --verification-out /tmp/prometheus-metrics-oracle-verification.json
+```
+
+`report-metrics-broadcast` additionally requires
+`--acknowledge-signing-request-sha256` equal to the exact reviewed request hash.
+It revalidates both live UTXOs, persists an exclusive intent journal before
+submission, never auto-resubmits an in-progress intent, and supports
+reconciliation by transaction ID. `report-metrics-observe` rebuilds and fully
+verifies the signed transition before querying the exact successor output.
+Every output command rejects normalized input/output path collisions. Neither
+command accepts a private key, seed phrase, wallet file, keystore, or raw
+transaction.
 
 ## External operator capability verification
 
