@@ -916,6 +916,15 @@ release build, Cargo package, Black, Pylint 9.95/10, Memory, Autodidactic, HTML,
 Actionlint, dependency, staged Gitleaks, public-status, and diff gates. Final
 security and CI/package re-reviews report no remaining actionable finding.
 
+The first PR #49 Rust Workspace run exposed one Linux-only overload behavior:
+closing a busy AF_UNIX connection with unread request bytes reset the client
+before its `busy` response was observed. A separate bounded rejection pool now
+reads and validates one exact request frame before returning `busy`; excess
+rejection work remains capped and malformed frames fail as transport errors.
+The focused admission regression, complete 32-test crate suite, process test,
+Rustfmt, and all-target Clippy pass after the fix. Refreshed remote evidence is
+pending.
+
 No secret, wallet, existing private key, signature, raw transaction, broadcast,
 contract, reputation, KAS/PROM, slash ACL, commit-reveal, or Guardian
 authorization behavior was accessed or changed. `Prometheus-1.png` remains

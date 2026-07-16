@@ -87,6 +87,7 @@ pub struct SubmissionServer {
     path: PathBuf,
     listener: UnixListener,
     admission: Arc<Semaphore>,
+    rejection_admission: Arc<Semaphore>,
     request_tx: mpsc::Sender<LocalSubmission>,
     expected_uid: u32,
     request_timeout: Duration,
@@ -128,6 +129,7 @@ impl SubmissionServer {
                 path,
                 listener,
                 admission: Arc::new(Semaphore::new(max_concurrent_submissions)),
+                rejection_admission: Arc::new(Semaphore::new(max_concurrent_submissions)),
                 request_tx,
                 expected_uid,
                 request_timeout,
@@ -169,10 +171,11 @@ impl SubmissionServer {
                             });
                         }
                         Err(_) => {
-                            tasks.spawn(async move {
-                                let mut stream = stream;
-                                let _ = write_response(&mut stream, LocalSubmissionResult::Busy).await;
-                            });
+                            if let Ok(permit) = server.rejection_admission.clone().try_acquire_owned() {
+                                tasks.spawn(async move {
+                                    server.handle_busy_connection(stream, permit).await;
+                                });
+                            }
                         }
                     }
                 }
@@ -197,6 +200,19 @@ impl SubmissionServer {
             _ => LocalSubmissionResult::TransportFailure,
         };
 
+        let _ = write_response(&mut stream, response).await;
+    }
+
+    async fn handle_busy_connection(
+        self: Arc<Self>,
+        mut stream: UnixStream,
+        _permit: OwnedSemaphorePermit,
+    ) {
+        let response =
+            match time::timeout(self.request_timeout, read_submission_request(&mut stream)).await {
+                Ok(Ok(_)) => LocalSubmissionResult::Busy,
+                _ => LocalSubmissionResult::TransportFailure,
+            };
         let _ = write_response(&mut stream, response).await;
     }
 
