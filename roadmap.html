@@ -349,7 +349,8 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
         <div class="sprint-num">Sprint 10</div>
         <div class="sprint-title">Real KRC-20 Reader + P2P Network</div>
         <ul class="sprint-items">
-          <li>Full libp2p module: peer discovery, NAT traversal, STUN/TURN</li>
+          <li class="done-item">Guardian ballot core: direct QUIC/libp2p request/response, static peers, bounded resources, and owner-only collector bridge</li>
+          <li>Operated relay/AutoNAT/DCUtR evidence and broad discovery; mDNS is held while its compatible dependency path has unresolved RustSec advisories</li>
           <li>KRC-20 UTXO queries for "PROM-RULES" tick</li>
           <li>Rule content download from IPFS via CIDv1</li>
           <li>Light Client ↔ Guardian P2P communication</li>
@@ -364,8 +365,9 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
           <li class="done-item">Threat-hash, confidence, and submission-decision safety envelope</li>
           <li class="done-item">Local 5+ Guardian complete-ballot validation with canonical commitments and strict majority</li>
           <li class="done-item">Transport-neutral BIP340 ballot intake with persistent replay and equivocation protection</li>
+          <li class="done-item">Real Guardian ballot carrier with exact bounded frames and end-to-end QUIC-to-collector ACK tests</li>
           <li>Live 8B/70B service wiring and calibrated confidence evidence</li>
-          <li>Actual P2P carrier and discovery/NAT traversal, trusted membership and key assignment, Sybil resistance, and on-chain ensemble attestation</li>
+          <li>Operated discovery/NAT/relay evidence, trusted membership and key assignment, Sybil resistance, and on-chain ensemble attestation</li>
           <li>Guardian pooling and final Sybil-resistance design</li>
         </ul>
       </div>

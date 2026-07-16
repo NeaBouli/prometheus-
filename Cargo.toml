@@ -2,6 +2,7 @@
 resolver = "2"
 members = [
     "modules/client",
+    "modules/guardian-p2p",
     "modules/silverc-deployer",
     "modules/validator-node",
 ]
@@ -36,3 +37,20 @@ sha2 = "0.10"
 clap = { version = "4", features = ["derive"] }
 hex = "0.4"
 url = "2"
+async-trait = "=0.1.89"
+futures = "=0.3.31"
+libp2p-autonat = "=0.15.0"
+libp2p-connection-limits = "=0.6.0"
+libp2p-core = "=0.43.2"
+libp2p-dcutr = "=0.14.1"
+libp2p-identify = "=0.47.0"
+libp2p-identity = { version = "=0.2.14", features = ["ed25519", "peerid", "rand"] }
+libp2p-ping = "=0.47.0"
+libp2p-quic = { version = "=0.13.1", features = ["tokio"] }
+libp2p-relay = "=0.21.1"
+libp2p-request-response = "=0.29.0"
+libp2p-swarm = { version = "=0.47.1", features = ["macros", "tokio"] }
+libp2p-tls = "=0.6.2"
+libp2p-yamux = "=0.47.0"
+thiserror = "=2.0.18"
+rustix = { version = "=1.1.4", features = ["process"] }

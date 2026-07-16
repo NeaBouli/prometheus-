@@ -266,8 +266,25 @@ UNIQUE (session_id, nonce)
 Markers may be removed only after the complete session expires. The parent
 directory must be owner-controlled, the regular database file is mode `0600`,
 symlink paths are rejected, and a wall-clock rollback below the persisted
-high-water mark fails closed. Membership/key trust, network transport, Sybil
-resistance, and on-chain attestation are not properties of this schema.
+high-water mark fails closed. Membership/key trust, Sybil resistance, and
+on-chain attestation are not properties of this schema.
+
+### 3.4 Guardian Ballot Carrier (GH-42)
+
+The libp2p stream is versioned independently as
+`/prometheus/guardian-ballot/1.0.0`:
+
+```text
+request  = uint16_be(length) || exact SignedGuardianBallot bytes
+response = uint8(status)  # accepted=0, duplicate=1, rejected=2, busy=3
+```
+
+`length` must be in `1..=8192`. The local AF_UNIX bridge uses a four-byte
+big-endian length around the same exact ballot bytes and a canonical JSON ACK
+containing protocol version, session ID, payload SHA-256, and status. The Rust
+side verifies socket ownership/peer credentials and the ACK digest before
+answering the remote request. No PeerId, address, relay, or route field enters
+the Guardian membership/session schema.
 
 ---
 

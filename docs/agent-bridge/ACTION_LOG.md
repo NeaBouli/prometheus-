@@ -523,3 +523,18 @@ Rules for all dev agents:
 - Live GitHub Pages contains the authenticated-intake boundary in Whitepaper and Roadmap, and the GitHub `main` README contains the matching merged GH-39 status.
 - GH-39 software/docs/CI are accepted. Actual P2P carrier/discovery/NAT traversal, trusted membership/key assignment, Sybil resistance, on-chain attestation, live model/signing operation, proposal submission, and production evidence remain open.
 - No wallet file, private key, secret, signature, raw transaction, broadcast, contract, slash ACL, commit-reveal formula, KAS/PROM split, Guardian-reputation behavior, or foreign untracked file was accessed or changed. `Prometheus-1.png` remains untouched and uncommitted.
+
+## 2026-07-16 GH-42 Guardian libp2p ballot carrier
+
+- Opened issue #42 and branch `feat/GH-42-guardian-libp2p-carrier` for the first real post-GH-39 transport slice.
+- Added a dedicated Rust workspace crate using direct pinned rust-libp2p 0.56 component crates: QUIC, request/response protocol `/prometheus/guardian-ballot/1.0.0`, exact opaque frames capped at 8192 bytes, static peers, Identify/Ping, relay client, AutoNAT, DCUtR, connection limits, one stream per connection, global request admission, and bounded timeouts.
+- Added an owner-only Python AF_UNIX ingress that resolves only locally registered sessions, invokes the unchanged authenticated collector, distinguishes exact duplicate delivery from equivocation, and executes BIP340/SQLite work outside the asyncio event loop.
+- Added a Rust Unix client that requires directory/socket ownership and connected peer credentials to equal the effective UID, requires canonical local ACKs, and verifies their SHA-256 against the exact transported ballot before returning a one-byte network status.
+- Added the operational `next_sidecar_event` seam and deterministic tests for exact two-node QUIC transport plus the complete QUIC-to-collector-to-network-ACK path.
+- Independent review found one high effective-UID gap and medium slowloris/event-loop/missing-bridge concerns. Effective UID plus peer-credential checks, per-connection/global admission, thread offload, and the integrated sidecar path close the merge-blocking concerns; public relay/NAT/discovery and packaging remain rollout follow-ups.
+- The optional mDNS path introduced two current RustSec findings through lock-only DNS dependencies, including one with no compatible fix. The umbrella crate and mDNS were removed; direct component dependencies reduced the lock graph and restored `cargo audit` to zero known vulnerabilities. mDNS stays excluded until a compatible clean path exists.
+- Final independent re-review reports no remaining blocking/high/medium finding.
+- Local evidence: 8 Rust carrier tests pass; the full workspace passes 178 tests with two intentional live-network ignores; warning-free Clippy and Rustfmt pass; 124 Guardian tests pass with three intentional live-model skips; Black is clean; Pylint is 9.95/10; and `cargo audit` reports no known vulnerabilities with the eight pre-existing allowed maintenance/yank warnings.
+- README, Guardian/module docs, Whitepaper Markdown/HTML, Roadmap Markdown/HTML, `llms.txt`, Backlog, Memory API/Schema/Status/TODO/Checkpoint/Audit, Bridge, and this log were synchronized without claiming trusted membership, Sybil resistance, public NAT/relay operation, or on-chain attestation.
+- No secret, wallet, private key, signature, raw transaction, broadcast, contract, reputation, KAS/PROM, slash ACL, commit-reveal formula, or foreign untracked file was accessed or changed. `Prometheus-1.png` remains untouched and uncommitted.
+- PR, protected checks, merge, exact-main CI/Security/Pages, and live public verification remain pending.

@@ -143,17 +143,17 @@
 
 ## ═══ SPRINT 10: P2P + KRC-20 REAL (Mai-Juni 2026) ═══
 
-- [ ] [P0] libp2p Modul komplett implementieren (peer discovery, NAT, STUN/TURN) | Claude Code | -
+- [~] [P0] libp2p Modul komplett implementieren | Codex | GH-42 direct Guardian QUIC request/response, static peers, resource caps, owner-only collector bridge, AutoNAT/relay/DCUtR behaviours implemented; operated relay/NAT/discovery evidence and remaining client/validator paths open; mDNS blocked by unresolved compatible RustSec dependency path
 - [ ] [P0] Echte KRC-20 UTXO-Abfrage für PROM-RULES Tick | Claude Code | Contracts live
 - [ ] [P1] Regel-Download von IPFS via CIDv1 | Claude Code | KRC-20 Reader
-- [ ] [P1] Light Client ↔ Guardian P2P Kommunikation | Claude Code | libp2p
+- [ ] [P1] Light Client ↔ Guardian P2P Kommunikation | Claude Code | Guardian ballot carrier does not yet carry ThreatHint
 
 ---
 
 ## ═══ SPRINT 10B: GUARDIAN DECENTRALIZATION (parallel to Sprint 10) ═══
 
 - [x] [P1] Design and implement hybrid routing: 8B default, 70B escalation when confidence < 0.70 | Codex | GH-33/PR #34 merged as `ce1d213`; dependency-injected local router, threat/rule hash binding, finite confidence and strict submission checks, fail-closed escalation, 47 passed/3 live-model skipped; exact-main CI/Security/Pages green; live wiring/calibration remains operational work
-- [~] [P1] Implement ensemble voting protocol: 5+ 8B Guardians vote on same YARA rule via majority | Codex | GH-36 local fail-closed protocol merged/exact-main verified at `f8ebaac`; GH-39 BIP340 key/session binding, canonical envelopes/freshness, and owner-only SQLite restart/concurrency/clock-rollback-safe replay/equivocation protection merged/exact-main verified at `d0f78a9`. Actual P2P carrier/discovery/NAT traversal, trusted membership/key assignment, Sybil resistance, on-chain attestation, and production evidence remain
+- [~] [P1] Implement ensemble voting protocol: 5+ 8B Guardians vote on same YARA rule via majority | Codex | GH-36/39 local voting and authenticated intake are merged; GH-42 adds the bounded direct QUIC carrier and owner-only collector bridge. Operated relay/NAT/discovery, trusted membership/key assignment, Sybil resistance, on-chain attestation, and production evidence remain
 - [ ] [P2] Guardian Pooling Contract: on-chain PROM split for shared 70B nodes | Claude Code | Contracts live
 - [ ] [P2] Specialization sharding: Guardian registers attack class (ransomware/network/privilege) during PoW registration | Claude Code | Sprint 11
 - [ ] [P2] Sybil resistance final design: KAS/PROM stake per Guardian identity OR hardware ZK-fingerprint | Architect decision needed

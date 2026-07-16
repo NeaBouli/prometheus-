@@ -263,7 +263,7 @@ Priority tasks:
 - Sprint 9: run the merged keyless operator against a real funded testnet-10 UTXO and collect confirmed public receipt plus independent node/explorer evidence records
 - H-001: keep LE encoding and signed-boundary verification gated in CI
 - Oracle: execute the merged/exact-main keyless GovernanceAutoTuning transition operator with real public state/sponsor UTXOs, external oracle/sponsor signatures, confirmed successor evidence, and existing result/evidence/status gates before beta/mainnet governance
-- Sprint 10B: GH-33 hybrid routing, GH-36 local 5+ complete-ballot validation, and GH-39 local BIP340 authenticated intake with persistent replay/equivocation protection are merged/exact-main verified. Actual P2P carrier/discovery/NAT traversal, trusted membership/key assignment, Sybil resistance, on-chain attestation, live model wiring/calibration, and production evidence remain
+- Sprint 10B: GH-33 hybrid routing, GH-36 local 5+ complete-ballot validation, and GH-39 local BIP340 authenticated intake are merged/exact-main verified. GH-42 implements direct QUIC/libp2p Guardian ballot request/response, static peers, bounded resources, owner-only Unix collector integration, and end-to-end exact-byte ACK tests. Operated relay/NAT/discovery, trusted membership/key assignment, Sybil resistance, on-chain attestation, live model wiring/calibration, and production evidence remain
 - M-001/M-002: Medium findings (can wait until Aug/Sep)
 ```
 

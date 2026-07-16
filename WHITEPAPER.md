@@ -2,7 +2,7 @@
 
 **Whitepaper v4.0 — March 2026**
 
-**Status update — July 2026:** Kaspa Toccata is treated as a post-fork deployment environment for Prometheus. The current Silverc verifier covers H-001 commit-reveal byte encoding, ValidatorStaking runtime transitions, GuardianReputation runtime/formula gates, RuleStorage runtime gates, CommunityDonations runtime gates, DevIncentivePool runtime gates, and GovernanceAutoTuning runtime gates. Release-bundle, deploy-preflight, request/receipt/evidence verification, operator-handoff, metrics-oracle, and exact-commit release-hardening gates prepare operation without holding signing material. Closed deployment profiles separate the full seven-contract path from the non-promotable `testnet-10-validator-staking-h001` canary. The repository operator closes genesis and `reportMetrics` transaction assembly, verification, guarded broadcast, and observation while externalizing only BIP340 signing. The metrics transition preserves the covenant state value and uses a separate P2PK sponsor for its bounded fee. Public testnet-10 funding and the deterministic schema-v2 H-001 request/digest were rebuilt from exact main commit `205e1ca`, passed exact-main CI/Security/Pages, revalidated the live funding output, and remained byte-identical across two builds and to the earlier baseline; no signature or broadcast has occurred. Sprint 10B now includes a local fail-closed Guardian router that runs 8B first and escalates below confidence `0.70` to an injected 70B analyzer without changing the `0.85` submission policy, plus a local 5+ Guardian vote validator with domain-separated candidate/snapshot commitments, complete-ballot strict-majority semantics, and conservative source/approval confidence. A transport-neutral authenticated intake binds Guardian IDs to per-session BIP340 x-only public keys, verifies exact canonical envelopes and freshness, and atomically persists replay/equivocation protection across restarts and concurrent submissions. Live model wiring, calibrated confidence, an actual P2P carrier with discovery/NAT traversal, trusted membership, Sybil protection, on-chain ensemble attestation, and production evidence remain open. Mainnet remains gated by the explicitly approved external canary signature, verified one-shot canary broadcast, confirmed public receipt plus independent evidence, the remaining contract deployments, real oracle/sponsor inputs and signatures with successor evidence, and public release-hardening evidence for the exact rollout commit.
+**Status update — July 2026:** Kaspa Toccata is treated as a post-fork deployment environment for Prometheus. Current Silverc compile/runtime, release-bundle, request/receipt/evidence, metrics-oracle, and exact-commit gates cover the seven contract fixtures without holding signing material. Closed profiles separate the full path from the non-promotable `testnet-10-validator-staking-h001` canary. Public funding and the deterministic schema-v2 H-001 request/digest remain verified and byte-identical; no signature or broadcast has occurred. Sprint 10B includes fail-closed 8B-first/70B escalation, complete 5+ Guardian strict-majority voting, per-session BIP340 authenticated replay-safe intake, and a real bounded direct QUIC/libp2p ballot carrier with an owner-only local collector bridge. Static peers and relay/AutoNAT/DCUtR behaviours are implemented; public relay/NAT operation, broad discovery, trusted membership/key assignment, Sybil protection, on-chain ensemble attestation, live model evidence, and production operation remain open. Mainnet remains gated by the explicitly approved external canary signature and evidence, remaining deployments, real oracle/sponsor signatures and successor evidence, and exact-commit rollout evidence.
 
 **Keyless operator update — July 2026:** The repository contains `prometheus-silverc-deployer`, pinned to official `rusty-kaspa` v2.0.1 and the exact Silverc source compiler revision. Its covenant-genesis path constructs transaction version 1 with compute budget 10 and the exact contextual `storage_mass` commitment, derives the official covenant ID, validates the exact live unspent funding UTXO during preflight and immediately before broadcast, and models the final 66-byte Schnorr signature script before exporting the 32-byte `SIG_HASH_ALL` digest. Signing-request schema v2 binds compute, transient, storage, normalized noncontextual/overall mass, the pinned relay rate, and both relay and conservative operator fee floors. The `reportMetrics` path recompiles exact predecessor and successor state, preserves the covenant value, uses a separate P2PK fee sponsor, derives two `SIG_HASH_ALL` digests, verifies both external BIP340 signatures plus every covenant/P2PK input, and revalidates both UTXOs before guarded broadcast. Both paths reject normalized input/output collisions, persist exclusive intent before acknowledged submission, reconcile retry state by transaction ID, enforce wRPC deadlines, and rebuild verified transactions before observation. The Rust package has 49 unit/security tests, including 11 focused metrics-transition tests. No private-key, seed, wallet, keystore, or raw-transaction input exists. Public testnet-10 funding plus an exact-main H-001 schema-v2 request/digest are confirmed. The H-001 canary and real metrics transition still require explicitly approved external signatures, complete operator verification, broadcast, confirmation, and independent chain evidence. Those results cannot authorize the full release by themselves.
 
@@ -90,10 +90,11 @@ Light Client (Phi-3-mini)          Guardian (LLaMA 3)           Kaspa L1
 
 ### 4.2 P2P Layer
 
-- **Protocol**: libp2p with Prometheus-specific message types
-- **Messages**: ThreatHint, RuleProposal, RuleUpdate, PeerHandshake
-- **Header**: Magic 0x50524F4D ("PROM") + version + type + length
-- **Port**: 16420 (testnet and mainnet)
+- **Implemented Guardian protocol**: direct QUIC request/response at `/prometheus/guardian-ballot/1.0.0`, carrying one exact canonical signed ballot of at most 8192 bytes and returning a one-byte status without echoing the ballot
+- **Resource boundary**: explicit global request, per-connection stream, connection, frame, and timeout limits; invalid or overloaded input fails before Guardian authorization
+- **Local trust boundary**: an owner-only AF_UNIX bridge binds each collector ACK to the exact ballot digest; the existing BIP340/session/freshness/replay verifier remains authoritative
+- **Connectivity**: static peer multiaddresses are implemented. Relay client, AutoNAT, and DCUtR behaviours are present but public relay/NAT operation is not yet proven. mDNS is intentionally excluded because the compatible optional DNS dependency currently carries unresolved RustSec advisories
+- **Target convention**: port 16420 remains the deployment convention, but the carrier accepts explicit multiaddresses and does not hard-code a production listener
 
 ### 4.3 Off-Chain Layer
 
@@ -230,11 +231,17 @@ ledger atomically consumes one vote per member and one nonce per active
 session; persisted envelopes are reverified before `EnsembleVoter` receives
 them. Replay and equivocation markers survive restart and concurrent intake.
 
-This does not establish that the membership source or key assignment is
-trustworthy, provide an HTTP/libp2p carrier, peer discovery or NAT traversal,
-prevent Sybil identities, submit a proposal, or prove an ensemble on Kaspa L1.
-No production private-key or signing API is included. Those remain production
-protocol and deployment gates.
+GH-42 adds a real transport-only Guardian carrier. It sends the exact canonical
+ballot bytes over bounded direct QUIC/libp2p request/response, forwards inbound
+bytes to the owner-only local collector, and returns a digest-bound local result
+as a bounded network ACK. A libp2p `PeerId`, static address, relay, or discovered
+route cannot assign a Guardian ID or bypass the existing BIP340 verifier.
+
+This still does not establish that the membership source or key assignment is
+trustworthy, prove public relay/NAT operation or broad discovery, prevent Sybil
+identities, submit a proposal, or prove an ensemble on Kaspa L1. No production
+private-key or signing API is included. Those remain production protocol and
+deployment gates.
 
 ---
 

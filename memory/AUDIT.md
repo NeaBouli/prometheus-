@@ -812,5 +812,23 @@ were verified. CodeRabbit was rate-limited without a content review; the
 independent security review/re-review and protected automated gates are the
 substantive review evidence.
 
+**AUDIT UPDATE 2026-07-16:** GH-42 adds the first real Guardian ballot carrier
+without changing GH-36 voting or GH-39 authentication. Exact opaque ballot
+bytes travel over direct QUIC request/response with an 8192-byte pre-allocation
+limit, one stream per connection, global request admission, bounded connection
+counts, and deadlines. Inbound data reaches the existing collector only through
+an owner-only AF_UNIX bridge; directory, socket, and connected peer credentials
+must match the sidecar effective UID, and canonical local ACKs are bound to the
+exact payload SHA-256 before a one-byte network result is sent. SQLite/BIP340
+work runs outside the asyncio event loop. Independent review found one high UID
+ownership gap plus medium availability and missing-bridge concerns; effective
+UID/peer-credential checks, per-connection/global caps, thread offload, and the
+`next_sidecar_event` end-to-end QUIC-to-collector test close them. The
+rust-libp2p umbrella crate and mDNS were removed after optional DNS dependencies
+introduced two lockfile RustSec findings; direct pinned component crates restore
+`cargo audit` to zero known vulnerabilities. Public relay/NAT/discovery,
+trusted membership/key assignment, Sybil resistance, proposal transport, and
+on-chain attestation remain rollout gates.
+
 *Audit completed 2026-04-02 by Claude Code (5 parallel agents, 7 levels, 35 checks).*
 *The fire belongs to humanity.*
