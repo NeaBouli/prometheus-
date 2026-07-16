@@ -96,8 +96,9 @@ and live Whitepaper verification pass. No signature or broadcast occurred.
 
 ## GH-25 KEYLESS METRICS TRANSITION STATUS
 
-On branch `feat/GH-25-keyless-oracle-operator`, the repository operator now
-owns deterministic `GovernanceAutoTuningState.reportMetrics` assembly,
+PR #26 merged normally as exact main
+`072f04a7b6dbdb77970b9d51c6bb13ff79b3ee72`. The repository operator owns
+deterministic `GovernanceAutoTuningState.reportMetrics` assembly,
 verification, guarded broadcast, and successor observation. The closed
 transition spec binds exact predecessor state/outpoint/covenant, pinned source
 and compiler, public request, and a separate P2PK fee sponsor. Covenant value
@@ -107,8 +108,10 @@ executed before output or broadcast. Live UTXOs are revalidated, output paths
 are collision-checked, and an acknowledged exclusive journal prevents
 ambiguous automatic resubmission. Forty-nine deployer tests, full workspace
 fmt/clippy/tests, the full local Silverc CI job, 55 pinned upstream tests, and
-independent review pass. No real signature or broadcast occurred. PR and
-exact-main CI/Security/Pages remain pending.
+independent review pass. Exact-main Prometheus CI `29453756167`, Security Audit
+`29453756135`, Pages `29453755086`, and live Whitepaper verification pass. No
+real signature or broadcast occurred. Real state/sponsor inputs, signatures,
+confirmation, successor evidence, and release evidence remain.
 
 Scope-weighted status estimate on 2026-07-16: H-001 canary preparation is about
 96% complete; rollout-capable core-network work is about 68-72% complete; the
@@ -154,11 +157,11 @@ Whitepaper verification pass. GH-13 is accepted as development-only foundation.
 | claude-code-start.sh         | DONE            | 100%     | 2026-03-21  | -            | -               |
 | **SPRINT 0 – SETUP**         |                 |          |             |              |                 |
 | Testnet-10-Node              | DONE            | 100%     | 2026-03-21  | -            | wrpc://127.0.0.1:17210 |
-| Silverscript tooling (silverc/ssc) | IN_PROGRESS | 99%      | 2026-07-16  | -            | Upstream `silverc` builds/tests in CI; all seven current-Silverc compile/ABI/runtime gates pass; deterministic release/handoff/evidence tooling and the repository keyless genesis plus value-preserving reportMetrics operators pass locally; upstream `silverc` remains compile-only while the Rust operator supplies the network path; real signatures/receipts/evidence remain |
-| prometheus-silverc-deployer | ACCEPTED | 100% | 2026-07-16 | REMOTE PASS | PR #23 merged as `f79150d`; canonical public-signature import, normalized path-collision guards, 38 focused tests, exact-main CI/Security/Pages, and live Whitepaper pass |
-| GovernanceAutoTuning reportMetrics operator | IN_PROGRESS | 95% | 2026-07-16 | LOCAL PASS | GH-25 software/docs complete locally: two-input value-preserving transition, external oracle+sponsor BIP340 signatures, full input execution, live UTXO checks, journaled acknowledged broadcast, successor observation, 11 focused tests; PR/exact-main checks and real operation/evidence pending |
+| Silverscript tooling (silverc/ssc) | IN_PROGRESS | 99%      | 2026-07-16  | -            | Upstream `silverc` builds/tests in CI; all seven current-Silverc compile/ABI/runtime gates, deterministic release/handoff/evidence tooling, and the repository keyless genesis plus value-preserving reportMetrics operators pass exact-main CI; upstream `silverc` remains compile-only while the Rust operator supplies the network path; real signatures/receipts/evidence remain |
+| prometheus-silverc-deployer | ACCEPTED | 100% | 2026-07-16 | REMOTE PASS | PR #26 merged as `072f04a`; canonical public-signature import, keyless genesis and reportMetrics assembly/verification/guarded broadcast paths, 49 tests, exact-main CI/Security/Pages, and live Whitepaper pass |
+| GovernanceAutoTuning reportMetrics operator | ACCEPTED | 100% | 2026-07-16 | REMOTE PASS | GH-25 software/docs merged as `072f04a`: two-input value-preserving transition, external oracle+sponsor BIP340 signatures, full input execution, live UTXO checks, journaled acknowledged broadcast, successor observation, 11 focused tests, exact-main CI/Security/Pages, and live Whitepaper pass; real operation/evidence remains separately gated |
 | ValidatorStakingH001 Canary | IN_PROGRESS | 96% | 2026-07-16 | SIGNING HANDOFF READY | Public funding/identity and exact-main schema-v2 request/digest confirmed; external BIP340 signature, operator verification, one-shot broadcast, confirmation, receipt, and independent evidence remain; non-promotable by design |
-| GitHub Actions CI/CD         | ACCEPTED        | 100%     | 2026-07-16  | ACCEPTED     | Prometheus CI `29449066498`, Security Audit `29449066352`, and Pages `29449065192` green for exact merged commit `f79150d`; current-Silverc runtime, Rust/Python, Memory, HTML, Gitleaks, cargo/pip audit, and security summary pass |
+| GitHub Actions CI/CD         | ACCEPTED        | 100%     | 2026-07-16  | ACCEPTED     | Prometheus CI `29453756167`, Security Audit `29453756135`, and Pages `29453755086` green on rerun attempt 2 for exact merged commit `072f04a`; current-Silverc runtime, Rust/Python, Memory, HTML, Gitleaks, cargo/pip audit, and security summary pass |
 | Sprint-1 Pre-Check           | ACCEPTED        | 100%     | 2026-03-21  | ACCEPTED     | V-001, V-002, V-003 alle genehmigt |
 | **SPRINT 1 – CONTRACTS**     |                 |          |             |              |                 |
 | ValidatorStaking.ss          | ACCEPTED        | 100%     | 2026-03-21  | ACCEPTED     | v1.2: slash ACL, bond return, test patches |

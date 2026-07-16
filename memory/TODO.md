@@ -167,7 +167,7 @@
 - [ ] [P1] LLaMA 3 8B LoRA Fine-Tuning auf Security-Datensätzen | Claude Code | Datensätze
 - [ ] [P1] LLaMA 3 70B Fine-Tuning | Claude Code | 8B done
 - [ ] [P2] Fed-DART echte Implementierung (Gradient-Aggregation) | Claude Code | -
-- [~] [P2] fp_rate Oracle Contract + Integration | Codex | Current-Silverc contract gate and repository-owned two-input keyless transition operator pass locally with dual external BIP340 verification, value preservation, separate P2PK fee sponsor, guarded broadcast, and successor observation; GH-25 PR/exact-main checks plus real public inputs/signatures/confirmation/evidence remain
+- [~] [P2] fp_rate Oracle Contract + Integration | Codex | Current-Silverc contract gate and repository-owned two-input keyless transition operator are merged and exact-main verified at `072f04a` with dual external BIP340 verification, value preservation, separate P2PK fee sponsor, guarded broadcast, and successor observation; real public inputs/signatures/confirmation/evidence remain
 
 ---
 
