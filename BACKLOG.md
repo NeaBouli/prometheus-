@@ -1,8 +1,8 @@
 # prometheus — Backlog
 
 ## 🔴 Aktiv (diese Session)
-- Latest documented green baseline is exact main `178ad3e73866e43ada36c0e1b9e0892de510d8a1`; run `git log --oneline -1` for the current working HEAD.
-- Prometheus CI `29462346299`, Security Audit `29462346239`, and GitHub Pages `29462345642` are green for exact main. Current-Silverc CI validates the keyless Toccata-v1 operator, operator runbook, request/receipt/evidence pipeline, release-readiness audit, metrics-oracle handoff, and exact-commit hardening gates.
+- Latest documented green baseline is exact main `d0f78a9857e654dd487678a031d39ac52a44e0ec`; run `git log --oneline -1` for the current working HEAD.
+- Prometheus CI `29464295373`, Security Audit `29464295355`, and GitHub Pages `29464294890` are green for exact main. Current-Silverc CI validates the keyless Toccata-v1 operator, operator runbook, request/receipt/evidence pipeline, release-readiness audit, metrics-oracle handoff, and exact-commit hardening gates.
 - Runtime stub gates added for Rust client; current-Silverc contract gates now cover H-001, ValidatorStaking, GuardianReputation, RuleStorage, CommunityDonations, DevIncentivePool, and GovernanceAutoTuning.
 - Local current-Silverc release-bundle smoke now compiles all 7 fixtures through pinned upstream `silverc` and writes a deterministic manifest plus optional archive with source/artifact/script hashes; deploy preflight validates the bundle/operator public inputs, emits a Markdown operator runbook, and confirms upstream `silverc` has no network deploy command.
 - Deployment receipt verifier validates public receipt records against the release bundle, rejects secret-like fields, and keeps synthetic `ci_fixture` receipts separate from real `operator_record` deployment evidence.
@@ -15,13 +15,13 @@
 - Sprint 9 tooling is implemented. It remains blocked by the explicitly approved external H-001 signature, verified one-shot canary broadcast/confirmation/evidence, the remaining six state deployments, real metrics-oracle operation, real Groth16/PROM emission/P2P integration, production node evidence, and exact-commit release hardening.
 - GH-33 is merged and exact-main verified at `ce1d213`: a local dependency-injected 8B-first/70B-escalation router with exact `0.70` routing, fail-closed safety checks, and unchanged `0.85` submission policy.
 - GH-36 local ensemble software is merged and exact-main verified at `f8ebaac`: domain-separated candidate/snapshot commitments, at least five unique 8B members, complete ballots, strict majority, exact `8500`-bps source/approval policy, and conservative confidence pass locally and in protected CI. Trusted membership, signed P2P ballots, replay/Sybil protection, on-chain attestation, and production evidence remain open.
-- GH-39 is in progress on `feat/GH-39-authenticated-ballots`: the local transport-neutral intake binds each Guardian ID to an exact per-session BIP340 key, verifies strict canonical envelopes and freshness, and uses owner-only SQLite uniqueness for restart/concurrency-safe replay and equivocation protection. Actual P2P transport/discovery/NAT traversal, trusted membership/key assignment, Sybil resistance, on-chain attestation, and production evidence remain open.
+- GH-39 is merged/exact-main verified at `d0f78a9`: the local transport-neutral intake binds each Guardian ID to an exact per-session BIP340 key, verifies strict canonical envelopes and freshness, and uses owner-only SQLite uniqueness plus a monotonic time watermark for restart/concurrency/clock-rollback-safe replay and equivocation protection. Actual P2P transport/discovery/NAT traversal, trusted membership/key assignment, Sybil resistance, on-chain attestation, and production evidence remain open.
 
 ## 🟡 Nächste Session — STARTFLOW
 
 ### Pflicht VOR neuem Code:
 1. `cd /Users/gio/Desktop/repos/prometheus`
-2. `git log --oneline -5` — aktuellen HEAD prüfen; letzter dokumentierter grüner Baseline-Commit ist `178ad3e`
+2. `git log --oneline -5` — aktuellen HEAD prüfen; letzter dokumentierter grüner Baseline-Commit ist `d0f78a9`
 3. Lies `memory/CHECKPOINT.md` — vollständiger Projektstatus
 4. Lies `memory/AUDIT.md` ab Zeile 337 — Pre-Hardfork-Audit-Ergebnisse
 5. Lies `memory/ERRORS.md` — 12 bekannte Patterns
