@@ -159,8 +159,9 @@ public release-hardening evidence for the exact rollout commit.
 **Sprint 10B — Guardian Decentralization**
 - Implemented: local fail-closed 8B-first router with exact 70B escalation below confidence `0.70`
 - Implemented: threat-hash binding, finite confidence checks, strict submission types, and unchanged `0.85` submission threshold
+- Implemented: local 5+ Guardian complete-ballot validator with canonical candidate/snapshot commitments, strict majority, and conservative confidence
 - Pending: live 8B/70B service wiring and model-calibrated confidence evidence
-- Pending: majority voting across 5+ independent 8B Guardians
+- Pending: trusted membership source, signed P2P vote collection, replay protection, and on-chain ensemble attestation
 - Pending: reviewed Guardian pooling and final Sybil-resistance design
 
 **Sprint 11 — Real Phi-3-mini Integration**

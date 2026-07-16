@@ -753,5 +753,24 @@ Security Audit `29459533770`, and Pages `29459533175` passed. Live Roadmap,
 Whitepaper, and FAQ markers were verified. Live 8B/70B wiring, calibrated model
 confidence, ensemble voting, and production evidence remain open.
 
+**AUDIT UPDATE 2026-07-16:** GH-36 implements the local fail-closed Guardian
+ensemble protocol without changing contracts, P2P, wallets, or submission
+behavior. A domain-separated canonical candidate digest binds the protocol,
+threat hash, exact YARA bytes/metadata, exact integer-bps source confidence,
+policy hash, and pinned 8B model artifact. An immutable sorted snapshot commits
+at least five unique canonical Guardian IDs and an explicit membership-source
+digest. The validator requires exactly one fully bound 8B vote per member, a
+complete-ballot strict majority, `8500` bps for the source and every approval,
+and final confidence equal to the minimum of source and approving votes. Any
+missing, duplicate, unknown, malformed, mismatched, tied, or below-policy input
+returns no rule. Independent review first found missing source-confidence
+binding, then found epsilon rounding across the `0.85` boundary; both were
+fixed with candidate binding plus exact `Decimal`-to-bps conversion. Final
+re-review reports no remaining high/medium finding. Local Guardian verification
+passes 96 tests with three intentional live-model skips, Black, CI-scope Pylint
+9.87/10, focused Pylint 10.00/10, and the Rust workspace regression. Trusted
+membership, signed P2P votes, replay/Sybil resistance, and on-chain ensemble
+attestation remain open and must not be inferred from this local gate.
+
 *Audit completed 2026-04-02 by Claude Code (5 parallel agents, 7 levels, 35 checks).*
 *The fire belongs to humanity.*

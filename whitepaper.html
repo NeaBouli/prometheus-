@@ -374,7 +374,10 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
       </table>
 
       <div class="sec-sub">Guardian Node — 8B default, 70B escalation</div>
-      <p>LLaMA 3 70B requires 4× NVIDIA A100/H100 (~$30,000–50,000). This excludes many potential Guardian operators. LLaMA 3 8B runs on a single consumer GPU (e.g. RTX 4070 Ti), dramatically lowering the entry barrier. The implemented local router runs 8B first and escalates to an independent 70B analyzer below confidence 0.70. Invalid confidence, mismatched threat hashes, malformed submission decisions, or a failed 70B route fail closed. The network submission threshold remains 0.85. Live model wiring, calibrated confidence, and 5+ Guardian ensemble voting remain open.</p>
+      <p>LLaMA 3 70B requires 4× NVIDIA A100/H100 (~$30,000–50,000). This excludes many potential Guardian operators. LLaMA 3 8B runs on a single consumer GPU (e.g. RTX 4070 Ti), dramatically lowering the entry barrier. The implemented local router runs 8B first and escalates to an independent 70B analyzer below confidence 0.70. Invalid confidence, mismatched threat hashes, malformed submission decisions, or a failed 70B route fail closed. The network submission threshold remains 0.85. Live model wiring and calibrated confidence remain open.</p>
+
+      <div class="sec-sub">Guardian Ensemble — local complete-ballot gate</div>
+      <p>The local Sprint 10B ensemble validator binds protocol version, threat hash, exact YARA bytes and metadata, source confidence in integer basis points, policy hash, and the pinned 8B model artifact into a domain-separated candidate digest. A committed snapshot requires at least five unique Guardian IDs and a membership-source digest. Every member must cast exactly one fully bound vote; approvals require at least 8500 basis points, a complete ballot requires a strict majority, and final confidence is the minimum of the source rule and all approvals. Any missing, duplicate, unknown, malformed, mismatched, tied, or below-policy input returns no submittable rule. This local unsigned gate does not yet prove trusted membership, signed P2P transport, replay or Sybil resistance, on-chain ensemble attestation, or production operation.</p>
     </div>
 
     <!-- AI -->
