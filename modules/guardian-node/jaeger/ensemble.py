@@ -254,6 +254,28 @@ class EnsembleVoter:  # pylint: disable=too-few-public-methods
         )
 
 
+def is_valid_candidate(candidate: object) -> bool:
+    """Return whether a candidate's complete canonical commitment is valid."""
+    return _is_valid_candidate(candidate)
+
+
+def is_valid_membership_snapshot(snapshot: object) -> bool:
+    """Return whether a membership snapshot is canonical and self-committed."""
+    return _is_valid_snapshot(snapshot)
+
+
+def is_valid_guardian_vote(
+    vote: object,
+    candidate: EnsembleCandidate,
+    snapshot: MembershipSnapshot,
+) -> bool:
+    """Return whether one vote is fully bound to a candidate and committee."""
+    if not _is_valid_candidate(candidate) or not _is_valid_snapshot(snapshot):
+        return False
+    members_by_id = {member.guardian_id: member for member in snapshot.members}
+    return _is_valid_vote(vote, candidate, snapshot, members_by_id)
+
+
 # Each early return names one distinct fail-closed ballot rejection.
 # pylint: disable-next=too-many-return-statements
 def _validate_ballot(

@@ -34,7 +34,7 @@ curl http://localhost:8000/health
 ## Running the Analyzer
 
 ```bash
-pip install httpx pytest black pylint
+pip install -r requirements.txt
 python -m jaeger.analyzer
 ```
 
@@ -62,9 +62,30 @@ basis points; final confidence is `min(source rule, approving votes)`.
 
 Missing, duplicate, unknown, malformed, mismatched, tied, or below-policy
 input fails closed with no YARA output. This component does not discover or
-trust Guardians, collect or sign network votes, prevent replay/Sybil
-identities, submit proposals, or prove an ensemble on chain. Those are
+trust Guardians, submit proposals, or prove an ensemble on chain. Those are
 separate production gates.
+
+## Authenticated Ballot Intake
+
+`BallotSession` binds one candidate, membership snapshot, network, validity
+window, session nonce, and the exact BIP340 x-only public key for every member.
+`BallotSigningRequest` exports only a 32-byte public digest for an external
+signer. `SignedGuardianBallot` uses an exact-schema canonical JSON envelope,
+and `BallotVerifier` checks every context, vote, freshness, and public signature
+before persistence.
+
+`ReplayLedger` uses an owner-controlled SQLite file. Its parent directory must
+not be writable by group or others; the regular database file is held at mode
+`0600`, symlinks are rejected, and atomic uniqueness constraints allow at most
+one vote per Guardian and one nonce per active session across restarts and
+concurrent collectors. Persisted envelopes are reverified before the existing
+`EnsembleVoter` evaluates them. A persistent time high-water mark fails closed
+after wall-clock rollback so an already pruned session cannot reopen.
+
+Production code contains no private-key or signing API. This layer is
+transport-neutral: an HTTP/libp2p carrier, peer discovery, NAT traversal,
+trusted membership and key assignment, Sybil resistance, proposal submission,
+and on-chain attestation remain separate rollout work.
 
 ## Testing
 

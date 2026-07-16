@@ -160,8 +160,9 @@ public release-hardening evidence for the exact rollout commit.
 - Implemented: local fail-closed 8B-first router with exact 70B escalation below confidence `0.70`
 - Implemented: threat-hash binding, finite confidence checks, strict submission types, and unchanged `0.85` submission threshold
 - Implemented: local 5+ Guardian complete-ballot validator with canonical candidate/snapshot commitments, strict majority, and conservative confidence
+- Implemented: transport-neutral BIP340 ballot intake with exact key/session/context binding, strict canonical envelopes, freshness checks, and owner-only SQLite replay/equivocation protection across restarts and concurrent submissions
 - Pending: live 8B/70B service wiring and model-calibrated confidence evidence
-- Pending: trusted membership source, signed P2P vote collection, replay protection, and on-chain ensemble attestation
+- Pending: actual P2P carrier, peer discovery/NAT traversal, trusted membership and key assignment, Sybil resistance, and on-chain ensemble attestation
 - Pending: reviewed Guardian pooling and final Sybil-resistance design
 
 **Sprint 11 — Real Phi-3-mini Integration**

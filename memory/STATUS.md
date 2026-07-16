@@ -263,7 +263,7 @@ Priority tasks:
 - Sprint 9: run the merged keyless operator against a real funded testnet-10 UTXO and collect confirmed public receipt plus independent node/explorer evidence records
 - H-001: keep LE encoding and signed-boundary verification gated in CI
 - Oracle: execute the merged/exact-main keyless GovernanceAutoTuning transition operator with real public state/sponsor UTXOs, external oracle/sponsor signatures, confirmed successor evidence, and existing result/evidence/status gates before beta/mainnet governance
-- Sprint 10B: GH-33 hybrid routing software is merged/exact-main verified at `ce1d213`; GH-36 local 5+ complete-ballot validation is merged/exact-main verified at `f8ebaac` and independently re-reviewed with no remaining high/medium finding. Trusted membership, signed P2P votes/replay protection, Sybil resistance, on-chain attestation, live model wiring/calibration, and production evidence remain
+- Sprint 10B: GH-33 hybrid routing and GH-36 local 5+ complete-ballot validation are merged/exact-main verified. GH-39 locally adds exact per-session BIP340 key binding, strict signed envelopes, freshness, and persistent restart/concurrency/clock-rollback-safe replay and equivocation protection. Actual P2P carrier/discovery/NAT traversal, trusted membership/key assignment, Sybil resistance, on-chain attestation, live model wiring/calibration, and production evidence remain
 - M-001/M-002: Medium findings (can wait until Aug/Sep)
 ```
 
@@ -322,6 +322,35 @@ Remote evidence: Prometheus CI 29461803530; Security Audit 29461803531;
                  Pages 29461802700; live Roadmap/Whitepaper and README verified
 Not yet proven: trusted membership source, signed P2P collection, replay protection,
                 Sybil resistance, on-chain ensemble attestation, production operation
+```
+
+## AUTHENTICATED GUARDIAN BALLOT INTAKE (GH-39)
+
+```
+Status: issue #39; branch feat/GH-39-authenticated-ballots; PR/remote evidence pending
+Session: domain-separated commitment binds candidate, snapshot, network, nonce,
+         validity window, and the exact unique Guardian-to-BIP340-key map
+Envelope: exact-schema canonical JSON binds complete vote/context/time/nonce;
+          malformed, duplicate-field, noncanonical, oversized, cross-context,
+          wrong-key, expired, future, and overlong input fails before persistence
+Crypto: coincurve 21.0.0 verifies public BIP340 x-only signatures; production code
+        exports digest-only signing requests and contains no private-key/signing API
+Replay: owner-only SQLite, BEGIN IMMEDIATE, PRIMARY KEY(session_id, guardian_id),
+        UNIQUE(session_id, nonce), session-lifetime retention, persistent monotonic
+        time watermark, restart/concurrency/clock-rollback fail-closed coverage
+Evaluation: persisted canonical envelopes are reverified before the unchanged
+            complete-ballot EnsembleVoter receives their domain votes
+Local evidence: focused signed-ballot/ensemble suite 70 passed; complete Guardian
+                suite 117 passed/3 intentional live-model skips; Black clean;
+                focused Pylint 10.00/10; CI-scope Pylint 9.93/10; dependency,
+                workflow, Memory, HTML, Gitleaks, compile, and diff gates pass;
+                Rustfmt/Clippy and 170 workspace tests/2 live ignores pass
+Review: independent review found one medium forward-clock/prune/rollback reopening
+        path; persistent high-water enforcement plus restart regression closes it;
+        final independent re-review reports no blocking/high/medium finding
+Not yet proven: actual HTTP/libp2p carrier, peer discovery/NAT traversal, trusted
+                membership/key assignment, Sybil resistance, on-chain attestation,
+                proposal submission, production signer/model operation
 ```
 
 ## MAINNET CONTRACT ADDRESSES (post-verification)

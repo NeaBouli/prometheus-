@@ -779,5 +779,32 @@ Whitepaper, and GitHub README contain the merged boundary. CodeRabbit's content
 review was rate-limited, so the independent multi-round review and automated
 gates remain the substantive review evidence.
 
+**AUDIT UPDATE 2026-07-16:** GH-39 adds a transport-neutral authenticated
+Guardian ballot intake around the unchanged GH-36 ensemble decision. A
+domain-separated session commits candidate, membership snapshot, network,
+validity, nonce, and the exact unique Guardian-to-BIP340-x-only-key mapping.
+Exact-schema canonical envelopes bind the complete vote and freshness context;
+public signatures are verified through pinned `coincurve==21.0.0` before an
+owner-only SQLite ledger atomically consumes one vote per Guardian and one
+nonce per active session. Persistence survives restart and concurrent
+collectors, retains markers for the complete session, and reverifies stored
+envelopes before evaluation. Independent review found one medium
+forward-clock/prune/rollback path that could reopen a pruned session. A
+persistent monotonic ledger-time watermark updated in the same immediate
+transaction as consume/prune plus a restart regression closes it; final
+re-review reports 0 blocking/high/medium findings. Local evidence is 70 focused
+signed-ballot/ensemble tests, 117 complete Guardian tests with three intentional
+live-model skips, Black, Pylint 10.00/10 focused and 9.93/10 CI-scope, Python
+compilation, Rustfmt, warning-free Clippy, 170 Rust tests with two intentional
+live ignores, no known dependency vulnerabilities, YAML/Actionlint, Memory,
+Autodidactic, HTML, Gitleaks, and diff gates. One first Rust run hit the known
+sub-millisecond performance jitter at 1.408 ms; isolated and complete reruns
+passed. Actual P2P carrier/discovery/NAT,
+trusted membership/key assignment, Sybil resistance, on-chain attestation,
+proposal submission, and production signer/model operation remain open. No
+wallet, private key, signature, raw transaction, broadcast, contract, slash
+ACL, commit-reveal formula, KAS/PROM split, or Guardian-reputation behavior was
+used or changed. PR and remote exact-main evidence remain pending.
+
 *Audit completed 2026-04-02 by Claude Code (5 parallel agents, 7 levels, 35 checks).*
 *The fire belongs to humanity.*
