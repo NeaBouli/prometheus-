@@ -263,7 +263,7 @@ Priority tasks:
 - Sprint 9: run the merged keyless operator against a real funded testnet-10 UTXO and collect confirmed public receipt plus independent node/explorer evidence records
 - H-001: keep LE encoding and signed-boundary verification gated in CI
 - Oracle: execute the merged/exact-main keyless GovernanceAutoTuning transition operator with real public state/sponsor UTXOs, external oracle/sponsor signatures, confirmed successor evidence, and existing result/evidence/status gates before beta/mainnet governance
-- Sprint 10B: GH-33 hybrid routing software is implemented and locally verified; ensemble voting, live model wiring/calibration, and production evidence remain
+- Sprint 10B: GH-33 hybrid routing software is merged/exact-main verified at `ce1d213`; ensemble voting, live model wiring/calibration, and production evidence remain
 - M-001/M-002: Medium findings (can wait until Aug/Sep)
 ```
 
@@ -286,7 +286,7 @@ those gates are readiness evidence and must not be presented as deployed address
 ## GUARDIAN HYBRID ROUTING (GH-33)
 
 ```
-Status: local fail-closed router implemented; PR/exact-main evidence pending
+Status: merged via PR #34 as ce1d213; exact-main CI/Security/Pages green
 Primary route: injected LLaMA 3 8B analyzer
 Escalation: injected LLaMA 3 70B analyzer when confidence < 0.70
 Submission policy: unchanged MIN_CONFIDENCE = 0.85
@@ -294,6 +294,8 @@ Safety: threat/rule hash binding, finite [0,1] confidence, strict bool/rule type
         generic failure notes, no mutable per-request router state
 Local evidence: 47 passed, 3 intentionally skipped live-model tests; Black clean;
                 Pylint 9.69/10
+Remote evidence: Prometheus CI 29459533780; Security Audit 29459533770;
+                 Pages 29459533175; live Roadmap/Whitepaper/FAQ markers verified
 Not yet proven: live 8B/70B services, calibrated model confidence, P2P transport,
                 5+ Guardian ensemble voting, production operation
 ```
