@@ -217,7 +217,27 @@ FUNDING=/path/to/Contract.genesis-funding.json
 ```
 
 3. Send only `sighash_hex` and the expected public-key identity from the signing
-request to the approved external vault or HSM. The signer returns public JSON:
+request to the approved external vault or HSM. Do not use the Kaspa wallet
+`message sign` command: it applies personal-message domain hashing and therefore
+does not sign this transaction digest. The preferred signer output is a text
+file containing exactly the 64-byte BIP340 signature as 128 lowercase hex
+characters, with at most one trailing newline. Importing that file binds every
+response field from the validated signing request and completes both BIP340 and
+Kaspa transaction verification before writing output:
+
+```bash
+"$OP" import-signature \
+  --request "$REQUEST" \
+  --artifact "$ARTIFACT" \
+  --funding "$FUNDING" \
+  --signing-request /path/to/Contract.signing-request.json \
+  --signature-hex-file /path/to/Contract.signature.hex \
+  --signature-response-out /path/to/Contract.signature-response.json \
+  --verification-out /path/to/Contract.signature-verification.json
+```
+
+An existing vault/HSM integration may instead return the full public JSON
+response directly:
 
 ```json
 {
@@ -236,8 +256,9 @@ request to the approved external vault or HSM. The signer returns public JSON:
 }
 ```
 
-4. Rebuild everything from source inputs and verify both signature and complete
-Kaspa transaction:
+4. If the full-JSON response path was used, rebuild everything from source
+inputs and verify both signature and complete Kaspa transaction. The preferred
+plain-signature import above has already performed this exact verification:
 
 ```bash
 "$OP" verify-signature \
@@ -293,11 +314,11 @@ checks outpoint, amount, covenant ID, contract script, and DAA depth. The
 existing public receipt-evidence flow still requires independent explorer/block
 evidence before rollout status can become ready.
 
-The local suite contains 35 unit/security tests. It includes fixed public
+The local suite contains 38 unit/security tests. It includes fixed public
 transaction ID, covenant ID, sighash, signing-request hash, and storage-mass
 values, resolver fail-closed coverage, plus a file-based
-deploy-request/artifact/signing-response roundtrip and closed H-001 canary
-profile/tamper guards.
+deploy-request/artifact/signing-response roundtrip, canonical signature-import
+failure/path-collision guards, and closed H-001 canary profile/tamper guards.
 
 ## PSKT Compatibility Note
 

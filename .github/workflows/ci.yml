@@ -201,15 +201,18 @@ jobs:
           cargo build -p prometheus-silverc-deployer
           operator=target/debug/prometheus-silverc-deployer
           "$operator" --help > /tmp/prometheus-silverc-deployer-help.txt
-          for command in probe preflight prepare verify-signature broadcast observe; do
+          for command in probe preflight prepare import-signature verify-signature broadcast observe; do
             "$operator" "$command" --help >> /tmp/prometheus-silverc-deployer-help.txt
           done
           "$operator" probe --help > /tmp/prometheus-silverc-deployer-probe-help.txt
+          "$operator" import-signature --help > /tmp/prometheus-silverc-deployer-import-signature-help.txt
           grep -q -- '--rpc-url' /tmp/prometheus-silverc-deployer-probe-help.txt
           grep -q -- '--network-id' /tmp/prometheus-silverc-deployer-probe-help.txt
           grep -q -- '--evidence-out' /tmp/prometheus-silverc-deployer-probe-help.txt
           grep -q -- '--signing-request-out' /tmp/prometheus-silverc-deployer-help.txt
           grep -q -- '--signature-response' /tmp/prometheus-silverc-deployer-help.txt
+          grep -q -- '--signature-hex-file' /tmp/prometheus-silverc-deployer-import-signature-help.txt
+          grep -q -- '--signature-response-out' /tmp/prometheus-silverc-deployer-import-signature-help.txt
           grep -q -- '--acknowledge-signing-request-sha256' /tmp/prometheus-silverc-deployer-help.txt
           "$operator" observe --help > /tmp/prometheus-silverc-deployer-observe-help.txt
           grep -q -- '--request' /tmp/prometheus-silverc-deployer-observe-help.txt

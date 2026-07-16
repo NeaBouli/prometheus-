@@ -397,3 +397,14 @@ Rules for all dev agents:
 - PR #21 merged normally without admin bypass as `9e28629d81ca19a8716618034d5117922e8bfb8f`; issue #20 closed.
 - Exact-main Prometheus CI `29446061787`, Security Audit `29446061842`, and Pages `29446060342` passed. Live `index.html` and `roadmap.html` contain the merged readiness-gated status and progress estimates.
 - The Bridge header now records a merge-safe verified baseline rather than a transient documentation branch. The next real blocker is unchanged: explicit external BIP340 signing approval and verified H-001 canary execution/evidence.
+
+## 2026-07-16 GH-9 canonical public-signature import hardening
+
+- Reverified clean exact main baseline `5c1d82258eca0c1bc905416381c223e672b53ce9`; only foreign untracked `Prometheus-1.png` remains and was not inspected.
+- Confirmed from pinned official `rusty-kaspa` v2.0.1 source that wallet `message sign` applies `PersonalMessageSigningHash`, so it cannot sign the existing 32-byte transaction sighash.
+- Added `prometheus-silverc-deployer import-signature` for a plain public 64-byte BIP340 signature encoded as 128 lowercase hex characters with at most one trailing LF or CRLF.
+- The importer derives every response field from the validated schema-v2 signing request, normalizes paths before I/O, rejects output collisions with any input or other output, and writes response/verification files only after BIP340 plus complete Kaspa transaction verification.
+- Preserved the existing full-JSON `verify-signature` path and all signing/broadcast approval boundaries. No private-key, seed, wallet, password, keystore, signature, raw signed transaction, or broadcast was used.
+- Local verification passes: 38 focused deployer tests, warning-free deployer Clippy, 159 workspace tests passed with two intentional live ignores, Rustfmt, CLI smoke, CI YAML parsing, and `git diff --check`.
+- Independent Terra review initially found an input/output alias-overwrite risk and missing file-level coverage. Both were fixed; the second review reports no remaining actionable findings.
+- Updated README, Whitepaper Markdown/HTML, roadmap, Silverc docs, `llms.txt`, runbook, Bridge, Audit, Status, TODO, and Checkpoint. PR and exact-main CI remain pending.

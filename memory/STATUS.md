@@ -82,6 +82,17 @@ before digest export. PR #18, exact-main CI/Security/Pages, 35 focused Rust test
 the exact funding preflight, and a byte-identical two-pass signing-request build
 all pass. No signature or broadcast occurred.
 
+GH-9 signature-import hardening is implemented locally on
+`fix/GH-9-canonical-signature-import`. The new `import-signature` command
+accepts only a public 64-byte BIP340 signature as canonical lowercase hex,
+derives the complete response from the validated schema-v2 request, rejects
+normalized input/output path collisions, and writes no output until BIP340 and
+the complete Kaspa transaction pass. The runbook explicitly rejects Kaspa
+wallet `message sign` because personal-message domain hashing is incompatible
+with the transaction digest. Thirty-eight focused tests, warning-free Clippy,
+CLI smoke, workspace tests, and independent review pass locally. PR and
+exact-main CI remain pending; no signature or broadcast occurred.
+
 Scope-weighted status estimate on 2026-07-16: H-001 canary preparation is about
 96% complete; rollout-capable core-network work is about 65-70% complete; the
 complete roadmap vision is about 35-40% complete. These values distinguish
@@ -127,7 +138,7 @@ Whitepaper verification pass. GH-13 is accepted as development-only foundation.
 | **SPRINT 0 – SETUP**         |                 |          |             |              |                 |
 | Testnet-10-Node              | DONE            | 100%     | 2026-03-21  | -            | wrpc://127.0.0.1:17210 |
 | Silverscript tooling (silverc/ssc) | IN_PROGRESS | 99%      | 2026-07-15  | -            | Upstream `silverc` builds/tests in CI; H-001 fixture verifies; ValidatorStaking state fixture compiles; `commitVote`, `revealVote`, `slashInvalidReveal`, `requestWithdraw`, `completeWithdraw`, and signed-int deployment-bound runtime tests pass; GuardianReputationState compile/ABI/runtime/formula gates pass; RuleStorageState, CommunityDonationsState, DevIncentivePoolState, and GovernanceAutoTuningState compile/ABI/runtime gates pass locally; all 7 current-Silverc fixtures compile through the CLI artifact smoke locally and in CI; deterministic release manifest/archive, deploy preflight, operator runbook, external deploy request set/verifier, public deploy operator procedure, public orchestrator-result receipt import with raw-transaction rejection, deployment receipt verifier, public receipt-evidence verifier, deployment status staging guard, operator handoff package, release-readiness audit, public metrics-oracle report preflight, unsigned metrics-oracle tx-request builder, external oracle operator procedure, public external-operator capability verifier, public oracle tx-result verifier, public oracle tx-evidence verifier, public oracle status-draft staging, and public release-hardening evidence verification pass; upstream `silverc` remains compile-only while the repository Toccata-v1 operator supplies the keyless network path |
-| prometheus-silverc-deployer | ACCEPTED | 100% | 2026-07-16 | REMOTE PASS | GH-17 merged as `9477fab`; schema-v2 fee/mass hardening, 35 focused tests, exact-main CI/Security/Pages, live funding preflight, and deterministic request rebuild pass |
+| prometheus-silverc-deployer | IN_PROGRESS | 99% | 2026-07-16 | LOCAL PASS / REMOTE PENDING | GH-17 baseline merged as `9477fab`; canonical public-signature import, normalized path-collision guards, and 38 focused tests pass locally; PR/exact-main CI pending |
 | ValidatorStakingH001 Canary | IN_PROGRESS | 96% | 2026-07-16 | SIGNING HANDOFF READY | Public funding/identity and exact-main schema-v2 request/digest confirmed; external BIP340 signature, operator verification, one-shot broadcast, confirmation, receipt, and independent evidence remain; non-promotable by design |
 | GitHub Actions CI/CD         | ACCEPTED        | 100%     | 2026-07-16  | ACCEPTED     | Prometheus CI `29442211087`, Security Audit `29442210829`, and Pages `29442209299` green for exact merged commit `9477fab`; current-Silverc runtime, Rust/Python, Memory, HTML, Gitleaks, cargo/pip audit, and security summary pass |
 | Sprint-1 Pre-Check           | ACCEPTED        | 100%     | 2026-03-21  | ACCEPTED     | V-001, V-002, V-003 alle genehmigt |
