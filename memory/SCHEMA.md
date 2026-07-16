@@ -325,8 +325,11 @@ u32 ballot_length | exact opaque ballot bytes | EOF
 The response is `u8 version | u8 status | EOF`. Ballots remain capped at 8192
 bytes. JSON operator records may contain transport peer/address/path/status and
 bounded counts, but never ballot bytes, collector ACK bytes, or filesystem
-paths. None of these fields enter Guardian membership/session, reputation,
-staking, reward, or Kaspa state schemas.
+paths. Records are serialized before entering a bounded dedicated stdout queue;
+queue saturation or writer failure is terminal, and `stopped` is emitted only
+after the local submission server confirms shutdown. None of these fields enter
+Guardian membership/session, reputation, staking, reward, or Kaspa state
+schemas.
 
 ---
 

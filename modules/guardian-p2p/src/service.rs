@@ -8,6 +8,8 @@ use std::{
     path::{Component, Path, PathBuf},
     pin::Pin,
     str::FromStr,
+    sync::mpsc::{self, SyncSender, TrySendError},
+    thread,
     time::Duration,
 };
 
@@ -21,7 +23,7 @@ use rustix::{
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 use tokio::{
-    sync::oneshot,
+    sync::{oneshot, watch},
     task::JoinHandle,
     time::{self, MissedTickBehavior},
 };
@@ -43,6 +45,7 @@ const MAX_HEALTH_INTERVAL_SECS: u64 = 3_600;
 const MAX_COLLECTOR_STARTUP_SECS: u64 = 5 * 60;
 const MAX_SHUTDOWN_DRAIN_SECS: u64 = 60;
 const MAX_LOCAL_TIMEOUT_SECS: u64 = 60;
+const OPERATOR_OUTPUT_QUEUE_CAPACITY: usize = 256;
 
 type ShutdownFuture = Pin<Box<dyn Future<Output = Result<(), std::io::Error>> + Send>>;
 
@@ -172,6 +175,99 @@ struct OperatorRecord {
     pending_inbound: Option<usize>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pending_outbound: Option<usize>,
+}
+
+#[derive(Clone, Debug)]
+struct OutputFailure {
+    kind: std::io::ErrorKind,
+    message: String,
+}
+
+impl OutputFailure {
+    fn into_error(self) -> std::io::Error {
+        std::io::Error::new(self.kind, self.message)
+    }
+}
+
+struct OperatorOutput {
+    sender: Option<SyncSender<Vec<u8>>>,
+    failure: watch::Receiver<Option<OutputFailure>>,
+    completed: oneshot::Receiver<()>,
+}
+
+impl OperatorOutput {
+    fn start() -> Result<Self, ServiceError> {
+        let (sender, receiver) = mpsc::sync_channel::<Vec<u8>>(OPERATOR_OUTPUT_QUEUE_CAPACITY);
+        let (failure_tx, failure) = watch::channel(None);
+        let (completed_tx, completed) = oneshot::channel();
+        thread::Builder::new()
+            .name("guardian-operator-output".to_owned())
+            .spawn(move || {
+                let stdout = std::io::stdout();
+                let mut stdout = stdout.lock();
+                while let Ok(record) = receiver.recv() {
+                    if let Err(error) = stdout.write_all(&record).and_then(|()| stdout.flush()) {
+                        failure_tx.send_replace(Some(OutputFailure {
+                            kind: error.kind(),
+                            message: error.to_string(),
+                        }));
+                        break;
+                    }
+                }
+                let _ = completed_tx.send(());
+            })
+            .map_err(ServiceError::Io)?;
+        Ok(Self {
+            sender: Some(sender),
+            failure,
+            completed,
+        })
+    }
+
+    fn emit(&self, record: OperatorRecord) -> Result<(), ServiceError> {
+        self.check_failure()?;
+        let mut encoded = serde_json::to_vec(&record).map_err(ServiceError::Json)?;
+        encoded.push(b'\n');
+        match self
+            .sender
+            .as_ref()
+            .ok_or(ServiceError::OutputTask)?
+            .try_send(encoded)
+        {
+            Ok(()) => Ok(()),
+            Err(TrySendError::Full(_)) => Err(ServiceError::OutputBackpressure),
+            Err(TrySendError::Disconnected(_)) => {
+                self.check_failure().and(Err(ServiceError::OutputTask))
+            }
+        }
+    }
+
+    async fn failed(&mut self) -> ServiceError {
+        loop {
+            if let Some(failure) = self.failure.borrow().clone() {
+                return ServiceError::Io(failure.into_error());
+            }
+            if self.failure.changed().await.is_err() {
+                return ServiceError::OutputTask;
+            }
+        }
+    }
+
+    fn check_failure(&self) -> Result<(), ServiceError> {
+        match self.failure.borrow().clone() {
+            Some(failure) => Err(ServiceError::Io(failure.into_error())),
+            None => Ok(()),
+        }
+    }
+
+    async fn shutdown(mut self, timeout: Duration) -> Result<(), ServiceError> {
+        self.sender.take();
+        match time::timeout(timeout, &mut self.completed).await {
+            Ok(Ok(())) => self.check_failure(),
+            Ok(Err(_)) => Err(ServiceError::OutputTask),
+            Err(_) => Err(ServiceError::OutputShutdownTimeout),
+        }
+    }
 }
 
 impl ServiceConfig {
@@ -343,32 +439,54 @@ impl PreparedService {
 
 /// Runs the prepared service until SIGINT or SIGTERM.
 pub async fn run_service(service: PreparedService) -> Result<(), ServiceError> {
+    let output_timeout = match &service {
+        PreparedService::Guardian(service) => service.shutdown_drain_timeout,
+        PreparedService::Relay(service) => service.shutdown_drain_timeout,
+    };
     let shutdown: ShutdownFuture = Box::pin(shutdown_signal());
-    match service {
-        PreparedService::Guardian(service) => run_guardian(*service, shutdown).await,
-        PreparedService::Relay(service) => run_relay(*service, shutdown).await,
+    let mut output = OperatorOutput::start()?;
+    let service_result = match service {
+        PreparedService::Guardian(service) => run_guardian(*service, shutdown, &mut output).await,
+        PreparedService::Relay(service) => run_relay(*service, shutdown, &mut output).await,
+    };
+    let output_result = output.shutdown(output_timeout).await;
+    match service_result {
+        Err(error) => Err(error),
+        Ok(()) => output_result,
     }
 }
 
 async fn run_guardian(
     service: PreparedGuardian,
     mut shutdown: ShutdownFuture,
+    output: &mut OperatorOutput,
 ) -> Result<(), ServiceError> {
     let peer_id = service.keypair.public().to_peer_id();
     let ingress =
         UnixBallotIngress::configured(&service.collector_socket, service.ingress_timeout)?;
-    emit(OperatorRecord::basic(
+    output.emit(OperatorRecord::basic(
         ServiceRole::Guardian,
         "waiting-for-collector",
         false,
         peer_id,
     ))?;
-    ingress
-        .wait_ready(
+    tokio::select! {
+        result = ingress.wait_ready(
             service.collector_startup_timeout,
             Duration::from_millis(100),
-        )
-        .await?;
+        ) => result?,
+        error = output.failed() => return Err(error),
+        signal = &mut shutdown => {
+            signal.map_err(ServiceError::Signal)?;
+            output.emit(OperatorRecord::basic(
+                ServiceRole::Guardian,
+                "stopped",
+                false,
+                peer_id,
+            ))?;
+            return Ok(());
+        }
+    }
 
     let mut node = GuardianP2p::new(service.keypair, service.transport)?;
     let (submission_server, mut submissions) = SubmissionServer::bind(
@@ -386,7 +504,7 @@ async fn run_guardian(
     let mut health = time::interval(service.health_interval);
     health.set_missed_tick_behavior(MissedTickBehavior::Skip);
     health.tick().await;
-    emit(OperatorRecord::basic(
+    output.emit(OperatorRecord::basic(
         ServiceRole::Guardian,
         "starting",
         false,
@@ -395,6 +513,7 @@ async fn run_guardian(
 
     loop {
         tokio::select! {
+            error = output.failed() => return Err(error),
             signal = &mut shutdown => {
                 signal.map_err(ServiceError::Signal)?;
                 break;
@@ -410,7 +529,7 @@ async fn run_guardian(
                 record.connections = Some(connections);
                 record.pending_inbound = Some(pending_inbound);
                 record.pending_outbound = Some(pending_outbound);
-                emit(record)?;
+                output.emit(record)?;
             }
             submission = submissions.recv() => {
                 let Some(submission) = submission else {
@@ -422,7 +541,7 @@ async fn run_guardian(
                 let event = event?;
                 update_connection_count(&event, &mut connections);
                 complete_local_submission(&event, &mut pending_submissions);
-                emit(guardian_event_record(&event, node.is_ready(), peer_id, connections))?;
+                output.emit(guardian_event_record(&event, node.is_ready(), peer_id, connections))?;
             }
         }
     }
@@ -439,7 +558,7 @@ async fn run_guardian(
             Ok(Ok(event)) => {
                 update_connection_count(&event, &mut connections);
                 complete_local_submission(&event, &mut pending_submissions);
-                emit(guardian_event_record(
+                output.emit(guardian_event_record(
                     &event,
                     node.is_ready(),
                     peer_id,
@@ -458,13 +577,14 @@ async fn run_guardian(
     stopping.connections = Some(connections);
     stopping.pending_inbound = Some(pending_inbound);
     stopping.pending_outbound = Some(pending_outbound);
-    emit(stopping)?;
-    await_submission_server(submission_task, service.shutdown_drain_timeout).await
+    await_submission_server(submission_task, service.shutdown_drain_timeout).await?;
+    output.emit(stopping)
 }
 
 async fn run_relay(
     service: PreparedRelay,
     mut shutdown: ShutdownFuture,
+    output: &mut OperatorOutput,
 ) -> Result<(), ServiceError> {
     let mut relay = RelayService::new(service.keypair, service.relay)?;
     let peer_id = relay.local_peer_id();
@@ -472,7 +592,7 @@ async fn run_relay(
     health.set_missed_tick_behavior(MissedTickBehavior::Skip);
     health.tick().await;
     let mut connections = 0_usize;
-    emit(OperatorRecord::basic(
+    output.emit(OperatorRecord::basic(
         ServiceRole::Relay,
         "starting",
         false,
@@ -481,6 +601,7 @@ async fn run_relay(
 
     loop {
         tokio::select! {
+            error = output.failed() => return Err(error),
             signal = &mut shutdown => {
                 signal.map_err(ServiceError::Signal)?;
                 break;
@@ -493,11 +614,11 @@ async fn run_relay(
                     peer_id,
                 );
                 record.connections = Some(connections);
-                emit(record)?;
+                output.emit(record)?;
             }
             event = relay.next_event() => {
                 update_relay_connection_count(&event, &mut connections);
-                emit(relay_event_record(&event, relay.is_ready(), peer_id, connections))?;
+                output.emit(relay_event_record(&event, relay.is_ready(), peer_id, connections))?;
             }
         }
     }
@@ -508,7 +629,7 @@ async fn run_relay(
         match time::timeout_at(deadline, relay.next_event()).await {
             Ok(event) => {
                 update_relay_connection_count(&event, &mut connections);
-                emit(relay_event_record(
+                output.emit(relay_event_record(
                     &event,
                     relay.is_ready(),
                     peer_id,
@@ -520,7 +641,7 @@ async fn run_relay(
     }
     let mut stopped = OperatorRecord::basic(ServiceRole::Relay, "stopped", false, peer_id);
     stopped.connections = Some(connections);
-    emit(stopped)
+    output.emit(stopped)
 }
 
 fn admit_submission(
@@ -744,14 +865,6 @@ impl OperatorRecord {
     }
 }
 
-fn emit(record: OperatorRecord) -> Result<(), ServiceError> {
-    let stdout = std::io::stdout();
-    let mut stdout = stdout.lock();
-    serde_json::to_writer(&mut stdout, &record).map_err(ServiceError::Json)?;
-    stdout.write_all(b"\n").map_err(ServiceError::Io)?;
-    stdout.flush().map_err(ServiceError::Io)
-}
-
 async fn await_submission_server(
     task: JoinHandle<Result<(), LocalSubmissionError>>,
     timeout: Duration,
@@ -825,7 +938,12 @@ fn bounded_seconds(
 }
 
 fn validate_absolute_file_path(path: &Path) -> Result<(), ServiceError> {
-    if !path.is_absolute() || !matches!(path.components().next_back(), Some(Component::Normal(_))) {
+    if !path.is_absolute()
+        || path
+            .components()
+            .any(|component| component == Component::ParentDir)
+        || !matches!(path.components().next_back(), Some(Component::Normal(_)))
+    {
         return Err(ServiceError::InvalidConfig(
             "service paths must be absolute file paths",
         ));
@@ -961,6 +1079,12 @@ pub enum ServiceError {
     Signal(#[source] std::io::Error),
     #[error("Guardian local submission task terminated unexpectedly")]
     SubmissionTask,
+    #[error("Guardian P2P operator output task terminated unexpectedly")]
+    OutputTask,
+    #[error("Guardian P2P operator output queue is full")]
+    OutputBackpressure,
+    #[error("Guardian P2P operator output shutdown timed out")]
+    OutputShutdownTimeout,
     #[error("Guardian P2P shutdown drain timed out")]
     ShutdownTimeout,
 }
@@ -1054,5 +1178,13 @@ health_interval_secs = 3601
             ),
         );
         assert!(ServiceConfig::from_toml_file(&config).is_err());
+    }
+
+    #[test]
+    fn parent_directory_components_are_rejected() {
+        assert!(matches!(
+            validate_absolute_file_path(Path::new("/tmp/prometheus/../identity")),
+            Err(ServiceError::InvalidConfig(_))
+        ));
     }
 }

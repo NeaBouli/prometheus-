@@ -22,6 +22,8 @@ use tokio::{
     sync::oneshot,
 };
 
+use prometheus_guardian_p2p::MAX_BALLOT_BYTES;
+
 const BINARY: &str = env!("CARGO_BIN_EXE_prometheus-guardian-p2p");
 
 struct ServiceProcess {
@@ -141,6 +143,10 @@ async fn bind_collector(path: &Path) -> UnixListener {
 async fn collect_once(listener: UnixListener, received_tx: oneshot::Sender<Vec<u8>>) {
     let (mut stream, _) = listener.accept().await.expect("accept sidecar ingress");
     let length = stream.read_u32().await.expect("read ballot length") as usize;
+    assert!(
+        (1..=MAX_BALLOT_BYTES).contains(&length),
+        "collector ballot length is out of bounds"
+    );
     let mut ballot = vec![0_u8; length];
     stream
         .read_exact(&mut ballot)
@@ -159,6 +165,67 @@ async fn collect_once(listener: UnixListener, received_tx: oneshot::Sender<Vec<u
         .expect("write acknowledgement length");
     stream.write_all(&ack).await.expect("write acknowledgement");
     received_tx.send(ballot).expect("record received ballot");
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn sigterm_during_collector_wait_stops_cleanly() {
+    let directory = secure_directory();
+    let collector = directory.path().join("missing-collector.sock");
+    let submission = directory.path().join("waiting-submit.sock");
+    let config = guardian_config(
+        directory.path(),
+        "waiting",
+        &collector,
+        &submission,
+        &["/ip4/127.0.0.1/udp/0/quic-v1".to_owned()],
+        None,
+    );
+    let mut service = ServiceProcess::spawn(&config);
+    service.wait_for(Duration::from_secs(5), |event| {
+        event["event"] == "waiting-for-collector"
+    });
+
+    assert!(service.terminate(Duration::from_secs(5)).success());
+    let stopped = service.wait_for(Duration::from_secs(5), |event| event["event"] == "stopped");
+    assert_eq!(stopped["ready"], false);
+    assert!(!submission.exists());
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn broken_stdout_fails_without_blocking_the_service() {
+    let directory = secure_directory();
+    let collector_path = directory.path().join("collector.sock");
+    let _collector = bind_collector(&collector_path).await;
+    let submission = directory.path().join("broken-output-submit.sock");
+    let config = guardian_config(
+        directory.path(),
+        "broken-output",
+        &collector_path,
+        &submission,
+        &["/ip4/127.0.0.1/udp/0/quic-v1".to_owned()],
+        None,
+    );
+    let mut child = Command::new(BINARY)
+        .args(["run", "--config"])
+        .arg(&config)
+        .stdout(Stdio::piped())
+        .stderr(Stdio::null())
+        .spawn()
+        .expect("spawn service with breakable stdout");
+    drop(child.stdout.take().expect("capture service stdout"));
+
+    let deadline = Instant::now() + Duration::from_secs(5);
+    loop {
+        if let Some(status) = child.try_wait().expect("poll service exit") {
+            assert!(!status.success(), "broken stdout must fail closed");
+            break;
+        }
+        assert!(
+            Instant::now() < deadline,
+            "service remained blocked after stdout closed"
+        );
+        thread::sleep(Duration::from_millis(20));
+    }
 }
 
 fn guardian_config(

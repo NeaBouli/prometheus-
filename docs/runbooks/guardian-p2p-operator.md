@@ -96,6 +96,7 @@ prometheus-guardian-p2p run --config /var/lib/prometheus/guardian-p2p/service.to
 - Start the existing authenticated collector before the sidecar, or within `collector_startup_timeout_secs`.
 - Treat `ready: true` as listener readiness only, not Guardian authorization or public reachability.
 - Monitor JSON-line `health`, listener, connection, reservation, circuit, inbound, outbound, and terminal events.
+- Drain stdout continuously. JSON-line output uses a bounded dedicated writer; output backpressure or writer failure makes the service fail closed instead of blocking signal handling indefinitely.
 - A collector outage returns `busy`; unsafe IPC ownership, framing, or ACK data fails closed.
 
 7) Submit one canonical ballot
@@ -111,7 +112,7 @@ The local protocol is owner-credential checked, exact-framed, capped at 8192 bal
 
 8) Stop and recover
 
-- Send SIGTERM or SIGINT. The process closes admission/listeners, drains bounded work, emits `stopped`, and removes the submission socket.
+- Send SIGTERM or SIGINT. The process closes admission/listeners, drains bounded work, confirms submission-server shutdown and socket cleanup, then emits `stopped`.
 - Keep the identity path unchanged across restarts to retain the same transport `PeerId`.
 - Never delete or replace an identity merely to fix a connectivity problem; diagnose permissions and routes first.
 

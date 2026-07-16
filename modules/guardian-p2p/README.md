@@ -90,6 +90,7 @@ The CLI never accepts wallet keys, Guardian signing keys, seeds, or raw transact
 - One-byte responses: `accepted`, `duplicate`, `rejected`, or `busy`.
 - Request-response and connection limits are bounded, with one outbound stream per connection default.
 - Local collector I/O failures map to bounded `busy`/`rejected` outcomes.
+- Newline-delimited operator JSON uses a bounded dedicated writer; saturation, output failure, and output-shutdown timeout fail closed without pinning the async service loop.
 
 The transport cannot do or claim:
 

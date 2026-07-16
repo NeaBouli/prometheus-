@@ -391,16 +391,16 @@ IPC: owner-only AF_UNIX submission, exact EOF-bound frames, effective-UID peer
 Lifecycle: live listener readiness, data-minimal path-free JSON records,
            SIGINT/SIGTERM admission stop, bounded work drain, terminal status,
            and owned submission-socket cleanup
-Local evidence: 32 unit tests plus one separate-process test pass; relay,
+Local evidence: 33 unit tests plus three separate-process tests pass; relay,
                 receiver, sender, submit client, and collector prove exact-byte
                 relayed delivery, canonical ACK propagation, clean SIGTERM,
                 socket cleanup, and stable transport identities on one host;
-                203 workspace Rust tests/2 live ignores, 126 Guardian tests/3
+                206 workspace Rust tests/2 live ignores, 126 Guardian tests/3
                 live-model skips, release/package, lint, Memory, HTML, workflow,
                 dependency, staged Gitleaks, and diff gates pass
 Review: independent review found one medium trailing-ACK acceptance gap; strict
-        EOF validation and a regression close it; final security and CI/package
-        re-reviews report no remaining actionable finding
+        EOF validation closes it. Six CodeRabbit follow-ups are fixed, and the
+        final independent Terra review reports no actionable finding
 Boundary: no wallet, chain, signing, contract, reputation, KAS/PROM, slash ACL,
           commit-reveal, or Guardian authorization behavior changed
 Not yet proven: public/multi-host operation, broad discovery, trusted
