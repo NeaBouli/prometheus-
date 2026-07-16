@@ -1,11 +1,16 @@
 //! Bounded QUIC relay and AutoNAT service for operated Guardian networks.
 
-use std::{collections::HashSet, time::Duration};
+use std::{
+    collections::{HashMap, HashSet},
+    time::Duration,
+};
 
 use futures::StreamExt;
 use libp2p_autonat as autonat;
 use libp2p_connection_limits as connection_limits;
-use libp2p_core::{multiaddr::Protocol, muxing::StreamMuxerBox, Multiaddr, Transport};
+use libp2p_core::{
+    multiaddr::Protocol, muxing::StreamMuxerBox, transport::ListenerId, Multiaddr, Transport,
+};
 use libp2p_identity::{Keypair, PeerId};
 use libp2p_ping as ping;
 use libp2p_relay as relay;
@@ -13,6 +18,7 @@ use libp2p_swarm::{NetworkBehaviour, Swarm, SwarmEvent};
 
 use crate::{
     connection_path, validate_listen_address, ConnectionPath, TransportError, MAX_LISTEN_ADDRESSES,
+    MAX_TRANSPORT_DURATION,
 };
 
 /// Bounded relay service settings.
@@ -34,10 +40,11 @@ impl Default for RelayServiceConfig {
 }
 
 impl RelayServiceConfig {
-    fn validate(&self) -> Result<(), TransportError> {
+    pub fn validate(&self) -> Result<(), TransportError> {
         if self.listen_addresses.is_empty()
             || self.listen_addresses.len() > MAX_LISTEN_ADDRESSES
             || self.idle_connection_timeout.is_zero()
+            || self.idle_connection_timeout > MAX_TRANSPORT_DURATION
         {
             return Err(TransportError::InvalidConfig(
                 "relay listeners and idle timeout must be bounded",
@@ -65,6 +72,13 @@ impl RelayServiceConfig {
 #[derive(Debug)]
 pub enum RelayServiceEvent {
     Listening {
+        address: Multiaddr,
+    },
+    ListenerClosed {
+        address: Multiaddr,
+        failed: bool,
+    },
+    ListenerFailed {
         address: Multiaddr,
     },
     ConnectionEstablished {
@@ -141,6 +155,8 @@ impl From<std::convert::Infallible> for RelayBehaviourEvent {
 /// Operated relay node with fixed resource caps and no Guardian authorization role.
 pub struct RelayService {
     swarm: Swarm<RelayBehaviour>,
+    listener_addresses: HashMap<ListenerId, Multiaddr>,
+    active_listener_addresses: HashMap<ListenerId, HashSet<Multiaddr>>,
 }
 
 impl RelayService {
@@ -181,17 +197,45 @@ impl RelayService {
         let swarm_config = libp2p_swarm::Config::with_tokio_executor()
             .with_idle_connection_timeout(config.idle_connection_timeout);
         let mut swarm = Swarm::new(transport, behaviour, local_peer_id, swarm_config);
+        let mut listener_addresses = HashMap::new();
         for address in config.listen_addresses {
-            swarm
-                .listen_on(address)
+            let listener_id = swarm
+                .listen_on(address.clone())
                 .map_err(|error| TransportError::Listen(error.to_string()))?;
+            listener_addresses.insert(listener_id, address);
         }
-        Ok(Self { swarm })
+        Ok(Self {
+            swarm,
+            listener_addresses,
+            active_listener_addresses: HashMap::new(),
+        })
     }
 
     /// Returns transport metadata only; it grants no Guardian role.
     pub fn local_peer_id(&self) -> PeerId {
         *self.swarm.local_peer_id()
+    }
+
+    /// Returns true only after every configured listener has produced an active address.
+    pub fn is_ready(&self) -> bool {
+        !self.listener_addresses.is_empty()
+            && self.listener_addresses.keys().all(|listener_id| {
+                self.active_listener_addresses
+                    .get(listener_id)
+                    .is_some_and(|addresses| !addresses.is_empty())
+            })
+    }
+
+    /// Stops relay listeners before the owner loop drains and exits.
+    pub fn shutdown_listeners(&mut self) -> usize {
+        let listener_ids: Vec<_> = self.listener_addresses.keys().copied().collect();
+        let mut removed = 0;
+        for listener_id in listener_ids {
+            if self.swarm.remove_listener(listener_id) {
+                removed += 1;
+            }
+        }
+        removed
     }
 
     /// Drives the relay until an operator-relevant event is available.
@@ -209,10 +253,49 @@ impl RelayService {
         event: SwarmEvent<RelayBehaviourEvent>,
     ) -> Option<RelayServiceEvent> {
         match event {
-            SwarmEvent::NewListenAddr { address, .. } => {
+            SwarmEvent::NewListenAddr {
+                listener_id,
+                address,
+            } => {
                 self.swarm.add_external_address(address.clone());
+                self.active_listener_addresses
+                    .entry(listener_id)
+                    .or_default()
+                    .insert(address.clone());
                 Some(RelayServiceEvent::Listening { address })
             }
+            SwarmEvent::ExpiredListenAddr {
+                listener_id,
+                address,
+            } => {
+                if let Some(addresses) = self.active_listener_addresses.get_mut(&listener_id) {
+                    addresses.remove(&address);
+                }
+                Some(RelayServiceEvent::ListenerClosed {
+                    address,
+                    failed: false,
+                })
+            }
+            SwarmEvent::ListenerClosed {
+                listener_id,
+                addresses,
+                reason,
+            } => {
+                self.active_listener_addresses.remove(&listener_id);
+                let address = addresses
+                    .into_iter()
+                    .next()
+                    .or_else(|| self.listener_addresses.get(&listener_id).cloned())?;
+                Some(RelayServiceEvent::ListenerClosed {
+                    address,
+                    failed: reason.is_err(),
+                })
+            }
+            SwarmEvent::ListenerError { listener_id, .. } => self
+                .listener_addresses
+                .get(&listener_id)
+                .cloned()
+                .map(|address| RelayServiceEvent::ListenerFailed { address }),
             SwarmEvent::ConnectionEstablished {
                 peer_id, endpoint, ..
             } => Some(RelayServiceEvent::ConnectionEstablished {

@@ -306,6 +306,31 @@ AutoNAT       = direct peer route only
 Counts and encoded address length are bounded. DNS/mDNS, target-mismatched,
 duplicate, unspecified dial, and zero-port dial routes fail validation.
 
+### 3.6 Guardian Operated Service Boundary (GH-48 candidate)
+
+The strict service config is role-tagged TOML. Both roles require an absolute
+persistent transport-identity path and bounded listener set. Guardian adds
+distinct absolute collector/submission sockets, optional bounded static and
+AutoNAT routes, bounded health/ingress/startup/drain durations, and bounded
+local admission. Relay accepts no Guardian collector, submission, membership,
+wallet, reputation, or token fields. Unknown fields fail parsing.
+
+The owner-only local submission frame is:
+
+```text
+u8 version | u16 peer_id_length | canonical PeerId UTF-8 |
+u32 ballot_length | exact opaque ballot bytes | EOF
+```
+
+The response is `u8 version | u8 status | EOF`. Ballots remain capped at 8192
+bytes. JSON operator records may contain transport peer/address/path/status and
+bounded counts, but never ballot bytes, collector ACK bytes, or filesystem
+paths. Records are serialized before entering a bounded dedicated stdout queue;
+queue saturation or writer failure is terminal, and `stopped` is emitted only
+after the local submission server confirms shutdown. None of these fields enter
+Guardian membership/session, reputation, staking, reward, or Kaspa state
+schemas.
+
 ---
 
 ## 4. API DATENSTRUKTUREN (JSON)

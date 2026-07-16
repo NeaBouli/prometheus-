@@ -1,8 +1,10 @@
-# Guardian P2P Operator Runbook (GH-44)
+# Guardian P2P Operator Runbook (GH-48 candidate)
 
 ## Purpose
 
-Document the merged GH-44 transport slice for operated Guardian-sidecar communication: persisted transport identity, bounded routes, operated relay/NAT instrumentation, and race-tested admission behavior.
+Operate the GH-48 Guardian sidecar or relay candidate with persisted transport identity, strict owner-only configuration, bounded local submission, JSON health, and graceful shutdown.
+
+Supported target: Unix-like systems with AF_UNIX peer credentials. Protected CI verifies Linux. Windows and public macOS packaging are outside the current candidate.
 
 ## Scope of this implementation
 
@@ -10,6 +12,7 @@ Document the merged GH-44 transport slice for operated Guardian-sidecar communic
 - `PeerId` is metadata only, never a Guardian trust decision.
 - Transport remains opaque ballot request/ACK exchange (`/prometheus/guardian-ballot/1.0.0`) with a Python collector behind an owner-only Unix socket.
 - No wallet, chain, signature, reputation, tokenomics, or committee-auth assignment.
+- `PeerId` and all emitted addresses are transport metadata only.
 
 ## Startup and config
 
@@ -23,7 +26,42 @@ chmod 700 /var/lib/prometheus/guardian-p2p
 - Use an **absolute** path for transport identity.
 - The directory must be mode `0700`. A generated identity is mode `0600`; an existing identity may be owner-read-only, but must have no execute, group, or world bits.
 
-2) Build runtime config (`GuardianP2pConfig` in crate use site)
+2) Prepare the service and socket directory
+
+```bash
+mkdir -p /var/lib/prometheus/guardian-p2p /run/prometheus/guardian-p2p
+chmod 700 /var/lib/prometheus/guardian-p2p /run/prometheus/guardian-p2p
+```
+
+- The collector must create its Unix socket with mode `0600` in the owner-only runtime directory.
+- The sidecar creates its submission socket with mode `0600` and removes it after graceful shutdown.
+- Collector and submission paths must be distinct absolute file paths.
+
+3) Write an owner-only Guardian config
+
+```toml
+role = "guardian"
+identity_path = "/var/lib/prometheus/guardian-p2p/identity"
+collector_socket = "/run/prometheus/guardian-p2p/collector.sock"
+submission_socket = "/run/prometheus/guardian-p2p/submit.sock"
+listen_addresses = ["/ip4/0.0.0.0/udp/4101/quic-v1"]
+health_interval_secs = 30
+ingress_timeout_secs = 10
+collector_startup_timeout_secs = 30
+shutdown_drain_timeout_secs = 10
+max_local_submissions = 32
+static_peers = []
+autonat_servers = []
+```
+
+```bash
+chmod 600 /var/lib/prometheus/guardian-p2p/service.toml
+prometheus-guardian-p2p preflight --config /var/lib/prometheus/guardian-p2p/service.toml
+```
+
+Preflight is network-free, rejects unknown/unbounded fields, and emits a path-free JSON report. It creates or securely reuses the persistent transport identity.
+
+4) Configure routes
 
 - Listener routes: direct IP/UDP/QUIC-v1 or exact relay reservations ending in `/p2p-circuit`.
 - Static routes: direct QUIC-v1 or exact relay-circuit with `p2p-circuit`.
@@ -31,7 +69,15 @@ chmod 700 /var/lib/prometheus/guardian-p2p
 - No DNS routes (DNS-based routes are rejected).
 - Keep route count and timeout values bounded.
 
-3) Start relay node for operated relay path (when used)
+5) Start a relay role when used
+
+```toml
+role = "relay"
+identity_path = "/var/lib/prometheus/guardian-p2p/relay.identity"
+listen_addresses = ["/ip4/0.0.0.0/udp/4100/quic-v1"]
+health_interval_secs = 30
+shutdown_drain_timeout_secs = 10
+```
 
 - Relay service requires direct QUIC-v1 listener address.
 - Relay limits are bounded in config and hard-coded relay caps (reservations/circuits/time windows).
@@ -41,15 +87,36 @@ chmod 700 /var/lib/prometheus/guardian-p2p
   - `CircuitClosed`
   - relay and direct transport events from participants.
 
-4) Start sidecar nodes
+6) Start processes
 
-- Use `GuardianP2p::new` with:
-  - static peer entries for direct peer and relay circuit routes
-  - an explicit direct AutoNAT server route when reachability classification is required
-  - local Unix ingress validated with owner-only permissions and bounded size/timeout.
-- Run event loop calling `next_sidecar_event` to process inbound ballots and send bounded collector outcomes.
+```bash
+prometheus-guardian-p2p run --config /var/lib/prometheus/guardian-p2p/service.toml
+```
 
-## Operated relay evidence (deterministic harness)
+- Start the existing authenticated collector before the sidecar, or within `collector_startup_timeout_secs`.
+- Treat `ready: true` as listener readiness only, not Guardian authorization or public reachability.
+- Monitor JSON-line `health`, listener, connection, reservation, circuit, inbound, outbound, and terminal events.
+- Drain stdout continuously. JSON-line output uses a bounded dedicated writer; output backpressure or writer failure makes the service fail closed instead of blocking signal handling indefinitely.
+- A collector outage returns `busy`; unsafe IPC ownership, framing, or ACK data fails closed.
+
+7) Submit one canonical ballot
+
+```bash
+prometheus-guardian-p2p submit \
+  --socket /run/prometheus/guardian-p2p/submit.sock \
+  --peer '<canonical-libp2p-peer-id>' \
+  --ballot /run/prometheus/guardian-p2p/ballot.bin
+```
+
+The local protocol is owner-credential checked, exact-framed, capped at 8192 ballot bytes, and returns only `accepted`, `duplicate`, `rejected`, `busy`, or `transport-failure`.
+
+8) Stop and recover
+
+- Send SIGTERM or SIGINT. The process closes admission/listeners, drains bounded work, confirms submission-server shutdown and socket cleanup, then emits `stopped`.
+- Keep the identity path unchanged across restarts to retain the same transport `PeerId`.
+- Never delete or replace an identity merely to fix a connectivity problem; diagnose permissions and routes first.
+
+## Operated evidence
 
 `relay_service.rs` test `operated_relay_delivers_ballot_and_preserves_fallback` provides the current deterministic, isolated three-node proof:
 
@@ -61,6 +128,15 @@ chmod 700 /var/lib/prometheus/guardian-p2p
   - AutoNAT reports public path on sender,
   - DCUtR outcome is relay fallback,
   - circuit and relayed connection close events are observed after receiver stop.
+
+`tests/sidecar_process.rs` adds separate-process evidence on one host:
+
+- relay, receiver, sender, local submit client, and collector boundary run independently;
+- exact ballot bytes reach the receiver collector through the relay circuit;
+- the canonical collector ACK returns to the submit client;
+- SIGTERM exits cleanly, submission sockets disappear, and identities remain stable.
+
+This is packaging and lifecycle evidence, not public Internet or multi-host proof.
 
 ## Recovery and restart guidance
 
@@ -80,11 +156,12 @@ chmod 700 /var/lib/prometheus/guardian-p2p
 ```bash
 cargo test -p prometheus-guardian-p2p concurrent_creation_returns_one_peer_id
 cargo test -p prometheus-guardian-p2p operated_relay_delivers_ballot_and_preserves_fallback
+cargo test -p prometheus-guardian-p2p --test sidecar_process
 cargo test -p prometheus-guardian-p2p configuration_accepts_exact_direct_and_relay_routes
 cargo test -p prometheus-guardian-p2p configuration_rejects_dns_mismatches_duplicates_and_unbounded_routes
 cargo test -p prometheus-guardian-p2p closed_response_channel_race_is_nonfatal
 cargo test -p prometheus-guardian-p2p canceled_peer_keeps_capacity_until_ingress_finishes
-cargo test -p prometheus-guardian-p2p
+cargo test -p prometheus-guardian-p2p --all-targets
 cargo fmt --all -- --check
 cargo clippy -p prometheus-guardian-p2p --all-targets -- -D warnings
 cargo audit
@@ -93,4 +170,4 @@ cargo audit
 ## Explicit exclusions
 
 - Do not treat this crate as discovery, membership, signing, chain governance, or token-distribution logic.
-- Do not claim public relay operation, mDNS discovery, or multi-host production packaging as complete.
+- Do not claim public relay operation, mDNS discovery, or multi-host production operation as complete.

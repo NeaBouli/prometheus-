@@ -7,8 +7,8 @@
 | Scope | Estimated complete | Estimated remaining | Current gate |
 |-------|-------------------:|--------------------:|--------------|
 | H-001 testnet-10 canary preparation | 96% | 4% | External BIP340 signature, verification, one-shot broadcast, confirmation, receipt, independent evidence |
-| Rollout-capable core network | 71–75% | 25–29% | Six state deployments, real Groth16, PROM emission, real metrics-oracle execution/evidence, public multi-host P2P/rule distribution, production node evidence |
-| Complete roadmap vision | 38–43% | 57–62% | Production AI, desktop/mobile clients, installers, operated network, vProgs, plus all core-network gates |
+| Rollout-capable core network | 73–77% | 23–27% | Six state deployments, real Groth16, PROM emission, real metrics-oracle execution/evidence, public multi-host P2P/rule distribution, production node evidence |
+| Complete roadmap vision | 39–44% | 56–61% | Production AI, desktop/mobile clients, installers, operated network, vProgs, plus all core-network gates |
 
 Percentages are scope-weighted engineering estimates. They are not release dates,
 financial forecasts, or evidence that any contract is live.
@@ -154,6 +154,7 @@ public release-hardening evidence for the exact rollout commit.
 - Rule content download from IPFS via CIDv1
 - Merged/exact-main verified: GH-42 Guardian ballot carrier has direct QUIC request/response, static peers, bounded resources, owner-only local collector ingress, cancellation-safe concurrent swarm progress, and relay/AutoNAT/DCUtR behaviours
 - Merged/exact-main verified in GH-44: atomic owner-only persistent transport identity, strict bounded direct/relay/AutoNAT routes, data-minimal health events, and a bounded relay service
+- Locally verified GH-48 candidate: strict Guardian/relay process roles, owner-only local submission, JSON readiness/health, graceful signal drain, and separate-process same-host relay delivery/cleanup evidence
 - Proven on an isolated three-node harness: relay reservation/delivery, AutoNAT state, DCUtR relay fallback, and disconnect handling; public/multi-host operation remains pending
 - Pending: public operated relay/NAT infrastructure and broad discovery; mDNS remains excluded while its compatible dependency path has unresolved RustSec advisories
 - Light Client ↔ Guardian communication over P2P

@@ -892,5 +892,53 @@ commit-reveal behavior was accessed or changed. The known foreign untracked
 exact-main Prometheus CI `29471344601`, Security Audit `29471344556`, and Pages
 `29471344050` passed for the same SHA, and live public markers were verified.
 
-*Audit completed 2026-04-02 by Claude Code (5 parallel agents, 7 levels, 35 checks).*
+## GH-48 OPERATED SIDECAR CANDIDATE AUDIT UPDATE (2026-07-16)
+
+GH-48 packages the existing transport core as an explicit Guardian/relay
+process without changing membership, keys, signatures, reputation, stake,
+rewards, contracts, or chain behavior. Strict owner-only TOML selects one role;
+the Guardian role owns a bounded AF_UNIX submission service and continuously
+drives network/collector work, while relay remains transport-only. JSON records
+exclude ballot, collector, and local-path data. SIGINT/SIGTERM stops admission
+and listeners, drains admitted work to a bounded deadline, emits terminal state,
+and removes the owned socket.
+
+The separate-process same-host test proves exact relayed ballot delivery from
+the submit CLI to the receiver collector, canonical ACK return, graceful signal
+exit, socket cleanup, and stable transport identities. It is not public or
+multi-host evidence. Independent review found one medium strict-framing gap:
+collector acknowledgements accepted bytes after the declared canonical JSON.
+Mandatory ACK EOF and a trailing-byte regression close it. Final verification
+passes 33 unit tests plus three process tests, 206 workspace Rust tests with two
+intentional live-network ignores, 126 Guardian tests with three intentional
+live-model skips, Rustfmt, warning-free workspace/all-target Clippy, locked
+release build, Cargo package, Black, Pylint 9.95/10, Memory, Autodidactic, HTML,
+Actionlint, dependency, staged Gitleaks, public-status, and diff gates. Final
+security and CI/package re-reviews report no remaining actionable finding.
+
+The first PR #49 Rust Workspace run exposed one Linux-only overload behavior:
+closing a busy AF_UNIX connection with unread request bytes reset the client
+before its `busy` response was observed. A separate bounded rejection pool now
+reads and validates one exact request frame before returning `busy`; excess
+rejection work remains capped and malformed frames fail as transport errors.
+The focused admission regression, then-complete 32-test crate suite, process
+test, Rustfmt, and all-target Clippy pass after the fix. CodeRabbit's refreshed
+review identified six valid items: synchronous stdout backpressure could
+pin signal handling, `stopped` preceded submission-server confirmation, service
+paths accepted parent-directory components, the process collector allocated
+before checking the frame bound, Backlog named stale baselines, and Audit
+metadata was ambiguous. A bounded dedicated JSON writer, corrected shutdown
+ordering, lexical path rejection, pre-allocation frame guard, and synchronized
+metadata close them. Focused tests, the now-complete 33-test crate suite, three
+process tests including broken-stdout and collector-wait SIGTERM coverage, all
+206 workspace tests, Rustfmt, and workspace all-target Clippy pass. Independent
+Terra re-review reports no actionable finding. Refreshed remote evidence is
+pending.
+
+No secret, wallet, existing private key, signature, raw transaction, broadcast,
+contract, reputation, KAS/PROM, slash ACL, commit-reveal, or Guardian
+authorization behavior was accessed or changed. `Prometheus-1.png` remains
+untouched and uncommitted.
+
+*Original pre-hardfork audit completed 2026-04-02 by Claude Code (5 parallel agents, 7 levels, 35 checks); GH-48 candidate update completed 2026-07-16 by Codex.*
 *The fire belongs to humanity.*

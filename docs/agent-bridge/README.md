@@ -9,6 +9,8 @@ Startpunkt fuer Codex/Claude Code:
 3. CLAUDE_CODE_README.md
 
 Keine Secrets, Tokens, Passwoerter, privaten Keys oder Wallet-Daten in diese Bridge schreiben.
+
+Aktiver Handover: GH-48 operated Guardian sidecar candidate. Verbindlicher Status und offene Gates stehen in `CODEX_BRIDGE.md`; laufende Schritte stehen in `ACTION_LOG.md`.
 <!-- CODEX_CLAUDE_CODE_TERMINAL_BRIDGE_V1 -->
 ## Codex -> Claude Code Terminal Bridge
 

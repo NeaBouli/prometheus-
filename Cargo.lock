@@ -3796,7 +3796,9 @@ dependencies = [
 name = "prometheus-guardian-p2p"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "async-trait",
+ "clap",
  "futures",
  "libp2p-autonat",
  "libp2p-connection-limits",
@@ -3818,6 +3820,7 @@ dependencies = [
  "tempfile",
  "thiserror 2.0.18",
  "tokio",
+ "toml",
 ]
 
 [[package]]

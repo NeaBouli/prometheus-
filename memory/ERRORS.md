@@ -147,6 +147,8 @@ Check:    Reject unknown/changed profiles, rehashed profile tampering, oracle
 | 2026-03-21 | Sprint 0 / ssc | CRITICAL: `ssc` did not exist in the audited rusty-kaspa workspace, so the original compile/deploy instructions were invalid. | Resolved after Toccata with pinned upstream `silverc` commit `d25bd3427a093c17327ca3d6b9e1aa5f7688c863`, deterministic seven-fixture release gates, and the repository-owned keyless testnet-10 covenant operator. Real signatures and chain evidence remain separate rollout gates, not a compiler blocker. | RESOLVED |
 | 2026-03-21 | Sprint 0 / Testnet | MEDIUM: Testnet-12 does not exist in rusty-kaspa v1.1.0. Only Testnet-10 (netsuffix=10) is supported. Panic in params.rs:519. | Testnet-10 used instead. All references in MEMO.md and contracts changed to Testnet-10. | RESOLVED |
 | 2026-03-21 | Sprint 0 / kaspad | LOW: `--netsuffix 12` syntax error. kaspad expects `--netsuffix=12` (equals sign). | Correct syntax: `--netsuffix=10` with equals sign. | RESOLVED |
+| 2026-07-16 | guardian-p2p/local_submit.rs | MEDIUM: Linux reset an overloaded local submit connection because the server returned `busy` while request bytes remained unread. | Added a separately bounded rejection pool that validates and drains one exact request frame before returning `busy`; malformed overload frames return transport failure and rejection tasks remain capped. | RESOLVED |
+| 2026-07-16 | guardian-p2p/service.rs | HIGH: synchronous stdout writes could block the async owner loop and defeat bounded SIGTERM handling. | Serialize into a bounded dedicated writer queue, fail closed on saturation/output failure, bound writer shutdown, and cover broken stdout plus SIGTERM during collector wait in process tests. | RESOLVED |
 
 ---
 
