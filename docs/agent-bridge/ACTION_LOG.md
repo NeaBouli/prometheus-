@@ -589,3 +589,10 @@ Rules for all dev agents:
 - Exact-main Prometheus CI `29481830688`, Security Audit `29481830686`, and Pages `29481830054` passed for the same merge SHA.
 - README, Whitepaper, Roadmap, Backlog, module/runbook docs, Memory, and Bridge now publish merged/exact-main GH-48 wording while retaining the explicit boundary: same-host packaging evidence is complete, but public/multi-host operation, broad discovery, trusted membership/key assignment, Sybil resistance, on-chain attestation, and production evidence remain open.
 - Scope-weighted estimates remain core 73-77%, complete vision 39-44%, and 56-61% remaining. No wallet, private key, secret, signature, raw transaction, broadcast, contract, reputation, KAS/PROM, slash ACL, commit-reveal formula, or Guardian authorization behavior was accessed or changed. `Prometheus-1.png` remains untouched and uncommitted.
+
+## 2026-07-16 GH-48 public closeout evidence
+
+- Documentation PR #50 passed Prometheus CI `29482545756`, Security Audit `29482545776`, all ten contexts, and CodeRabbit without review threads, then merged normally as `bde829f057b8059d3f9a7cfc170aee9d9b650f8c`.
+- Exact-main Prometheus CI `29482783924`, Security Audit `29482783910`, and Pages `29482782380` passed for the closeout SHA.
+- Live GitHub `main` README and Markdown Whitepaper plus GitHub Pages Whitepaper, Roadmap, and `llms.txt` expose the merged/exact-main GH-48 markers and retain every public/multi-host, trust, Sybil, attestation, and production blocker.
+- This Bridge-only evidence update does not change the verified product baseline `b14d36fc` or public rollout/docs baseline `bde829f0`. `Prometheus-1.png` remains untouched and uncommitted.
