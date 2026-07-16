@@ -39,6 +39,7 @@ I/O failure returns `busy`; an unsafe socket or invalid local ACK returns
 
 ```bash
 cargo test -p prometheus-guardian-p2p
+cargo fmt --all -- --check
 cargo clippy -p prometheus-guardian-p2p --all-targets -- -D warnings
 cargo audit
 ```

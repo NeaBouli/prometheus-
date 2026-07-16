@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import asyncio
+import hashlib
 import os
 import shutil
 import tempfile
+import threading
 from dataclasses import replace
 from pathlib import Path
 
@@ -119,6 +121,81 @@ async def test_server_rejects_oversize_prefix_without_reading_body(tmp_path) -> 
         assert ack.status == "rejected"
         writer.close()
         await writer.wait_closed()
+    finally:
+        await server.close()
+        shutil.rmtree(socket_dir)
+
+
+@pytest.mark.asyncio
+async def test_server_keeps_worker_permit_until_timed_out_processing_finishes() -> None:
+    class BlockingIngress:
+        def __init__(self) -> None:
+            self.started = threading.Event()
+            self.release = threading.Event()
+
+        def process(self, wire: bytes, now_ms: int) -> IngressAck:
+            del now_ms
+            self.started.set()
+            self.release.wait()
+            return IngressAck("accepted", "a" * 64, hashlib.sha256(wire).hexdigest())
+
+    socket_dir = Path(tempfile.mkdtemp(prefix="prom-in-"))
+    os.chmod(socket_dir, 0o700)
+    socket_path = socket_dir / "guardian.sock"
+    ingress = BlockingIngress()
+    server = BallotIngressServer(
+        socket_path,
+        ingress,
+        now_ms=lambda: NOW_MS,
+        max_connections=1,
+        io_timeout_seconds=0.01,
+    )
+    wire = b"blocked ballot"
+    try:
+        await server.start()
+        with pytest.raises(asyncio.IncompleteReadError):
+            await submit_to_ingress(socket_path, wire, timeout_seconds=0.1)
+        assert await asyncio.to_thread(ingress.started.wait, 0.5)
+
+        busy = await submit_to_ingress(socket_path, wire)
+        assert busy == IngressAck("busy", "", "")
+
+        ingress.release.set()
+        for _ in range(50):
+            try:
+                accepted = await submit_to_ingress(socket_path, wire)
+            except asyncio.IncompleteReadError:
+                await asyncio.sleep(0.01)
+            else:
+                if accepted.status == "accepted":
+                    break
+                assert accepted == IngressAck("busy", "", "")
+                await asyncio.sleep(0.01)
+        else:
+            pytest.fail("worker permit was not released after processing completed")
+    finally:
+        ingress.release.set()
+        await server.close()
+        shutil.rmtree(socket_dir)
+
+
+@pytest.mark.asyncio
+async def test_submit_rejects_ack_for_a_different_ballot() -> None:
+    class MismatchedIngress:
+        def process(self, wire: bytes, now_ms: int) -> IngressAck:
+            del wire, now_ms
+            return IngressAck("accepted", "a" * 64, "b" * 64)
+
+    socket_dir = Path(tempfile.mkdtemp(prefix="prom-in-"))
+    os.chmod(socket_dir, 0o700)
+    socket_path = socket_dir / "guardian.sock"
+    server = BallotIngressServer(
+        socket_path, MismatchedIngress(), now_ms=lambda: NOW_MS
+    )
+    try:
+        await server.start()
+        with pytest.raises(BallotIngressError, match="does not match ballot"):
+            await submit_to_ingress(socket_path, b"exact ballot")
     finally:
         await server.close()
         shutil.rmtree(socket_dir)

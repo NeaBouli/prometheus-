@@ -9,13 +9,16 @@ pub mod ingress;
 
 use std::{
     collections::{HashMap, HashSet},
+    future::Future,
     io,
+    pin::Pin,
     time::Duration,
 };
 
 use async_trait::async_trait;
 use futures::{
     io::{AsyncRead, AsyncReadExt, AsyncWrite, AsyncWriteExt},
+    stream::FuturesUnordered,
     StreamExt,
 };
 use libp2p_autonat as autonat;
@@ -454,9 +457,20 @@ pub struct GuardianP2p {
     swarm: Swarm<GuardianBehaviour>,
     inbound_responses:
         HashMap<request_response::InboundRequestId, request_response::ResponseChannel<AckStatus>>,
+    inbound_work: HashSet<request_response::InboundRequestId>,
+    ingress_request_ids: HashSet<request_response::InboundRequestId>,
+    ingress_tasks: FuturesUnordered<IngressFuture>,
     outbound_requests: HashSet<request_response::OutboundRequestId>,
     max_outbound_requests: usize,
     max_inbound_requests: usize,
+}
+
+type IngressFuture = Pin<Box<dyn Future<Output = IngressCompletion> + Send>>;
+
+struct IngressCompletion {
+    peer: PeerId,
+    request_id: request_response::InboundRequestId,
+    status: AckStatus,
 }
 
 impl GuardianP2p {
@@ -506,6 +520,9 @@ impl GuardianP2p {
         Ok(Self {
             swarm,
             inbound_responses: HashMap::new(),
+            inbound_work: HashSet::new(),
+            ingress_request_ids: HashSet::new(),
+            ingress_tasks: FuturesUnordered::new(),
             outbound_requests: HashSet::new(),
             max_outbound_requests,
             max_inbound_requests,
@@ -562,6 +579,7 @@ impl GuardianP2p {
             .inbound_responses
             .remove(&request_id)
             .ok_or(TransportError::UnknownInboundRequest)?;
+        self.inbound_work.remove(&request_id);
         self.swarm
             .behaviour_mut()
             .ballots
@@ -572,31 +590,9 @@ impl GuardianP2p {
     /// Waits for the next application-relevant transport event.
     pub async fn next_event(&mut self) -> TransportEvent {
         loop {
-            match self.swarm.select_next_some().await {
-                SwarmEvent::NewListenAddr { address, .. } => {
-                    return TransportEvent::Listening { address };
-                }
-                SwarmEvent::Behaviour(BehaviourEvent::Ballots(event)) => {
-                    if let Some(event) = self.handle_ballot_event(event) {
-                        return event;
-                    }
-                }
-                SwarmEvent::Behaviour(BehaviourEvent::Identify(event)) => {
-                    let _ = event;
-                }
-                SwarmEvent::Behaviour(BehaviourEvent::Ping(event)) => {
-                    let _ = event;
-                }
-                SwarmEvent::Behaviour(BehaviourEvent::Autonat(event)) => {
-                    let _ = event;
-                }
-                SwarmEvent::Behaviour(BehaviourEvent::Relay(event)) => {
-                    let _ = event;
-                }
-                SwarmEvent::Behaviour(BehaviourEvent::Dcutr(event)) => {
-                    let _ = event;
-                }
-                _ => {}
+            let event = self.swarm.select_next_some().await;
+            if let Some(event) = self.handle_swarm_event(event) {
+                return event;
             }
         }
     }
@@ -606,21 +602,115 @@ impl GuardianP2p {
         &mut self,
         ingress: &UnixBallotIngress,
     ) -> Result<TransportEvent, TransportError> {
-        match self.next_event().await {
-            TransportEvent::InboundBallot {
-                peer,
-                request_id,
-                ballot,
-            } => {
-                let status = match ingress.forward(&ballot).await {
-                    Ok(status) => status,
-                    Err(IngressError::Io(_) | IngressError::Timeout) => AckStatus::Busy,
-                    Err(_) => AckStatus::Rejected,
-                };
-                self.respond(request_id, status)?;
-                Ok(TransportEvent::InboundProcessed { peer, status })
+        loop {
+            enum Progress {
+                Swarm(SwarmEvent<BehaviourEvent>),
+                Ingress(IngressCompletion),
             }
-            event => Ok(event),
+
+            let progress = if self.ingress_tasks.is_empty() {
+                Progress::Swarm(self.swarm.select_next_some().await)
+            } else {
+                let swarm = &mut self.swarm;
+                let ingress_tasks = &mut self.ingress_tasks;
+                tokio::select! {
+                    event = swarm.select_next_some() => Progress::Swarm(event),
+                    completion = ingress_tasks.select_next_some() => {
+                        Progress::Ingress(completion)
+                    }
+                }
+            };
+
+            match progress {
+                Progress::Swarm(event) => {
+                    let Some(event) = self.handle_swarm_event(event) else {
+                        continue;
+                    };
+                    match event {
+                        TransportEvent::InboundBallot {
+                            peer,
+                            request_id,
+                            ballot,
+                        } => {
+                            let ingress = ingress.clone();
+                            let inserted = self.ingress_request_ids.insert(request_id);
+                            debug_assert!(inserted, "inbound request cannot start ingress twice");
+                            self.ingress_tasks.push(Box::pin(async move {
+                                let status = match ingress.forward(&ballot).await {
+                                    Ok(status) => status,
+                                    Err(IngressError::Io(_) | IngressError::Timeout) => {
+                                        AckStatus::Busy
+                                    }
+                                    Err(_) => AckStatus::Rejected,
+                                };
+                                IngressCompletion {
+                                    peer,
+                                    request_id,
+                                    status,
+                                }
+                            }));
+                        }
+                        event => return Ok(event),
+                    }
+                }
+                Progress::Ingress(completion) => {
+                    if let Some(event) = self.complete_ingress(completion)? {
+                        return Ok(event);
+                    }
+                }
+            }
+        }
+    }
+
+    fn complete_ingress(
+        &mut self,
+        completion: IngressCompletion,
+    ) -> Result<Option<TransportEvent>, TransportError> {
+        self.ingress_request_ids.remove(&completion.request_id);
+        if !self.inbound_responses.contains_key(&completion.request_id) {
+            self.inbound_work.remove(&completion.request_id);
+            return Ok(None);
+        }
+
+        match self.respond(completion.request_id, completion.status) {
+            Ok(()) => Ok(Some(TransportEvent::InboundProcessed {
+                peer: completion.peer,
+                status: completion.status,
+            })),
+            Err(TransportError::ResponseChannelClosed) => Ok(None),
+            Err(error) => Err(error),
+        }
+    }
+
+    fn handle_swarm_event(&mut self, event: SwarmEvent<BehaviourEvent>) -> Option<TransportEvent> {
+        match event {
+            SwarmEvent::NewListenAddr { address, .. } => {
+                Some(TransportEvent::Listening { address })
+            }
+            SwarmEvent::Behaviour(BehaviourEvent::Ballots(event)) => {
+                self.handle_ballot_event(event)
+            }
+            SwarmEvent::Behaviour(BehaviourEvent::Identify(event)) => {
+                let _ = event;
+                None
+            }
+            SwarmEvent::Behaviour(BehaviourEvent::Ping(event)) => {
+                let _ = event;
+                None
+            }
+            SwarmEvent::Behaviour(BehaviourEvent::Autonat(event)) => {
+                let _ = event;
+                None
+            }
+            SwarmEvent::Behaviour(BehaviourEvent::Relay(event)) => {
+                let _ = event;
+                None
+            }
+            SwarmEvent::Behaviour(BehaviourEvent::Dcutr(event)) => {
+                let _ = event;
+                None
+            }
+            _ => None,
         }
     }
 
@@ -639,7 +729,7 @@ impl GuardianP2p {
                     },
                 ..
             } => {
-                if self.inbound_responses.len() >= self.max_inbound_requests {
+                if self.inbound_work.len() >= self.max_inbound_requests {
                     let _ = self
                         .swarm
                         .behaviour_mut()
@@ -647,6 +737,8 @@ impl GuardianP2p {
                         .send_response(channel, AckStatus::Busy);
                     return None;
                 }
+                let admitted = self.inbound_work.insert(request_id);
+                debug_assert!(admitted, "libp2p request IDs must be unique");
                 let previous = self.inbound_responses.insert(request_id, channel);
                 debug_assert!(previous.is_none(), "libp2p request IDs must be unique");
                 Some(TransportEvent::InboundBallot {
@@ -684,9 +776,16 @@ impl GuardianP2p {
                     failure: RequestFailure::from(&error),
                 })
             }
-            request_response::Event::InboundFailure { request_id, .. }
-            | request_response::Event::ResponseSent { request_id, .. } => {
+            request_response::Event::InboundFailure { request_id, .. } => {
                 self.inbound_responses.remove(&request_id);
+                if !self.ingress_request_ids.contains(&request_id) {
+                    self.inbound_work.remove(&request_id);
+                }
+                None
+            }
+            request_response::Event::ResponseSent { request_id, .. } => {
+                self.inbound_responses.remove(&request_id);
+                self.inbound_work.remove(&request_id);
                 None
             }
         }
@@ -695,13 +794,14 @@ impl GuardianP2p {
 
 #[cfg(test)]
 mod tests {
-    use std::{fs, os::unix::fs::PermissionsExt, path::PathBuf, time::Duration};
+    use std::{fs, os::unix::fs::PermissionsExt, path::PathBuf, sync::Arc, time::Duration};
 
     use super::*;
     use sha2::{Digest, Sha256};
     use tokio::{
         io::{AsyncReadExt as TokioAsyncReadExt, AsyncWriteExt},
-        net::UnixListener,
+        net::{UnixListener, UnixStream},
+        sync::Notify,
     };
 
     fn test_config() -> GuardianP2pConfig {
@@ -723,23 +823,58 @@ mod tests {
         fs::set_permissions(&path, fs::Permissions::from_mode(0o600))
             .expect("owner-only collector socket");
         let (mut stream, _) = listener.accept().await.expect("accept carrier");
+        let received = read_ingress_ballot(&mut stream).await;
+        assert_eq!(received, expected);
+        write_ingress_ack(&mut stream, &received, "accepted").await;
+    }
+
+    async fn read_ingress_ballot(stream: &mut UnixStream) -> Vec<u8> {
         let length = stream.read_u32().await.expect("read ingress length") as usize;
         let mut received = vec![0_u8; length];
         stream
             .read_exact(&mut received)
             .await
             .expect("read exact ingress ballot");
-        assert_eq!(received, expected);
-        let digest = format!("{:x}", Sha256::digest(&received));
+        received
+    }
+
+    async fn write_ingress_ack(stream: &mut UnixStream, ballot: &[u8], status: &str) {
+        let digest = format!("{:x}", Sha256::digest(ballot));
         let ack = format!(
-            "{{\"payload_digest\":\"{digest}\",\"protocol_version\":1,\"session_id\":\"{}\",\"status\":\"accepted\"}}",
-            "a".repeat(64)
+            "{{\"payload_digest\":\"{digest}\",\"protocol_version\":1,\"session_id\":\"{}\",\"status\":\"{status}\"}}",
+            "a".repeat(64),
         );
         stream
             .write_u32(u32::try_from(ack.len()).expect("bounded ack"))
             .await
             .expect("write ack length");
         stream.write_all(ack.as_bytes()).await.expect("write ack");
+    }
+
+    async fn serve_two_ingress_out_of_order(path: PathBuf) {
+        let listener = UnixListener::bind(&path).expect("bind collector ingress");
+        fs::set_permissions(&path, fs::Permissions::from_mode(0o600))
+            .expect("owner-only collector socket");
+
+        let (mut first_stream, _) = listener.accept().await.expect("accept first carrier");
+        let first_ballot = read_ingress_ballot(&mut first_stream).await;
+        let (mut second_stream, _) = listener.accept().await.expect("accept second carrier");
+        let second_ballot = read_ingress_ballot(&mut second_stream).await;
+
+        write_ingress_ack(&mut second_stream, &second_ballot, "accepted").await;
+        tokio::time::sleep(Duration::from_millis(250)).await;
+        write_ingress_ack(&mut first_stream, &first_ballot, "rejected").await;
+    }
+
+    async fn serve_delayed_ingress(path: PathBuf, started: Arc<Notify>, release: Arc<Notify>) {
+        let listener = UnixListener::bind(&path).expect("bind collector ingress");
+        fs::set_permissions(&path, fs::Permissions::from_mode(0o600))
+            .expect("owner-only collector socket");
+        let (mut stream, _) = listener.accept().await.expect("accept carrier");
+        let ballot = read_ingress_ballot(&mut stream).await;
+        started.notify_one();
+        release.notified().await;
+        write_ingress_ack(&mut stream, &ballot, "accepted").await;
     }
 
     #[test]
@@ -926,6 +1061,329 @@ mod tests {
             event => panic!("expected accepted acknowledgement, got {event:?}"),
         }
         ingress_server.await.expect("collector ingress task");
+    }
+
+    #[tokio::test]
+    async fn slow_ingress_does_not_stop_swarm_progress() {
+        let directory = tempfile::tempdir().expect("temporary ingress directory");
+        fs::set_permissions(directory.path(), fs::Permissions::from_mode(0o700))
+            .expect("owner-only ingress directory");
+        let socket_path = directory.path().join("guardian.sock");
+        let ingress_server = tokio::spawn(serve_two_ingress_out_of_order(socket_path.clone()));
+        tokio::task::yield_now().await;
+        let ingress = UnixBallotIngress::new(&socket_path, Duration::from_secs(2))
+            .expect("validated ingress");
+
+        let receiver_identity = identity::Keypair::generate_ed25519();
+        let receiver_peer = receiver_identity.public().to_peer_id();
+        let mut receiver_config = test_config();
+        receiver_config.listen_addresses.push(
+            "/ip4/127.0.0.1/udp/0/quic-v1"
+                .parse()
+                .expect("valid test address"),
+        );
+        let mut receiver =
+            GuardianP2p::new(receiver_identity, receiver_config).expect("receiver initializes");
+        let receiver_address = match next_event_with_timeout(&mut receiver).await {
+            TransportEvent::Listening { address } => address,
+            event => panic!("expected listener address, got {event:?}"),
+        };
+
+        let mut sender_one_config = test_config();
+        sender_one_config.static_peers.push(StaticPeer {
+            peer_id: receiver_peer,
+            address: receiver_address.clone(),
+        });
+        let mut sender_one =
+            GuardianP2p::new(identity::Keypair::generate_ed25519(), sender_one_config)
+                .expect("first sender initializes");
+
+        let mut sender_two_config = test_config();
+        sender_two_config.static_peers.push(StaticPeer {
+            peer_id: receiver_peer,
+            address: receiver_address,
+        });
+        let mut sender_two =
+            GuardianP2p::new(identity::Keypair::generate_ed25519(), sender_two_config)
+                .expect("second sender initializes");
+
+        sender_one
+            .send_ballot(
+                receiver_peer,
+                BallotBytes::new(b"first slow ballot".to_vec()).expect("bounded ballot"),
+            )
+            .expect("send first ballot");
+        sender_two
+            .send_ballot(
+                receiver_peer,
+                BallotBytes::new(b"second fast ballot".to_vec()).expect("bounded ballot"),
+            )
+            .expect("send second ballot");
+
+        let first_status = tokio::time::timeout(Duration::from_secs(10), async {
+            loop {
+                tokio::select! {
+                    event = receiver.next_sidecar_event(&ingress) => {
+                        if let TransportEvent::InboundProcessed { status, .. } =
+                            event.expect("sidecar event")
+                        {
+                            break status;
+                        }
+                    },
+                    event = sender_one.next_event() => {
+                        if let TransportEvent::OutboundFailure { failure, .. } = event {
+                            panic!("first ballot request failed: {failure:?}");
+                        }
+                    },
+                    event = sender_two.next_event() => {
+                        if let TransportEvent::OutboundFailure { failure, .. } = event {
+                            panic!("second ballot request failed: {failure:?}");
+                        }
+                    }
+                }
+            }
+        })
+        .await
+        .expect("concurrent sidecar processing timed out");
+        assert_eq!(first_status, AckStatus::Accepted);
+
+        let second_status = tokio::time::timeout(Duration::from_secs(10), async {
+            loop {
+                tokio::select! {
+                    event = receiver.next_sidecar_event(&ingress) => {
+                        if let TransportEvent::InboundProcessed { status, .. } =
+                            event.expect("sidecar event")
+                        {
+                            break status;
+                        }
+                    },
+                    _ = sender_one.next_event() => {},
+                    _ = sender_two.next_event() => {}
+                }
+            }
+        })
+        .await
+        .expect("delayed sidecar processing timed out");
+        assert_eq!(second_status, AckStatus::Rejected);
+        ingress_server.await.expect("collector ingress task");
+    }
+
+    #[tokio::test]
+    async fn canceled_peer_keeps_capacity_until_ingress_finishes() {
+        let directory = tempfile::tempdir().expect("temporary ingress directory");
+        fs::set_permissions(directory.path(), fs::Permissions::from_mode(0o700))
+            .expect("owner-only ingress directory");
+        let socket_path = directory.path().join("guardian.sock");
+        let started = Arc::new(Notify::new());
+        let release = Arc::new(Notify::new());
+        let ingress_server = tokio::spawn(serve_delayed_ingress(
+            socket_path.clone(),
+            Arc::clone(&started),
+            Arc::clone(&release),
+        ));
+        tokio::task::yield_now().await;
+        let ingress = UnixBallotIngress::new(&socket_path, Duration::from_secs(2))
+            .expect("validated ingress");
+
+        let receiver_identity = identity::Keypair::generate_ed25519();
+        let receiver_peer = receiver_identity.public().to_peer_id();
+        let mut receiver_config = test_config();
+        receiver_config.request_timeout = Duration::from_millis(200);
+        receiver_config.max_concurrent_requests = 1;
+        receiver_config.listen_addresses.push(
+            "/ip4/127.0.0.1/udp/0/quic-v1"
+                .parse()
+                .expect("valid test address"),
+        );
+        let mut receiver =
+            GuardianP2p::new(receiver_identity, receiver_config).expect("receiver initializes");
+        let receiver_address = match next_event_with_timeout(&mut receiver).await {
+            TransportEvent::Listening { address } => address,
+            event => panic!("expected listener address, got {event:?}"),
+        };
+
+        let mut sender_config = test_config();
+        sender_config.request_timeout = Duration::from_millis(200);
+        sender_config.static_peers.push(StaticPeer {
+            peer_id: receiver_peer,
+            address: receiver_address,
+        });
+        let mut sender = GuardianP2p::new(identity::Keypair::generate_ed25519(), sender_config)
+            .expect("sender initializes");
+        sender
+            .send_ballot(
+                receiver_peer,
+                BallotBytes::new(b"peer cancels before collector".to_vec())
+                    .expect("bounded ballot"),
+            )
+            .expect("send ballot");
+
+        tokio::time::timeout(Duration::from_secs(10), async {
+            loop {
+                tokio::select! {
+                    _ = started.notified() => break,
+                    event = receiver.next_sidecar_event(&ingress) => {
+                        panic!("sidecar unexpectedly completed before release: {event:?}");
+                    },
+                    event = sender.next_event() => {
+                        if let TransportEvent::OutboundFailure { failure, .. } = event {
+                            panic!("request failed before reaching ingress: {failure:?}");
+                        }
+                    }
+                }
+            }
+        })
+        .await
+        .expect("collector did not receive ballot");
+
+        tokio::time::timeout(Duration::from_secs(10), async {
+            loop {
+                tokio::select! {
+                    event = receiver.next_sidecar_event(&ingress) => {
+                        panic!("sidecar unexpectedly completed while ingress blocked: {event:?}");
+                    },
+                    event = sender.next_event() => {
+                        if let TransportEvent::OutboundFailure { failure, .. } = event {
+                            assert!(matches!(
+                                failure,
+                                RequestFailure::Timeout
+                                    | RequestFailure::ConnectionClosed
+                                    | RequestFailure::Io
+                            ));
+                            break;
+                        }
+                    }
+                }
+            }
+        })
+        .await
+        .expect("peer request did not time out");
+
+        assert!(
+            tokio::time::timeout(
+                Duration::from_millis(100),
+                receiver.next_sidecar_event(&ingress),
+            )
+            .await
+            .is_err(),
+            "canceled peer must not create an application event"
+        );
+        assert!(receiver.inbound_responses.is_empty());
+        assert_eq!(receiver.inbound_work.len(), 1);
+        assert_eq!(receiver.ingress_request_ids.len(), 1);
+
+        release.notify_one();
+        ingress_server.await.expect("collector ingress task");
+        assert!(
+            tokio::time::timeout(
+                Duration::from_millis(100),
+                receiver.next_sidecar_event(&ingress),
+            )
+            .await
+            .is_err(),
+            "orphaned ingress completion must be discarded without an error"
+        );
+        assert!(receiver.inbound_work.is_empty());
+        assert!(receiver.ingress_request_ids.is_empty());
+    }
+
+    #[tokio::test]
+    async fn closed_response_channel_race_is_nonfatal() {
+        let directory = tempfile::tempdir().expect("temporary ingress directory");
+        fs::set_permissions(directory.path(), fs::Permissions::from_mode(0o700))
+            .expect("owner-only ingress directory");
+        let socket_path = directory.path().join("guardian.sock");
+        let started = Arc::new(Notify::new());
+        let release = Arc::new(Notify::new());
+        let ingress_server = tokio::spawn(serve_delayed_ingress(
+            socket_path.clone(),
+            Arc::clone(&started),
+            Arc::clone(&release),
+        ));
+        tokio::task::yield_now().await;
+        let ingress = UnixBallotIngress::new(&socket_path, Duration::from_secs(2))
+            .expect("validated ingress");
+
+        let receiver_identity = identity::Keypair::generate_ed25519();
+        let receiver_peer = receiver_identity.public().to_peer_id();
+        let mut receiver_config = test_config();
+        receiver_config.request_timeout = Duration::from_millis(200);
+        receiver_config.listen_addresses.push(
+            "/ip4/127.0.0.1/udp/0/quic-v1"
+                .parse()
+                .expect("valid test address"),
+        );
+        let mut receiver =
+            GuardianP2p::new(receiver_identity, receiver_config).expect("receiver initializes");
+        let receiver_address = match next_event_with_timeout(&mut receiver).await {
+            TransportEvent::Listening { address } => address,
+            event => panic!("expected listener address, got {event:?}"),
+        };
+
+        let mut sender_config = test_config();
+        sender_config.request_timeout = Duration::from_millis(200);
+        sender_config.static_peers.push(StaticPeer {
+            peer_id: receiver_peer,
+            address: receiver_address,
+        });
+        let mut sender = GuardianP2p::new(identity::Keypair::generate_ed25519(), sender_config)
+            .expect("sender initializes");
+        sender
+            .send_ballot(
+                receiver_peer,
+                BallotBytes::new(b"closed response channel race".to_vec()).expect("bounded ballot"),
+            )
+            .expect("send ballot");
+
+        tokio::time::timeout(Duration::from_secs(10), async {
+            loop {
+                tokio::select! {
+                    _ = started.notified() => break,
+                    event = receiver.next_sidecar_event(&ingress) => {
+                        panic!("sidecar unexpectedly completed before release: {event:?}");
+                    },
+                    _ = sender.next_event() => {}
+                }
+            }
+        })
+        .await
+        .expect("collector did not receive ballot");
+
+        let failed_request = tokio::time::timeout(Duration::from_secs(10), async {
+            loop {
+                tokio::select! {
+                    event = receiver.swarm.select_next_some() => {
+                        if let SwarmEvent::Behaviour(BehaviourEvent::Ballots(
+                            request_response::Event::InboundFailure { request_id, .. },
+                        )) = event
+                        {
+                            break request_id;
+                        }
+                    },
+                    _ = sender.next_event() => {}
+                }
+            }
+        })
+        .await
+        .expect("receiver did not close the response channel");
+        assert!(receiver.inbound_responses.contains_key(&failed_request));
+
+        release.notify_one();
+        ingress_server.await.expect("collector ingress task");
+        let completion = tokio::time::timeout(
+            Duration::from_secs(1),
+            receiver.ingress_tasks.select_next_some(),
+        )
+        .await
+        .expect("ingress completion timed out");
+        assert_eq!(completion.request_id, failed_request);
+        assert!(receiver
+            .complete_ingress(completion)
+            .expect("closed automatic response channel is nonfatal")
+            .is_none());
+        assert!(receiver.inbound_responses.is_empty());
+        assert!(receiver.inbound_work.is_empty());
+        assert!(receiver.ingress_request_ids.is_empty());
     }
 
     #[test]

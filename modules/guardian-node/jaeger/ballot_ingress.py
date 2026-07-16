@@ -215,6 +215,7 @@ class BallotIngressServer:  # pylint: disable=too-many-instance-attributes
         self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter
     ) -> None:
         admitted = False
+        worker: asyncio.Task[IngressAck] | None = None
         try:
             async with self._active_lock:
                 if self._active < self._max_connections:
@@ -237,10 +238,9 @@ class BallotIngressServer:  # pylint: disable=too-many-instance-attributes
             wire = await asyncio.wait_for(
                 reader.readexactly(frame_size), self._io_timeout
             )
-            ack = await asyncio.wait_for(
-                asyncio.to_thread(self._ingress.process, wire, self._now_ms()),
-                self._io_timeout,
-            )
+            worker = asyncio.create_task(self._process_with_permit(wire))
+            admitted = False
+            ack = await asyncio.wait_for(asyncio.shield(worker), self._io_timeout)
             await asyncio.wait_for(
                 _write_frame(writer, ack.to_wire()), self._io_timeout
             )
@@ -255,6 +255,13 @@ class BallotIngressServer:  # pylint: disable=too-many-instance-attributes
                 await writer.wait_closed()
             except ConnectionError:
                 pass
+
+    async def _process_with_permit(self, wire: bytes) -> IngressAck:
+        try:
+            return await asyncio.to_thread(self._ingress.process, wire, self._now_ms())
+        finally:
+            async with self._active_lock:
+                self._active -= 1
 
 
 async def submit_to_ingress(
@@ -278,7 +285,13 @@ async def submit_to_ingress(
         if not 0 < ack_size <= MAX_INGRESS_ACK_BYTES:
             raise BallotIngressError("invalid ingress acknowledgement size")
         ack_wire = await asyncio.wait_for(reader.readexactly(ack_size), timeout_seconds)
-        return IngressAck.from_wire(ack_wire)
+        ack = IngressAck.from_wire(ack_wire)
+        if (
+            ack.status != "busy"
+            and ack.payload_digest != hashlib.sha256(wire).hexdigest()
+        ):
+            raise BallotIngressError("ingress acknowledgement does not match ballot")
+        return ack
     finally:
         writer.close()
         await writer.wait_closed()

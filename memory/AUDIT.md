@@ -830,5 +830,30 @@ introduced two lockfile RustSec findings; direct pinned component crates restore
 trusted membership/key assignment, Sybil resistance, proposal transport, and
 on-chain attestation remain rollout gates.
 
+CodeRabbit's subsequent review found that Python admission could be released
+while a timed-out `to_thread` job still ran, Python client-side ACK parsing did
+not bind the returned digest to the submitted ballot, and synchronous collector
+awaiting stopped exclusive libp2p swarm polling. A shielded worker task now owns
+the admission permit until the worker future completes; non-busy ACKs are
+payload-bound; and bounded Rust ingress futures are retained in carrier state
+and polled alongside the swarm. New timeout/permit, digest-mismatch, and
+two-peer out-of-order tests close these paths. Post-fix local verification is
+126 Guardian tests with three intentional live-model skips, 181 Rust workspace
+tests with two intentional live-network ignores, Rustfmt, warning-free Clippy,
+Black, and Pylint 9.95/10. One first workspace run hit the known sub-millisecond
+performance jitter at 1.278 ms; isolated and complete reruns passed.
+
+Follow-up review identified two peer-cancellation orderings around active local
+ingress work and libp2p response-channel closure. Separate admitted-work,
+active-ingress, and response-channel tracking now keeps capacity consumed until
+real local completion. Both already-removed channels and channels that close
+before `InboundFailure` handling are nonfatal only in the automatic sidecar
+completion path; the manual `respond()` API preserves its explicit error.
+Deterministic ordered-cancellation and closed-channel-race tests pass, and final
+independent re-review reports zero blocking/high/medium findings. A later
+concurrent workspace attempt hit the same performance jitter at 2.291 ms while
+Cargo artifact locks were contended; the isolated test completed in 43
+microseconds and the clean complete workspace rerun passed.
+
 *Audit completed 2026-04-02 by Claude Code (5 parallel agents, 7 levels, 35 checks).*
 *The fire belongs to humanity.*

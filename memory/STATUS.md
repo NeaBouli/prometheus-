@@ -350,7 +350,7 @@ Review: independent review found one medium forward-clock/prune/rollback reopeni
         final independent re-review reports no blocking/high/medium finding
 Remote evidence: Prometheus CI 29464295373; Security Audit 29464295355;
                  Pages 29464294890; live Whitepaper/Roadmap/README verified
-Not yet proven: actual HTTP/libp2p carrier, peer discovery/NAT traversal, trusted
+Not yet proven: operated peer discovery/NAT traversal, trusted
                 membership/key assignment, Sybil resistance, on-chain attestation,
                 proposal submission, production signer/model operation
 ```
