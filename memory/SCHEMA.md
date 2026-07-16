@@ -286,7 +286,7 @@ side verifies socket ownership/peer credentials and the ACK digest before
 answering the remote request. No PeerId, address, relay, or route field enters
 the Guardian membership/session schema.
 
-### 3.5 Guardian Transport Identity and Routes (GH-44 candidate)
+### 3.5 Guardian Transport Identity and Routes (GH-44 merged)
 
 The libp2p transport identity is a canonical bounded private-key protobuf in an
 owner-controlled local file. Its public `PeerId` is transport metadata only and

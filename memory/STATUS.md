@@ -116,8 +116,8 @@ real signature or broadcast occurred. Real state/sponsor inputs, signatures,
 confirmation, successor evidence, and release evidence remain.
 
 Scope-weighted status estimate on 2026-07-16: H-001 canary preparation is about
-96% complete; rollout-capable core-network work is about 68-72% complete; the
-complete roadmap vision is about 35-40% complete. These values distinguish
+96% complete; rollout-capable core-network work is about 71-75% complete; the
+complete roadmap vision is about 38-43% complete. These values distinguish
 prepared software from real chain operation and are not release guarantees.
 Latest verified public-status main `e9a970a9d3dbaa98cd754a4149075c0cca866001`
 passed Prometheus CI `29455597727`, Security Audit `29455597677`, and Pages
@@ -239,7 +239,7 @@ Repo current-Silverc public release-hardening evidence verifier: `scripts/verify
 Signed-int boundary decision: current upstream Silverc entrypoint `int` values are deployable only in the nonnegative signed range `0..=i64::MAX`; Rust retains raw `u64` H-001 vectors for byte compatibility and uses `build_silverc_checked` / `validate_silverc_commitment_bounds` for deployment calls.
 Rusty-Kaspa workspace dependencies pinned to `v2.0.1`; `cargo audit` now reports no vulnerabilities, only allowed warnings.
 GitHub Security Audit workflow re-enabled and dependency audits now fail on findings instead of using `|| true`; after `c673766`, Dependency Audit was hardened with explicit job/step timeouts and split cargo-audit install/run steps. GH-30 extends explicit job-level runtime bounds to every required CI/Security context and pins `cargo-audit 0.22.2`, `pip-audit 2.10.1`, Rust 1.95.0, and Python 3.11 without renaming protected contexts. PR #31 merged as `71e5783`; exact-main Prometheus CI `29457601210`, Security Audit `29457601183`, and Pages `29457600490` passed, including the jointly pinned Dependency Audit in 2m54s and Current Silverc Runtime in 2m35s.
-Current remote verification baseline: exact operational main `c8038e93` passed Prometheus CI `29469319855`, Security Audit `29469319851`, and Pages `29469319460` on 2026-07-16. All nine required contexts are bounded and green; GH-42 plus its docs closeout are merged/exact-main/live verified, while the H-001 execution artifacts remain intentionally bound to `205e1ca`.
+Current remote verification baseline: exact operational main `27c2edc31` passed Prometheus CI `29471344601`, Security Audit `29471344556`, and Pages `29471344050` on 2026-07-16. All nine required contexts are bounded and green; GH-42 and GH-44 are merged/exact-main/live verified, while public/multi-host Guardian operation and the H-001 execution gates remain open. H-001 execution artifacts remain intentionally bound to `205e1ca`.
 Remote verification baseline: Prometheus CI `29456156122` attempt 2, Security Audit `29456155263` attempt 2, and Pages `29456154432` passed for exact operational main `3ba90a9` on 2026-07-16. The first CI/Security attempts were cancelled after remaining in progress in runtime/dependency paths and then passed unchanged on the same SHA. Exact public-status main `e9a970a` passed Prometheus CI `29455597727`, Security Audit `29455597677`, and Pages `29455597066`; live GitHub Pages exposes the `205e1ca` handoff and unchanged rollout gates. Earlier exact artifact baseline `205e1ca` passed Prometheus CI `29454591518`, Security Audit `29454591555`, and Pages `29454590793`. Earlier GH-9 profile CI `29412667386`, Security Audit `29412667410`, and Pages `29412666483` passed for `6213c559`. The prior official SilverScript covenant-genesis capability baseline `9d74c0c` passed on 2026-07-12. The prior `40bb9a0` baseline passed after adding public release-hardening evidence verification; live GitHub Pages contains both release-hardening and genesis-capability wording. The prior `48a6743` baseline passed after adding public oracle tx-evidence verification. The prior `9a1ac59` baseline passed after recording the Autodidactic workflow-helper regression suite CI run. The prior `4816444` baseline passed after adding the Autodidactic workflow-helper regression suite to CI. The prior `ffbad55` baseline passed after the public receipt-evidence verifier documentation follow-up. The prior `4d7a6b8` baseline passed after adding public node/explorer deployment receipt-evidence verification. The prior `181cde2` baseline passed after adding raw/serialized transaction field rejection to public deploy-result import and deployment receipt verification. The prior `6cc000c` baseline passed after adding public external-operator capability verification. The prior `3d02326` baseline passed after adding public oracle status-draft staging. The prior `a86c1b5` baseline passed after adding the public deploy operator procedure gate for verified Silverc deploy request sets. The prior `442853f` baseline passed after public external oracle operator procedure coverage for signer-ready metrics tx requests. The prior `8bf6a14` baseline passed after public release-readiness audit coverage for generated handoff packages. The prior `fa719fc` baseline passed after public oracle tx-result verification, generated operator receipt verification/status staging, operator handoff import mode, and public result handoff mode; the interim `119fa89` CI failure was workflow-only missing `hashlib` import in the metrics-oracle tx-result fixture block and is fixed by `fa719fc`.
 GitHub branch governance: `main` requires pull requests, strict up-to-date branches, linear history, resolved conversations, and nine successful CI/Security contexts. Admin enforcement is enabled; force pushes and deletion are disabled. Solo-maintainer mode uses zero formal approvals because only one collaborator exists and self-approval is impossible; raise the count to one when a second collaborator is added.
 Public docs refreshed by 2026-07-16: README, WHITEPAPER.md, whitepaper.html, docs/roadmap.md, roadmap.html, index.html, modules/contracts/silverc/README.md, and llms.txt state deployment-gated post-Toccata status, verified seven-contract runtime gates, the repository-owned keyless genesis execution boundary, public request/receipt/evidence/status guards, metrics-oracle and exact-commit release gates, target-only PROM-RULES asset orchestration, and no Kasplex dependency for Guardian reputation. Expired June-September launch promises are replaced by readiness gates.
@@ -263,7 +263,7 @@ Priority tasks:
 - Sprint 9: run the merged keyless operator against a real funded testnet-10 UTXO and collect confirmed public receipt plus independent node/explorer evidence records
 - H-001: keep LE encoding and signed-boundary verification gated in CI
 - Oracle: execute the merged/exact-main keyless GovernanceAutoTuning transition operator with real public state/sponsor UTXOs, external oracle/sponsor signatures, confirmed successor evidence, and existing result/evidence/status gates before beta/mainnet governance
-- Sprint 10B: GH-33 hybrid routing, GH-36 local 5+ complete-ballot validation, GH-39 local BIP340 authenticated intake, and GH-42 direct QUIC/libp2p ballot transport are merged/exact-main verified. The GH-44 candidate adds persistent identity, strict bounded routes, a relay service, health events, and isolated three-node relay/AutoNAT/DCUtR-fallback/disconnect evidence. Protected merge, public/multi-host operation, broad discovery, trusted membership/key assignment, Sybil resistance, on-chain attestation, live model wiring/calibration, and production evidence remain
+- Sprint 10B: GH-33 hybrid routing, GH-36 local 5+ complete-ballot validation, GH-39 local BIP340 authenticated intake, GH-42 direct QUIC/libp2p ballot transport, and GH-44 persistent identity plus isolated operated relay/NAT evidence are merged/exact-main verified. Public/multi-host operation, broad discovery, trusted membership/key assignment, Sybil resistance, on-chain attestation, live model wiring/calibration, and production evidence remain
 - M-001/M-002: Medium findings (can wait until Aug/Sep)
 ```
 
@@ -355,10 +355,10 @@ Not yet proven: operated peer discovery/NAT traversal, trusted
                 proposal submission, production signer/model operation
 ```
 
-## GUARDIAN OPERATED TRANSPORT (GH-44 CANDIDATE)
+## GUARDIAN OPERATED TRANSPORT (GH-44 MERGED)
 
 ```text
-Status: local branch candidate; protected PR/merge and exact-main evidence pending
+Status: merged as 27c2edc31; exact-main CI/Security/Pages and live markers pass
 Identity: absolute path, effective-user-owned 0700 parent, NOFOLLOW opens,
           owner-readable regular canonical protobuf, atomic same-directory 0600
           creation, fsync, stable PeerId across restart/concurrent creation
@@ -373,8 +373,8 @@ Local evidence: 21 Guardian P2P crate tests pass; deterministic isolated
                 upgrade with relay fallback, and circuit/connection close
 Boundary: PeerId never authorizes Guardian membership. No wallet, chain, contract,
           signature, reputation, KAS/PROM, slash ACL, or commit-reveal change
-Not yet proven: protected merge/exact-main CI, public or multi-host operation,
-                broad discovery, trusted membership/key assignment, Sybil
+Not yet proven: public or multi-host operation, broad discovery, trusted
+                membership/key assignment, Sybil
                 resistance, on-chain attestation, standalone service packaging
 ```
 

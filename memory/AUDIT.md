@@ -862,9 +862,9 @@ and live Whitepaper, Roadmap, and GitHub README markers were verified. Issue
 #42 is closed. GH-44 carries the explicit persistent-identity and operated
 relay/NAT follow-up without changing the authorization boundary.
 
-## GH-44 CANDIDATE AUDIT UPDATE (2026-07-16)
+## GH-44 MERGED AUDIT UPDATE (2026-07-16)
 
-The candidate adds persistent libp2p identity, strict route validation,
+Merged GH-44 adds persistent libp2p identity, strict route validation,
 data-minimal health events, and a bounded relay/AutoNAT service without changing
 Guardian authorization. Identity creation uses an absolute owner-controlled
 path, `NOFOLLOW`, effective UID and mode checks, bounded canonical protobuf,
@@ -888,7 +888,9 @@ workspace attempt hit known M-002 jitter at 1.993 ms; isolated rerun passed at
 No secret, wallet, private key from an existing user file, signature, raw
 transaction, broadcast, contract, reputation, KAS/PROM, slash ACL, or
 commit-reveal behavior was accessed or changed. The known foreign untracked
-`Prometheus-1.png` remains untouched.
+`Prometheus-1.png` remains untouched. PR #46 merged normally as `27c2edc31`;
+exact-main Prometheus CI `29471344601`, Security Audit `29471344556`, and Pages
+`29471344050` passed for the same SHA, and live public markers were verified.
 
 *Audit completed 2026-04-02 by Claude Code (5 parallel agents, 7 levels, 35 checks).*
 *The fire belongs to humanity.*
