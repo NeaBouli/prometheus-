@@ -104,9 +104,10 @@ Current runtime coverage:
 - `completeWithdraw` accepts zero-output termination after cooldown
 - `completeWithdraw` rejects before the cooldown expires
 
-Current operator coverage is 27 unit/security tests, including a fixed public
+Current operator coverage is 35 unit/security tests, including a fixed public
 interoperability vector for transaction ID, covenant ID, sighash,
-signing-request hash, and contextual storage-mass commitment.
+signing-request hash, contextual storage-mass commitment, and signed-shape
+fee/mass tamper guards.
 
 Current signed-int deployment boundary:
 
@@ -121,7 +122,7 @@ Current signed-int deployment boundary:
 
 Remaining deployment blockers:
 
-- real funded testnet-10 operator inputs and external BIP340 signatures
+- exact merged-commit testnet-10 requests and external BIP340 signatures
 - confirmed `operator_record` receipts plus independent node/explorer evidence
 - the external signed metrics-oracle transaction and exact-commit release evidence
 
@@ -231,6 +232,15 @@ input. Official PSKT/PSKB is not used because its audited input builder creates
 legacy sigop-count commitments where Toccata transaction v1 requires an explicit
 compute-budget commitment. Contextual storage mass is a separate v1 transaction
 commitment and is calculated through the official consensus API.
+The operator uses a finalized 66-byte Schnorr signature script form.
+The signing request binds `compute_mass`, `transient_mass`,
+`normalized_non_contextual_mass`, `normalized_overall_mass`,
+`pinned_fee_rate_sompi_per_kg`, `minimum_relay_fee_sompi`, and
+`minimum_operator_fee_sompi`.
+
+`rusty-kaspa` v2.0.1 relay floor is based on normalized non-contextual mass.
+Prometheus additionally enforces the same baseline conservatively on normalized
+overall mass including storage for stable miner prioritization.
 See [`docs/runbooks/silverc-genesis-operator.md`](../../../docs/runbooks/silverc-genesis-operator.md)
 for schemas, commands, safety gates, and rollback handling.
 

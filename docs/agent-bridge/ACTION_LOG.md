@@ -340,6 +340,15 @@ Rules for all dev agents:
 - Verified `9d74c0c` on `main`: Prometheus CI `29184186551` success, Security Audit `29184186538` success including Gitleaks/cargo audit/pip audit, and Pages `29184186085` success.
 - Security note: no private keys, tokens, credentials, raw transactions, keystores, wallet files, or secrets were added. Foreign untracked `Prometheus-1.png` remains untouched.
 
+## 2026-07-16 GH-17 signed-shape fee/mass hardening
+
+- Opened issue #17 and branch `fix/GH-17-genesis-fee-mass` after the first real funding-bound dry run exposed an unsafe `80000`-sompi/`2000`-sompi example and missing derived fee/mass floor.
+- Upgraded public signing requests to schema v2 and bound final 66-byte Schnorr-script compute, transient, storage, normalized non-contextual/overall mass, pinned v2.0.1 fee rate, relay floor, and conservative operator floor.
+- Added fail-closed below-floor, rehashed fee/mass-tamper, and unknown-field tests; the signature integration test also proves final signed-shape mass parity. All 35 focused operator tests pass.
+- Replaced the runbook template with a mass-aware 10-TKAS covenant output, 500000-sompi fee, and same-address change. A live funding-bound candidate preflight passed with compute `2083`, transient `1412`, storage/overall `4001`, relay floor `208300`, and operator floor `400100`.
+- The branch candidate is deliberately not approved for signing. It must be discarded and rebuilt from the exact merged commit after main CI. No private wallet data, signature, raw signed transaction, or broadcast was used.
+- Spark handled only the bounded operator documentation slice; Sol reviewed and integrated the diff. Foreign untracked `Prometheus-1.png` remains untouched.
+
 - Remote verification update:
   - `181cde2 ci: reject raw deploy receipt payloads`
   - Prometheus CI: success

@@ -171,7 +171,8 @@ Dies ist nicht optional. Es ist Teil jeder Task-Definition.
 Sprint 9 ist nicht mehr durch Toccata, H-001-Verifikation oder Funding blockiert.
 Der öffentliche non-promotable H-001 testnet-10 P2PK-Outpoint und die passende
 öffentliche Deployer-Identität sind bestätigt. Der Canary wartet auf den
-exact-commit Request/Digest, eine externe BIP340-Signatur, Broadcast,
+Merge der GH-17 Signed-Shape-Fee/Mass-Härtung, danach den exact-commit
+Request/Digest, eine externe BIP340-Signatur, Broadcast,
 Bestätigung, `operator_record`-Receipt-Erfassung/-Verifikation und öffentliche
 Evidence; der Full-Rollout wartet zusätzlich auf die übrigen State-Contracts,
 Metrics Oracle und Release Hardening.
@@ -193,3 +194,4 @@ Core Dev benötigt: Apple Developer Account + Google Play Account (vor Sprint 13
 | 2026-03-22 | Mobile: Flutter (nicht React Native)  | Architect  | Hintergrund-Scanning braucht native Integration |
 | 2026-03-22 | Guardian Installer: curl one-click script | Architect | Niedrigste Einstiegshürde für Server-Betreiber |
 | 2026-07-15 | Geschlossene Deployment-Profile | Codex Audit | `full` bindet sieben Release-Fixtures und Metrics Oracle; H-001 bindet nur den non-promotable testnet-10 Canary ohne Oracle-Key |
+| 2026-07-16 | Signed-shape Fee/Mass-Floor vor externer Signatur | Codex Audit | Pinned v2.0.1 Relay-Floor plus konservativer Overall-Mass-Floor werden in Signing-Request Schema v2 gebunden; alte Requests werden verworfen |
