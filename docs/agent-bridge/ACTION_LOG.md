@@ -442,3 +442,5 @@ Rules for all dev agents:
 - Two prepare runs were byte-identical to each other and the prior `9477fab` request. Signing-request hash remains `6b8e65065ca5ae2ca561ddd3fcb9659c384496fd31db32c137fcc9d811fa5323`; sighash remains `174ccbe80d1d37e62d2bbabfbfba48245372df2bcf9e6724ac79ebc16b4e0bcd`.
 - Preserved the public handoff outside Git at `/Users/gio/Desktop/repos/prometheus-handoffs/205e1ca` with 0700 directories and 0600 files. Full-directory Gitleaks v8.30.1 scanned about 1.27 MB and found no leaks.
 - No wallet file, private key, secret, signature, raw transaction, or broadcast was accessed or produced. The next gate is an explicitly approved external BIP340 signature response, not repository-side signing.
+- PR #28 merged normally without admin bypass as `e9a970a9d3dbaa98cd754a4149075c0cca866001`; exact-main Prometheus CI `29455597727`, Security Audit `29455597677`, and Pages `29455597066` passed.
+- Live GitHub README, index, roadmap, and whitepaper contain the merged `205e1ca` handoff/live-preflight status and the synchronized 68-72% core-network estimate. Issue #9 was updated with the public evidence and unchanged signature/broadcast gates.

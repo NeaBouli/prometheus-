@@ -11,7 +11,7 @@
 |------|------|
 | Projekt | Prometheus — Decentralized AI Threat Intelligence |
 | Repo | https://github.com/NeaBouli/prometheus- |
-| Branch | `docs/GH-9-exact-main-rebuild` from verified baseline `205e1ca` |
+| Branch | `main`; all status changes remain PR-only |
 | Lokaler Pfad | `$REPO_ROOT` |
 | Letzter grün verifizierter Produkt-/Tooling-Commit | `205e1ca` — GH-25 evidence merge; main CI `29454591518`, Security `29454591555`, Pages `29454590793` green; H-001 handoff/live preflight rebuilt afterward |
 | Aktuelle Tooling-Baseline | Exact main `205e1ca` plus GH-9 public funding, live UTXO preflight, and byte-identical deterministic schema-v2 signing request/digest are ready for explicitly approved external signing |
