@@ -44,7 +44,7 @@ If criterion 1, 2, or 3 is NOT met: automatic REJECTED (no NEEDS_CHANGES).
 | Sprint-7 Dashboard    | 1.0     | 2026-03-22 | Claude  | ACCEPTED        | Dashboard, README, WHITEPAPER.md                     |
 | scripts/autodidactic.py | 1.1   | 2026-07-12 | Codex   | ACCEPTED        | Regression suite added for memory loading, padded dependency/status table handling, task completion, and blocker detection |
 | Miner Companion Foundation | 0.1 | 2026-07-16 | Codex + Terra + Spark | ACCEPTED | Safe Phase-1 boundary and all review findings resolved; PR #14 plus exact-merge CI/Security/Pages and live Whitepaper verification pass |
-| Keyless reportMetrics Operator | 0.1 | 2026-07-16 | Codex + Terra | PENDING_AUDIT | Local implementation and independent review pass: exact state/value binding, separate P2PK fee sponsor, dual external BIP340 verification, full input execution, UTXO revalidation, collision guards, journal recovery, 49 deployer tests, and full local Silverc CI job; PR/exact-main CI/Security/Pages pending |
+| Keyless reportMetrics Operator | 0.1 | 2026-07-16 | Codex + Terra | ACCEPTED | Exact state/value binding, separate P2PK fee sponsor, dual external BIP340 verification, full input execution, UTXO revalidation, collision guards, journal recovery, 49 deployer tests, independent review, PR #26, exact-main CI/Security/Pages, and live Whitepaper pass at `072f04a`; real chain operation/evidence remains gated |
 
 ---
 

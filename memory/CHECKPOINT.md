@@ -148,7 +148,7 @@
 - [~] Sprint 9: H-001 canary handoff is locally ready and non-promotable; real signature/receipt/evidence execution remains external. The keyless metrics transition operator is locally complete; real oracle/sponsor UTXOs, signatures, confirmation/evidence, remaining state contracts, and exact-commit release hardening still block full rollout
 - [x] GH-1 covenant-genesis capability gate — merged via PR #2 as `9d74c0c`; transaction version 1, compiled-script P2SH, official funding-outpoint/unbound-output covenant-ID derivation, and funding-input binding after ID derivation are required; four tamper classes reject; main CI, Security Audit, and Pages pass
 - [ ] Sprint 10B: Guardian hybrid routing (8B/70B) + Ensemble voting
-- [~] Q-003: fp_rate Oracle — current-Silverc contract gate uses signed metrics input; public report/request/result/evidence/status gates plus repository-owned value-preserving two-input Rust assembly, dual external-signature verification, guarded broadcast, and successor observation are locally covered; real inputs/signatures/confirmation/evidence pending
+- [~] Q-003: fp_rate Oracle — current-Silverc contract gate, public report/request/result/evidence/status gates, and repository-owned value-preserving two-input Rust assembly, dual external-signature verification, guarded broadcast, and successor observation are merged and exact-main verified at `072f04a`; real inputs/signatures/confirmation/evidence remain
 - [ ] Sybil resistance final design — Architect decision needed
 - [ ] M-001: yara_generator.py Heuristic → LLM confidence
 - [ ] M-002: Performance test threshold relaxen oder --release gate
