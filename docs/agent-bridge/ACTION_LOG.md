@@ -449,9 +449,13 @@ Rules for all dev agents:
 
 - Audited the exact-main closeout after Prometheus CI and Security Audit required attempt-2 reruns on unchanged `3ba90a9`; Pages passed on attempt 1 and all three final runs are green.
 - Opened issue #30 and branch `fix/GH-30-ci-runtime-bounds` to ensure every protected CI/Security job has an explicit fail-closed runtime bound while preserving all nine required context names.
-- Pinned the target audit environment to Rust 1.95.0, Python 3.11, `cargo-audit 0.22.2`, and `pip-audit 2.10.1` instead of resolving latest installer versions at run time. Those component versions were observed in prior green jobs; their combined GH-30 Security Audit evidence remains pending until the PR runs.
+- Pinned the audit environment to Rust 1.95.0, Python 3.11, `cargo-audit 0.22.2`, and `pip-audit 2.10.1` instead of resolving latest installer versions at run time. Those component versions were observed in prior green jobs and were later jointly verified on exact main as recorded below.
 - Reclassified the obsolete pre-Toccata missing-`ssc` blocker as resolved by the pinned current-Silverc release/operator path; retained external signature, broadcast, receipt/evidence, remaining-contract, oracle-transition, and release-hardening gates as open.
 - Removed the remaining obsolete `ssc --testnet` and compiler-wait instructions from `CLAUDE.md`, `memory/MEMO.md`, and the Checkpoint pattern table; corrected the role split so PROM rewards and canonical L1 Guardian reputation are not conflated.
 - Updated `memory/SCHEMA.md`, the developer guide, and the migration security memo to preserve the same earned-only PROM/separate L1 reputation boundary and replace the expired pre-Toccata migration sequence with exact-commit execution gates.
 - Corrected the testnet-address table so compile/ABI/runtime readiness can no longer be mistaken for a deployed address.
 - No wallet, private key, signature, raw transaction, secret, or foreign untracked file was accessed. `Prometheus-1.png` remains untouched and uncommitted.
+- PR #31 merged normally without admin bypass as `71e578342d26639740e76172245c47b8c4e6dbaf`; issue #30 closed.
+- Exact-main Prometheus CI `29457601210`, Security Audit `29457601183`, and Pages `29457600490` passed. All nine protected contexts are explicitly bounded; Dependency Audit completed in 2m54s and Current Silverc Runtime in 2m35s.
+- Optional CodeRabbit remained pending without review threads. The independent Terra review found one medium evidence-wording issue, which was fixed before commit; no blocking/high finding remained.
+- GH-30 is complete. The next rollout gate returns to the external BIP340 response for GH-9; no signature or broadcast occurred during this task.
