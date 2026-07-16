@@ -492,3 +492,12 @@ Rules for all dev agents:
 - Local evidence: focused ensemble/router tests 73 passed; complete Guardian suite 96 passed and three intentional live-model tests skipped; Black clean; focused Pylint 10.00/10; CI-scope Pylint 9.87/10; Rust workspace 170 passed with two intentional live ignores after one isolated load-jitter rerun of the pre-existing sub-millisecond performance test.
 - Updated README, Whitepaper Markdown/HTML, Roadmap Markdown/HTML, Guardian docs, `llms.txt`, Backlog, Memory, API, Bridge, and this log without claiming production ensemble readiness.
 - Opened PR #37 linked to issue #36. No contract, network, chain, wallet, key, signature, raw transaction, broadcast, slash ACL, commit-reveal formula, KAS/PROM split, or Guardian-reputation behavior changed. Protected checks, merge, exact-main evidence, and live Pages verification remain pending.
+
+## 2026-07-16 GH-36 merge and exact-main closeout
+
+- PR #37 merged normally by squash without admin bypass as `f8ebaacea8b36ebe45ac6ec5419d294431716362`; issue #36 closed automatically.
+- All protected contexts passed. CodeRabbit's status context passed, but its content review was rate-limited; the independent multi-round review ended with no remaining high/medium finding.
+- Exact-main Prometheus CI `29461803530`, Security Audit `29461803531`, and Pages `29461802700` passed for the same merge SHA.
+- Live GitHub Pages contains the merged Guardian-ensemble boundary in Whitepaper and Roadmap, and the GitHub README contains the matching GH-36 status.
+- GH-36 local software/docs/CI are accepted. Trusted membership, signed P2P vote collection, replay/Sybil protection, on-chain ensemble attestation, live model evidence, and production operation remain open.
+- No wallet file, private key, secret, signature, raw transaction, broadcast, or foreign untracked file was accessed. `Prometheus-1.png` remains untouched and uncommitted.
