@@ -2,7 +2,7 @@
 
 **Whitepaper v4.0 — March 2026**
 
-**Status update — July 2026:** Kaspa Toccata is treated as a post-fork deployment environment for Prometheus. The current Silverc verifier covers H-001 commit-reveal byte encoding, ValidatorStaking runtime transitions, GuardianReputation runtime/formula gates, RuleStorage runtime gates, CommunityDonations runtime gates, DevIncentivePool runtime gates, and GovernanceAutoTuning runtime gates. Release-bundle, deploy-preflight, request/receipt/evidence verification, operator-handoff, metrics-oracle, and exact-commit release-hardening gates prepare operation without holding signing material. Closed deployment profiles separate the full seven-contract path from the non-promotable `testnet-10-validator-staking-h001` canary. The repository operator closes genesis and `reportMetrics` transaction assembly, verification, guarded broadcast, and observation while externalizing only BIP340 signing. The metrics transition preserves the covenant state value and uses a separate P2PK sponsor for its bounded fee. Public testnet-10 funding and the deterministic schema-v2 H-001 request/digest were rebuilt from exact main commit `205e1ca`, passed exact-main CI/Security/Pages, revalidated the live funding output, and remained byte-identical across two builds and to the earlier baseline; no signature or broadcast has occurred. Mainnet remains gated by the explicitly approved external canary signature, verified one-shot canary broadcast, confirmed public receipt plus independent evidence, the remaining contract deployments, real oracle/sponsor inputs and signatures with successor evidence, and public release-hardening evidence for the exact rollout commit.
+**Status update — July 2026:** Kaspa Toccata is treated as a post-fork deployment environment for Prometheus. The current Silverc verifier covers H-001 commit-reveal byte encoding, ValidatorStaking runtime transitions, GuardianReputation runtime/formula gates, RuleStorage runtime gates, CommunityDonations runtime gates, DevIncentivePool runtime gates, and GovernanceAutoTuning runtime gates. Release-bundle, deploy-preflight, request/receipt/evidence verification, operator-handoff, metrics-oracle, and exact-commit release-hardening gates prepare operation without holding signing material. Closed deployment profiles separate the full seven-contract path from the non-promotable `testnet-10-validator-staking-h001` canary. The repository operator closes genesis and `reportMetrics` transaction assembly, verification, guarded broadcast, and observation while externalizing only BIP340 signing. The metrics transition preserves the covenant state value and uses a separate P2PK sponsor for its bounded fee. Public testnet-10 funding and the deterministic schema-v2 H-001 request/digest were rebuilt from exact main commit `205e1ca`, passed exact-main CI/Security/Pages, revalidated the live funding output, and remained byte-identical across two builds and to the earlier baseline; no signature or broadcast has occurred. Sprint 10B now includes a local fail-closed Guardian router that runs 8B first and escalates below confidence `0.70` to an injected 70B analyzer without changing the `0.85` submission policy. Live model wiring, calibrated confidence, ensemble voting, and production evidence remain open. Mainnet remains gated by the explicitly approved external canary signature, verified one-shot canary broadcast, confirmed public receipt plus independent evidence, the remaining contract deployments, real oracle/sponsor inputs and signatures with successor evidence, and public release-hardening evidence for the exact rollout commit.
 
 **Keyless operator update — July 2026:** The repository contains `prometheus-silverc-deployer`, pinned to official `rusty-kaspa` v2.0.1 and the exact Silverc source compiler revision. Its covenant-genesis path constructs transaction version 1 with compute budget 10 and the exact contextual `storage_mass` commitment, derives the official covenant ID, validates the exact live unspent funding UTXO during preflight and immediately before broadcast, and models the final 66-byte Schnorr signature script before exporting the 32-byte `SIG_HASH_ALL` digest. Signing-request schema v2 binds compute, transient, storage, normalized noncontextual/overall mass, the pinned relay rate, and both relay and conservative operator fee floors. The `reportMetrics` path recompiles exact predecessor and successor state, preserves the covenant value, uses a separate P2PK fee sponsor, derives two `SIG_HASH_ALL` digests, verifies both external BIP340 signatures plus every covenant/P2PK input, and revalidates both UTXOs before guarded broadcast. Both paths reject normalized input/output collisions, persist exclusive intent before acknowledged submission, reconcile retry state by transaction ID, enforce wRPC deadlines, and rebuild verified transactions before observation. The Rust package has 49 unit/security tests, including 11 focused metrics-transition tests. No private-key, seed, wallet, keystore, or raw-transaction input exists. Public testnet-10 funding plus an exact-main H-001 schema-v2 request/digest are confirmed. The H-001 canary and real metrics transition still require explicitly approved external signatures, complete operator verification, broadcast, confirmation, and independent chain evidence. Those results cannot authorize the full release by themselves.
 
@@ -98,7 +98,7 @@ Light Client (Phi-3-mini)          Guardian (LLaMA 3)           Kaspa L1
 ### 4.3 Off-Chain Layer
 
 - **Light Client AI**: Phi-3-mini 3.8B (4-bit quantized, 4GB RAM, no GPU)
-- **Guardian AI**: LLaMA 3 70B (primary) / LLaMA 3 8B (fallback)
+- **Guardian AI**: LLaMA 3 8B (default) / LLaMA 3 70B (confidence escalation)
 - **Federated Learning**: Fed-DART protocol — only gradients transmitted, never raw data
 
 ---
@@ -110,7 +110,7 @@ Light Client (Phi-3-mini)          Guardian (LLaMA 3)           Kaspa L1
 | Token | Purpose | Mechanism |
 |-------|---------|-----------|
 | **KAS** | Validator staking | Native Kaspa token. Validators stake KAS (min 10,000). Slashed on misbehavior. |
-| **PROM** | Reputation & Governance | Earned through accepted proposals. Never staked by validators. 0% pre-mine. |
+| **PROM** | Rewards & Governance | Earned through accepted proposals. Never staked by validators. 0% pre-mine. |
 
 **Critical rule**: Validators stake KAS, never PROM. PROM is exclusively earned through contribution.
 
@@ -174,7 +174,7 @@ Guardians run LLaMA 3 models to analyze threats and generate YARA rules.
 
 - PoW difficulty scales with current guardian count (anti-Sybil)
 - Minimum compute: `MIN_COMPUTE_GFLOPS = 100`
-- Model auto-assigned: >= 500 GFLOPS = 70B, < 500 = 8B
+- Model eligibility: >= 500 GFLOPS may serve 70B escalation; all hybrid routes start with 8B
 
 ### 7.2 Reputation
 
@@ -183,6 +183,9 @@ Guardians run LLaMA 3 models to analyze threats and generate YARA rules.
 - On accepted proposal: `reputation += isqrt(compute_power_gflops) * 100` at 10000x fixed-point scale
 - On rejected proposal: `reputation *= 0.5`; if below `MIN_REPUTATION (1000)`: set to 0
 
+Guardian reputation is canonical Kaspa L1 state in `GuardianReputationState`.
+It is separate from PROM balances and is not a badge or NFT.
+
 ### 7.3 Voting Power (Quadratic)
 
 ```
@@ -190,6 +193,20 @@ power = (reputation / 100)^2 * compute_power / 1000
 ```
 
 Quadratic voting (Architecture Decision #14) provides mathematical Sybil resistance: 1 real guardian with reputation 1.0 and 500 GFLOPS has power 5000, while 100 fake guardians with reputation 0.1 and 100 GFLOPS have total power 1000. The attacker needs 500+ accounts to match 1 legitimate guardian.
+
+### 7.4 Hybrid Analysis Routing
+
+The implemented Sprint 10B router invokes an injected 8B analyzer first and
+escalates to an independent 70B analyzer only when the primary confidence is
+below `0.70` or the primary safety envelope is invalid. The exact `0.70`
+boundary remains on the 8B route. Threat-hash mismatches, non-finite or
+out-of-range confidence, malformed submission decisions, and failed or invalid
+70B output fail closed with no submittable rule. The existing minimum network
+submission confidence remains `0.85`.
+
+This implementation is local orchestration with unit-test evidence. It does
+not yet prove live 8B/70B operation, model-calibrated confidence, P2P delivery,
+or the planned 5+ Guardian ensemble vote.
 
 ---
 

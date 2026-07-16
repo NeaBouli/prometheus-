@@ -5,13 +5,13 @@ for the Prometheus decentralized threat intelligence network.
 
 ## Hardware Requirements
 
-### LLaMA 3 8B (Fallback — Architecture Decision #7)
+### LLaMA 3 8B (Default — Architecture Decision #16)
 - **GPU:** NVIDIA RTX 4070 Ti or better (12-16 GB VRAM minimum)
 - **RAM:** 32 GB system RAM
 - **Storage:** 20 GB for model weights
 - **OS:** Linux with NVIDIA drivers + CUDA 12.x
 
-### LLaMA 3 70B (Primary — Architecture Decision #6)
+### LLaMA 3 70B (Escalation — Architecture Decision #16)
 - **GPU:** 4x NVIDIA A100 or H100 (80 GB each)
 - **RAM:** 128 GB system RAM
 - **Storage:** 150 GB for model weights
@@ -38,8 +38,20 @@ pip install httpx pytest black pylint
 python -m jaeger.analyzer
 ```
 
+## Hybrid Routing
+
+`HybridAnalyzer` accepts independently constructed 8B and 70B analyzer
+pipelines. It always runs 8B first, keeps a valid result at confidence `0.70`
+or above, and escalates below that boundary. Invalid confidence, mismatched
+threat hashes, malformed submission decisions, or a failed 70B route fail
+closed. The network submission threshold remains `0.85`.
+
+This is a local orchestration component. Live model service wiring, calibrated
+model-provided confidence, multi-Guardian ensemble voting, P2P transport, and
+production evidence remain separate rollout gates.
+
 ## Testing
 
 ```bash
-pytest tests/ --tb=short
+PYTHONPATH=. python -m pytest tests/ --tb=short
 ```

@@ -156,6 +156,13 @@ public release-hardening evidence for the exact rollout commit.
 - Light Client ↔ Guardian communication over P2P
 - Guardian ↔ Validator communication over P2P
 
+**Sprint 10B — Guardian Decentralization**
+- Implemented: local fail-closed 8B-first router with exact 70B escalation below confidence `0.70`
+- Implemented: threat-hash binding, finite confidence checks, strict submission types, and unchanged `0.85` submission threshold
+- Pending: live 8B/70B service wiring and model-calibrated confidence evidence
+- Pending: majority voting across 5+ independent 8B Guardians
+- Pending: reviewed Guardian pooling and final Sybil-resistance design
+
 **Sprint 11 — Real Phi-3-mini Integration**
 - Download Phi-3-mini 3.8B from Microsoft HuggingFace
 - 4-bit quantization via ONNX Runtime
