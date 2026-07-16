@@ -168,11 +168,12 @@ Dies ist nicht optional. Es ist Teil jeder Task-Definition.
 
 ## BLOCKADEN (aktuell)
 
-Sprint 9 ist nicht mehr durch Toccata, H-001-Verifikation oder Funding blockiert.
-Der öffentliche non-promotable H-001 testnet-10 P2PK-Outpoint und die passende
-öffentliche Deployer-Identität sind bestätigt. Der Canary wartet auf den
-Merge der GH-17 Signed-Shape-Fee/Mass-Härtung, danach den exact-commit
-Request/Digest, eine externe BIP340-Signatur, Broadcast,
+Sprint 9 ist nicht mehr durch Toccata, H-001-Verifikation oder das
+Funding-/Identitäts-Gate blockiert. Der öffentliche non-promotable H-001
+testnet-10 P2PK-Outpoint und die passende öffentliche Deployer-Identität sind
+bestätigt. Canary-Ausführung und Evidence bleiben bis zum Merge der GH-17
+Signed-Shape-Fee/Mass-Härtung und der exact-main Verifikation blockiert. Danach
+folgen der exact-commit Request/Digest, eine externe BIP340-Signatur, Broadcast,
 Bestätigung, `operator_record`-Receipt-Erfassung/-Verifikation und öffentliche
 Evidence; der Full-Rollout wartet zusätzlich auf die übrigen State-Contracts,
 Metrics Oracle und Release Hardening.

@@ -348,6 +348,8 @@ Rules for all dev agents:
 - Replaced the runbook template with a mass-aware 10-TKAS covenant output, 500000-sompi fee, and same-address change. A live funding-bound candidate preflight passed with compute `2083`, transient `1412`, storage/overall `4001`, relay floor `208300`, and operator floor `400100`.
 - The branch candidate is deliberately not approved for signing. It must be discarded and rebuilt from the exact merged commit after main CI. No private wallet data, signature, raw signed transaction, or broadcast was used.
 - Spark handled only the bounded operator documentation slice; Sol reviewed and integrated the diff. Foreign untracked `Prometheus-1.png` remains untouched.
+- Commit `126659c` was pushed through PR #18. Prometheus CI and Security Audit are green across Rust Workspace, Current Silverc Runtime + Artifact Smoke, Silverscript Contracts, Python Guardian, Memory Integrity, HTML Pages, Secret Detection, Dependency Audit, and Security Summary.
+- CodeRabbit completed its review. Its one actionable wording finding was addressed by making `MEMO`, `TODO`, and `CHECKPOINT` explicit that funding/identity are confirmed while canary execution/evidence remain blocked through GH-17 merge and exact-main verification. The repository-wide docstring coverage warning is non-blocking and does not justify unrelated comment churn.
 
 - Remote verification update:
   - `181cde2 ci: reject raw deploy receipt payloads`
