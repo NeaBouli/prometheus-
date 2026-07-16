@@ -12,8 +12,8 @@
 | Projekt | Prometheus — Decentralized AI Threat Intelligence |
 | Repo | https://github.com/NeaBouli/prometheus- |
 | Branch | `feature/GH-13-miner-companion` from merged baseline `72c9717` |
-| Lokaler Pfad | /Users/gio/Desktop/repos/prometheus |
-| Letzter grün verifizierter Produkt-/Tooling-Commit | `4176093` — GH-4 closeout baseline; main CI `29406057800`, Security `29406057729`, Pages `29406056965` green |
+| Lokaler Pfad | `$REPO_ROOT` |
+| Letzter grün verifizierter Produkt-/Tooling-Commit | `6213c559` — GH-9 product/tooling baseline; main CI `29412667386`, Security `29412667410`, Pages `29412666483` green; later docs closeout baseline `72c9717` is recorded separately |
 | Aktuelle Tooling-Baseline | GH-9 manifest-bound, non-promotable H-001 testnet-10 canary profile remains merged; docs closeout baseline is `72c9717`; GH-13 miner companion is under local review |
 | Aktueller HEAD | Mit `git log --oneline -1` prüfen; Bridge-/Status-Commits können neuer sein |
 | Rollback-Tag | `pre-session-20260413` → `6347b85` |

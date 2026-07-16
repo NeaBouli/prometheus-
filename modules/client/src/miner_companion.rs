@@ -4,6 +4,7 @@
 //! It does not scan the host, submit reports, manage mining software, or award PROM.
 
 use std::fs;
+use std::io::Read;
 use std::net::IpAddr;
 use std::path::Path;
 use std::time::Duration;
@@ -24,6 +25,7 @@ const MAX_POLL_INTERVAL_SECS: u64 = 3600;
 #[derive(Debug, Clone, Copy, Deserialize, Serialize, PartialEq, Eq)]
 #[serde(rename_all = "kebab-case")]
 pub enum CompanionRole {
+    /// Observe local Kaspa node health without scanning or reporting.
     Light,
 }
 
@@ -31,6 +33,7 @@ pub enum CompanionRole {
 #[derive(Debug, Clone, Copy, Deserialize, Serialize, PartialEq, Eq)]
 #[serde(rename_all = "kebab-case")]
 pub enum CompanionNetwork {
+    /// Kaspa public Testnet-10.
     Testnet10,
 }
 
@@ -73,10 +76,12 @@ impl ValidatedMinerCompanionConfig {
         KaspaConnection::new(&self.rpc_url)
     }
 
+    /// Return the validated BlockDAG health polling interval.
     pub fn poll_interval(&self) -> Duration {
         self.poll_interval
     }
 
+    /// Build a public status report without endpoint or operator identity data.
     pub fn preflight_report(&self) -> MinerCompanionPreflight {
         MinerCompanionPreflight {
             status: "ready-for-development-rpc-observer",
@@ -94,20 +99,32 @@ impl ValidatedMinerCompanionConfig {
 /// Public preflight report. It contains no endpoint, wallet, worker, or pool data.
 #[derive(Debug, Clone, Serialize, PartialEq, Eq)]
 pub struct MinerCompanionPreflight {
+    /// Machine-readable readiness state for the bounded observer.
     pub status: &'static str,
+    /// Runtime profile in which the companion is permitted.
     pub runtime: &'static str,
+    /// Enabled companion role.
     pub role: CompanionRole,
+    /// Kaspa network selected by the strict profile.
     pub network: CompanionNetwork,
+    /// Allowed RPC endpoint scope without exposing the endpoint itself.
     pub rpc_scope: &'static str,
+    /// Host scanning state.
     pub scanning: &'static str,
+    /// Threat-reporting state.
     pub reporting: &'static str,
+    /// Reward implementation state.
     pub rewards: &'static str,
 }
 
 impl MinerCompanionConfig {
     /// Parse a strict TOML configuration from disk with a small size limit.
     pub fn from_toml_file(path: &Path) -> Result<Self> {
-        let bytes = fs::read(path).context("failed to read companion config")?;
+        let file = fs::File::open(path).context("failed to read companion config")?;
+        let mut bytes = Vec::new();
+        file.take(MAX_CONFIG_BYTES + 1)
+            .read_to_end(&mut bytes)
+            .context("failed to read companion config")?;
         if bytes.len() as u64 > MAX_CONFIG_BYTES {
             bail!("companion config exceeds the 64 KiB size limit");
         }

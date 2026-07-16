@@ -29,9 +29,11 @@ AI compute and threat intelligence.
 **Q: Does running Prometheus beside a Kaspa miner automatically earn PROM?**
 No. The current miner companion is a development-only local Testnet-10
 wRPC observer. It does not scan, report threats, control mining, or award
-PROM. The 20% reporter allocation is a future protocol pool for verified
-security contributions, not a passive uptime payment. Kaspa mining uses
-Stratum in most ASIC/pool setups; Prometheus wRPC observation is separate.
+PROM. The aggregate future reporter pool is split into 15% for verified Light
+Client contributions and 5% for verified Honeypot contributions. The current
+companion is eligible for neither allocation and cannot claim the full 20%.
+Kaspa mining uses Stratum in most ASIC/pool setups; Prometheus wRPC observation
+is separate.
 
 **Q: What is the PROM emission schedule?**
 Year 1: 20,000,000 PROM. Each subsequent year: -10%.

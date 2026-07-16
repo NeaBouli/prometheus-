@@ -126,7 +126,7 @@ Light Client (Phi-3-mini)          Guardian (LLaMA 3)           Kaspa L1
 | Community | 5% | 1,000,000 PROM |
 | **Total** | **100%** | **20,000,000 PROM** |
 
-Reporter percentages are protocol allocation targets, not passive uptime rewards. A miner-side companion receives no PROM merely for running; rewards require a future implemented and consensus-verified contribution path.
+Reporter percentages are protocol allocation targets, not passive uptime rewards. A miner-side companion receives no PROM merely for running; rewards require a future implementation and consensus-verified contribution path.
 
 No foundation allocation. No founder tokens. No pre-mine. Identical to Kaspa's launch philosophy.
 

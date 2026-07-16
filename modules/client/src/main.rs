@@ -96,15 +96,19 @@ async fn run_miner_companion(config_path: PathBuf) -> anyhow::Result<()> {
     loop {
         tokio::select! {
             _ = interval.tick() => {
-                let dag = connection.get_block_dag_info().await?;
-                info!(
-                    "Kaspa DAG health: network={}, blocks={}, headers={}, tips={}, daa={}",
-                    dag.network,
-                    dag.block_count,
-                    dag.header_count,
-                    dag.tip_count,
-                    dag.virtual_daa_score
-                );
+                match connection.get_block_dag_info().await {
+                    Ok(dag) => info!(
+                        "Kaspa DAG health: network={}, blocks={}, headers={}, tips={}, daa={}",
+                        dag.network,
+                        dag.block_count,
+                        dag.header_count,
+                        dag.tip_count,
+                        dag.virtual_daa_score
+                    ),
+                    Err(_) => warn!(
+                        "Failed to query BlockDAG health; retrying on the next interval"
+                    ),
+                }
             }
             signal = tokio::signal::ctrl_c() => {
                 signal?;
