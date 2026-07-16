@@ -306,7 +306,7 @@ AutoNAT       = direct peer route only
 Counts and encoded address length are bounded. DNS/mDNS, target-mismatched,
 duplicate, unspecified dial, and zero-port dial routes fail validation.
 
-### 3.6 Guardian Operated Service Boundary (GH-48 candidate)
+### 3.6 Guardian Operated Service Boundary (GH-48 merged)
 
 The strict service config is role-tagged TOML. Both roles require an absolute
 persistent transport-identity path and bounded listener set. Guardian adds
