@@ -929,9 +929,9 @@ Sprint 7 — Dashboard & Audit. Sprints 0-6 abgeschlossen (Setup, Contracts, Cli
 - `Cargo.lock` (nur indirekt über Cargo.toml ändern)
 
 ## Kontext-Notizen
-- Workspace hat nur 2 Rust-Crates: `client` und `validator-node`. Guardian-Node ist Python/Docker-basiert.
+- Workspace hat 3 Rust-Crates: `client`, `validator-node` und `silverc-deployer`. Guardian-Node ist Python/Docker-basiert.
 - Contracts sind in Silverscript (.ss), nicht Solidity — Kaspa-eigene Contract-Sprache.
-- Zwei Token: KAS (Staking, nativ) und PROM (Reputation, 0% Pre-Mine, earned only).
+- Zwei Token: KAS (Validator-Staking, nativ) und PROM (earned-only Belohnung für verifizierte Sicherheitsarbeit). Guardian-Reputation bleibt separat und kanonisch auf Kaspa L1.
 - Repo: github.com/NeaBouli/prometheus-
 - CI via GitHub Actions
 - Lizenz: MIT
@@ -942,7 +942,8 @@ Sprint 7 — Dashboard & Audit. Sprints 0-6 abgeschlossen (Setup, Contracts, Cli
 
 ```
 Schritt 1: Orientierung
-  git log --oneline -5              → HEAD muss 6347b85 sein
+  git status --short --branch       → Fremde lokale Dateien nicht anfassen
+  git log --oneline -5              → Aktuellen HEAD mit Bridge/Checkpoint abgleichen
   git tag -l                        → Rollback: pre-session-20260413
   cargo test 2>&1 | tail -5         → Alle Tests GRÜN?
 
@@ -950,20 +951,25 @@ Schritt 2: Kontext laden (in dieser Reihenfolge!)
   1. BACKLOG.md                     → Priorisierte Task-Liste + nächste Session
   2. memory/CHECKPOINT.md           → Vollständiger Projektstatus + Architekturregeln
   3. memory/AUDIT.md (ab Zeile 337) → Pre-Hardfork Audit: 0 CRITICAL, 2 HIGH
-  4. memory/ERRORS.md               → 12 Error-Patterns (IMMER beachten)
+  4. memory/ERRORS.md               → 13 Error-Patterns (IMMER beachten)
   5. memory/MEMO.md                 → 18 Architektur-Entscheidungen (UNVERÄNDERLICH)
 
 Schritt 3: Was steht an?
   - Sprints 0-7: ALLE ACCEPTED ✓
-  - H-002 (PATTERN-010): FIXED ✓ (6347b85)
-  - H-001 (LE encoding): OFFEN — wartet auf ssc Compiler (05.05.2026)
-  - Sprint 9: Contracts compile + deploy — wartet auf ssc
-  - Sprint 10B: Guardian Decentralization — kann JETZT gestartet werden
-  - Q-003 (fp_rate Oracle): Architect-Entscheidung nötig
+  - H-002 (PATTERN-010): FIXED ✓
+  - H-001 (LE encoding): Byte-Core, signed-int bounds und CI-Gates verifiziert
+  - Sprint 9: H-001 ist finanziert/vorbereitet; externe BIP340-Signatur,
+    separate Broadcast-Freigabe, Bestätigung, Receipt und Chain-Evidence offen
+  - Full rollout: sechs State-Deployments, reale reportMetrics-Transition
+    und exact-commit Release-Hardening-Evidence offen
+  - Sprint 10B: Guardian Decentralization bleibt vor Mainnet erforderlich
+  - Q-003 (fp_rate Oracle): durch den gemergten keyless reportMetrics-Operator gelöst;
+    reale Oracle-/Sponsor-Signaturen und Successor-Evidence bleiben operativ offen
   - Siehe BACKLOG.md für vollständige priorisierte Liste
 
 Schritt 4: Regeln
-  - KAS = Staking (Validators), PROM = Reputation (Guardians) — NIE verwechseln
+  - KAS = Validator-Staking, PROM = earned-only Reward; Guardian-Reputation ist
+    ein separater kanonischer Kaspa-L1-Zustand — NIE vermischen
   - cargo fmt + cargo clippy -- -D warnings VOR jedem Commit
   - Jede neue HTML-Seite: SEO/GEO-Checkliste (MEMO.md)
   - Nach jeder Task: STATUS.md + TODO.md + AUDIT.md aktualisieren

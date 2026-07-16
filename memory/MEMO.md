@@ -34,7 +34,7 @@ Abweichungen führen zu automatischem REJECT im Audit.
 | #  | Entscheidung                          | Begründung                                      | Datum      |
 |----|---------------------------------------|-------------------------------------------------|------------|
 | 1  | KAS = Staking-Asset der Validators    | KAS ist etabliert, liquide, 0% Pre-Mine         | 2026-03-21 |
-| 2  | PROM = Reputations-/Governance-Token  | Guardians verdienen PROM durch Leistung         | 2026-03-21 |
+| 2  | PROM = earned-only Reward/Governance  | Verifizierte Sicherheitsarbeit verdient PROM; der kanonische Guardian-Reputationswert bleibt separater Kaspa-L1-State | 2026-03-21 / clarified 2026-07-16 |
 | 3  | Kein Emergency-Stop                   | Ultimative Dezentralisierung – Feature, kein Bug| 2026-03-21 |
 | 4  | Keine Foundation, kein Gründer-Pool   | 0% Pre-Mine, genau wie Kaspa                    | 2026-03-21 |
 | 5  | Governance: vollautomatisch           | Code ist das Gesetz – kein menschlicher Eingriff| 2026-03-21 |
@@ -115,7 +115,10 @@ DevIncentivePool Contract:
 - Mindest-Coverage: 80%
 
 ### Silverscript
-- Kompilierung: `ssc compile --testnet` (Testnet), `ssc compile` (Mainnet)
+- Kompilierung ausschließlich über den gepinnten upstream `silverc`-Stand und
+  `scripts/smoke_silverc_artifacts.py`; der Compiler führt kein Netzwerk-Deploy aus
+- Netzwerkpfad: geschlossene Deployment-Profile plus repository-eigener keyless
+  Toccata-v1 Operator; externe Signaturen und bestätigte Evidence bleiben Pflicht
 - Alle Structs aus SCHEMA.md verwenden
 - Keine Magic Numbers – immer benannte Konstanten
 - Jede Funktion: Kommentar mit Zweck

@@ -1,7 +1,7 @@
 # PROMETHEUS – DATA SCHEMAS
 # Kanonische Datenmodelle für das gesamte Projekt.
 # Claude Code MUSS diese exakt verwenden. Keine Abweichungen ohne Audit-Approval.
-# Last Updated: 2026-03-21
+# Last Updated: 2026-07-16
 
 ---
 
@@ -12,10 +12,14 @@ KAS  = Kaspa nativer Token = Staking-Asset der Validators
        → Wird in tx.value gesendet
        → MIN_STAKE_KAS = 10.000 KAS
 
-PROM = Prometheus Token = Reputations-/Governance-Token
+PROM = Prometheus Token = earned-only Reward-/Governance-Asset
        → Wird durch Leistung VERDIENT
        → Guardians verdienen PROM für akzeptierte Vorschläge
        → NIEMALS als Staking-Asset der Validators verwenden
+
+Guardian-Reputation = separater kanonischer Kaspa-L1-Zustand
+       → Wird nicht durch ein Badge/NFT-System ersetzt
+       → PROM-Balance und Reputationswert sind nicht dasselbe Feld
 ```
 
 ---

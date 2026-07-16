@@ -13,12 +13,12 @@
 | Repo | https://github.com/NeaBouli/prometheus- |
 | Branch | `main`; all status changes remain PR-only |
 | Lokaler Pfad | `$REPO_ROOT` |
-| Letzter grün verifizierter Produkt-/Tooling-Commit | `205e1ca` — GH-25 evidence merge; main CI `29454591518`, Security `29454591555`, Pages `29454590793` green; H-001 handoff/live preflight rebuilt afterward |
-| Aktuelle Tooling-Baseline | Exact main `205e1ca` plus GH-9 public funding, live UTXO preflight, and byte-identical deterministic schema-v2 signing request/digest are ready for explicitly approved external signing |
+| Letzter grün verifizierter Produkt-/Tooling-Commit | `3ba90a9` — Prometheus CI `29456156122` attempt 2, Security `29456155263` attempt 2, and Pages `29456154432` green; public rollout/docs baseline remains `e9a970a` |
+| Aktuelle Tooling-Baseline | Exact execution artifacts remain bound to `205e1ca`; GH-9 public funding/live UTXO and the byte-identical schema-v2 signing request are ready for explicitly approved external signing. GH-30 is bounding required CI runtimes and pinning audit tools. |
 | Aktueller HEAD | Mit `git log --oneline -1` prüfen; Bridge-/Status-Commits können neuer sein |
 | Rollback-Tag | `pre-session-20260413` → `6347b85` |
 | Whitepaper | WHITEPAPER.md (root) + whitepaper.html (styled), miner companion and reward boundaries live-verified 2026-07-16 |
-| Status | Feature-complete through Sprint 7. Post-Toccata deployment verification active. |
+| Status | Rollout-capable core estimated at 68-72%; post-Toccata canary execution and full rollout evidence remain gated. |
 | GitHub Pages | https://neabouli.github.io/prometheus-/ |
 | Google Search Console | Verified: googleaa2902079481c7a8 |
 
@@ -173,7 +173,7 @@
 7. Commit-Reveal: sha256(vote_byte || salt_le || block_height_le)
 8. cargo fmt + cargo clippy -- -D warnings vor jedem Rust-Commit
 9. Legacy-Tests nutzen kaspa-testnet-10; post-Toccata Deployment braucht TN12/Toccata-Tooling-Verifikation
-10. Current Silverscript tooling and actual Prometheus contract compatibility must be tested post-Toccata before Sprint 9
+10. Current Silverc tooling, contract compatibility, LE/signed-int bounds, and closed deployment profiles must remain CI-gated through Sprint 9
 11. Jede neue HTML-Seite: SEO/GEO-Checkliste (Schema.org, OG, ai-summary)
 12. Mobile Hamburger-Menü auf jeder Seite
 13. GitHub-only Contact (kein Email, kein Discord DM)
@@ -185,7 +185,7 @@
 | # | Entscheidung |
 |---|-------------|
 | 1 | KAS = Staking-Asset der Validators |
-| 2 | PROM = Reputations-/Governance-Token |
+| 2 | PROM = earned-only Reward/Governance; kanonische Guardian-Reputation bleibt separater Kaspa-L1-State |
 | 3 | Kein Emergency-Stop |
 | 4 | Keine Foundation, kein Gründer-Pool |
 | 5 | Governance: vollautomatisch |
@@ -205,12 +205,12 @@
 
 ---
 
-## FEHLER-MUSTER (P-001 bis P-012)
+## FEHLER-MUSTER (P-001 bis P-013)
 
 | ID | Problem | Lösung |
 |----|---------|--------|
 | P-001 | KAS/PROM Verwechslung | grep -n "MIN_STAKE" vor Commit |
-| P-002 | ssc ohne --testnet Flag | ssc compile --testnet --network testnet-10 |
+| P-002 | Obsoleten `ssc`-Compile/Deploy-Pfad verwenden | Pinned `silverc`-Release-Build plus keyless Repository-Operator verwenden |
 | P-003 | std::sync::Mutex in async | tokio::sync::Mutex |
 | P-004 | Groth16 Parameter-Mismatch | kaspa-zk-params Crate |
 | P-005 | CIDv0 statt CIDv1 | ipfs add --cid-version 1 |
@@ -221,6 +221,7 @@
 | P-010 | Unnötige Mutex | Arc<T> statt Arc<Mutex<T>> bei &self |
 | P-011 | Heuristische Confidence | LLM-Confidence für Production |
 | P-012 | Guardian Centralization | Hybrid routing + Ensemble voting |
+| P-013 | Canary als Full Rollout ausgeben | Nur geschlossene manifestgebundene Profile und non-promotable Canary-Status verwenden |
 
 ---
 
@@ -292,4 +293,4 @@ Leistungsbasierte Emission. Guardians = "Miner" (KI statt GPU).
 
 - VERDICT update 2026-07-16: GH-25 closes the repository-side metrics transaction assembly gap with a value-preserving two-input Toccata-v1 transition, separate P2PK fee sponsor, two external `SIG_HASH_ALL` BIP340 signatures, exact source/state/request/fee/mass binding, full covenant and P2PK execution, live UTXO revalidation, collision-safe outputs, acknowledged crash-consistent broadcast, and successor observation. Forty-nine deployer tests, full workspace fmt/clippy/tests, 55 pinned upstream Silverc tests, independent Terra review, PR #26, exact-main Prometheus CI `29453756167`, Security Audit `29453756135`, Pages `29453755086`, and live Whitepaper verification pass for `072f04a`. Real inputs, signatures, confirmation, successor evidence, and exact-rollout release evidence remain.
 
-*Prometheus v4.0 · Checkpoint 2026-07-16 · Last updated: H-001 handoff rebuilt/live-preflight verified from exact main `205e1ca` with byte-identical schema-v2 request + GH-25 keyless value-preserving reportMetrics operator merged/exact-main green at `072f04a` + external signatures/broadcast/evidence pending + GH-13 experimental local miner companion accepted at `2e4b4ec` + seven current-Silverc runtime gates + crash-consistent keyless Toccata-v1 genesis operator + manifest-bound non-promotable H-001 testnet-10 profile + TLS-only official resolver probe + public receipts/evidence/status staging + exact-commit release-hardening gates · The fire belongs to humanity.*
+*Prometheus v4.0 · Checkpoint 2026-07-16 · Last updated: operational main `3ba90a9` exact-main CI/Security/Pages green + GH-30 bounded required-check runtimes in progress + H-001 handoff rebuilt/live-preflight verified from exact execution baseline `205e1ca` with byte-identical schema-v2 request + GH-25 keyless value-preserving reportMetrics operator merged/exact-main green at `072f04a` + external signatures/broadcast/evidence pending + GH-13 experimental local miner companion accepted at `2e4b4ec` + seven current-Silverc runtime gates + crash-consistent keyless Toccata-v1 genesis operator + manifest-bound non-promotable H-001 testnet-10 profile + TLS-only official resolver probe + public receipts/evidence/status staging + exact-commit release-hardening gates · The fire belongs to humanity.*
