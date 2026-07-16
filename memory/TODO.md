@@ -125,7 +125,7 @@
 ## ═══ SPRINT 9: CONTRACTS LIVE (Mai 2026) ═══
 
 - [~] [P0] GH-9: manifest-gebundenes H-001 testnet-10 Canary-Handoff mergen | Codex | GH-7 Resolver + Operator
-- [!] [P0] `ValidatorStakingH001` Canary real ausführen; nie als Full-/Metrics-Readiness promoten | Core Dev + externer Signer | Funding/identity confirmed; exact-commit request/digest + external BIP340 response + confirmation/evidence remain
+- [!] [P0] `ValidatorStakingH001` Canary real ausführen; nie als Full-/Metrics-Readiness promoten | Core Dev + externer Signer | Funding/identity confirmed; exact-commit request/digest + external BIP340 response + one-shot broadcast + confirmation + operator_record receipt capture/verification + independent evidence remain
 - [!] [P0] Full-Profil: sieben Release-Fixtures auf testnet-10 verifizieren und sechs State-Contracts erst danach auf Mainnet ausrollen | Core Dev + Codex | Canary-Evidence + Metrics Oracle + Release Hardening
 - [ ] [P0] kaspa-zk-params Crate integrieren, echte Groth16 in zk_proof.rs | Claude Code | ssc live
 - [ ] [P0] PROM Emission Contract schreiben + deployen | Claude Code | ssc live
