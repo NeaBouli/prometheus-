@@ -501,3 +501,4 @@ Rules for all dev agents:
 - Live GitHub Pages contains the merged Guardian-ensemble boundary in Whitepaper and Roadmap, and the GitHub README contains the matching GH-36 status.
 - GH-36 local software/docs/CI are accepted. Trusted membership, signed P2P vote collection, replay/Sybil protection, on-chain ensemble attestation, live model evidence, and production operation remain open.
 - No wallet file, private key, secret, signature, raw transaction, broadcast, or foreign untracked file was accessed. `Prometheus-1.png` remains untouched and uncommitted.
+- Opened documentation closeout PR #38 to preserve the merge SHA, exact-main run IDs, and live-public verification in the Bridge, README, Backlog, and Memory files.
