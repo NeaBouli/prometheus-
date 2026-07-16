@@ -7,8 +7,8 @@
 | Scope | Estimated complete | Estimated remaining | Current gate |
 |-------|-------------------:|--------------------:|--------------|
 | H-001 testnet-10 canary preparation | 96% | 4% | External BIP340 signature, verification, one-shot broadcast, confirmation, receipt, independent evidence |
-| Rollout-capable core network | 68–72% | 28–32% | Six state deployments, real Groth16, PROM emission, real metrics-oracle execution/evidence, P2P/rule distribution, production node evidence |
-| Complete roadmap vision | 35–40% | 60–65% | Production AI, desktop/mobile clients, installers, operated network, vProgs, plus all core-network gates |
+| Rollout-capable core network | 71–75% | 25–29% | Six state deployments, real Groth16, PROM emission, real metrics-oracle execution/evidence, public multi-host P2P/rule distribution, production node evidence |
+| Complete roadmap vision | 38–43% | 57–62% | Production AI, desktop/mobile clients, installers, operated network, vProgs, plus all core-network gates |
 
 Percentages are scope-weighted engineering estimates. They are not release dates,
 financial forecasts, or evidence that any contract is live.
@@ -153,8 +153,8 @@ public release-hardening evidence for the exact rollout commit.
 - KRC-20 UTXO queries for "PROM-RULES" tick (real on-chain reads)
 - Rule content download from IPFS via CIDv1
 - Merged/exact-main verified: GH-42 Guardian ballot carrier has direct QUIC request/response, static peers, bounded resources, owner-only local collector ingress, cancellation-safe concurrent swarm progress, and relay/AutoNAT/DCUtR behaviours
-- Implemented on the GH-44 candidate branch: atomic owner-only persistent transport identity, strict bounded direct/relay/AutoNAT routes, data-minimal health events, and a bounded relay service
-- Locally proven on an isolated three-node harness: relay reservation/delivery, AutoNAT state, DCUtR relay fallback, and disconnect handling; protected merge plus public/multi-host operation remain pending
+- Merged/exact-main verified in GH-44: atomic owner-only persistent transport identity, strict bounded direct/relay/AutoNAT routes, data-minimal health events, and a bounded relay service
+- Proven on an isolated three-node harness: relay reservation/delivery, AutoNAT state, DCUtR relay fallback, and disconnect handling; public/multi-host operation remains pending
 - Pending: public operated relay/NAT infrastructure and broad discovery; mDNS remains excluded while its compatible dependency path has unresolved RustSec advisories
 - Light Client ↔ Guardian communication over P2P
 - Guardian ↔ Validator communication over P2P
@@ -166,7 +166,7 @@ public release-hardening evidence for the exact rollout commit.
 - Implemented: transport-neutral BIP340 ballot intake with exact key/session/context binding, strict canonical envelopes, freshness checks, and owner-only SQLite replay/equivocation protection across restarts and concurrent submissions
 - Merged/exact-main verified: real Guardian ballot transport over direct QUIC/libp2p request/response with exact 8192-byte-bounded frames, static peers, resource caps, owner-only AF_UNIX collector integration, and cancellation-safe concurrent processing
 - Pending: live 8B/70B service wiring and model-calibrated confidence evidence
-- Candidate-complete: persistent transport identity and isolated operated relay/AutoNAT/DCUtR evidence; protected merge and public/multi-host evidence remain
+- Merged/exact-main verified: persistent transport identity and isolated operated relay/AutoNAT/DCUtR evidence; public/multi-host evidence remains
 - Pending: broad discovery, trusted membership and key assignment, Sybil resistance, and on-chain ensemble attestation
 - Pending: reviewed Guardian pooling and final Sybil-resistance design
 

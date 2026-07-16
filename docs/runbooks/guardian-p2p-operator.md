@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Document the currently implemented GH-44 transport candidate for operated Guardian-sidecar communication: persisted transport identity, bounded routes, operated relay/NAT instrumentation, and race-tested admission behavior.
+Document the merged GH-44 transport slice for operated Guardian-sidecar communication: persisted transport identity, bounded routes, operated relay/NAT instrumentation, and race-tested admission behavior.
 
 ## Scope of this implementation
 

@@ -557,3 +557,11 @@ Rules for all dev agents:
 - No wallet, existing private key, secret, signature, raw transaction, broadcast, contract, reputation, KAS/PROM, slash ACL, commit-reveal formula, or foreign untracked file was accessed or changed. `Prometheus-1.png` remains untouched and uncommitted. PR, protected checks, merge, exact-main CI/Security/Pages, and live-site verification remain pending.
 - Pushed implementation commit `840e71a5058ddf824701445fe6cc50857d796f98` to PR #46. All nine protected contexts passed in Prometheus CI `29470853630` and Security Audit `29470853695`; CodeRabbit passed and identified two valid documentation-only precision issues.
 - Clarified that listener configuration accepts direct IP/UDP/QUIC-v1 routes and exact relay reservations ending in `/p2p-circuit`, and added the missing `text` language to the GH-44 status transcript. Refreshed checks, merge, exact-main evidence, and live-site verification remain pending.
+
+## 2026-07-16 GH-44 merge and exact-main closeout
+
+- Review fix `cad0801` addressed both CodeRabbit documentation findings; refreshed Prometheus CI `29471188735`, Security Audit `29471188734`, all nine required contexts, and CodeRabbit passed with both threads resolved.
+- PR #46 merged normally by squash without admin bypass as `27c2edc311f41f7eada4cad725b0e1ef29b83a51`; issue #44 closed automatically.
+- Exact-main Prometheus CI `29471344601`, Security Audit `29471344556`, and Pages `29471344050` passed for that same SHA. Live GitHub README, Whitepaper, and Roadmap exposed the GH-44 transport boundary before this wording closeout.
+- GH-44 software/docs/CI are accepted. Public/multi-host relay/NAT operation, broad discovery, trusted membership/key assignment, Sybil resistance, on-chain attestation, live model wiring, proposal submission, and production operation remain open.
+- No wallet, private key, secret, signature, raw transaction, broadcast, contract, reputation, KAS/PROM, slash ACL, commit-reveal formula, or foreign untracked file was accessed or changed. `Prometheus-1.png` remains untouched and uncommitted.
