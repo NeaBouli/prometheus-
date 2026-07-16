@@ -163,6 +163,24 @@ Operated relay/NAT/discovery, trusted membership/key assignment, Sybil
 resistance, proposal submission, and on-chain attestation remain outside this
 API. `PeerId` is never Guardian authorization.
 
+### Guardian Operated Transport Candidate (GH-44)
+
+`transport_identity::load_or_create_transport_identity()` requires an absolute
+path and an effective-user-owned mode-`0700` parent directory. It rejects
+symlinks, non-regular files, unsafe ownership/mode, oversized or noncanonical
+protobuf, writes a mode-`0600` same-directory temporary file, syncs it, and
+publishes atomically. Concurrent creators converge on one stable transport
+`PeerId`; no wallet or Guardian signing key is involved.
+
+`GuardianP2pConfig` accepts only bounded IP/UDP/QUIC-v1 direct listeners,
+direct static routes, exact relay-circuit routes, and explicit direct AutoNAT
+servers. DNS and mDNS routes are rejected. `RelayService` applies fixed
+reservation, circuit, byte, duration, connection, and per-peer limits. Health
+events expose only transport peer/path/status metadata. The isolated three-node
+test proves reservation, relayed ballot/ACK, AutoNAT state, DCUtR failure with
+relay fallback, and disconnect handling. Public or multi-host operation, broad
+discovery, membership trust, and on-chain attestation remain outside this API.
+
 ---
 
 ## 4. SILVERSCRIPT CONTRACT API

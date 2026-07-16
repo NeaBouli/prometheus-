@@ -286,6 +286,26 @@ side verifies socket ownership/peer credentials and the ACK digest before
 answering the remote request. No PeerId, address, relay, or route field enters
 the Guardian membership/session schema.
 
+### 3.5 Guardian Transport Identity and Routes (GH-44 candidate)
+
+The libp2p transport identity is a canonical bounded private-key protobuf in an
+owner-controlled local file. Its public `PeerId` is transport metadata only and
+must never enter Guardian membership, BIP340 key assignment, reputation,
+staking, reward, or chain-state records.
+
+Accepted operator routes are closed schemas rather than arbitrary strings:
+
+```text
+direct listen = /ip4|ip6/<ip>/udp/<port>/quic-v1
+direct peer   = direct listen [/p2p/<target-peer-id>]
+relay listen  = direct peer-of-relay /p2p-circuit
+relay peer    = relay listen /p2p/<target-peer-id>
+AutoNAT       = direct peer route only
+```
+
+Counts and encoded address length are bounded. DNS/mDNS, target-mismatched,
+duplicate, unspecified dial, and zero-port dial routes fail validation.
+
 ---
 
 ## 4. API DATENSTRUKTUREN (JSON)
