@@ -804,7 +804,13 @@ trusted membership/key assignment, Sybil resistance, on-chain attestation,
 proposal submission, and production signer/model operation remain open. No
 wallet, private key, signature, raw transaction, broadcast, contract, slash
 ACL, commit-reveal formula, KAS/PROM split, or Guardian-reputation behavior was
-used or changed. PR and remote exact-main evidence remain pending.
+used or changed. PR #40 merged normally without admin bypass as exact main
+`d0f78a9857e654dd487678a031d39ac52a44e0ec`; issue #39 closed automatically.
+Exact-main Prometheus CI `29464295373`, Security Audit `29464295355`, and Pages
+`29464294890` passed, and live Whitepaper, Roadmap, and GitHub README markers
+were verified. CodeRabbit was rate-limited without a content review; the
+independent security review/re-review and protected automated gates are the
+substantive review evidence.
 
 *Audit completed 2026-04-02 by Claude Code (5 parallel agents, 7 levels, 35 checks).*
 *The fire belongs to humanity.*

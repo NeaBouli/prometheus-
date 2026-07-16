@@ -263,7 +263,7 @@ Priority tasks:
 - Sprint 9: run the merged keyless operator against a real funded testnet-10 UTXO and collect confirmed public receipt plus independent node/explorer evidence records
 - H-001: keep LE encoding and signed-boundary verification gated in CI
 - Oracle: execute the merged/exact-main keyless GovernanceAutoTuning transition operator with real public state/sponsor UTXOs, external oracle/sponsor signatures, confirmed successor evidence, and existing result/evidence/status gates before beta/mainnet governance
-- Sprint 10B: GH-33 hybrid routing and GH-36 local 5+ complete-ballot validation are merged/exact-main verified. GH-39 locally adds exact per-session BIP340 key binding, strict signed envelopes, freshness, and persistent restart/concurrency/clock-rollback-safe replay and equivocation protection. Actual P2P carrier/discovery/NAT traversal, trusted membership/key assignment, Sybil resistance, on-chain attestation, live model wiring/calibration, and production evidence remain
+- Sprint 10B: GH-33 hybrid routing, GH-36 local 5+ complete-ballot validation, and GH-39 local BIP340 authenticated intake with persistent replay/equivocation protection are merged/exact-main verified. Actual P2P carrier/discovery/NAT traversal, trusted membership/key assignment, Sybil resistance, on-chain attestation, live model wiring/calibration, and production evidence remain
 - M-001/M-002: Medium findings (can wait until Aug/Sep)
 ```
 
@@ -327,7 +327,7 @@ Not yet proven: trusted membership source, signed P2P collection, replay protect
 ## AUTHENTICATED GUARDIAN BALLOT INTAKE (GH-39)
 
 ```
-Status: issue #39; branch feat/GH-39-authenticated-ballots; PR/remote evidence pending
+Status: issue #39 closed; PR #40 merged/exact-main verified at d0f78a9
 Session: domain-separated commitment binds candidate, snapshot, network, nonce,
          validity window, and the exact unique Guardian-to-BIP340-key map
 Envelope: exact-schema canonical JSON binds complete vote/context/time/nonce;
@@ -348,6 +348,8 @@ Local evidence: focused signed-ballot/ensemble suite 70 passed; complete Guardia
 Review: independent review found one medium forward-clock/prune/rollback reopening
         path; persistent high-water enforcement plus restart regression closes it;
         final independent re-review reports no blocking/high/medium finding
+Remote evidence: Prometheus CI 29464295373; Security Audit 29464295355;
+                 Pages 29464294890; live Whitepaper/Roadmap/README verified
 Not yet proven: actual HTTP/libp2p carrier, peer discovery/NAT traversal, trusted
                 membership/key assignment, Sybil resistance, on-chain attestation,
                 proposal submission, production signer/model operation
