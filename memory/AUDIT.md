@@ -862,5 +862,33 @@ and live Whitepaper, Roadmap, and GitHub README markers were verified. Issue
 #42 is closed. GH-44 carries the explicit persistent-identity and operated
 relay/NAT follow-up without changing the authorization boundary.
 
+## GH-44 CANDIDATE AUDIT UPDATE (2026-07-16)
+
+The candidate adds persistent libp2p identity, strict route validation,
+data-minimal health events, and a bounded relay/AutoNAT service without changing
+Guardian authorization. Identity creation uses an absolute owner-controlled
+path, `NOFOLLOW`, effective UID and mode checks, bounded canonical protobuf,
+same-directory exclusive temporary creation, sync, and atomic hard-link
+publication. Concurrent creation and restart retain one `PeerId`.
+
+The deterministic isolated three-node harness proves relay reservation,
+relay-only exact ballot/ACK delivery, AutoNAT state, a failed DCUtR direct upgrade
+with continued relay fallback, and circuit/connection close. Public Internet or
+multi-host operation, broad discovery, membership/key trust, Sybil resistance,
+and on-chain attestation remain explicitly unproven. The initial independent
+review caught one displaced duplicate-listener validation block; compiler errors
+also exposed it. Re-review then found that dev feature unification masked a
+production-only missing `rustix/fs` feature. Both were fixed. Production-only
+`cargo check`, 21 crate tests, 191 clean-rerun workspace Rust tests, 126 Guardian
+tests, format/lint/dependency/Memory/HTML/workflow gates, and final independent
+re-review pass with no remaining blocking/high/medium finding. One concurrent
+workspace attempt hit known M-002 jitter at 1.993 ms; isolated rerun passed at
+914 microseconds and the clean complete rerun passed.
+
+No secret, wallet, private key from an existing user file, signature, raw
+transaction, broadcast, contract, reputation, KAS/PROM, slash ACL, or
+commit-reveal behavior was accessed or changed. The known foreign untracked
+`Prometheus-1.png` remains untouched.
+
 *Audit completed 2026-04-02 by Claude Code (5 parallel agents, 7 levels, 35 checks).*
 *The fire belongs to humanity.*

@@ -200,3 +200,4 @@ Core Dev benötigt: Apple Developer Account + Google Play Account (vor Sprint 13
 | 2026-03-22 | Guardian Installer: curl one-click script | Architect | Niedrigste Einstiegshürde für Server-Betreiber |
 | 2026-07-15 | Geschlossene Deployment-Profile | Codex Audit | `full` bindet sieben Release-Fixtures und Metrics Oracle; H-001 bindet nur den non-promotable testnet-10 Canary ohne Oracle-Key |
 | 2026-07-16 | Signed-shape Fee/Mass-Floor vor externer Signatur | Codex Audit | Pinned v2.0.1 Relay-Floor plus konservativer Overall-Mass-Floor werden in Signing-Request Schema v2 gebunden; alte Requests werden verworfen |
+| 2026-07-16 | PeerId bleibt Transportmetadatum | Codex Audit | Persistente libp2p Identitaet, Relay, AutoNAT und DCUtR duerfen niemals Guardian-Mitgliedschaft, BIP340-Key-Zuordnung, Reputation, Stake oder Rewards autorisieren |

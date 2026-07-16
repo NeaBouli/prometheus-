@@ -6,6 +6,9 @@
 //! membership record, or signing-key assignment.
 
 pub mod ingress;
+pub mod relay_service;
+#[path = "identity.rs"]
+pub mod transport_identity;
 
 use std::{
     collections::{HashMap, HashSet},
@@ -23,7 +26,7 @@ use futures::{
 };
 use libp2p_autonat as autonat;
 use libp2p_connection_limits as connection_limits;
-use libp2p_core::{muxing::StreamMuxerBox, upgrade, Multiaddr, Transport};
+use libp2p_core::{multiaddr::Protocol, muxing::StreamMuxerBox, upgrade, Multiaddr, Transport};
 use libp2p_dcutr as dcutr;
 use libp2p_identify as identify;
 use libp2p_identity::{self as identity, PeerId};
@@ -39,6 +42,14 @@ use crate::ingress::{IngressError, UnixBallotIngress};
 pub const BALLOT_PROTOCOL: &str = "/prometheus/guardian-ballot/1.0.0";
 /// Maximum permitted ballot envelope size, matching the canonical verifier.
 pub const MAX_BALLOT_BYTES: usize = 8_192;
+/// Maximum configured static transport routes.
+pub const MAX_STATIC_PEERS: usize = 64;
+/// Maximum configured direct or relay listeners.
+pub const MAX_LISTEN_ADDRESSES: usize = 16;
+/// Maximum encoded length accepted for an operator-supplied multiaddress.
+pub const MAX_MULTIADDR_BYTES: usize = 512;
+/// Maximum explicitly trusted AutoNAT probe servers.
+pub const MAX_AUTONAT_SERVERS: usize = 8;
 
 const ACK_BYTES: usize = 1;
 const BALLOT_LENGTH_BYTES: usize = 2;
@@ -94,7 +105,7 @@ impl AckStatus {
 }
 
 /// A configured transport peer. It intentionally has no Guardian identity fields.
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub struct StaticPeer {
     pub peer_id: PeerId,
     pub address: Multiaddr,
@@ -105,6 +116,12 @@ pub struct StaticPeer {
 pub struct GuardianP2pConfig {
     pub listen_addresses: Vec<Multiaddr>,
     pub static_peers: Vec<StaticPeer>,
+    pub autonat_servers: Vec<StaticPeer>,
+    pub autonat_boot_delay: Duration,
+    pub autonat_retry_interval: Duration,
+    pub autonat_refresh_interval: Duration,
+    pub autonat_confidence_max: usize,
+    pub autonat_allow_private_addresses: bool,
     pub request_timeout: Duration,
     pub idle_connection_timeout: Duration,
     pub max_concurrent_requests: usize,
@@ -121,6 +138,12 @@ impl Default for GuardianP2pConfig {
         Self {
             listen_addresses: Vec::new(),
             static_peers: Vec::new(),
+            autonat_servers: Vec::new(),
+            autonat_boot_delay: Duration::from_secs(15),
+            autonat_retry_interval: Duration::from_secs(90),
+            autonat_refresh_interval: Duration::from_secs(15 * 60),
+            autonat_confidence_max: 3,
+            autonat_allow_private_addresses: false,
             request_timeout: Duration::from_secs(10),
             idle_connection_timeout: Duration::from_secs(30),
             max_concurrent_requests: 32,
@@ -139,6 +162,14 @@ impl GuardianP2pConfig {
         if self.request_timeout.is_zero() || self.idle_connection_timeout.is_zero() {
             return Err(TransportError::InvalidConfig("timeouts must be non-zero"));
         }
+        if self.autonat_retry_interval.is_zero()
+            || self.autonat_refresh_interval.is_zero()
+            || !(1..=10).contains(&self.autonat_confidence_max)
+        {
+            return Err(TransportError::InvalidConfig(
+                "AutoNAT intervals and confidence must be bounded",
+            ));
+        }
 
         if self.max_concurrent_requests == 0
             || self.max_concurrent_streams_per_connection == 0
@@ -151,6 +182,42 @@ impl GuardianP2pConfig {
             return Err(TransportError::InvalidConfig(
                 "connection limits must be non-zero",
             ));
+        }
+
+        if self.listen_addresses.len() > MAX_LISTEN_ADDRESSES {
+            return Err(TransportError::InvalidConfig("too many listen addresses"));
+        }
+        if self.static_peers.len() > MAX_STATIC_PEERS {
+            return Err(TransportError::InvalidConfig("too many static peers"));
+        }
+        if self.autonat_servers.len() > MAX_AUTONAT_SERVERS {
+            return Err(TransportError::InvalidConfig("too many AutoNAT servers"));
+        }
+
+        let mut listen_addresses = HashSet::new();
+        for address in &self.listen_addresses {
+            validate_listen_address(address)?;
+            if !listen_addresses.insert(address) {
+                return Err(TransportError::InvalidConfig("duplicate listen address"));
+            }
+        }
+
+        let mut static_peers = HashSet::new();
+        for peer in &self.static_peers {
+            validate_static_peer(peer)?;
+            if !static_peers.insert(peer) {
+                return Err(TransportError::InvalidConfig("duplicate static peer route"));
+            }
+        }
+
+        let mut autonat_servers = HashSet::new();
+        for server in &self.autonat_servers {
+            validate_autonat_server(server)?;
+            if !autonat_servers.insert(server) {
+                return Err(TransportError::InvalidConfig(
+                    "duplicate AutoNAT server route",
+                ));
+            }
         }
 
         Ok(())
@@ -168,6 +235,94 @@ impl GuardianP2pConfig {
                     .saturating_add(self.max_established_outgoing_connections),
             ))
     }
+
+    fn autonat_config(&self) -> autonat::Config {
+        autonat::Config {
+            boot_delay: self.autonat_boot_delay,
+            retry_interval: self.autonat_retry_interval,
+            refresh_interval: self.autonat_refresh_interval,
+            confidence_max: self.autonat_confidence_max,
+            only_global_ips: !self.autonat_allow_private_addresses,
+            ..autonat::Config::default()
+        }
+    }
+}
+
+fn validate_listen_address(address: &Multiaddr) -> Result<(), TransportError> {
+    validate_address_size(address)?;
+    let protocols: Vec<_> = address.iter().collect();
+    validate_quic_base(&protocols, true)?;
+
+    match protocols.as_slice() {
+        [_, _, Protocol::QuicV1] => Ok(()),
+        [_, _, Protocol::QuicV1, Protocol::P2p(_), Protocol::P2pCircuit] => Ok(()),
+        _ => Err(TransportError::InvalidConfig(
+            "listen address must be an IP/UDP/QUIC-v1 address or relay reservation",
+        )),
+    }
+}
+
+fn validate_static_peer(peer: &StaticPeer) -> Result<(), TransportError> {
+    validate_address_size(&peer.address)?;
+    let protocols: Vec<_> = peer.address.iter().collect();
+    validate_quic_base(&protocols, false)?;
+
+    match protocols.as_slice() {
+        [_, _, Protocol::QuicV1] => Ok(()),
+        [_, _, Protocol::QuicV1, Protocol::P2p(target)] if target == &peer.peer_id => Ok(()),
+        [_, _, Protocol::QuicV1, Protocol::P2p(relay_peer), Protocol::P2pCircuit, Protocol::P2p(target)]
+            if target == &peer.peer_id && relay_peer != target =>
+        {
+            Ok(())
+        }
+        _ => Err(TransportError::InvalidConfig(
+            "static peer address must be direct QUIC-v1 or an exact relay circuit route",
+        )),
+    }
+}
+
+fn validate_autonat_server(server: &StaticPeer) -> Result<(), TransportError> {
+    validate_address_size(&server.address)?;
+    let protocols: Vec<_> = server.address.iter().collect();
+    validate_quic_base(&protocols, false)?;
+    match protocols.as_slice() {
+        [_, _, Protocol::QuicV1] => Ok(()),
+        [_, _, Protocol::QuicV1, Protocol::P2p(target)] if target == &server.peer_id => Ok(()),
+        _ => Err(TransportError::InvalidConfig(
+            "AutoNAT server must use an exact direct QUIC-v1 route",
+        )),
+    }
+}
+
+fn validate_address_size(address: &Multiaddr) -> Result<(), TransportError> {
+    if address.is_empty() || address.to_vec().len() > MAX_MULTIADDR_BYTES {
+        return Err(TransportError::InvalidConfig(
+            "multiaddress is empty or exceeds the configured limit",
+        ));
+    }
+    Ok(())
+}
+
+fn validate_quic_base(protocols: &[Protocol<'_>], listener: bool) -> Result<(), TransportError> {
+    let ip_is_valid = match protocols.first() {
+        Some(Protocol::Ip4(address)) => {
+            listener || (!address.is_unspecified() && !address.is_multicast())
+        }
+        Some(Protocol::Ip6(address)) => {
+            listener || (!address.is_unspecified() && !address.is_multicast())
+        }
+        _ => false,
+    };
+    let port_is_valid = match protocols.get(1) {
+        Some(Protocol::Udp(port)) => listener || *port != 0,
+        _ => false,
+    };
+    if !ip_is_valid || !port_is_valid || !matches!(protocols.get(2), Some(Protocol::QuicV1)) {
+        return Err(TransportError::InvalidConfig(
+            "multiaddress must begin with a valid IP/UDP/QUIC-v1 route",
+        ));
+    }
+    Ok(())
 }
 
 /// Events relevant to a sidecar's ballot processing loop.
@@ -195,6 +350,69 @@ pub enum TransportEvent {
         request_id: request_response::OutboundRequestId,
         failure: RequestFailure,
     },
+    ConnectionEstablished {
+        peer: PeerId,
+        path: ConnectionPath,
+    },
+    ConnectionClosed {
+        peer: PeerId,
+        path: ConnectionPath,
+        remaining: u32,
+        failed: bool,
+    },
+    RelayReservationAccepted {
+        relay_peer: PeerId,
+        renewal: bool,
+    },
+    RelayOutboundCircuit {
+        relay_peer: PeerId,
+    },
+    RelayInboundCircuit {
+        source_peer: PeerId,
+    },
+    NatStatusChanged {
+        old: NatReachability,
+        new: NatReachability,
+    },
+    HolePunchFinished {
+        peer: PeerId,
+        outcome: HolePunchOutcome,
+    },
+    ExternalAddressConfirmed {
+        path: ConnectionPath,
+    },
+}
+
+/// Whether a connection or confirmed external route is direct or relayed.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum ConnectionPath {
+    Direct,
+    Relayed,
+}
+
+/// Data-minimal AutoNAT status for operator health reporting.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum NatReachability {
+    Unknown,
+    Private,
+    Public,
+}
+
+impl From<&autonat::NatStatus> for NatReachability {
+    fn from(status: &autonat::NatStatus) -> Self {
+        match status {
+            autonat::NatStatus::Unknown => Self::Unknown,
+            autonat::NatStatus::Private => Self::Private,
+            autonat::NatStatus::Public(_) => Self::Public,
+        }
+    }
+}
+
+/// Stable outcome of a DCUtR direct-connection upgrade attempt.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum HolePunchOutcome {
+    DirectEstablished,
+    RelayFallback,
 }
 
 /// Stable classification of an outbound request-response failure.
@@ -392,7 +610,7 @@ impl GuardianBehaviour {
                 keypair.public(),
             )),
             ping: ping::Behaviour::new(ping::Config::new()),
-            autonat: autonat::Behaviour::new(local_peer_id, autonat::Config::default()),
+            autonat: autonat::Behaviour::new(local_peer_id, config.autonat_config()),
             relay: relay_client,
             dcutr: dcutr::Behaviour::new(local_peer_id),
             limits: connection_limits::Behaviour::new(config.connection_limits()),
@@ -463,6 +681,8 @@ pub struct GuardianP2p {
     outbound_requests: HashSet<request_response::OutboundRequestId>,
     max_outbound_requests: usize,
     max_inbound_requests: usize,
+    configured_static_peers: HashSet<StaticPeer>,
+    configured_listen_addresses: HashSet<Multiaddr>,
 }
 
 type IngressFuture = Pin<Box<dyn Future<Output = IngressCompletion> + Send>>;
@@ -481,6 +701,8 @@ impl GuardianP2p {
     ) -> Result<Self, TransportError> {
         config.validate()?;
         let static_peers = config.static_peers.clone();
+        let listen_addresses = config.listen_addresses.clone();
+        let autonat_servers = config.autonat_servers.clone();
         let idle_connection_timeout = config.idle_connection_timeout;
         let max_outbound_requests = config.max_concurrent_requests;
         let max_inbound_requests = config.max_concurrent_requests;
@@ -508,12 +730,19 @@ impl GuardianP2p {
             .with_idle_connection_timeout(idle_connection_timeout);
         let mut swarm = Swarm::new(transport, behaviour, local_peer_id, swarm_config);
 
-        for peer in static_peers {
-            swarm.add_peer_address(peer.peer_id, peer.address);
-        }
-        for address in config.listen_addresses {
+        for server in autonat_servers {
             swarm
-                .listen_on(address)
+                .behaviour_mut()
+                .autonat
+                .add_server(server.peer_id, Some(server.address));
+        }
+
+        for peer in &static_peers {
+            swarm.add_peer_address(peer.peer_id, peer.address.clone());
+        }
+        for address in &listen_addresses {
+            swarm
+                .listen_on(address.clone())
                 .map_err(|error| TransportError::Listen(error.to_string()))?;
         }
 
@@ -526,6 +755,8 @@ impl GuardianP2p {
             outbound_requests: HashSet::new(),
             max_outbound_requests,
             max_inbound_requests,
+            configured_static_peers: static_peers.into_iter().collect(),
+            configured_listen_addresses: listen_addresses.into_iter().collect(),
         })
     }
 
@@ -535,16 +766,34 @@ impl GuardianP2p {
     }
 
     /// Adds a static dial address for a transport peer.
-    pub fn add_static_peer(&mut self, peer: StaticPeer) {
-        self.swarm.add_peer_address(peer.peer_id, peer.address);
+    pub fn add_static_peer(&mut self, peer: StaticPeer) -> Result<(), TransportError> {
+        validate_static_peer(&peer)?;
+        if self.configured_static_peers.contains(&peer) {
+            return Ok(());
+        }
+        if self.configured_static_peers.len() >= MAX_STATIC_PEERS {
+            return Err(TransportError::InvalidConfig("too many static peers"));
+        }
+        self.swarm
+            .add_peer_address(peer.peer_id, peer.address.clone());
+        self.configured_static_peers.insert(peer);
+        Ok(())
     }
 
     /// Starts a listener, including an explicitly configured relay circuit address.
     pub fn listen_on(&mut self, address: Multiaddr) -> Result<(), TransportError> {
+        validate_listen_address(&address)?;
+        if self.configured_listen_addresses.contains(&address) {
+            return Ok(());
+        }
+        if self.configured_listen_addresses.len() >= MAX_LISTEN_ADDRESSES {
+            return Err(TransportError::InvalidConfig("too many listen addresses"));
+        }
         self.swarm
-            .listen_on(address)
-            .map(|_| ())
-            .map_err(|error| TransportError::Listen(error.to_string()))
+            .listen_on(address.clone())
+            .map_err(|error| TransportError::Listen(error.to_string()))?;
+        self.configured_listen_addresses.insert(address);
+        Ok(())
     }
 
     /// Sends exact opaque ballot bytes and returns the request correlation ID.
@@ -699,16 +948,67 @@ impl GuardianP2p {
                 None
             }
             SwarmEvent::Behaviour(BehaviourEvent::Autonat(event)) => {
-                let _ = event;
-                None
+                if let autonat::Event::StatusChanged { old, new } = event {
+                    Some(TransportEvent::NatStatusChanged {
+                        old: NatReachability::from(&old),
+                        new: NatReachability::from(&new),
+                    })
+                } else {
+                    None
+                }
             }
-            SwarmEvent::Behaviour(BehaviourEvent::Relay(event)) => {
-                let _ = event;
-                None
-            }
+            SwarmEvent::Behaviour(BehaviourEvent::Relay(event)) => match event {
+                relay::client::Event::ReservationReqAccepted {
+                    relay_peer_id,
+                    renewal,
+                    ..
+                } => Some(TransportEvent::RelayReservationAccepted {
+                    relay_peer: relay_peer_id,
+                    renewal,
+                }),
+                relay::client::Event::OutboundCircuitEstablished { relay_peer_id, .. } => {
+                    Some(TransportEvent::RelayOutboundCircuit {
+                        relay_peer: relay_peer_id,
+                    })
+                }
+                relay::client::Event::InboundCircuitEstablished { src_peer_id, .. } => {
+                    Some(TransportEvent::RelayInboundCircuit {
+                        source_peer: src_peer_id,
+                    })
+                }
+            },
             SwarmEvent::Behaviour(BehaviourEvent::Dcutr(event)) => {
-                let _ = event;
-                None
+                Some(TransportEvent::HolePunchFinished {
+                    peer: event.remote_peer_id,
+                    outcome: if event.result.is_ok() {
+                        HolePunchOutcome::DirectEstablished
+                    } else {
+                        HolePunchOutcome::RelayFallback
+                    },
+                })
+            }
+            SwarmEvent::ConnectionEstablished {
+                peer_id, endpoint, ..
+            } => Some(TransportEvent::ConnectionEstablished {
+                peer: peer_id,
+                path: connection_path(endpoint.is_relayed()),
+            }),
+            SwarmEvent::ConnectionClosed {
+                peer_id,
+                endpoint,
+                num_established,
+                cause,
+                ..
+            } => Some(TransportEvent::ConnectionClosed {
+                peer: peer_id,
+                path: connection_path(endpoint.is_relayed()),
+                remaining: num_established,
+                failed: cause.is_some(),
+            }),
+            SwarmEvent::ExternalAddrConfirmed { address } => {
+                Some(TransportEvent::ExternalAddressConfirmed {
+                    path: connection_path(address.iter().any(|part| part == Protocol::P2pCircuit)),
+                })
             }
             _ => None,
         }
@@ -792,6 +1092,14 @@ impl GuardianP2p {
     }
 }
 
+fn connection_path(relayed: bool) -> ConnectionPath {
+    if relayed {
+        ConnectionPath::Relayed
+    } else {
+        ConnectionPath::Direct
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use std::{fs, os::unix::fs::PermissionsExt, path::PathBuf, sync::Arc, time::Duration};
@@ -816,6 +1124,24 @@ mod tests {
         tokio::time::timeout(Duration::from_secs(10), node.next_event())
             .await
             .expect("two-node libp2p test timed out")
+    }
+
+    async fn next_sidecar_ballot_event(
+        node: &mut GuardianP2p,
+        ingress: &UnixBallotIngress,
+    ) -> Result<TransportEvent, TransportError> {
+        loop {
+            let event = node.next_sidecar_event(ingress).await?;
+            if matches!(
+                event,
+                TransportEvent::InboundBallot { .. }
+                    | TransportEvent::InboundProcessed { .. }
+                    | TransportEvent::OutboundAck { .. }
+                    | TransportEvent::OutboundFailure { .. }
+            ) {
+                return Ok(event);
+            }
+        }
     }
 
     async fn serve_ingress_once(path: PathBuf, expected: Vec<u8>) {
@@ -882,6 +1208,98 @@ mod tests {
         assert!(BallotBytes::new(vec![0_u8; MAX_BALLOT_BYTES]).is_ok());
         assert!(BallotBytes::new(Vec::new()).is_err());
         assert!(BallotBytes::new(vec![0_u8; MAX_BALLOT_BYTES + 1]).is_err());
+    }
+
+    #[test]
+    fn configuration_accepts_exact_direct_and_relay_routes() {
+        let target = identity::Keypair::generate_ed25519().public().to_peer_id();
+        let relay = identity::Keypair::generate_ed25519().public().to_peer_id();
+        let direct = format!("/ip4/127.0.0.1/udp/4001/quic-v1/p2p/{target}")
+            .parse()
+            .expect("direct route");
+        let relayed =
+            format!("/ip4/127.0.0.1/udp/4002/quic-v1/p2p/{relay}/p2p-circuit/p2p/{target}")
+                .parse()
+                .expect("relay route");
+        let reservation = format!("/ip4/127.0.0.1/udp/4002/quic-v1/p2p/{relay}/p2p-circuit")
+            .parse()
+            .expect("relay reservation");
+        let config = GuardianP2pConfig {
+            listen_addresses: vec![
+                "/ip4/0.0.0.0/udp/0/quic-v1"
+                    .parse()
+                    .expect("direct listener"),
+                reservation,
+            ],
+            static_peers: vec![
+                StaticPeer {
+                    peer_id: target,
+                    address: direct,
+                },
+                StaticPeer {
+                    peer_id: target,
+                    address: relayed,
+                },
+            ],
+            ..test_config()
+        };
+
+        config.validate().expect("strict routes are valid");
+    }
+
+    #[test]
+    fn configuration_rejects_dns_mismatches_duplicates_and_unbounded_routes() {
+        let target = identity::Keypair::generate_ed25519().public().to_peer_id();
+        let other = identity::Keypair::generate_ed25519().public().to_peer_id();
+
+        for address in [
+            "/dns4/example.invalid/udp/4001/quic-v1".to_owned(),
+            format!("/ip4/127.0.0.1/udp/0/quic-v1/p2p/{target}"),
+            format!("/ip4/127.0.0.1/udp/4001/quic-v1/p2p/{other}"),
+        ] {
+            let config = GuardianP2pConfig {
+                static_peers: vec![StaticPeer {
+                    peer_id: target,
+                    address: address.parse().expect("syntactically valid multiaddress"),
+                }],
+                ..test_config()
+            };
+            assert!(matches!(
+                config.validate(),
+                Err(TransportError::InvalidConfig(_))
+            ));
+        }
+
+        let route = StaticPeer {
+            peer_id: target,
+            address: "/ip4/127.0.0.1/udp/4001/quic-v1"
+                .parse()
+                .expect("direct route"),
+        };
+        let duplicate = GuardianP2pConfig {
+            static_peers: vec![route.clone(), route],
+            ..test_config()
+        };
+        assert!(matches!(
+            duplicate.validate(),
+            Err(TransportError::InvalidConfig(_))
+        ));
+
+        let unbounded = GuardianP2pConfig {
+            static_peers: (0..=MAX_STATIC_PEERS)
+                .map(|port| StaticPeer {
+                    peer_id: target,
+                    address: format!("/ip4/127.0.0.1/udp/{}/quic-v1", 4000 + port)
+                        .parse()
+                        .expect("bounded direct route"),
+                })
+                .collect(),
+            ..test_config()
+        };
+        assert!(matches!(
+            unbounded.validate(),
+            Err(TransportError::InvalidConfig(_))
+        ));
     }
 
     #[tokio::test]
@@ -1222,7 +1640,7 @@ mod tests {
             loop {
                 tokio::select! {
                     _ = started.notified() => break,
-                    event = receiver.next_sidecar_event(&ingress) => {
+                    event = next_sidecar_ballot_event(&mut receiver, &ingress) => {
                         panic!("sidecar unexpectedly completed before release: {event:?}");
                     },
                     event = sender.next_event() => {
@@ -1239,7 +1657,7 @@ mod tests {
         tokio::time::timeout(Duration::from_secs(10), async {
             loop {
                 tokio::select! {
-                    event = receiver.next_sidecar_event(&ingress) => {
+                    event = next_sidecar_ballot_event(&mut receiver, &ingress) => {
                         panic!("sidecar unexpectedly completed while ingress blocked: {event:?}");
                     },
                     event = sender.next_event() => {
@@ -1262,7 +1680,7 @@ mod tests {
         assert!(
             tokio::time::timeout(
                 Duration::from_millis(100),
-                receiver.next_sidecar_event(&ingress),
+                next_sidecar_ballot_event(&mut receiver, &ingress),
             )
             .await
             .is_err(),
@@ -1277,7 +1695,7 @@ mod tests {
         assert!(
             tokio::time::timeout(
                 Duration::from_millis(100),
-                receiver.next_sidecar_event(&ingress),
+                next_sidecar_ballot_event(&mut receiver, &ingress),
             )
             .await
             .is_err(),
@@ -1339,7 +1757,7 @@ mod tests {
             loop {
                 tokio::select! {
                     _ = started.notified() => break,
-                    event = receiver.next_sidecar_event(&ingress) => {
+                    event = next_sidecar_ballot_event(&mut receiver, &ingress) => {
                         panic!("sidecar unexpectedly completed before release: {event:?}");
                     },
                     _ = sender.next_event() => {}
