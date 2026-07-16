@@ -182,6 +182,24 @@ test proves reservation, relayed ballot/ACK, AutoNAT state, DCUtR failure with
 relay fallback, and disconnect handling. Public or multi-host operation, broad
 discovery, membership trust, and on-chain attestation remain outside this API.
 
+### Guardian Operated Service Candidate (GH-48)
+
+The `prometheus-guardian-p2p` binary exposes `preflight --config`,
+`run --config`, and `submit --socket --peer --ballot`. Role-tagged TOML is
+bounded, rejects unknown fields, and must be a mode-`0600` effective-user-owned
+regular file in a mode-`0700` directory. `guardian` owns an owner-only AF_UNIX
+submission socket and drives `GuardianP2p` plus the existing authenticated
+collector boundary; `relay` drives only the bounded relay service.
+
+Local submission frames are exact and versioned: protocol byte, canonical
+transport PeerId length and UTF-8 bytes, ballot length, and the unchanged ballot
+bytes. Request and response EOF are mandatory. Results are limited to accepted,
+duplicate, rejected, busy, or transport failure. JSON lifecycle and health
+records exclude ballots, collector responses, and local paths. SIGINT/SIGTERM
+stops admission/listeners, drains bounded work, and removes the owned socket.
+This API adds no Guardian membership, signature, reputation, stake, reward, or
+chain authority.
+
 ---
 
 ## 4. SILVERSCRIPT CONTRACT API

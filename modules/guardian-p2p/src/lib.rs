@@ -5,8 +5,13 @@
 //! [`libp2p_identity::PeerId`] is connection metadata and is never a Guardian identity,
 //! membership record, or signing-key assignment.
 
+#[cfg(not(unix))]
+compile_error!("prometheus-guardian-p2p requires Unix AF_UNIX and peer credentials");
+
 pub mod ingress;
+pub mod local_submit;
 pub mod relay_service;
+pub mod service;
 #[path = "identity.rs"]
 pub mod transport_identity;
 
@@ -26,7 +31,10 @@ use futures::{
 };
 use libp2p_autonat as autonat;
 use libp2p_connection_limits as connection_limits;
-use libp2p_core::{multiaddr::Protocol, muxing::StreamMuxerBox, upgrade, Multiaddr, Transport};
+use libp2p_core::{
+    multiaddr::Protocol, muxing::StreamMuxerBox, transport::ListenerId, upgrade, Multiaddr,
+    Transport,
+};
 use libp2p_dcutr as dcutr;
 use libp2p_identify as identify;
 use libp2p_identity::{self as identity, PeerId};
@@ -50,6 +58,14 @@ pub const MAX_LISTEN_ADDRESSES: usize = 16;
 pub const MAX_MULTIADDR_BYTES: usize = 512;
 /// Maximum explicitly trusted AutoNAT probe servers.
 pub const MAX_AUTONAT_SERVERS: usize = 8;
+/// Maximum requests accepted from an operator configuration.
+pub const MAX_CONCURRENT_REQUESTS: usize = 1_024;
+/// Maximum concurrent streams accepted per connection.
+pub const MAX_STREAMS_PER_CONNECTION: usize = 64;
+/// Maximum value for any individual configured connection limit.
+pub const MAX_CONNECTION_LIMIT: u32 = 4_096;
+/// Maximum operator-configured transport duration.
+pub const MAX_TRANSPORT_DURATION: Duration = Duration::from_secs(24 * 60 * 60);
 
 const ACK_BYTES: usize = 1;
 const BALLOT_LENGTH_BYTES: usize = 2;
@@ -100,6 +116,16 @@ impl AckStatus {
                 io::ErrorKind::InvalidData,
                 "unknown Guardian ballot acknowledgement",
             )),
+        }
+    }
+
+    /// Stable machine-readable acknowledgement name.
+    pub const fn as_str(self) -> &'static str {
+        match self {
+            Self::Accepted => "accepted",
+            Self::Duplicate => "duplicate",
+            Self::Rejected => "rejected",
+            Self::Busy => "busy",
         }
     }
 }
@@ -158,12 +184,19 @@ impl Default for GuardianP2pConfig {
 }
 
 impl GuardianP2pConfig {
-    fn validate(&self) -> Result<(), TransportError> {
-        if self.request_timeout.is_zero() || self.idle_connection_timeout.is_zero() {
+    pub fn validate(&self) -> Result<(), TransportError> {
+        if self.request_timeout.is_zero()
+            || self.request_timeout > MAX_TRANSPORT_DURATION
+            || self.idle_connection_timeout.is_zero()
+            || self.idle_connection_timeout > MAX_TRANSPORT_DURATION
+        {
             return Err(TransportError::InvalidConfig("timeouts must be non-zero"));
         }
         if self.autonat_retry_interval.is_zero()
+            || self.autonat_retry_interval > MAX_TRANSPORT_DURATION
             || self.autonat_refresh_interval.is_zero()
+            || self.autonat_refresh_interval > MAX_TRANSPORT_DURATION
+            || self.autonat_boot_delay > MAX_TRANSPORT_DURATION
             || !(1..=10).contains(&self.autonat_confidence_max)
         {
             return Err(TransportError::InvalidConfig(
@@ -171,13 +204,14 @@ impl GuardianP2pConfig {
             ));
         }
 
-        if self.max_concurrent_requests == 0
-            || self.max_concurrent_streams_per_connection == 0
-            || self.max_pending_incoming_connections == 0
-            || self.max_pending_outgoing_connections == 0
-            || self.max_established_incoming_connections == 0
-            || self.max_established_outgoing_connections == 0
-            || self.max_established_connections_per_peer == 0
+        if !(1..=MAX_CONCURRENT_REQUESTS).contains(&self.max_concurrent_requests)
+            || !(1..=MAX_STREAMS_PER_CONNECTION)
+                .contains(&self.max_concurrent_streams_per_connection)
+            || !(1..=MAX_CONNECTION_LIMIT).contains(&self.max_pending_incoming_connections)
+            || !(1..=MAX_CONNECTION_LIMIT).contains(&self.max_pending_outgoing_connections)
+            || !(1..=MAX_CONNECTION_LIMIT).contains(&self.max_established_incoming_connections)
+            || !(1..=MAX_CONNECTION_LIMIT).contains(&self.max_established_outgoing_connections)
+            || !(1..=MAX_CONNECTION_LIMIT).contains(&self.max_established_connections_per_peer)
         {
             return Err(TransportError::InvalidConfig(
                 "connection limits must be non-zero",
@@ -329,6 +363,13 @@ fn validate_quic_base(protocols: &[Protocol<'_>], listener: bool) -> Result<(), 
 #[derive(Debug)]
 pub enum TransportEvent {
     Listening {
+        address: Multiaddr,
+    },
+    ListenerClosed {
+        address: Multiaddr,
+        failed: bool,
+    },
+    ListenerFailed {
         address: Multiaddr,
     },
     InboundBallot {
@@ -683,6 +724,8 @@ pub struct GuardianP2p {
     max_inbound_requests: usize,
     configured_static_peers: HashSet<StaticPeer>,
     configured_listen_addresses: HashSet<Multiaddr>,
+    listener_addresses: HashMap<ListenerId, Multiaddr>,
+    active_listener_addresses: HashMap<ListenerId, HashSet<Multiaddr>>,
 }
 
 type IngressFuture = Pin<Box<dyn Future<Output = IngressCompletion> + Send>>;
@@ -740,10 +783,12 @@ impl GuardianP2p {
         for peer in &static_peers {
             swarm.add_peer_address(peer.peer_id, peer.address.clone());
         }
+        let mut listener_addresses = HashMap::new();
         for address in &listen_addresses {
-            swarm
+            let listener_id = swarm
                 .listen_on(address.clone())
                 .map_err(|error| TransportError::Listen(error.to_string()))?;
+            listener_addresses.insert(listener_id, address.clone());
         }
 
         Ok(Self {
@@ -757,6 +802,8 @@ impl GuardianP2p {
             max_inbound_requests,
             configured_static_peers: static_peers.into_iter().collect(),
             configured_listen_addresses: listen_addresses.into_iter().collect(),
+            listener_addresses,
+            active_listener_addresses: HashMap::new(),
         })
     }
 
@@ -789,11 +836,40 @@ impl GuardianP2p {
         if self.configured_listen_addresses.len() >= MAX_LISTEN_ADDRESSES {
             return Err(TransportError::InvalidConfig("too many listen addresses"));
         }
-        self.swarm
+        let listener_id = self
+            .swarm
             .listen_on(address.clone())
             .map_err(|error| TransportError::Listen(error.to_string()))?;
-        self.configured_listen_addresses.insert(address);
+        self.configured_listen_addresses.insert(address.clone());
+        self.listener_addresses.insert(listener_id, address);
         Ok(())
+    }
+
+    /// Returns true only after every configured listener has produced an active address.
+    pub fn is_ready(&self) -> bool {
+        !self.listener_addresses.is_empty()
+            && self.listener_addresses.keys().all(|listener_id| {
+                self.active_listener_addresses
+                    .get(listener_id)
+                    .is_some_and(|addresses| !addresses.is_empty())
+            })
+    }
+
+    /// Returns admitted inbound collector work and outstanding outbound requests.
+    pub fn pending_work(&self) -> (usize, usize) {
+        (self.inbound_work.len(), self.outbound_requests.len())
+    }
+
+    /// Stops accepting new network traffic while retained work is drained by the owner loop.
+    pub fn shutdown_listeners(&mut self) -> usize {
+        let listener_ids: Vec<_> = self.listener_addresses.keys().copied().collect();
+        let mut removed = 0;
+        for listener_id in listener_ids {
+            if self.swarm.remove_listener(listener_id) {
+                removed += 1;
+            }
+        }
+        removed
     }
 
     /// Sends exact opaque ballot bytes and returns the request correlation ID.
@@ -887,9 +963,11 @@ impl GuardianP2p {
                             self.ingress_tasks.push(Box::pin(async move {
                                 let status = match ingress.forward(&ballot).await {
                                     Ok(status) => status,
-                                    Err(IngressError::Io(_) | IngressError::Timeout) => {
-                                        AckStatus::Busy
-                                    }
+                                    Err(
+                                        IngressError::Io(_)
+                                        | IngressError::Timeout
+                                        | IngressError::Unavailable,
+                                    ) => AckStatus::Busy,
                                     Err(_) => AckStatus::Rejected,
                                 };
                                 IngressCompletion {
@@ -933,9 +1011,48 @@ impl GuardianP2p {
 
     fn handle_swarm_event(&mut self, event: SwarmEvent<BehaviourEvent>) -> Option<TransportEvent> {
         match event {
-            SwarmEvent::NewListenAddr { address, .. } => {
+            SwarmEvent::NewListenAddr {
+                listener_id,
+                address,
+            } => {
+                self.active_listener_addresses
+                    .entry(listener_id)
+                    .or_default()
+                    .insert(address.clone());
                 Some(TransportEvent::Listening { address })
             }
+            SwarmEvent::ExpiredListenAddr {
+                listener_id,
+                address,
+            } => {
+                if let Some(addresses) = self.active_listener_addresses.get_mut(&listener_id) {
+                    addresses.remove(&address);
+                }
+                Some(TransportEvent::ListenerClosed {
+                    address,
+                    failed: false,
+                })
+            }
+            SwarmEvent::ListenerClosed {
+                listener_id,
+                addresses,
+                reason,
+            } => {
+                self.active_listener_addresses.remove(&listener_id);
+                let address = addresses
+                    .into_iter()
+                    .next()
+                    .or_else(|| self.listener_addresses.get(&listener_id).cloned())?;
+                Some(TransportEvent::ListenerClosed {
+                    address,
+                    failed: reason.is_err(),
+                })
+            }
+            SwarmEvent::ListenerError { listener_id, .. } => self
+                .listener_addresses
+                .get(&listener_id)
+                .cloned()
+                .map(|address| TransportEvent::ListenerFailed { address }),
             SwarmEvent::Behaviour(BehaviourEvent::Ballots(event)) => {
                 self.handle_ballot_event(event)
             }
@@ -1175,6 +1292,7 @@ mod tests {
             .await
             .expect("write ack length");
         stream.write_all(ack.as_bytes()).await.expect("write ack");
+        stream.shutdown().await.expect("close acknowledgement");
     }
 
     async fn serve_two_ingress_out_of_order(path: PathBuf) {

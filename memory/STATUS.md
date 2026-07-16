@@ -116,8 +116,9 @@ real signature or broadcast occurred. Real state/sponsor inputs, signatures,
 confirmation, successor evidence, and release evidence remain.
 
 Scope-weighted status estimate on 2026-07-16: H-001 canary preparation is about
-96% complete; rollout-capable core-network work is about 71-75% complete; the
-complete roadmap vision is about 38-43% complete. These values distinguish
+96% complete; rollout-capable core-network work is about 73-77% complete after
+local GH-48 operated-sidecar verification; the complete roadmap vision is about
+39-44% complete. These values distinguish
 prepared software from real chain operation and are not release guarantees.
 Latest verified public-status main `e9a970a9d3dbaa98cd754a4149075c0cca866001`
 passed Prometheus CI `29455597727`, Security Audit `29455597677`, and Pages
@@ -263,7 +264,7 @@ Priority tasks:
 - Sprint 9: run the merged keyless operator against a real funded testnet-10 UTXO and collect confirmed public receipt plus independent node/explorer evidence records
 - H-001: keep LE encoding and signed-boundary verification gated in CI
 - Oracle: execute the merged/exact-main keyless GovernanceAutoTuning transition operator with real public state/sponsor UTXOs, external oracle/sponsor signatures, confirmed successor evidence, and existing result/evidence/status gates before beta/mainnet governance
-- Sprint 10B: GH-33 hybrid routing, GH-36 local 5+ complete-ballot validation, GH-39 local BIP340 authenticated intake, GH-42 direct QUIC/libp2p ballot transport, and GH-44 persistent identity plus isolated operated relay/NAT evidence are merged/exact-main verified. Public/multi-host operation, broad discovery, trusted membership/key assignment, Sybil resistance, on-chain attestation, live model wiring/calibration, and production evidence remain
+- Sprint 10B: GH-33 hybrid routing, GH-36 local 5+ complete-ballot validation, GH-39 local BIP340 authenticated intake, GH-42 direct QUIC/libp2p ballot transport, and GH-44 persistent identity plus isolated operated relay/NAT evidence are merged/exact-main verified. The GH-48 candidate adds strict operated Guardian/relay roles, owner-only local submission, path-free JSON health, graceful signal drain, and separate-process same-host exact relay evidence. Public/multi-host operation, broad discovery, trusted membership/key assignment, Sybil resistance, on-chain attestation, live model wiring/calibration, and production evidence remain
 - M-001/M-002: Medium findings (can wait until Aug/Sep)
 ```
 
@@ -375,7 +376,36 @@ Boundary: PeerId never authorizes Guardian membership. No wallet, chain, contrac
           signature, reputation, KAS/PROM, slash ACL, or commit-reveal change
 Not yet proven: public or multi-host operation, broad discovery, trusted
                 membership/key assignment, Sybil
-                resistance, on-chain attestation, standalone service packaging
+                resistance, and on-chain attestation
+```
+
+## GUARDIAN OPERATED SIDECAR (GH-48 CANDIDATE)
+
+```text
+Status: implementation and focused local verification complete on
+        feat/GH-48-guardian-sidecar-service; PR/exact-main evidence pending
+Process: explicit prometheus-guardian-p2p preflight/run/submit CLI with strict
+         role-tagged owner-only TOML for guardian and relay roles
+IPC: owner-only AF_UNIX submission, exact EOF-bound frames, effective-UID peer
+     checks, bounded admission/timeouts, and collector outages mapped to busy
+Lifecycle: live listener readiness, data-minimal path-free JSON records,
+           SIGINT/SIGTERM admission stop, bounded work drain, terminal status,
+           and owned submission-socket cleanup
+Local evidence: 32 unit tests plus one separate-process test pass; relay,
+                receiver, sender, submit client, and collector prove exact-byte
+                relayed delivery, canonical ACK propagation, clean SIGTERM,
+                socket cleanup, and stable transport identities on one host;
+                203 workspace Rust tests/2 live ignores, 126 Guardian tests/3
+                live-model skips, release/package, lint, Memory, HTML, workflow,
+                dependency, staged Gitleaks, and diff gates pass
+Review: independent review found one medium trailing-ACK acceptance gap; strict
+        EOF validation and a regression close it; final security and CI/package
+        re-reviews report no remaining actionable finding
+Boundary: no wallet, chain, signing, contract, reputation, KAS/PROM, slash ACL,
+          commit-reveal, or Guardian authorization behavior changed
+Not yet proven: public/multi-host operation, broad discovery, trusted
+                membership/key assignment, Sybil resistance, on-chain
+                attestation, or production node evidence
 ```
 
 ## MAINNET CONTRACT ADDRESSES (post-verification)

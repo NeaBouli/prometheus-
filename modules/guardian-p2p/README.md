@@ -1,8 +1,57 @@
 # Prometheus Guardian P2P
 
-## GH-44 implementation (as implemented)
+## GH-48 operated service candidate
 
-This workspace crate is the transport-only Guardian ballot carrier. GH-44 adds persisted transport identity and operated relay/NAT evidence while keeping no Guardian identity/auth role inside transport.
+This workspace crate is the transport-only Guardian ballot carrier. GH-42 and GH-44 provide the bounded carrier, persisted transport identity, and relay/NAT evidence. GH-48 packages those APIs as an operated process while keeping Guardian identity and authorization outside transport.
+
+Supported operated target: Unix-like systems with AF_UNIX peer credentials. Protected CI verifies Linux; public Windows or macOS packaging is not claimed.
+
+- Explicit `prometheus-guardian-p2p` binary with `preflight`, `run`, and `submit` commands.
+- Strict role-tagged TOML with unknown-field rejection and owner-only config, identity, collector, and submission paths.
+- `guardian` and `relay` roles expose conservative bounded settings rather than arbitrary transport internals.
+- The Guardian role waits for its existing authenticated collector, owns a local submission socket, continuously drives libp2p, and correlates local requests with network ACKs.
+- JSON-line lifecycle, readiness, connection, transport, ACK, and health records contain no ballot or collector bytes and no local filesystem paths.
+- SIGINT/SIGTERM stops local admission and network listeners, drains admitted work to a bounded deadline, emits a terminal record, and removes the owned submission socket.
+- Missing or refused collector ingress is temporary `busy`; unsafe ownership, modes, symlinks, framing, or acknowledgements still fail closed.
+- Listener readiness is live state and is cleared on expired or closed listeners.
+- The separate-process test starts a relay, receiver, sender, local submit client, and owner-only collector boundary; it proves exact-byte relay delivery, canonical ACK, graceful shutdown, socket cleanup, and stable transport identities on one host.
+
+Example owner-only Guardian config:
+
+```toml
+role = "guardian"
+identity_path = "/var/lib/prometheus/guardian-p2p/identity"
+collector_socket = "/run/user/1000/prometheus/collector.sock"
+submission_socket = "/run/user/1000/prometheus/submit.sock"
+listen_addresses = ["/ip4/127.0.0.1/udp/0/quic-v1"]
+health_interval_secs = 30
+ingress_timeout_secs = 10
+collector_startup_timeout_secs = 30
+shutdown_drain_timeout_secs = 10
+max_local_submissions = 32
+static_peers = []
+autonat_servers = []
+```
+
+The config file must be mode `0600` in an effective-user-owned mode-`0700` directory. Run a network-free validation before starting:
+
+```bash
+prometheus-guardian-p2p preflight --config /var/lib/prometheus/guardian-p2p/service.toml
+prometheus-guardian-p2p run --config /var/lib/prometheus/guardian-p2p/service.toml
+```
+
+Submit an already authenticated canonical ballot to a configured transport peer:
+
+```bash
+prometheus-guardian-p2p submit \
+  --socket /run/user/1000/prometheus/submit.sock \
+  --peer '<canonical-libp2p-peer-id>' \
+  --ballot /run/user/1000/prometheus/ballot.bin
+```
+
+The CLI never accepts wallet keys, Guardian signing keys, seeds, or raw transactions.
+
+## GH-44 transport foundation
 
 - `PeerId` remains transport metadata only. It is never a Guardian identity, membership value, signing key, chain account, reputation index, or tokenomics key.
 - Persistent Ed25519 transport identity via `load_or_create_transport_identity`.
@@ -48,13 +97,13 @@ The transport cannot do or claim:
 - Wallet keys, signature validation, or transaction flow.
 - Reputation/SLASH score handling.
 - tokenomics logic.
-- public relay bootstrap, multi-host operated package, or mDNS-based discovery.
-- autonomous relay-server package shipping.
+- public relay bootstrap, public or multi-host operating evidence, or mDNS-based discovery.
+- trusted membership/key assignment, Sybil resistance, or on-chain attestation.
 
 ## Verification
 
 ```bash
-cargo test -p prometheus-guardian-p2p
+cargo test -p prometheus-guardian-p2p --all-targets
 cargo fmt --all -- --check
 cargo clippy -p prometheus-guardian-p2p --all-targets -- -D warnings
 cargo audit
@@ -65,14 +114,15 @@ Key tests to run first:
 ```bash
 cargo test -p prometheus-guardian-p2p concurrent_creation_returns_one_peer_id
 cargo test -p prometheus-guardian-p2p operated_relay_delivers_ballot_and_preserves_fallback
+cargo test -p prometheus-guardian-p2p --test sidecar_process
 cargo test -p prometheus-guardian-p2p configuration_accepts_exact_direct_and_relay_routes
 cargo test -p prometheus-guardian-p2p configuration_rejects_dns_mismatches_duplicates_and_unbounded_routes
 cargo test -p prometheus-guardian-p2p closed_response_channel_race_is_nonfatal
 cargo test -p prometheus-guardian-p2p canceled_peer_keeps_capacity_until_ingress_finishes
 ```
 
-## Not yet proven by GH-44
+## Not yet proven by GH-48
 
 - Broad peer discovery and public relay bootstrap.
-- Multi-host packaged operator operation.
+- Public or multi-host operator operation.
 - Public service hardening for multi-instance deployment.
