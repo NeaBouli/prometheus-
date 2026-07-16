@@ -688,9 +688,11 @@ transaction verification. The existing full-JSON response path remains
 compatible. The runbook explicitly forbids wallet `message sign` because its
 personal-message domain hash is not the transaction sighash. Thirty-eight
 focused tests, warning-free Clippy, workspace tests, CLI smoke, YAML parsing,
-and independent Terra review pass locally. PR/exact-main verification remains
-pending. No wallet, private material, signature, raw signed transaction, or
-broadcast was used.
+and independent Terra review pass. PR #23 merged as exact main
+`f79150d77ebbf8c71ec8051dc22c7a126d4f38c0`; Prometheus CI `29449066498`,
+Security Audit `29449066352`, Pages `29449065192`, and live Whitepaper
+verification pass. No wallet, private material, signature, raw signed
+transaction, or broadcast was used.
 
 *Audit completed 2026-04-02 by Claude Code (5 parallel agents, 7 levels, 35 checks).*
 *The fire belongs to humanity.*
