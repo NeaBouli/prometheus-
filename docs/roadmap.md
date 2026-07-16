@@ -86,7 +86,9 @@ external BIP340 signing, verifies the returned signature and complete
 transaction, revalidates the exact live funding UTXO, broadcasts, and observes
 the covenant output. Its funding-free TLS-only official-resolver probe now
 confirms a synced, UTXO-indexed post-Toccata testnet-10 node while preserving
-the mandatory funding-bound preflight. Real funded testnet-10 evidence remains required.
+the mandatory funding-bound preflight. Public H-001 funding and the exact-main
+schema-v2 request/digest are confirmed; external signature, verified broadcast,
+receipt, and independent testnet-10 evidence remain required.
 A public release-hardening evidence verifier binds successful CI, Pages,
 branch-control, rollback, and release-note checks to the exact release commit
 without querying GitHub, accepting credentials, changing repository settings,
@@ -124,7 +126,7 @@ public release-hardening evidence for the exact rollout commit.
 - Keep public oracle status staging guarded against blocked requests, secrets, and raw transactions
 - Keep public release-hardening evidence verification green and bound to the exact release commit
 - Keep the keyless Toccata-v1 genesis operator tests, deterministic public vectors, public-file handoff, CLI secret-boundary checks, contextual storage-mass commitment, exact live funding-UTXO checks, fee caps, and broadcast acknowledgement gates green
-- Produce real testnet-10 funding, external-signature, deployment-receipt, and independent chain-observation evidence
+- Complete explicitly approved external signing, operator verification, one-shot broadcast, deployment receipt, and independent chain-observation evidence for the funded H-001 testnet-10 canary
 - Compile and deploy all six state contracts to Kaspa Mainnet only after the full seven-fixture verification path passes; H-001 remains a proof/canary fixture
 - Integrate kaspa-zk-params crate (real Groth16, replacing stub)
 - Implement PROM emission contract (minting logic)
