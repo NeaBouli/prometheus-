@@ -1,5 +1,13 @@
 # Action Log
 
+## 2026-07-16 — GH-9 public TN10 funding confirmed
+
+- Reopened issue https://github.com/NeaBouli/prometheus-/issues/9 because the H-001 canary execution remains active after the software-profile closeout.
+- Requested `1001 TKAS` from the official TN10 faucet to the public deployer address after explicit operator confirmation. Faucet transaction `24e81339f3656689643ca86e3c53c4c5336e4273bb127d25bdaf328e5da241c7` was accepted.
+- Independently verified through the official TN10 REST API that outpoint `24e81339f3656689643ca86e3c53c4c5336e4273bb127d25bdaf328e5da241c7:0` is unspent, non-coinbase, holds `100100000000` sompi, uses P2PK script `20e5a39b02e8bad5dbe8d793425e2590b008a4517696c756ccf18dfa9f16c1f1cfac`, and has block DAA score `517772692`.
+- The matching public deployer identity is `kaspatest:qrj68xczazadtklg67f5yh39jzcq3fz3w6tvw4kv7xxl48ckc8cu7rwdr0jrt` with x-only public key `e5a39b02e8bad5dbe8d793425e2590b008a4517696c756ccf18dfa9f16c1f1cf`.
+- Funding and public-identity blockers are resolved. Exact-commit artifact/request rebuild, external BIP340 digest signature, one-shot broadcast, confirmation, receipt, and independent chain evidence remain. No wallet file, wallet hint, seed, mnemonic, private key, password, token, or raw signed transaction was read, copied, logged, or published.
+
 ## 2026-07-16 — GH-13 experimental miner companion completed
 
 - Opened issue https://github.com/NeaBouli/prometheus-/issues/13 and branch `feature/GH-13-miner-companion` from clean merged baseline `72c9717`; foreign untracked `Prometheus-1.png` remains untouched.
