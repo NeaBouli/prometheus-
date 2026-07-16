@@ -154,7 +154,7 @@ public release-hardening evidence for the exact rollout commit.
 - Rule content download from IPFS via CIDv1
 - Merged/exact-main verified: GH-42 Guardian ballot carrier has direct QUIC request/response, static peers, bounded resources, owner-only local collector ingress, cancellation-safe concurrent swarm progress, and relay/AutoNAT/DCUtR behaviours
 - Merged/exact-main verified in GH-44: atomic owner-only persistent transport identity, strict bounded direct/relay/AutoNAT routes, data-minimal health events, and a bounded relay service
-- Locally verified GH-48 candidate: strict Guardian/relay process roles, owner-only local submission, JSON readiness/health, graceful signal drain, and separate-process same-host relay delivery/cleanup evidence
+- Merged and exact-main-verified GH-48: strict Guardian/relay process roles, owner-only local submission, bounded JSON readiness/health, graceful signal drain, and separate-process same-host relay delivery/cleanup evidence
 - Proven on an isolated three-node harness: relay reservation/delivery, AutoNAT state, DCUtR relay fallback, and disconnect handling; public/multi-host operation remains pending
 - Pending: public operated relay/NAT infrastructure and broad discovery; mDNS remains excluded while its compatible dependency path has unresolved RustSec advisories
 - Light Client ↔ Guardian communication over P2P

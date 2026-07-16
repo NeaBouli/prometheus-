@@ -892,7 +892,7 @@ commit-reveal behavior was accessed or changed. The known foreign untracked
 exact-main Prometheus CI `29471344601`, Security Audit `29471344556`, and Pages
 `29471344050` passed for the same SHA, and live public markers were verified.
 
-## GH-48 OPERATED SIDECAR CANDIDATE AUDIT UPDATE (2026-07-16)
+## GH-48 OPERATED SIDECAR MERGE AUDIT UPDATE (2026-07-16)
 
 GH-48 packages the existing transport core as an explicit Guardian/relay
 process without changing membership, keys, signatures, reputation, stake,
@@ -932,13 +932,16 @@ ordering, lexical path rejection, pre-allocation frame guard, and synchronized
 metadata close them. Focused tests, the now-complete 33-test crate suite, three
 process tests including broken-stdout and collector-wait SIGTERM coverage, all
 206 workspace tests, Rustfmt, and workspace all-target Clippy pass. Independent
-Terra re-review reports no actionable finding. Refreshed remote evidence is
-pending.
+Terra re-review reports no actionable finding. All ten final PR contexts passed
+in Prometheus CI `29481599742` and Security Audit `29481599706`, including
+CodeRabbit with every thread resolved. PR #49 merged normally as exact main
+`b14d36fc79ddc7e0b407b42cb4a271e29cb1ddea`; exact-main Prometheus CI
+`29481830688`, Security Audit `29481830686`, and Pages `29481830054` pass.
 
 No secret, wallet, existing private key, signature, raw transaction, broadcast,
 contract, reputation, KAS/PROM, slash ACL, commit-reveal, or Guardian
 authorization behavior was accessed or changed. `Prometheus-1.png` remains
 untouched and uncommitted.
 
-*Original pre-hardfork audit completed 2026-04-02 by Claude Code (5 parallel agents, 7 levels, 35 checks); GH-48 candidate update completed 2026-07-16 by Codex.*
+*Original pre-hardfork audit completed 2026-04-02 by Claude Code (5 parallel agents, 7 levels, 35 checks); GH-48 merge update completed 2026-07-16 by Codex.*
 *The fire belongs to humanity.*

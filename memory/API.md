@@ -182,7 +182,7 @@ test proves reservation, relayed ballot/ACK, AutoNAT state, DCUtR failure with
 relay fallback, and disconnect handling. Public or multi-host operation, broad
 discovery, membership trust, and on-chain attestation remain outside this API.
 
-### Guardian Operated Service Candidate (GH-48)
+### Guardian Operated Service (GH-48 merged)
 
 The `prometheus-guardian-p2p` binary exposes `preflight --config`,
 `run --config`, and `submit --socket --peer --ballot`. Role-tagged TOML is

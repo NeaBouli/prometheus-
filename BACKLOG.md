@@ -1,8 +1,8 @@
 # prometheus — Backlog
 
 ## 🔴 Aktiv (diese Session)
-- Latest documented green baseline is exact main `b639a5bc80bf4f6e442e6dc295c091714089ce38`; run `git log --oneline -1` for the current working HEAD.
-- Prometheus CI `29471846882`, Security Audit `29471846860`, and GitHub Pages `29471846338` are green for exact main. Current-Silverc CI validates the keyless Toccata-v1 operator, operator runbook, request/receipt/evidence pipeline, release-readiness audit, metrics-oracle handoff, and exact-commit hardening gates.
+- Latest documented green baseline is exact main `b14d36fc79ddc7e0b407b42cb4a271e29cb1ddea`; run `git log --oneline -1` for the current working HEAD.
+- Prometheus CI `29481830688`, Security Audit `29481830686`, and GitHub Pages `29481830054` are green for exact main. Current-Silverc CI validates the keyless Toccata-v1 operator, operator runbook, request/receipt/evidence pipeline, release-readiness audit, metrics-oracle handoff, and exact-commit hardening gates.
 - Runtime stub gates added for Rust client; current-Silverc contract gates now cover H-001, ValidatorStaking, GuardianReputation, RuleStorage, CommunityDonations, DevIncentivePool, and GovernanceAutoTuning.
 - Local current-Silverc release-bundle smoke now compiles all 7 fixtures through pinned upstream `silverc` and writes a deterministic manifest plus optional archive with source/artifact/script hashes; deploy preflight validates the bundle/operator public inputs, emits a Markdown operator runbook, and confirms upstream `silverc` has no network deploy command.
 - Deployment receipt verifier validates public receipt records against the release bundle, rejects secret-like fields, and keeps synthetic `ci_fixture` receipts separate from real `operator_record` deployment evidence.
@@ -16,13 +16,13 @@
 - GH-33 is merged and exact-main verified at `ce1d213`: a local dependency-injected 8B-first/70B-escalation router with exact `0.70` routing, fail-closed safety checks, and unchanged `0.85` submission policy.
 - GH-36 local ensemble software is merged and exact-main verified at `f8ebaac`: domain-separated candidate/snapshot commitments, at least five unique 8B members, complete ballots, strict majority, exact `8500`-bps source/approval policy, and conservative confidence pass locally and in protected CI. Trusted membership, signed P2P ballots, replay/Sybil protection, on-chain attestation, and production evidence remain open.
 - GH-39 is merged/exact-main verified at `d0f78a9`: the local transport-neutral intake binds each Guardian ID to an exact per-session BIP340 key, verifies strict canonical envelopes and freshness, and uses owner-only SQLite uniqueness plus a monotonic time watermark for restart/concurrency/clock-rollback-safe replay and equivocation protection. GH-42 now supplies direct ballot transport; operated discovery/NAT/relay infrastructure, trusted membership/key assignment, Sybil resistance, on-chain attestation, and production evidence remain open.
-- Merged and exact-main-verified GH-42 implements the first real Guardian P2P vertical slice. Merged and exact-main-verified GH-44 adds atomic owner-only persistent transport identity, strict bounded direct/relay/AutoNAT routes, data-minimal health events, a bounded relay service, and deterministic isolated three-node reservation/delivery/AutoNAT/DCUtR-fallback/disconnect evidence. The GH-48 candidate adds strict operated Guardian/relay process roles, owner-only local submission, bounded lifecycle/health, and separate-process same-host relay evidence. Public/multi-host operation, broad discovery, trusted membership/key assignment, Sybil resistance, and on-chain attestation remain open. mDNS is excluded because its compatible optional dependency path has unresolved RustSec advisories.
+- Merged and exact-main-verified GH-42 implements the first real Guardian P2P vertical slice. Merged and exact-main-verified GH-44 adds atomic owner-only persistent transport identity, strict bounded direct/relay/AutoNAT routes, data-minimal health events, a bounded relay service, and deterministic isolated three-node reservation/delivery/AutoNAT/DCUtR-fallback/disconnect evidence. Merged and exact-main-verified GH-48 adds strict operated Guardian/relay process roles, owner-only local submission, bounded lifecycle/health, and separate-process same-host relay evidence. Public/multi-host operation, broad discovery, trusted membership/key assignment, Sybil resistance, and on-chain attestation remain open. mDNS is excluded because its compatible optional dependency path has unresolved RustSec advisories.
 
 ## 🟡 Nächste Session — STARTFLOW
 
 ### Pflicht VOR neuem Code:
 1. `cd /Users/gio/Desktop/repos/prometheus`
-2. `git log --oneline -5` — aktuellen HEAD prüfen; letzter dokumentierter grüner Baseline-Commit ist `b639a5bc`
+2. `git log --oneline -5` — aktuellen HEAD prüfen; letzter dokumentierter grüner Baseline-Commit ist `b14d36fc`
 3. Lies `memory/CHECKPOINT.md` — vollständiger Projektstatus
 4. Lies `memory/AUDIT.md` ab Zeile 337 — Pre-Hardfork-Audit-Ergebnisse
 5. Lies `memory/ERRORS.md` — 12 bekannte Patterns
@@ -35,7 +35,7 @@
 ### Nächste konkrete Tasks (Priorität):
 1. **[P0] H-001 Canary ausführen** — exakt vorbereiteten schema-v2 Digest extern per BIP340 signieren, Antwort vollständig verifizieren, einmalig senden, Bestätigung abwarten und unabhängige öffentliche Chain-Evidenz erfassen. Kein Private Key, Seed oder Wallet-Material gehört ins Repository oder in Agent-Chats.
 2. **[P1] Oracle Operator Integration** — external signed metrics-oracle transaction assembly/signer/broadcast process für `GovernanceAutoTuningState.sil` operationalisieren; public report preflight, unsigned tx-request builder, operator procedure, public tx-result verifier, and public status-draft staging are local- and CI-covered.
-3. **[P1] Sprint 10B: Guardian Decentralization** — GH-33/36/39 plus merged/exact-main-verified GH-42/GH-44 and the locally verified GH-48 operated-service candidate are implemented. Public/multi-host operation, broad discovery, trusted membership/key assignment and rotation, Sybil resistance, and an explicit on-chain-attestation decision follow.
+3. **[P1] Sprint 10B: Guardian Decentralization** — GH-33/36/39 plus merged/exact-main-verified GH-42/GH-44/GH-48 are implemented. Public/multi-host operation, broad discovery, trusted membership/key assignment and rotation, Sybil resistance, and an explicit on-chain-attestation decision follow.
 4. **[P2] fp_rate Oracle** — Q-003 current-Silverc contract gate uses signed metrics input; public report/request/result verification is covered; production external transaction assembly/signing/broadcast/deploy operation remains
 5. **[P2] M-001** — Heuristic confidence in yara_generator.py durch LLM-Confidence ersetzen
 6. **[P2] M-002** — Performance test threshold (1ms → 2ms) oder --release gate

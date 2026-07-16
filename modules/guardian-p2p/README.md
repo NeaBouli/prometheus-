@@ -1,6 +1,6 @@
 # Prometheus Guardian P2P
 
-## GH-48 operated service candidate
+## GH-48 operated service
 
 This workspace crate is the transport-only Guardian ballot carrier. GH-42 and GH-44 provide the bounded carrier, persisted transport identity, and relay/NAT evidence. GH-48 packages those APIs as an operated process while keeping Guardian identity and authorization outside transport.
 

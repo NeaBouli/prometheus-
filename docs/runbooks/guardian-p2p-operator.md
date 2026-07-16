@@ -1,10 +1,10 @@
-# Guardian P2P Operator Runbook (GH-48 candidate)
+# Guardian P2P Operator Runbook (GH-48)
 
 ## Purpose
 
-Operate the GH-48 Guardian sidecar or relay candidate with persisted transport identity, strict owner-only configuration, bounded local submission, JSON health, and graceful shutdown.
+Operate the merged GH-48 Guardian sidecar or relay with persisted transport identity, strict owner-only configuration, bounded local submission, JSON health, and graceful shutdown.
 
-Supported target: Unix-like systems with AF_UNIX peer credentials. Protected CI verifies Linux. Windows and public macOS packaging are outside the current candidate.
+Supported target: Unix-like systems with AF_UNIX peer credentials. Protected CI verifies Linux. Windows and public macOS packaging remain outside the current package.
 
 ## Scope of this implementation
 

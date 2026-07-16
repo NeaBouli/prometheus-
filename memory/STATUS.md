@@ -117,13 +117,13 @@ confirmation, successor evidence, and release evidence remain.
 
 Scope-weighted status estimate on 2026-07-16: H-001 canary preparation is about
 96% complete; rollout-capable core-network work is about 73-77% complete after
-local GH-48 operated-sidecar verification; the complete roadmap vision is about
+merged and exact-main-verified GH-48; the complete roadmap vision is about
 39-44% complete. These values distinguish
 prepared software from real chain operation and are not release guarantees.
-Latest verified public-status main `e9a970a9d3dbaa98cd754a4149075c0cca866001`
-passed Prometheus CI `29455597727`, Security Audit `29455597677`, and Pages
-`29455597066`; live README/index/roadmap/whitepaper verification passed. The
-unchanged execution-artifact baseline remains exact main `205e1ca`.
+Latest verified product/status main `b14d36fc79ddc7e0b407b42cb4a271e29cb1ddea`
+passed Prometheus CI `29481830688`, Security Audit `29481830686`, and Pages
+`29481830054`; this closeout synchronizes README, Roadmap, and Whitepaper merge
+wording. The unchanged execution-artifact baseline remains exact main `205e1ca`.
 
 ## GH-13 EXPERIMENTAL MINER COMPANION STATUS
 
@@ -264,7 +264,7 @@ Priority tasks:
 - Sprint 9: run the merged keyless operator against a real funded testnet-10 UTXO and collect confirmed public receipt plus independent node/explorer evidence records
 - H-001: keep LE encoding and signed-boundary verification gated in CI
 - Oracle: execute the merged/exact-main keyless GovernanceAutoTuning transition operator with real public state/sponsor UTXOs, external oracle/sponsor signatures, confirmed successor evidence, and existing result/evidence/status gates before beta/mainnet governance
-- Sprint 10B: GH-33 hybrid routing, GH-36 local 5+ complete-ballot validation, GH-39 local BIP340 authenticated intake, GH-42 direct QUIC/libp2p ballot transport, and GH-44 persistent identity plus isolated operated relay/NAT evidence are merged/exact-main verified. The GH-48 candidate adds strict operated Guardian/relay roles, owner-only local submission, path-free JSON health, graceful signal drain, and separate-process same-host exact relay evidence. Public/multi-host operation, broad discovery, trusted membership/key assignment, Sybil resistance, on-chain attestation, live model wiring/calibration, and production evidence remain
+- Sprint 10B: GH-33 hybrid routing, GH-36 local 5+ complete-ballot validation, GH-39 local BIP340 authenticated intake, GH-42 direct QUIC/libp2p ballot transport, GH-44 persistent identity plus isolated operated relay/NAT evidence, and GH-48 strict operated Guardian/relay roles are merged/exact-main verified. Public/multi-host operation, broad discovery, trusted membership/key assignment, Sybil resistance, on-chain attestation, live model wiring/calibration, and production evidence remain
 - M-001/M-002: Medium findings (can wait until Aug/Sep)
 ```
 
@@ -379,11 +379,11 @@ Not yet proven: public or multi-host operation, broad discovery, trusted
                 resistance, and on-chain attestation
 ```
 
-## GUARDIAN OPERATED SIDECAR (GH-48 CANDIDATE)
+## GUARDIAN OPERATED SIDECAR (GH-48 MERGED)
 
 ```text
-Status: implementation and focused local verification complete on
-        feat/GH-48-guardian-sidecar-service; PR/exact-main evidence pending
+Status: PR #49 merged as b14d36fc79ddc7e0b407b42cb4a271e29cb1ddea;
+        exact-main CI 29481830688, Security 29481830686, and Pages 29481830054 pass
 Process: explicit prometheus-guardian-p2p preflight/run/submit CLI with strict
          role-tagged owner-only TOML for guardian and relay roles
 IPC: owner-only AF_UNIX submission, exact EOF-bound frames, effective-UID peer
