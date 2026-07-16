@@ -799,7 +799,7 @@ compilation, Rustfmt, warning-free Clippy, 170 Rust tests with two intentional
 live ignores, no known dependency vulnerabilities, YAML/Actionlint, Memory,
 Autodidactic, HTML, Gitleaks, and diff gates. One first Rust run hit the known
 sub-millisecond performance jitter at 1.408 ms; isolated and complete reruns
-passed. Actual P2P carrier/discovery/NAT,
+passed. GH-42 later supplied direct ballot transport; operated discovery/NAT/relay,
 trusted membership/key assignment, Sybil resistance, on-chain attestation,
 proposal submission, and production signer/model operation remain open. No
 wallet, private key, signature, raw transaction, broadcast, contract, slash
@@ -854,6 +854,13 @@ independent re-review reports zero blocking/high/medium findings. A later
 concurrent workspace attempt hit the same performance jitter at 2.291 ms while
 Cargo artifact locks were contended; the isolated test completed in 43
 microseconds and the clean complete workspace rerun passed.
+
+PR #43 merged normally without admin bypass as exact main
+`5224c00956346475d6a48b6e335003237d03c6ed`. Exact-main Prometheus CI
+`29468717108`, Security Audit `29468717112`, and Pages `29468716410` passed,
+and live Whitepaper, Roadmap, and GitHub README markers were verified. Issue
+#42 is closed. GH-44 carries the explicit persistent-identity and operated
+relay/NAT follow-up without changing the authorization boundary.
 
 *Audit completed 2026-04-02 by Claude Code (5 parallel agents, 7 levels, 35 checks).*
 *The fire belongs to humanity.*

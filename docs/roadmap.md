@@ -152,7 +152,8 @@ public release-hardening evidence for the exact rollout commit.
 **Sprint 10 — Real KRC-20 Reader + P2P Network**
 - KRC-20 UTXO queries for "PROM-RULES" tick (real on-chain reads)
 - Rule content download from IPFS via CIDv1
-- In progress: Guardian ballot carrier now has direct QUIC request/response, static peers, bounded resources, owner-only local collector ingress, and relay/AutoNAT/DCUtR behaviours
+- Merged/exact-main verified: GH-42 Guardian ballot carrier has direct QUIC request/response, static peers, bounded resources, owner-only local collector ingress, cancellation-safe concurrent swarm progress, and relay/AutoNAT/DCUtR behaviours
+- In progress: GH-44 persistent transport identity plus operated relay/AutoNAT/DCUtR evidence; mDNS remains excluded pending an advisory-free compatible dependency path
 - Pending: operated relay/NAT evidence and broad discovery; mDNS remains excluded while its compatible dependency path has unresolved RustSec advisories
 - Light Client ↔ Guardian communication over P2P
 - Guardian ↔ Validator communication over P2P
@@ -162,7 +163,7 @@ public release-hardening evidence for the exact rollout commit.
 - Implemented: threat-hash binding, finite confidence checks, strict submission types, and unchanged `0.85` submission threshold
 - Implemented: local 5+ Guardian complete-ballot validator with canonical candidate/snapshot commitments, strict majority, and conservative confidence
 - Implemented: transport-neutral BIP340 ballot intake with exact key/session/context binding, strict canonical envelopes, freshness checks, and owner-only SQLite replay/equivocation protection across restarts and concurrent submissions
-- Implemented: real Guardian ballot transport over direct QUIC/libp2p request/response with exact 8192-byte-bounded frames, static peers, resource caps, and owner-only AF_UNIX collector integration
+- Merged/exact-main verified: real Guardian ballot transport over direct QUIC/libp2p request/response with exact 8192-byte-bounded frames, static peers, resource caps, owner-only AF_UNIX collector integration, and cancellation-safe concurrent processing
 - Pending: live 8B/70B service wiring and model-calibrated confidence evidence
 - Pending: operated relay/AutoNAT/DCUtR and discovery evidence, trusted membership and key assignment, Sybil resistance, and on-chain ensemble attestation
 - Pending: reviewed Guardian pooling and final Sybil-resistance design
