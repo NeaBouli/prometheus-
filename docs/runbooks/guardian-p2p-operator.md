@@ -25,7 +25,7 @@ chmod 700 /var/lib/prometheus/guardian-p2p
 
 2) Build runtime config (`GuardianP2pConfig` in crate use site)
 
-- Listener routes: IP/UDP/QUIC-v1 only.
+- Listener routes: direct IP/UDP/QUIC-v1 or exact relay reservations ending in `/p2p-circuit`.
 - Static routes: direct QUIC-v1 or exact relay-circuit with `p2p-circuit`.
 - AutoNAT routes: exact direct QUIC-v1 routes only.
 - No DNS routes (DNS-based routes are rejected).

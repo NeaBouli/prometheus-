@@ -172,9 +172,10 @@ protobuf, writes a mode-`0600` same-directory temporary file, syncs it, and
 publishes atomically. Concurrent creators converge on one stable transport
 `PeerId`; no wallet or Guardian signing key is involved.
 
-`GuardianP2pConfig` accepts only bounded IP/UDP/QUIC-v1 direct listeners,
-direct static routes, exact relay-circuit routes, and explicit direct AutoNAT
-servers. DNS and mDNS routes are rejected. `RelayService` applies fixed
+`GuardianP2pConfig` accepts bounded direct IP/UDP/QUIC-v1 listeners and exact
+relay reservations ending in `/p2p-circuit`, plus direct static routes, exact
+relay-circuit routes, and explicit direct AutoNAT servers. DNS and mDNS routes
+are rejected. `RelayService` applies fixed
 reservation, circuit, byte, duration, connection, and per-peer limits. Health
 events expose only transport peer/path/status metadata. The isolated three-node
 test proves reservation, relayed ballot/ACK, AutoNAT state, DCUtR failure with

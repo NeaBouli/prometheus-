@@ -357,7 +357,7 @@ Not yet proven: operated peer discovery/NAT traversal, trusted
 
 ## GUARDIAN OPERATED TRANSPORT (GH-44 CANDIDATE)
 
-```
+```text
 Status: local branch candidate; protected PR/merge and exact-main evidence pending
 Identity: absolute path, effective-user-owned 0700 parent, NOFOLLOW opens,
           owner-readable regular canonical protobuf, atomic same-directory 0600
