@@ -8,10 +8,10 @@
 ## CURRENT SPRINT
 
 ```
-Sprint 7: Dashboard + Docs
-Status:   ACCEPTED
-Start:    2026-03-21
-Goal:     All sprints 0-7 accepted. Post-Toccata deployment verification.
+Sprint 9: Post-Toccata deployment and production-protocol gates
+Status:   BLOCKED on external H-001 signing/execution evidence
+Start:    2026-07-08
+Goal:     Complete the non-promotable H-001 canary, then the full state-contract, oracle, ZK, P2P, and release-evidence path.
 ```
 
 ## GH-4 DEPLOY OPERATOR STATUS
@@ -81,6 +81,13 @@ floors into signing-request schema v2, and rejects underpriced transactions
 before digest export. PR #18, exact-main CI/Security/Pages, 35 focused Rust tests,
 the exact funding preflight, and a byte-identical two-pass signing-request build
 all pass. No signature or broadcast occurred.
+
+Scope-weighted status estimate on 2026-07-16: H-001 canary preparation is about
+96% complete; rollout-capable core-network work is about 65-70% complete; the
+complete roadmap vision is about 35-40% complete. These values distinguish
+prepared software from real chain operation and are not release guarantees.
+Exact main `529fc2f4a82717005011f0b8af66814b6d40c676` passed Prometheus CI
+`29443646026`, Security Audit `29443645464`, and Pages `29443644198`.
 
 ## GH-13 EXPERIMENTAL MINER COMPANION STATUS
 
@@ -198,7 +205,7 @@ Rusty-Kaspa workspace dependencies pinned to `v2.0.1`; `cargo audit` now reports
 GitHub Security Audit workflow re-enabled and dependency audits now fail on findings instead of using `|| true`; after `c673766`, Dependency Audit was hardened with explicit job/step timeouts and split cargo-audit install/run steps, and green reruns passed through `a11545b`.
 Remote verification baseline: Prometheus CI `29412667386`, Security Audit `29412667410`, and Pages `29412666483` passed for exact GH-9 merge `6213c559` on 2026-07-15. The prior official SilverScript covenant-genesis capability baseline `9d74c0c` passed on 2026-07-12. The prior `40bb9a0` baseline passed after adding public release-hardening evidence verification; live GitHub Pages contains both release-hardening and genesis-capability wording. The prior `48a6743` baseline passed after adding public oracle tx-evidence verification. The prior `9a1ac59` baseline passed after recording the Autodidactic workflow-helper regression suite CI run. The prior `4816444` baseline passed after adding the Autodidactic workflow-helper regression suite to CI. The prior `ffbad55` baseline passed after the public receipt-evidence verifier documentation follow-up. The prior `4d7a6b8` baseline passed after adding public node/explorer deployment receipt-evidence verification. The prior `181cde2` baseline passed after adding raw/serialized transaction field rejection to public deploy-result import and deployment receipt verification. The prior `6cc000c` baseline passed after adding public external-operator capability verification. The prior `3d02326` baseline passed after adding public oracle status-draft staging. The prior `a86c1b5` baseline passed after adding the public deploy operator procedure gate for verified Silverc deploy request sets. The prior `442853f` baseline passed after public external oracle operator procedure coverage for signer-ready metrics tx requests. The prior `8bf6a14` baseline passed after public release-readiness audit coverage for generated handoff packages. The prior `fa719fc` baseline passed after public oracle tx-result verification, generated operator receipt verification/status staging, operator handoff import mode, and public result handoff mode; the interim `119fa89` CI failure was workflow-only missing `hashlib` import in the metrics-oracle tx-result fixture block and is fixed by `fa719fc`.
 GitHub branch governance: `main` requires pull requests, strict up-to-date branches, linear history, resolved conversations, and nine successful CI/Security contexts. Admin enforcement is enabled; force pushes and deletion are disabled. Solo-maintainer mode uses zero formal approvals because only one collaborator exists and self-approval is impossible; raise the count to one when a second collaborator is added.
-Public docs refreshed by 2026-07-15: README, WHITEPAPER.md, whitepaper.html, docs/roadmap.md, modules/contracts/silverc/README.md, and llms.txt now state deployment-gated post-Toccata status, verified seven-contract runtime gates, the repository-owned keyless genesis execution boundary, public request/receipt/evidence/status guards, metrics-oracle and exact-commit release gates, target-only PROM-RULES asset orchestration, and no Kasplex dependency for Guardian reputation.
+Public docs refreshed by 2026-07-16: README, WHITEPAPER.md, whitepaper.html, docs/roadmap.md, roadmap.html, index.html, modules/contracts/silverc/README.md, and llms.txt state deployment-gated post-Toccata status, verified seven-contract runtime gates, the repository-owned keyless genesis execution boundary, public request/receipt/evidence/status guards, metrics-oracle and exact-commit release gates, target-only PROM-RULES asset orchestration, and no Kasplex dependency for Guardian reputation. Expired June-September launch promises are replaced by readiness gates.
 Rust client runtime gate added: `PROMETHEUS_RUNTIME=beta|mainnet|production|prod` rejects ZK/Phi-3/KRC-20/Fed-DART stubs; development mode remains testable.
 Rollback tag: pre-session-20260413 → 6347b85
 ```

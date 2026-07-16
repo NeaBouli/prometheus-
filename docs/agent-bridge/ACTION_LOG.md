@@ -356,6 +356,16 @@ Rules for all dev agents:
 - No signature, wallet access, raw signed transaction, or broadcast occurred. External BIP340 signing now requires explicit approval; full operator verification remains mandatory before any one-shot broadcast.
 - Preserved the reproducible public handoff outside Git at `/Users/gio/Desktop/repos/prometheus-handoffs/9477fab` with owner-only permissions; the repository still contains no signing response, wallet material, or raw transaction.
 
+## 2026-07-16 GH-20 rollout status synchronization
+
+- Verified exact main `529fc2f4a82717005011f0b8af66814b6d40c676` and successful Prometheus CI `29443646026`, Security Audit `29443645464`, and Pages `29443644198`.
+- Live-verified the deployed homepage and whitepaper exact-main H-001 wording before starting the documentation update.
+- Opened issue #20 and branch `docs/GH-20-rollout-status-sync` because the Bridge header still referenced the prior merge and the public roadmap contained expired June-September 2026 launch promises.
+- Replaced fixed-date promises with readiness gates and documented three separately scoped estimates: H-001 canary preparation 96%, rollout-capable core network 65-70%, and complete roadmap vision 35-40%.
+- Local verification passed: Memory Integrity, six Autodidactic tests, JSON-LD parsing for all four structured public pages, SEO marker checks, stale-status scan, `git diff --check`, and staged Gitleaks v8.30.1 with no findings.
+- Responsive browser verification passed at 1440x1000 and 390x844 with no document overflow. A pre-existing mobile overflow in the roadmap hardware table/footer was fixed with contained table scrolling and wrapped footer links.
+- Preserved the signing boundary: no wallet access, private material, signature, raw signed transaction, or broadcast occurred. Foreign untracked `Prometheus-1.png` remains untouched.
+
 - Remote verification update:
   - `181cde2 ci: reject raw deploy receipt payloads`
   - Prometheus CI: success

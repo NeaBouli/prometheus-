@@ -1,15 +1,27 @@
 # Prometheus — Full Deployment Roadmap
-*Target: Full release August / September 2026*
-*Working daily. No shortcuts.*
+*Readiness-gated roadmap; no fixed public-release date is claimed.*
+*Last status reconciliation: 2026-07-16.*
+
+## Progress Snapshot
+
+| Scope | Estimated complete | Estimated remaining | Current gate |
+|-------|-------------------:|--------------------:|--------------|
+| H-001 testnet-10 canary preparation | 96% | 4% | External BIP340 signature, verification, one-shot broadcast, confirmation, receipt, independent evidence |
+| Rollout-capable core network | 65–70% | 30–35% | Six state deployments, real Groth16, PROM emission, metrics oracle, P2P/rule distribution, production node evidence |
+| Complete roadmap vision | 35–40% | 60–65% | Production AI, desktop/mobile clients, installers, operated network, vProgs, plus all core-network gates |
+
+Percentages are scope-weighted engineering estimates. They are not release dates,
+financial forecasts, or evidence that any contract is live.
 
 ---
 
 ## Phase 0 — Foundation (COMPLETE)
 **March 2026 · All sprints accepted**
 
-All architecture decisions final. 6 Silverscript contracts written
-and audited. Rust light client, Python guardian node, voting mechanism,
-E2E tests, documentation, landing page — all complete and on GitHub.
+The architecture and tested foundation are complete. Six contract state machines,
+the Rust light-client foundation, Python guardian foundation, voting mechanism,
+E2E fixtures, documentation, and landing page are in GitHub. Production stubs and
+real network operation are tracked in the later phases below.
 
 | Sprint | Deliverable | Status |
 |--------|-------------|--------|
@@ -26,7 +38,7 @@ E2E tests, documentation, landing page — all complete and on GitHub.
 ---
 
 ## Phase A — Post-Toccata Core Integration
-**June/July 2026**
+**Current phase — readiness-gated**
 
 Kaspa Toccata moved the ecosystem into the post-fork verification phase.
 Prometheus current-Silverc runtime gates now cover H-001, ValidatorStaking,
@@ -150,7 +162,7 @@ public release-hardening evidence for the exact rollout commit.
 ---
 
 ## Phase B — Guardian + Validator Production
-**June 2026**
+**After the core-network rollout gates pass**
 
 **Sprint 12 — LLaMA 3 Fine-Tuning**
 - Assemble security training datasets:
@@ -174,7 +186,7 @@ public release-hardening evidence for the exact rollout commit.
 ---
 
 ## Phase C — Desktop Client Full Release
-**July / August 2026**
+**After production AI, ZK, P2P, and rule distribution pass**
 
 **Sprint 14 — Tauri Desktop UI**
 - Tauri v2 app (Rust + React/TypeScript)
@@ -197,7 +209,7 @@ public release-hardening evidence for the exact rollout commit.
 ---
 
 ## Phase D — Mobile Clients
-**August / September 2026**
+**After the desktop beta and mobile security review pass**
 
 **Technology choice: Flutter**
 Flutter is chosen over React Native because background scanning
@@ -230,7 +242,7 @@ on both iOS and Android.
 - Production expansion waits for real Phi-3, ZK proofs, canonical rule distribution, reviewed transport/privacy scopes, and enforceable resource controls
 
 ## Phase E — Server Tooling Simplified
-**August 2026**
+**After production Guardian and Validator operation is proven**
 
 **Sprint 18 — One-Click Guardian Installer**
 ```bash
@@ -252,7 +264,7 @@ curl -sSf https://neabouli.github.io/prometheus-/install-guardian.sh | sh
 ---
 
 ## Phase F — vProgs Integration
-**Q4 2026**
+**After upstream DAGKnight/vProgs capability is stable and independently verified**
 
 vProgs ("verifiable Programs") ships after the DAGKnight deployment.
 This is the final architectural milestone described in the whitepaper.
@@ -269,14 +281,12 @@ This is the final architectural milestone described in the whitepaper.
 | Date | Milestone |
 |------|-----------|
 | March 2026 | All sprints 0-8 accepted. Foundation complete. |
-| June/July 2026 | Toccata post-fork verification. Current-Silverscript H-001 vectors checked; validator-state runtime transition gate in progress. |
-| Post-verification | First PROM minted. First DEX pool live. |
-| June 2026 | Real ZK-proof, P2P network, Phi-3 production |
-| June 2026 | LLaMA 3 fine-tuned on security datasets |
-| July 2026 | Desktop client beta (Windows / macOS / Linux) |
-| **August 2026** | **Full desktop release. One-click Guardian installer.** |
-| **September 2026** | **Mobile clients (iOS + Android). Full public release.** |
-| Q4 2026 | vProgs integration. Complete architectural vision. |
+| July 2026 | Toccata runtime/release gates, public H-001 funding, and exact-main schema-v2 signing handoff verified; external canary execution remains. |
+| After H-001 evidence | Deploy the remaining state contracts, execute the metrics-oracle transaction, and complete exact-commit release hardening. |
+| After core-network rollout | Real Groth16, PROM emission, P2P rule distribution, production Phi-3, and operated Guardian/Validator network. |
+| After production AI/P2P | Desktop client beta and signed installers for Windows, macOS, and Linux. |
+| After desktop beta | Mobile clients for iOS and Android, subject to platform security review and store approval. |
+| After upstream readiness | vProgs integration and complete architectural vision. |
 
 ---
 
@@ -284,14 +294,14 @@ This is the final architectural milestone described in the whitepaper.
 
 | Device | How to run Prometheus | When available |
 |--------|----------------------|----------------|
-| Windows PC | Download installer, run, done | August 2026 |
-| macOS | Download DMG, install, done | August 2026 |
-| Linux | .deb / .AppImage / Flatpak | August 2026 |
-| Ubuntu Server | One-click guardian installer script | August 2026 |
-| iPhone / iPad | App Store download | September 2026 |
-| Android | Google Play or F-Droid | September 2026 |
-| Any VPS | Docker Compose (guardian or validator) | Post-verification |
-| Raspberry Pi | ARM Linux client | August 2026 |
+| Windows PC | Download installer, run, done | After production AI/P2P and desktop beta gates |
+| macOS | Download DMG, install, done | After production AI/P2P and desktop beta gates |
+| Linux | .deb / .AppImage / Flatpak | After production AI/P2P and desktop beta gates |
+| Ubuntu Server | One-click guardian installer script | After production Guardian operation is proven |
+| iPhone / iPad | App Store download | After desktop beta and mobile security review |
+| Android | Google Play or F-Droid | After desktop beta and mobile security review |
+| Any VPS | Docker Compose (guardian or validator) | After core-network rollout evidence |
+| Raspberry Pi | ARM Linux client | After production Light Client resource validation |
 
 ---
 
