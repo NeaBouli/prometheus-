@@ -812,5 +812,48 @@ were verified. CodeRabbit was rate-limited without a content review; the
 independent security review/re-review and protected automated gates are the
 substantive review evidence.
 
+**AUDIT UPDATE 2026-07-16:** GH-42 adds the first real Guardian ballot carrier
+without changing GH-36 voting or GH-39 authentication. Exact opaque ballot
+bytes travel over direct QUIC request/response with an 8192-byte pre-allocation
+limit, one stream per connection, global request admission, bounded connection
+counts, and deadlines. Inbound data reaches the existing collector only through
+an owner-only AF_UNIX bridge; directory, socket, and connected peer credentials
+must match the sidecar effective UID, and canonical local ACKs are bound to the
+exact payload SHA-256 before a one-byte network result is sent. SQLite/BIP340
+work runs outside the asyncio event loop. Independent review found one high UID
+ownership gap plus medium availability and missing-bridge concerns; effective
+UID/peer-credential checks, per-connection/global caps, thread offload, and the
+`next_sidecar_event` end-to-end QUIC-to-collector test close them. The
+rust-libp2p umbrella crate and mDNS were removed after optional DNS dependencies
+introduced two lockfile RustSec findings; direct pinned component crates restore
+`cargo audit` to zero known vulnerabilities. Public relay/NAT/discovery,
+trusted membership/key assignment, Sybil resistance, proposal transport, and
+on-chain attestation remain rollout gates.
+
+CodeRabbit's subsequent review found that Python admission could be released
+while a timed-out `to_thread` job still ran, Python client-side ACK parsing did
+not bind the returned digest to the submitted ballot, and synchronous collector
+awaiting stopped exclusive libp2p swarm polling. A shielded worker task now owns
+the admission permit until the worker future completes; non-busy ACKs are
+payload-bound; and bounded Rust ingress futures are retained in carrier state
+and polled alongside the swarm. New timeout/permit, digest-mismatch, and
+two-peer out-of-order tests close these paths. Post-fix local verification is
+126 Guardian tests with three intentional live-model skips, 181 Rust workspace
+tests with two intentional live-network ignores, Rustfmt, warning-free Clippy,
+Black, and Pylint 9.95/10. One first workspace run hit the known sub-millisecond
+performance jitter at 1.278 ms; isolated and complete reruns passed.
+
+Follow-up review identified two peer-cancellation orderings around active local
+ingress work and libp2p response-channel closure. Separate admitted-work,
+active-ingress, and response-channel tracking now keeps capacity consumed until
+real local completion. Both already-removed channels and channels that close
+before `InboundFailure` handling are nonfatal only in the automatic sidecar
+completion path; the manual `respond()` API preserves its explicit error.
+Deterministic ordered-cancellation and closed-channel-race tests pass, and final
+independent re-review reports zero blocking/high/medium findings. A later
+concurrent workspace attempt hit the same performance jitter at 2.291 ms while
+Cargo artifact locks were contended; the isolated test completed in 43
+microseconds and the clean complete workspace rerun passed.
+
 *Audit completed 2026-04-02 by Claude Code (5 parallel agents, 7 levels, 35 checks).*
 *The fire belongs to humanity.*

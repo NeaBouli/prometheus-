@@ -82,10 +82,14 @@ concurrent collectors. Persisted envelopes are reverified before the existing
 `EnsembleVoter` evaluates them. A persistent time high-water mark fails closed
 after wall-clock rollback so an already pruned session cannot reopen.
 
-Production code contains no private-key or signing API. This layer is
-transport-neutral: an HTTP/libp2p carrier, peer discovery, NAT traversal,
-trusted membership and key assignment, Sybil resistance, proposal submission,
-and on-chain attestation remain separate rollout work.
+Production code contains no private-key or signing API. GH-42 adds an
+owner-only AF_UNIX ingress that resolves only locally registered sessions and
+passes exact bounded bytes to this collector. The Rust Guardian carrier uses
+direct QUIC/libp2p request/response and returns only accepted, duplicate,
+rejected, or busy. `PeerId` is transport metadata, never Guardian membership.
+Operated relay/NAT traversal, broad discovery, trusted membership and key
+assignment, Sybil resistance, proposal submission, and on-chain attestation
+remain separate rollout work.
 
 ## Testing
 

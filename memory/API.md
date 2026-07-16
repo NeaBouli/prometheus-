@@ -145,9 +145,23 @@ The owner-only SQLite ledger atomically enforces unique
 `(session_id, guardian_id)` and `(session_id, nonce)` pairs across restart and
 concurrency, retains markers through session expiry, and reverifies stored
 envelopes before calling the unchanged `EnsembleVoter`. A persistent monotonic
-ledger-time watermark rejects wall-clock rollback after pruning. Transport,
-peer discovery/NAT traversal, trusted membership/key assignment, Sybil
-resistance, proposal submission, and on-chain attestation are outside this API.
+ledger-time watermark rejects wall-clock rollback after pruning.
+
+### Guardian Ballot Carrier (GH-42)
+
+The Rust `prometheus-guardian-p2p` crate exposes `GuardianP2p`,
+`BallotBytes`, `UnixBallotIngress`, and the production seam
+`next_sidecar_event()`. Direct QUIC request/response transports one exact
+opaque frame under `/prometheus/guardian-ballot/1.0.0`; the 8192-byte frame
+limit, connection/stream/request caps, and timeouts apply before the local
+collector. The AF_UNIX client requires the directory, socket, and connected
+peer credentials to match the sidecar effective UID. Canonical local ACKs bind
+the exact SHA-256 payload digest before the network receives a one-byte status.
+
+Static peer addresses and relay/AutoNAT/DCUtR behaviours are implemented.
+Operated relay/NAT/discovery, trusted membership/key assignment, Sybil
+resistance, proposal submission, and on-chain attestation remain outside this
+API. `PeerId` is never Guardian authorization.
 
 ---
 

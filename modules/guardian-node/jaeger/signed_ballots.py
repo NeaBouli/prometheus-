@@ -457,6 +457,10 @@ class AuthenticatedBallotCollector:
         self._ledger.consume(envelope, session, wire, now_ms)
         return vote
 
+    def contains_wire(self, session_id: str, wire: bytes) -> bool:
+        """Return whether this exact canonical frame was already persisted."""
+        return wire in self._ledger.session_wires(session_id)
+
     def evaluate(
         self,
         candidate: EnsembleCandidate,
