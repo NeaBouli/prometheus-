@@ -239,6 +239,36 @@ class ThreatHint:
     timestamp: int                     # Unix-Timestamp
 ```
 
+### 3.3 Authenticated Guardian Ballot (GH-39)
+
+The session commitment binds the signed-ballot protocol version, network ID,
+candidate digest, membership snapshot ID, session nonce, validity window, and
+the exact sorted set of unique `(guardian_id, xonly_public_key)` entries.
+
+The exact-schema canonical JSON envelope contains:
+
+```text
+protocol_version, vote_protocol_version, session_id, network_id,
+guardian_id, membership_snapshot_id, candidate_digest, decision,
+confidence_bps, model_tier, model_artifact_sha256, nonce,
+issued_at_ms, expires_at_ms, payload_digest, signature
+```
+
+The owner-only SQLite replay ledger stores the canonical wire bytes plus
+`session_valid_until_ms`, maintains a singleton monotonic `high_water_ms`, and
+enforces:
+
+```sql
+PRIMARY KEY (session_id, guardian_id)
+UNIQUE (session_id, nonce)
+```
+
+Markers may be removed only after the complete session expires. The parent
+directory must be owner-controlled, the regular database file is mode `0600`,
+symlink paths are rejected, and a wall-clock rollback below the persisted
+high-water mark fails closed. Membership/key trust, network transport, Sybil
+resistance, and on-chain attestation are not properties of this schema.
+
 ---
 
 ## 4. API DATENSTRUKTUREN (JSON)

@@ -1,7 +1,7 @@
 # PROMETHEUS – API DEFINITIONEN
 # Stabile Schnittstellen-Definitionen für alle Module.
 # Änderungen hier erfordern einen Audit durch Claude.
-# Last Updated: 2026-03-21
+# Last Updated: 2026-07-16
 
 ---
 
@@ -112,9 +112,42 @@ decision = EnsembleVoter().evaluate(candidate, snapshot, votes)
 least five unique 8B members with a strict majority. The candidate and snapshot
 are domain-separated commitments; source-rule and approve confidence use exact
 integer basis points with a minimum of `8500`, and the result uses the minimum
-confidence. This local API does not establish membership trust, transport or
-sign votes, prevent replay/Sybil identities, submit a proposal, or create an
-on-chain ensemble proof.
+confidence. By itself, this local API does not establish membership trust,
+authenticate or transport votes, prevent replay/Sybil identities, submit a
+proposal, or create an on-chain ensemble proof.
+
+### Authenticated Ballot Intake (GH-39)
+
+```python
+session = BallotSession.create(
+    candidate,
+    snapshot,
+    signers,
+    network_id,
+    session_nonce,
+    valid_from_ms,
+    valid_until_ms,
+)
+request = BallotSigningRequest.create(
+    vote, candidate, snapshot, session, nonce, issued_at_ms, expires_at_ms
+)
+envelope = request.attach_signature(external_public_signature)
+
+collector = AuthenticatedBallotCollector(ReplayLedger(owner_only_db_path))
+collector.accept_wire(envelope.to_wire(), candidate, snapshot, session, now_ms)
+decision = collector.evaluate(candidate, snapshot, session, now_ms)
+```
+
+The request exports only a domain-separated 32-byte digest; an external signer
+returns a public 64-byte BIP340 signature. Production code accepts no private
+key. Exact canonical JSON binds the complete vote/session/network/time context.
+The owner-only SQLite ledger atomically enforces unique
+`(session_id, guardian_id)` and `(session_id, nonce)` pairs across restart and
+concurrency, retains markers through session expiry, and reverifies stored
+envelopes before calling the unchanged `EnsembleVoter`. A persistent monotonic
+ledger-time watermark rejects wall-clock rollback after pruning. Transport,
+peer discovery/NAT traversal, trusted membership/key assignment, Sybil
+resistance, proposal submission, and on-chain attestation are outside this API.
 
 ---
 

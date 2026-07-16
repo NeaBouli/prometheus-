@@ -2410,7 +2410,7 @@ jobs:
         with:
           python-version: '3.11'
       - name: Install dependencies
-        run: pip install httpx pytest pytest-asyncio black pylint
+        run: pip install -r modules/guardian-node/requirements.txt
       - name: Format Check (black)
         run: black --check modules/guardian-node/jaeger/
       - name: Lint (pylint)
