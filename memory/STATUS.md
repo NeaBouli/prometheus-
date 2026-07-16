@@ -263,7 +263,7 @@ Priority tasks:
 - Sprint 9: run the merged keyless operator against a real funded testnet-10 UTXO and collect confirmed public receipt plus independent node/explorer evidence records
 - H-001: keep LE encoding and signed-boundary verification gated in CI
 - Oracle: execute the merged/exact-main keyless GovernanceAutoTuning transition operator with real public state/sponsor UTXOs, external oracle/sponsor signatures, confirmed successor evidence, and existing result/evidence/status gates before beta/mainnet governance
-- Sprint 10B: GH-33 hybrid routing software is merged/exact-main verified at `ce1d213`; ensemble voting, live model wiring/calibration, and production evidence remain
+- Sprint 10B: GH-33 hybrid routing software is merged/exact-main verified at `ce1d213`; GH-36 local 5+ complete-ballot validation is implemented and independently re-reviewed with no remaining high/medium finding. Trusted membership, signed P2P votes/replay protection, Sybil resistance, on-chain attestation, live model wiring/calibration, and production evidence remain
 - M-001/M-002: Medium findings (can wait until Aug/Sep)
 ```
 
@@ -297,7 +297,29 @@ Local evidence: 47 passed, 3 intentionally skipped live-model tests; Black clean
 Remote evidence: Prometheus CI 29459533780; Security Audit 29459533770;
                  Pages 29459533175; live Roadmap/Whitepaper/FAQ markers verified
 Not yet proven: live 8B/70B services, calibrated model confidence, P2P transport,
-                5+ Guardian ensemble voting, production operation
+                trusted membership, signed/replay-protected votes, on-chain
+                ensemble attestation, production operation
+```
+
+## GUARDIAN ENSEMBLE VALIDATION (GH-36)
+
+```
+Status: local protocol implemented on branch feat/GH-36-guardian-ensemble-voting
+Candidate: domain-separated canonical JSON binds protocol, threat hash, exact YARA
+           bytes/metadata, exact integer-bps source confidence, policy, and 8B artifact
+Membership: immutable sorted snapshot, 5+ unique canonical Guardian IDs, explicit
+            membership-source digest; source trust itself is not claimed
+Ballot: exactly one bound 8B vote per member; missing/duplicate/unknown/malformed,
+        wrong snapshot/candidate/model/tier, tie, or below-policy approval fails closed
+Decision: strict complete-committee majority; source and every approval >=8500 bps;
+          final confidence = min(source, approving votes); negative result has no rule
+Local evidence: 96 passed, 3 intentionally skipped Guardian tests; focused ensemble/
+                router subset 73 passed; Black clean; CI-scope Pylint 9.87/10;
+                focused Pylint 10.00/10; Rust workspace 170 passed/2 ignored
+Review: initial medium source-confidence binding and recheck float-rounding findings
+        fixed; final independent re-review reports no remaining high/medium finding
+Not yet proven: trusted membership source, signed P2P collection, replay protection,
+                Sybil resistance, on-chain ensemble attestation, production operation
 ```
 
 ## MAINNET CONTRACT ADDRESSES (post-verification)

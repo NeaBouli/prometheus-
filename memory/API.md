@@ -100,6 +100,22 @@ class GuardianNode:
     async def get_reputation(self) -> float
 ```
 
+### Local Ensemble Interface (GH-36)
+
+```python
+candidate = EnsembleCandidate.create(rule, policy_sha256, model_artifact_sha256)
+snapshot = MembershipSnapshot.create(members, membership_source_sha256)
+decision = EnsembleVoter().evaluate(candidate, snapshot, votes)
+```
+
+`decision.analysis.should_submit` is true only for a complete ballot from at
+least five unique 8B members with a strict majority. The candidate and snapshot
+are domain-separated commitments; source-rule and approve confidence use exact
+integer basis points with a minimum of `8500`, and the result uses the minimum
+confidence. This local API does not establish membership trust, transport or
+sign votes, prevent replay/Sybil identities, submit a proposal, or create an
+on-chain ensemble proof.
+
 ---
 
 ## 4. SILVERSCRIPT CONTRACT API

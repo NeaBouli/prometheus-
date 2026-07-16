@@ -480,3 +480,15 @@ Rules for all dev agents:
 - Live GitHub Pages verification confirms the Sprint 10B roadmap card, 8B-default/70B-escalation Whitepaper wording, and separate Kaspa-L1 Guardian-reputation wording in FAQ.
 - GH-33 software/docs/CI are accepted. Live 8B/70B service wiring, model-calibrated confidence, P2P integration, and 5+ Guardian ensemble voting remain open.
 - No wallet file, private key, secret, signature, raw transaction, broadcast, or foreign untracked file was accessed. `Prometheus-1.png` remains untouched and uncommitted.
+
+## 2026-07-16 GH-36 local Guardian ensemble protocol
+
+- Re-read exact main `d6896df`, Bridge/Memory, public Sprint 10B claims, Guardian code, CI, and open issues; only the known foreign untracked `Prometheus-1.png` was present and it remained untouched.
+- Opened issue #36 and branch `feat/GH-36-guardian-ensemble-voting` for a local side-effect-free pre-submission gate. Trusted membership, signed P2P transport/replay protection, Sybil resistance, and on-chain attestation are explicit separate gates.
+- Added a domain-separated canonical candidate commitment binding protocol version, threat hash, exact YARA bytes/metadata, exact integer-bps source confidence, policy hash, and pinned 8B artifact.
+- Added an immutable sorted membership snapshot requiring 5+ unique canonical Guardian IDs, one 8B artifact, and an explicit membership-source digest without claiming that the source is trusted.
+- Added complete-ballot validation: exactly one bound vote per member, strict majority over the full committee, source and approve confidence at least 8500 bps, conservative `min(source, approvals)` output, and no rule for missing/duplicate/unknown/malformed/mismatched/tied/below-policy input.
+- Independent review found two successive medium issues: missing source-confidence binding and epsilon rounding that could cross the 0.85 boundary. Both were fixed with digest-bound source bps and exact `Decimal(str(value))` conversion; final re-review reports no remaining high/medium finding.
+- Local evidence: focused ensemble/router tests 73 passed; complete Guardian suite 96 passed and three intentional live-model tests skipped; Black clean; focused Pylint 10.00/10; CI-scope Pylint 9.87/10; Rust workspace 170 passed with two intentional live ignores after one isolated load-jitter rerun of the pre-existing sub-millisecond performance test.
+- Updated README, Whitepaper Markdown/HTML, Roadmap Markdown/HTML, Guardian docs, `llms.txt`, Backlog, Memory, API, Bridge, and this log without claiming production ensemble readiness.
+- Opened PR #37 linked to issue #36. No contract, network, chain, wallet, key, signature, raw transaction, broadcast, slash ACL, commit-reveal formula, KAS/PROM split, or Guardian-reputation behavior changed. Protected checks, merge, exact-main evidence, and live Pages verification remain pending.

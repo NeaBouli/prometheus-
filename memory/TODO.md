@@ -153,7 +153,7 @@
 ## ═══ SPRINT 10B: GUARDIAN DECENTRALIZATION (parallel to Sprint 10) ═══
 
 - [x] [P1] Design and implement hybrid routing: 8B default, 70B escalation when confidence < 0.70 | Codex | GH-33/PR #34 merged as `ce1d213`; dependency-injected local router, threat/rule hash binding, finite confidence and strict submission checks, fail-closed escalation, 47 passed/3 live-model skipped; exact-main CI/Security/Pages green; live wiring/calibration remains operational work
-- [ ] [P1] Implement ensemble voting protocol: 5+ 8B Guardians vote on same YARA rule via majority | Claude Code | Sprint 10
+- [~] [P1] Implement ensemble voting protocol: 5+ 8B Guardians vote on same YARA rule via majority | Codex | GH-36 local fail-closed protocol implemented: domain-separated candidate/snapshot commitments, complete unique 8B ballot, strict majority, exact 8500-bps source/approval gates, conservative confidence, and focused tests; trusted membership, signed P2P collection/replay protection, Sybil resistance, and on-chain attestation remain
 - [ ] [P2] Guardian Pooling Contract: on-chain PROM split for shared 70B nodes | Claude Code | Contracts live
 - [ ] [P2] Specialization sharding: Guardian registers attack class (ransomware/network/privilege) during PoW registration | Claude Code | Sprint 11
 - [ ] [P2] Sybil resistance final design: KAS/PROM stake per Guardian identity OR hardware ZK-fingerprint | Architect decision needed

@@ -2,7 +2,7 @@
 
 **Whitepaper v4.0 — March 2026**
 
-**Status update — July 2026:** Kaspa Toccata is treated as a post-fork deployment environment for Prometheus. The current Silverc verifier covers H-001 commit-reveal byte encoding, ValidatorStaking runtime transitions, GuardianReputation runtime/formula gates, RuleStorage runtime gates, CommunityDonations runtime gates, DevIncentivePool runtime gates, and GovernanceAutoTuning runtime gates. Release-bundle, deploy-preflight, request/receipt/evidence verification, operator-handoff, metrics-oracle, and exact-commit release-hardening gates prepare operation without holding signing material. Closed deployment profiles separate the full seven-contract path from the non-promotable `testnet-10-validator-staking-h001` canary. The repository operator closes genesis and `reportMetrics` transaction assembly, verification, guarded broadcast, and observation while externalizing only BIP340 signing. The metrics transition preserves the covenant state value and uses a separate P2PK sponsor for its bounded fee. Public testnet-10 funding and the deterministic schema-v2 H-001 request/digest were rebuilt from exact main commit `205e1ca`, passed exact-main CI/Security/Pages, revalidated the live funding output, and remained byte-identical across two builds and to the earlier baseline; no signature or broadcast has occurred. Sprint 10B now includes a local fail-closed Guardian router that runs 8B first and escalates below confidence `0.70` to an injected 70B analyzer without changing the `0.85` submission policy. Live model wiring, calibrated confidence, ensemble voting, and production evidence remain open. Mainnet remains gated by the explicitly approved external canary signature, verified one-shot canary broadcast, confirmed public receipt plus independent evidence, the remaining contract deployments, real oracle/sponsor inputs and signatures with successor evidence, and public release-hardening evidence for the exact rollout commit.
+**Status update — July 2026:** Kaspa Toccata is treated as a post-fork deployment environment for Prometheus. The current Silverc verifier covers H-001 commit-reveal byte encoding, ValidatorStaking runtime transitions, GuardianReputation runtime/formula gates, RuleStorage runtime gates, CommunityDonations runtime gates, DevIncentivePool runtime gates, and GovernanceAutoTuning runtime gates. Release-bundle, deploy-preflight, request/receipt/evidence verification, operator-handoff, metrics-oracle, and exact-commit release-hardening gates prepare operation without holding signing material. Closed deployment profiles separate the full seven-contract path from the non-promotable `testnet-10-validator-staking-h001` canary. The repository operator closes genesis and `reportMetrics` transaction assembly, verification, guarded broadcast, and observation while externalizing only BIP340 signing. The metrics transition preserves the covenant state value and uses a separate P2PK sponsor for its bounded fee. Public testnet-10 funding and the deterministic schema-v2 H-001 request/digest were rebuilt from exact main commit `205e1ca`, passed exact-main CI/Security/Pages, revalidated the live funding output, and remained byte-identical across two builds and to the earlier baseline; no signature or broadcast has occurred. Sprint 10B now includes a local fail-closed Guardian router that runs 8B first and escalates below confidence `0.70` to an injected 70B analyzer without changing the `0.85` submission policy, plus a local 5+ Guardian vote validator with domain-separated candidate/snapshot commitments, complete-ballot strict-majority semantics, and conservative source/approval confidence. Live model wiring, calibrated confidence, trusted membership, signed P2P votes, replay/Sybil protection, on-chain ensemble attestation, and production evidence remain open. Mainnet remains gated by the explicitly approved external canary signature, verified one-shot canary broadcast, confirmed public receipt plus independent evidence, the remaining contract deployments, real oracle/sponsor inputs and signatures with successor evidence, and public release-hardening evidence for the exact rollout commit.
 
 **Keyless operator update — July 2026:** The repository contains `prometheus-silverc-deployer`, pinned to official `rusty-kaspa` v2.0.1 and the exact Silverc source compiler revision. Its covenant-genesis path constructs transaction version 1 with compute budget 10 and the exact contextual `storage_mass` commitment, derives the official covenant ID, validates the exact live unspent funding UTXO during preflight and immediately before broadcast, and models the final 66-byte Schnorr signature script before exporting the 32-byte `SIG_HASH_ALL` digest. Signing-request schema v2 binds compute, transient, storage, normalized noncontextual/overall mass, the pinned relay rate, and both relay and conservative operator fee floors. The `reportMetrics` path recompiles exact predecessor and successor state, preserves the covenant value, uses a separate P2PK fee sponsor, derives two `SIG_HASH_ALL` digests, verifies both external BIP340 signatures plus every covenant/P2PK input, and revalidates both UTXOs before guarded broadcast. Both paths reject normalized input/output collisions, persist exclusive intent before acknowledged submission, reconcile retry state by transaction ID, enforce wRPC deadlines, and rebuild verified transactions before observation. The Rust package has 49 unit/security tests, including 11 focused metrics-transition tests. No private-key, seed, wallet, keystore, or raw-transaction input exists. Public testnet-10 funding plus an exact-main H-001 schema-v2 request/digest are confirmed. The H-001 canary and real metrics transition still require explicitly approved external signatures, complete operator verification, broadcast, confirmation, and independent chain evidence. Those results cannot authorize the full release by themselves.
 
@@ -205,8 +205,26 @@ out-of-range confidence, malformed submission decisions, and failed or invalid
 submission confidence remains `0.85`.
 
 This implementation is local orchestration with unit-test evidence. It does
-not yet prove live 8B/70B operation, model-calibrated confidence, P2P delivery,
-or the planned 5+ Guardian ensemble vote.
+not yet prove live 8B/70B operation, model-calibrated confidence, or P2P
+delivery.
+
+### 7.5 Local Guardian Ensemble Vote
+
+The Sprint 10B ensemble validator commits the protocol version, threat hash,
+exact YARA bytes and metadata, source-rule confidence in integer basis points,
+policy hash, and pinned 8B model artifact into a domain-separated candidate
+digest. An immutable snapshot commits at least five unique canonical Guardian
+IDs, the 8B artifact, and a public membership-source digest. Every configured
+member must provide exactly one fully bound vote. Approvals require at least
+`8500` basis points, a complete ballot must reach a strict majority, and final
+confidence is the minimum of the source rule and all approving votes. Missing,
+duplicate, unknown, malformed, mismatched, tied, or below-policy input returns
+no submittable rule.
+
+This is an unsigned local pre-submission gate. It does not establish that the
+membership source is trustworthy, transport signed votes, prevent replay or
+Sybil identities, or prove an ensemble on Kaspa L1. Those remain production
+protocol and deployment gates.
 
 ---
 

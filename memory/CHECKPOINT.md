@@ -148,7 +148,7 @@
 - [~] Sprint 9: H-001 canary handoff is rebuilt from exact main `205e1ca`, live-preflight verified, byte-identical, and non-promotable; real signature/receipt/evidence execution remains external. The keyless metrics transition operator is merged/exact-main verified; real oracle/sponsor UTXOs, signatures, confirmation/evidence, remaining state contracts, and exact-commit release hardening still block full rollout
 - [x] GH-1 covenant-genesis capability gate — merged via PR #2 as `9d74c0c`; transaction version 1, compiled-script P2SH, official funding-outpoint/unbound-output covenant-ID derivation, and funding-input binding after ID derivation are required; four tamper classes reject; main CI, Security Audit, and Pages pass
 - [x] Sprint 10B hybrid routing software: PR #34 merged/exact-main verified as `ce1d213`; 8B first, exact 70B escalation below `0.70`, fail-closed safety envelope, and unchanged `0.85` submission threshold; live model wiring/calibration remains
-- [ ] Sprint 10B ensemble voting: majority across 5+ independent 8B Guardians
+- [~] Sprint 10B ensemble voting: GH-36 local 5+ complete-ballot/strict-majority protocol passes; trusted membership, signed P2P votes, replay/Sybil resistance, and on-chain attestation remain
 - [~] Q-003: fp_rate Oracle — current-Silverc contract gate, public report/request/result/evidence/status gates, and repository-owned value-preserving two-input Rust assembly, dual external-signature verification, guarded broadcast, and successor observation are merged and exact-main verified at `072f04a`; real inputs/signatures/confirmation/evidence remain
 - [ ] Sybil resistance final design — Architect decision needed
 - [ ] M-001: yara_generator.py Heuristic → LLM confidence
