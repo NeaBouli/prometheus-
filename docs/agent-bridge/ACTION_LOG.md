@@ -630,3 +630,11 @@ Rules for all dev agents:
 - Independent Terra review found one high cross-protocol stream-budget multiplication and one low missing cancellation regression. Protocol quotas now split one global budget, and a canceled ThreatHint cleanup test passes. Terra rechecked both findings as resolved and found no new blocker, high, or medium issue.
 - PR #56 CodeRabbit review found that ballot admission still counted only ballot work while ThreatHint admission used the shared cap. Both handlers now use one shared inbound counter; the mixed-protocol saturation regression proves an admitted hint forces a concurrent ballot to receive `busy`. Four minor documentation findings were aligned in the same review patch.
 - Scope-weighted estimates are now core 74-78%, complete vision 40-45%, and 55-60% remaining. No wallet, private key, secret, signature, raw transaction, broadcast, contract, Guardian/reporter authorization, reputation, KAS/PROM, slash ACL, commit-reveal behavior, or foreign untracked file was accessed or changed. `Prometheus-1.png` remains untouched and uncommitted.
+
+## 2026-07-19 GH-55 merge and exact-main closeout
+
+- PR #56 passed all ten protected CI/Security/CodeRabbit contexts with every review thread resolved and merged normally, closing issue #55 as exact main `c8a6cb83419d442542257f470af35d76528786bc`.
+- Exact-main Prometheus CI `29646732936`, Security Audit `29646732941`, and Pages `29646732673` completed successfully for that SHA.
+- Live GitHub README, Markdown Whitepaper, Bridge, Pages Whitepaper/Roadmap, and `llms.txt` expose the GH-55 scope and continue to state that accepted ThreatHint analysis is blocked on real Groth16 verification, freshness/replay persistence, and dedicated bounded owner-only ingress.
+- Browser integration can verify public GitHub/Pages and public chain evidence, but cannot repair SSH public-key access, access a second approved host, sign externally controlled BIP340 digests, or replace explicit approval for irreversible broadcast.
+- Scope-weighted estimates remain core 74-78%, complete vision 40-45%, and 55-60% remaining. No wallet, private key, secret, signature, raw transaction, broadcast, contract, Guardian/reporter authorization, reputation, KAS/PROM, slash ACL, commit-reveal behavior, or foreign untracked file was accessed or changed. `Prometheus-1.png` remains untouched and uncommitted.
