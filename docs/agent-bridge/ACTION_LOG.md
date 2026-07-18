@@ -608,3 +608,11 @@ Rules for all dev agents:
 - Added a controlled two-host operator procedure with fixed UDP firewall guidance and explicit evidence requirements. Same-host tests remain packaging evidence only.
 - Direct `ssh sandbox` capability probe reached the host but failed public-key authentication. Therefore no real two-host or public reachability claim is made yet.
 - No wallet, private key, secret, signature, raw transaction, broadcast, contract, Guardian authorization, reputation, KAS/PROM, slash ACL, commit-reveal formula, or foreign untracked file was accessed or changed. `Prometheus-1.png` remains untouched and uncommitted.
+
+## 2026-07-19 GH-52 merge and exact-main closeout
+
+- PR #53 passed all ten protected CI/Security contexts and merged normally, closing issue #52 as exact main `f2e52beebe5ec7d6a3e6e0e8d36bced8f6f68ac7`.
+- Exact-main Prometheus CI `29644233106`, Security Audit `29644233098`, and Pages `29644232771` completed successfully for that SHA.
+- Live GitHub README, Markdown Whitepaper, and GitHub Pages expose the GH-52 relay-bootstrap boundaries and continue to state that real two-host operation is unproven.
+- The next autonomous Guardian work can proceed in repository code, but real two-host evidence remains externally blocked until approved SSH public-key access is repaired or a second approved host is supplied. Browser integration cannot replace host access, private-key signing, or irreversible transaction broadcast.
+- Scope-weighted estimates remain core 73-77%, complete vision 39-44%, and 56-61% remaining. No wallet, private key, secret, signature, raw transaction, broadcast, contract, Guardian authorization, reputation, KAS/PROM, slash ACL, or commit-reveal behavior was accessed or changed. `Prometheus-1.png` remains untouched and uncommitted.

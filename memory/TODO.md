@@ -143,7 +143,7 @@
 
 ## ═══ SPRINT 10: P2P + KRC-20 REAL (Mai-Juni 2026) ═══
 
-- [~] [P0] libp2p Modul komplett implementieren | Codex | GH-42/GH-44/GH-48 are merged/exact-main verified. GH-52 is in progress with strict relay-only advertised IP/UDP/QUIC bootstrap routes, canonical path-free events, and bind/advertise separation; 38 unit + 3 process and 211 workspace tests/2 live ignores pass locally. Real two-host evidence is blocked by rejected `ssh sandbox` public-key authentication. Broad discovery and remaining client/validator paths stay open; mDNS remains excluded by the unresolved compatible RustSec dependency path
+- [~] [P0] libp2p Modul komplett implementieren | Codex | GH-42/GH-44/GH-48/GH-52 are merged/exact-main verified. Strict relay-only advertised IP/UDP/QUIC bootstrap routes, canonical path-free events, and bind/advertise separation pass 38 unit + 3 process and 211 workspace tests/2 live ignores. Real two-host evidence is blocked by rejected `ssh sandbox` public-key authentication. Broad discovery and remaining client/validator paths stay open; mDNS remains excluded by the unresolved compatible RustSec dependency path
 - [ ] [P0] Echte KRC-20 UTXO-Abfrage für PROM-RULES Tick | Claude Code | Contracts live
 - [ ] [P1] Regel-Download von IPFS via CIDv1 | Claude Code | KRC-20 Reader
 - [ ] [P1] Light Client ↔ Guardian P2P Kommunikation | Claude Code | Guardian ballot carrier does not yet carry ThreatHint
@@ -153,7 +153,7 @@
 ## ═══ SPRINT 10B: GUARDIAN DECENTRALIZATION (parallel to Sprint 10) ═══
 
 - [x] [P1] Design and implement hybrid routing: 8B default, 70B escalation when confidence < 0.70 | Codex | GH-33/PR #34 merged as `ce1d213`; dependency-injected local router, threat/rule hash binding, finite confidence and strict submission checks, fail-closed escalation, 47 passed/3 live-model skipped; exact-main CI/Security/Pages green; live wiring/calibration remains operational work
-- [~] [P1] Implement ensemble voting protocol: 5+ 8B Guardians vote on same YARA rule via majority | Codex | GH-36/39 plus merged/exact-main GH-42/GH-44/GH-48 are implemented. Public/multi-host operation, broad discovery, trusted membership/key assignment, Sybil resistance, on-chain attestation, and production evidence remain
+- [~] [P1] Implement ensemble voting protocol: 5+ 8B Guardians vote on same YARA rule via majority | Codex | GH-36/39 plus merged/exact-main GH-42/GH-44/GH-48/GH-52 are implemented. Public/multi-host operation, broad discovery, trusted membership/key assignment, Sybil resistance, on-chain attestation, and production evidence remain
 - [ ] [P2] Guardian Pooling Contract: on-chain PROM split for shared 70B nodes | Claude Code | Contracts live
 - [ ] [P2] Specialization sharding: Guardian registers attack class (ransomware/network/privilege) during PoW registration | Claude Code | Sprint 11
 - [ ] [P2] Sybil resistance final design: KAS/PROM stake per Guardian identity OR hardware ZK-fingerprint | Architect decision needed
