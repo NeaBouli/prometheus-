@@ -638,3 +638,10 @@ Rules for all dev agents:
 - Live GitHub README, Markdown Whitepaper, Bridge, Pages Whitepaper/Roadmap, and `llms.txt` expose the GH-55 scope and continue to state that accepted ThreatHint analysis is blocked on real Groth16 verification, freshness/replay persistence, and dedicated bounded owner-only ingress.
 - Browser integration can verify public GitHub/Pages and public chain evidence, but cannot repair SSH public-key access, access a second approved host, sign externally controlled BIP340 digests, or replace explicit approval for irreversible broadcast.
 - Scope-weighted estimates remain core 74-78%, complete vision 40-45%, and 55-60% remaining. No wallet, private key, secret, signature, raw transaction, broadcast, contract, Guardian/reporter authorization, reputation, KAS/PROM, slash ACL, commit-reveal behavior, or foreign untracked file was accessed or changed. `Prometheus-1.png` remains untouched and uncommitted.
+
+## 2026-07-19 GH-55 public closeout and next slice
+
+- PR #57 passed all ten protected contexts and merged normally as exact public/docs main `a78d3ed7d3f05c41a9adfa3746aa2a9884dd60b0`.
+- Exact-main Prometheus CI `29647112173`, Security Audit `29647112172`, and Pages `29647111845` completed successfully; live README, Whitepaper, Bridge, Pages Whitepaper/Roadmap, and `llms.txt` markers pass.
+- Opened issue #58 for the next autonomous product slice: dedicated owner-only ThreatHint verifier ingress, persistent freshness/replay admission, and bounded analyzer handoff. The sidecar remains fail-closed until a real independently approved Groth16/KIP-16 verifier exists.
+- Browser access remains useful for public GitHub, Pages, explorer, and read-only evidence checks. It cannot repair `ssh sandbox` public-key authentication, supply a second approved host, or replace external signing and explicit irreversible-broadcast approval.

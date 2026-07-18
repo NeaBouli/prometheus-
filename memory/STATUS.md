@@ -120,9 +120,11 @@ Scope-weighted status estimate on 2026-07-19: H-001 canary preparation is about
 the merged/exact-main-verified fail-closed GH-55 ThreatHint transport core; the complete roadmap vision is about
 40-45% complete. These values distinguish
 prepared software from real chain operation and are not release guarantees.
-Latest verified product/status main `c8a6cb83419d442542257f470af35d76528786bc`
-passed Prometheus CI `29646732936`, Security Audit `29646732941`, and Pages
-`29646732673`; live README, Markdown Whitepaper, Bridge, and Pages GH-55 markers pass.
+Latest verified product/status main `a78d3ed7d3f05c41a9adfa3746aa2a9884dd60b0`
+passed Prometheus CI `29647112173`, Security Audit `29647112172`, and Pages
+`29647111845`; live README, Markdown Whitepaper, Bridge, and Pages GH-55 markers pass.
+Issue #58 tracks the next owner-only verifier-ingress, persistent replay/freshness,
+and bounded analyzer-admission slice; accepted hints remain real-Groth16 gated.
 The unchanged execution-artifact baseline remains exact main `205e1ca`.
 
 ## GH-13 EXPERIMENTAL MINER COMPANION STATUS
