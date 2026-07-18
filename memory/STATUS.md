@@ -117,12 +117,12 @@ confirmation, successor evidence, and release evidence remain.
 
 Scope-weighted status estimate on 2026-07-19: H-001 canary preparation is about
 96% complete; rollout-capable core-network work is about 74-78% complete with
-the fail-closed GH-55 ThreatHint transport core in progress; the complete roadmap vision is about
+the merged/exact-main-verified fail-closed GH-55 ThreatHint transport core; the complete roadmap vision is about
 40-45% complete. These values distinguish
 prepared software from real chain operation and are not release guarantees.
-Latest verified product/status main `f2e52beebe5ec7d6a3e6e0e8d36bced8f6f68ac7`
-passed Prometheus CI `29644233106`, Security Audit `29644233098`, and Pages
-`29644232771`; live README, Markdown Whitepaper, and Pages GH-52 markers pass.
+Latest verified product/status main `c8a6cb83419d442542257f470af35d76528786bc`
+passed Prometheus CI `29646732936`, Security Audit `29646732941`, and Pages
+`29646732673`; live README, Markdown Whitepaper, Bridge, and Pages GH-55 markers pass.
 The unchanged execution-artifact baseline remains exact main `205e1ca`.
 
 ## GH-13 EXPERIMENTAL MINER COMPANION STATUS
@@ -430,10 +430,10 @@ Remote evidence: Prometheus CI 29644233106, Security Audit 29644233098, and
                  Pages 29644232771 passed for exact main f2e52be
 ```
 
-## LIGHT CLIENT TO GUARDIAN THREATHINT CORE (GH-55 IN PROGRESS)
+## LIGHT CLIENT TO GUARDIAN THREATHINT CORE (GH-55 MERGED/EXACT-MAIN VERIFIED)
 
 ```text
-Status: issue #55; branch feature/GH-55-threat-hint-transport
+Status: issue #55 closed; PR #56 merged as c8a6cb83419d442542257f470af35d76528786bc
 Schema: OS-independent canonical JSON v1; exact lowercase hash/nonce, integer
         confidence basis points, explicit proof system, 1..=1024 proof bytes,
         non-zero timestamp, 2048-byte total cap, no unknown/duplicate fields
@@ -448,6 +448,8 @@ Local evidence: 6 schema tests, 8 client builder tests, 45 Guardian P2P unit
 Boundary: PeerId is routing metadata only; no wallet, signing, chain, Guardian or
           reporter authorization, reputation, KAS/PROM, slash ACL, or
           commit-reveal behavior changed
+Exact main: Prometheus CI 29646732936, Security Audit 29646732941, and Pages
+            29646732673 passed; live public markers were verified
 ```
 
 ## MAINNET CONTRACT ADDRESSES (post-verification)
