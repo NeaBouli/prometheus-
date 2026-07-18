@@ -133,27 +133,45 @@ const REWARD_PER_LINE: uint64 = 10;    // 10 PROM pro Codezeile
 
 ## 2. RUST SCHEMAS
 
-### 2.1 ThreatReport (Light Client → Guardian)
+### 2.1 ThreatHintEnvelope v1 (Light Client -> Guardian transport)
 
 ```rust
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct ThreatReport {
-    pub file_hash: [u8; 32],         // SHA-256 der verdächtigen Datei
-    pub confidence: f64,              // 0.0 - 1.0
-    pub indicator_type: IndicatorType,
-    pub zk_proof: Vec<u8>,            // Groth16 ZK-Proof
-    pub reporter_id: [u8; 32],        // Anonymisierte Client-ID
-    pub timestamp: u64,               // Unix-Timestamp
+#[serde(deny_unknown_fields)]
+pub struct ThreatHintEnvelope {
+    schema_version: u16,              // exact 1
+    threat_hash: String,              // 32-byte lowercase hex
+    confidence_bps: u16,              // 1..=10000, no float on wire
+    indicator_type: ThreatIndicatorType,
+    proof_system: ThreatProofSystem,
+    proof: String,                    // 1..=1024 proof bytes as lowercase hex
+    report_nonce: String,             // 32-byte lowercase hex
+    observed_at: u64,                 // non-zero Unix timestamp
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub enum IndicatorType {
+#[serde(rename_all = "snake_case")]
+pub enum ThreatIndicatorType {
     FileHash,
-    BehaviorPattern,
-    NetworkIOC,
-    ApiCallPattern,
+    Behavior,
+    Network,
+    ApiCall,
+}
+
+pub enum ThreatProofSystem {
+    #[serde(rename = "groth16_kip16_v1")]
+    Groth16Kip16V1,
+    #[serde(rename = "development_stub_v1")]
+    DevelopmentStubV1,
 }
 ```
+
+Canonical JSON field order is `schema_version`, `threat_hash`,
+`confidence_bps`, `indicator_type`, `proof_system`, `proof`, `report_nonce`,
+`observed_at`. Unknown/duplicate fields, reordered or whitespace-modified bytes,
+trailing data, invalid lowercase hex, and envelopes above 2048 bytes fail
+closed. No reporter identity, `PeerId`, wallet, chain, membership, reward,
+KAS/PROM, slash, or commit-reveal field is transported. A real Groth16 verifier,
+freshness/replay policy, and dedicated owner-only Guardian ingress remain open;
+the operated sidecar rejects all ThreatHints until those gates exist.
 
 ### 2.2 ScanResult (Phi-3-mini Output)
 
@@ -193,19 +211,18 @@ pub enum RuleType {
 }
 ```
 
-### 2.4 NetworkMessage (P2P)
+### 2.4 Implemented P2P request types
 
-```rust
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub enum NetworkMessage {
-    ThreatHint(ThreatReport),
-    RuleProposal(ProposalMessage),
-    RuleUpdate(KaspaRule),
-    PeerHandshake(HandshakeData),
-    Ping(u64),
-    Pong(u64),
-}
+```text
+/prometheus/guardian-ballot/1.0.0 request = BallotBytes
+/prometheus/threat-hint/1.0.0 request = ThreatHintEnvelope
 ```
+
+These are independent libp2p request-response behaviours with separate request
+IDs, response channels, and work maps under shared global admission and stream
+budgets. The earlier generic TCP `NetworkMessage`/handshake design is not an
+implemented protocol. Rule updates, proposal transport, and subscriptions
+remain open.
 
 ---
 
@@ -226,18 +243,22 @@ class ThreatAnalysis:
     analysis_duration_ms: int
 ```
 
-### 3.2 ThreatHint (Eingehend vom Client)
+### 3.2 Guardian ThreatHint domain input (post-verification target)
 
 ```python
 @dataclass
 class ThreatHint:
-    file_hash: str                     # Hex-String (64 Zeichen)
-    confidence: float                  # Phi-3-mini Konfidenzwert
-    indicator_type: str                # "file_hash", "behavior", "network"
-    zk_proof: bytes                    # Groth16 Beweis
-    reporter_id: str                   # Anonymisierte ID
-    timestamp: int                     # Unix-Timestamp
+    threat_hash: str                   # verified 32-byte lowercase hex
+    reporter_zk_proof: bytes           # verified Groth16 proof bytes
+    indicators: list[str]              # future bounded analyzer inputs
+    timestamp: int                     # verified/fresh Unix timestamp
 ```
+
+This Python dataclass is not the wire parser. GH-55 deliberately stops before
+conversion to this analyzer input because the real proof relation, bounded
+indicator mapping, freshness/replay store, and owner-only verifier ingress are
+not implemented. It must never receive development-stub or merely
+transport-valid input.
 
 ### 3.3 Authenticated Guardian Ballot (GH-39)
 

@@ -2397,8 +2397,12 @@ jobs:
         run: cargo clippy --workspace -- -D warnings
       - name: Build Guardian Sidecar Release
         run: cargo build --release --locked -p prometheus-guardian-p2p --bin prometheus-guardian-p2p
-      - name: Verify Guardian Sidecar Package
-        run: cargo package --locked -p prometheus-guardian-p2p
+      - name: Verify ThreatHint Schema Package
+        run: cargo package --locked -p prometheus-threat-hint
+      - name: Build Guardian Sidecar Package Set
+        # The Guardian tarball references the workspace schema crate by version;
+        # its locked release build above remains the executable verification gate.
+        run: cargo package --locked --no-verify -p prometheus-threat-hint -p prometheus-guardian-p2p
       - name: Tests
         run: cargo test --workspace
         timeout-minutes: 30

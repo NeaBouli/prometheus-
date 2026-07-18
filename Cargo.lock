@@ -3782,6 +3782,7 @@ dependencies = [
  "kaspa-rpc-core",
  "kaspa-wrpc-client",
  "log",
+ "prometheus-threat-hint",
  "prometheus-validator",
  "serde",
  "serde_json",
@@ -3813,6 +3814,7 @@ dependencies = [
  "libp2p-swarm",
  "libp2p-tls",
  "libp2p-yamux",
+ "prometheus-threat-hint",
  "rustix",
  "serde",
  "serde_json",
@@ -3843,6 +3845,16 @@ dependencies = [
  "silverscript-lang",
  "tokio",
  "url",
+]
+
+[[package]]
+name = "prometheus-threat-hint"
+version = "0.1.0"
+dependencies = [
+ "hex",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.18",
 ]
 
 [[package]]

@@ -12,6 +12,7 @@ name = "prometheus-guardian-p2p"
 path = "src/main.rs"
 
 [dependencies]
+prometheus-threat-hint = { version = "0.1.0", path = "../threat-hint" }
 async-trait.workspace = true
 anyhow.workspace = true
 clap.workspace = true
