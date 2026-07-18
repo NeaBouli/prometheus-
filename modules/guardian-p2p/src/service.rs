@@ -95,6 +95,8 @@ pub struct GuardianServiceConfig {
 pub struct RelayServiceFileConfig {
     identity_path: PathBuf,
     listen_addresses: Vec<String>,
+    #[serde(default)]
+    advertise_addresses: Vec<String>,
     #[serde(default = "default_health_interval_secs")]
     health_interval_secs: u64,
     #[serde(default = "default_shutdown_drain_secs")]
@@ -144,6 +146,7 @@ pub struct PreflightReport {
     role: ServiceRole,
     peer_id: String,
     listener_count: usize,
+    advertise_address_count: usize,
     static_peer_count: usize,
     autonat_server_count: usize,
     identity_storage: &'static str,
@@ -387,6 +390,7 @@ impl RelayServiceFileConfig {
         )?;
         let relay = RelayServiceConfig {
             listen_addresses: parse_addresses(&self.listen_addresses)?,
+            advertise_addresses: parse_canonical_addresses(&self.advertise_addresses)?,
             allow_private_autonat_addresses: self.allow_private_autonat_addresses,
             ..RelayServiceConfig::default()
         };
@@ -406,12 +410,13 @@ impl PreparedService {
     pub fn preflight_report(&self) -> PreflightReport {
         match self {
             Self::Guardian(service) => PreflightReport {
-                schema_version: 1,
+                schema_version: 2,
                 service: "prometheus-guardian-p2p",
                 status: "ready-for-operated-sidecar",
                 role: ServiceRole::Guardian,
                 peer_id: service.keypair.public().to_peer_id().to_string(),
                 listener_count: service.transport.listen_addresses.len(),
+                advertise_address_count: 0,
                 static_peer_count: service.transport.static_peers.len(),
                 autonat_server_count: service.transport.autonat_servers.len(),
                 identity_storage: "owner-only-persistent-ed25519",
@@ -420,12 +425,13 @@ impl PreparedService {
                 public_multi_host_evidence: "not-proven",
             },
             Self::Relay(service) => PreflightReport {
-                schema_version: 1,
+                schema_version: 2,
                 service: "prometheus-guardian-p2p",
                 status: "ready-for-operated-relay",
                 role: ServiceRole::Relay,
                 peer_id: service.keypair.public().to_peer_id().to_string(),
                 listener_count: service.relay.listen_addresses.len(),
+                advertise_address_count: service.relay.advertise_addresses.len(),
                 static_peer_count: 0,
                 autonat_server_count: 0,
                 identity_storage: "owner-only-persistent-ed25519",
@@ -782,6 +788,7 @@ fn relay_event_record(
     record.connections = Some(connections);
     match event {
         RelayServiceEvent::Listening { address }
+        | RelayServiceEvent::BootstrapRoute { address }
         | RelayServiceEvent::ListenerClosed { address, .. }
         | RelayServiceEvent::ListenerFailed { address } => {
             record.address = Some(address.to_string())
@@ -833,6 +840,7 @@ fn guardian_event_name(event: &TransportEvent) -> &'static str {
 
 fn relay_event_name(event: &RelayServiceEvent) -> &'static str {
     match event {
+        RelayServiceEvent::BootstrapRoute { .. } => "bootstrap-route",
         RelayServiceEvent::Listening { .. } => "listening",
         RelayServiceEvent::ListenerClosed { .. } => "listener-closed",
         RelayServiceEvent::ListenerFailed { .. } => "listener-failed",
@@ -848,7 +856,7 @@ fn relay_event_name(event: &RelayServiceEvent) -> &'static str {
 impl OperatorRecord {
     fn basic(role: ServiceRole, event: &'static str, ready: bool, peer_id: PeerId) -> Self {
         Self {
-            schema_version: 1,
+            schema_version: 2,
             service: "prometheus-guardian-p2p",
             role,
             event,
@@ -904,6 +912,22 @@ fn parse_addresses(values: &[String]) -> Result<Vec<Multiaddr>, ServiceError> {
         .map(|value| {
             Multiaddr::from_str(value)
                 .map_err(|_| ServiceError::InvalidConfig("invalid multiaddress"))
+        })
+        .collect()
+}
+
+fn parse_canonical_addresses(values: &[String]) -> Result<Vec<Multiaddr>, ServiceError> {
+    values
+        .iter()
+        .map(|value| {
+            let address = Multiaddr::from_str(value)
+                .map_err(|_| ServiceError::InvalidConfig("invalid multiaddress"))?;
+            if value != &address.to_string() {
+                return Err(ServiceError::InvalidConfig(
+                    "advertised multiaddress must be canonical",
+                ));
+            }
+            Ok(address)
         })
         .collect()
 }
@@ -1178,6 +1202,69 @@ health_interval_secs = 3601
             ),
         );
         assert!(ServiceConfig::from_toml_file(&config).is_err());
+
+        let guardian_config = write_config(
+            &directory,
+            &format!(
+                r#"role = "guardian"
+identity_path = "{}"
+collector_socket = "{}"
+submission_socket = "{}"
+listen_addresses = ["/ip4/127.0.0.1/udp/4101/quic-v1"]
+advertise_addresses = ["/ip4/198.51.100.10/udp/4101/quic-v1"]
+"#,
+                directory.path().join("guardian.identity").display(),
+                directory.path().join("collector.sock").display(),
+                directory.path().join("submit.sock").display(),
+            ),
+        );
+        assert!(ServiceConfig::from_toml_file(&guardian_config).is_err());
+    }
+
+    #[test]
+    fn relay_preflight_reports_canonical_advertised_routes() {
+        let directory = secure_directory();
+        let config = write_config(
+            &directory,
+            &format!(
+                r#"role = "relay"
+identity_path = "{}"
+listen_addresses = ["/ip4/0.0.0.0/udp/4100/quic-v1"]
+advertise_addresses = ["/ip4/198.51.100.10/udp/4100/quic-v1"]
+"#,
+                directory.path().join("identity").display(),
+            ),
+        );
+        let prepared = ServiceConfig::from_toml_file(&config)
+            .expect("parse relay config")
+            .prepare()
+            .expect("prepare relay config");
+        let report = serde_json::to_value(prepared.preflight_report()).expect("preflight report");
+        assert_eq!(report["schema_version"], 2);
+        assert_eq!(report["listener_count"], 1);
+        assert_eq!(report["advertise_address_count"], 1);
+        assert_eq!(report["public_multi_host_evidence"], "not-proven");
+        assert!(!report.to_string().contains("198.51.100.10"));
+    }
+
+    #[test]
+    fn noncanonical_advertised_address_is_rejected() {
+        let directory = secure_directory();
+        let config = write_config(
+            &directory,
+            &format!(
+                r#"role = "relay"
+identity_path = "{}"
+listen_addresses = ["/ip4/127.0.0.1/udp/4100/quic-v1"]
+advertise_addresses = ["/ip6/2001:0db8::1/udp/4100/quic-v1"]
+"#,
+                directory.path().join("identity").display(),
+            ),
+        );
+        assert!(ServiceConfig::from_toml_file(&config)
+            .expect("parse relay config")
+            .prepare()
+            .is_err());
     }
 
     #[test]

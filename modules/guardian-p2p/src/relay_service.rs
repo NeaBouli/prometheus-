@@ -1,7 +1,8 @@
 //! Bounded QUIC relay and AutoNAT service for operated Guardian networks.
 
 use std::{
-    collections::{HashMap, HashSet},
+    collections::{HashMap, HashSet, VecDeque},
+    net::Ipv4Addr,
     time::Duration,
 };
 
@@ -25,6 +26,7 @@ use crate::{
 #[derive(Clone, Debug)]
 pub struct RelayServiceConfig {
     pub listen_addresses: Vec<Multiaddr>,
+    pub advertise_addresses: Vec<Multiaddr>,
     pub idle_connection_timeout: Duration,
     pub allow_private_autonat_addresses: bool,
 }
@@ -33,6 +35,7 @@ impl Default for RelayServiceConfig {
     fn default() -> Self {
         Self {
             listen_addresses: Vec::new(),
+            advertise_addresses: Vec::new(),
             idle_connection_timeout: Duration::from_secs(60),
             allow_private_autonat_addresses: false,
         }
@@ -64,13 +67,48 @@ impl RelayServiceConfig {
                 return Err(TransportError::InvalidConfig("duplicate relay listener"));
             }
         }
+
+        if self.advertise_addresses.len() > MAX_LISTEN_ADDRESSES {
+            return Err(TransportError::InvalidConfig(
+                "too many relay advertised addresses",
+            ));
+        }
+        let mut advertise_addresses = HashSet::new();
+        for address in &self.advertise_addresses {
+            validate_advertise_address(address)?;
+            if !advertise_addresses.insert(address) {
+                return Err(TransportError::InvalidConfig(
+                    "duplicate relay advertised address",
+                ));
+            }
+        }
         Ok(())
     }
+}
+
+fn validate_advertise_address(address: &Multiaddr) -> Result<(), TransportError> {
+    crate::validate_address_size(address)?;
+    let protocols: Vec<_> = address.iter().collect();
+    crate::validate_quic_base(&protocols, false)?;
+    if matches!(protocols.first(), Some(Protocol::Ip4(ip)) if *ip == Ipv4Addr::BROADCAST) {
+        return Err(TransportError::InvalidConfig(
+            "relay advertised address must not use IPv4 broadcast",
+        ));
+    }
+    if !matches!(protocols.as_slice(), [_, _, Protocol::QuicV1]) {
+        return Err(TransportError::InvalidConfig(
+            "relay advertised address must be an exact IP/UDP/QUIC-v1 route",
+        ));
+    }
+    Ok(())
 }
 
 /// Data-minimal events emitted by the operated relay service.
 #[derive(Debug)]
 pub enum RelayServiceEvent {
+    BootstrapRoute {
+        address: Multiaddr,
+    },
     Listening {
         address: Multiaddr,
     },
@@ -157,6 +195,7 @@ pub struct RelayService {
     swarm: Swarm<RelayBehaviour>,
     listener_addresses: HashMap<ListenerId, Multiaddr>,
     active_listener_addresses: HashMap<ListenerId, HashSet<Multiaddr>>,
+    pending_events: VecDeque<RelayServiceEvent>,
 }
 
 impl RelayService {
@@ -197,6 +236,13 @@ impl RelayService {
         let swarm_config = libp2p_swarm::Config::with_tokio_executor()
             .with_idle_connection_timeout(config.idle_connection_timeout);
         let mut swarm = Swarm::new(transport, behaviour, local_peer_id, swarm_config);
+        let mut pending_events = VecDeque::new();
+        for address in config.advertise_addresses {
+            swarm.add_external_address(address.clone());
+            pending_events.push_back(RelayServiceEvent::BootstrapRoute {
+                address: address.with(Protocol::P2p(local_peer_id)),
+            });
+        }
         let mut listener_addresses = HashMap::new();
         for address in config.listen_addresses {
             let listener_id = swarm
@@ -208,6 +254,7 @@ impl RelayService {
             swarm,
             listener_addresses,
             active_listener_addresses: HashMap::new(),
+            pending_events,
         })
     }
 
@@ -240,6 +287,9 @@ impl RelayService {
 
     /// Drives the relay until an operator-relevant event is available.
     pub async fn next_event(&mut self) -> RelayServiceEvent {
+        if let Some(event) = self.pending_events.pop_front() {
+            return event;
+        }
         loop {
             let event = self.swarm.select_next_some().await;
             if let Some(event) = self.handle_event(event) {
@@ -257,7 +307,6 @@ impl RelayService {
                 listener_id,
                 address,
             } => {
-                self.swarm.add_external_address(address.clone());
                 self.active_listener_addresses
                     .entry(listener_id)
                     .or_default()
@@ -359,7 +408,7 @@ impl RelayService {
 
 #[cfg(test)]
 mod tests {
-    use std::time::Duration;
+    use std::{net::UdpSocket, time::Duration};
 
     use libp2p_core::multiaddr::Protocol;
     use libp2p_identity::Keypair;
@@ -384,28 +433,163 @@ mod tests {
         }
     }
 
+    fn available_udp_port() -> u16 {
+        UdpSocket::bind((Ipv4Addr::LOCALHOST, 0))
+            .expect("reserve local UDP port")
+            .local_addr()
+            .expect("read local UDP address")
+            .port()
+    }
+
     #[tokio::test]
-    async fn operated_relay_delivers_ballot_and_preserves_fallback() {
+    async fn advertised_address_emits_canonical_bootstrap_route() {
         let relay_identity = Keypair::generate_ed25519();
         let relay_peer = relay_identity.public().to_peer_id();
+        let advertise_address: Multiaddr = "/ip4/198.51.100.10/udp/4100/quic-v1"
+            .parse()
+            .expect("advertised relay address");
         let mut relay = RelayService::new(
             relay_identity,
             RelayServiceConfig {
                 listen_addresses: vec!["/ip4/127.0.0.1/udp/0/quic-v1"
                     .parse()
                     .expect("relay listen route")],
+                advertise_addresses: vec![advertise_address.clone()],
                 idle_connection_timeout: Duration::from_secs(10),
                 allow_private_autonat_addresses: true,
             },
         )
         .expect("relay service initializes");
-        let relay_address = match tokio::time::timeout(Duration::from_secs(5), relay.next_event())
+
+        match relay.next_event().await {
+            RelayServiceEvent::BootstrapRoute { address } => {
+                assert_eq!(address, advertise_address.with(Protocol::P2p(relay_peer)))
+            }
+            event => panic!("expected bootstrap route, got {event:?}"),
+        }
+    }
+
+    #[test]
+    fn invalid_advertised_addresses_fail_closed() {
+        let invalid = [
+            "/ip4/0.0.0.0/udp/4100/quic-v1",
+            "/ip4/224.0.0.1/udp/4100/quic-v1",
+            "/ip4/255.255.255.255/udp/4100/quic-v1",
+            "/ip6/::/udp/4100/quic-v1",
+            "/dns4/relay.example/udp/4100/quic-v1",
+            "/ip4/198.51.100.10/udp/0/quic-v1",
+            "/ip4/198.51.100.10/tcp/4100",
+        ];
+        for address in invalid {
+            let config = RelayServiceConfig {
+                listen_addresses: vec!["/ip4/127.0.0.1/udp/0/quic-v1"
+                    .parse()
+                    .expect("relay listen route")],
+                advertise_addresses: vec![address.parse().expect("parse invalid test route")],
+                ..RelayServiceConfig::default()
+            };
+            assert!(config.validate().is_err(), "accepted {address}");
+        }
+
+        let duplicate: Multiaddr = "/ip4/198.51.100.10/udp/4100/quic-v1"
+            .parse()
+            .expect("duplicate advertised route");
+        let duplicate_config = RelayServiceConfig {
+            listen_addresses: vec!["/ip4/127.0.0.1/udp/0/quic-v1"
+                .parse()
+                .expect("relay listen route")],
+            advertise_addresses: vec![duplicate.clone(), duplicate],
+            ..RelayServiceConfig::default()
+        };
+        assert!(duplicate_config.validate().is_err());
+
+        let too_many = (1..=MAX_LISTEN_ADDRESSES + 1)
+            .map(|index| {
+                format!("/ip4/198.51.100.{index}/udp/4100/quic-v1")
+                    .parse()
+                    .expect("bounded advertised route")
+            })
+            .collect();
+        let too_many_config = RelayServiceConfig {
+            listen_addresses: vec!["/ip4/127.0.0.1/udp/0/quic-v1"
+                .parse()
+                .expect("relay listen route")],
+            advertise_addresses: too_many,
+            ..RelayServiceConfig::default()
+        };
+        assert!(too_many_config.validate().is_err());
+
+        let mut oversized = Multiaddr::empty();
+        for _ in 0..=crate::MAX_MULTIADDR_BYTES {
+            oversized.push(Protocol::P2pCircuit);
+        }
+        let oversized_config = RelayServiceConfig {
+            listen_addresses: vec!["/ip4/127.0.0.1/udp/0/quic-v1"
+                .parse()
+                .expect("relay listen route")],
+            advertise_addresses: vec![oversized],
+            ..RelayServiceConfig::default()
+        };
+        assert!(oversized_config.validate().is_err());
+    }
+
+    #[tokio::test]
+    async fn listener_is_not_implicitly_advertised() {
+        let mut relay = RelayService::new(
+            Keypair::generate_ed25519(),
+            RelayServiceConfig {
+                listen_addresses: vec!["/ip4/127.0.0.1/udp/0/quic-v1"
+                    .parse()
+                    .expect("relay listen route")],
+                advertise_addresses: Vec::new(),
+                ..RelayServiceConfig::default()
+            },
+        )
+        .expect("relay service initializes");
+
+        assert!(matches!(
+            relay.next_event().await,
+            RelayServiceEvent::Listening { .. }
+        ));
+        assert_eq!(relay.swarm.external_addresses().count(), 0);
+    }
+
+    #[tokio::test]
+    async fn operated_relay_delivers_ballot_and_preserves_fallback() {
+        let relay_identity = Keypair::generate_ed25519();
+        let relay_peer = relay_identity.public().to_peer_id();
+        let relay_port = available_udp_port();
+        let relay_address: Multiaddr = format!("/ip4/127.0.0.1/udp/{relay_port}/quic-v1")
+            .parse()
+            .expect("relay advertised route");
+        let mut relay = RelayService::new(
+            relay_identity,
+            RelayServiceConfig {
+                listen_addresses: vec![format!("/ip4/0.0.0.0/udp/{relay_port}/quic-v1")
+                    .parse()
+                    .expect("relay wildcard listener")],
+                advertise_addresses: vec![relay_address.clone()],
+                idle_connection_timeout: Duration::from_secs(10),
+                allow_private_autonat_addresses: true,
+            },
+        )
+        .expect("relay service initializes");
+        match relay.next_event().await {
+            RelayServiceEvent::BootstrapRoute { address } => {
+                assert_eq!(
+                    address,
+                    relay_address.clone().with(Protocol::P2p(relay_peer))
+                )
+            }
+            event => panic!("expected bootstrap route, got {event:?}"),
+        }
+        match tokio::time::timeout(Duration::from_secs(5), relay.next_event())
             .await
             .expect("relay listener timed out")
         {
-            RelayServiceEvent::Listening { address } => address,
+            RelayServiceEvent::Listening { .. } => {}
             event => panic!("expected relay listener, got {event:?}"),
-        };
+        }
         let autonat_server = StaticPeer {
             peer_id: relay_peer,
             address: relay_address.clone(),

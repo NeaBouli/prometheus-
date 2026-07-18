@@ -1,5 +1,28 @@
 # Prometheus Guardian P2P
 
+## GH-52 explicit relay bootstrap routes
+
+GH-52 adds a controlled, transport-only bootstrap surface for relay operators:
+
+- relay-only `advertise_addresses` are distinct from bind listeners;
+- each advertised route must be canonical IP/UDP/QUIC-v1 with a non-zero port and a non-wildcard, non-multicast IP address;
+- DNS, mDNS, wildcard, multicast, duplicate, malformed, oversized, and over-limit advertisements fail closed;
+- each accepted address produces a path-free `bootstrap-route` operator event ending in the relay's persistent transport `PeerId`;
+- configured advertised addresses are registered as libp2p external addresses, but they do not prove reachability or grant Guardian authorization.
+
+Example relay config:
+
+```toml
+role = "relay"
+identity_path = "/var/lib/prometheus/guardian-p2p/relay.identity"
+listen_addresses = ["/ip4/0.0.0.0/udp/4100/quic-v1"]
+advertise_addresses = ["/ip4/203.0.113.10/udp/4100/quic-v1"]
+health_interval_secs = 30
+shutdown_drain_timeout_secs = 10
+```
+
+Replace the documentation IP with the operator-controlled routable address before use. A controlled two-host run is still required before claiming multi-host evidence.
+
 ## GH-48 operated service
 
 This workspace crate is the transport-only Guardian ballot carrier. GH-42 and GH-44 provide the bounded carrier, persisted transport identity, and relay/NAT evidence. GH-48 packages those APIs as an operated process while keeping Guardian identity and authorization outside transport.
@@ -98,7 +121,7 @@ The transport cannot do or claim:
 - Wallet keys, signature validation, or transaction flow.
 - Reputation/SLASH score handling.
 - tokenomics logic.
-- public relay bootstrap, public or multi-host operating evidence, or mDNS-based discovery.
+- broad public relay discovery, public or multi-host operating evidence, or mDNS-based discovery.
 - trusted membership/key assignment, Sybil resistance, or on-chain attestation.
 
 ## Verification
@@ -122,8 +145,8 @@ cargo test -p prometheus-guardian-p2p closed_response_channel_race_is_nonfatal
 cargo test -p prometheus-guardian-p2p canceled_peer_keeps_capacity_until_ingress_finishes
 ```
 
-## Not yet proven by GH-48
+## Not yet proven by GH-52
 
-- Broad peer discovery and public relay bootstrap.
+- Broad peer discovery or a hardened public relay registry.
 - Public or multi-host operator operation.
 - Public service hardening for multi-instance deployment.

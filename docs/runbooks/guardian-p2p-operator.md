@@ -1,4 +1,4 @@
-# Guardian P2P Operator Runbook (GH-48)
+# Guardian P2P Operator Runbook (GH-48 + GH-52)
 
 ## Purpose
 
@@ -75,17 +75,41 @@ Preflight is network-free, rejects unknown/unbounded fields, and emits a path-fr
 role = "relay"
 identity_path = "/var/lib/prometheus/guardian-p2p/relay.identity"
 listen_addresses = ["/ip4/0.0.0.0/udp/4100/quic-v1"]
+advertise_addresses = ["/ip4/203.0.113.10/udp/4100/quic-v1"]
 health_interval_secs = 30
 shutdown_drain_timeout_secs = 10
 ```
 
 - Relay service requires direct QUIC-v1 listener address.
+- `advertise_addresses` is optional and relay-only. Replace the documentation address with an operator-controlled routable IP and the externally forwarded UDP port.
+- Advertised routes reject DNS/mDNS, wildcard, multicast, port zero, duplicates, noncanonical text, and non-QUIC shapes.
+- A `bootstrap-route` event appends the persistent relay transport `PeerId` to each configured advertised address. The event is operator metadata, not a reachability or authorization claim.
 - Relay limits are bounded in config and hard-coded relay caps (reservations/circuits/time windows).
 - Observe relay events:
   - `ReservationAccepted`
   - `CircuitAccepted`
   - `CircuitClosed`
   - relay and direct transport events from participants.
+
+### Controlled two-host bootstrap procedure
+
+This procedure creates real multi-host evidence only when the relay and Guardian run on distinct hosts. Do not label containers, network namespaces, or multiple processes on one machine as multi-host proof.
+
+1. On the relay host, forward one fixed UDP port such as `4100` and restrict ingress to the approved Guardian host addresses where infrastructure permits.
+2. Bind the relay to `/ip4/0.0.0.0/udp/4100/quic-v1` and set `advertise_addresses` to the relay's operator-controlled routable IP and the same external UDP port.
+3. Run preflight, then start the relay. Record the exact `bootstrap-route` JSON line. It has this form:
+
+```text
+/ip4/<relay-ip>/udp/4100/quic-v1/p2p/<relay-peer-id>
+```
+
+4. On the receiver host, configure the relay reservation listener as `<bootstrap-route>/p2p-circuit`.
+5. After the receiver emits `relay-reservation-accepted`, construct its sender route as `<bootstrap-route>/p2p-circuit/p2p/<receiver-peer-id>`.
+6. Start the sender with that exact static route and submit one already authenticated canonical ballot through its owner-only local submission socket.
+7. Capture path-free evidence for the relay `reservation-accepted` and `circuit-accepted`, receiver `inbound-processed`, sender `outbound-ack`, and clean `stopped` records. Record host identities outside these service logs; the service deliberately does not emit hostnames or local paths.
+8. Stop all processes and verify owned submission sockets are removed. Keep transport identity files unchanged for repeatability.
+
+Passing this procedure proves controlled reachability and exact opaque ballot/ACK transport between the tested hosts. It does not prove broad discovery, Guardian membership, Sybil resistance, public-service hardening, or production readiness.
 
 6) Start processes
 
@@ -136,7 +160,7 @@ The local protocol is owner-credential checked, exact-framed, capped at 8192 bal
 - the canonical collector ACK returns to the submit client;
 - SIGTERM exits cleanly, submission sockets disappear, and identities remain stable.
 
-This is packaging and lifecycle evidence, not public Internet or multi-host proof.
+This is packaging and lifecycle evidence, not public Internet or multi-host proof. GH-52 adds the explicit bootstrap route needed to run the controlled two-host procedure; live evidence remains separate.
 
 ## Recovery and restart guidance
 
@@ -170,4 +194,4 @@ cargo audit
 ## Explicit exclusions
 
 - Do not treat this crate as discovery, membership, signing, chain governance, or token-distribution logic.
-- Do not claim public relay operation, mDNS discovery, or multi-host production operation as complete.
+- Do not claim broad public relay operation, mDNS discovery, or multi-host production operation as complete from configuration or same-host tests.

@@ -408,6 +408,26 @@ Not yet proven: public/multi-host operation, broad discovery, trusted
                 attestation, or production node evidence
 ```
 
+## GUARDIAN EXPLICIT RELAY BOOTSTRAP (GH-52 IN PROGRESS)
+
+```text
+Status: issue #52; branch feature/GH-52-guardian-bootstrap-routes
+Config: relay-only canonical advertise_addresses are distinct from bind
+        listeners; wildcard, multicast, DNS/mDNS, port-zero, duplicate,
+        malformed, oversized, over-limit, and noncanonical routes fail closed
+Output: each configured address emits one path-free bootstrap-route ending in
+        the persistent transport PeerId; ready remains false until listeners bind
+Local evidence: 38 Guardian P2P unit tests and three process tests; 211
+                workspace Rust tests/2 live ignores; locked release build;
+                13-file package; workspace Clippy; 126 Python tests/3 skips;
+                Black; Pylint 9.95/10; Memory/HTML/audit/diff gates pass
+Boundary: advertised routes are operator metadata, not reachability proof or
+          Guardian authorization; no wallet, signing, chain, reputation,
+          KAS/PROM, slash ACL, or commit-reveal behavior changed
+External evidence: ssh sandbox reaches the host but public-key authentication
+                   is rejected, so real two-host evidence is not claimed
+```
+
 ## MAINNET CONTRACT ADDRESSES (post-verification)
 
 ```

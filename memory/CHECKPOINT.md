@@ -1,5 +1,5 @@
 # PROMETHEUS — SESSION CHECKPOINT
-# Last updated: 2026-07-16
+# Last updated: 2026-07-19
 # Purpose: Full recovery document. If Claude (Architect) or Claude Code
 # loses context, read this file first. It contains the complete project state.
 
@@ -14,10 +14,11 @@
 | Branch | `main`; all status changes remain PR-only |
 | Lokaler Pfad | `$REPO_ROOT` |
 | Letzter grün verifizierter Produkt-/Tooling-Commit | `b14d36fc` — GH-48 operated Guardian sidecar; Prometheus CI `29481830688`, Security `29481830686`, and Pages `29481830054` green |
+| Aktueller Entwicklungs-Slice | GH-52 auf `feature/GH-52-guardian-bootstrap-routes`: explizite kanonische Relay-Anzeigen und path-free Bootstrap-Routen; 38 Unit + 3 Prozess-Tests sowie 211 Workspace-Tests/2 Live-Ignores lokal grün; echter Zwei-Host-Nachweis wartet auf reparierten `ssh sandbox` Public-Key-Zugriff |
 | Aktuelle Tooling-Baseline | Exact main `b14d36fc` includes merged GH-48 strict Guardian/relay roles, owner-only submission, bounded JSON output, and graceful drain. Public/multi-host operation, broad discovery, trusted membership/key assignment, Sybil resistance, and on-chain attestation remain open. Execution artifacts remain bound to `205e1ca`; GH-9 remains ready for explicitly approved external signing. |
 | Aktueller HEAD | Mit `git log --oneline -1` prüfen; Bridge-/Status-Commits können neuer sein |
 | Rollback-Tag | `pre-session-20260413` → `6347b85` |
-| Whitepaper | WHITEPAPER.md (root) + whitepaper.html (styled); miner companion, reward boundaries, GH-36/GH-39 trust boundaries, and merged GH-48 operated-sidecar scope remain synchronized |
+| Whitepaper | WHITEPAPER.md (root) + whitepaper.html (styled); miner companion, reward boundaries, GH-36/GH-39 trust boundaries, merged GH-48 operated-sidecar scope, and GH-52 bootstrap boundaries remain synchronized |
 | Status | Rollout-capable core estimated at 73-77% after merged/exact-main GH-48; post-Toccata canary execution and full rollout evidence remain gated. |
 | GitHub Pages | https://neabouli.github.io/prometheus-/ |
 | Google Search Console | Verified: googleaa2902079481c7a8 |
@@ -148,7 +149,7 @@
 - [~] Sprint 9: H-001 canary handoff is rebuilt from exact main `205e1ca`, live-preflight verified, byte-identical, and non-promotable; real signature/receipt/evidence execution remains external. The keyless metrics transition operator is merged/exact-main verified; real oracle/sponsor UTXOs, signatures, confirmation/evidence, remaining state contracts, and exact-commit release hardening still block full rollout
 - [x] GH-1 covenant-genesis capability gate — merged via PR #2 as `9d74c0c`; transaction version 1, compiled-script P2SH, official funding-outpoint/unbound-output covenant-ID derivation, and funding-input binding after ID derivation are required; four tamper classes reject; main CI, Security Audit, and Pages pass
 - [x] Sprint 10B hybrid routing software: PR #34 merged/exact-main verified as `ce1d213`; 8B first, exact 70B escalation below `0.70`, fail-closed safety envelope, and unchanged `0.85` submission threshold; live model wiring/calibration remains
-- [~] Sprint 10B ensemble voting: GH-36/39 plus merged/exact-main GH-42/GH-44/GH-48 are implemented. Public/multi-host operation, broad discovery, trusted membership/key assignment, Sybil resistance, and on-chain attestation remain
+- [~] Sprint 10B ensemble voting: GH-36/39 plus merged/exact-main GH-42/GH-44/GH-48 are implemented; GH-52 explicit relay bootstrap configuration is in progress. Real two-host operation, broad discovery, trusted membership/key assignment, Sybil resistance, and on-chain attestation remain
 - [~] Q-003: fp_rate Oracle — current-Silverc contract gate, public report/request/result/evidence/status gates, and repository-owned value-preserving two-input Rust assembly, dual external-signature verification, guarded broadcast, and successor observation are merged and exact-main verified at `072f04a`; real inputs/signatures/confirmation/evidence remain
 - [ ] Sybil resistance final design — Architect decision needed
 - [ ] M-001: yara_generator.py Heuristic → LLM confidence

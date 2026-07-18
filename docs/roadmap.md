@@ -155,7 +155,8 @@ public release-hardening evidence for the exact rollout commit.
 - Merged/exact-main verified: GH-42 Guardian ballot carrier has direct QUIC request/response, static peers, bounded resources, owner-only local collector ingress, cancellation-safe concurrent swarm progress, and relay/AutoNAT/DCUtR behaviours
 - Merged/exact-main verified in GH-44: atomic owner-only persistent transport identity, strict bounded direct/relay/AutoNAT routes, data-minimal health events, and a bounded relay service
 - Merged and exact-main-verified GH-48: strict Guardian/relay process roles, owner-only local submission, bounded JSON readiness/health, graceful signal drain, and separate-process same-host relay delivery/cleanup evidence
-- Proven on an isolated three-node harness: relay reservation/delivery, AutoNAT state, DCUtR relay fallback, and disconnect handling; public/multi-host operation remains pending
+- GH-52 adds relay-only canonical advertised IP/UDP/QUIC bootstrap routes, bind/advertise separation, and path-free operator events; configured routes are not reachability or authorization proof
+- Proven on an isolated three-node harness: relay reservation/delivery, AutoNAT state, DCUtR relay fallback, and disconnect handling; real two-host operation remains pending
 - Pending: public operated relay/NAT infrastructure and broad discovery; mDNS remains excluded while its compatible dependency path has unresolved RustSec advisories
 - Light Client ↔ Guardian communication over P2P
 - Guardian ↔ Validator communication over P2P
@@ -167,7 +168,7 @@ public release-hardening evidence for the exact rollout commit.
 - Implemented: transport-neutral BIP340 ballot intake with exact key/session/context binding, strict canonical envelopes, freshness checks, and owner-only SQLite replay/equivocation protection across restarts and concurrent submissions
 - Merged/exact-main verified: real Guardian ballot transport over direct QUIC/libp2p request/response with exact 8192-byte-bounded frames, static peers, resource caps, owner-only AF_UNIX collector integration, and cancellation-safe concurrent processing
 - Pending: live 8B/70B service wiring and model-calibrated confidence evidence
-- Merged/exact-main verified: persistent transport identity and isolated operated relay/AutoNAT/DCUtR evidence; public/multi-host evidence remains
+- Merged/exact-main verified: persistent transport identity and isolated operated relay/AutoNAT/DCUtR evidence; explicit bootstrap configuration is implemented, while real two-host evidence remains
 - Pending: broad discovery, trusted membership and key assignment, Sybil resistance, and on-chain ensemble attestation
 - Pending: reviewed Guardian pooling and final Sybil-resistance design
 

@@ -143,7 +143,7 @@
 
 ## ═══ SPRINT 10: P2P + KRC-20 REAL (Mai-Juni 2026) ═══
 
-- [~] [P0] libp2p Modul komplett implementieren | Codex | GH-42/GH-44/GH-48 are merged/exact-main verified; GH-48 adds strict Guardian/relay process roles, owner-only local submission, bounded path-free JSON health, graceful signal drain, and separate-process same-host exact relay delivery/cleanup evidence. Public/multi-host operation, broad discovery, and remaining client/validator paths stay open; mDNS remains excluded by the unresolved compatible RustSec dependency path
+- [~] [P0] libp2p Modul komplett implementieren | Codex | GH-42/GH-44/GH-48 are merged/exact-main verified. GH-52 is in progress with strict relay-only advertised IP/UDP/QUIC bootstrap routes, canonical path-free events, and bind/advertise separation; 38 unit + 3 process and 211 workspace tests/2 live ignores pass locally. Real two-host evidence is blocked by rejected `ssh sandbox` public-key authentication. Broad discovery and remaining client/validator paths stay open; mDNS remains excluded by the unresolved compatible RustSec dependency path
 - [ ] [P0] Echte KRC-20 UTXO-Abfrage für PROM-RULES Tick | Claude Code | Contracts live
 - [ ] [P1] Regel-Download von IPFS via CIDv1 | Claude Code | KRC-20 Reader
 - [ ] [P1] Light Client ↔ Guardian P2P Kommunikation | Claude Code | Guardian ballot carrier does not yet carry ThreatHint

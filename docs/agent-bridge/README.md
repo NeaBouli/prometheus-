@@ -10,7 +10,7 @@ Startpunkt fuer Codex/Claude Code:
 
 Keine Secrets, Tokens, Passwoerter, privaten Keys oder Wallet-Daten in diese Bridge schreiben.
 
-Aktiver Handover: GH-48 operated Guardian sidecar ist merged/exact-main verifiziert; der naechste offene Guardian-Slice beginnt bei public/multi-host operation und trust boundaries. Verbindlicher Status und offene Gates stehen in `CODEX_BRIDGE.md`; laufende Schritte stehen in `ACTION_LOG.md`.
+Aktiver Handover: GH-52 implementiert explizite Relay-Bootstrap-Routen fuer kontrollierten Multi-Host-Betrieb, ohne Transport-`PeerId` in Guardian-Autorisierung umzudeuten. Lokale Tests sind gruen; echte Zwei-Host-Evidence wartet auf reparierten `ssh sandbox` Public-Key-Zugriff. Verbindlicher Status und offene Gates stehen in `CODEX_BRIDGE.md`; laufende Schritte stehen in `ACTION_LOG.md`.
 <!-- CODEX_CLAUDE_CODE_TERMINAL_BRIDGE_V1 -->
 ## Codex -> Claude Code Terminal Bridge
 

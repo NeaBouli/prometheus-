@@ -1,8 +1,9 @@
 # PROMETHEUS CODEX BRIDGE
 
-Last updated: 2026-07-16 EEST
+Last updated: 2026-07-19 EEST
 Repo path: /Users/gio/Desktop/repos/prometheus
 Operational baseline: `main`; all product, public-site, and status changes remain PR-only, and foreign untracked `Prometheus-1.png` remains untouched
+Current task: issue https://github.com/NeaBouli/prometheus-/issues/52 on branch `feature/GH-52-guardian-bootstrap-routes` adds relay-only canonical `advertise_addresses`, path-free schema-v2 `bootstrap-route` events, and controlled two-host operator guidance. Only explicitly configured advertisements enter the libp2p external-address registry; listeners remain readiness telemetry. Local evidence is 38 Guardian P2P unit tests plus three process tests. Live two-host evidence is not yet claimed because `ssh sandbox` currently rejects the configured public key. `PeerId` remains transport metadata only; no Guardian authorization, wallet, signing, chain, reputation, KAS/PROM, slash ACL, or commit-reveal boundary changes.
 Latest verified operational baseline: `b14d36fc79ddc7e0b407b42cb4a271e29cb1ddea feat: package Guardian P2P sidecar service (#49)`
 Latest verified public rollout/docs baseline: `bde829f057b8059d3f9a7cfc170aee9d9b650f8c docs: close out guardian sidecar rollout (#50)`; exact-main CI/Security/Pages and live GitHub README, Whitepaper, Roadmap, and `llms.txt` markers pass
 Latest completed task: issue https://github.com/NeaBouli/prometheus-/issues/48 is closed after PR https://github.com/NeaBouli/prometheus-/pull/49 merged normally. GH-48 packages explicit `preflight`, `run`, and `submit` commands; strict owner-only role-tagged TOML; Guardian and relay owner loops; owner-only AF_UNIX submission; live listener readiness; bounded path-free JSON lifecycle/health; bounded SIGINT/SIGTERM drain; collector-outage `busy`; and separate-process same-host relay/receiver/sender/submit/collector evidence. Public or multi-host operation, broad discovery, trusted membership/key assignment, Sybil resistance, and on-chain attestation remain open. `PeerId` is transport metadata only.
