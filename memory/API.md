@@ -200,6 +200,20 @@ stops admission/listeners, drains bounded work, and removes the owned socket.
 This API adds no Guardian membership, signature, reputation, stake, reward, or
 chain authority.
 
+### Guardian Explicit Relay Bootstrap (GH-52)
+
+Relay-role TOML accepts optional `advertise_addresses` separately from
+`listen_addresses`. Every entry must be one canonical non-wildcard,
+non-multicast IP/UDP/QUIC-v1 address with a non-zero port. DNS/mDNS, malformed,
+duplicate, oversized, over-limit, and noncanonical values fail closed.
+
+Preflight schema version 2 reports only the advertised-address count. Runtime
+operator records also use schema version 2 and emit one `bootstrap-route` JSON
+record per configured address, appending the persistent transport `PeerId`.
+The route is registered as a libp2p external address but remains untrusted
+operator metadata: it is not reachability proof, Guardian membership, key
+assignment, or chain authority.
+
 ---
 
 ## 4. SILVERSCRIPT CONTRACT API

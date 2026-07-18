@@ -3,6 +3,7 @@
 use std::{
     fs,
     io::{BufRead, BufReader},
+    net::{Ipv4Addr, UdpSocket},
     os::unix::fs::PermissionsExt,
     path::{Path, PathBuf},
     process::{Child, Command, ExitStatus, Stdio},
@@ -117,6 +118,14 @@ fn write_owner_only(path: &Path, contents: impl AsRef<[u8]>) {
     fs::write(path, contents).expect("write owner-only fixture");
     fs::set_permissions(path, fs::Permissions::from_mode(0o600))
         .expect("set owner-only fixture permissions");
+}
+
+fn available_udp_port() -> u16 {
+    UdpSocket::bind((Ipv4Addr::LOCALHOST, 0))
+        .expect("reserve local UDP port")
+        .local_addr()
+        .expect("read local UDP address")
+        .port()
 }
 
 fn preflight(config: &Path) -> Value {
@@ -262,26 +271,39 @@ fn guardian_config(
 async fn separate_processes_relay_exact_ballot_and_shutdown_cleanly() {
     let directory = secure_directory();
     let relay_config = directory.path().join("relay.toml");
+    let relay_port = available_udp_port();
+    let relay_dial_address = format!("/ip4/127.0.0.1/udp/{relay_port}/quic-v1");
     write_owner_only(
         &relay_config,
         format!(
-            "role = \"relay\"\nidentity_path = \"{}\"\nlisten_addresses = [\"/ip4/127.0.0.1/udp/0/quic-v1\"]\nhealth_interval_secs = 1\nshutdown_drain_timeout_secs = 5\nallow_private_autonat_addresses = true\n",
-            directory.path().join("relay.identity").display()
+            "role = \"relay\"\nidentity_path = \"{}\"\nlisten_addresses = [\"/ip4/0.0.0.0/udp/{relay_port}/quic-v1\"]\nadvertise_addresses = [\"{relay_dial_address}\"]\nhealth_interval_secs = 1\nshutdown_drain_timeout_secs = 5\nallow_private_autonat_addresses = true\n",
+            directory.path().join("relay.identity").display(),
         ),
     );
     let relay_preflight = preflight(&relay_config);
+    assert_eq!(relay_preflight["schema_version"], 2);
+    assert_eq!(relay_preflight["advertise_address_count"], 1);
     let relay_peer = relay_preflight["peer_id"]
         .as_str()
         .expect("relay peer id")
         .to_owned();
     let mut relay = ServiceProcess::spawn(&relay_config);
+    let bootstrap = relay.wait_for(Duration::from_secs(10), |event| {
+        event["event"] == "bootstrap-route"
+    });
+    assert_eq!(
+        bootstrap["address"],
+        format!("{relay_dial_address}/p2p/{relay_peer}")
+    );
+    assert_eq!(bootstrap["schema_version"], 2);
+    assert_eq!(bootstrap["ready"], false);
     let relay_listening = relay.wait_for(Duration::from_secs(10), |event| {
         event["event"] == "listening" && event["ready"] == true
     });
-    let relay_address = relay_listening["address"]
+    assert!(relay_listening["address"]
         .as_str()
         .expect("relay listen address")
-        .to_owned();
+        .contains(&relay_port.to_string()));
 
     let receiver_collector_path = directory.path().join("receiver-collector.sock");
     let sender_collector_path = directory.path().join("sender-collector.sock");
@@ -289,7 +311,7 @@ async fn separate_processes_relay_exact_ballot_and_shutdown_cleanly() {
     let _sender_collector = bind_collector(&sender_collector_path).await;
     let receiver_submit = directory.path().join("receiver-submit.sock");
     let sender_submit = directory.path().join("sender-submit.sock");
-    let reservation_address = format!("{relay_address}/p2p/{relay_peer}/p2p-circuit");
+    let reservation_address = format!("{relay_dial_address}/p2p/{relay_peer}/p2p-circuit");
 
     let receiver_config = guardian_config(
         directory.path(),
