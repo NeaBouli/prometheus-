@@ -1095,9 +1095,13 @@ impl GuardianP2p {
     /// Returns admitted inbound collector work and outstanding outbound requests.
     pub fn pending_work(&self) -> (usize, usize) {
         (
-            self.inbound_work.len() + self.inbound_threat_hint_work.len(),
+            self.inbound_request_count(),
             self.outbound_requests.len() + self.outbound_threat_hint_requests.len(),
         )
+    }
+
+    fn inbound_request_count(&self) -> usize {
+        self.inbound_work.len() + self.inbound_threat_hint_work.len()
     }
 
     /// Stops accepting new network traffic while retained work is drained by the owner loop.
@@ -1449,7 +1453,7 @@ impl GuardianP2p {
                     },
                 ..
             } => {
-                if self.inbound_work.len() >= self.max_inbound_requests {
+                if self.inbound_request_count() >= self.max_inbound_requests {
                     let _ = self
                         .swarm
                         .behaviour_mut()
@@ -1526,9 +1530,7 @@ impl GuardianP2p {
                     },
                 ..
             } => {
-                if self.inbound_work.len() + self.inbound_threat_hint_work.len()
-                    >= self.max_inbound_requests
-                {
+                if self.inbound_request_count() >= self.max_inbound_requests {
                     let _ = self
                         .swarm
                         .behaviour_mut()
@@ -2050,6 +2052,97 @@ mod tests {
         })
         .await
         .expect("two-node ThreatHint acknowledgement timed out");
+    }
+
+    #[tokio::test]
+    async fn mixed_protocol_inbound_work_shares_one_admission_cap() {
+        let receiver_identity = identity::Keypair::generate_ed25519();
+        let receiver_peer = receiver_identity.public().to_peer_id();
+        let mut receiver_config = test_config();
+        receiver_config.max_concurrent_requests = 1;
+        receiver_config.listen_addresses.push(
+            "/ip4/127.0.0.1/udp/0/quic-v1"
+                .parse()
+                .expect("valid test address"),
+        );
+        let mut receiver = GuardianP2p::new(receiver_identity, receiver_config)
+            .expect("ephemeral receiver should initialize");
+        let receiver_address = match next_event_with_timeout(&mut receiver).await {
+            TransportEvent::Listening { address } => address,
+            event => panic!("expected listener address, got {event:?}"),
+        };
+
+        let mut sender_config = test_config();
+        sender_config.static_peers.push(StaticPeer {
+            peer_id: receiver_peer,
+            address: receiver_address,
+        });
+        let mut sender = GuardianP2p::new(identity::Keypair::generate_ed25519(), sender_config)
+            .expect("ephemeral sender should initialize");
+        sender
+            .send_threat_hint(receiver_peer, test_threat_hint())
+            .expect("ThreatHint request capacity available");
+
+        let inbound_hint = tokio::time::timeout(Duration::from_secs(10), async {
+            loop {
+                tokio::select! {
+                    event = receiver.next_event() => {
+                        if let TransportEvent::InboundThreatHint { request_id, .. } = event {
+                            break request_id;
+                        }
+                    },
+                    event = sender.next_event() => {
+                        if let TransportEvent::OutboundThreatHintFailure { failure, .. } = event {
+                            panic!("ThreatHint request failed before admission: {failure:?}");
+                        }
+                    }
+                }
+            }
+        })
+        .await
+        .expect("ThreatHint did not occupy the shared inbound slot");
+        assert_eq!(receiver.pending_work(), (1, 0));
+
+        let ballot_request = sender
+            .send_ballot(
+                receiver_peer,
+                BallotBytes::new(b"mixed-protocol overflow ballot".to_vec())
+                    .expect("bounded ballot"),
+            )
+            .expect("ballot request capacity available");
+        tokio::time::timeout(Duration::from_secs(10), async {
+            loop {
+                tokio::select! {
+                    event = receiver.next_event() => {
+                        if matches!(event, TransportEvent::InboundBallot { .. }) {
+                            panic!("ballot bypassed the shared inbound admission cap");
+                        }
+                    },
+                    event = sender.next_event() => match event {
+                        TransportEvent::OutboundAck { request_id, status, .. }
+                            if request_id == ballot_request =>
+                        {
+                            assert_eq!(status, AckStatus::Busy);
+                            break;
+                        }
+                        TransportEvent::OutboundFailure { request_id, failure, .. }
+                            if request_id == ballot_request =>
+                        {
+                            panic!("overflow ballot failed before busy ACK: {failure:?}");
+                        }
+                        _ => {}
+                    }
+                }
+            }
+        })
+        .await
+        .expect("mixed-protocol busy acknowledgement timed out");
+
+        assert_eq!(receiver.pending_work(), (1, 0));
+        receiver
+            .respond_threat_hint(inbound_hint, ThreatHintAckStatus::Rejected)
+            .expect("held ThreatHint response channel remains open");
+        assert_eq!(receiver.pending_work(), (0, 0));
     }
 
     #[tokio::test]

@@ -443,7 +443,7 @@ Transport: independent /prometheus/threat-hint/1.0.0 request/ACK behaviour;
            ballot and hint state remain separate and share global work/stream caps
 Sidecar: rejects every hint until a dedicated owner-only real-Groth16 verifier,
          freshness/replay persistence, and bounded analyzer ingress exist
-Local evidence: 6 schema tests, 8 client builder tests, 44 Guardian P2P unit
+Local evidence: 6 schema tests, 8 client builder tests, 45 Guardian P2P unit
                 tests plus 3 process tests, and 229 workspace tests/2 live ignores
 Boundary: PeerId is routing metadata only; no wallet, signing, chain, Guardian or
           reporter authorization, reputation, KAS/PROM, slash ACL, or

@@ -1,6 +1,6 @@
 # Prometheus — Full Deployment Roadmap
 *Readiness-gated roadmap; no fixed public-release date is claimed.*
-*Last status reconciliation: 2026-07-19.*
+*Last status reconciliation: 2026-07-19 (Europe/Athens project time).*
 
 ## Progress Snapshot
 

@@ -148,6 +148,7 @@ pub struct ThreatHintEnvelope {
     observed_at: u64,                 // non-zero Unix timestamp
 }
 
+#[serde(rename_all = "snake_case")]
 pub enum ThreatIndicatorType {
     FileHash,
     Behavior,
@@ -156,7 +157,9 @@ pub enum ThreatIndicatorType {
 }
 
 pub enum ThreatProofSystem {
+    #[serde(rename = "groth16_kip16_v1")]
     Groth16Kip16V1,
+    #[serde(rename = "development_stub_v1")]
     DevelopmentStubV1,
 }
 ```
@@ -210,13 +213,9 @@ pub enum RuleType {
 
 ### 2.4 Implemented P2P request types
 
-```rust
-pub enum TransportRequest {
-    // /prometheus/guardian-ballot/1.0.0
-    GuardianBallot(BallotBytes),
-    // /prometheus/threat-hint/1.0.0
-    ThreatHint(ThreatHintEnvelope),
-}
+```text
+/prometheus/guardian-ballot/1.0.0 request = BallotBytes
+/prometheus/threat-hint/1.0.0 request = ThreatHintEnvelope
 ```
 
 These are independent libp2p request-response behaviours with separate request

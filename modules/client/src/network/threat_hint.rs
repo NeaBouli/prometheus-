@@ -12,7 +12,7 @@ pub const CONFIDENCE_BPS_SCALE: f64 = 10_000.0;
 
 /// Build a canonical threat hint envelope from a report input tuple.
 ///
-/// - confidence is checked for finiteness and bounded in `0.0..=1.0`
+/// - confidence is checked for finiteness and bounded in `(0.0, 1.0]`
 /// - proof confidence is mapped using floor (`x * 10_000.0`).
 /// - `ZkProof.public_input` must equal `threat_hash`
 /// - proof bytes must be 1..=1024

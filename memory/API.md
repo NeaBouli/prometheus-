@@ -285,7 +285,7 @@ function recommendedReward(lines: uint64, complexity: uint64) -> uint64
 
 ### Implemented Guardian transport protocols
 
-```
+```text
 /prometheus/guardian-ballot/1.0.0
   request: 2-byte big-endian length + 1..=8192 opaque canonical ballot bytes
   response: accepted | duplicate | rejected | busy
@@ -301,7 +301,7 @@ authentication is implemented. `PeerId` never grants application authority.
 
 ### Still open
 
-```
+```text
 1. Dedicated owner-only ThreatHint verifier ingress
 2. Real Groth16 relation and verification
 3. Freshness/replay persistence and bounded analyzer admission
