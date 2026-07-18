@@ -49,17 +49,20 @@ pub trait SecurityScanner: Send + Sync {
 }
 ```
 
-### Blockchain Interface
+### Blockchain Interface (target, not implemented)
 
 ```rust
 pub trait BlockchainClient: Send + Sync {
     async fn connect(&self) -> Result<()>;
     async fn get_latest_rules(&self) -> Result<Vec<KaspaRule>>;
-    async fn submit_threat_hint(&self, hint: ThreatReport) -> Result<TxId>;
     async fn get_prom_balance(&self, address: &Address) -> Result<u64>;
     fn is_connected(&self) -> bool;
 }
 ```
+
+ThreatHints are not Kaspa transactions. GH-55 defines an independent bounded
+libp2p transport channel; accepted Guardian ingestion and any later proposal or
+reward flow remain separate and unimplemented.
 
 ### AI Interface
 
@@ -76,7 +79,7 @@ pub trait LocalAI: Send + Sync {
 
 ## 3. GUARDIAN NODE API
 
-### HTTP API (intern, nicht öffentlich)
+### HTTP API (target only, not implemented)
 
 ```
 POST /api/v1/threat-hint
@@ -214,6 +217,27 @@ The route is registered as a libp2p external address but remains untrusted
 operator metadata: it is not reachability proof, Guardian membership, key
 assignment, or chain authority.
 
+### Light Client ThreatHint Transport Core (GH-55)
+
+The shared `prometheus-threat-hint` crate defines canonical schema v1 with
+integer confidence basis points, exact lowercase hashes/nonces, explicit proof
+system, bounded proof bytes, and a non-zero observation timestamp. Unknown or
+duplicate fields, noncanonical JSON, trailing data, malformed values, and
+envelopes over 2048 bytes fail closed.
+
+`GuardianP2p::send_threat_hint()` uses the independent
+`/prometheus/threat-hint/1.0.0` request-response behavior. Ballot and ThreatHint
+request maps and response channels are separate, while their total admitted
+inbound/outbound work shares the configured global cap. The raw API exposes
+`InboundThreatHint` and requires an explicit `respond_threat_hint()` decision.
+
+The Light Client `ThreatHintBuilder` binds proof public input to the exact
+threat hash, floors finite confidence into basis points, and refuses
+`development_stub_v1` in beta/mainnet modes. It does not verify opaque Groth16
+bytes. The operated Guardian sidecar has no dedicated ThreatHint verifier
+ingress and always returns `rejected`; it never forwards hints to the ballot
+collector or Python analyzer. `PeerId` remains routing metadata only.
+
 ---
 
 ## 4. SILVERSCRIPT CONTRACT API
@@ -259,25 +283,30 @@ function recommendedReward(lines: uint64, complexity: uint64) -> uint64
 
 ## 5. KOMMUNIKATIONS-PROTOKOLL (P2P)
 
-### Message Format
+### Implemented Guardian transport protocols
 
 ```
-Header (8 bytes):
-  - Magic:    0x50524F4D  ("PROM")
-  - Version:  1 byte
-  - Type:     1 byte (siehe NetworkMessage enum)
-  - Length:   4 bytes (Payload-Länge)
+/prometheus/guardian-ballot/1.0.0
+  request: 2-byte big-endian length + 1..=8192 opaque canonical ballot bytes
+  response: accepted | duplicate | rejected | busy
 
-Payload: JSON (UTF-8)
+/prometheus/threat-hint/1.0.0
+  request: 2-byte big-endian length + 1..=2048 canonical schema-v1 JSON bytes
+  response: accepted | duplicate | rejected | busy
 ```
 
-### Verbindungsaufbau
+Both require exact EOF. QUIC-v1 direct and relay-circuit routes are implemented.
+No TCP port, generic PROM header, handshake-based identity, or transport ZK
+authentication is implemented. `PeerId` never grants application authority.
+
+### Still open
 
 ```
-1. TCP-Verbindung auf Port 16420 (Testnet) / 16420 (Mainnet)
-2. Handshake: PeerHandshake-Message senden
-3. ZK-Proof für anonyme Authentifizierung
-4. Subscription: Bedrohungsmeldungen und Regel-Updates
+1. Dedicated owner-only ThreatHint verifier ingress
+2. Real Groth16 relation and verification
+3. Freshness/replay persistence and bounded analyzer admission
+4. Broad discovery and trusted Guardian membership/key assignment
+5. Light Client rule-update subscription
 ```
 
 ---

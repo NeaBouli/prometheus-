@@ -5,6 +5,7 @@ members = [
     "modules/guardian-p2p",
     "modules/silverc-deployer",
     "modules/validator-node",
+    "modules/threat-hint",
 ]
 
 [workspace.package]

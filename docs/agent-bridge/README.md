@@ -10,7 +10,7 @@ Startpunkt fuer Codex/Claude Code:
 
 Keine Secrets, Tokens, Passwoerter, privaten Keys oder Wallet-Daten in diese Bridge schreiben.
 
-Aktiver Handover: GH-52 ist ueber PR #53 gemergt und auf exact main `f2e52be` CI-/Security-/Pages-verifiziert. Explizite Relay-Bootstrap-Routen sind implementiert, ohne Transport-`PeerId` in Guardian-Autorisierung umzudeuten. Echte Zwei-Host-Evidence wartet auf reparierten `ssh sandbox` Public-Key-Zugriff; broad discovery und die weiteren Client-/Validator-Pfade bleiben offen. Verbindlicher Status und offene Gates stehen in `CODEX_BRIDGE.md`; laufende Schritte stehen in `ACTION_LOG.md`.
+Aktiver Handover: GH-55 implementiert auf `feature/GH-55-threat-hint-transport` ein separates kanonisches ThreatHint-Schema/Protokoll und einen Light Client Builder. Development-Stubs sind in beta/mainnet gesperrt; der operated Sidecar bleibt ohne echten Groth16-Verifier und dedizierten owner-only Ingress strikt `rejected`. GH-52 ist gemergt/exact-main verifiziert; echte Zwei-Host-Evidence wartet weiterhin auf reparierten `ssh sandbox` Public-Key-Zugriff. Verbindlicher Status und offene Gates stehen in `CODEX_BRIDGE.md`; laufende Schritte stehen in `ACTION_LOG.md`.
 <!-- CODEX_CLAUDE_CODE_TERMINAL_BRIDGE_V1 -->
 ## Codex -> Claude Code Terminal Bridge
 

@@ -1,14 +1,14 @@
 # Prometheus — Full Deployment Roadmap
 *Readiness-gated roadmap; no fixed public-release date is claimed.*
-*Last status reconciliation: 2026-07-16.*
+*Last status reconciliation: 2026-07-19.*
 
 ## Progress Snapshot
 
 | Scope | Estimated complete | Estimated remaining | Current gate |
 |-------|-------------------:|--------------------:|--------------|
 | H-001 testnet-10 canary preparation | 96% | 4% | External BIP340 signature, verification, one-shot broadcast, confirmation, receipt, independent evidence |
-| Rollout-capable core network | 73–77% | 23–27% | Six state deployments, real Groth16, PROM emission, real metrics-oracle execution/evidence, public multi-host P2P/rule distribution, production node evidence |
-| Complete roadmap vision | 39–44% | 56–61% | Production AI, desktop/mobile clients, installers, operated network, vProgs, plus all core-network gates |
+| Rollout-capable core network | 74–78% | 22–26% | Six state deployments, real Groth16 and accepted ThreatHint ingress, PROM emission, real metrics-oracle execution/evidence, public multi-host P2P/rule distribution, production node evidence |
+| Complete roadmap vision | 40–45% | 55–60% | Production AI, desktop/mobile clients, installers, operated network, vProgs, plus all core-network gates |
 
 Percentages are scope-weighted engineering estimates. They are not release dates,
 financial forecasts, or evidence that any contract is live.
@@ -156,6 +156,7 @@ public release-hardening evidence for the exact rollout commit.
 - Merged/exact-main verified in GH-44: atomic owner-only persistent transport identity, strict bounded direct/relay/AutoNAT routes, data-minimal health events, and a bounded relay service
 - Merged and exact-main-verified GH-48: strict Guardian/relay process roles, owner-only local submission, bounded JSON readiness/health, graceful signal drain, and separate-process same-host relay delivery/cleanup evidence
 - Merged/exact-main-verified GH-52 adds relay-only canonical advertised IP/UDP/QUIC bootstrap routes, bind/advertise separation, and path-free operator events; configured routes are not reachability or authorization proof
+- GH-55 adds a separate canonical bounded ThreatHint transport core and development-only Light Client builder; the operated sidecar rejects hints until real Groth16 verification and dedicated bounded ingress exist
 - Proven on an isolated three-node harness: relay reservation/delivery, AutoNAT state, DCUtR relay fallback, and disconnect handling; real two-host operation remains pending
 - Pending: public operated relay/NAT infrastructure and broad discovery; mDNS remains excluded while its compatible dependency path has unresolved RustSec advisories
 - Light Client ↔ Guardian communication over P2P

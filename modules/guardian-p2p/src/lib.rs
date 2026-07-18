@@ -42,14 +42,19 @@ use libp2p_ping as ping;
 use libp2p_relay as relay;
 use libp2p_request_response as request_response;
 use libp2p_swarm::{NetworkBehaviour, StreamProtocol, Swarm, SwarmEvent};
+pub use prometheus_threat_hint::{ThreatHintEnvelope, ThreatIndicatorType, ThreatProofSystem};
 use thiserror::Error;
 
 use crate::ingress::{IngressError, UnixBallotIngress};
 
 /// Direct request-response protocol for opaque Guardian ballot envelopes.
 pub const BALLOT_PROTOCOL: &str = "/prometheus/guardian-ballot/1.0.0";
+/// Direct request-response protocol for canonical Light Client threat hints.
+pub const THREAT_HINT_PROTOCOL: &str = "/prometheus/threat-hint/1.0.0";
 /// Maximum permitted ballot envelope size, matching the canonical verifier.
 pub const MAX_BALLOT_BYTES: usize = 8_192;
+/// Maximum permitted canonical threat-hint envelope size.
+pub const MAX_THREAT_HINT_BYTES: usize = prometheus_threat_hint::MAX_CANONICAL_BYTES;
 /// Maximum configured static transport routes.
 pub const MAX_STATIC_PEERS: usize = 64;
 /// Maximum configured direct or relay listeners.
@@ -62,6 +67,8 @@ pub const MAX_AUTONAT_SERVERS: usize = 8;
 pub const MAX_CONCURRENT_REQUESTS: usize = 1_024;
 /// Maximum concurrent streams accepted per connection.
 pub const MAX_STREAMS_PER_CONNECTION: usize = 64;
+/// Minimum global stream budget needed to reserve one stream per protocol.
+pub const MIN_STREAMS_PER_CONNECTION: usize = 2;
 /// Maximum value for any individual configured connection limit.
 pub const MAX_CONNECTION_LIMIT: u32 = 4_096;
 /// Maximum operator-configured transport duration.
@@ -95,6 +102,40 @@ impl BallotBytes {
     }
 }
 
+/// A validated canonical ThreatHint envelope retained as exact wire bytes.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct ThreatHintBytes(Vec<u8>);
+
+impl ThreatHintBytes {
+    /// Parses one canonical schema-v1 envelope and retains its exact bytes.
+    pub fn new(bytes: Vec<u8>) -> Result<Self, TransportError> {
+        if bytes.is_empty() || bytes.len() > MAX_THREAT_HINT_BYTES {
+            return Err(TransportError::ThreatHintSize(bytes.len()));
+        }
+        ThreatHintEnvelope::parse_canonical(&bytes)
+            .map_err(|_| TransportError::InvalidThreatHint)?;
+        Ok(Self(bytes))
+    }
+
+    /// Encodes a validated envelope into exact canonical transport bytes.
+    pub fn from_envelope(envelope: &ThreatHintEnvelope) -> Result<Self, TransportError> {
+        let bytes = envelope
+            .to_canonical_bytes()
+            .map_err(|_| TransportError::InvalidThreatHint)?;
+        Self::new(bytes)
+    }
+
+    /// Returns the exact canonical bytes supplied to this transport.
+    pub fn as_bytes(&self) -> &[u8] {
+        &self.0
+    }
+
+    /// Parses the retained bytes into the shared schema type.
+    pub fn parse(&self) -> Result<ThreatHintEnvelope, TransportError> {
+        ThreatHintEnvelope::parse_canonical(&self.0).map_err(|_| TransportError::InvalidThreatHint)
+    }
+}
+
 /// The only response data emitted by the ballot carrier.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 #[repr(u8)]
@@ -115,6 +156,41 @@ impl AckStatus {
             _ => Err(io::Error::new(
                 io::ErrorKind::InvalidData,
                 "unknown Guardian ballot acknowledgement",
+            )),
+        }
+    }
+
+    /// Stable machine-readable acknowledgement name.
+    pub const fn as_str(self) -> &'static str {
+        match self {
+            Self::Accepted => "accepted",
+            Self::Duplicate => "duplicate",
+            Self::Rejected => "rejected",
+            Self::Busy => "busy",
+        }
+    }
+}
+
+/// Data-minimal response for the independent ThreatHint channel.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[repr(u8)]
+pub enum ThreatHintAckStatus {
+    Accepted = 0,
+    Duplicate = 1,
+    Rejected = 2,
+    Busy = 3,
+}
+
+impl ThreatHintAckStatus {
+    fn from_wire(value: u8) -> io::Result<Self> {
+        match value {
+            0 => Ok(Self::Accepted),
+            1 => Ok(Self::Duplicate),
+            2 => Ok(Self::Rejected),
+            3 => Ok(Self::Busy),
+            _ => Err(io::Error::new(
+                io::ErrorKind::InvalidData,
+                "unknown ThreatHint acknowledgement",
             )),
         }
     }
@@ -173,7 +249,7 @@ impl Default for GuardianP2pConfig {
             request_timeout: Duration::from_secs(10),
             idle_connection_timeout: Duration::from_secs(30),
             max_concurrent_requests: 32,
-            max_concurrent_streams_per_connection: 1,
+            max_concurrent_streams_per_connection: MIN_STREAMS_PER_CONNECTION,
             max_pending_incoming_connections: 8,
             max_pending_outgoing_connections: 8,
             max_established_incoming_connections: 16,
@@ -205,7 +281,7 @@ impl GuardianP2pConfig {
         }
 
         if !(1..=MAX_CONCURRENT_REQUESTS).contains(&self.max_concurrent_requests)
-            || !(1..=MAX_STREAMS_PER_CONNECTION)
+            || !(MIN_STREAMS_PER_CONNECTION..=MAX_STREAMS_PER_CONNECTION)
                 .contains(&self.max_concurrent_streams_per_connection)
             || !(1..=MAX_CONNECTION_LIMIT).contains(&self.max_pending_incoming_connections)
             || !(1..=MAX_CONNECTION_LIMIT).contains(&self.max_pending_outgoing_connections)
@@ -214,7 +290,7 @@ impl GuardianP2pConfig {
             || !(1..=MAX_CONNECTION_LIMIT).contains(&self.max_established_connections_per_peer)
         {
             return Err(TransportError::InvalidConfig(
-                "connection limits must be non-zero",
+                "request and connection limits are out of bounds",
             ));
         }
 
@@ -381,12 +457,31 @@ pub enum TransportEvent {
         peer: PeerId,
         status: AckStatus,
     },
+    InboundThreatHint {
+        peer: PeerId,
+        request_id: request_response::InboundRequestId,
+        hint: ThreatHintBytes,
+    },
+    InboundThreatHintProcessed {
+        peer: PeerId,
+        status: ThreatHintAckStatus,
+    },
     OutboundAck {
         peer: PeerId,
         request_id: request_response::OutboundRequestId,
         status: AckStatus,
     },
     OutboundFailure {
+        peer: PeerId,
+        request_id: request_response::OutboundRequestId,
+        failure: RequestFailure,
+    },
+    OutboundThreatHintAck {
+        peer: PeerId,
+        request_id: request_response::OutboundRequestId,
+        status: ThreatHintAckStatus,
+    },
+    OutboundThreatHintFailure {
         peer: PeerId,
         request_id: request_response::OutboundRequestId,
         failure: RequestFailure,
@@ -483,6 +578,10 @@ impl From<&request_response::OutboundFailure> for RequestFailure {
 pub enum TransportError {
     #[error("ballot must contain between 1 and {MAX_BALLOT_BYTES} bytes; got {0}")]
     BallotSize(usize),
+    #[error("ThreatHint must contain between 1 and {MAX_THREAT_HINT_BYTES} bytes; got {0}")]
+    ThreatHintSize(usize),
+    #[error("ThreatHint envelope is not canonical schema v1")]
+    InvalidThreatHint,
     #[error("invalid Guardian P2P configuration: {0}")]
     InvalidConfig(&'static str),
     #[error("failed to initialize libp2p transport: {0}")]
@@ -493,6 +592,8 @@ pub enum TransportError {
     OutboundBusy { max: usize },
     #[error("inbound request is no longer awaiting an acknowledgement")]
     UnknownInboundRequest,
+    #[error("the inbound ThreatHint is no longer awaiting an acknowledgement")]
+    UnknownInboundThreatHint,
     #[error("the inbound response channel closed before the acknowledgement was sent")]
     ResponseChannelClosed,
 }
@@ -511,7 +612,7 @@ impl request_response::Codec for BallotCodec {
         T: AsyncRead + Unpin + Send,
     {
         let ballot = BallotBytes::new(read_ballot_frame(io).await?).map_err(to_invalid_data)?;
-        require_stream_end(io).await?;
+        require_stream_end(io, "Guardian ballot frame contains trailing bytes").await?;
         Ok(ballot)
     }
 
@@ -525,7 +626,11 @@ impl request_response::Codec for BallotCodec {
     {
         let mut encoded = [0_u8; ACK_BYTES];
         io.read_exact(&mut encoded).await?;
-        require_stream_end(io).await?;
+        require_stream_end(
+            io,
+            "Guardian ballot acknowledgement contains trailing bytes",
+        )
+        .await?;
         AckStatus::from_wire(encoded[0])
     }
 
@@ -555,18 +660,115 @@ impl request_response::Codec for BallotCodec {
     }
 }
 
-async fn require_stream_end<T>(io: &mut T) -> io::Result<()>
+#[derive(Clone, Debug, Default)]
+struct ThreatHintCodec;
+
+#[async_trait]
+impl request_response::Codec for ThreatHintCodec {
+    type Protocol = StreamProtocol;
+    type Request = ThreatHintBytes;
+    type Response = ThreatHintAckStatus;
+
+    async fn read_request<T>(&mut self, _: &Self::Protocol, io: &mut T) -> io::Result<Self::Request>
+    where
+        T: AsyncRead + Unpin + Send,
+    {
+        let hint =
+            ThreatHintBytes::new(read_threat_hint_frame(io).await?).map_err(to_invalid_data)?;
+        require_stream_end(io, "ThreatHint frame contains trailing bytes").await?;
+        Ok(hint)
+    }
+
+    async fn read_response<T>(
+        &mut self,
+        _: &Self::Protocol,
+        io: &mut T,
+    ) -> io::Result<Self::Response>
+    where
+        T: AsyncRead + Unpin + Send,
+    {
+        let mut encoded = [0_u8; ACK_BYTES];
+        io.read_exact(&mut encoded).await?;
+        require_stream_end(io, "ThreatHint acknowledgement contains trailing bytes").await?;
+        ThreatHintAckStatus::from_wire(encoded[0])
+    }
+
+    async fn write_request<T>(
+        &mut self,
+        _: &Self::Protocol,
+        io: &mut T,
+        request: Self::Request,
+    ) -> io::Result<()>
+    where
+        T: AsyncWrite + Unpin + Send,
+    {
+        write_threat_hint_frame(io, request.as_bytes()).await
+    }
+
+    async fn write_response<T>(
+        &mut self,
+        _: &Self::Protocol,
+        io: &mut T,
+        response: Self::Response,
+    ) -> io::Result<()>
+    where
+        T: AsyncWrite + Unpin + Send,
+    {
+        io.write_all(&[response as u8]).await?;
+        io.close().await
+    }
+}
+
+async fn require_stream_end<T>(io: &mut T, message: &'static str) -> io::Result<()>
 where
     T: AsyncRead + Unpin,
 {
     let mut trailing = [0_u8; 1];
     if io.read(&mut trailing).await? != 0 {
-        return Err(io::Error::new(
-            io::ErrorKind::InvalidData,
-            "Guardian ballot frame contains trailing bytes",
-        ));
+        return Err(io::Error::new(io::ErrorKind::InvalidData, message));
     }
     Ok(())
+}
+
+async fn read_threat_hint_frame<T>(io: &mut T) -> io::Result<Vec<u8>>
+where
+    T: AsyncRead + Unpin,
+{
+    let mut length = [0_u8; BALLOT_LENGTH_BYTES];
+    io.read_exact(&mut length).await?;
+    let length = usize::from(u16::from_be_bytes(length));
+    if length == 0 || length > MAX_THREAT_HINT_BYTES {
+        return Err(io::Error::new(
+            io::ErrorKind::InvalidData,
+            "ThreatHint exceeds transport limit",
+        ));
+    }
+
+    let mut hint = vec![0_u8; length];
+    io.read_exact(&mut hint).await?;
+    Ok(hint)
+}
+
+async fn write_threat_hint_frame<T>(io: &mut T, hint: &[u8]) -> io::Result<()>
+where
+    T: AsyncWrite + Unpin,
+{
+    if hint.is_empty() || hint.len() > MAX_THREAT_HINT_BYTES {
+        return Err(io::Error::new(
+            io::ErrorKind::InvalidInput,
+            "ThreatHint exceeds transport limit",
+        ));
+    }
+
+    let length = u16::try_from(hint.len()).map_err(|_| {
+        io::Error::new(
+            io::ErrorKind::InvalidInput,
+            "ThreatHint length does not fit transport frame",
+        )
+    })?;
+    io.write_all(&length.to_be_bytes()).await?;
+    io.write_all(hint).await?;
+    io.close().await
 }
 
 async fn read_ballot_frame<T>(io: &mut T) -> io::Result<Vec<u8>>
@@ -618,6 +820,7 @@ fn to_invalid_data(error: TransportError) -> io::Error {
 #[behaviour(to_swarm = "BehaviourEvent", prelude = "libp2p_swarm::derive_prelude")]
 struct GuardianBehaviour {
     ballots: request_response::Behaviour<BallotCodec>,
+    threat_hints: request_response::Behaviour<ThreatHintCodec>,
     identify: identify::Behaviour,
     ping: ping::Behaviour,
     autonat: autonat::Behaviour,
@@ -633,6 +836,8 @@ impl GuardianBehaviour {
         config: &GuardianP2pConfig,
     ) -> Result<Self, Box<dyn std::error::Error + Send + Sync>> {
         let local_peer_id = keypair.public().to_peer_id();
+        let (ballot_streams, threat_hint_streams) =
+            protocol_stream_limits(config.max_concurrent_streams_per_connection);
         let ballots = request_response::Behaviour::with_codec(
             BallotCodec,
             [(
@@ -641,11 +846,22 @@ impl GuardianBehaviour {
             )],
             request_response::Config::default()
                 .with_request_timeout(config.request_timeout)
-                .with_max_concurrent_streams(config.max_concurrent_streams_per_connection),
+                .with_max_concurrent_streams(ballot_streams),
+        );
+        let threat_hints = request_response::Behaviour::with_codec(
+            ThreatHintCodec,
+            [(
+                StreamProtocol::new(THREAT_HINT_PROTOCOL),
+                request_response::ProtocolSupport::Full,
+            )],
+            request_response::Config::default()
+                .with_request_timeout(config.request_timeout)
+                .with_max_concurrent_streams(threat_hint_streams),
         );
 
         Ok(Self {
             ballots,
+            threat_hints,
             identify: identify::Behaviour::new(identify::Config::new(
                 "/prometheus/guardian/1.0.0".to_owned(),
                 keypair.public(),
@@ -659,9 +875,15 @@ impl GuardianBehaviour {
     }
 }
 
+fn protocol_stream_limits(total: usize) -> (usize, usize) {
+    let threat_hints = total / 2;
+    (total - threat_hints, threat_hints)
+}
+
 #[derive(Debug)]
 enum BehaviourEvent {
     Ballots(request_response::Event<BallotBytes, AckStatus>),
+    ThreatHints(request_response::Event<ThreatHintBytes, ThreatHintAckStatus>),
     Identify(Box<identify::Event>),
     Ping(ping::Event),
     Autonat(autonat::Event),
@@ -678,6 +900,12 @@ impl From<std::convert::Infallible> for BehaviourEvent {
 impl From<request_response::Event<BallotBytes, AckStatus>> for BehaviourEvent {
     fn from(event: request_response::Event<BallotBytes, AckStatus>) -> Self {
         Self::Ballots(event)
+    }
+}
+
+impl From<request_response::Event<ThreatHintBytes, ThreatHintAckStatus>> for BehaviourEvent {
+    fn from(event: request_response::Event<ThreatHintBytes, ThreatHintAckStatus>) -> Self {
+        Self::ThreatHints(event)
     }
 }
 
@@ -716,10 +944,16 @@ pub struct GuardianP2p {
     swarm: Swarm<GuardianBehaviour>,
     inbound_responses:
         HashMap<request_response::InboundRequestId, request_response::ResponseChannel<AckStatus>>,
+    inbound_threat_hint_responses: HashMap<
+        request_response::InboundRequestId,
+        request_response::ResponseChannel<ThreatHintAckStatus>,
+    >,
     inbound_work: HashSet<request_response::InboundRequestId>,
+    inbound_threat_hint_work: HashSet<request_response::InboundRequestId>,
     ingress_request_ids: HashSet<request_response::InboundRequestId>,
     ingress_tasks: FuturesUnordered<IngressFuture>,
     outbound_requests: HashSet<request_response::OutboundRequestId>,
+    outbound_threat_hint_requests: HashSet<request_response::OutboundRequestId>,
     max_outbound_requests: usize,
     max_inbound_requests: usize,
     configured_static_peers: HashSet<StaticPeer>,
@@ -794,10 +1028,13 @@ impl GuardianP2p {
         Ok(Self {
             swarm,
             inbound_responses: HashMap::new(),
+            inbound_threat_hint_responses: HashMap::new(),
             inbound_work: HashSet::new(),
+            inbound_threat_hint_work: HashSet::new(),
             ingress_request_ids: HashSet::new(),
             ingress_tasks: FuturesUnordered::new(),
             outbound_requests: HashSet::new(),
+            outbound_threat_hint_requests: HashSet::new(),
             max_outbound_requests,
             max_inbound_requests,
             configured_static_peers: static_peers.into_iter().collect(),
@@ -857,7 +1094,10 @@ impl GuardianP2p {
 
     /// Returns admitted inbound collector work and outstanding outbound requests.
     pub fn pending_work(&self) -> (usize, usize) {
-        (self.inbound_work.len(), self.outbound_requests.len())
+        (
+            self.inbound_work.len() + self.inbound_threat_hint_work.len(),
+            self.outbound_requests.len() + self.outbound_threat_hint_requests.len(),
+        )
     }
 
     /// Stops accepting new network traffic while retained work is drained by the owner loop.
@@ -878,7 +1118,9 @@ impl GuardianP2p {
         peer: PeerId,
         ballot: BallotBytes,
     ) -> Result<request_response::OutboundRequestId, TransportError> {
-        if self.outbound_requests.len() >= self.max_outbound_requests {
+        if self.outbound_requests.len() + self.outbound_threat_hint_requests.len()
+            >= self.max_outbound_requests
+        {
             return Err(TransportError::OutboundBusy {
                 max: self.max_outbound_requests,
             });
@@ -891,6 +1133,30 @@ impl GuardianP2p {
             .send_request(&peer, ballot);
         let inserted = self.outbound_requests.insert(request_id);
         debug_assert!(inserted, "libp2p request IDs must be unique");
+        Ok(request_id)
+    }
+
+    /// Sends one canonical ThreatHint without assigning trust to the transport peer.
+    pub fn send_threat_hint(
+        &mut self,
+        peer: PeerId,
+        hint: ThreatHintBytes,
+    ) -> Result<request_response::OutboundRequestId, TransportError> {
+        if self.outbound_requests.len() + self.outbound_threat_hint_requests.len()
+            >= self.max_outbound_requests
+        {
+            return Err(TransportError::OutboundBusy {
+                max: self.max_outbound_requests,
+            });
+        }
+
+        let request_id = self
+            .swarm
+            .behaviour_mut()
+            .threat_hints
+            .send_request(&peer, hint);
+        let inserted = self.outbound_threat_hint_requests.insert(request_id);
+        debug_assert!(inserted, "libp2p request IDs must be unique per behaviour");
         Ok(request_id)
     }
 
@@ -908,6 +1174,24 @@ impl GuardianP2p {
         self.swarm
             .behaviour_mut()
             .ballots
+            .send_response(channel, status)
+            .map_err(|_| TransportError::ResponseChannelClosed)
+    }
+
+    /// Sends one bounded response for a pending inbound ThreatHint.
+    pub fn respond_threat_hint(
+        &mut self,
+        request_id: request_response::InboundRequestId,
+        status: ThreatHintAckStatus,
+    ) -> Result<(), TransportError> {
+        let channel = self
+            .inbound_threat_hint_responses
+            .remove(&request_id)
+            .ok_or(TransportError::UnknownInboundThreatHint)?;
+        self.inbound_threat_hint_work.remove(&request_id);
+        self.swarm
+            .behaviour_mut()
+            .threat_hints
             .send_response(channel, status)
             .map_err(|_| TransportError::ResponseChannelClosed)
     }
@@ -976,6 +1260,22 @@ impl GuardianP2p {
                                     status,
                                 }
                             }));
+                        }
+                        TransportEvent::InboundThreatHint {
+                            peer, request_id, ..
+                        } => {
+                            match self
+                                .respond_threat_hint(request_id, ThreatHintAckStatus::Rejected)
+                            {
+                                Ok(()) => {
+                                    return Ok(TransportEvent::InboundThreatHintProcessed {
+                                        peer,
+                                        status: ThreatHintAckStatus::Rejected,
+                                    });
+                                }
+                                Err(TransportError::ResponseChannelClosed) => continue,
+                                Err(error) => return Err(error),
+                            }
                         }
                         event => return Ok(event),
                     }
@@ -1055,6 +1355,9 @@ impl GuardianP2p {
                 .map(|address| TransportEvent::ListenerFailed { address }),
             SwarmEvent::Behaviour(BehaviourEvent::Ballots(event)) => {
                 self.handle_ballot_event(event)
+            }
+            SwarmEvent::Behaviour(BehaviourEvent::ThreatHints(event)) => {
+                self.handle_threat_hint_event(event)
             }
             SwarmEvent::Behaviour(BehaviourEvent::Identify(event)) => {
                 let _ = event;
@@ -1207,6 +1510,84 @@ impl GuardianP2p {
             }
         }
     }
+
+    fn handle_threat_hint_event(
+        &mut self,
+        event: request_response::Event<ThreatHintBytes, ThreatHintAckStatus>,
+    ) -> Option<TransportEvent> {
+        match event {
+            request_response::Event::Message {
+                peer,
+                message:
+                    request_response::Message::Request {
+                        request_id,
+                        request: hint,
+                        channel,
+                    },
+                ..
+            } => {
+                if self.inbound_work.len() + self.inbound_threat_hint_work.len()
+                    >= self.max_inbound_requests
+                {
+                    let _ = self
+                        .swarm
+                        .behaviour_mut()
+                        .threat_hints
+                        .send_response(channel, ThreatHintAckStatus::Busy);
+                    return None;
+                }
+                let admitted = self.inbound_threat_hint_work.insert(request_id);
+                debug_assert!(admitted, "libp2p request IDs must be unique per behaviour");
+                let previous = self
+                    .inbound_threat_hint_responses
+                    .insert(request_id, channel);
+                debug_assert!(
+                    previous.is_none(),
+                    "request IDs must be unique per behaviour"
+                );
+                Some(TransportEvent::InboundThreatHint {
+                    peer,
+                    request_id,
+                    hint,
+                })
+            }
+            request_response::Event::Message {
+                peer,
+                message:
+                    request_response::Message::Response {
+                        request_id,
+                        response: status,
+                    },
+                ..
+            } => {
+                self.outbound_threat_hint_requests.remove(&request_id);
+                Some(TransportEvent::OutboundThreatHintAck {
+                    peer,
+                    request_id,
+                    status,
+                })
+            }
+            request_response::Event::OutboundFailure {
+                peer,
+                request_id,
+                error,
+                ..
+            } => {
+                self.outbound_threat_hint_requests.remove(&request_id);
+                Some(TransportEvent::OutboundThreatHintFailure {
+                    peer,
+                    request_id,
+                    failure: RequestFailure::from(&error),
+                })
+            }
+            request_response::Event::InboundFailure { request_id, .. }
+            | request_response::Event::ResponseSent { request_id, .. } => {
+                self.inbound_threat_hint_responses.remove(&request_id);
+                self.inbound_threat_hint_work.remove(&request_id);
+                None
+            }
+        }
+    }
 }
 
 fn connection_path(relayed: bool) -> ConnectionPath {
@@ -1235,6 +1616,20 @@ mod tests {
             idle_connection_timeout: Duration::from_secs(3),
             ..GuardianP2pConfig::default()
         }
+    }
+
+    fn test_threat_hint() -> ThreatHintBytes {
+        let envelope = ThreatHintEnvelope::new(
+            "11".repeat(32),
+            8_501,
+            ThreatIndicatorType::Behavior,
+            ThreatProofSystem::DevelopmentStubV1,
+            vec![0x42; 48],
+            "22".repeat(32),
+            1_700_000_000,
+        )
+        .expect("valid test ThreatHint");
+        ThreatHintBytes::from_envelope(&envelope).expect("canonical test ThreatHint")
     }
 
     async fn next_event_with_timeout(node: &mut GuardianP2p) -> TransportEvent {
@@ -1329,6 +1724,30 @@ mod tests {
     }
 
     #[test]
+    fn threat_hint_requires_canonical_shared_schema() {
+        let hint = test_threat_hint();
+        assert_eq!(
+            hint.parse().expect("retained hint parses").confidence_bps(),
+            8_501
+        );
+
+        let mut noncanonical = hint.as_bytes().to_vec();
+        noncanonical.push(b'\n');
+        assert!(matches!(
+            ThreatHintBytes::new(noncanonical),
+            Err(TransportError::InvalidThreatHint)
+        ));
+        assert!(matches!(
+            ThreatHintBytes::new(Vec::new()),
+            Err(TransportError::ThreatHintSize(0))
+        ));
+        assert!(matches!(
+            ThreatHintBytes::new(vec![b'x'; MAX_THREAT_HINT_BYTES + 1]),
+            Err(TransportError::ThreatHintSize(_))
+        ));
+    }
+
+    #[test]
     fn configuration_accepts_exact_direct_and_relay_routes() {
         let target = identity::Keypair::generate_ed25519().public().to_peer_id();
         let relay = identity::Keypair::generate_ed25519().public().to_peer_id();
@@ -1420,12 +1839,42 @@ mod tests {
         ));
     }
 
+    #[test]
+    fn stream_budget_is_split_without_multiplying_per_connection_capacity() {
+        assert_eq!(protocol_stream_limits(2), (1, 1));
+        assert_eq!(protocol_stream_limits(3), (2, 1));
+        assert_eq!(protocol_stream_limits(MAX_STREAMS_PER_CONNECTION), (32, 32));
+
+        let mut config = test_config();
+        config.max_concurrent_streams_per_connection = 1;
+        assert!(matches!(
+            config.validate(),
+            Err(TransportError::InvalidConfig(_))
+        ));
+    }
+
     #[tokio::test]
     async fn request_codec_rejects_trailing_bytes() {
         let mut frame = vec![0, 1, 7, 9];
         let mut cursor = futures::io::Cursor::new(&mut frame);
         let mut codec = BallotCodec;
         let protocol = StreamProtocol::new(BALLOT_PROTOCOL);
+        let error = request_response::Codec::read_request(&mut codec, &protocol, &mut cursor)
+            .await
+            .expect_err("trailing bytes must fail closed");
+        assert_eq!(error.kind(), io::ErrorKind::InvalidData);
+    }
+
+    #[tokio::test]
+    async fn threat_hint_codec_rejects_trailing_bytes() {
+        let hint = test_threat_hint();
+        let length = u16::try_from(hint.as_bytes().len()).expect("bounded hint length");
+        let mut frame = length.to_be_bytes().to_vec();
+        frame.extend_from_slice(hint.as_bytes());
+        frame.push(0);
+        let mut cursor = futures::io::Cursor::new(&mut frame);
+        let mut codec = ThreatHintCodec;
+        let protocol = StreamProtocol::new(THREAT_HINT_PROTOCOL);
         let error = request_response::Codec::read_request(&mut codec, &protocol, &mut cursor)
             .await
             .expect_err("trailing bytes must fail closed");
@@ -1517,6 +1966,252 @@ mod tests {
         })
         .await
         .expect("two-node acknowledgement timed out");
+    }
+
+    #[tokio::test]
+    async fn two_nodes_exchange_canonical_threat_hint_on_independent_protocol() {
+        let receiver_identity = identity::Keypair::generate_ed25519();
+        let receiver_peer = receiver_identity.public().to_peer_id();
+        let mut receiver_config = test_config();
+        receiver_config.listen_addresses.push(
+            "/ip4/127.0.0.1/udp/0/quic-v1"
+                .parse()
+                .expect("valid test address"),
+        );
+        let mut receiver = GuardianP2p::new(receiver_identity, receiver_config)
+            .expect("ephemeral receiver should initialize");
+        let receiver_address = match next_event_with_timeout(&mut receiver).await {
+            TransportEvent::Listening { address } => address,
+            event => panic!("expected listener address, got {event:?}"),
+        };
+
+        let sender_identity = identity::Keypair::generate_ed25519();
+        let sender_peer = sender_identity.public().to_peer_id();
+        let mut sender_config = test_config();
+        sender_config.static_peers.push(StaticPeer {
+            peer_id: receiver_peer,
+            address: receiver_address,
+        });
+        let mut sender = GuardianP2p::new(sender_identity, sender_config)
+            .expect("ephemeral sender should initialize");
+        let hint = test_threat_hint();
+        let request_id = sender
+            .send_threat_hint(receiver_peer, hint.clone())
+            .expect("ThreatHint request capacity available");
+
+        let inbound_request = tokio::time::timeout(Duration::from_secs(10), async {
+            loop {
+                tokio::select! {
+                    event = receiver.next_event() => if let TransportEvent::InboundThreatHint {
+                        peer,
+                        request_id,
+                        hint: received,
+                    } = event {
+                        assert_eq!(peer, sender_peer);
+                        assert_eq!(received, hint);
+                        break request_id;
+                    },
+                    event = sender.next_event() => {
+                        if let TransportEvent::OutboundThreatHintFailure { failure, .. } = event {
+                            panic!("ThreatHint request failed before delivery: {failure:?}");
+                        }
+                    }
+                }
+            }
+        })
+        .await
+        .expect("two-node ThreatHint delivery timed out");
+        receiver
+            .respond_threat_hint(inbound_request, ThreatHintAckStatus::Accepted)
+            .expect("ThreatHint acknowledgement channel remains open");
+
+        tokio::time::timeout(Duration::from_secs(10), async {
+            loop {
+                tokio::select! {
+                    event = sender.next_event() => match event {
+                        TransportEvent::OutboundThreatHintAck {
+                            peer,
+                            request_id: received_request_id,
+                            status,
+                        } => {
+                            assert_eq!(peer, receiver_peer);
+                            assert_eq!(received_request_id, request_id);
+                            assert_eq!(status, ThreatHintAckStatus::Accepted);
+                            break;
+                        }
+                        TransportEvent::OutboundThreatHintFailure { failure, .. } => {
+                            panic!("ThreatHint acknowledgement failed: {failure:?}");
+                        }
+                        _ => {}
+                    },
+                    _ = receiver.next_event() => {}
+                }
+            }
+        })
+        .await
+        .expect("two-node ThreatHint acknowledgement timed out");
+    }
+
+    #[tokio::test]
+    async fn operated_sidecar_rejects_threat_hint_without_dedicated_verifier() {
+        let directory = tempfile::tempdir().expect("temporary ingress directory");
+        fs::set_permissions(directory.path(), fs::Permissions::from_mode(0o700))
+            .expect("owner-only ingress directory");
+        let ingress = UnixBallotIngress::configured(
+            directory.path().join("unused-ballot.sock"),
+            Duration::from_secs(2),
+        )
+        .expect("safe configured ballot ingress");
+
+        let receiver_identity = identity::Keypair::generate_ed25519();
+        let receiver_peer = receiver_identity.public().to_peer_id();
+        let mut receiver_config = test_config();
+        receiver_config.listen_addresses.push(
+            "/ip4/127.0.0.1/udp/0/quic-v1"
+                .parse()
+                .expect("valid test address"),
+        );
+        let mut receiver =
+            GuardianP2p::new(receiver_identity, receiver_config).expect("receiver initializes");
+        let receiver_address = match next_event_with_timeout(&mut receiver).await {
+            TransportEvent::Listening { address } => address,
+            event => panic!("expected listener address, got {event:?}"),
+        };
+
+        let mut sender_config = test_config();
+        sender_config.static_peers.push(StaticPeer {
+            peer_id: receiver_peer,
+            address: receiver_address,
+        });
+        let mut sender = GuardianP2p::new(identity::Keypair::generate_ed25519(), sender_config)
+            .expect("sender initializes");
+        let request_id = sender
+            .send_threat_hint(receiver_peer, test_threat_hint())
+            .expect("send canonical ThreatHint");
+
+        tokio::time::timeout(Duration::from_secs(10), async {
+            loop {
+                tokio::select! {
+                    event = receiver.next_sidecar_event(&ingress) => {
+                        if let TransportEvent::InboundThreatHintProcessed { status, .. } =
+                            event.expect("sidecar event")
+                        {
+                            assert_eq!(status, ThreatHintAckStatus::Rejected);
+                            break;
+                        }
+                    },
+                    event = sender.next_event() => {
+                        if let TransportEvent::OutboundThreatHintFailure { failure, .. } = event {
+                            panic!("ThreatHint request failed: {failure:?}");
+                        }
+                    }
+                }
+            }
+        })
+        .await
+        .expect("sidecar fail-closed response timed out");
+
+        match next_event_with_timeout(&mut sender).await {
+            TransportEvent::OutboundThreatHintAck {
+                request_id: received,
+                status,
+                ..
+            } => {
+                assert_eq!(received, request_id);
+                assert_eq!(status, ThreatHintAckStatus::Rejected);
+            }
+            event => panic!("expected rejected ThreatHint acknowledgement, got {event:?}"),
+        }
+        assert_eq!(receiver.pending_work(), (0, 0));
+    }
+
+    #[tokio::test]
+    async fn canceled_threat_hint_releases_its_independent_work_slot() {
+        let receiver_identity = identity::Keypair::generate_ed25519();
+        let receiver_peer = receiver_identity.public().to_peer_id();
+        let mut receiver_config = test_config();
+        receiver_config.request_timeout = Duration::from_millis(150);
+        receiver_config.listen_addresses.push(
+            "/ip4/127.0.0.1/udp/0/quic-v1"
+                .parse()
+                .expect("valid test address"),
+        );
+        let mut receiver =
+            GuardianP2p::new(receiver_identity, receiver_config).expect("receiver initializes");
+        let receiver_address = match next_event_with_timeout(&mut receiver).await {
+            TransportEvent::Listening { address } => address,
+            event => panic!("expected listener address, got {event:?}"),
+        };
+
+        let mut sender_config = test_config();
+        sender_config.request_timeout = Duration::from_millis(150);
+        sender_config.static_peers.push(StaticPeer {
+            peer_id: receiver_peer,
+            address: receiver_address,
+        });
+        let mut sender = GuardianP2p::new(identity::Keypair::generate_ed25519(), sender_config)
+            .expect("sender initializes");
+        sender
+            .send_threat_hint(receiver_peer, test_threat_hint())
+            .expect("send canonical ThreatHint");
+
+        let inbound_request = tokio::time::timeout(Duration::from_secs(10), async {
+            loop {
+                tokio::select! {
+                    event = receiver.next_event() => {
+                        if let TransportEvent::InboundThreatHint { request_id, .. } = event {
+                            break request_id;
+                        }
+                    },
+                    event = sender.next_event() => {
+                        if let TransportEvent::OutboundThreatHintFailure { failure, .. } = event {
+                            panic!("ThreatHint failed before inbound delivery: {failure:?}");
+                        }
+                    }
+                }
+            }
+        })
+        .await
+        .expect("ThreatHint did not reach receiver");
+        assert!(receiver
+            .inbound_threat_hint_responses
+            .contains_key(&inbound_request));
+        assert!(receiver.inbound_threat_hint_work.contains(&inbound_request));
+
+        tokio::time::timeout(Duration::from_secs(10), async {
+            loop {
+                tokio::select! {
+                    event = sender.next_event() => {
+                        if let TransportEvent::OutboundThreatHintFailure { failure, .. } = event {
+                            assert!(matches!(
+                                failure,
+                                RequestFailure::Timeout
+                                    | RequestFailure::ConnectionClosed
+                                    | RequestFailure::Io
+                            ));
+                            break;
+                        }
+                    },
+                    _ = receiver.next_event() => {}
+                }
+            }
+        })
+        .await
+        .expect("ThreatHint request did not time out");
+
+        let cleanup_deadline = tokio::time::Instant::now() + Duration::from_secs(2);
+        while receiver
+            .inbound_threat_hint_responses
+            .contains_key(&inbound_request)
+            && tokio::time::Instant::now() < cleanup_deadline
+        {
+            let _ = tokio::time::timeout_at(cleanup_deadline, receiver.next_event()).await;
+        }
+        assert!(!receiver
+            .inbound_threat_hint_responses
+            .contains_key(&inbound_request));
+        assert!(!receiver.inbound_threat_hint_work.contains(&inbound_request));
+        assert_eq!(receiver.pending_work(), (0, 0));
     }
 
     #[tokio::test]
@@ -1935,6 +2630,10 @@ mod tests {
             .expect("first request is admitted");
         assert!(matches!(
             node.send_ballot(peer, ballot),
+            Err(TransportError::OutboundBusy { max: 1 })
+        ));
+        assert!(matches!(
+            node.send_threat_hint(peer, test_threat_hint()),
             Err(TransportError::OutboundBusy { max: 1 })
         ));
     }

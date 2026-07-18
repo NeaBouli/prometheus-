@@ -116,9 +116,9 @@ real signature or broadcast occurred. Real state/sponsor inputs, signatures,
 confirmation, successor evidence, and release evidence remain.
 
 Scope-weighted status estimate on 2026-07-19: H-001 canary preparation is about
-96% complete; rollout-capable core-network work is about 73-77% complete after
-merged and exact-main-verified GH-52; the complete roadmap vision is about
-39-44% complete. These values distinguish
+96% complete; rollout-capable core-network work is about 74-78% complete with
+the fail-closed GH-55 ThreatHint transport core in progress; the complete roadmap vision is about
+40-45% complete. These values distinguish
 prepared software from real chain operation and are not release guarantees.
 Latest verified product/status main `f2e52beebe5ec7d6a3e6e0e8d36bced8f6f68ac7`
 passed Prometheus CI `29644233106`, Security Audit `29644233098`, and Pages
@@ -428,6 +428,26 @@ External evidence: ssh sandbox reaches the host but public-key authentication
                    is rejected, so real two-host evidence is not claimed
 Remote evidence: Prometheus CI 29644233106, Security Audit 29644233098, and
                  Pages 29644232771 passed for exact main f2e52be
+```
+
+## LIGHT CLIENT TO GUARDIAN THREATHINT CORE (GH-55 IN PROGRESS)
+
+```text
+Status: issue #55; branch feature/GH-55-threat-hint-transport
+Schema: OS-independent canonical JSON v1; exact lowercase hash/nonce, integer
+        confidence basis points, explicit proof system, 1..=1024 proof bytes,
+        non-zero timestamp, 2048-byte total cap, no unknown/duplicate fields
+Client: proof public input must bind the exact threat hash; confidence floors
+        conservatively; development stubs fail in beta/mainnet
+Transport: independent /prometheus/threat-hint/1.0.0 request/ACK behaviour;
+           ballot and hint state remain separate and share global work/stream caps
+Sidecar: rejects every hint until a dedicated owner-only real-Groth16 verifier,
+         freshness/replay persistence, and bounded analyzer ingress exist
+Local evidence: 6 schema tests, 8 client builder tests, 44 Guardian P2P unit
+                tests plus 3 process tests, and 229 workspace tests/2 live ignores
+Boundary: PeerId is routing metadata only; no wallet, signing, chain, Guardian or
+          reporter authorization, reputation, KAS/PROM, slash ACL, or
+          commit-reveal behavior changed
 ```
 
 ## MAINNET CONTRACT ADDRESSES (post-verification)

@@ -1,5 +1,23 @@
 # Prometheus Guardian P2P
 
+## GH-55 ThreatHint transport core
+
+GH-55 adds `/prometheus/threat-hint/1.0.0` as an independent request-response
+protocol beside the authenticated Guardian ballot protocol. It accepts only the
+shared canonical schema-v1 envelope, caps the complete frame at 2048 bytes, and
+shares the existing global inbound/outbound admission budget without sharing
+request state or response channels with ballots.
+
+The raw library API can send, receive, and explicitly acknowledge a canonical
+ThreatHint. The operated sidecar has no ThreatHint verifier socket yet and
+therefore returns only `rejected`; it never forwards a hint to the ballot
+collector or analyzer. A dedicated owner-only ingress with real Groth16
+verification, freshness/replay policy, and bounded analyzer admission remains
+required before any accepted production flow.
+
+Transport `PeerId` remains routing metadata only. It is not a reporter identity,
+Guardian membership record, proof of reachability, authorization, or reward key.
+
 ## GH-52 explicit relay bootstrap routes
 
 GH-52 adds a controlled, transport-only bootstrap surface for relay operators:

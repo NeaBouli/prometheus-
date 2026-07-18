@@ -212,7 +212,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
   <div class="page-header-inner">
     <div class="breadcrumb r"><a href="index.html">Prometheus</a><span>/</span>Roadmap</div>
     <h1 class="page-title r">Full deployment<br>roadmap.</h1>
-    <p class="page-desc r d1">Readiness-gated delivery. H-001 canary preparation: 96%. Core-network rollout: 73–77%. Complete roadmap vision: 39–44%. No fixed release date is claimed.</p>
+    <p class="page-desc r d1">Readiness-gated delivery. H-001 canary preparation: 96%. Core-network rollout: 74–78%. Complete roadmap vision: 40–45%. No fixed release date is claimed.</p>
   </div>
 </div>
 
@@ -353,10 +353,12 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
           <li class="done-item">Merged/exact-main-verified GH-44: atomic owner-only persistent transport identity, strict bounded routes, data-minimal health events, and a bounded relay service</li>
           <li class="done-item">Isolated three-node evidence: relay reservation/delivery, AutoNAT state, DCUtR relay fallback, and disconnect handling</li>
           <li class="done-item">Merged and exact-main-verified GH-48: strict Guardian/relay process roles, owner-only local submission, bounded JSON health, graceful drain, and separate-process same-host relay evidence</li>
+          <li class="done-item">Merged and exact-main-verified GH-52: explicit canonical relay bootstrap advertisements with bind/advertise separation</li>
+          <li class="done-item">GH-55 ThreatHint core: shared canonical schema, development-only Light Client builder, and an independent bounded request/ACK protocol</li>
           <li>Public or multi-host relay/NAT operation and broad discovery; mDNS is held while its compatible dependency path has unresolved RustSec advisories</li>
           <li>KRC-20 UTXO queries for "PROM-RULES" tick</li>
           <li>Rule content download from IPFS via CIDv1</li>
-          <li>Light Client ↔ Guardian P2P communication</li>
+          <li>Accepted Light Client ThreatHint ingestion after real Groth16 verification, freshness/replay persistence, and dedicated owner-only analyzer admission</li>
           <li>Guardian ↔ Validator proposal submission</li>
         </ul>
       </div>

@@ -14,12 +14,12 @@
 | Branch | `main`; all status changes remain PR-only |
 | Lokaler Pfad | `$REPO_ROOT` |
 | Letzter grün verifizierter Produkt-/Tooling-Commit | `f2e52be` — GH-52 explicit Guardian relay bootstrap routes; Prometheus CI `29644233106`, Security `29644233098`, and Pages `29644232771` green |
-| Aktueller Entwicklungs-Slice | GH-52 ist ueber PR #53 gemergt/exact-main verifiziert: explizite kanonische Relay-Anzeigen und path-free Bootstrap-Routen; echter Zwei-Host-Nachweis wartet auf reparierten `ssh sandbox` Public-Key-Zugriff |
+| Aktueller Entwicklungs-Slice | GH-55 auf `feature/GH-55-threat-hint-transport`: separates kanonisches ThreatHint-Schema/Protokoll und Light Client Builder; Sidecar ohne realen Groth16-Verifier bleibt `rejected`; echter Zwei-Host-Nachweis wartet weiterhin auf reparierten `ssh sandbox` Public-Key-Zugriff |
 | Aktuelle Tooling-Baseline | Exact main `f2e52be` includes merged GH-48 strict Guardian/relay roles plus GH-52 bind/advertise separation and explicit bootstrap routes. Public/multi-host operation, broad discovery, trusted membership/key assignment, Sybil resistance, and on-chain attestation remain open. Execution artifacts remain bound to `205e1ca`; GH-9 remains ready for explicitly approved external signing. |
 | Aktueller HEAD | Mit `git log --oneline -1` prüfen; Bridge-/Status-Commits können neuer sein |
 | Rollback-Tag | `pre-session-20260413` → `6347b85` |
-| Whitepaper | WHITEPAPER.md (root) + whitepaper.html (styled); miner companion, reward boundaries, GH-36/GH-39 trust boundaries, and merged/exact-main GH-48/GH-52 Guardian scopes remain synchronized |
-| Status | Rollout-capable core estimated at 73-77% after merged/exact-main GH-52; post-Toccata canary execution and full rollout evidence remain gated. |
+| Whitepaper | WHITEPAPER.md (root) + whitepaper.html (styled); miner companion, reward boundaries, GH-36/GH-39 trust boundaries, merged/exact-main GH-48/GH-52 scopes, and fail-closed GH-55 ThreatHint boundaries remain synchronized |
+| Status | Rollout-capable core estimated at 74-78% with GH-55 transport core in progress; post-Toccata canary execution, real ThreatHint verification/analysis, and full rollout evidence remain gated. |
 | GitHub Pages | https://neabouli.github.io/prometheus-/ |
 | Google Search Console | Verified: googleaa2902079481c7a8 |
 

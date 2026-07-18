@@ -65,6 +65,12 @@ PYTHONPATH=. python -m jaeger.analyzer
 
 ## How Rule Generation Works
 
+Current transport status: GH-55 provides a separate canonical
+`/prometheus/threat-hint/1.0.0` carrier, but the operated Guardian sidecar
+rejects every ThreatHint until a dedicated owner-only ingress performs real
+Groth16 verification, freshness/replay checks, and bounded analyzer admission.
+The steps below describe the target flow, not current production readiness.
+
 1. Light Client submits a threat hint with ZK proof
 2. Guardian receives the hint via the P2P network
 3. LLaMA 3 analyzes the threat indicators

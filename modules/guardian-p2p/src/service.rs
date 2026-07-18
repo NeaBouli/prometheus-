@@ -736,8 +736,12 @@ fn guardian_event_record(
         | TransportEvent::ListenerFailed { address } => record.address = Some(address.to_string()),
         TransportEvent::InboundBallot { peer, .. }
         | TransportEvent::InboundProcessed { peer, .. }
+        | TransportEvent::InboundThreatHint { peer, .. }
+        | TransportEvent::InboundThreatHintProcessed { peer, .. }
         | TransportEvent::OutboundAck { peer, .. }
         | TransportEvent::OutboundFailure { peer, .. }
+        | TransportEvent::OutboundThreatHintAck { peer, .. }
+        | TransportEvent::OutboundThreatHintFailure { peer, .. }
         | TransportEvent::ConnectionEstablished { peer, .. }
         | TransportEvent::ConnectionClosed { peer, .. }
         | TransportEvent::HolePunchFinished { peer, .. } => {
@@ -755,7 +759,14 @@ fn guardian_event_record(
     match event {
         TransportEvent::InboundProcessed { status, .. }
         | TransportEvent::OutboundAck { status, .. } => record.status = Some(status.as_str()),
+        TransportEvent::InboundThreatHintProcessed { status, .. }
+        | TransportEvent::OutboundThreatHintAck { status, .. } => {
+            record.status = Some(status.as_str())
+        }
         TransportEvent::OutboundFailure { failure, .. } => {
+            record.status = Some(request_failure_name(*failure))
+        }
+        TransportEvent::OutboundThreatHintFailure { failure, .. } => {
             record.status = Some(request_failure_name(*failure))
         }
         TransportEvent::NatStatusChanged { new, .. } => record.status = Some(nat_name(*new)),
@@ -825,8 +836,12 @@ fn guardian_event_name(event: &TransportEvent) -> &'static str {
         TransportEvent::ListenerFailed { .. } => "listener-failed",
         TransportEvent::InboundBallot { .. } => "inbound-ballot",
         TransportEvent::InboundProcessed { .. } => "inbound-processed",
+        TransportEvent::InboundThreatHint { .. } => "inbound-threat-hint",
+        TransportEvent::InboundThreatHintProcessed { .. } => "inbound-threat-hint-processed",
         TransportEvent::OutboundAck { .. } => "outbound-ack",
         TransportEvent::OutboundFailure { .. } => "outbound-failure",
+        TransportEvent::OutboundThreatHintAck { .. } => "outbound-threat-hint-ack",
+        TransportEvent::OutboundThreatHintFailure { .. } => "outbound-threat-hint-failure",
         TransportEvent::ConnectionEstablished { .. } => "connection-established",
         TransportEvent::ConnectionClosed { .. } => "connection-closed",
         TransportEvent::RelayReservationAccepted { .. } => "relay-reservation-accepted",
