@@ -33,9 +33,9 @@ mkdir -p /var/lib/prometheus/guardian-p2p /run/prometheus/guardian-p2p
 chmod 700 /var/lib/prometheus/guardian-p2p /run/prometheus/guardian-p2p
 ```
 
-- The collector must create its Unix socket with mode `0600` in the owner-only runtime directory.
+- The collector and ThreatHint verifier must create their independent Unix sockets with mode `0600` in the owner-only runtime directory.
 - The sidecar creates its submission socket with mode `0600` and removes it after graceful shutdown.
-- Collector and submission paths must be distinct absolute file paths.
+- Identity, collector, ThreatHint, and submission paths must be distinct absolute file paths.
 
 3) Write an owner-only Guardian config
 
@@ -43,6 +43,7 @@ chmod 700 /var/lib/prometheus/guardian-p2p /run/prometheus/guardian-p2p
 role = "guardian"
 identity_path = "/var/lib/prometheus/guardian-p2p/identity"
 collector_socket = "/run/prometheus/guardian-p2p/collector.sock"
+threat_hint_socket = "/run/prometheus/guardian-p2p/threat-hint.sock"
 submission_socket = "/run/prometheus/guardian-p2p/submit.sock"
 listen_addresses = ["/ip4/0.0.0.0/udp/4101/quic-v1"]
 health_interval_secs = 30
@@ -122,6 +123,11 @@ prometheus-guardian-p2p run --config /var/lib/prometheus/guardian-p2p/service.to
 - Monitor JSON-line `health`, listener, connection, reservation, circuit, inbound, outbound, and terminal events.
 - Drain stdout continuously. JSON-line output uses a bounded dedicated writer; output backpressure or writer failure makes the service fail closed instead of blocking signal handling indefinitely.
 - A collector outage returns `busy`; unsafe IPC ownership, framing, or ACK data fails closed.
+- A missing, unavailable, or verifier-disabled ThreatHint boundary returns `busy`.
+  Invalid canonical data, development proof stubs, stale/replayed conflicting
+  data, and invalid proof results return `rejected`. `accepted` means the
+  approved proof passed and replay state plus one durable outbox job committed;
+  it does not claim that model analysis completed.
 
 7) Submit one canonical ballot
 

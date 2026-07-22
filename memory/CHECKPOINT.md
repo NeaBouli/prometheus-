@@ -1,5 +1,5 @@
 # PROMETHEUS — SESSION CHECKPOINT
-# Last updated: 2026-07-19
+# Last updated: 2026-07-23
 # Purpose: Full recovery document. If Claude (Architect) or Claude Code
 # loses context, read this file first. It contains the complete project state.
 
@@ -11,15 +11,15 @@
 |------|------|
 | Projekt | Prometheus — Decentralized AI Threat Intelligence |
 | Repo | https://github.com/NeaBouli/prometheus- |
-| Branch | `main`; all status changes remain PR-only |
+| Branch | `feature/GH-58-threat-hint-verifier-ingress`; all status changes remain PR-only |
 | Lokaler Pfad | `$REPO_ROOT` |
 | Letzter grün verifizierter Produkt-/Tooling-Commit | `f2e52be` — GH-52 explicit Guardian relay bootstrap routes; Prometheus CI `29644233106`, Security `29644233098`, and Pages `29644232771` green |
-| Aktueller Entwicklungs-Slice | GH-55 ist als exact main `c8a6cb8` verifiziert; Issue #58 ist der nächste autonome Slice für owner-only ThreatHint-Verifier-Ingress, persistente Freshness/Replay-Abwehr und begrenzten Analyzer-Handoff. Ohne realen Groth16-Verifier bleibt der Sidecar `rejected`; echter Zwei-Host-Nachweis wartet weiterhin auf reparierten `ssh sandbox` Public-Key-Zugriff |
+| Aktueller Entwicklungs-Slice | GH-58 implementiert separaten owner-only ThreatHint-Verifier-IPC, trusted Network/Domain Binding, persistente Freshness/Replay-Abwehr und atomaren dauerhaften Outbox-Handoff. Ohne unabhängig freigegebenen realen Groth16-Verifier bleibt der Sidecar fail-closed `busy`; echter Zwei-Host-Nachweis wartet weiterhin auf reparierten `ssh sandbox` Public-Key-Zugriff |
 | Aktuelle Tooling-Baseline | Exact main `f2e52be` includes merged GH-48 strict Guardian/relay roles plus GH-52 bind/advertise separation and explicit bootstrap routes. Public/multi-host operation, broad discovery, trusted membership/key assignment, Sybil resistance, and on-chain attestation remain open. Execution artifacts remain bound to `205e1ca`; GH-9 remains ready for explicitly approved external signing. |
 | Aktueller HEAD | Mit `git log --oneline -1` prüfen; Bridge-/Status-Commits können neuer sein |
 | Rollback-Tag | `pre-session-20260413` → `6347b85` |
-| Whitepaper | WHITEPAPER.md (root) + whitepaper.html (styled); miner companion, reward boundaries, GH-36/GH-39 trust boundaries, and merged/exact-main GH-48/GH-52/GH-55 scopes remain synchronized |
-| Status | Rollout-capable core estimated at 74-78% with GH-55 transport exact-main verified; post-Toccata canary execution, real ThreatHint verification/analysis, and full rollout evidence remain gated. |
+| Whitepaper | WHITEPAPER.md (root) + whitepaper.html (styled); miner companion, reward boundaries, GH-36/GH-39 trust boundaries, and GH-48/GH-52/GH-55/GH-58 scopes remain synchronized |
+| Status | Rollout-capable core estimated at 76-80% with GH-58 durable fail-closed ingress implemented; post-Toccata canary execution, approved real Groth16 verification/accepted analysis, and full rollout evidence remain gated. |
 | GitHub Pages | https://neabouli.github.io/prometheus-/ |
 | Google Search Console | Verified: googleaa2902079481c7a8 |
 

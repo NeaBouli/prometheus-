@@ -12,6 +12,7 @@ pub mod ingress;
 pub mod local_submit;
 pub mod relay_service;
 pub mod service;
+pub mod threat_hint_ingress;
 #[path = "identity.rs"]
 pub mod transport_identity;
 
@@ -46,6 +47,7 @@ pub use prometheus_threat_hint::{ThreatHintEnvelope, ThreatIndicatorType, Threat
 use thiserror::Error;
 
 use crate::ingress::{IngressError, UnixBallotIngress};
+use crate::threat_hint_ingress::{ThreatHintIngressError, UnixThreatHintIngress};
 
 /// Direct request-response protocol for opaque Guardian ballot envelopes.
 pub const BALLOT_PROTOCOL: &str = "/prometheus/guardian-ballot/1.0.0";
@@ -952,6 +954,8 @@ pub struct GuardianP2p {
     inbound_threat_hint_work: HashSet<request_response::InboundRequestId>,
     ingress_request_ids: HashSet<request_response::InboundRequestId>,
     ingress_tasks: FuturesUnordered<IngressFuture>,
+    threat_hint_ingress_request_ids: HashSet<request_response::InboundRequestId>,
+    threat_hint_ingress_tasks: FuturesUnordered<ThreatHintIngressFuture>,
     outbound_requests: HashSet<request_response::OutboundRequestId>,
     outbound_threat_hint_requests: HashSet<request_response::OutboundRequestId>,
     max_outbound_requests: usize,
@@ -963,11 +967,18 @@ pub struct GuardianP2p {
 }
 
 type IngressFuture = Pin<Box<dyn Future<Output = IngressCompletion> + Send>>;
+type ThreatHintIngressFuture = Pin<Box<dyn Future<Output = ThreatHintIngressCompletion> + Send>>;
 
 struct IngressCompletion {
     peer: PeerId,
     request_id: request_response::InboundRequestId,
     status: AckStatus,
+}
+
+struct ThreatHintIngressCompletion {
+    peer: PeerId,
+    request_id: request_response::InboundRequestId,
+    status: ThreatHintAckStatus,
 }
 
 impl GuardianP2p {
@@ -1033,6 +1044,8 @@ impl GuardianP2p {
             inbound_threat_hint_work: HashSet::new(),
             ingress_request_ids: HashSet::new(),
             ingress_tasks: FuturesUnordered::new(),
+            threat_hint_ingress_request_ids: HashSet::new(),
+            threat_hint_ingress_tasks: FuturesUnordered::new(),
             outbound_requests: HashSet::new(),
             outbound_threat_hint_requests: HashSet::new(),
             max_outbound_requests,
@@ -1210,26 +1223,52 @@ impl GuardianP2p {
         }
     }
 
-    /// Drives one event and completes inbound ballots through the local collector.
+    /// Drives one event with ThreatHints rejected when no verifier boundary is configured.
     pub async fn next_sidecar_event(
         &mut self,
         ingress: &UnixBallotIngress,
+    ) -> Result<TransportEvent, TransportError> {
+        self.next_sidecar_event_inner(ingress, None).await
+    }
+
+    /// Drives one event through separate ballot and verified-ThreatHint boundaries.
+    pub async fn next_verified_sidecar_event(
+        &mut self,
+        ingress: &UnixBallotIngress,
+        threat_hint_ingress: &UnixThreatHintIngress,
+    ) -> Result<TransportEvent, TransportError> {
+        self.next_sidecar_event_inner(ingress, Some(threat_hint_ingress))
+            .await
+    }
+
+    async fn next_sidecar_event_inner(
+        &mut self,
+        ingress: &UnixBallotIngress,
+        threat_hint_ingress: Option<&UnixThreatHintIngress>,
     ) -> Result<TransportEvent, TransportError> {
         loop {
             enum Progress {
                 Swarm(SwarmEvent<BehaviourEvent>),
                 Ingress(IngressCompletion),
+                ThreatHintIngress(ThreatHintIngressCompletion),
             }
 
-            let progress = if self.ingress_tasks.is_empty() {
+            let progress = if self.ingress_tasks.is_empty()
+                && self.threat_hint_ingress_tasks.is_empty()
+            {
                 Progress::Swarm(self.swarm.select_next_some().await)
             } else {
                 let swarm = &mut self.swarm;
                 let ingress_tasks = &mut self.ingress_tasks;
+                let threat_hint_ingress_tasks = &mut self.threat_hint_ingress_tasks;
                 tokio::select! {
                     event = swarm.select_next_some() => Progress::Swarm(event),
-                    completion = ingress_tasks.select_next_some() => {
+                    completion = ingress_tasks.select_next_some(), if !ingress_tasks.is_empty() => {
                         Progress::Ingress(completion)
+                    }
+                    completion = threat_hint_ingress_tasks.select_next_some(),
+                        if !threat_hint_ingress_tasks.is_empty() => {
+                            Progress::ThreatHintIngress(completion)
                     }
                 }
             };
@@ -1266,20 +1305,46 @@ impl GuardianP2p {
                             }));
                         }
                         TransportEvent::InboundThreatHint {
-                            peer, request_id, ..
+                            peer,
+                            request_id,
+                            hint,
                         } => {
-                            match self
-                                .respond_threat_hint(request_id, ThreatHintAckStatus::Rejected)
-                            {
-                                Ok(()) => {
-                                    return Ok(TransportEvent::InboundThreatHintProcessed {
-                                        peer,
-                                        status: ThreatHintAckStatus::Rejected,
-                                    });
+                            let Some(threat_hint_ingress) = threat_hint_ingress else {
+                                match self
+                                    .respond_threat_hint(request_id, ThreatHintAckStatus::Rejected)
+                                {
+                                    Ok(()) => {
+                                        return Ok(TransportEvent::InboundThreatHintProcessed {
+                                            peer,
+                                            status: ThreatHintAckStatus::Rejected,
+                                        });
+                                    }
+                                    Err(TransportError::ResponseChannelClosed) => continue,
+                                    Err(error) => return Err(error),
                                 }
-                                Err(TransportError::ResponseChannelClosed) => continue,
-                                Err(error) => return Err(error),
-                            }
+                            };
+                            let ingress = threat_hint_ingress.clone();
+                            let inserted = self.threat_hint_ingress_request_ids.insert(request_id);
+                            debug_assert!(
+                                inserted,
+                                "inbound ThreatHint cannot start ingress twice"
+                            );
+                            self.threat_hint_ingress_tasks.push(Box::pin(async move {
+                                let status = match ingress.forward(&hint).await {
+                                    Ok(status) => status,
+                                    Err(
+                                        ThreatHintIngressError::Io(_)
+                                        | ThreatHintIngressError::Timeout
+                                        | ThreatHintIngressError::Unavailable,
+                                    ) => ThreatHintAckStatus::Busy,
+                                    Err(_) => ThreatHintAckStatus::Rejected,
+                                };
+                                ThreatHintIngressCompletion {
+                                    peer,
+                                    request_id,
+                                    status,
+                                }
+                            }));
                         }
                         event => return Ok(event),
                     }
@@ -1289,7 +1354,36 @@ impl GuardianP2p {
                         return Ok(event);
                     }
                 }
+                Progress::ThreatHintIngress(completion) => {
+                    if let Some(event) = self.complete_threat_hint_ingress(completion)? {
+                        return Ok(event);
+                    }
+                }
             }
+        }
+    }
+
+    fn complete_threat_hint_ingress(
+        &mut self,
+        completion: ThreatHintIngressCompletion,
+    ) -> Result<Option<TransportEvent>, TransportError> {
+        self.threat_hint_ingress_request_ids
+            .remove(&completion.request_id);
+        if !self
+            .inbound_threat_hint_responses
+            .contains_key(&completion.request_id)
+        {
+            self.inbound_threat_hint_work.remove(&completion.request_id);
+            return Ok(None);
+        }
+
+        match self.respond_threat_hint(completion.request_id, completion.status) {
+            Ok(()) => Ok(Some(TransportEvent::InboundThreatHintProcessed {
+                peer: completion.peer,
+                status: completion.status,
+            })),
+            Err(TransportError::ResponseChannelClosed) => Ok(None),
+            Err(error) => Err(error),
         }
     }
 
@@ -1582,8 +1676,14 @@ impl GuardianP2p {
                     failure: RequestFailure::from(&error),
                 })
             }
-            request_response::Event::InboundFailure { request_id, .. }
-            | request_response::Event::ResponseSent { request_id, .. } => {
+            request_response::Event::InboundFailure { request_id, .. } => {
+                self.inbound_threat_hint_responses.remove(&request_id);
+                if !self.threat_hint_ingress_request_ids.contains(&request_id) {
+                    self.inbound_threat_hint_work.remove(&request_id);
+                }
+                None
+            }
+            request_response::Event::ResponseSent { request_id, .. } => {
                 self.inbound_threat_hint_responses.remove(&request_id);
                 self.inbound_threat_hint_work.remove(&request_id);
                 None
@@ -1683,6 +1783,25 @@ mod tests {
         let ack = format!(
             "{{\"payload_digest\":\"{digest}\",\"protocol_version\":1,\"session_id\":\"{}\",\"status\":\"{status}\"}}",
             "a".repeat(64),
+        );
+        stream
+            .write_u32(u32::try_from(ack.len()).expect("bounded ack"))
+            .await
+            .expect("write ack length");
+        stream.write_all(ack.as_bytes()).await.expect("write ack");
+        stream.shutdown().await.expect("close acknowledgement");
+    }
+
+    async fn serve_threat_hint_ingress_once(path: PathBuf, expected: Vec<u8>, status: &str) {
+        let listener = UnixListener::bind(&path).expect("bind ThreatHint ingress");
+        fs::set_permissions(&path, fs::Permissions::from_mode(0o600))
+            .expect("owner-only ThreatHint socket");
+        let (mut stream, _) = listener.accept().await.expect("accept ThreatHint carrier");
+        let received = read_ingress_ballot(&mut stream).await;
+        assert_eq!(received, expected);
+        let digest = format!("{:x}", Sha256::digest(&received));
+        let ack = format!(
+            "{{\"payload_digest\":\"{digest}\",\"protocol_version\":1,\"status\":\"{status}\"}}"
         );
         stream
             .write_u32(u32::try_from(ack.len()).expect("bounded ack"))
@@ -2214,6 +2333,94 @@ mod tests {
                 assert_eq!(status, ThreatHintAckStatus::Rejected);
             }
             event => panic!("expected rejected ThreatHint acknowledgement, got {event:?}"),
+        }
+        assert_eq!(receiver.pending_work(), (0, 0));
+    }
+
+    #[tokio::test]
+    async fn operated_sidecar_forwards_threat_hint_to_dedicated_verifier() {
+        let directory = tempfile::tempdir().expect("temporary ingress directory");
+        fs::set_permissions(directory.path(), fs::Permissions::from_mode(0o700))
+            .expect("owner-only ingress directory");
+        let ballot_ingress = UnixBallotIngress::configured(
+            directory.path().join("unused-ballot.sock"),
+            Duration::from_secs(2),
+        )
+        .expect("safe configured ballot ingress");
+        let threat_hint = test_threat_hint();
+        let threat_hint_path = directory.path().join("threat-hint.sock");
+        let verifier_task = tokio::spawn(serve_threat_hint_ingress_once(
+            threat_hint_path.clone(),
+            threat_hint.as_bytes().to_vec(),
+            "accepted",
+        ));
+        tokio::task::yield_now().await;
+        let threat_hint_ingress =
+            UnixThreatHintIngress::new(threat_hint_path, Duration::from_secs(2))
+                .expect("owner-only ThreatHint ingress");
+
+        let receiver_identity = identity::Keypair::generate_ed25519();
+        let receiver_peer = receiver_identity.public().to_peer_id();
+        let mut receiver_config = test_config();
+        receiver_config.listen_addresses.push(
+            "/ip4/127.0.0.1/udp/0/quic-v1"
+                .parse()
+                .expect("valid test address"),
+        );
+        let mut receiver =
+            GuardianP2p::new(receiver_identity, receiver_config).expect("receiver initializes");
+        let receiver_address = match next_event_with_timeout(&mut receiver).await {
+            TransportEvent::Listening { address } => address,
+            event => panic!("expected listener address, got {event:?}"),
+        };
+
+        let mut sender_config = test_config();
+        sender_config.static_peers.push(StaticPeer {
+            peer_id: receiver_peer,
+            address: receiver_address,
+        });
+        let mut sender = GuardianP2p::new(identity::Keypair::generate_ed25519(), sender_config)
+            .expect("sender initializes");
+        let request_id = sender
+            .send_threat_hint(receiver_peer, threat_hint)
+            .expect("send canonical ThreatHint");
+
+        tokio::time::timeout(Duration::from_secs(10), async {
+            loop {
+                tokio::select! {
+                    event = receiver.next_verified_sidecar_event(
+                        &ballot_ingress,
+                        &threat_hint_ingress,
+                    ) => {
+                        if let TransportEvent::InboundThreatHintProcessed { status, .. } =
+                            event.expect("sidecar event")
+                        {
+                            assert_eq!(status, ThreatHintAckStatus::Accepted);
+                            break;
+                        }
+                    },
+                    event = sender.next_event() => {
+                        if let TransportEvent::OutboundThreatHintFailure { failure, .. } = event {
+                            panic!("ThreatHint request failed: {failure:?}");
+                        }
+                    }
+                }
+            }
+        })
+        .await
+        .expect("verified sidecar response timed out");
+        verifier_task.await.expect("verifier task");
+
+        match next_event_with_timeout(&mut sender).await {
+            TransportEvent::OutboundThreatHintAck {
+                request_id: received,
+                status,
+                ..
+            } => {
+                assert_eq!(received, request_id);
+                assert_eq!(status, ThreatHintAckStatus::Accepted);
+            }
+            event => panic!("expected accepted ThreatHint acknowledgement, got {event:?}"),
         }
         assert_eq!(receiver.pending_work(), (0, 0));
     }

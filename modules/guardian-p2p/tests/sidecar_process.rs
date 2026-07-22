@@ -257,9 +257,10 @@ fn guardian_config(
         .collect::<Vec<_>>()
         .join(", ");
     let config = format!(
-        "role = \"guardian\"\nidentity_path = \"{}\"\ncollector_socket = \"{}\"\nsubmission_socket = \"{}\"\nlisten_addresses = [{listeners}]\nhealth_interval_secs = 1\ningress_timeout_secs = 5\ncollector_startup_timeout_secs = 5\nshutdown_drain_timeout_secs = 5\n{static_peers}",
+        "role = \"guardian\"\nidentity_path = \"{}\"\ncollector_socket = \"{}\"\nthreat_hint_socket = \"{}\"\nsubmission_socket = \"{}\"\nlisten_addresses = [{listeners}]\nhealth_interval_secs = 1\ningress_timeout_secs = 5\ncollector_startup_timeout_secs = 5\nshutdown_drain_timeout_secs = 5\n{static_peers}",
         directory.join(format!("{name}.identity")).display(),
         collector_socket.display(),
+        directory.join(format!("{name}-threat-hint.sock")).display(),
         submission_socket.display(),
     );
     let path = directory.join(format!("{name}.toml"));

@@ -169,9 +169,15 @@ Canonical JSON field order is `schema_version`, `threat_hash`,
 `observed_at`. Unknown/duplicate fields, reordered or whitespace-modified bytes,
 trailing data, invalid lowercase hex, and envelopes above 2048 bytes fail
 closed. No reporter identity, `PeerId`, wallet, chain, membership, reward,
-KAS/PROM, slash, or commit-reveal field is transported. A real Groth16 verifier,
-freshness/replay policy, and dedicated owner-only Guardian ingress remain open;
-the operated sidecar rejects all ThreatHints until those gates exist.
+KAS/PROM, slash, or commit-reveal field is transported. GH-58's separate
+owner-only Guardian ingress now revalidates these exact bytes, binds the
+verifier to trusted local network/domain context, applies persistent
+freshness/replay policy, and atomically writes a durable analyzer outbox job.
+That job contains canonical wire bytes, digest, network ID, and admission time;
+it does not fabricate indicator content absent from this schema. A real
+independently approved Groth16 relation, verifying key, and vectors remain
+open, so the production verifier is unavailable and returns fail-closed
+`busy`.
 
 ### 2.2 ScanResult (Phi-3-mini Output)
 

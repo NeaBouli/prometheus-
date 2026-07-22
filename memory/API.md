@@ -234,9 +234,27 @@ inbound/outbound work shares the configured global cap. The raw API exposes
 The Light Client `ThreatHintBuilder` binds proof public input to the exact
 threat hash, floors finite confidence into basis points, and refuses
 `development_stub_v1` in beta/mainnet modes. It does not verify opaque Groth16
-bytes. The operated Guardian sidecar has no dedicated ThreatHint verifier
-ingress and always returns `rejected`; it never forwards hints to the ballot
-collector or Python analyzer. `PeerId` remains routing metadata only.
+bytes.
+
+### Guardian ThreatHint Verifier Ingress (GH-58)
+
+`UnixThreatHintIngress` forwards exact canonical bytes over a distinct
+owner-only AF_UNIX socket. Its canonical response is
+`{payload_digest,protocol_version,status}`; non-`busy` responses bind the
+SHA-256 digest of the exact request, while `busy` is deliberately unbound.
+Socket ownership/mode, peer UID, frame bounds, timeout, EOF, schema, and
+canonical ACK encoding are all checked independently of ballot ingress.
+
+Python `ThreatHintIngress` re-parses schema v1, rejects development stubs,
+checks freshness and monotonic time, and invokes an injected verifier with the
+exact canonical bytes plus trusted local `network_id` and domain separation.
+An accepted result atomically commits nonce/hash/digest replay identities and
+one durable `VerifiedThreatHintJob` in SQLite. `pending_jobs(limit)` is
+bounded to 256 and never invents concrete analyzer indicators absent from the
+wire schema. The default verifier is unavailable and returns fail-closed
+`busy`; no production `accepted` claim exists until an independently
+approved Groth16 relation, verifying key, and vectors are injected. `PeerId`
+remains routing metadata only.
 
 ---
 
