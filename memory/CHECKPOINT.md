@@ -13,13 +13,13 @@
 | Repo | https://github.com/NeaBouli/prometheus- |
 | Branch | `main`; all product and status changes remain PR-only |
 | Lokaler Pfad | `$REPO_ROOT` |
-| Letzter grün verifizierter Produkt-/Tooling-Commit | Product `4cada95` merged GH-77 with CI `29975041446`, Security `29975041416`, and Pages `29975040944`; docs/status exact main `e1756f9` passed CI `29975474205`, Security `29975474202`, and Pages `29975473701` |
-| Aktueller Entwicklungs-Slice | Issue #82 and branch `docs/GH-82-threat-observable-v2-spec` freeze the privacy-preserving v2 contract and correct unsupported public privacy/proof claims. V1 remains unchanged and non-actionable. Local cross-language bundle validators/vectors are the next code slice after protected review. |
+| Letzter grün verifizierter Produkt-/Tooling-Commit | Operational product `4cada95` merged GH-77 with CI `29975041446`, Security `29975041416`, and Pages `29975040944`; design/public exact main `fceff1d` merged GH-82 with CI `29977301070`, Security `29977301063`, and Pages `29977300539` |
+| Aktueller Entwicklungs-Slice | Issue #84 and branch `docs/GH-84-threat-observable-v2-closeout` record the merged/exact-main GH-82 evidence. Local Rust/Python canonical bundle validators and shared vectors are the next product slice. V1 remains unchanged and non-actionable. |
 | Aktuelle Tooling-Baseline | Exact main `4cada95` includes GH-58 durable ingress, GH-63's active-KIP-16-aligned manifest-pinned BN254/Arkworks verifier plus bounded owner-aware adapter/service, GH-69's deterministic manifest-preflight CLI tests, GH-74's bounded hash-only v1 analyzer adapter, and GH-77's per-job drain isolation/data-minimal report. Public/multi-host operation, trusted membership/key assignment, Sybil resistance, approved production proof artifacts, concrete observables/actionable analysis, and on-chain attestation remain open. Execution artifacts remain bound to `205e1ca`; GH-9 remains ready for explicitly approved external signing. |
-| Aktueller HEAD | Branch from exact main `e1756f966e66d92e00dbdeb161dd57641808ba4e`; mit `git log --oneline -1` prüfen |
+| Aktueller HEAD | Branch from exact main `fceff1d3ae6db0f38c0076bc2c8dc82f34c3d96d`; mit `git log --oneline -1` prüfen |
 | Rollback-Tag | `pre-session-20260413` → `6347b85` |
 | Whitepaper | WHITEPAPER.md (root) + whitepaper.html (styled); miner companion, reward boundaries, GH-36/GH-39 trust boundaries, and GH-48/GH-52/GH-55/GH-58/GH-63/GH-74 merged boundaries remain synchronized |
-| Status | Rollout-capable core remains estimated at 78-82%. GH-82 is a design/claim-correction candidate and does not raise the estimate; post-Toccata canary execution, approved v2 proof artifacts, concrete-observable/actionable analysis, and full rollout evidence remain gated. |
+| Status | Rollout-capable core remains estimated at 78-82%. GH-82 is merged/exact-main verified but is design and claim correction only, so it does not raise the estimate; local validators/vectors, post-Toccata canary execution, approved v2 proof artifacts, concrete-observable/actionable analysis, and full rollout evidence remain gated. |
 | GitHub Pages | https://neabouli.github.io/prometheus-/ |
 | Google Search Console | Verified: googleaa2902079481c7a8 |
 
