@@ -1244,10 +1244,13 @@ checks and normal merge remain required.
 
 CI recovery note: GitHub registered both review-fix pushes on #95 but retained
 the original PR tracking SHA for the first push and attached reopened workflow
-suites to stale commit `6daa9f3` even after the PR commit list reached current
-head `96a6f8e`. PR #95 was therefore closed, and replacement PR #96 uses the
-identical current commit set on branch
-`feat/GH-94-local-byte-pattern-producer-r2`. Security Audit's existing manual
-dispatch correctly attached to the current SHA. Prometheus CI now exposes the
-same `workflow_dispatch` recovery trigger so both required workflows can be
-executed and reviewed on the exact head without admin bypass.
+suites to stale commit `6daa9f3` even after the PR commit list advanced. PR #95
+was closed. First replacement #96 correctly ran its initial suites on
+`96a6f8e`, but GitHub again omitted suites for later final head `95034d1`;
+#96 was closed without merge. Final branch
+`feat/GH-94-local-byte-pattern-producer-final` contains the identical reviewed
+product commit set and is opened only after all changes are committed, avoiding
+post-open synchronization. Security Audit's existing manual dispatch correctly
+attached to its requested SHA. Prometheus CI now exposes the same
+`workflow_dispatch` recovery trigger for future default-branch availability;
+no required check is fabricated or bypassed.

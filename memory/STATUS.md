@@ -158,9 +158,9 @@ wallet, signing, or chain input. This is deterministic function-boundary
 derivation only; external provenance, privacy approval, and proof binding
 remain open. Exact-main Prometheus CI `29984477087`, Security Audit
 `29984476876`, and Pages `29984476107` passed.
-Issue #94, replacement PR #96, and branch
-`feat/GH-94-local-byte-pattern-producer-r2` add one local Rust producer for a
-bounded `byte_pattern` derived from exact caller-supplied
+Issue #94 and final protected branch
+`feat/GH-94-local-byte-pattern-producer-final` add one local Rust producer for
+a bounded `byte_pattern` derived from exact caller-supplied
 bytes, checked offset, boolean wildcard mask, and typed scope. It accepts no
 path or pattern string, requires 8..=64 positions and at least eight fixed
 bytes, and always emits local-only `review_required_v1`. Shared vectors cover
@@ -170,10 +170,11 @@ checks pass, and independent Terra review reports no blocking/high/medium
 finding. The complete workspace passes 265 Rust tests plus one compile-fail
 doctest with two intentional live-network ignores; Guardian passes 181 tests
 with three intentional live-model skips. Full formatting, lint, package,
-Memory, Pages, workflow, and dependency checks pass. Initial PR #95 was
-replaced after GitHub attached refreshed suites to a stale SHA; #96 carries the
-identical current commit set and no gate is bypassed. Protected PR/exact-main
-evidence remains open. External provenance, maliciousness, privacy approval,
+Memory, Pages, workflow, and dependency checks pass. Initial PR #95 and first
+replacement #96 were closed after GitHub attached later suites to stale heads.
+The final protected replacement carries the identical reviewed product commit
+set and no gate is bypassed. Protected PR/exact-main evidence remains open.
+External provenance, maliciousness, privacy approval,
 disclosure authorization, transport, and proof binding remain unproved.
 The unchanged execution-artifact baseline remains exact main `205e1ca`.
 

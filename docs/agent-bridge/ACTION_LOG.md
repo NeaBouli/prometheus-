@@ -884,6 +884,7 @@ Rules for all dev agents:
 ## 2026-07-23 GH-94 stale PR-ref recovery
 
 - GitHub accepted review-fix commit `91275ce` and synchronization commit `96a6f8e` on the #95 source branch, but repeatedly attached reopened workflow suites to stale initial SHA `6daa9f3`; Branch Protection correctly refused to treat those suites as current-head evidence.
-- PR #95 was closed and replaced by PR #96 on branch `feat/GH-94-local-byte-pattern-producer-r2` with the identical current commit set. No review or required check was bypassed.
-- Security Audit's existing manual dispatch started correctly on current head `96a6f8e`. Prometheus CI now exposes the same `workflow_dispatch` recovery trigger, allowing both protected workflows to run on the exact branch head when GitHub drops a pull-request synchronization event.
-- Product behavior and all wallet, signing, chain, KAS/PROM, reputation, slash ACL, commit-reveal, and emergency-stop boundaries remain unchanged. Replacement-PR checks and normal merge remain pending; `Prometheus-1.png` remains untouched and uncommitted.
+- PR #95 was closed and replaced by #96 with the identical reviewed product commit set. #96's initial suites passed on `96a6f8e`, but GitHub again omitted suites after final CI-recovery commit `95034d1`; #96 was closed without merge. No review or required check was bypassed.
+- Security Audit's existing manual dispatch attached correctly to its requested SHA. Prometheus CI now exposes the same `workflow_dispatch` recovery trigger for future default-branch availability.
+- Final branch `feat/GH-94-local-byte-pattern-producer-final` is complete before its protected PR is opened, so its initial suites can bind the exact final head without a post-open push.
+- Product behavior and all wallet, signing, chain, KAS/PROM, reputation, slash ACL, commit-reveal, and emergency-stop boundaries remain unchanged. Final protected-PR checks and normal merge remain pending; `Prometheus-1.png` remains untouched and uncommitted.
