@@ -11,15 +11,15 @@
 |------|------|
 | Projekt | Prometheus — Decentralized AI Threat Intelligence |
 | Repo | https://github.com/NeaBouli/prometheus- |
-| Branch | `feature/GH-63-kip16-threat-verifier`; all product and status changes remain PR-only |
+| Branch | `docs/GH-65-kip16-closeout`; all product and status changes remain PR-only |
 | Lokaler Pfad | `$REPO_ROOT` |
-| Letzter grün verifizierter Produkt-/Tooling-Commit | `22bc55a` — GH-58 durable ThreatHint verifier ingress; Prometheus CI `29962533693`, Security `29962533720`, and Pages `29962533075` green |
-| Aktueller Entwicklungs-Slice | GH-63/PR #64 adds the active-KIP-16-aligned manifest-pinned BN254/Arkworks verifier and bounded operated adapter. Protected review found and locally verified one additional ancestor-owner check; refreshed PR checks, merge, and exact-main evidence remain. Ohne unabhängig freigegebene Produktionsrelation, VK, Vektoren und expliziten Analyzer-Domain-Adapter bleibt der Sidecar fail-closed `busy`; echter Zwei-Host-Nachweis wartet weiterhin auf reparierten `ssh sandbox` Public-Key-Zugriff |
-| Aktuelle Tooling-Baseline | Exact public/docs main `6da3e48` includes merged GH-58 owner-only verifier IPC, trusted context binding, persistent replay/freshness admission, atomic durable outbox, and its public closeout. GH-63 is still in protected review. Public/multi-host operation, trusted membership/key assignment, Sybil resistance, real accepted analysis, and on-chain attestation remain open. Execution artifacts remain bound to `205e1ca`; GH-9 remains ready for explicitly approved external signing. |
+| Letzter grün verifizierter Produkt-/Tooling-Commit | `f4f9df9` — GH-63 manifest-pinned KIP-16 verifier; Prometheus CI `29968203074`, Security `29968203053`, and Pages `29968202562` green |
+| Aktueller Entwicklungs-Slice | GH-65 synchronisiert den GH-63 exact-main/public closeout. Ohne unabhängig freigegebene Produktionsrelation, VK, Vektoren und expliziten Analyzer-Domain-Adapter bleibt der Sidecar fail-closed `busy`; echter Zwei-Host-Nachweis wartet weiterhin auf reparierten `ssh sandbox` Public-Key-Zugriff |
+| Aktuelle Tooling-Baseline | Exact main `f4f9df9` includes merged GH-58 durable ingress and GH-63's active-KIP-16-aligned manifest-pinned BN254/Arkworks verifier plus bounded owner-aware adapter/service. Public/multi-host operation, trusted membership/key assignment, Sybil resistance, approved production proof artifacts, real accepted analysis, and on-chain attestation remain open. Execution artifacts remain bound to `205e1ca`; GH-9 remains ready for explicitly approved external signing. |
 | Aktueller HEAD | Mit `git log --oneline -1` prüfen; Bridge-/Status-Commits können neuer sein |
 | Rollback-Tag | `pre-session-20260413` → `6347b85` |
-| Whitepaper | WHITEPAPER.md (root) + whitepaper.html (styled); miner companion, reward boundaries, GH-36/GH-39 trust boundaries, and GH-48/GH-52/GH-55/GH-58/GH-63 scopes remain synchronized on the review branch |
-| Status | Rollout-capable core estimated at 77-81% with the GH-63 real verifier engine implemented but not yet merged; post-Toccata canary execution, approved production proof artifacts/accepted analysis, and full rollout evidence remain gated. |
+| Whitepaper | WHITEPAPER.md (root) + whitepaper.html (styled); miner companion, reward boundaries, GH-36/GH-39 trust boundaries, and GH-48/GH-52/GH-55/GH-58/GH-63 merged scopes remain synchronized |
+| Status | Rollout-capable core estimated at 77-81% with the GH-63 real verifier engine merged and exact-main verified; post-Toccata canary execution, approved production proof artifacts/accepted analysis, and full rollout evidence remain gated. |
 | GitHub Pages | https://neabouli.github.io/prometheus-/ |
 | Google Search Console | Verified: googleaa2902079481c7a8 |
 
@@ -305,11 +305,11 @@ Leistungsbasierte Emission. Guardians = "Miner" (KI statt GPU).
 - Scope-weighted estimates are core 76-80%, complete vision 42-47%, and 53-58% remaining. H-001 execution, remaining deployments, real metrics transition, two-host Guardian evidence, production verifier/analyzer wiring, PROM emission, and production nodes remain open.
 - No wallet, private key, secret, signature, raw transaction, broadcast, contract, reputation, KAS/PROM, slash ACL, commit-reveal formula, emergency-stop policy, or foreign untracked file was accessed or changed. `Prometheus-1.png` remains untouched and uncommitted.
 
-## Checkpoint 2026-07-23: GH-63 implementation candidate
+## Checkpoint 2026-07-23: GH-63 merged and exact-main verified
 
 - Active KIP-16 and pinned `rusty-kaspa` v2.0.1 provide the upstream BN254/Arkworks serialization baseline; the old `kaspa-zk-params` assumption is retired.
 - `prometheus-threat-proof` performs real manifest-pinned Groth16 verification with exact canonical VK/proof parsing and complete domain/network/ThreatHint statement binding.
 - The Guardian adapter/service uses owner-only exact-schema configuration, fixed no-shell invocation, clean environment, hard timeout, and distinct valid/invalid/syntax/unavailable exits.
 - No production relation, VK, proving key, or independently approved vectors are invented or bundled. Default operation remains fail-closed `busy`; accepted production analysis is not claimed.
-- Local verification passes 247 workspace Rust tests/2 live ignores, 144 Guardian tests/3 live-model skips, 7 focused Rust verifier tests, 18 focused Python adapter/service tests, locked optimized builds, all three Cargo packages, formatting/lint, Memory/HTML/workflow checks, and dependency audit. CodeRabbit's valid ancestor-owner hardening is implemented and locally verified; refreshed protected PR and exact-main evidence remain before closeout.
+- Local verification passes 247 workspace Rust tests/2 live ignores, 144 Guardian tests/3 live-model skips, 7 focused Rust verifier tests, 18 focused Python adapter/service tests, locked optimized builds, all three Cargo packages, formatting/lint, Memory/HTML/workflow checks, and dependency audit. CodeRabbit's valid ancestor-owner hardening is implemented, all protected PR contexts passed, and exact-main Prometheus CI `29968203074`, Security `29968203053`, and Pages `29968202562` are green for `f4f9df9`.
 - Scope-weighted estimates are core 77-81%, complete vision 43-48%, and 52-57% remaining.

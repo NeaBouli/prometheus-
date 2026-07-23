@@ -704,3 +704,11 @@ Rules for all dev agents:
 - The traversal fixture now derives its deliberately noncanonical path from the owner-only test directory. The unsafe-mode fixture still sets a real non-owner write bit through a symbolic mode expression; the suggested `0o744` was not used because the production policy intentionally allows read-only group/world bits and that value would invalidate the negative test.
 - CodeRabbit's date warning is not a repository defect: the work was completed on 2026-07-23 EEST while the GitHub review timestamp was still 2026-07-22 UTC. Project logs consistently use the configured local timezone.
 - No wallet, private key, secret, signature, raw transaction, broadcast, contract, Guardian/reporter authorization, reputation, KAS/PROM, slash ACL, commit-reveal behavior, emergency-stop policy, or foreign untracked file was accessed or changed. `Prometheus-1.png` remains untouched and uncommitted.
+
+## 2026-07-23 GH-63 merge and exact-main closeout start
+
+- Review hardening commit `a9cab60` passed all ten protected PR contexts. CodeRabbit accepted the ancestor-owner fix and the two lint-preserving test changes; the local-time documentation finding was explained, and all four threads are resolved.
+- PR #64 merged normally without admin bypass as exact main `f4f9df95848d41c82379ef59044d12453b12279c`; issue #63 closed automatically.
+- Exact-main Prometheus CI `29968203074`, Security Audit `29968203053`, and Pages `29968202562` all passed for the merge SHA. The public files now contain the merged implementation, while their status wording is being finalized through issue #65 and branch `docs/GH-65-kip16-closeout`.
+- The merged verifier remains deliberately unavailable as `busy` without an independently approved production relation, verifying key, vectors, and installation ceremony. The analyzer-domain adapter, real accepted-analysis evidence, two-host operation, H-001 external signing/execution, remaining deployments, metrics transition, PROM emission, and production nodes remain open.
+- No wallet, private key, secret, signature, raw transaction, broadcast, contract, Guardian/reporter authorization, reputation, KAS/PROM, slash ACL, commit-reveal behavior, emergency-stop policy, or foreign untracked file was accessed or changed. `Prometheus-1.png` remains untouched and uncommitted.
