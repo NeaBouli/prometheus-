@@ -1098,8 +1098,8 @@ serialization/commitment, a mutation regression covers both operations, and a
 shared non-string-policy vector exercises both languages. Final targeted
 re-review reports no remaining blocking, high, or medium finding.
 
-Evidence: 15 focused Rust tests plus one compile-fail doctest; 16 focused
-Python tests; 256 complete Rust workspace passes with two intentional
+Evidence: 16 focused Rust tests plus one compile-fail doctest; 16 focused
+Python tests; 257 complete Rust workspace passes with two intentional
 live-network ignores; 179 complete Guardian Python passes with three
 intentional live-model skips; Rustfmt; warning-free workspace all-target
 Clippy; locked optimized Guardian/proof builds; verified 9-file ThreatHint and
@@ -1107,8 +1107,9 @@ Clippy; locked optimized Guardian/proof builds; verified 9-file ThreatHint and
 9.86/10 and focused new-module Pylint 10.00/10. Existing CI discovers all new
 code and vectors; no workflow change is required. One unchanged client
 microbenchmark failed once at 1.84 ms against its 1 ms local threshold; the
-immediate isolated rerun measured 41 microseconds and the following complete
-workspace run passed all 256 tests. No GH-86 code path was involved.
+immediate isolated rerun measured 41 microseconds and subsequent complete
+workspace runs passed, most recently all 257 tests. No GH-86 code path was
+involved.
 
 Protected review update: initial CI/Security contexts, including Secret
 Detection, passed on `1abb4ce`. CodeRabbit found one actionable Python/Rust
@@ -1117,3 +1118,9 @@ constant-time loop. Python now validates grammar before disclosure policy,
 matching Rust, with a focused regression. Rust now uses the already-locked
 `subtle 2.6.1` `ConstantTimeEq` primitive through an explicit workspace
 dependency. Refreshed protected checks remain required.
+
+Claude Code 2.1.218 then completed a bounded read-only second review and found
+no blocking, high, or medium issue. Its one concrete low-severity hardening
+point was missing explicit Rust coverage for grammar-before-policy precedence;
+a matching regression now closes that asymmetry. Its exact dependency-pin
+observation was informational and does not change the reviewed behavior.

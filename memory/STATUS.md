@@ -140,7 +140,7 @@ commitment separate. Commitment matching proves canonical-byte consistency
 only. GH-86 now has locally complete isolated Rust/Python canonical validators
 against 5 valid, 35 invalid-bundle, and 9 invalid-context shared vectors.
 Direct unvalidated construction and value-bearing debug/repr output are closed.
-Independent re-review reports no remaining blocking/high/medium finding; 256
+Independent re-review reports no remaining blocking/high/medium finding; 257
 Rust workspace tests plus two intentional live-network ignores and 179
 Guardian Python tests plus three intentional live-model skips pass. The slice
 does not enable v2 transport or actionable analysis, so progress estimates

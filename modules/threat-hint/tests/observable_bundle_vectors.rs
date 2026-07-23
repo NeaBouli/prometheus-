@@ -215,6 +215,20 @@ fn rejected_values_are_absent_from_error_text() {
 }
 
 #[test]
+fn observable_grammar_precedes_disclosure_policy() {
+    let wire = concat!(
+        r#"{"schema_version":1,"disclosure_policy":"public_auto_v1","#,
+        r#""scope":{"platform":"linux","format":"elf"},"#,
+        r#""observables":[{"kind":"byte_pattern","value":"aa"}]}"#
+    );
+
+    assert!(matches!(
+        ObservableBundle::parse_canonical(wire.as_bytes()),
+        Err(ObservableBundleError::InvalidObservable)
+    ));
+}
+
+#[test]
 fn rejects_byte_pattern_over_token_cap() {
     let value = vec!["aa"; 65].join(" ");
     let wire = concat!(
