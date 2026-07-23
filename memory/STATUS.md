@@ -615,8 +615,7 @@ Exact main: 4cada95ed2f97c2d0251dd82ef40290b0c664c41; Prometheus CI
 ## GH-103 LOCAL LINUX ELF API-IMPORT PRODUCER
 
 ```text
-Status: local implementation and independent review pass; protected PR and
-        exact-main evidence remain
+Status: merged through protected PR #104 and exact-main/live verified
 Input: exact caller-supplied ELF bytes plus one checked import index
 Parser: object 0.39.1, read-only ELF features; 16 MiB and 4096 dynamic-symbol
         limits
@@ -631,10 +630,12 @@ Evidence: 5 focused producer tests, 1 Rust vector test, 30 ThreatHint tests plus
           Rustfmt, warning-free Clippy, Black, and Pylint pass
 Review: Claude Code architecture review plus Terra diff review; no unresolved
         blocking/high/medium finding
+Exact main: 42d9cd939c635474547d1bac7058f30451c926e7; Prometheus CI
+            29999873100, Security Audit 29999873126, and Pages 29999872424 pass
 Boundary: no path/import-string/generic builder, transport, analyzer, proof,
           wallet, signing, chain, reputation, KAS/PROM, slash ACL,
           commit-reveal, or emergency-stop change
-Remaining: protected PR/exact-main/live evidence; external provenance/privacy
-           approval; other platform/format extractors; v2 wire/proof/pairing;
-           actionable analysis and all existing rollout gates
+Remaining: external provenance/privacy approval; other platform/format
+           extractors; v2 wire/proof/pairing; actionable analysis and all
+           existing rollout gates
 ```

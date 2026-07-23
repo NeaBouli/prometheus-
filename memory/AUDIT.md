@@ -1354,9 +1354,15 @@ all 30 ThreatHint tests plus one compile-fail doctest, 19 focused Python
 observable tests, 182 complete Guardian tests with three intentional
 live-model skips, and the complete Rust workspace with two intentional
 live-network ignores pass. Rustfmt, warning-free crate/workspace all-target
-Clippy, Black, and Guardian Pylint above the CI threshold pass. Protected PR,
-dependency/security checks, exact-main runs, and live public verification
-remain required.
+Clippy, Black, and Guardian Pylint 9.86/10 pass.
+
+Protected closeout: PR #104 passed all nine attached protected CI/Security
+contexts on exact head `0774358250c72f60a00ed6326a04fcb427fe6f26` and
+merged by the repository-allowed squash method without admin bypass as
+`42d9cd939c635474547d1bac7058f30451c926e7`; issue #103 closed. Exact-main
+Prometheus CI `29999873100`, Security Audit `29999873126`, and Pages
+`29999872424` passed. Raw README and live Whitepaper, Roadmap, FAQ, and
+`llms.txt` markers were verified.
 
 Non-claims: the index is a local selection and the scope label is parser
 policy, not proof of external artifact provenance, host OS, maliciousness,
