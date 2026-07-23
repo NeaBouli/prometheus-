@@ -13,10 +13,10 @@
 | Repo | https://github.com/NeaBouli/prometheus- |
 | Branch | Canonical target `main`; product/public/status changes remain PR-only |
 | Lokaler Pfad | `$REPO_ROOT` |
-| Letzter grün verifizierter Produkt-/Public-Baseline | Exact main `60166bd6d8d3c7d8e88727c2f6d507b206a308ad` merges GH-111 through protected PR #112; Prometheus CI `30011976919`, Security `30011976853`, and Pages `30011975363` pass, and raw/live README/Whitepaper/Roadmap/FAQ/llms markers were verified |
-| Aktueller Entwicklungs-Slice | GH-114 is active on `feat/GH-114-local-threat-hint-v2-statement`: isolated Rust/Python canonical schema-2 statement parsing, trusted-network equality, shared exact-byte corpus, and domain-separated digest without v1, relation, proof, pairing, transport, analyzer, wallet, or chain effects |
-| Aktuelle Tooling-Baseline | Exact main `60166bd6d8d3c7d8e88727c2f6d507b206a308ad` includes GH-58 durable ingress, GH-63's active-KIP-16-aligned verifier, GH-69 manifest preflight, GH-74 hash-only analyzer adapter, GH-77 batch isolation, GH-86 observable validators, GH-90 `file_sha256`, GH-94 mandatory-review `byte_pattern`, GH-100 pre-readiness signal registration, GH-98 public/license reconciliation, GH-103 bounded review-required Linux ELF `api_import` derivation, GH-107 local canonical Observable Approval verification, and GH-111 local fixed-policy durable approval consumption. Public/multi-host operation, trusted membership/key assignment, authority rotation/scope assignment, Sybil resistance, approved production proof artifacts, privacy-reviewed pairing/promotion/actionable analysis, and on-chain attestation remain open. Execution artifacts remain bound to `205e1ca`; GH-9 remains ready for explicitly approved external signing. |
-| Aktueller HEAD | Latest verified product/public baseline is exact main `60166bd6d8d3c7d8e88727c2f6d507b206a308ad`; status-only closeout commits may be newer, so inspect `git log --oneline -1` |
+| Letzter grün verifizierter Produkt-/Public-Baseline | Exact product main `70bb8ab0ba4cbb0e32a107d0d426736fa5020ba4` merges GH-114 through protected PR #115; Prometheus CI `30019079713`, Security `30019079960`, and Pages `30019075639` pass, and raw/live README/Whitepaper/Roadmap/FAQ/llms markers were verified |
+| Aktueller Entwicklungs-Slice | Status-only GH-114 closeout on `docs/GH-114-closeout`; no product code or architectural boundary changes |
+| Aktuelle Tooling-Baseline | Exact product main `70bb8ab0ba4cbb0e32a107d0d426736fa5020ba4` includes GH-58 durable ingress, GH-63's active-KIP-16-aligned verifier, GH-69 manifest preflight, GH-74 hash-only analyzer adapter, GH-77 batch isolation, GH-86 observable validators, GH-90 `file_sha256`, GH-94 mandatory-review `byte_pattern`, GH-100 pre-readiness signal registration, GH-98 public/license reconciliation, GH-103 bounded review-required Linux ELF `api_import` derivation, GH-107 local canonical Observable Approval verification, GH-111 local fixed-policy durable approval consumption, and GH-114 local canonical ThreatHint v2 statement parsing. Public/multi-host operation, trusted membership/key assignment, authority rotation/scope assignment, Sybil resistance, approved production proof artifacts, privacy-reviewed pairing/promotion/actionable analysis, and on-chain attestation remain open. Execution artifacts remain bound to `205e1ca`; GH-9 remains ready for explicitly approved external signing. |
+| Aktueller HEAD | Latest verified product/public baseline is exact product main `70bb8ab0ba4cbb0e32a107d0d426736fa5020ba4`; status-only closeout commits may be newer, so inspect `git log --oneline -1` |
 | Rollback-Tag | `pre-session-20260413` → `6347b85` |
 | Whitepaper | WHITEPAPER.md (root) + whitepaper.html (styled); miner companion, reward boundaries, GH-36/GH-39 trust boundaries, and GH-48/GH-52/GH-55/GH-58/GH-63/GH-74/GH-94/GH-107/GH-111/GH-114 boundaries remain synchronized |
 | Status | Rollout-capable core remains estimated at 78-82%. GH-114 adds local structural v2 statement binding only. Authority rotation/scope assignment, owner-only hint/bundle/approval pairing, external provenance/privacy promotion, post-Toccata canary execution, reviewed v2 relation/proof artifacts, transport, actionable analysis, crash-safe external side effects, and full rollout evidence remain gated. |
@@ -321,11 +321,11 @@ Leistungsbasierte Emission. Guardians = "Miner" (KI statt GPU).
 - Local evidence is 24 focused tests, 158 complete Guardian passes with three intentional live-model skips, Black, Ruff, and focused Pylint 10.00/10. PR #75 passed all ten protected contexts twice with no open review thread and merged normally as `17d8ceb`; exact-main Prometheus CI `29973290911`, Security Audit `29973290913`, and Pages `29973290610` pass.
 - Scope-weighted estimates are core 78-82%, complete vision 44-49%, and 51-56% remaining. Production proof artifacts, a concrete-observable channel or future schema, real actionable analysis, and all existing external rollout gates remain open.
 
-## Checkpoint 2026-07-24: GH-114 local v2 statement candidate
+## Checkpoint 2026-07-24: GH-114 local v2 statement accepted
 
-- Issue #114 and branch `feat/GH-114-local-threat-hint-v2-statement` add one
-  isolated canonical schema-2 statement boundary without changing ThreatHint
-  v1.
+- Issue #114 is closed after protected PR #115 merged as exact product main
+  `70bb8ab0ba4cbb0e32a107d0d426736fa5020ba4`. The isolated canonical schema-2
+  statement boundary does not change ThreatHint v1.
 - Rust and Python independently require exact field order/bytes, separate
   artifact hash and observable commitment, confidence, structural disclosure
   class, report nonce, positive u64 observed time, and exact equality with
@@ -342,10 +342,11 @@ Leistungsbasierte Emission. Guardians = "Miner" (KI statt GPU).
   snapshot and two regressions closed it, and re-review reports no remaining
   blocking, high, or medium issue. Claude Code was reachable, but its read-only
   helper call stopped before repository access on the configured USD budget.
-- Protected PR #115 first-round CI/Security technical jobs passed. CodeRabbit's
-  four minor digest-context, positive-u64, network-regex, and public-HTML
-  consistency findings are fixed; affected post-fix tests and document gates
-  pass. Second-round protected checks and thread resolution remain.
+- PR #115 final head passed all ten contexts with zero unresolved threads.
+  CodeRabbit's four minor digest-context, positive-u64, network-regex, and
+  public-HTML consistency findings are fixed. Exact-main CI `30019079713`,
+  Security `30019079960`, Pages `30019075639`, and raw/live public markers
+  pass.
 - Relation/proof artifacts, privacy approval, authority semantics,
   hint/bundle/approval pairing, replay/external-side-effect policy, transport,
   actionable analysis, and all external rollout gates remain open. Completion

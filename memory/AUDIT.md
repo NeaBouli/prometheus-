@@ -1599,12 +1599,18 @@ two-character network minimum, and synchronize public HTML digest wording.
 All four are fixed. Nine focused and 223 complete Guardian tests with three
 intentional skips, Black, source Pylint 10.00/10, HTML/SEO/JSON-LD/public
 status, Memory Integrity, six Autodidactic tests, and clean diff checks pass
-after the fixes. Second-round protected checks and thread resolution remain.
+after the fixes. Final head `b225a7f4058eb657fd6b29ef1086d046c218263b`
+passed all ten contexts with zero unresolved threads. PR #115 merged normally
+without admin bypass as exact product main
+`70bb8ab0ba4cbb0e32a107d0d426736fa5020ba4`; issue #114 closed. Exact-main
+Prometheus CI `30019079713`, Security Audit `30019079960`, and Pages
+`30019075639` pass, and raw/live public markers were verified.
 
 Non-claims: the asserted artifact hash and commitment are not proven to derive
 from real bytes. The statement digest is not a signature or proof. Structural
 `disclosure_class` does not authorize disclosure. No relation, proof
 acceptance, signer, approval pairing, replay authority, persistence, transport,
-analysis, publication, wallet, or chain action is added. Protected PR
-review/CI, exact-main evidence, and live public verification remain before this
-slice is accepted.
+analysis, publication, wallet, or chain action is added. The focused local
+structural-binding slice is accepted; the later relation, proof, pairing,
+privacy/promotion, transport, actionable-analysis, and external rollout gates
+remain separate.
