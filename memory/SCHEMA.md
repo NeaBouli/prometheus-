@@ -187,7 +187,7 @@ future separate `artifact_hash` plus domain-separated
 `observable_commitment`. A matching reveal proves commitment consistency only;
 no v2 wire schema is implemented yet.
 
-GH-86 implements the local Canonical Observable Bundle v1 parser in Rust and
+Merged and exact-main-verified GH-86 implements the local Canonical Observable Bundle v1 parser in Rust and
 Python against one shared byte-exact valid/invalid corpus. The local schema is
 strict UTF-8 JSON capped at 4096 bytes, carries 1..=16 closed typed
 observables, and binds its commitment to the trusted network plus a 32-byte

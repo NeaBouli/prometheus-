@@ -1124,3 +1124,11 @@ no blocking, high, or medium issue. Its one concrete low-severity hardening
 point was missing explicit Rust coverage for grammar-before-policy precedence;
 a matching regression now closes that asymmetry. Its exact dependency-pin
 observation was informational and does not change the reviewed behavior.
+
+Closeout: all ten protected contexts passed on `d4396ca`, the only review
+thread is resolved, and PR #87 merged normally without admin bypass as exact
+main `2bfe5a3cd5df68bd9d17433748c06bb010070fae`. Issue #86 is closed.
+Exact-main Prometheus CI `29981646898`, Security Audit `29981646867`, and Pages
+`29981646320` passed. GH-86 is complete only as the isolated local
+structural/commitment boundary; all extractor, privacy, v2 wire/proof/pairing,
+actionable-analysis, chain, and production-operation gates remain.

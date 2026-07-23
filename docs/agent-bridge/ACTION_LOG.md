@@ -819,3 +819,12 @@ Rules for all dev agents:
 - Claude Code's first bounded attempt stopped at its configured USD limit; a later read-only retry completed successfully. Spark, Terra, and Claude provided bounded help while Sol retained architecture, corrections, integration, and final verification ownership.
 - Scope estimates remain core 78-82%, complete vision 44-49%, and 51-56% remaining. PR/protected exact-main verification is next.
 - No wallet, private key, secret, signature, raw transaction, broadcast, contract, Guardian/reporter authorization, reputation, KAS/PROM, slash ACL, commit-reveal behavior, emergency-stop policy, or foreign untracked file was accessed or changed. `Prometheus-1.png` remains untouched and uncommitted.
+
+## 2026-07-23 GH-86 merge and exact-main closeout
+
+- Review-fix commits `5cd314dc17046401eb164cddb9437f16b8158500` and `d4396ca59374935276e68194b0bf3c1698604a7a` closed CodeRabbit's validation-order and constant-time-comparison findings plus Claude Code's low-severity Rust test-coverage point.
+- All ten protected PR contexts passed on `d4396ca`; the only review thread is resolved. PR #87 merged normally without admin bypass as exact main `2bfe5a3cd5df68bd9d17433748c06bb010070fae`, and issue #86 closed.
+- Exact-main Prometheus CI `29981646898`, Security Audit `29981646867`, and Pages `29981646320` passed. Issue #88 and branch `docs/GH-88-local-observable-closeout` reconcile this evidence through the protected documentation workflow.
+- GH-86 is complete as a local structural/commitment boundary. It adds no v2 wire, proof relation/artifact, extractor provenance, privacy approval, analyzer side effect, chain action, or production acceptance.
+- Scope estimates remain core 78-82%, complete vision 44-49%, and 51-56% remaining. The next safe product work remains reviewed extractor/privacy design or another independently bounded non-operational slice; rollout still requires external evidence and production operation.
+- No wallet, private key, secret, signature, raw transaction, broadcast, contract, Guardian/reporter authorization, reputation, KAS/PROM, slash ACL, commit-reveal behavior, emergency-stop policy, or foreign untracked file was accessed or changed. `Prometheus-1.png` remains untouched and uncommitted.

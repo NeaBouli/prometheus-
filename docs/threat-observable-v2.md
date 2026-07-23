@@ -1,6 +1,6 @@
 # Threat Observable v2 Protocol Draft
 
-Status: normative design draft for GH-82. GH-86 implements only the isolated
+Status: normative design draft for GH-82. Merged and exact-main-verified GH-86 implements only the isolated
 local Rust/Python bundle validators and shared vectors in Sections 4-5. No v2
 wire, proof relation, production key, pairing, analyzer promotion, or
 deployment is approved by this document.
@@ -185,7 +185,7 @@ Implementation may begin with a local canonical bundle type and validator, but
 network or analyzer promotion requires:
 
 - frozen cross-language test vectors for valid and invalid canonical bundles
-  (implemented locally by GH-86);
+  (implemented locally and exact-main verified by GH-86);
 - a separate ThreatHint v2 schema and protocol identifier;
 - an exact v2 statement specification and reviewed relation source;
 - independently approved relation, proving/verifying keys, and vectors;

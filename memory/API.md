@@ -282,7 +282,7 @@ review.
 ### Local Threat Observable bundle APIs (GH-82/GH-86)
 
 `docs/threat-observable-v2.md` remains the normative design draft for the
-future protocol. GH-86 implements only its local canonical bundle boundary:
+future protocol. Merged and exact-main-verified GH-86 implements only its local canonical bundle boundary:
 
 ```text
 Rust: prometheus_threat_hint::ObservableBundle
