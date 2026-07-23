@@ -48,3 +48,12 @@ extractor provenance or semantic privacy. There is no transport or semantic
 privacy guarantee for any bundle, including `review_required_v1`. No logger or
 payload is emitted on validation failure, fixed errors never include rejected
 values, and value-bearing debug/repr output is disabled.
+
+The local Rust producers remain kind-specific and accept no paths or observable
+strings. `produce_file_sha256_bundle` hashes exact caller-supplied bytes and
+emits one `public_auto_v1` digest. `produce_byte_pattern_bundle` selects a
+bounded 8..=64-byte range from exact caller-supplied bytes, replaces positions
+chosen by a boolean mask with `??`, requires at least eight fixed bytes, and
+always emits `review_required_v1`. Neither profile authorizes transport, and
+the byte-pattern result must remain local until a separate authenticated
+approval protocol is specified and reviewed.

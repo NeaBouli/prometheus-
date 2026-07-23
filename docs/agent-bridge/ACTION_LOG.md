@@ -859,3 +859,32 @@ Rules for all dev agents:
 - Issue #92 records the protected documentation-only reconciliation: public and internal status now describe GH-90 as merged/exact-main verified and retain every provenance, privacy, transport, proof, actionable-analysis, chain, and production-operation gate.
 - Scope estimates remain core 78-82%, complete vision 44-49%, and 51-56% remaining. GH-90 closes a local deterministic producer boundary only and does not increase rollout readiness.
 - No product code, workflow, wallet, private key, secret, signature, raw transaction, broadcast, contract, Guardian/reporter authorization, reputation, KAS/PROM, slash ACL, commit-reveal behavior, or emergency-stop policy changed in this reconciliation. `Prometheus-1.png` remains untouched and uncommitted.
+
+## 2026-07-23 GH-92 exact-main closeout and GH-94 byte-pattern producer
+
+- PR #93 merged the GH-90 documentation closeout normally without admin bypass as exact main `2ad2c44f37ec15ab2004b83daa5a8891945db1b3`; issue #92 closed.
+- Exact-main Prometheus CI `29985377659`, Security Audit `29985377455`, and Pages `29985377181` passed. Live GitHub Pages Whitepaper/Roadmap/FAQ plus raw GitHub README/Bridge markers were verified.
+- Opened issue #94 and branch `feat/GH-94-local-byte-pattern-producer` for one local Rust producer that selects a checked 8..=64-byte range from exact artifact bytes and emits lowercase fixed tokens or mask-selected `??`. At least eight bytes must remain fixed.
+- The public API accepts bytes, offset, boolean mask, and typed scope only. Its crate-private constructor accepts fixed-or-wildcard byte tokens rather than text. Every result is `review_required_v1`; no path, pattern string, generic builder, transport, proof, analyzer, wallet, signing, or chain input exists.
+- Added four shared vectors covering minimum, checked offset/mixed wildcard, script, and exact 64-token/minimum-fixed boundaries. Rust produces exact canonical bytes; Python independently derives the expected pattern and validates the wire without gaining a producer API.
+- Focused evidence passes 18 Rust producer/validator tests and 18 Python observable tests. Independent Terra review reports no blocking/high/medium finding; its exact-end offset and 64-token cross-language coverage recommendations are included.
+- Sol integration review found that the constructor's 64-token cap was reached only after the public producer collected tokens. The producer now rejects invalid lengths and insufficient fixed bytes before range selection or allocation, while the constructor retains the same defensive checks.
+- Complete local evidence passes 265 Rust workspace tests plus one compile-fail doctest with two intentional live-network ignores and 181 Guardian tests with three intentional live-model skips. Rustfmt, warning-free workspace all-target Clippy, verified 15-file ThreatHint package contents, Black, Ruff, Guardian Pylint 9.86/10, Memory Integrity, six Autodidactic tests, HTML/JSON-LD/public-status checks, workflow YAML parsing, Actionlint 1.7.12, Cargo Audit with no vulnerabilities and eight known allowed warnings, staged-diff Gitleaks 8.30.1 with no leak, and clean diff checks pass.
+- Claude Code was requested as a no-tool helper, but its configured monthly spend limit rejected the call before analysis or repository access. Sol retains architecture, implementation, integration, and verification responsibility.
+- Scope estimates remain core 78-82%, complete vision 44-49%, and 51-56% remaining. External provenance, wildcard suitability, semantic privacy approval, disclosure authorization, transport, proof binding, actionable analysis, and production acceptance remain unproved and gated.
+- No wallet, private key, secret, signature, raw transaction, broadcast, contract, Guardian/reporter authorization, reputation, KAS/PROM, slash ACL, commit-reveal behavior, or emergency-stop policy was accessed or changed. `Prometheus-1.png` remains untouched and uncommitted.
+
+## 2026-07-23 GH-94 protected review follow-up
+
+- PR #95 passed all ten initial protected CI, Security, and CodeRabbit contexts on commit `6daa9f3fa1c8af39f6ac4a17a970cac627b43e9e`.
+- CodeRabbit's only valid finding was a minor documentation ambiguity in `memory/API.md`: generic Rust/Python bundle validation uses `threat-observable-bundle-v1.json`, while GH-94 producer validation uses the separate `threat-observable-byte-pattern-producer-v1.json` corpus.
+- The API memory now names both corpora explicitly. Audit and Bridge record the review result; no product code, public behavior, workflow, wallet, signing, chain, KAS/PROM, reputation, slash ACL, commit-reveal, or emergency-stop boundary changed.
+- Refreshed checks, normal merge without admin bypass, exact-main CI/Security/Pages, and protected documentation reconciliation remain next. `Prometheus-1.png` remains untouched and uncommitted.
+
+## 2026-07-23 GH-94 stale PR-ref recovery
+
+- GitHub accepted review-fix commit `91275ce` and synchronization commit `96a6f8e` on the #95 source branch, but repeatedly attached reopened workflow suites to stale initial SHA `6daa9f3`; Branch Protection correctly refused to treat those suites as current-head evidence.
+- PR #95 was closed and replaced by #96 with the identical reviewed product commit set. #96's initial suites passed on `96a6f8e`, but GitHub again omitted suites after final CI-recovery commit `95034d1`; #96 was closed without merge. No review or required check was bypassed.
+- Security Audit's existing manual dispatch attached correctly to its requested SHA. Prometheus CI now exposes the same `workflow_dispatch` recovery trigger for future default-branch availability.
+- Final branch `feat/GH-94-local-byte-pattern-producer-final` is complete before its protected PR is opened, so its initial suites can bind the exact final head without a post-open push.
+- Product behavior and all wallet, signing, chain, KAS/PROM, reputation, slash ACL, commit-reveal, and emergency-stop boundaries remain unchanged. Final protected-PR checks and normal merge remain pending; `Prometheus-1.png` remains untouched and uncommitted.

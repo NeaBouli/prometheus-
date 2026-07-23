@@ -6,6 +6,8 @@
 
 **GH-90 merged and exact-main verified — July 2026:** One local Rust producer computes a single `file_sha256` observable from exact caller-supplied bytes and typed scope; Python independently validates the shared producer vectors. The API accepts no path, caller-supplied digest, or generic observable value and performs no transport. It proves deterministic function-boundary derivation only, not external file provenance, maliciousness, privacy approval, or proof binding.
 
+**GH-94 candidate — July 2026:** One local Rust producer derives a bounded `byte_pattern` from exact caller-supplied bytes, a checked offset, a boolean wildcard mask, and typed scope; Python independently validates the shared producer vectors. It accepts no path or pattern string, requires at least eight fixed bytes, and always emits local-only `review_required_v1`. It does not authorize disclosure or transport and proves no external provenance, maliciousness, privacy approval, or proof binding.
+
 **Keyless operator update — July 2026:** The repository contains `prometheus-silverc-deployer`, pinned to official `rusty-kaspa` v2.0.1 and the exact Silverc source compiler revision. Its covenant-genesis path constructs transaction version 1 with compute budget 10 and the exact contextual `storage_mass` commitment, derives the official covenant ID, validates the exact live unspent funding UTXO during preflight and immediately before broadcast, and models the final 66-byte Schnorr signature script before exporting the 32-byte `SIG_HASH_ALL` digest. Signing-request schema v2 binds compute, transient, storage, normalized noncontextual/overall mass, the pinned relay rate, and both relay and conservative operator fee floors. The `reportMetrics` path recompiles exact predecessor and successor state, preserves the covenant value, uses a separate P2PK fee sponsor, derives two `SIG_HASH_ALL` digests, verifies both external BIP340 signatures plus every covenant/P2PK input, and revalidates both UTXOs before guarded broadcast. Both paths reject normalized input/output collisions, persist exclusive intent before acknowledged submission, reconcile retry state by transaction ID, enforce wRPC deadlines, and rebuild verified transactions before observation. The Rust package has 49 unit/security tests, including 11 focused metrics-transition tests. No private-key, seed, wallet, keystore, or raw-transaction input exists. Public testnet-10 funding plus an exact-main H-001 schema-v2 request/digest are confirmed. The H-001 canary and real metrics transition still require explicitly approved external signatures, complete operator verification, broadcast, confirmation, and independent chain evidence. Those results cannot authorize the full release by themselves.
 
 The deploy capability gate and repository operator both bind the official SilverScript covenant-genesis profile: transaction version 1, `pay_to_script_hash_script` over the compiled contract script, covenant-ID derivation from the funding outpoint and unbound genesis output, and `CovenantBinding` only after the ID is derived. The repository assembles, verifies, broadcasts, and observes public transactions but delegates all signing to an external vault/HSM and never accepts key material. The current official PSKT/PSKB implementation is not used because its audited v1 path still constructs legacy sigop-count input commitments instead of Toccata compute-budget commitments.
@@ -93,10 +95,14 @@ computes a single `file_sha256` observable from exact caller-supplied bytes and
 typed scope; Python independently validates the shared producer vectors. This
 proves only deterministic derivation at that function boundary, not that the
 bytes came from a real file, are malicious or privacy-approved, or are bound by
-a proof. Neither slice is connected to v1 transport, proof verification,
-Guardian analysis, or rule publication. Reviewed privacy gates, the remaining
-kind-specific extractors, a v2 wire and statement/relation, approved proof
-artifacts, and owner-only pairing remain required before actionable analysis.
+a proof. The GH-94 candidate additionally derives one bounded byte pattern from an exact
+artifact-byte selection and boolean wildcard mask. It is always local-only
+`review_required_v1`; no transport or privacy approval follows from successful
+construction. None of these slices is connected to v1 transport, proof
+verification, Guardian analysis, or rule publication. Reviewed privacy gates,
+the remaining kind-specific extractors, a v2 wire and statement/relation,
+approved proof artifacts, and owner-only pairing remain required before
+actionable analysis.
 
 ---
 

@@ -1182,3 +1182,75 @@ Prometheus CI `29984477087`, Security Audit `29984476876`, and Pages
 `29984476107` passed. GH-90 does not close external provenance, privacy,
 transport, v2 proof, actionable-analysis, chain, or production-operation
 gates.
+
+## GH-94 LOCAL BYTE-PATTERN PRODUCER CANDIDATE (2026-07-23)
+
+Scope: one local Rust producer in `prometheus-threat-hint`, one shared
+producer-vector corpus, independent Python consumption, and synchronized
+internal/public documentation. ThreatHint v1, P2P, verifier, analyzer, proof,
+wallet, signing, contracts, and chain paths remain out of scope.
+
+Result: CONDITIONAL PASS pending protected PR/exact-main evidence. The public
+function accepts exact artifact bytes, a checked start offset, a boolean
+wildcard mask, and typed scope. It derives every fixed token
+from the selected artifact range, emits `??` only where the mask requests it,
+requires 8..=64 positions and at least eight fixed bytes, and exposes no path,
+pattern string, generic observable value, or builder. The crate-private
+constructor accepts fixed-or-wildcard byte tokens rather than text and always
+assigns `review_required_v1`.
+
+Security boundary: deterministic extraction is established only from the byte
+slice, offset, and mask supplied to the function. Wildcard selection, external
+file provenance, truth, maliciousness, semantic privacy approval, disclosure
+authorization, and proof binding remain unproved. `review_required_v1` remains
+local-only and no IPC, P2P, analyzer, committee, IPFS, chain, or public-rule
+path is added.
+
+Focused evidence: 18 Rust producer/validator tests and 18 Python observable
+tests pass. Shared vectors cover the minimum fixed pattern, checked nonzero
+offset with mixed wildcards, script bytes, and the exact 64-token maximum with
+only eight fixed bytes. Rust tests additionally cover short/long/empty masks,
+insufficient fixed bytes, out-of-range and overflowing offsets, fixed-byte
+sensitivity, and wildcard invariance. Independent Terra review reports no
+blocking, high, or medium finding and recommended two coverage additions; both
+the exact-end offset rejection and 64-token cross-language vector are included.
+Claude Code was requested as a no-tool helper but its configured monthly spend
+limit rejected the call before analysis or repository access.
+
+Sol's integration review found that the constructor enforced the 64-token cap
+only after the public producer had selected and collected tokens. The public
+producer now rejects invalid mask lengths and insufficient fixed-byte counts
+before range selection or allocation; the constructor repeats both checks
+defensively.
+
+Complete local evidence: 265 Rust workspace tests plus one compile-fail doctest
+pass with two intentional live-network ignores; Guardian passes 181 tests with
+three intentional live-model skips. Rustfmt, warning-free workspace all-target
+Clippy, verified 15-file ThreatHint package contents including all producer
+modules/tests/vector corpora, Black, Ruff, Guardian Pylint 9.86/10, Memory
+Integrity, six Autodidactic tests, HTML/JSON-LD/public-status checks, workflow
+YAML parsing, Actionlint 1.7.12, Cargo Audit with no vulnerabilities and eight
+known allowed warnings, staged-diff Gitleaks 8.30.1 with no leak, and clean
+diff checks pass. Protected CI remains authoritative for the full-history
+secret gate.
+
+Protected PR evidence: PR #95 passed all ten CI, Security, and CodeRabbit
+contexts for commit `6daa9f3fa1c8af39f6ac4a17a970cac627b43e9e`. CodeRabbit
+reported one valid minor documentation ambiguity: the API memory could imply
+that GH-94 producer validation reused the generic bundle corpus. The API now
+distinguishes the generic bundle corpus from the separate GH-94 byte-pattern
+producer corpus. No product or workflow behavior changed; refreshed protected
+checks and normal merge remain required.
+
+CI recovery note: GitHub registered both review-fix pushes on #95 but retained
+the original PR tracking SHA for the first push and attached reopened workflow
+suites to stale commit `6daa9f3` even after the PR commit list advanced. PR #95
+was closed. First replacement #96 correctly ran its initial suites on
+`96a6f8e`, but GitHub again omitted suites for later final head `95034d1`;
+#96 was closed without merge. Final branch
+`feat/GH-94-local-byte-pattern-producer-final` contains the identical reviewed
+product commit set and is opened only after all changes are committed, avoiding
+post-open synchronization. Security Audit's existing manual dispatch correctly
+attached to its requested SHA. Prometheus CI now exposes the same
+`workflow_dispatch` recovery trigger for future default-branch availability;
+no required check is fabricated or bypassed.

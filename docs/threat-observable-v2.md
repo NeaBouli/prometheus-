@@ -4,7 +4,11 @@ Status: normative design draft for GH-82. Merged and exact-main-verified GH-86
 implements only the isolated local Rust/Python bundle validators and shared
 vectors in Sections 4-5. Merged and exact-main-verified GH-90 adds one local Rust producer for a
 single `file_sha256` observable from exact caller-supplied bytes, plus shared
-vectors independently consumed by Python. No v2 wire, proof relation,
+vectors independently consumed by Python. The GH-94 candidate adds one local
+Rust producer for a bounded `byte_pattern` derived from exact caller-supplied
+bytes, offset, and boolean wildcard mask; it is always
+`review_required_v1`, and Python independently validates the shared vectors.
+No v2 wire, proof relation,
 production key, pairing, analyzer promotion, or deployment is approved by this
 document.
 
@@ -163,6 +167,16 @@ observable builder. Its result establishes only deterministic derivation from
 the supplied byte slice. It does not prove that those bytes came from a real
 file, that the file is malicious, that disclosure is privacy-approved, or that
 the digest is bound by a proof. It performs no transport or analysis.
+
+The GH-94 candidate applies the same bytes-only boundary to one bounded
+`byte_pattern`. The caller selects a start offset and a boolean wildcard mask
+of 8..=64 positions; every fixed token is derived from the selected artifact
+bytes, and at least eight positions must remain fixed. The API accepts no
+pattern string and uses checked range arithmetic. Its output is always
+`review_required_v1`, so it is structurally valid for local review only and
+does not authorize disclosure or transport. Wildcard selection, external
+artifact provenance, maliciousness, semantic privacy approval, and proof
+binding remain unproved.
 
 `review_required_v1` is local-only in the first implementation. Any IPC, P2P,
 Guardian analyzer, committee, IPFS, chain, or public-rule boundary must reject
