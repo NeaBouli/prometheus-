@@ -212,7 +212,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
   <div class="page-header-inner">
     <div class="breadcrumb r"><a href="index.html">Prometheus</a><span>/</span>Roadmap</div>
     <h1 class="page-title r">Full deployment<br>roadmap.</h1>
-    <p class="page-desc r d1">Readiness-gated delivery. H-001 canary preparation: 96%. Core-network rollout: 74–78%. Complete roadmap vision: 40–45%. No fixed release date is claimed.</p>
+    <p class="page-desc r d1">Readiness-gated delivery. H-001 canary preparation: 96%. Core-network rollout: 78–82%. Complete roadmap vision: 44–49%. No fixed release date is claimed.</p>
   </div>
 </div>
 
@@ -357,10 +357,11 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
           <li class="done-item">Merged/exact-main-verified GH-55 ThreatHint core: shared canonical schema, development-only Light Client builder, and an independent bounded request/ACK protocol</li>
           <li class="done-item">Merged/exact-main-verified GH-58 ThreatHint verifier ingress: separate owner-only IPC, trusted network/domain binding, persistent freshness/replay admission, and atomic durable analyzer outbox; production Groth16 remains fail-closed unavailable</li>
           <li class="done-item">Merged and exact-main-verified GH-63 real Groth16 engine: canonical manifest/VK trust anchors, exact proof parsing, complete ThreatHint statement binding, bounded owner-aware adapter/service, and fail-closed operation without approved production artifacts</li>
+          <li class="done-item">GH-74 bounded analyzer adapter: canonical outbox digest/network/time revalidation and exact non-submittable handling of hash-only v1 without fabricated IOC, LLM, or YARA output</li>
           <li>Public or multi-host relay/NAT operation and broad discovery; mDNS is held while its compatible dependency path has unresolved RustSec advisories</li>
           <li>KRC-20 UTXO queries for "PROM-RULES" tick</li>
           <li>Rule content download from IPFS via CIDv1</li>
-          <li>Approve and install the production ThreatHint relation, verifying key, independent vectors, and explicit analyzer-domain adapter before accepted analysis</li>
+          <li>Approve and install the production ThreatHint relation, verifying key, and independent vectors; add a reviewed privacy-preserving concrete-observable channel or future schema before actionable analysis</li>
           <li>Guardian ↔ Validator proposal submission</li>
         </ul>
       </div>

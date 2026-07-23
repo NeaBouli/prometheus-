@@ -249,22 +249,32 @@ class ThreatAnalysis:
     analysis_duration_ms: int
 ```
 
-### 3.2 Guardian ThreatHint domain input (post-verification target)
+### 3.2 Guardian verified ThreatHint v1 analyzer input
 
 ```python
-@dataclass
-class ThreatHint:
+@dataclass(frozen=True)
+class VerifiedThreatHint:
+    payload_digest: str                # SHA-256 of exact canonical wire
+    schema_version: int                # exact 1
     threat_hash: str                   # verified 32-byte lowercase hex
-    reporter_zk_proof: bytes           # verified Groth16 proof bytes
-    indicators: list[str]              # future bounded analyzer inputs
-    timestamp: int                     # verified/fresh Unix timestamp
+    confidence_bps: int                # verified source claim, 1..10000
+    indicator_type: str                # category metadata, not an IOC value
+    proof_system: str                  # exact groth16_kip16_v1
+    reporter_zk_proof: bytes           # verified bounded proof bytes
+    report_nonce: str                  # verified 32-byte lowercase hex
+    observed_at: int                   # verified/fresh Unix timestamp
+    network_id: str                    # trusted local network context
+    admitted_at: int                   # durable ingress admission time
 ```
 
-This Python dataclass is not the wire parser. GH-55 deliberately stops before
-conversion to this analyzer input because the real proof relation, bounded
-indicator mapping, freshness/replay store, and owner-only verifier ingress are
-not implemented. It must never receive development-stub or merely
-transport-valid input.
+This Python dataclass is not the wire parser. GH-74's adapter re-parses the
+canonical bytes and revalidates digest, trusted network, proof mode, and
+admission window before constructing it. It intentionally has no `indicators`
+field because ThreatHint v1 does not transport concrete IOC strings. The
+verified-v1 analyzer path must return zero confidence, no YARA rule, and no
+submission without invoking an LLM. The older local `ThreatHint` type with
+explicit indicator strings remains a separate manually constructed analyzer
+input and is never populated by this adapter.
 
 ### 3.3 Authenticated Guardian Ballot (GH-39)
 

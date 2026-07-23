@@ -14,12 +14,12 @@
 | Branch | `main`; all product and status changes remain PR-only |
 | Lokaler Pfad | `$REPO_ROOT` |
 | Letzter grün verifizierter Produkt-/Tooling-Commit | `20d22d1` — GH-63 verifier plus GH-69 preflight test stabilization; Prometheus CI `29971220681`, Security `29971220685`, and Pages `29971220259` green |
-| Aktueller Entwicklungs-Slice | GH-63 plus GH-65 public closeout are complete and exact-main verified. Next repository-owned slice: explicit bounded analyzer-domain adapter without inventing fields absent from canonical ThreatHint. Ohne unabhängig freigegebene Produktionsrelation, VK und Vektoren bleibt der Sidecar fail-closed `busy`; echter Zwei-Host-Nachweis wartet weiterhin auf reparierten `ssh sandbox` Public-Key-Zugriff |
-| Aktuelle Tooling-Baseline | Exact main `20d22d1` includes merged GH-58 durable ingress, GH-63's active-KIP-16-aligned manifest-pinned BN254/Arkworks verifier plus bounded owner-aware adapter/service, and GH-69's deterministic manifest-preflight CLI tests. Public/multi-host operation, trusted membership/key assignment, Sybil resistance, approved production proof artifacts, real accepted analysis, and on-chain attestation remain open. Execution artifacts remain bound to `205e1ca`; GH-9 remains ready for explicitly approved external signing. |
+| Aktueller Entwicklungs-Slice | Issue #74 on `feat/GH-74-threat-hint-analyzer-adapter`: bounded digest/network/time-bound outbox adapter plus explicit non-submittable no-LLM/no-YARA handling for hash-only ThreatHint v1. 24 focused and 158 complete Guardian tests pass locally. Ohne unabhängig freigegebene Produktionsrelation, VK und Vektoren bleibt der Sidecar fail-closed `busy`; actionable analysis also needs a reviewed concrete-observable channel or future schema, and echter Zwei-Host-Nachweis wartet weiterhin auf reparierten `ssh sandbox` Public-Key-Zugriff |
+| Aktuelle Tooling-Baseline | Exact main `a53fe88` includes merged GH-58 durable ingress, GH-63's active-KIP-16-aligned manifest-pinned BN254/Arkworks verifier plus bounded owner-aware adapter/service, GH-69's deterministic manifest-preflight CLI tests, and reconciled stable evidence. GH-74's bounded hash-only v1 analyzer adapter is locally verified on its feature branch. Public/multi-host operation, trusted membership/key assignment, Sybil resistance, approved production proof artifacts, concrete observables/actionable analysis, and on-chain attestation remain open. Execution artifacts remain bound to `205e1ca`; GH-9 remains ready for explicitly approved external signing. |
 | Aktueller HEAD | Mit `git log --oneline -1` prüfen; Bridge-/Status-Commits können neuer sein |
 | Rollback-Tag | `pre-session-20260413` → `6347b85` |
-| Whitepaper | WHITEPAPER.md (root) + whitepaper.html (styled); miner companion, reward boundaries, GH-36/GH-39 trust boundaries, and GH-48/GH-52/GH-55/GH-58/GH-63 merged scopes remain synchronized |
-| Status | Rollout-capable core estimated at 77-81% with the GH-63 real verifier engine merged and exact-main verified; post-Toccata canary execution, approved production proof artifacts/accepted analysis, and full rollout evidence remain gated. |
+| Whitepaper | WHITEPAPER.md (root) + whitepaper.html (styled); miner companion, reward boundaries, GH-36/GH-39 trust boundaries, and GH-48/GH-52/GH-55/GH-58/GH-63 plus GH-74 candidate boundaries remain synchronized |
+| Status | Rollout-capable core estimated at 78-82% with GH-63 merged/exact-main and GH-74 locally verified; post-Toccata canary execution, approved production proof artifacts, concrete-observable/actionable analysis, and full rollout evidence remain gated. |
 | GitHub Pages | https://neabouli.github.io/prometheus-/ |
 | Google Search Console | Verified: googleaa2902079481c7a8 |
 
@@ -313,3 +313,11 @@ Leistungsbasierte Emission. Guardians = "Miner" (KI statt GPU).
 - No production relation, VK, proving key, or independently approved vectors are invented or bundled. Default operation remains fail-closed `busy`; accepted production analysis is not claimed.
 - Local verification passes 247 workspace Rust tests/2 live ignores, 144 Guardian tests/3 live-model skips, 7 focused Rust verifier tests, 18 focused Python adapter/service tests, locked optimized builds, all three Cargo packages, formatting/lint, Memory/HTML/workflow checks, and dependency audit. CodeRabbit's valid ancestor-owner hardening is implemented, all protected PR contexts passed, and exact-main Prometheus CI `29968203074`, Security `29968203053`, and Pages `29968202562` are green for `f4f9df9`.
 - Scope-weighted estimates are core 77-81%, complete vision 43-48%, and 52-57% remaining.
+
+## Checkpoint 2026-07-23: GH-74 analyzer adapter candidate
+
+- Issue #74 and branch `feat/GH-74-threat-hint-analyzer-adapter` implement the explicit bounded mapping from GH-58 durable outbox jobs into a frozen verified-v1 analyzer type.
+- Digest, canonical wire, trusted network, real proof mode, and original admission time are revalidated. ThreatHint v1 carries no concrete IOC strings, so the analyzer emits only confidence `0.0`, no YARA rule, and no submission without invoking LLM or YARA generation.
+- Per-instance drains are serialized and capped at 32; delivery follows only an exact safe result. Parse/network/analyzer/result/clock failures remain pending.
+- Local evidence is 24 focused tests, 158 complete Guardian passes with three intentional live-model skips, Black, Ruff, and focused Pylint 10.00/10. Protected PR, review, merge, and exact-main evidence remain pending.
+- Scope-weighted estimates are core 78-82%, complete vision 44-49%, and 51-56% remaining. Production proof artifacts, a concrete-observable channel or future schema, real actionable analysis, and all existing external rollout gates remain open.

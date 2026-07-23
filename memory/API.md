@@ -256,6 +256,23 @@ wire schema. The default verifier is unavailable and returns fail-closed
 approved Groth16 relation, verifying key, and vectors are injected. `PeerId`
 remains routing metadata only.
 
+### Guardian ThreatHint Analyzer Adapter (GH-74)
+
+`ThreatHintAnalyzerAdapter` consumes at most 32 pending jobs per call. It
+re-parses canonical bytes, verifies the stored digest, exact trusted network,
+real proof mode, and original admission window, then constructs a frozen
+`VerifiedThreatHint` containing only v1 wire/job fields. The verified type has
+no concrete indicator list. `Analyzer.process_verified_threat_hint()` therefore
+does not invoke the LLM or YARA generator and returns only a hash-bound result
+with confidence `0.0`, no rule, and `should_submit = false`.
+
+Drain calls are serialized per adapter instance. A job is marked delivered only
+after that exact result passes adapter validation; parse/network/time failures,
+analyzer exceptions, unsafe results, and delivery-clock rollback leave it
+pending. This is a non-actionable v1 consumption path, not accepted rule
+generation. A future observable-bearing schema/channel and any side-effecting
+multi-process consumer require separate review.
+
 ---
 
 ## 4. SILVERSCRIPT CONTRACT API

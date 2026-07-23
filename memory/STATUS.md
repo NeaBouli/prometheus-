@@ -116,15 +116,16 @@ real signature or broadcast occurred. Real state/sponsor inputs, signatures,
 confirmation, successor evidence, and release evidence remain.
 
 Scope-weighted status estimate on 2026-07-23: H-001 canary preparation is about
-96% complete; rollout-capable core-network work is about 76-80% complete with
-the merged/exact-main-verified GH-58 durable fail-closed ThreatHint verifier ingress; the complete roadmap vision is about
-42-47% complete. These values distinguish
+96% complete; rollout-capable core-network work is about 78-82% complete with
+the merged/exact-main-verified GH-63 verifier and the locally verified GH-74
+analyzer-domain candidate; the complete roadmap vision is about 44-49% complete. These values distinguish
 prepared software from real chain operation and are not release guarantees.
-Latest verified product/status main `22bc55a72bf441a2abc0372bc0eb789fb89fbb0b`
-passed Prometheus CI `29962533693`, Security Audit `29962533720`, and Pages
-`29962533075`; GitHub Pages reports built and public GH-58 markers retain all rollout gates.
-Issue #58 is closed after PR #60. Accepted hints remain gated on an independently
-approved real Groth16 relation/key/vectors and an explicit analyzer-domain adapter.
+Latest verified product/status main `a53fe88ffc29903432a5311111936f70b19b483e`
+passed Prometheus CI `29971776459`, Security Audit `29971776509`, and Pages
+`29971775911`; GitHub Pages reports built and public GH-63 markers retain all rollout gates.
+Issue #74 tracks the analyzer adapter candidate. Accepted proof verification remains gated on an independently
+approved real Groth16 relation/key/vectors; actionable analysis additionally
+requires a concrete-observable channel or future schema rather than fabricated v1 indicators.
 The unchanged execution-artifact baseline remains exact main `205e1ca`.
 
 ## GH-13 EXPERIMENTAL MINER COMPANION STATUS
@@ -500,7 +501,29 @@ Production gate: no approved production relation, VK, proving key, or
 Exact main: f4f9df95848d41c82379ef59044d12453b12279c; Prometheus CI
             29968203074, Security 29968203053, and Pages 29968202562 pass
 Remaining: independent production artifact ceremony/vectors, reviewed
-           analyzer-domain adapter, and real accepted-analysis evidence
+           analyzer-domain merge, concrete-observable design, and real
+           accepted-analysis evidence
+```
+
+## THREATHINT V1 ANALYZER ADAPTER (GH-74 CANDIDATE)
+
+```text
+Input: durable VerifiedThreatHintJob from the GH-58 SQLite outbox
+Binding: canonical reparse plus SHA-256 digest, exact trusted network,
+         groth16_kip16_v1, and original admission-window checks
+Domain: frozen VerifiedThreatHint preserves only v1 wire/job fields and has no
+        concrete indicator list
+Decision: exact confidence 0.0, no YARA rule, should_submit false; LLM and YARA
+          generation are not invoked for hash-only v1 claims
+Drain: maximum 32 jobs, per-instance serialization, mark-delivered only after
+       exact safe result; failures and clock rollback remain pending
+Local evidence: 24 focused analyzer/adapter tests and 158 complete Guardian
+                passes with three intentional live-model skips; Black, Ruff,
+                and focused Pylint 10.00/10 pass
+Boundary: no approved production proof artifacts, concrete observable channel,
+          live-model evidence, proposal submission, or production acceptance
+Unchanged: PeerId authorization, wallets/signing/chain, reputation, KAS/PROM,
+           slash ACL, commit-reveal, and emergency-stop policy
 ```
 
 ## MAINNET CONTRACT ADDRESSES (post-verification)

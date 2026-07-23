@@ -68,9 +68,13 @@ PYTHONPATH=. python -m jaeger.analyzer
 Current transport status: GH-55 provides the separate canonical
 `/prometheus/threat-hint/1.0.0` carrier. GH-58 adds its owner-only verifier
 IPC, trusted network/domain binding, persistent freshness/replay admission, and
-atomic durable analyzer outbox. No approved production Groth16 relation,
-verifying key, or vectors ship yet, so unavailable verification returns
-fail-closed `busy` and accepted analysis is not claimed. The steps below
+atomic durable analyzer outbox; GH-63 adds real manifest-pinned verification.
+GH-74 maps the outbox into a verified analyzer type without inventing IOC data.
+Because v1 carries only a hash commitment and category, that path returns zero
+confidence, no YARA rule, and no submission without invoking LLM or YARA. No
+approved production Groth16 relation, verifying key, or vectors ship yet, so
+unavailable verification returns fail-closed `busy`; actionable analysis also
+needs a reviewed concrete-observable channel or future schema. The steps below
 describe the target flow, not current production readiness.
 
 1. Light Client submits a threat hint with ZK proof

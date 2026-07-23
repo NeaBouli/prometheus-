@@ -136,8 +136,25 @@ approved vectors are bundled. Until those public artifacts are reviewed and the
 complete trusted `kip16_groth16` configuration is installed, the default
 verifier raises `ThreatProofVerifierUnavailable` and the ingress returns
 fail-closed `busy`. Test keys are generated at test runtime and are never a
-deployment default. Outbox consumers still require an explicit reviewed
-analyzer-domain adapter before accepted hints can become analyzer indicators.
+deployment default.
+
+`jaeger.threat_hint_adapter` provides the GH-74 analyzer-domain boundary. It
+re-parses every queued canonical payload, verifies its SHA-256 digest, trusted
+network, real-proof mode, and admission window, and maps only fields present in
+ThreatHint v1 into a frozen `VerifiedThreatHint`. The type deliberately has no
+concrete `indicators` field: v1 carries a hash commitment and category, not IOC
+strings. `Analyzer.process_verified_threat_hint()` therefore returns an exact
+zero-confidence, no-rule, non-submittable result without invoking LLM or YARA
+generation. The adapter serializes drains per instance, loads at most 32 jobs,
+and marks each one delivered only after that exact safe result; malformed,
+wrong-network, failed, clock-rollback, or unsafe-analyzer jobs stay pending.
+
+This closes the repository-owned v1 outbox-to-analyzer boundary without
+claiming actionable threat analysis. Concrete rule generation still requires a
+separately reviewed privacy-preserving observable channel or future schema,
+approved production proof artifacts, live model wiring, and real operational
+evidence. Future side-effecting consumers also require a reviewed cross-process
+claim/lease design; GH-74's v1 decision has no submission side effects.
 
 ## Testing
 
