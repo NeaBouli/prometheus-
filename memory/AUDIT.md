@@ -1318,3 +1318,47 @@ head `ced783527a406fff769ae3a22995a9b612c64da2` and merged normally without
 admin bypass as `83bdfe0e52e9308e28c8f0984a1219f203aa1f74`; issue #100
 closed. Exact-main Prometheus CI `29994190542`, Security Audit `29994190564`,
 and Pages `29994189428` passed.
+
+## GH-103 LOCAL LINUX ELF API-IMPORT PRODUCER (2026-07-23)
+
+Scope: one isolated Rust producer in `prometheus-threat-hint` derives one
+`api_import` from exact caller-supplied Linux ELF bytes plus a checked index.
+It is not imported by ThreatHint v1, P2P, proof, Guardian ingress/analyzer,
+committee, IPFS, chain, wallet, signing, reputation, or reward paths.
+
+Result: PASS for local deterministic extraction. The API accepts no path,
+caller-supplied import string, platform, format, or generic observable value.
+It derives `linux`/`elf` internally and always emits `review_required_v1`.
+Exactly pinned `object 0.39.1` uses only `read_core`, `elf`, and `std`.
+Artifacts above 16 MiB and dynamic-symbol tables above 4096 entries fail
+before sorting. Empty, malformed, non-ELF, invalid-UTF-8/grammar, no-import,
+and out-of-range inputs fail with fixed redacted errors. Dynamic symbols are
+streamed, then exact names are byte-sorted and deduplicated before selection.
+
+Cross-language evidence: one SHA-256-bound exact ELF64 fixture contains
+unsorted and duplicate `mmap`, `close`, and `pthread_create` imports. Rust
+produces all three checked canonical bundles; Python independently parses ELF
+section headers, dynamic strings, and dynamic symbols before validating the
+same `review_required_v1` wire bytes.
+
+Independent review: Claude Code approved the bounded bytes-only direction but
+suggested a filesystem return and Tokio timeout. Those recommendations were
+rejected because this crate is synchronous and side-effect-free; the valid
+mandatory-review and parser-bound concerns were retained. Terra reported no
+blocking/high/medium or actionable low finding. Its residual concern that
+`Object::imports()` would allocate the complete table was closed by replacing
+that API with streaming `dynamic_symbols()` iteration and a 4096-symbol cap.
+
+Evidence: five focused producer security tests, one Rust shared-vector test,
+all 30 ThreatHint tests plus one compile-fail doctest, 19 focused Python
+observable tests, 182 complete Guardian tests with three intentional
+live-model skips, and the complete Rust workspace with two intentional
+live-network ignores pass. Rustfmt, warning-free crate/workspace all-target
+Clippy, Black, and Guardian Pylint above the CI threshold pass. Protected PR,
+dependency/security checks, exact-main runs, and live public verification
+remain required.
+
+Non-claims: the index is a local selection and the scope label is parser
+policy, not proof of external artifact provenance, host OS, maliciousness,
+privacy approval, disclosure authorization, v2 relation binding, analysis,
+publication, or production acceptance.

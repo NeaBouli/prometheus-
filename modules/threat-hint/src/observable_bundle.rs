@@ -247,6 +247,25 @@ impl ObservableBundle {
         Ok(bundle)
     }
 
+    pub(crate) fn from_review_required_api_import(
+        platform: ScopePlatform,
+        format: ScopeFormat,
+        value: &str,
+    ) -> Result<Self, ObservableBundleError> {
+        validate_api_import(value)?;
+        let bundle = ObservableBundle {
+            schema_version: Self::SCHEMA_VERSION,
+            disclosure_policy: DisclosurePolicy::ReviewRequiredV1,
+            scope: ObservableScope { platform, format },
+            observables: vec![ObservableBundleObservable {
+                kind: ObservableKind::ApiImport,
+                value: value.to_owned(),
+            }],
+        };
+        bundle.to_canonical_bytes()?;
+        Ok(bundle)
+    }
+
     /// Parses bytes and accepts them only when they are valid canonical JSON.
     pub fn parse_canonical(bytes: &[u8]) -> Result<Self, ObservableBundleError> {
         if bytes.is_empty() {
@@ -443,7 +462,7 @@ fn validate_file_sha256(value: &str) -> Result<(), ObservableBundleError> {
     Ok(())
 }
 
-fn validate_api_import(value: &str) -> Result<(), ObservableBundleError> {
+pub(crate) fn validate_api_import(value: &str) -> Result<(), ObservableBundleError> {
     let bytes = value.as_bytes();
 
     if bytes.is_empty() || bytes.len() > MAX_API_IMPORT_LEN {

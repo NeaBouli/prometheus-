@@ -57,3 +57,11 @@ chosen by a boolean mask with `??`, requires at least eight fixed bytes, and
 always emits `review_required_v1`. Neither profile authorizes transport, and
 the byte-pattern result must remain local until a separate authenticated
 approval protocol is specified and reviewed.
+
+`produce_elf_api_import_bundle` accepts exact Linux ELF bytes plus one checked
+index, derives scope internally, validates and byte-sorts/deduplicates dynamic
+imports, and always emits `review_required_v1`. Its exactly pinned read-only
+parser rejects artifacts above 16 MiB and dynamic-symbol tables above 4096
+entries. It accepts no path, caller-supplied import string, platform, format,
+or generic value. The result remains local and does not prove provenance,
+maliciousness, privacy approval, or disclosure authorization.

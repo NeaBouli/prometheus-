@@ -41,6 +41,13 @@ _BYTE_PATTERN_PRODUCER_VECTOR_PATH = (
     / "vectors"
     / "threat-observable-byte-pattern-producer-v1.json"
 )
+_ELF_API_IMPORT_PRODUCER_VECTOR_PATH = (
+    Path(__file__).resolve().parents[2]
+    / "threat-hint"
+    / "tests"
+    / "vectors"
+    / "threat-observable-elf-api-import-producer-v1.json"
+)
 
 
 def _unique_object(items: list[tuple[str, object]]) -> dict:
@@ -364,3 +371,104 @@ def test_rust_byte_pattern_producer_vectors_validate_independently() -> None:
         assert len(bundle.observables) == 1
         assert bundle.observables[0].kind == ObservableKind.BYTE_PATTERN
         assert bundle.observables[0].value == expected_pattern
+
+
+def _read_test_elf_integer(artifact: bytes, offset: int, size: int) -> int:
+    return int.from_bytes(artifact[offset : offset + size], "little")
+
+
+def _parse_test_elf64_sections(artifact: bytes) -> list[dict[str, int]]:
+    assert artifact[:7] == b"\x7fELF\x02\x01\x01"
+    section_headers_offset = _read_test_elf_integer(artifact, 40, 8)
+    section_header_size = _read_test_elf_integer(artifact, 58, 2)
+    section_count = _read_test_elf_integer(artifact, 60, 2)
+    assert section_header_size == 64
+    assert section_headers_offset + section_header_size * section_count <= len(artifact)
+
+    sections = []
+    for index in range(section_count):
+        start = section_headers_offset + index * section_header_size
+        sections.append(
+            {
+                "type": _read_test_elf_integer(artifact, start + 4, 4),
+                "offset": _read_test_elf_integer(artifact, start + 24, 8),
+                "size": _read_test_elf_integer(artifact, start + 32, 8),
+                "link": _read_test_elf_integer(artifact, start + 40, 4),
+                "entry_size": _read_test_elf_integer(artifact, start + 56, 8),
+            }
+        )
+    return sections
+
+
+def _extract_test_elf64_dynamic_imports(artifact: bytes) -> list[str]:
+    sections = _parse_test_elf64_sections(artifact)
+    dynamic_symbols = next(section for section in sections if section["type"] == 11)
+    dynamic_strings = sections[dynamic_symbols["link"]]
+    assert dynamic_strings["type"] == 3
+    assert dynamic_symbols["entry_size"] == 24
+
+    strings_start = dynamic_strings["offset"]
+    strings_end = strings_start + dynamic_strings["size"]
+    symbols_start = dynamic_symbols["offset"]
+    symbols_end = symbols_start + dynamic_symbols["size"]
+    assert strings_end <= len(artifact)
+    assert symbols_end <= len(artifact)
+
+    names = []
+    for start in range(
+        symbols_start + dynamic_symbols["entry_size"],
+        symbols_end,
+        dynamic_symbols["entry_size"],
+    ):
+        name_offset = _read_test_elf_integer(artifact, start, 4)
+        section_index = _read_test_elf_integer(artifact, start + 6, 2)
+        if section_index != 0 or name_offset == 0:
+            continue
+        name_start = strings_start + name_offset
+        name_end = artifact.index(b"\x00", name_start, strings_end)
+        names.append(artifact[name_start:name_end].decode("ascii"))
+
+    return sorted(set(names), key=lambda name: name.encode("ascii"))
+
+
+def test_rust_elf_api_import_producer_vectors_validate_independently() -> None:
+    raw = _ELF_API_IMPORT_PRODUCER_VECTOR_PATH.read_text(encoding="utf-8")
+    producer_vectors = json.loads(raw, object_pairs_hook=_unique_object)
+
+    assert set(producer_vectors.keys()) == {
+        "vector_schema_version",
+        "artifact_sha256",
+        "artifact_hex",
+        "cases",
+    }
+    assert producer_vectors["vector_schema_version"] == 1
+    assert len(producer_vectors["cases"]) >= 3
+
+    artifact = bytes.fromhex(producer_vectors["artifact_hex"])
+    assert hashlib.sha256(artifact).hexdigest() == producer_vectors["artifact_sha256"]
+    imports = _extract_test_elf64_dynamic_imports(artifact)
+    assert imports == ["close", "mmap", "pthread_create"]
+
+    names = set()
+    for case in producer_vectors["cases"]:
+        assert set(case.keys()) == {
+            "name",
+            "import_index",
+            "api_import",
+            "wire_hex",
+        }
+        assert case["name"] not in names
+        names.add(case["name"])
+        assert isinstance(case["import_index"], int)
+        assert not isinstance(case["import_index"], bool)
+        assert imports[case["import_index"]] == case["api_import"]
+
+        wire = bytes.fromhex(case["wire_hex"])
+        bundle = ObservableBundle.parse_canonical(wire)
+        assert bundle.canonical_bytes == wire
+        assert bundle.disclosure_policy == DisclosurePolicy.REVIEW_REQUIRED_V1
+        assert bundle.scope.platform == ScopePlatform.LINUX
+        assert bundle.scope.format == ScopeFormat.ELF
+        assert len(bundle.observables) == 1
+        assert bundle.observables[0].kind == ObservableKind.API_IMPORT
+        assert bundle.observables[0].value == case["api_import"]
