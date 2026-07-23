@@ -720,3 +720,11 @@ Rules for all dev agents:
 - Direct HTTP 200 verification found the exact merged GH-63 markers in live README, Bridge, Whitepaper, Roadmap, and `llms.txt`. Scope estimates remain core 77-81%, complete vision 43-48%, and 52-57% remaining.
 - The next repository-owned product slice is the explicit bounded analyzer-domain adapter. Production proof-artifact approval/installation, real accepted-analysis evidence, two-host operation, H-001 external signing/execution, remaining deployments, metrics transition, PROM emission, and production nodes remain open.
 - No wallet, private key, secret, signature, raw transaction, broadcast, contract, Guardian/reporter authorization, reputation, KAS/PROM, slash ACL, commit-reveal behavior, emergency-stop policy, or foreign untracked file was accessed or changed. `Prometheus-1.png` remains untouched and uncommitted.
+
+## 2026-07-23 GH-69 verifier preflight test-race hardening
+
+- Exact-main Prometheus CI `29969343483` for the bridge reconciliation commit exposed a race in `unsafe_manifest_mode_is_unavailable`: the verifier correctly rejected the unsafe manifest before reading stdin, while the test helper incorrectly treated the resulting writer-side `BrokenPipe` as a verifier failure.
+- The shared runner remains strict for every normal verification path. A separate explicit preflight-exit helper tolerates only `ErrorKind::BrokenPipe`, after which the test still requires exit 3 and silent stdout/stderr.
+- Local verification passes 50 consecutive repetitions of the affected preflight test, all 7 threat-proof tests, focused warning-free Clippy, Rustfmt, Memory Integrity, and the complete 247-test workspace with two intentional live-network ignores.
+- Production manifest ownership/mode validation, proof verification, CLI exit semantics, and fail-closed operation are unchanged. Issue #69 tracks the CI stabilization through the protected workflow.
+- No wallet, private key, secret, signature, raw transaction, broadcast, contract, Guardian/reporter authorization, reputation, KAS/PROM, slash ACL, commit-reveal behavior, emergency-stop policy, or foreign untracked file was accessed or changed. `Prometheus-1.png` remains untouched and uncommitted.
