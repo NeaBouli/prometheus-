@@ -1255,14 +1255,25 @@ attached to its requested SHA. Prometheus CI now exposes the same
 `workflow_dispatch` recovery trigger for future default-branch availability;
 no required check is fabricated or bypassed.
 
-Closeout: final protected PR #97 attached every required context to exact head
-`4284a88988297f7d2f82f7a1e35817e7d03b6e5e`, passed all ten contexts, and
-merged normally without admin bypass as exact main
-`34ab5b7a62b17ef2c9cab672439b77dcf4a66d9c`. Issue #94 is closed. Exact-main
+## GH-94 EXACT-MAIN CLOSEOUT (2026-07-23)
+
+Result: PASS for the bounded local producer scope. Final PR #97 passed all ten
+protected contexts on exact head `4284a88`, had no unresolved review thread,
+and merged normally without admin bypass as
+`34ab5b7a62b17ef2c9cab672439b77dcf4a66d9c`; issue #94 closed. Exact-main
 Prometheus CI `29989116631`, Security Audit `29989117912`, and Pages
-`29989118948` passed. The product slice is ACCEPTED; external provenance,
-privacy approval, disclosure authorization, v2 proof binding, transport, and
-actionable analysis remain separate gates.
+`29989118948` passed. Because GitHub omitted the automatic main suites, the
+merged CI recovery trigger and existing Security dispatch executed the complete
+workflows on exact main, and the Pages build API queued the exact-main deploy.
+No status or check was fabricated.
+
+Public evidence: raw GitHub README and live Whitepaper, Roadmap, FAQ, and
+`llms.txt` return the GH-94 `byte_pattern` and `review_required_v1` markers.
+This closes only deterministic local derivation and mandatory-review
+serialization. External artifact provenance, wildcard suitability,
+maliciousness, privacy approval, disclosure/transport authorization, v2 proof
+binding, actionable analysis, chain acceptance, and production operation remain
+open.
 
 ## GH-100 SIDECAR SIGNAL READINESS FIX (2026-07-23)
 
@@ -1279,27 +1290,31 @@ SIGTERM to retain the operating-system default action. The existing
 `sigterm_during_collector_wait_stops_cleanly` process regression failed in a
 compiled-binary stress run at iteration 24.
 
-Fix: CONDITIONAL PASS pending protected PR/exact-main evidence. Signal-listener
-construction is synchronous and occurs before `OperatorOutput::start()`.
-Unix creates SIGINT and SIGTERM receivers before returning the boxed wait
-future. Registration errors map to `ServiceError::Signal` before any operator
-record. The receivers are owned by the boxed future for its full lifetime.
+Fix result: PASS. Signal-listener construction is synchronous and occurs before
+`OperatorOutput::start()`. Unix creates SIGINT and SIGTERM receivers before
+returning the boxed wait future. Registration errors map to
+`ServiceError::Signal` before any operator record. The receivers are owned by
+the boxed future for its full lifetime. The crate remains explicitly Unix-only
+because AF_UNIX and peer credentials are mandatory.
 
-Independent review: Claude Code 2.1.218 performed a bounded no-tool review. It
-found the Unix change sound and asked whether the generic non-Unix
-`tokio::signal::ctrl_c()` fallback remained lazy. That path is not a supported
-target: the crate has an explicit non-Unix `compile_error!` because AF_UNIX and
-peer credentials are mandatory. Sol retains final integration and release
-responsibility.
+Independent review: Claude Code 2.1.218 performed a bounded no-tool review and
+found the Unix lifetime/error handling sound. Sol retained final integration
+and release responsibility.
 
-Evidence: patched compiled-binary stress passed 64/64 immediate
-post-readiness SIGTERM iterations. The focused regression passes; the complete
-three-process suite passed ten consecutive repetitions; all 53 Guardian P2P
-unit tests plus all three process tests pass; and the complete Rust workspace
-passes with two intentional live-network ignores. Rustfmt, warning-free
-crate/workspace all-target Clippy, locked optimized Guardian build, package
-checks, Black, Guardian Pylint 9.86/10, 181 Guardian tests with three
-intentional live-model skips, and Cargo Audit with no vulnerabilities pass.
-One relay-process `busy` result and one Python verifier-stub timeout occurred
-once each; focused reruns, ten process-suite repetitions, and later complete
-suites passed, so no unrelated behavior was changed.
+Evidence: patched compiled-binary stress passed 64/64 immediate post-readiness
+SIGTERM iterations. The focused regression passes; the complete three-process
+suite passed ten consecutive repetitions; all 53 Guardian P2P unit tests plus
+all three process tests pass; and the complete Rust workspace passes with two
+intentional live-network ignores. Rustfmt, warning-free crate/workspace
+all-target Clippy, locked optimized Guardian build, package checks, Black,
+Guardian Pylint 9.86/10, 181 Guardian tests with three intentional live-model
+skips, and Cargo Audit with no vulnerabilities pass. One relay-process `busy`
+result and one Python verifier-stub timeout occurred once each; focused reruns,
+ten process-suite repetitions, and later complete suites passed, so no
+unrelated behavior was changed.
+
+Protected closeout: PR #101 passed every attached protected context on exact
+head `ced783527a406fff769ae3a22995a9b612c64da2` and merged normally without
+admin bypass as `83bdfe0e52e9308e28c8f0984a1219f203aa1f74`; issue #100
+closed. Exact-main Prometheus CI `29994190542`, Security Audit `29994190564`,
+and Pages `29994189428` passed.

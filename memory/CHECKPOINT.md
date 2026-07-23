@@ -11,15 +11,15 @@
 |------|------|
 | Projekt | Prometheus — Decentralized AI Threat Intelligence |
 | Repo | https://github.com/NeaBouli/prometheus- |
-| Branch | `fix/GH-100-sidecar-signal-readiness`; issue #100; all product and status changes remain PR-only |
+| Branch | `docs/GH-98-byte-pattern-producer-closeout-r2`; documentation-only exact-main reconciliation remains PR-only |
 | Lokaler Pfad | `$REPO_ROOT` |
-| Letzter grün verifizierter Produkt-/Public-Baseline | Exact main `34ab5b7` merged the GH-94 `byte_pattern` producer through PR #97 with CI `29989116631`, Security `29989117912`, and Pages `29989118948` |
-| Aktueller Entwicklungs-Slice | Issue #100 installs SIGINT/SIGTERM listeners before any operator/readiness output in the explicitly Unix-only Guardian sidecar. The pre-fix process race reproduced at iteration 24, while the patched binary passed 64/64 stress iterations. |
-| Aktuelle Tooling-Baseline | Exact main `34ab5b7` includes the merged GH-58/GH-63/GH-69/GH-74/GH-77/GH-86/GH-90/GH-94 Guardian, verifier, analyzer, observable-validator, and local-producer slices. GH-98 public documentation reconciliation remains open until GH-100 merges. Public/multi-host operation, trusted membership/key assignment, Sybil resistance, approved production proof artifacts, privacy-reviewed concrete observables/actionable analysis, and on-chain attestation remain open. Execution artifacts remain bound to `205e1ca`; GH-9 remains ready for explicitly approved external signing. |
-| Aktueller HEAD | Branch from exact main `34ab5b7a62b17ef2c9cab672439b77dcf4a66d9c`; mit `git log --oneline -1` prüfen |
+| Letzter grün verifizierter Produkt-/Public-Baseline | Exact main `83bdfe0` merged GH-100 through PR #101 with CI `29994190542`, Security `29994190564`, and Pages `29994189428`; GH-94 remains product-merged as `34ab5b7` with its own exact-main gates |
+| Aktueller Entwicklungs-Slice | Issue #98 and branch `docs/GH-98-byte-pattern-producer-closeout-r2` reconcile merged GH-94/GH-100 product and public evidence only. |
+| Aktuelle Tooling-Baseline | Exact main `83bdfe0` includes GH-58 durable ingress, GH-63's active-KIP-16-aligned verifier, GH-69 manifest preflight, GH-74 hash-only analyzer adapter, GH-77 batch isolation, GH-86 observable validators, GH-90 `file_sha256`, GH-94 mandatory-review `byte_pattern`, and GH-100 pre-readiness signal registration. Public/multi-host operation, trusted membership/key assignment, Sybil resistance, approved production proof artifacts, privacy-reviewed promotion/actionable analysis, and on-chain attestation remain open. Execution artifacts remain bound to `205e1ca`; GH-9 remains ready for explicitly approved external signing. |
+| Aktueller HEAD | Documentation branch from exact main `83bdfe0e52e9308e28c8f0984a1219f203aa1f74`; mit `git log --oneline -1` prüfen |
 | Rollback-Tag | `pre-session-20260413` → `6347b85` |
-| Whitepaper | WHITEPAPER.md (root) + whitepaper.html (styled); miner companion, reward boundaries, GH-36/GH-39 trust boundaries, and GH-48/GH-52/GH-55/GH-58/GH-63/GH-74 merged boundaries remain synchronized |
-| Status | Rollout-capable core remains estimated at 78-82%. GH-94 is merged/exact-main green. GH-100 is complete-local green and awaits protected PR/exact-main evidence; GH-98 then reconciles README/Whitepaper/Pages. External provenance/privacy promotion, post-Toccata canary execution, approved v2 proof artifacts, actionable analysis, and full rollout evidence remain gated. |
+| Whitepaper | WHITEPAPER.md (root) + whitepaper.html (styled); miner companion, reward boundaries, GH-36/GH-39 trust boundaries, and GH-48/GH-52/GH-55/GH-58/GH-63/GH-74/GH-94 merged boundaries remain synchronized |
+| Status | Rollout-capable core remains estimated at 78-82%. GH-94 and GH-100 are merged/exact-main green; GH-98 reconciles README/Whitepaper/Pages. External provenance/privacy promotion, post-Toccata canary execution, approved v2 proof artifacts, actionable analysis, and full rollout evidence remain gated. |
 | GitHub Pages | https://neabouli.github.io/prometheus-/ |
 | Google Search Console | Verified: googleaa2902079481c7a8 |
 

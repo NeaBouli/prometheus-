@@ -294,7 +294,7 @@ Rust: prometheus_threat_hint::ObservableBundle
 Rust GH-90 merged/exact-main:
   produce_file_sha256_bundle(&[u8], ScopePlatform, ScopeFormat)
 
-Rust GH-94 candidate (validated with separate producer vectors):
+Rust GH-94 merged/exact-main (validated with separate producer vectors):
   produce_byte_pattern_bundle(
     &[u8], usize, &[bool], ScopePlatform, ScopeFormat
   )
@@ -331,7 +331,7 @@ generic observable value. That profile does not authorize disclosure or
 transport. Python remains an independent validator consumer rather than
 gaining an unused producer API.
 
-The GH-94 candidate selects a checked 8..=64-byte range from exact
+The merged GH-94 producer selects a checked 8..=64-byte range from exact
 caller-supplied bytes. A same-length boolean mask emits `??` for wildcard
 positions and lowercase hex for fixed positions; at least eight positions must
 remain fixed. It accepts no pattern string, always emits exactly one
