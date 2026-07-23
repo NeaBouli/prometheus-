@@ -1476,15 +1476,17 @@ remain unchanged. No secret, wallet, signing, transaction, chain, contract,
 token-model, reputation, slash-ACL, commit-reveal, or emergency-stop boundary
 changed.
 
-GH-109 local documentation evidence passes Memory Integrity, six Autodidactic
+GH-109 local documentation evidence passed Memory Integrity, six Autodidactic
 tests, HTML/JSON-LD/public-status checks, a stale-candidate scan, and clean-diff
-checks. Spark found two short merge-SHA references in Checkpoint/TODO; both now
-use the full exact SHA, and its read-only re-review reports no remaining
-actionable finding. Protected PR and documentation exact-main/live verification
-remain.
+checks. Spark found two short merge-SHA references in Checkpoint/TODO; both use
+the full exact SHA, and its read-only re-review reported no remaining
+actionable finding. PR #110 merged normally without admin bypass as exact main
+`f71740cd79e0ae788fa732f42e7f000276ea1741`; Prometheus CI `30008005279`,
+Security Audit `30008005305`, and Pages `30008004574` passed, and live public
+markers were verified.
 ## GH-111 LOCAL DURABLE OBSERVABLE APPROVAL CONSUMPTION (2026-07-23)
 
-Issue #111 and branch `feat/GH-111-local-observable-approval-consumption` add
+Issue #111 and branch `feat/GH-111-local-observable-approval-consumption` added
 the smallest local durable consumer after the merged GH-107 verifier. The
 Guardian service loads one exact network, x-only approver public key, and opaque
 recipient-scope digest from an owner-only exact-schema TOML policy. The public
@@ -1511,9 +1513,7 @@ one possible parallel-test busy flake and missing relative policy-path coverage;
 both were fixed. Independent Terra security review found no finding and
 recommended constructor-lock, transaction-abort, and corrupt/unknown-ledger
 tests; all were added and pass. Claude Code was requested as a helper but its
-monthly usage limit remains exhausted and it read no GH-111 file. Complete
-Guardian/project, documentation/security, protected-PR, and exact-main checks
-remain before merge.
+monthly usage limit remained exhausted and it read no GH-111 file.
 
 Final Sol review found that a pre-existing version-zero SQLite file with the
 wrong table shape needed explicit startup rejection. The ledger now validates
@@ -1528,7 +1528,16 @@ complete Guardian Pylint 9.78/10, Memory Integrity, six Autodidactic tests,
 HTML/JSON-LD/public-status checks, workflow YAML parsing, Actionlint 1.7.12,
 Cargo Audit with no vulnerabilities and eight allowed warnings, Python Audit
 with no known vulnerabilities, staged Gitleaks 8.30.1, and clean staged diff.
-Protected PR plus exact-main/live evidence remain before acceptance.
+PR head `ec4a5d264abb47d08b263bdda1eddf33d42c72bd` passed all ten
+attached CI/Security contexts in Prometheus CI `30011641764` and Security Audit
+`30011641778`; there were no review threads. CodeRabbit's required status passed
+but its content review was rate-limited. PR #112 merged by the
+repository-allowed squash method without admin bypass as exact main
+`60166bd6d8d3c7d8e88727c2f6d507b206a308ad`; issue #111 closed.
+Exact-main Prometheus CI `30011976919`, Security Audit `30011976853`, and Pages
+`30011975363` pass. Raw README and live Whitepaper/Roadmap/FAQ/`llms.txt`
+markers were verified. GH-111 is accepted within its explicit local-only
+boundary.
 
 The receipt is data only and grants no downstream authority. This slice does
 not establish real-world approver-key ownership or rotation, recipient-scope

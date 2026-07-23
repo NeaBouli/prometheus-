@@ -979,3 +979,24 @@ Rules for all dev agents:
   HTML/JSON-LD/public status; workflow YAML; Actionlint 1.7.12; Cargo Audit
   with no vulnerabilities and eight allowed warnings; Python Audit with no
   known vulnerabilities; staged Gitleaks 8.30.1; and clean staged diff.
+## 2026-07-23 — GH-111 protected merge and exact-main verification
+
+- PR #112 head `ec4a5d264abb47d08b263bdda1eddf33d42c72bd`
+  passed all ten attached contexts in Prometheus CI `30011641764` and Security
+  Audit `30011641778`; no review thread was opened.
+- CodeRabbit's required status passed, but its content review was rate-limited.
+  Independent Terra/Spark review plus the complete local and protected gates
+  supplied the substantive review evidence.
+- PR #112 merged by the repository-allowed squash method without admin bypass
+  as exact main `60166bd6d8d3c7d8e88727c2f6d507b206a308ad`; issue #111 closed.
+- Exact-main Prometheus CI `30011976919`, Security Audit `30011976853`, and
+  Pages `30011975363` pass.
+- Raw README and live Pages Whitepaper, Roadmap, FAQ, and `llms.txt` GH-111
+  markers were verified.
+- GH-111 is accepted within its local-only fixed-policy durable-consumption
+  boundary. Authority rotation/scope assignment, v2 wire/relation/artifacts,
+  hint/bundle/approval pairing, privacy promotion, actionable analysis, and
+  crash-safe external side effects remain.
+- No secret, wallet, signing, transaction, broadcast, KAS/PROM, slash ACL,
+  commit-reveal, reputation, emergency-stop, or foreign untracked file was
+  accessed or changed. `Prometheus-1.png` remains untouched.

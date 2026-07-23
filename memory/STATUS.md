@@ -298,7 +298,7 @@ Repo current-Silverc public release-hardening evidence verifier: `scripts/verify
 Signed-int boundary decision: current upstream Silverc entrypoint `int` values are deployable only in the nonnegative signed range `0..=i64::MAX`; Rust retains raw `u64` H-001 vectors for byte compatibility and uses `build_silverc_checked` / `validate_silverc_commitment_bounds` for deployment calls.
 Rusty-Kaspa workspace dependencies pinned to `v2.0.1`; `cargo audit` now reports no vulnerabilities, only allowed warnings.
 GitHub Security Audit workflow re-enabled and dependency audits now fail on findings instead of using `|| true`; after `c673766`, Dependency Audit was hardened with explicit job/step timeouts and split cargo-audit install/run steps. GH-30 extends explicit job-level runtime bounds to every required CI/Security context and pins `cargo-audit 0.22.2`, `pip-audit 2.10.1`, Rust 1.95.0, and Python 3.11 without renaming protected contexts. PR #31 merged as `71e5783`; exact-main Prometheus CI `29457601210`, Security Audit `29457601183`, and Pages `29457600490` passed, including the jointly pinned Dependency Audit in 2m54s and Current Silverc Runtime in 2m35s.
-Current remote verification baseline: exact operational main `f2e52beebe5ec7d6a3e6e0e8d36bced8f6f68ac7` passed Prometheus CI `29644233106`, Security Audit `29644233098`, and Pages `29644232771` on 2026-07-19. All required contexts are bounded and green; GH-42/GH-44/GH-48/GH-52 are merged/exact-main/live verified, while real two-host Guardian operation and the H-001 execution gates remain open. H-001 execution artifacts remain intentionally bound to `205e1ca`.
+Current remote verification baseline: exact product/public main `60166bd6d8d3c7d8e88727c2f6d507b206a308ad` passed Prometheus CI `30011976919`, Security Audit `30011976853`, and Pages `30011975363` on 2026-07-23. All required contexts are bounded and green through GH-111; real two-host Guardian operation, v2 relation/artifacts/pairing/actionable analysis, authority rotation/scope assignment, and H-001 execution gates remain open. H-001 execution artifacts remain intentionally bound to `205e1ca`.
 Remote verification baseline: Prometheus CI `29456156122` attempt 2, Security Audit `29456155263` attempt 2, and Pages `29456154432` passed for exact operational main `3ba90a9` on 2026-07-16. The first CI/Security attempts were cancelled after remaining in progress in runtime/dependency paths and then passed unchanged on the same SHA. Exact public-status main `e9a970a` passed Prometheus CI `29455597727`, Security Audit `29455597677`, and Pages `29455597066`; live GitHub Pages exposes the `205e1ca` handoff and unchanged rollout gates. Earlier exact artifact baseline `205e1ca` passed Prometheus CI `29454591518`, Security Audit `29454591555`, and Pages `29454590793`. Earlier GH-9 profile CI `29412667386`, Security Audit `29412667410`, and Pages `29412666483` passed for `6213c559`. The prior official SilverScript covenant-genesis capability baseline `9d74c0c` passed on 2026-07-12. The prior `40bb9a0` baseline passed after adding public release-hardening evidence verification; live GitHub Pages contains both release-hardening and genesis-capability wording. The prior `48a6743` baseline passed after adding public oracle tx-evidence verification. The prior `9a1ac59` baseline passed after recording the Autodidactic workflow-helper regression suite CI run. The prior `4816444` baseline passed after adding the Autodidactic workflow-helper regression suite to CI. The prior `ffbad55` baseline passed after the public receipt-evidence verifier documentation follow-up. The prior `4d7a6b8` baseline passed after adding public node/explorer deployment receipt-evidence verification. The prior `181cde2` baseline passed after adding raw/serialized transaction field rejection to public deploy-result import and deployment receipt verification. The prior `6cc000c` baseline passed after adding public external-operator capability verification. The prior `3d02326` baseline passed after adding public oracle status-draft staging. The prior `a86c1b5` baseline passed after adding the public deploy operator procedure gate for verified Silverc deploy request sets. The prior `442853f` baseline passed after public external oracle operator procedure coverage for signer-ready metrics tx requests. The prior `8bf6a14` baseline passed after public release-readiness audit coverage for generated handoff packages. The prior `fa719fc` baseline passed after public oracle tx-result verification, generated operator receipt verification/status staging, operator handoff import mode, and public result handoff mode; the interim `119fa89` CI failure was workflow-only missing `hashlib` import in the metrics-oracle tx-result fixture block and is fixed by `fa719fc`.
 GitHub branch governance: `main` requires pull requests, strict up-to-date branches, linear history, resolved conversations, and nine successful CI/Security contexts. Admin enforcement is enabled; force pushes and deletion are disabled. Solo-maintainer mode uses zero formal approvals because only one collaborator exists and self-approval is impossible; raise the count to one when a second collaborator is added.
 Public docs refreshed by 2026-07-16: README, WHITEPAPER.md, whitepaper.html, docs/roadmap.md, roadmap.html, index.html, modules/contracts/silverc/README.md, and llms.txt state deployment-gated post-Toccata status, verified seven-contract runtime gates, the repository-owned keyless genesis execution boundary, public request/receipt/evidence/status guards, metrics-oracle and exact-commit release gates, target-only PROM-RULES asset orchestration, and no Kasplex dependency for Guardian reputation. Expired June-September launch promises are replaced by readiness gates.
@@ -677,17 +677,20 @@ Boundary: authenticates a local statement only; no signing/private key,
           replay persistence, transport, promotion, disclosure, analyzer,
           publication, proof, wallet, chain, reputation, KAS/PROM, slash ACL,
           commit-reveal, or emergency-stop change
-Remaining: durable one-time approval consumption, trusted authority rotation,
-           recipient-scope policy, owner-only pairing, v2 wire/proof relation,
-           actionable analysis, and all existing rollout gates
+Remaining: GH-111 separately closes fixed-policy local consumption; trusted
+           authority rotation, recipient-scope assignment, owner-only pairing,
+           v2 wire/proof relation, actionable analysis, and all existing
+           rollout gates remain
 ```
 
 ## GH-111 LOCAL DURABLE OBSERVABLE APPROVAL CONSUMPTION
 
 ```text
-Status: local feature branch; protected PR and exact-main evidence remain
-Base: f71740cd79e0ae788fa732f42e7f000276ea1741
-Issue: #111
+Status: merged through protected PR #112 and exact-main/live verified
+Main: 60166bd6d8d3c7d8e88727c2f6d507b206a308ad
+Runs: Prometheus CI 30011976919; Security Audit 30011976853;
+      Pages 30011975363
+Issue: #111 closed
 Policy: owner-only exact-schema TOML fixes one network, x-only approver public
         key, opaque recipient-scope digest, and absolute owner-only ledger path
 Call path: service accepts canonical approval/bundle bytes plus trusted
@@ -714,8 +717,7 @@ Evidence: 24 focused consumption tests; 32 combined approval tests; 214
 Boundary: no transport, pairing, promotion, disclosure, analyzer, outbox,
           publication, proof, signing, wallet, chain, reputation, KAS/PROM,
           slash ACL, commit-reveal, or emergency-stop change
-Remaining: protected PR and exact-main/live evidence; authority
-           ownership/rotation, scope assignment, privacy
+Remaining: authority ownership/rotation, scope assignment, privacy
            review, verified hint/bundle/approval pairing, v2 relation/artifacts,
            crash-safe external side effects, actionable analysis, and rollout
 ```

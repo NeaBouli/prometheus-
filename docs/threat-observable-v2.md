@@ -248,7 +248,7 @@ identifiable; the verifier alone does not prevent replay.
 In Python, the returned object is data only and its object identity is not an
 authority boundary.
 
-GH-111 adds a separate local Python consumption boundary. It loads one exact
+Merged and exact-main-verified GH-111 adds a separate local Python consumption boundary. It loads one exact
 `(network_id, approver_xonly_public_key, recipient_scope)` policy tuple from an
 owner-only TOML file, constructs the verification context internally, invokes
 the verifier in the same trusted call path, and only then commits the approval
