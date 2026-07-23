@@ -149,6 +149,7 @@ Check:    Reject unknown/changed profiles, rehashed profile tampering, oracle
 | 2026-03-21 | Sprint 0 / kaspad | LOW: `--netsuffix 12` syntax error. kaspad expects `--netsuffix=12` (equals sign). | Correct syntax: `--netsuffix=10` with equals sign. | RESOLVED |
 | 2026-07-16 | guardian-p2p/local_submit.rs | MEDIUM: Linux reset an overloaded local submit connection because the server returned `busy` while request bytes remained unread. | Added a separately bounded rejection pool that validates and drains one exact request frame before returning `busy`; malformed overload frames return transport failure and rejection tasks remain capped. | RESOLVED |
 | 2026-07-16 | guardian-p2p/service.rs | HIGH: synchronous stdout writes could block the async owner loop and defeat bounded SIGTERM handling. | Serialize into a bounded dedicated writer queue, fail closed on saturation/output failure, bound writer shutdown, and cover broken stdout plus SIGTERM during collector wait in process tests. | RESOLVED |
+| 2026-07-23 | guardian-p2p/service.rs | HIGH: the service could emit `waiting-for-collector` before its async shutdown future installed signal receivers, allowing immediate SIGTERM to take the default non-success exit. | Construct Unix SIGINT/SIGTERM listeners synchronously before `OperatorOutput::start()`; fail registration before readiness and retain the process regression. Pre-fix stress failed at iteration 24; patched stress passed 64/64. | RESOLVED |
 
 ---
 
