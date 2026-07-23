@@ -729,3 +729,11 @@ Rules for all dev agents:
 - Exact-main Prometheus CI `29970159892` then exposed the same legitimate early exit in the all-zero relation-source-anchor preflight. The follow-up routes the three manifest preflight-unavailable invocations through the explicit helper and one shared exit-3/silent-output assertion. The post-stdin wrong-network case plus valid and invalid proof paths still reject every stdin write error.
 - Production manifest ownership/mode validation, proof verification, CLI exit semantics, and fail-closed operation are unchanged. Issue #69 tracks the CI stabilization through the protected workflow.
 - No wallet, private key, secret, signature, raw transaction, broadcast, contract, Guardian/reporter authorization, reputation, KAS/PROM, slash ACL, commit-reveal behavior, emergency-stop policy, or foreign untracked file was accessed or changed. `Prometheus-1.png` remains untouched and uncommitted.
+
+## 2026-07-23 GH-69 merge and exact-main stabilization
+
+- PR #71 passed all ten protected contexts after CodeRabbit required the post-stdin wrong-network case to remain on the strict runner. The one review thread is resolved, and the final split is three manifest preflights with bounded `BrokenPipe` tolerance versus strict network/valid/invalid proof paths.
+- PR #71 merged normally without admin bypass as `20d22d1799c384e2ea1035e00a85766998af3aab`; issue #69 closed automatically.
+- Exact-main Prometheus CI `29971220681`, Security Audit `29971220685`, and Pages `29971220259` all passed. This supersedes the two red intermediate main runs `29969343483` and `29970159892`, whose failures supplied the two preflight-race reproductions.
+- Production verifier behavior, manifest checks, proof semantics, CLI exits, and fail-closed operation never changed. The next repository-owned product slice remains the explicit bounded analyzer-domain adapter.
+- No wallet, private key, secret, signature, raw transaction, broadcast, contract, Guardian/reporter authorization, reputation, KAS/PROM, slash ACL, commit-reveal behavior, emergency-stop policy, or foreign untracked file was accessed or changed. `Prometheus-1.png` remains untouched and uncommitted.
