@@ -75,6 +75,9 @@ verification remains fail-closed. V1 does not prove how the hash was derived,
 that a report is true, or that its sender is anonymous. The
 [Threat Observable v2 draft](threat-observable-v2.md) defines the additional
 privacy and proof boundaries required before concrete indicators are sent.
+GH-86 adds isolated Rust and Python structural validators against one shared
+byte-exact corpus, but they do not prove extractor provenance or semantic
+privacy and are not connected to transport, Guardian analysis, or publication.
 
 **Q: What is Commit-Reveal voting?**
 A cryptographic protocol that prevents validators from copying each

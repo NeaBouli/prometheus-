@@ -1,7 +1,9 @@
 # Threat Observable v2 Protocol Draft
 
-Status: normative design draft for GH-82. No wire implementation, proof
-relation, production key, or deployment is approved by this document.
+Status: normative design draft for GH-82. GH-86 implements only the isolated
+local Rust/Python bundle validators and shared vectors in Sections 4-5. No v2
+wire, proof relation, production key, pairing, analyzer promotion, or
+deployment is approved by this document.
 
 ## 1. Purpose
 
@@ -127,7 +129,8 @@ constrains the artifact hash and observable extraction.
 The producer validates before commitment and disclosure. The Guardian repeats
 all structural validation before analysis. Neither side logs rejected values.
 
-The first implementation must reject:
+The closed schema has no field for the following classes, and the structural
+validator rejects representations outside the exact kind/value grammars:
 
 - paths, usernames, hostnames, device IDs, process command lines, environment
   values, credentials, tokens, keys, cookies, and connection strings;
@@ -138,6 +141,17 @@ The first implementation must reject:
 - control characters, non-ASCII values, hidden normalization, and values above
   the exact bounds;
 - automatic public disclosure of `byte_pattern` entries.
+
+Structural validation cannot prove extractor provenance or semantic privacy.
+For example, a string that satisfies the `api_import` token grammar could be
+mislabelled by an untrusted producer even if it was not read from a binary
+import table. A canonical bundle therefore proves neither that a value came
+from the claimed source nor that it is safe to disclose. Producers must accept
+observable values only from separately reviewed, kind-specific extractors and
+must not expose an arbitrary-string bundle builder to callers. Extractor
+allowlists, provenance binding, and privacy review remain promotion gates; the
+first local parser must not describe structurally valid input as
+`privacy_safe`, `approved`, or equivalent.
 
 `review_required_v1` is local-only in the first implementation. Any IPC, P2P,
 Guardian analyzer, committee, IPFS, chain, or public-rule boundary must reject
@@ -170,7 +184,8 @@ to the existing actionable analyzer.
 Implementation may begin with a local canonical bundle type and validator, but
 network or analyzer promotion requires:
 
-- frozen cross-language test vectors for valid and invalid canonical bundles;
+- frozen cross-language test vectors for valid and invalid canonical bundles
+  (implemented locally by GH-86);
 - a separate ThreatHint v2 schema and protocol identifier;
 - an exact v2 statement specification and reviewed relation source;
 - independently approved relation, proving/verifying keys, and vectors;

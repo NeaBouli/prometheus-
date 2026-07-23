@@ -13,13 +13,13 @@
 | Repo | https://github.com/NeaBouli/prometheus- |
 | Branch | `main`; all product and status changes remain PR-only |
 | Lokaler Pfad | `$REPO_ROOT` |
-| Letzter grün verifizierter Produkt-/Tooling-Commit | Operational product `4cada95` merged GH-77 with CI `29975041446`, Security `29975041416`, and Pages `29975040944`; design/public exact main `fceff1d` merged GH-82 with CI `29977301070`, Security `29977301063`, and Pages `29977300539` |
-| Aktueller Entwicklungs-Slice | Issue #84 and branch `docs/GH-84-threat-observable-v2-closeout` record the merged/exact-main GH-82 evidence. Local Rust/Python canonical bundle validators and shared vectors are the next product slice. V1 remains unchanged and non-actionable. |
+| Letzter grün verifizierter Produkt-/Tooling-Commit | Operational product `4cada95` merged GH-77 with CI `29975041446`, Security `29975041416`, and Pages `29975040944`; design/public exact main `6659ab1` closed GH-82 with CI `29977755581`, Security `29977755619`, and Pages `29977755074` |
+| Aktueller Entwicklungs-Slice | Issue #86 and branch `feat/GH-86-local-threat-observable-validators` have locally complete isolated Rust/Python canonical bundle validators and 5 valid + 35 invalid-bundle + 9 invalid-context shared vectors. V1 remains unchanged and non-actionable; no new wire, proof, analyzer, or transport path is included. |
 | Aktuelle Tooling-Baseline | Exact main `4cada95` includes GH-58 durable ingress, GH-63's active-KIP-16-aligned manifest-pinned BN254/Arkworks verifier plus bounded owner-aware adapter/service, GH-69's deterministic manifest-preflight CLI tests, GH-74's bounded hash-only v1 analyzer adapter, and GH-77's per-job drain isolation/data-minimal report. Public/multi-host operation, trusted membership/key assignment, Sybil resistance, approved production proof artifacts, concrete observables/actionable analysis, and on-chain attestation remain open. Execution artifacts remain bound to `205e1ca`; GH-9 remains ready for explicitly approved external signing. |
-| Aktueller HEAD | Branch from exact main `fceff1d3ae6db0f38c0076bc2c8dc82f34c3d96d`; mit `git log --oneline -1` prüfen |
+| Aktueller HEAD | Branch from exact main `6659ab18a94f92d006fe24efe5a451d74322d1c6`; mit `git log --oneline -1` prüfen |
 | Rollback-Tag | `pre-session-20260413` → `6347b85` |
 | Whitepaper | WHITEPAPER.md (root) + whitepaper.html (styled); miner companion, reward boundaries, GH-36/GH-39 trust boundaries, and GH-48/GH-52/GH-55/GH-58/GH-63/GH-74 merged boundaries remain synchronized |
-| Status | Rollout-capable core remains estimated at 78-82%. GH-82 is merged/exact-main verified but is design and claim correction only, so it does not raise the estimate; local validators/vectors, post-Toccata canary execution, approved v2 proof artifacts, concrete-observable/actionable analysis, and full rollout evidence remain gated. |
+| Status | Rollout-capable core remains estimated at 78-82%. GH-86 passes focused/full Rust and Python validation plus independent re-review with no remaining blocking/high/medium finding, but the local-only slice does not raise the estimate; extractor provenance/privacy, post-Toccata canary execution, approved v2 proof artifacts, concrete-observable/actionable analysis, and full rollout evidence remain gated. |
 | GitHub Pages | https://neabouli.github.io/prometheus-/ |
 | Google Search Console | Verified: googleaa2902079481c7a8 |
 
@@ -247,7 +247,7 @@
 | Gate | Milestone |
 |------|-----------|
 | Current | GH-9 H-001 testnet-10 canary external signature, broadcast, receipt, and independent evidence |
-| Core rollout | Remaining state deployments, real metrics transition, local observable validators/vectors, separately reviewed v2 statement/relation, approved proof artifacts, privacy-preserving channel, PROM emission, operated multi-host network |
+| Core rollout | Remaining state deployments, real metrics transition, reviewed observable extractors/privacy gates, separate v2 wire and statement/relation, approved proof artifacts, privacy-preserving pairing/channel, PROM emission, operated multi-host network |
 | Client rollout | Production AI, rule distribution, desktop installer, and security evidence |
 | Mobile rollout | Platform-specific Flutter implementation and review after core/client readiness |
 | Future research | vProgs integration under a separately reviewed protocol |

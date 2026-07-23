@@ -1067,3 +1067,60 @@ Security Audit `29977301063`, and Pages `29977300539` passed for that exact
 SHA. Raw GitHub and live Pages checks expose the merged boundary. No rollout
 estimate changed because no validator, wire, proof relation/artifact, analyzer
 side effect, or operated evidence was added.
+
+## GH-86 LOCAL OBSERVABLE VALIDATOR START (2026-07-23)
+
+Exact public/status main `6659ab18a94f92d006fe24efe5a451d74322d1c6`
+passed Prometheus CI `29977755581`, Security Audit `29977755619`, and Pages
+`29977755074`. Issue #86 owns isolated local Rust/Python validators and shared
+byte-exact vectors. No v1 wire, proof formula, verifier, transport, analyzer,
+committee, IPFS, chain, or public-rule path may import the new module.
+
+Architecture review identified a semantic limit: a structural parser cannot
+prove that a grammar-valid `api_import` token came from a binary import table.
+Canonical acceptance therefore proves only syntax and byte consistency, not
+extractor provenance or privacy. Reviewed kind-specific extractors, provenance
+binding, and disclosure review remain separate promotion gates.
+
+Implementation result: Rust and Python independently parse and commit the same
+5 valid, 35 invalid-bundle, and 9 invalid-context vectors. Sol review closed
+Python direct-construction and exception-chain leakage paths. Independent Terra
+review then found that public Rust `Deserialize` bypassed canonical validation
+and that value-bearing `Debug` exposed accepted local observables. Private
+wire-only deserialization, defensive validation before serialization/
+commitment, a compile-fail public-API regression, and removal of value-bearing
+`Debug` close both findings. The targeted re-review reports no remaining
+blocking, high, or medium finding. Final full-diff review then found two Python
+parity gaps: post-parse mutation through `object.__setattr__` was not
+revalidated before commitment, and a non-string disclosure policy escaped as
+`TypeError`. Defensive state validation now precedes every Python canonical
+serialization/commitment, a mutation regression covers both operations, and a
+shared non-string-policy vector exercises both languages. Final targeted
+re-review reports no remaining blocking, high, or medium finding.
+
+Evidence: 16 focused Rust tests plus one compile-fail doctest; 16 focused
+Python tests; 257 complete Rust workspace passes with two intentional
+live-network ignores; 179 complete Guardian Python passes with three
+intentional live-model skips; Rustfmt; warning-free workspace all-target
+Clippy; locked optimized Guardian/proof builds; verified 9-file ThreatHint and
+14/7-file Guardian/proof package sets; Black; Ruff; full Guardian Pylint
+9.86/10 and focused new-module Pylint 10.00/10. Existing CI discovers all new
+code and vectors; no workflow change is required. One unchanged client
+microbenchmark failed once at 1.84 ms against its 1 ms local threshold; the
+immediate isolated rerun measured 41 microseconds and subsequent complete
+workspace runs passed, most recently all 257 tests. No GH-86 code path was
+involved.
+
+Protected review update: initial CI/Security contexts, including Secret
+Detection, passed on `1abb4ce`. CodeRabbit found one actionable Python/Rust
+validation-order mismatch and one maintenance nit on the manual Rust
+constant-time loop. Python now validates grammar before disclosure policy,
+matching Rust, with a focused regression. Rust now uses the already-locked
+`subtle 2.6.1` `ConstantTimeEq` primitive through an explicit workspace
+dependency. Refreshed protected checks remain required.
+
+Claude Code 2.1.218 then completed a bounded read-only second review and found
+no blocking, high, or medium issue. Its one concrete low-severity hardening
+point was missing explicit Rust coverage for grammar-before-policy precedence;
+a matching regression now closes that asymmetry. Its exact dependency-pin
+observation was informational and does not change the reviewed behavior.

@@ -131,8 +131,8 @@ mode = "unavailable"
 ```
 
 Start it with `python -m jaeger.threat_hint_service --config /absolute/config.toml`.
-No production Groth16 relation, verifying key, proving key, or independently
-approved vectors are bundled. Until those public artifacts are reviewed and the
+No production Groth16 relation, verifying key, proving key, or approved
+relation vectors are bundled. Until those public artifacts are reviewed and the
 complete trusted `kip16_groth16` configuration is installed, the default
 verifier raises `ThreatProofVerifierUnavailable` and the ingress returns
 fail-closed `busy`. Test keys are generated at test runtime and are never a
@@ -159,6 +159,21 @@ separately reviewed privacy-preserving observable channel or future schema,
 approved production proof artifacts, live model wiring, and real operational
 evidence. Future side-effecting consumers also require a reviewed cross-process
 claim/lease design; GH-74's v1 decision has no submission side effects.
+
+## Local Observable Bundle Validation
+
+`jaeger.threat_observable` is the isolated Python counterpart to the Rust
+`prometheus-threat-hint` Canonical Observable Bundle v1 utility. Both parse the
+same byte-exact valid/invalid corpus, enforce the same closed grammar and
+network/nonce-bound commitment, and expose no arbitrary-value builder.
+Direct construction and value-bearing representations are disabled.
+
+This module is not imported by ThreatHint v1, verifier ingress, the analyzer,
+committee, IPFS, chain, or public-rule paths. Structural acceptance proves
+neither extractor provenance nor semantic privacy. Reviewed kind-specific
+extractors, privacy gates, a separate v2 wire/proof/pairing design, and
+production evidence remain required before any observable leaves its local
+producer boundary.
 
 ## Testing
 
