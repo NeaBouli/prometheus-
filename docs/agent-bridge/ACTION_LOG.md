@@ -888,3 +888,17 @@ Rules for all dev agents:
 - Security Audit's existing manual dispatch attached correctly to its requested SHA. Prometheus CI now exposes the same `workflow_dispatch` recovery trigger for future default-branch availability.
 - Final branch `feat/GH-94-local-byte-pattern-producer-final` is complete before its protected PR is opened, so its initial suites can bind the exact final head without a post-open push.
 - Product behavior and all wallet, signing, chain, KAS/PROM, reputation, slash ACL, commit-reveal, and emergency-stop boundaries remain unchanged. Final protected-PR checks and normal merge remain pending; `Prometheus-1.png` remains untouched and uncommitted.
+
+## 2026-07-23 GH-94 merge, GH-98 CI incident, and GH-100 signal fix
+
+- Final protected PR #97 passed all ten contexts on exact final head `4284a88` and merged normally without admin bypass as exact main `34ab5b7a62b17ef2c9cab672439b77dcf4a66d9c`; issue #94 is closed.
+- Exact-main manual recovery runs passed: Prometheus CI `29989116631`, Security Audit `29989117912`, and Pages `29989118948`. Raw README and live Whitepaper/Roadmap/FAQ markers expose the merged mandatory-review producer boundary.
+- GH-98 documentation reconciliation PR #99 was closed without merge after GitHub left a functionally complete runtime job stuck `in_progress`; rerunning the workflow exposed the pre-existing `sigterm_during_collector_wait_stops_cleanly` process race. Issue #98 remains open for a fresh branch after GH-100.
+- Opened issue #100 and branch `fix/GH-100-sidecar-signal-readiness`. Root cause: async signal-receiver construction happened only when the shutdown future was first polled, after `waiting-for-collector` could already be observed.
+- `run_service()` now installs Unix SIGINT/SIGTERM listeners before starting operator output. Registration failures surface before readiness; the crate remains explicitly Unix-only due to AF_UNIX and peer-credential requirements. No protocol, authorization, wallet, signing, chain, KAS/PROM, reputation, slash ACL, commit-reveal, or emergency-stop behavior changed.
+- Pre-fix stress reproduced the assertion at iteration 24. Patched stress passed 64/64; the focused regression passed; the three-process suite passed ten consecutive runs; Guardian P2P and the complete Rust workspace passed.
+- Claude Code 2.1.218 completed a no-tool review and confirmed the Unix lifetime/error handling. Its non-Unix fallback question is not applicable because the crate rejects non-Unix targets at compile time.
+- Complete local gates pass: Rustfmt, warning-free crate/workspace all-target Clippy, locked optimized Guardian build, package previews, 181 Guardian tests with three intentional live-model skips, Black, Guardian Pylint 9.86/10, and Cargo Audit with no vulnerabilities plus eight existing allowed warnings.
+- One relay-process `busy` response and one Python verifier-stub timeout occurred once each. Both focused reruns and later complete/repeated suites passed; no unrelated behavior was changed without a reproducible cause.
+- Next: run Memory/Autodidactic/YAML/Actionlint/Gitleaks/diff gates, commit once, open the protected GH-100 PR without post-open pushes, merge normally after exact-head checks, verify exact main, then recreate and finish GH-98 including README/Whitepaper/Pages.
+- Foreign untracked `Prometheus-1.png` remains untouched and uncommitted. No wallet, private key, secret, signature, raw transaction, or broadcast was accessed.

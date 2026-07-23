@@ -150,7 +150,8 @@
 - [x] [P1] Threat Observable v2 privacy contract | Codex + independent reviewers | GH-82/PR #83 merged/exact-main verified as `fceff1d`; separate artifact hash and observable commitment, strict canonical bounds, deny-by-default disclosure, and corrected public claims
 - [x] [P1] Local Threat Observable bundle validators and vectors | Codex + helper agents | GH-86/PR #87 merged/exact-main verified as `2bfe5a3`; matching Rust/Python canonical validation and commitment against 5 valid, 35 invalid-bundle, and 9 invalid-context shared vectors; CI `29981646898`, Security `29981646867`, and Pages `29981646320` pass
 - [x] [P1] Local `file_sha256` producer from exact artifact bytes | Codex + helper reviewers | GH-90/PR #91 merged as exact main `e7f34bb`; one digest is computed internally from bytes plus typed scope, with no path/digest/generic builder input and shared Rust-producer/Python-validator vectors; CI `29984477087`, Security `29984476876`, and Pages `29984476107` pass
-- [~] [P1] Local review-required `byte_pattern` producer | Codex + helper reviewers | GH-94 branch candidate derives one bounded pattern from exact bytes, checked offset, boolean wildcard mask, and typed scope; at least eight fixed bytes, no pattern/path/generic builder input, mandatory local-only `review_required_v1`, and shared Rust-producer/Python-validator vectors
+- [x] [P1] Local review-required `byte_pattern` producer | Codex + helper reviewers | GH-94/PR #97 merged as exact main `34ab5b7`; one bounded pattern derives from exact bytes, checked offset, boolean wildcard mask, and typed scope; exact-main CI/Security/Pages pass
+- [~] [P1] Guardian sidecar signal listeners before readiness | Codex + Claude Code review | GH-100 branch installs Unix SIGINT/SIGTERM listeners before operator output in the explicitly Unix-only crate; pre-fix stress reproduced at iteration 24, patched stress passed 64/64, local full gates pass; protected PR/exact-main evidence pending
 
 ---
 

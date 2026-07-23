@@ -461,7 +461,8 @@ pub async fn run_service(service: PreparedService) -> Result<(), ServiceError> {
         PreparedService::Guardian(service) => service.shutdown_drain_timeout,
         PreparedService::Relay(service) => service.shutdown_drain_timeout,
     };
-    let shutdown: ShutdownFuture = Box::pin(shutdown_signal());
+    // Install process signal listeners before any operator record can report readiness.
+    let shutdown = shutdown_signal().map_err(ServiceError::Signal)?;
     let mut output = OperatorOutput::start()?;
     let service_result = match service {
         PreparedService::Guardian(service) => run_guardian(*service, shutdown, &mut output).await,
@@ -918,25 +919,35 @@ async fn await_submission_server(
     }
 }
 
-async fn shutdown_signal() -> Result<(), std::io::Error> {
+fn shutdown_signal() -> Result<ShutdownFuture, std::io::Error> {
     #[cfg(unix)]
     {
+        let mut interrupt =
+            tokio::signal::unix::signal(tokio::signal::unix::SignalKind::interrupt())?;
         let mut terminate =
             tokio::signal::unix::signal(tokio::signal::unix::SignalKind::terminate())?;
-        tokio::select! {
-            result = tokio::signal::ctrl_c() => result,
-            signal = terminate.recv() => {
-                if signal.is_some() {
-                    Ok(())
-                } else {
-                    Err(std::io::Error::other("SIGTERM listener closed"))
+        Ok(Box::pin(async move {
+            tokio::select! {
+                signal = interrupt.recv() => {
+                    if signal.is_some() {
+                        Ok(())
+                    } else {
+                        Err(std::io::Error::other("SIGINT listener closed"))
+                    }
+                },
+                signal = terminate.recv() => {
+                    if signal.is_some() {
+                        Ok(())
+                    } else {
+                        Err(std::io::Error::other("SIGTERM listener closed"))
+                    }
                 }
             }
-        }
+        }))
     }
     #[cfg(not(unix))]
     {
-        tokio::signal::ctrl_c().await
+        Ok(Box::pin(tokio::signal::ctrl_c()))
     }
 }
 

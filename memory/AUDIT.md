@@ -1254,3 +1254,52 @@ post-open synchronization. Security Audit's existing manual dispatch correctly
 attached to its requested SHA. Prometheus CI now exposes the same
 `workflow_dispatch` recovery trigger for future default-branch availability;
 no required check is fabricated or bypassed.
+
+Closeout: final protected PR #97 attached every required context to exact head
+`4284a88988297f7d2f82f7a1e35817e7d03b6e5e`, passed all ten contexts, and
+merged normally without admin bypass as exact main
+`34ab5b7a62b17ef2c9cab672439b77dcf4a66d9c`. Issue #94 is closed. Exact-main
+Prometheus CI `29989116631`, Security Audit `29989117912`, and Pages
+`29989118948` passed. The product slice is ACCEPTED; external provenance,
+privacy approval, disclosure authorization, v2 proof binding, transport, and
+actionable analysis remain separate gates.
+
+## GH-100 SIDECAR SIGNAL READINESS FIX (2026-07-23)
+
+Scope: `modules/guardian-p2p/src/service.rs` process-signal registration and
+the existing Unix end-to-end process regression. Protocol frames, transport
+authorization, persistence, verifier/analyzer/proof paths, wallets, signing,
+chain behavior, KAS/PROM, slash ACL, commit-reveal, reputation, and
+emergency-stop policy are out of scope.
+
+Finding: HIGH, reproduced. `run_service()` boxed an async `shutdown_signal()`
+future, but the future did not create Tokio signal receivers until first poll.
+`run_guardian()` could emit `waiting-for-collector` first, allowing an immediate
+SIGTERM to retain the operating-system default action. The existing
+`sigterm_during_collector_wait_stops_cleanly` process regression failed in a
+compiled-binary stress run at iteration 24.
+
+Fix: CONDITIONAL PASS pending protected PR/exact-main evidence. Signal-listener
+construction is synchronous and occurs before `OperatorOutput::start()`.
+Unix creates SIGINT and SIGTERM receivers before returning the boxed wait
+future. Registration errors map to `ServiceError::Signal` before any operator
+record. The receivers are owned by the boxed future for its full lifetime.
+
+Independent review: Claude Code 2.1.218 performed a bounded no-tool review. It
+found the Unix change sound and asked whether the generic non-Unix
+`tokio::signal::ctrl_c()` fallback remained lazy. That path is not a supported
+target: the crate has an explicit non-Unix `compile_error!` because AF_UNIX and
+peer credentials are mandatory. Sol retains final integration and release
+responsibility.
+
+Evidence: patched compiled-binary stress passed 64/64 immediate
+post-readiness SIGTERM iterations. The focused regression passes; the complete
+three-process suite passed ten consecutive repetitions; all 53 Guardian P2P
+unit tests plus all three process tests pass; and the complete Rust workspace
+passes with two intentional live-network ignores. Rustfmt, warning-free
+crate/workspace all-target Clippy, locked optimized Guardian build, package
+checks, Black, Guardian Pylint 9.86/10, 181 Guardian tests with three
+intentional live-model skips, and Cargo Audit with no vulnerabilities pass.
+One relay-process `busy` result and one Python verifier-stub timeout occurred
+once each; focused reruns, ten process-suite repetitions, and later complete
+suites passed, so no unrelated behavior was changed.
