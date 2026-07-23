@@ -84,7 +84,7 @@ class BindingTestVerifier:
 
 
 def owner_only_directory() -> Path:
-    path = Path(tempfile.mkdtemp(prefix="prom-hint-"))
+    path = Path(tempfile.mkdtemp(prefix="prom-hint-", dir=Path.home())).resolve()
     os.chmod(path, 0o700)
     return path
 
