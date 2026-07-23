@@ -266,7 +266,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
       <h2 class="sec-title">The fire belongs to humanity,<br>not to corporations.</h2>
       <p>Prometheus is a fully decentralized, AI-powered threat intelligence protocol built on the Kaspa blockchain. It transforms every connected device into a node in a global threat detection swarm — without central control, without a foundation, and with zero pre-mined tokens.</p>
       <p>The protocol combines three layers: <strong>on-device AI</strong> (Phi-3-mini 3.8B, 4-bit quantized) for local anomaly detection, <strong>Guardian nodes</strong> (LLaMA 3 70B/8B) for advanced threat analysis and YARA rule generation, and <strong>Kaspa L1 consensus</strong> (high-throughput BlockDAG / DAGKnight path) for immutable rule storage and governance.</p>
-      <div class="callout"><p><strong>Key properties:</strong> 0% pre-mine · No emergency stop · Fully automated governance · GDPR non-applicable (no personal data on-chain) · Code is the only law.</p></div>
+      <div class="callout"><p><strong>Key properties:</strong> 0% pre-mine · No repository-controlled emergency-stop entrypoint · Automated governance target · Data-minimal on-chain state. Applicable privacy obligations depend on deployed data flows and jurisdiction; this whitepaper is not a legal determination.</p></div>
       <table class="wp-table">
         <tr><th>Parameter</th><th>Value</th></tr>
         <tr><td>Blockchain</td><td>Kaspa BlockDAG / DAGKnight path, high-throughput PoW settlement</td></tr>
@@ -316,15 +316,16 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
       <p>Prometheus solves the three core failures of the current security industry simultaneously:</p>
       <table class="wp-table">
         <tr><th>Failure</th><th>Prometheus Solution</th></tr>
-        <tr><td>Centralization</td><td>No foundation, no central server, no emergency stop. Protocol exists as long as Kaspa exists.</td></tr>
-        <tr><td>Latency</td><td>Threat to on-chain rule in under 60 seconds. Real-time swarm detection via Light Clients worldwide.</td></tr>
+        <tr><td>Centralization</td><td>Target: no foundation or central protocol server. Contract design has no repository-controlled emergency-stop entrypoint; availability still depends on Kaspa, nodes, clients, and network access.</td></tr>
+        <tr><td>Latency</td><td>Target: threat to on-chain rule in under 60 seconds after proof, observable, consensus, and rollout gates pass.</td></tr>
         <tr><td>Misaligned incentives</td><td>0% pre-mine. PROM earned only through verified security work. No commercial relationship with governments.</td></tr>
       </table>
 
-      <div class="sec-sub">The threat lifecycle — under 60 seconds</div>
+      <div class="sec-sub">Target threat lifecycle — under 60 seconds after rollout gates pass</div>
+      <p>The current verified ThreatHint v1 path stops before Guardian analysis: it transports a caller-supplied hash commitment and bounded metadata but no concrete IOC, then returns zero confidence, no rule, and no submission. It does not derive the hash from an artifact or prove report truth, artifact derivation, or reporter anonymity. GH-82 specifies a separate artifact-hash and observable-commitment v2 boundary before implementation.</p>
       <div class="timeline">
         <div class="tl-time">t = 0s</div>
-        <div class="tl-content"><strong>Light Client</strong> — Phi-3-mini detects anomaly. SHA-256 hash computed. ZK-proof generated. Anonymous hint sent to 3 Guardian nodes.</div>
+        <div class="tl-content"><strong>Light Client</strong> — Phi-3-mini detects anomaly. Artifact hash and privacy-filtered observable commitment computed. An approved, precisely scoped ZK-proof and data-minimal hint are sent to Guardian nodes.</div>
         <div class="tl-time">t = 2s</div>
         <div class="tl-content"><strong>Guardian Node</strong> — LLaMA 3 aggregates 5+ similar reports. Analyzes entropy, API patterns, CVE correlations. Generates YARA rule proposal (min. 85% confidence).</div>
         <div class="tl-time">t = 15s</div>
@@ -348,7 +349,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
         <li><strong>BlockDAG architecture:</strong> Parallel block production eliminates the bottleneck of linear chains. Prometheus treats high throughput as a deployment requirement and verifies contract/tooling compatibility before launch.</li>
         <li><strong>Silverscript:</strong> High-level language for UTXO-based smart contracts. H-001, ValidatorStaking, GuardianReputation, RuleStorage, CommunityDonations, DevIncentivePool, and GovernanceAutoTuning current-Silverc gates are verified. Closed release-manifest profiles separate the single H-001 testnet-10 canary from the full seven-fixture flow; canary receipts, evidence, and status remain non-promotable. Release-bundle, deploy-preflight, request/procedure/receipt/evidence verification, operator-handoff, metrics-oracle, and exact-commit hardening gates are covered; real funded canary evidence followed by full deployment and oracle evidence still gate Prometheus rollout.</li>
         <li><strong>Keyless genesis operator:</strong> Prometheus constructs the official transaction-v1 covenant genesis with compute budget 10 and exact contextual storage mass, validates the exact live funding UTXO during preflight and again before broadcast, and exports only the public sighash to an external vault/HSM. Its canonical import accepts only a public 64-byte BIP340 signature as lowercase hex, binds all response fields from the validated request, rejects normalized input/output path collisions, and verifies BIP340 plus the complete transaction before writing output. It enforces fee caps, journals the exact transaction before acknowledged submission, reconciles retries against chain and mempool state, and rebuilds the signed transaction before observation. A funding-free probe uses the pinned public resolver with mandatory TLS and testnet-10-only enforcement, recording the resolved endpoint without replacing funding or independent-evidence gates. Per-request wRPC deadlines fail closed. The CLI accepts no private key, seed, wallet, keystore, password, or raw transaction.</li>
-        <li><strong>Native ZK verification:</strong> Groth16 Zero-Knowledge Proofs directly on L1 — essential for anonymous threat reports.</li>
+        <li><strong>Native ZK verification:</strong> Kaspa KIP-16 supplies BN254 Groth16 verification. Prometheus has a manifest-pinned verifier engine, but no approved production relation or keys ship yet. The exact circuit determines what is proved; v1 does not establish artifact derivation, report truth, or reporter anonymity.</li>
       </ul>
 
       <div class="sec-sub">Layer 2 — Optional orchestration, not reputation authority</div>
@@ -359,7 +360,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
       <p>A deterministic isolated three-node harness proves relay reservation, relay-only ballot and ACK delivery, AutoNAT state, DCUtR failure with continued relay fallback, and circuit/connection close handling. A separate-process same-host test additionally proves exact relay delivery from the local submit socket to the collector, canonical ACK propagation, SIGTERM cleanup, and stable transport identities. Real two-host relay/NAT operation remains open. Broad discovery is not yet proven, and mDNS stays excluded while its compatible optional DNS dependency path has unresolved RustSec advisories.</p>
 
       <div class="sec-sub">Off-Chain — The Action Layer</div>
-      <p>The actual protective effect arises off-chain on the devices of users and the nodes of operators. This layer communicates constantly with L1 and L2 but acts autonomously. Raw data never leaves this layer.</p>
+      <p>The actual protective effect arises off-chain on user devices and operator nodes. Local scanning is designed to keep files and paths on the originating device, while bounded claim metadata and future explicitly reviewed observables may cross protocol boundaries.</p>
 
       <div class="callout"><p><strong>Why Kaspa?</strong> Kaspa is the only Proof-of-Work blockchain that fulfills the technical requirements of Prometheus: sub-second finality, 100+ BPS, Silverscript for native L1 contracts, ZK-proof support on L1, and a 0% pre-mine philosophy identical to Prometheus.</p></div>
     </div>
@@ -371,7 +372,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
 
       <table class="wp-table">
         <tr><th>Node Type</th><th>Hardware</th><th>Role</th><th>PROM Share</th></tr>
-        <tr><td>Light Client</td><td>4 GB RAM, no GPU</td><td>Local detection, ZK-proof generation, anonymous reporting</td><td>15%</td></tr>
+        <tr><td>Light Client</td><td>4 GB RAM, no GPU</td><td>Target: local detection and data-minimal, precisely proved reporting</td><td>15%</td></tr>
         <tr><td>Guardian Node</td><td>RTX 4070 Ti+ (8B) or 4× A100 (70B)</td><td>LLaMA 3 analysis, YARA rule generation, reputation-based voting</td><td>30%</td></tr>
         <tr><td>Validator Node</td><td>Standard server + 10,000 KAS stake</td><td>Commit-Reveal voting, economic security, slashing enforcement</td><td>40%</td></tr>
         <tr><td>Honeypot Node</td><td>Any internet-exposed server</td><td>Zero-day detection via decoy services</td><td>5%</td></tr>
@@ -394,7 +395,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
       <p>The choice of AI model is a security question, not a quality question. Proprietary models (GPT-4, Claude, Gemini) are black boxes — nobody can verify what they actually do. For a security system with transparency as a core principle, they are structurally unsuitable.</p>
 
       <div class="sec-sub">Wächter-KI — Phi-3-mini (Light Client)</div>
-      <p>Microsoft's Phi-3-mini 3.8B runs completely locally on the end user's device. No data transfer, no cloud, no dependency on external services. The model is 4-bit quantized and runs via ONNX Runtime on 4 GB RAM without GPU on Windows, macOS, Linux, and mobile.</p>
+      <p>Target architecture: Microsoft's Phi-3-mini 3.8B runs locally on the end user's device for inference. Reporting and model-update paths remain separate, bounded data flows. The planned model is 4-bit quantized and targets ONNX Runtime on 4 GB RAM without GPU on Windows, macOS, Linux, and mobile; production inference is not yet wired.</p>
 
       <div class="sec-sub">Jäger-KI — LLaMA 3 (Guardian Nodes)</div>
       <p>Meta's LLaMA 3 in the 70B or 8B variant is the centerpiece of the Guardian AI. It runs self-hosted on Guardian nodes and analyzes incoming threat hints from Light Clients across the network. Both variants are fine-tuned with LoRA (Low-Rank Adaptation) on security-specific datasets:</p>
@@ -419,14 +420,14 @@ lora_config = LoraConfig(
 # Result: specialized security model on LLaMA 3 base</pre>
 
       <div class="sec-sub">Federated Learning — Fed-DART</div>
-      <p>The network improves continuously without central data exchange. Fed-DART (Fraunhofer Institute) enables decentralized training: clients train locally and send only mathematical gradients — never the underlying data.</p>
-      <div class="callout"><p><strong>Privacy guarantee:</strong> Only gradients (mathematical differences to the global model) are transmitted. No conclusions about original data can be drawn from gradients. ZK-proofs additionally secure the anonymity of the reporting client.</p></div>
+      <p>Target architecture: Fed-DART enables clients to train locally and exchange bounded model updates instead of raw training records. Model updates can still leak information through inference or reconstruction attacks, so clipping, aggregation, privacy accounting, authentication, and independent validation remain production requirements.</p>
+      <div class="callout"><p><strong>Privacy boundary:</strong> Sending gradients instead of raw records reduces direct disclosure; it does not make reconstruction impossible. ZK privacy and anonymity claims are limited to the exact reviewed circuit and surrounding transport.</p></div>
     </div>
 
     <!-- CONTRACTS -->
     <div class="wp-section r" id="contracts">
       <span class="sec-label">07 / Smart Contracts</span>
-      <h2 class="sec-title">Six Silverscript contracts. Fully automated. Audited.</h2>
+      <h2 class="sec-title">Six Silverscript contracts. Deterministic state transitions.</h2>
       <p>The legacy contracts are written in Silverscript and use fixed-point integer scaling for reputation and confidence values (no float64). Current Silverc deployment fixtures use signed entrypoint integers at the deploy boundary; deployment calls are scoped to <code>0..=i64::MAX</code> where numeric values enter Silverc.</p>
       <table class="wp-table">
         <tr><th>Contract</th><th>Purpose</th><th>Key Functions</th></tr>
@@ -537,8 +538,8 @@ lora_config = LoraConfig(
     <!-- FEDERATED -->
     <div class="wp-section r" id="federated">
       <span class="sec-label">13 / Federated Learning</span>
-      <h2 class="sec-title">The network learns. Raw data never leaves.</h2>
-      <p>Fed-DART enables decentralized training: clients train locally and send only mathematical gradients — never the underlying data. The global model improves without any central party knowing the data of the users.</p>
+      <h2 class="sec-title">The network learns through bounded model updates.</h2>
+      <p>Target architecture: Fed-DART keeps training records local and exchanges model updates. Those updates are not raw records, but they may still leak information; production requires clipping, secure aggregation, privacy accounting, authentication, and validation.</p>
       <pre>
 # Fed-DART Training Round (simplified)
 async def training_round(self):
@@ -546,10 +547,10 @@ async def training_round(self):
     global_model = await self.client.fetch_global_model()
     # 2. Train locally — ONLY with local threat data
     local_gradients = await self.train_local(global_model)
-    # 3. Send ONLY gradients — NEVER raw data
+    # 3. Send bounded model updates; privacy controls remain required
     await self.client.submit_update(ModelUpdate(
         gradients=local_gradients,      # Mathematical difference
-        client_id=self.anonymized_id(), # Anonymous
+        client_id=self.pseudonymous_id(), # Not an anonymity guarantee
         data_size=self.local_data_count,# Count, not content
         signature=self.sign_update()    # Authenticity
     ))
@@ -560,8 +561,8 @@ async def training_round(self):
     <!-- GOVERNANCE -->
     <div class="wp-section r" id="governance">
       <span class="sec-label">14 / Governance Auto-Tuning</span>
-      <h2 class="sec-title">Fully automated. No human intervention possible.</h2>
-      <p>All protocol parameters adjust themselves weekly based on network data. No human can intervene — or needs to.</p>
+      <h2 class="sec-title">Deterministic, bounded auto-tuning.</h2>
+      <p>Target behavior: authenticated metrics drive bounded weekly parameter transitions. The repository verifies deterministic state transitions, but real inputs, external signatures, confirmed successor evidence, and production operation remain gated. There is no repository-controlled emergency-stop entrypoint; availability still depends on Kaspa, nodes, clients, and network access.</p>
       <table class="wp-table">
         <tr><th>Parameter</th><th>Start value</th><th>Target</th></tr>
         <tr><td>MIN_STAKE_KAS</td><td>10,000</td><td>50–200 active validators</td></tr>
@@ -585,7 +586,7 @@ async def training_round(self):
         <tr><td>Model poisoning</td><td>On-chain model hash. Any manipulation produces a different hash → rejected by all nodes.</td></tr>
         <tr><td>51% attack</td><td>DAGKnight: ~50% Byzantine fault tolerance. Prometheus inherits Kaspa security.</td></tr>
         <tr><td>Long-range attack</td><td>Weak subjectivity: new validators can only vote from their entry timestamp.</td></tr>
-        <tr><td>Emergency stop</td><td>Does not exist — by design. No single point of failure. The protocol cannot be paused.</td></tr>
+        <tr><td>Emergency stop</td><td>No repository-controlled emergency-stop entrypoint is introduced. This removes a developer kill switch, not every availability dependency.</td></tr>
       </table>
     </div>
 
@@ -608,10 +609,10 @@ async def training_round(self):
         <tr><td>Foundation</td><td>March 2026</td><td>Sprints 0–8 complete. 6 contracts, 160+ tests, landing page live.</td></tr>
         <tr><td>Kaspa Toccata</td><td>June/July 2026</td><td>Current-Silverc runtime/release gates and the keyless Toccata-v1 genesis operator are implemented. The closed, non-promotable ValidatorStakingH001 profile has confirmed public funding plus an exact-main <code>205e1ca</code> schema-v2 request/digest, live UTXO revalidation through the TLS-only official resolver, and a byte-identical two-pass rebuild. External signature, verified one-shot broadcast, confirmation, and independent public evidence remain; full seven-fixture and oracle gates follow.</td></tr>
         <tr><td>Miner Companion</td><td>July 2026</td><td>Experimental opt-in local Testnet-10 wRPC observer and strict preflight implemented. Scanning, reporting, rewards, validator/honeypot roles, Stratum integration, and miner firmware integration remain disabled.</td></tr>
-        <tr><td>AI Production</td><td>Post-verification</td><td>Real ZK-proof, P2P, Phi-3, LLaMA fine-tuned, Fed-DART live.</td></tr>
-        <tr><td>Desktop Release</td><td>July–August 2026</td><td>Windows / macOS / Linux installers. One-click Guardian setup.</td></tr>
-        <tr><td>Mobile Release</td><td>September 2026</td><td>iOS (App Store) + Android (Google Play + F-Droid).</td></tr>
-        <tr><td>vProgs</td><td>Q4 2026</td><td>AI results anchored to L1 via ZK-proofs. Complete architectural vision.</td></tr>
+        <tr><td>AI Production</td><td>Readiness-gated</td><td>Approved proof relation/artifacts, v2 observable path, operated P2P, production Phi-3/LLaMA, and privacy-reviewed federated learning.</td></tr>
+        <tr><td>Desktop Release</td><td>Readiness-gated</td><td>Windows / macOS / Linux installers after core-network and security gates pass.</td></tr>
+        <tr><td>Mobile Release</td><td>Readiness-gated</td><td>iOS and Android follow the desktop/core security boundary; no fixed release date is claimed.</td></tr>
+        <tr><td>vProgs</td><td>Future research</td><td>AI-result anchoring requires a separately reviewed protocol and proof statement.</td></tr>
       </table>
     </div>
 

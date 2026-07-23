@@ -84,7 +84,8 @@ PYTHONPATH=. pytest tests/ -v
 All 15 Architecture Decisions are documented in `memory/MEMO.md`. The most important for developers:
 
 1. **KAS = validator staking, PROM = earned-only reward/governance** — Canonical Guardian reputation is separate Kaspa L1 state; never mix these fields in contracts
-2. **No emergency stop** — The protocol cannot be paused by anyone
+2. **No emergency-stop entrypoint** — Never add a repository-controlled kill
+   switch; do not misstate this as an uninterrupted-availability guarantee
 3. **uint64 with 10000x scaling** — No float64 in on-chain contracts
 4. **tokio::sync::Mutex** — Never use std::sync::Mutex in async Rust code
 5. **CIDv1 bytes(36)** — Always binary CIDv1, never CIDv0 base58
@@ -150,7 +151,9 @@ Light Client C ──gradients──┼──→ Coordinator ──→ Aggregate
 Guardian D    ──gradients──┤     (rotated by      (IPFS + on-chain
 Guardian E    ──gradients──┘      reputation)       hash verification)
 
-PRIVACY: Only gradients flow. Raw data stays local. Always.
+PRIVACY TARGET: Training records stay local. Bounded model updates can still
+leak information; clipping, secure aggregation, privacy accounting,
+authentication, and validation remain production requirements.
 ```
 
 ### Model Distribution

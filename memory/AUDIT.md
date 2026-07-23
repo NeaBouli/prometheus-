@@ -1036,3 +1036,26 @@ live-model skips; Black, scoped Ruff, focused Pylint 10.00/10, and diff checks
 pass. PR #79 merged normally as `4cada95ed2f97c2d0251dd82ef40290b0c664c41`;
 exact-main Prometheus CI `29975041446`, Security Audit `29975041416`, and Pages
 `29975040944` pass. No protected review thread remained open.
+
+## GH-82 THREAT OBSERVABLE V2 DESIGN AUDIT (2026-07-23)
+
+Scope: ThreatHint v1 schema/client/verifier binding, Guardian analyzer and YARA
+boundaries, public privacy/proof claims, and the proposed observable contract.
+Read-only architecture and privacy reviews found that v1 `threat_hash` is
+caller-supplied. The schema, builder, and verifier validate and bind it but do
+not derive it from a file or observable.
+
+Decision: leave v1 and its proof formula unchanged. The preferred v2 design
+uses separate `artifact_hash` and `observable_commitment` fields under a new
+statement/relation. The canonical bundle is closed, bounded, domain-separated,
+network/nonce-bound, and deny-by-default. A digest match proves byte
+consistency only; truth, maliciousness, authorship, artifact derivation,
+membership, and anonymity are not claimed unless a separately reviewed
+relation explicitly proves them.
+
+Public absolute claims that no metadata leaves the device, gradients permit no
+inference, current ZK proves anonymous legitimate participation, or the
+under-60-second actionable lifecycle is already operational are corrected.
+This design slice adds no transport, key, relation, analyzer side effect,
+public rule storage, or production acceptance. Local cross-language canonical
+validators and vectors are the next implementation boundary.

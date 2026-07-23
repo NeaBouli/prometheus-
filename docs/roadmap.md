@@ -1,6 +1,6 @@
 # Prometheus — Full Deployment Roadmap
 *Readiness-gated roadmap; no fixed public-release date is claimed.*
-*Last status reconciliation: 2026-07-19 (Europe/Athens project time).*
+*Last status reconciliation: 2026-07-23 (Europe/Athens project time).*
 
 ## Progress Snapshot
 
@@ -31,7 +31,7 @@ real network operation are tracked in the later phases below.
 | 3 | Phi-3 wrapper, anomaly detection, Fed-DART | ACCEPTED |
 | 4 | Docker vLLM, YARA generator, analyzer | ACCEPTED |
 | 5 | Commit-Reveal voting, bond system, slashing | ACCEPTED |
-| 6 | E2E lifecycle <60s, Sybil + FP flood proof | ACCEPTED |
+| 6 | Development-stub E2E lifecycle fixture <60s, Sybil + FP flood tests | ACCEPTED as test foundation; not production evidence |
 | 7 | Audit dashboard, README, WHITEPAPER.md | ACCEPTED |
 | 8 | CONTRIBUTING.md, 5 wiki guides, landing page | DONE |
 
@@ -161,7 +161,8 @@ public release-hardening evidence for the exact rollout commit.
 - Merged and exact-main-verified GH-63 adds real manifest-pinned Groth16 verification aligned with active KIP-16, strict key/proof parsing, complete semantic ThreatHint binding, and a bounded owner-aware service
 - Merged and exact-main-verified GH-74 adds a bounded digest/network/time-bound outbox-to-analyzer adapter; hash-only ThreatHint v1 is consumed as an exact zero-confidence, no-rule, non-submittable result without invoking LLM or YARA generation
 - Merged and exact-main-verified GH-77 isolates failed jobs inside each bounded analyzer drain, preserves them as pending, lets later safe jobs progress, and emits only data-minimal fixed failure metadata
-- Pending: approved production proof artifacts plus a separately reviewed privacy-preserving concrete-observable channel or future schema before actionable analysis
+- GH-82 candidate freezes a Threat Observable v2 draft with separate artifact hash and observable commitment, strict canonical bounds, deny-by-default disclosure classes, and exact non-claims; no v2 wire or analyzer promotion is implemented by the draft
+- Pending: local cross-language v2 bundle validators/vectors, then a separately reviewed v2 statement/relation and approved production proof artifacts before actionable analysis
 - Proven on an isolated three-node harness: relay reservation/delivery, AutoNAT state, DCUtR relay fallback, and disconnect handling; real two-host operation remains pending
 - Pending: public operated relay/NAT infrastructure and broad discovery; mDNS remains excluded while its compatible dependency path has unresolved RustSec advisories
 - Light Client ↔ Guardian communication over P2P

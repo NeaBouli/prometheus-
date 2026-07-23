@@ -147,6 +147,7 @@
 - [ ] [P0] Echte KRC-20 UTXO-Abfrage für PROM-RULES Tick | Claude Code | Contracts live
 - [ ] [P1] Regel-Download von IPFS via CIDv1 | Claude Code | KRC-20 Reader
 - [~] [P1] Light Client ↔ Guardian P2P Kommunikation | Codex | GH-55 canonical schema/client builder/direct P2P core, GH-58 durable ingress, GH-63's real active-KIP-16 BN254/Arkworks verification engine plus bounded owner-aware adapter/service, GH-74's bounded digest/network/time-bound analyzer adapter, and GH-77's per-job batch isolation/data-minimal report are merged/exact-main verified. Hash-only v1 input remains an exact non-submittable no-LLM/no-YARA result. Operated acceptance stays fail-closed `busy` until independently approved production relation/VK/vectors are installed; actionable analysis also requires a reviewed privacy-preserving concrete-observable channel or future schema
+- [~] [P1] Threat Observable v2 privacy contract | Codex + independent reviewer | GH-82 draft separates artifact hash and observable commitment, defines strict canonical bounds and deny-by-default disclosure, and corrects unsupported public claims. Local Rust/Python validators and shared vectors are next; v2 wire/proof/analyzer promotion remain separately gated
 
 ---
 
