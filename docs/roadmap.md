@@ -7,8 +7,8 @@
 | Scope | Estimated complete | Estimated remaining | Current gate |
 |-------|-------------------:|--------------------:|--------------|
 | H-001 testnet-10 canary preparation | 96% | 4% | External BIP340 signature, verification, one-shot broadcast, confirmation, receipt, independent evidence |
-| Rollout-capable core network | 77–81% | 19–23% | Six state deployments, approved production Groth16 artifacts and accepted ThreatHint analysis, PROM emission, real metrics-oracle execution/evidence, public multi-host P2P/rule distribution, production node evidence |
-| Complete roadmap vision | 40–45% | 55–60% | Production AI, desktop/mobile clients, installers, operated network, vProgs, plus all core-network gates |
+| Rollout-capable core network | 78–82% | 18–22% | Six state deployments, approved production Groth16 artifacts, a concrete-observable channel and actionable ThreatHint analysis, PROM emission, real metrics-oracle execution/evidence, public multi-host P2P/rule distribution, production node evidence |
+| Complete roadmap vision | 44–49% | 51–56% | Production AI, desktop/mobile clients, installers, operated network, vProgs, plus all core-network gates |
 
 Percentages are scope-weighted engineering estimates. They are not release dates,
 financial forecasts, or evidence that any contract is live.
@@ -158,7 +158,9 @@ public release-hardening evidence for the exact rollout commit.
 - Merged/exact-main-verified GH-52 adds relay-only canonical advertised IP/UDP/QUIC bootstrap routes, bind/advertise separation, and path-free operator events; configured routes are not reachability or authorization proof
 - Merged/exact-main-verified GH-55 adds a separate canonical bounded ThreatHint transport core and development-only Light Client builder
 - Merged/exact-main-verified GH-58 adds separate owner-only verifier IPC, trusted context binding, persistent freshness/replay admission, and an atomic durable analyzer outbox; unavailable production Groth16 verification remains fail-closed as `busy`
-- Merged and exact-main-verified GH-63 adds real manifest-pinned Groth16 verification aligned with active KIP-16, strict key/proof parsing, complete semantic ThreatHint binding, and a bounded owner-aware service; accepted operation still requires approved production artifacts and analyzer mapping
+- Merged and exact-main-verified GH-63 adds real manifest-pinned Groth16 verification aligned with active KIP-16, strict key/proof parsing, complete semantic ThreatHint binding, and a bounded owner-aware service
+- GH-74 adds a bounded digest/network/time-bound outbox-to-analyzer adapter; hash-only ThreatHint v1 is consumed as an exact zero-confidence, no-rule, non-submittable result without invoking LLM or YARA generation
+- Pending: approved production proof artifacts plus a separately reviewed privacy-preserving concrete-observable channel or future schema before actionable analysis
 - Proven on an isolated three-node harness: relay reservation/delivery, AutoNAT state, DCUtR relay fallback, and disconnect handling; real two-host operation remains pending
 - Pending: public operated relay/NAT infrastructure and broad discovery; mDNS remains excluded while its compatible dependency path has unresolved RustSec advisories
 - Light Client ↔ Guardian communication over P2P

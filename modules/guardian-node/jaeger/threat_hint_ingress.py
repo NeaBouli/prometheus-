@@ -467,7 +467,7 @@ class ThreatHintReplayLedger:
         ]
 
     def mark_delivered(self, payload_digest: str, delivered_at: int) -> None:
-        """Idempotently mark a durable job after a future explicit adapter succeeds."""
+        """Idempotently mark a durable job after the analyzer adapter succeeds."""
         if not _is_hex_32(payload_digest):
             raise ThreatHintIngressError("outbox digest is invalid")
         if not _is_timestamp(delivered_at):

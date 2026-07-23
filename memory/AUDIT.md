@@ -981,3 +981,30 @@ All four review threads were resolved and all ten protected PR contexts passed.
 PR #64 merged normally as `f4f9df95848d41c82379ef59044d12453b12279c`;
 exact-main Prometheus CI `29968203074`, Security Audit `29968203053`, and Pages
 `29968202562` pass. Production artifact approval remains an operational gate.
+
+## GH-74 THREATHINT ANALYZER ADAPTER AUDIT UPDATE (2026-07-23)
+
+Scope: `jaeger/analyzer.py`, `jaeger/threat_hint_adapter.py`, the GH-58 outbox
+contract, focused adapter tests, Guardian docs, public status, and CI discovery.
+Result before protected review: 0 blocking, 0 high, 0 medium implementation
+findings. ThreatHint v1 has no concrete IOC strings; treating `indicator_type`
+as an indicator would fabricate evidence. GH-74 instead defines a frozen
+verified input with only actual wire/job fields and no `indicators` member.
+
+The adapter re-parses exact canonical bytes, constant-time compares the stored
+SHA-256 digest, binds the configured network, requires the real proof mode, and
+rechecks the original freshness admission window. Each per-instance serialized
+drain loads at most 32 jobs. The analyzer's verified-v1 entry point does not call
+an LLM or YARA generator and can return only confidence `0.0`, no rule, and no
+submission. The adapter validates that exact result before marking delivery;
+tamper, wrong network, analyzer failure, unsafe result, and clock rollback keep
+the job pending. The v1 result has no submission side effects. A future
+observable-bearing and side-effecting multi-process consumer requires separate
+schema/privacy and claim/lease review.
+
+Local evidence is 24 focused tests and 158 complete Guardian passes with three
+intentional live-model skips, plus Black, Ruff, focused Pylint 10.00/10, and
+clean diff checks. Existing CI automatically runs the complete Guardian suite,
+format/lint gates, secret scan, dependency audit, and public-page checks; no
+workflow change is required. Production proof-artifact approval, concrete
+observables, actionable analysis, live models, and real operation remain open.
