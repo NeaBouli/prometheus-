@@ -279,7 +279,7 @@ consumption path, not accepted rule generation. A future observable-bearing
 schema/channel and any side-effecting multi-process consumer require separate
 review.
 
-### Local Threat Observable bundle APIs (GH-82/GH-86/GH-90/GH-94)
+### Local Threat Observable bundle APIs (GH-82/GH-86/GH-90) and GH-94 producer
 
 `docs/threat-observable-v2.md` remains the normative design draft for the
 future protocol. Merged and exact-main-verified GH-86 implements only its local canonical bundle boundary:
@@ -294,7 +294,7 @@ Rust: prometheus_threat_hint::ObservableBundle
 Rust GH-90 merged/exact-main:
   produce_file_sha256_bundle(&[u8], ScopePlatform, ScopeFormat)
 
-Rust GH-94 candidate:
+Rust GH-94 candidate (validated with separate producer vectors):
   produce_byte_pattern_bundle(
     &[u8], usize, &[bool], ScopePlatform, ScopeFormat
   )
@@ -306,8 +306,10 @@ Python: jaeger.threat_observable.ObservableBundle
   commitment_matches(expected, network_id, report_nonce_hex, wire)
 ```
 
-Both consume the shared
+The Rust/Python bundle validators consume the shared
 `modules/threat-hint/tests/vectors/threat-observable-bundle-v1.json` corpus.
+GH-94 producer validation separately consumes
+`modules/threat-hint/tests/vectors/threat-observable-byte-pattern-producer-v1.json`.
 Rust public bundle types cannot be deserialized directly, and Python direct
 constructors are disabled; commitment calculation is reachable through a
 validated parsed bundle. Value-bearing Rust `Debug` and Python `repr` output is

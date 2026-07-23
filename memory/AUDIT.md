@@ -1233,3 +1233,11 @@ YAML parsing, Actionlint 1.7.12, Cargo Audit with no vulnerabilities and eight
 known allowed warnings, staged-diff Gitleaks 8.30.1 with no leak, and clean
 diff checks pass. Protected CI remains authoritative for the full-history
 secret gate.
+
+Protected PR evidence: PR #95 passed all ten CI, Security, and CodeRabbit
+contexts for commit `6daa9f3fa1c8af39f6ac4a17a970cac627b43e9e`. CodeRabbit
+reported one valid minor documentation ambiguity: the API memory could imply
+that GH-94 producer validation reused the generic bundle corpus. The API now
+distinguishes the generic bundle corpus from the separate GH-94 byte-pattern
+producer corpus. No product or workflow behavior changed; refreshed protected
+checks and normal merge remain required.

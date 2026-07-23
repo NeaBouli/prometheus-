@@ -873,3 +873,10 @@ Rules for all dev agents:
 - Claude Code was requested as a no-tool helper, but its configured monthly spend limit rejected the call before analysis or repository access. Sol retains architecture, implementation, integration, and verification responsibility.
 - Scope estimates remain core 78-82%, complete vision 44-49%, and 51-56% remaining. External provenance, wildcard suitability, semantic privacy approval, disclosure authorization, transport, proof binding, actionable analysis, and production acceptance remain unproved and gated.
 - No wallet, private key, secret, signature, raw transaction, broadcast, contract, Guardian/reporter authorization, reputation, KAS/PROM, slash ACL, commit-reveal behavior, or emergency-stop policy was accessed or changed. `Prometheus-1.png` remains untouched and uncommitted.
+
+## 2026-07-23 GH-94 protected review follow-up
+
+- PR #95 passed all ten initial protected CI, Security, and CodeRabbit contexts on commit `6daa9f3fa1c8af39f6ac4a17a970cac627b43e9e`.
+- CodeRabbit's only valid finding was a minor documentation ambiguity in `memory/API.md`: generic Rust/Python bundle validation uses `threat-observable-bundle-v1.json`, while GH-94 producer validation uses the separate `threat-observable-byte-pattern-producer-v1.json` corpus.
+- The API memory now names both corpora explicitly. Audit and Bridge record the review result; no product code, public behavior, workflow, wallet, signing, chain, KAS/PROM, reputation, slash ACL, commit-reveal, or emergency-stop boundary changed.
+- Refreshed checks, normal merge without admin bypass, exact-main CI/Security/Pages, and protected documentation reconciliation remain next. `Prometheus-1.png` remains untouched and uncommitted.
