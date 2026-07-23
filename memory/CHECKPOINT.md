@@ -247,7 +247,7 @@
 | Gate | Milestone |
 |------|-----------|
 | Current | GH-9 H-001 testnet-10 canary external signature, broadcast, receipt, and independent evidence |
-| Core rollout | Remaining state deployments, real metrics transition, approved proof artifacts, observable v2, PROM emission, operated multi-host network |
+| Core rollout | Remaining state deployments, real metrics transition, local observable validators/vectors, separately reviewed v2 statement/relation, approved proof artifacts, privacy-preserving channel, PROM emission, operated multi-host network |
 | Client rollout | Production AI, rule distribution, desktop installer, and security evidence |
 | Mobile rollout | Platform-specific Flutter implementation and review after core/client readiness |
 | Future research | vProgs integration under a separately reviewed protocol |

@@ -381,7 +381,7 @@ Current-Silverc verification status:
 Architecture Decision #10 target: privacy-preserving distributed model
 improvement.
 
-```
+```text
 PRIVACY BOUNDARY:
 - Training records remain local in the target architecture
 - Bounded model updates can still leak information

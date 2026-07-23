@@ -22,7 +22,7 @@ The protocol may claim only the property actually checked:
 
 | Check | Permitted claim | Not proved |
 |---|---|---|
-| `SHA-256(domain || canonical_bundle) == observable_commitment` | The revealed canonical bundle is consistent with the commitment | Truth, maliciousness, authorship, or artifact derivation |
+| SHA-256 of the domain concatenated with the canonical bundle equals `observable_commitment` | The revealed canonical bundle is consistent with the commitment | Truth, maliciousness, authorship, or artifact derivation |
 | v2 statement binds `artifact_hash` and `observable_commitment` | The proof statement cannot be changed without invalidating that proof | That either value was honestly produced |
 | A future reviewed derivation circuit constrains both values | Only the exact relation documented by that circuit | Reporter identity, authorization, or anonymity unless separately proved |
 | Multiple independent reports agree | Bounded corroboration under the membership and Sybil assumptions | Ground truth |

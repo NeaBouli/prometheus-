@@ -266,7 +266,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
       <h2 class="sec-title">The fire belongs to humanity,<br>not to corporations.</h2>
       <p>Prometheus is a fully decentralized, AI-powered threat intelligence protocol built on the Kaspa blockchain. It transforms every connected device into a node in a global threat detection swarm — without central control, without a foundation, and with zero pre-mined tokens.</p>
       <p>The protocol combines three layers: <strong>on-device AI</strong> (Phi-3-mini 3.8B, 4-bit quantized) for local anomaly detection, <strong>Guardian nodes</strong> (LLaMA 3 70B/8B) for advanced threat analysis and YARA rule generation, and <strong>Kaspa L1 consensus</strong> (high-throughput BlockDAG / DAGKnight path) for immutable rule storage and governance.</p>
-      <div class="callout"><p><strong>Key properties:</strong> 0% pre-mine · No emergency stop · Automated governance target · Data-minimal on-chain state. Applicable privacy obligations depend on deployed data flows and jurisdiction; this whitepaper is not a legal determination.</p></div>
+      <div class="callout"><p><strong>Key properties:</strong> 0% pre-mine · No repository-controlled emergency-stop entrypoint · Automated governance target · Data-minimal on-chain state. Applicable privacy obligations depend on deployed data flows and jurisdiction; this whitepaper is not a legal determination.</p></div>
       <table class="wp-table">
         <tr><th>Parameter</th><th>Value</th></tr>
         <tr><td>Blockchain</td><td>Kaspa BlockDAG / DAGKnight path, high-throughput PoW settlement</td></tr>
@@ -562,7 +562,7 @@ async def training_round(self):
     <div class="wp-section r" id="governance">
       <span class="sec-label">14 / Governance Auto-Tuning</span>
       <h2 class="sec-title">Deterministic, bounded auto-tuning.</h2>
-      <p>Target behavior: authenticated metrics drive bounded weekly parameter transitions. The repository verifies deterministic state transitions, but real inputs, external signatures, confirmed successor evidence, and production operation remain gated. There is no emergency-stop path.</p>
+      <p>Target behavior: authenticated metrics drive bounded weekly parameter transitions. The repository verifies deterministic state transitions, but real inputs, external signatures, confirmed successor evidence, and production operation remain gated. There is no repository-controlled emergency-stop entrypoint; availability still depends on Kaspa, nodes, clients, and network access.</p>
       <table class="wp-table">
         <tr><th>Parameter</th><th>Start value</th><th>Target</th></tr>
         <tr><td>MIN_STAKE_KAS</td><td>10,000</td><td>50–200 active validators</td></tr>
