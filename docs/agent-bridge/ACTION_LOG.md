@@ -850,3 +850,12 @@ Rules for all dev agents:
 - Scope estimates remain core 78-82%, complete vision 44-49%, and 51-56% remaining. Protected PR and exact-main CI/Security/Pages evidence remain next.
 - No wallet, private key, secret, signature, raw transaction, broadcast, contract, Guardian/reporter authorization, reputation, KAS/PROM, slash ACL, commit-reveal behavior, or emergency-stop policy was accessed or changed. Sol did not inspect, hash, modify, stage, or disclose `Prometheus-1.png`; it remains unmodified and uncommitted.
 - PR #91 initial protected checks all passed. CodeRabbit's one minor audit-trail finding correctly identified ambiguous wording between the GH-86 product merge (PR #87, `2bfe5a3`) and later evidence/documentation reconciliation (PR #89, `4ce27b2`). Checkpoint and Bridge now distinguish both records explicitly; refreshed checks and thread resolution remain.
+
+## 2026-07-23 GH-90 merge, exact-main evidence, and GH-92 documentation reconciliation
+
+- Commit `90068cf6b8f57f7ffe84adb6fd48a70bcc75a8ed` disambiguated the GH-86 product merge from its later documentation closeout. The only review thread was resolved, and all refreshed protected contexts passed.
+- PR #91 merged normally without admin bypass as exact main `e7f34bb438d4d2cee43db9e8c019f05b9ced0f33`; issue #90 closed.
+- Exact-main Prometheus CI `29984477087`, Security Audit `29984476876`, and Pages `29984476107` passed. Live GitHub Pages Whitepaper/Roadmap/FAQ plus raw GitHub README/Bridge markers were verified.
+- Issue #92 records the protected documentation-only reconciliation: public and internal status now describe GH-90 as merged/exact-main verified and retain every provenance, privacy, transport, proof, actionable-analysis, chain, and production-operation gate.
+- Scope estimates remain core 78-82%, complete vision 44-49%, and 51-56% remaining. GH-90 closes a local deterministic producer boundary only and does not increase rollout readiness.
+- No product code, workflow, wallet, private key, secret, signature, raw transaction, broadcast, contract, Guardian/reporter authorization, reputation, KAS/PROM, slash ACL, commit-reveal behavior, or emergency-stop policy changed in this reconciliation. `Prometheus-1.png` remains untouched and uncommitted.

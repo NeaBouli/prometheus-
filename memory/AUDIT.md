@@ -1133,14 +1133,14 @@ Exact-main Prometheus CI `29981646898`, Security Audit `29981646867`, and Pages
 structural/commitment boundary; all extractor, privacy, v2 wire/proof/pairing,
 actionable-analysis, chain, and production-operation gates remain.
 
-## GH-90 LOCAL FILE-SHA256 PRODUCER CANDIDATE (2026-07-23)
+## GH-90 LOCAL FILE-SHA256 PRODUCER (2026-07-23)
 
 Scope: one local Rust producer in `prometheus-threat-hint`, one shared
 producer-vector corpus, independent Python consumption, and synchronized
 internal/public documentation. ThreatHint v1, P2P, verifier, analyzer, proof,
 wallet, signing, contracts, and chain paths remain out of scope.
 
-Result: CONDITIONAL PASS pending protected PR and exact-main evidence. The only
+Result: PASS for the isolated local producer boundary. The only
 new public function accepts exact artifact bytes plus typed platform/format
 scope. It computes SHA-256 internally, reaches the existing validated bundle
 type through a crate-private fixed-digest constructor, and exposes no path,
@@ -1171,3 +1171,14 @@ attempt was stopped when its search scope exceeded the explicit file allowlist.
 That stopped process returned no file content and its output was discarded. A
 separate Terra diff review reports no blocking, high, or medium finding. Sol
 retains implementation, integration, and final verification responsibility.
+
+Closeout: PR #91 passed all ten protected contexts and merged normally without
+admin bypass as exact main `e7f34bb438d4d2cee43db9e8c019f05b9ced0f33`;
+issue #90 is closed. CodeRabbit's only actionable finding identified ambiguous
+GH-86 product-merge versus documentation-closeout evidence in the Checkpoint
+and Bridge. Commit `90068cf6b8f57f7ffe84adb6fd48a70bcc75a8ed`
+disambiguated those records, and the review thread was resolved. Exact-main
+Prometheus CI `29984477087`, Security Audit `29984476876`, and Pages
+`29984476107` passed. GH-90 does not close external provenance, privacy,
+transport, v2 proof, actionable-analysis, chain, or production-operation
+gates.
