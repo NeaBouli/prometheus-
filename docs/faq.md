@@ -78,7 +78,7 @@ privacy and proof boundaries required before concrete indicators are sent.
 Merged and exact-main-verified GH-86 adds isolated Rust and Python structural validators against one shared
 byte-exact corpus, but they do not prove extractor provenance or semantic
 privacy and are not connected to transport, Guardian analysis, or publication.
-The GH-107 candidate can locally authenticate one short-lived approval
+Merged and exact-main-verified GH-107 can locally authenticate one short-lived approval
 statement for one exact `review_required_v1` bundle against separately trusted
 context, including separately trusted current time that must never be
 attacker-controlled. It does not disclose, transport, analyze, publish, or

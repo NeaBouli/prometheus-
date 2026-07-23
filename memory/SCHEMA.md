@@ -224,7 +224,7 @@ with fixed errors. The resulting bundle is always `review_required_v1`;
 no path/string/generic builder, wire, approval envelope, proof, analyzer,
 wallet, or chain schema is added.
 
-The GH-107 candidate adds a local Observable Approval v1 envelope and matching
+Merged and exact-main-verified GH-107 adds a local Observable Approval v1 envelope and matching
 Rust/Python verification only. Canonical field order is `schema_version`,
 `observable_commitment`, `approver_xonly_public_key`, `purpose`,
 `recipient_scope`, `network_id`, `not_before`, `expires_at`,

@@ -643,8 +643,11 @@ Remaining: external provenance/privacy approval; other platform/format
 ## GH-107 LOCAL OBSERVABLE APPROVAL VERIFIER
 
 ```text
-Status: local candidate on feat/GH-107-local-observable-approval; protected
-        PR and exact-main evidence pending
+Status: merged through protected PR #108 and exact-main/live verified
+Main: fc6f1c9fdcfb74c4858b12ec9265ebd6cee10dfe
+Runs: Prometheus CI 30006654048; Security Audit 30006654027;
+      Pages 30006653208
+Live: raw README and Pages Whitepaper/Roadmap/FAQ/llms markers verified
 Input: one canonical approval wire, one exact canonical review_required_v1
        bundle, and separately trusted report nonce, x-only approver key,
        recipient-scope digest, network, and separately trusted current time

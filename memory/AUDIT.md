@@ -1442,7 +1442,8 @@ correctly required every trust-boundary description to state that current time
 is independently trusted and never attacker-controlled, and suggested reusing
 one verification-only secp256k1 context. The documentation wording and a static
 `OnceLock<Secp256k1<VerifyOnly>>` are implemented locally. Refreshed checks and
-both review-thread resolutions remain before merge.
+both review-thread resolutions remained at that point and are closed by the
+exact-main evidence below.
 
 A requested Claude Code re-review could not start because its configured
 monthly usage limit was exhausted; it read no repository file. The independent
@@ -1453,3 +1454,31 @@ that must never be attacker-controlled. Terra's read-only re-review reports no
 remaining actionable finding. Focused ThreatHint tests, complete workspace
 tests, Rustfmt, warning-free workspace all-target Clippy, Memory/Autodidactic,
 HTML/public-status, and clean-diff checks pass after the review fix.
+
+## GH-107 PROTECTED MERGE AND EXACT-MAIN EVIDENCE (2026-07-23)
+
+Review-fix commit `0ca2b0189f465386bee2ce713e39fc5e0c46f03f`
+passed refreshed Prometheus CI `30006371006`, Security Audit `30006371003`,
+all ten protected contexts, and CodeRabbit status. Both concrete review threads
+were answered and resolved. PR #108 merged normally by the repository-allowed
+squash method without admin bypass as exact main
+`fc6f1c9fdcfb74c4858b12ec9265ebd6cee10dfe`; issue #107 closed.
+
+Exact-main Prometheus CI `30006654048`, Security Audit `30006654027`, and Pages
+`30006653208` passed. Raw README and live Whitepaper, Roadmap, FAQ, and
+`llms.txt` expose the verifier plus the separately trusted,
+never-attacker-controlled clock and all non-claim boundaries. Result: PASS for
+the merged local Observable Approval verification slice.
+
+Issue #109 and branch `docs/GH-109-observable-approval-closeout` reconcile
+public/status wording only. Completion estimates and external rollout blockers
+remain unchanged. No secret, wallet, signing, transaction, chain, contract,
+token-model, reputation, slash-ACL, commit-reveal, or emergency-stop boundary
+changed.
+
+GH-109 local documentation evidence passes Memory Integrity, six Autodidactic
+tests, HTML/JSON-LD/public-status checks, a stale-candidate scan, and clean-diff
+checks. Spark found two short merge-SHA references in Checkpoint/TODO; both now
+use the full exact SHA, and its read-only re-review reports no remaining
+actionable finding. Protected PR and documentation exact-main/live verification
+remain.
