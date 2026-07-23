@@ -8,7 +8,7 @@ import hmac
 import math
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Final, Protocol
+from typing import Final, Literal, Protocol
 
 from .analyzer import AnalysisResult, VerifiedThreatHint
 from .threat_hint_ingress import (
@@ -45,10 +45,31 @@ class DeliveredThreatHintAnalysis:
     hint: VerifiedThreatHint
     analysis: AnalysisResult
     delivered_at: int
+    batch_index: int
+
+
+FailureCategory = Literal["adapt", "analysis", "clock", "delivery"]
+
+
+@dataclass(frozen=True)
+class ThreatHintDrainFailure:
+    """One bounded job failure with a minimal, non-sensitive envelope."""
+
+    batch_index: int
+    category: FailureCategory
+    payload_digest: str | None
+
+
+@dataclass(frozen=True)
+class ThreatHintDrainReport:
+    """Result of one bounded drain attempt."""
+
+    delivered: tuple[DeliveredThreatHintAnalysis, ...]
+    failures: tuple[ThreatHintDrainFailure, ...]
 
 
 class ThreatHintAnalyzerAdapter:
-    """Validate and serially drain a bounded verified ThreatHint outbox batch."""
+    """Drain a bounded batch of independent v1 jobs without FIFO acknowledgement."""
 
     def __init__(
         self,
@@ -132,30 +153,65 @@ class ThreatHintAnalyzerAdapter:
                 "ThreatHint analyzer input is invalid"
             ) from exc
 
-    async def drain_once(self) -> list[DeliveredThreatHintAnalysis]:
-        """Process at most one configured batch and acknowledge safe results."""
+    async def drain_once(self) -> ThreatHintDrainReport:
+        """Process one bounded batch while failed jobs remain independently pending."""
         async with self._drain_lock:
             jobs = await asyncio.to_thread(self._ledger.pending_jobs, self._batch_limit)
             delivered: list[DeliveredThreatHintAnalysis] = []
-            for job in jobs:
-                hint = self.adapt_job(job)
-                analysis = await self._analyzer.process_verified_threat_hint(hint)
-                _validate_v1_analysis(hint, analysis)
-                delivered_at = self._now_seconds()
-                if (
-                    not _is_positive_int(delivered_at)
-                    or delivered_at < hint.admitted_at
-                ):
-                    raise ThreatHintAdapterError("analyzer clock rollback detected")
-                await asyncio.to_thread(
-                    self._ledger.mark_delivered,
-                    hint.payload_digest,
-                    delivered_at,
-                )
+            failures: list[ThreatHintDrainFailure] = []
+            if len(jobs) > self._batch_limit:
+                raise ThreatHintAdapterError("analyzer batch is unexpectedly unbounded")
+            for batch_index, job in enumerate(jobs):
+                try:
+                    hint = self.adapt_job(job)
+                except Exception:  # pylint: disable=broad-exception-caught
+                    failures.append(ThreatHintDrainFailure(batch_index, "adapt", None))
+                    continue
+                digest = hint.payload_digest
+
+                try:
+                    analysis = await self._analyzer.process_verified_threat_hint(hint)
+                    _validate_v1_analysis(hint, analysis)
+                except Exception:  # pylint: disable=broad-exception-caught
+                    failures.append(
+                        ThreatHintDrainFailure(batch_index, "analysis", digest)
+                    )
+                    continue
+
+                try:
+                    delivered_at = self._now_seconds()
+                    if (
+                        not _is_positive_int(delivered_at)
+                        or delivered_at < hint.admitted_at
+                    ):
+                        raise ThreatHintAdapterError("analyzer clock rollback detected")
+                except Exception:  # pylint: disable=broad-exception-caught
+                    failures.append(
+                        ThreatHintDrainFailure(batch_index, "clock", digest)
+                    )
+                    continue
+
+                try:
+                    await _mark_delivered_cancellation_safe(
+                        self._ledger,
+                        hint.payload_digest,
+                        delivered_at,
+                    )
+                except Exception:  # pylint: disable=broad-exception-caught
+                    failures.append(
+                        ThreatHintDrainFailure(batch_index, "delivery", digest)
+                    )
+                    continue
                 delivered.append(
-                    DeliveredThreatHintAnalysis(hint, analysis, delivered_at)
+                    DeliveredThreatHintAnalysis(
+                        hint, analysis, delivered_at, batch_index
+                    )
                 )
-            return delivered
+            if len(delivered) + len(failures) > MAX_ANALYZER_BATCH_LIMIT:
+                raise ThreatHintAdapterError(
+                    "analyzer batch result is unexpectedly oversized"
+                )
+            return ThreatHintDrainReport(tuple(delivered), tuple(failures))
 
 
 def _validate_v1_analysis(hint: VerifiedThreatHint, analysis: object) -> None:
@@ -186,3 +242,26 @@ def _is_lower_hex_32(value: object) -> bool:
         and len(value) == 64
         and all(character in "0123456789abcdef" for character in value)
     )
+
+
+async def _mark_delivered_cancellation_safe(
+    ledger: ThreatHintReplayLedger,
+    payload_digest: str,
+    delivered_at: int,
+) -> None:
+    delivery = asyncio.create_task(
+        asyncio.to_thread(ledger.mark_delivered, payload_digest, delivered_at)
+    )
+    try:
+        await asyncio.shield(delivery)
+    except asyncio.CancelledError as cancelled:
+        while not delivery.done():
+            try:
+                await asyncio.shield(delivery)
+            except asyncio.CancelledError:
+                continue
+        try:
+            delivery.result()
+        except Exception:  # pylint: disable=broad-exception-caught
+            pass
+        raise cancelled

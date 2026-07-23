@@ -146,8 +146,12 @@ concrete `indicators` field: v1 carries a hash commitment and category, not IOC
 strings. `Analyzer.process_verified_threat_hint()` therefore returns an exact
 zero-confidence, no-rule, non-submittable result without invoking LLM or YARA
 generation. The adapter serializes drains per instance, loads at most 32 jobs,
-and marks each one delivered only after that exact safe result; malformed,
-wrong-network, failed, clock-rollback, or unsafe-analyzer jobs stay pending.
+and marks each one delivered only after that exact safe result. GH-77 isolates
+each job in the bounded batch: malformed, wrong-network, failed,
+clock-rollback, delivery-failed, or unsafe-analyzer jobs stay pending while
+later safe jobs continue. The structurally immutable drain report contains only delivered
+results plus batch index, fixed failure category, and a validated digest or
+`None`; it never includes canonical bytes, paths, or exception text.
 
 This closes the repository-owned v1 outbox-to-analyzer boundary without
 claiming actionable threat analysis. Concrete rule generation still requires a

@@ -1008,3 +1008,29 @@ clean diff checks. Existing CI automatically runs the complete Guardian suite,
 format/lint gates, secret scan, dependency audit, and public-page checks; no
 workflow change is required. Production proof-artifact approval, concrete
 observables, actionable analysis, live models, and real operation remain open.
+
+## GH-77 THREATHINT BATCH-PROGRESS AUDIT UPDATE (2026-07-23)
+
+Scope: GH-74 adapter drain semantics, delivery ordering, cancellation during
+threaded SQLite acknowledgement, failure-report privacy, bounds, and focused
+regressions. Independent post-merge review found that one failed leading job
+aborted the complete bounded drain and could starve later independent jobs.
+
+The candidate isolates ordinary adapt, analysis, clock, and delivery failures
+per job. Failed jobs stay pending while later safe v1 jobs continue. This
+deliberately relaxes FIFO acknowledgement only for independent hash-only v1
+jobs, which have no proposal-submission side effect; both delivered and failed
+records retain the original bounded batch index. Failure records contain only a
+fixed category and a digest validated through complete adaptation or `None`.
+Canonical bytes, paths, analyzer output, and arbitrary exception text are never
+reported.
+
+Cancellation remains a `BaseException` and is not converted into a failure.
+During threaded `mark_delivered`, the adapter holds the per-instance drain lock
+until the SQLite worker reaches its durable outcome, then propagates
+cancellation. Nineteen focused tests cover leading adapt/analyzer/delivery
+failures with later progress, valid-looking mismatched digest redaction, unsafe
+results, clock rollback, cancellation in analysis and delivery, serialization,
+and batch limits. All 163 complete Guardian tests pass with three intentional
+live-model skips; Black, scoped Ruff, focused Pylint 10.00/10, and diff checks
+pass. Protected review, merge, and exact-main evidence remain pending.

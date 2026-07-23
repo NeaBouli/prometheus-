@@ -266,12 +266,18 @@ no concrete indicator list. `Analyzer.process_verified_threat_hint()` therefore
 does not invoke the LLM or YARA generator and returns only a hash-bound result
 with confidence `0.0`, no rule, and `should_submit = false`.
 
-Drain calls are serialized per adapter instance. A job is marked delivered only
-after that exact result passes adapter validation; parse/network/time failures,
-analyzer exceptions, unsafe results, and delivery-clock rollback leave it
-pending. This is a non-actionable v1 consumption path, not accepted rule
-generation. A future observable-bearing schema/channel and any side-effecting
-multi-process consumer require separate review.
+Drain calls are serialized per adapter instance. `drain_once()` returns an
+structurally immutable `ThreatHintDrainReport` with tuples of delivered results and
+`ThreatHintDrainFailure` records. Each failure exposes only its bounded batch
+index, fixed `adapt|analysis|clock|delivery` category, and a validated lowercase
+32-byte digest or `None`; canonical bytes, paths, analyzer output, and arbitrary
+exception text are excluded. A failed job remains pending while later safe jobs
+in the same batch continue. Cancellation and other `BaseException` conditions
+still abort. A job is marked delivered only after the exact safe result passes
+adapter validation and the delivery clock is valid. This is a non-actionable v1
+consumption path, not accepted rule generation. A future observable-bearing
+schema/channel and any side-effecting multi-process consumer require separate
+review.
 
 ---
 
