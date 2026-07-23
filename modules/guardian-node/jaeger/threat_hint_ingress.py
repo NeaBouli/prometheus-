@@ -15,6 +15,7 @@ import os
 import re
 import sqlite3
 import stat
+from contextlib import closing
 from dataclasses import dataclass, fields
 from pathlib import Path
 from collections.abc import Callable
@@ -251,7 +252,7 @@ class ThreatHintReplayLedger:
 
     def __init__(self, path: Path) -> None:
         self.path = _prepare_ledger_path(path)
-        with self._connect() as connection:
+        with closing(self._connect()) as connection, connection:
             version = connection.execute("PRAGMA user_version").fetchone()[0]
             if version not in (0, _SQLITE_SCHEMA_VERSION):
                 raise ThreatHintIngressError("unsupported ThreatHint ledger schema")
@@ -306,7 +307,7 @@ class ThreatHintReplayLedger:
         payload_digest = hashlib.sha256(wire).hexdigest()
         expires_at = envelope.observed_at + MAX_HINT_AGE_SECONDS
         try:
-            with self._connect() as connection:
+            with closing(self._connect()) as connection, connection:
                 connection.execute("BEGIN IMMEDIATE")
                 self._advance_time(connection, now_seconds)
                 connection.execute(
@@ -359,7 +360,7 @@ class ThreatHintReplayLedger:
                 )
             return "accepted"
         except sqlite3.IntegrityError:
-            with self._connect() as connection:
+            with closing(self._connect()) as connection, connection:
                 row = connection.execute(
                     """
                     SELECT payload_digest, wire FROM hint_admissions
@@ -375,7 +376,7 @@ class ThreatHintReplayLedger:
         """Read one bounded recovery batch without inventing analyzer data."""
         if not 1 <= limit <= 256:
             raise ThreatHintIngressError("ThreatHint outbox limit is invalid")
-        with self._connect() as connection:
+        with closing(self._connect()) as connection, connection:
             rows = connection.execute(
                 """
                 SELECT payload_digest, canonical_wire, network_id, admitted_at
@@ -397,7 +398,7 @@ class ThreatHintReplayLedger:
             raise ThreatHintIngressError("outbox digest is invalid")
         if not _is_timestamp(delivered_at):
             raise ThreatHintIngressError("outbox delivery time is invalid")
-        with self._connect() as connection:
+        with closing(self._connect()) as connection, connection:
             connection.execute("BEGIN IMMEDIATE")
             cursor = connection.execute(
                 """

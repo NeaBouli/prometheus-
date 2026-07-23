@@ -1,7 +1,7 @@
 # PROMETHEUS CODEX BRIDGE
 
 Last updated: 2026-07-23 EEST
-Repo path: /Users/gio/Desktop/repos/prometheus
+Repo: Prometheus working-tree root
 Operational baseline: `main`; all product, public-site, and status changes remain PR-only, and foreign untracked `Prometheus-1.png` remains untouched
 Current task: issue https://github.com/NeaBouli/prometheus-/issues/58 on branch `feature/GH-58-threat-hint-verifier-ingress` now has the separate owner-only Rust/Python ThreatHint IPC, trusted network/domain verifier context, persistent freshness/replay admission, and atomic durable analyzer outbox implemented. The production default remains unavailable/fail-closed as `busy`; it cannot return `accepted` until an independently approved real Groth16/KIP-16 relation, verifying key, and test vectors are wired. Ballot transport, `PeerId` authorization boundaries, wallet/signing/chain behavior, KAS/PROM roles, slash ACL, commit-reveal, and emergency-stop policy remain unchanged.
 Current GH-58 local evidence: 12 focused Python security/lifecycle tests pass; the full Guardian suite has 138 passes and three intentional live-model skips. Black is clean and Pylint remains above the CI threshold. Guardian P2P has 53 unit/transport tests plus 3 process tests, and the Rust workspace passes 240 tests with two intentional live-network ignores. Rustfmt, warning-free workspace/all-target Clippy, locked optimized Guardian build, and the 14-file Guardian package set pass; remaining docs/security gates are pending before PR. A local Claude Code terminal handoff was attempted as requested but stopped before edits because its configured USD budget was exhausted; Sol implemented and reviewed the slice.
