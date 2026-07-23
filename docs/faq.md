@@ -86,7 +86,7 @@ persist the bundle. Its signed nonce and deterministic approval ID identify
 repeats but do not prevent replay; durable one-time consumption and trusted
 approver policy remain required before promotion.
 
-GH-111 adds that local consumption boundary in Guardian Node. One owner-only
+Merged and exact-main-verified GH-111 adds that local consumption boundary in Guardian Node. One owner-only
 policy fixes the network, approver public key, and opaque recipient-scope
 digest; the service verifies in the same call path and atomically records the
 approval ID and authority-bound nonce in an owner-only SQLite ledger. This
