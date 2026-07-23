@@ -645,3 +645,23 @@ Rules for all dev agents:
 - Exact-main Prometheus CI `29647112173`, Security Audit `29647112172`, and Pages `29647111845` completed successfully; live README, Whitepaper, Bridge, Pages Whitepaper/Roadmap, and `llms.txt` markers pass.
 - Opened issue #58 for the next autonomous product slice: dedicated owner-only ThreatHint verifier ingress, persistent freshness/replay admission, and bounded analyzer handoff. The sidecar remains fail-closed until a real independently approved Groth16/KIP-16 verifier exists.
 - Browser access remains useful for public GitHub, Pages, explorer, and read-only evidence checks. It cannot repair `ssh sandbox` public-key authentication, supply a second approved host, or replace external signing and explicit irreversible-broadcast approval.
+
+## 2026-07-23 GH-58 ThreatHint verifier ingress start
+
+- Resumed the autonomous rollout goal and opened branch `feature/GH-58-threat-hint-verifier-ingress` from exact green main `4189e200c545ef795edf1dd6cc6235150405918b`.
+- Scope remains issue #58 only: separate owner-only ThreatHint IPC, canonical schema revalidation, injected fail-closed proof verification, persistent nonce/hash replay and monotonic freshness state, bounded analyzer admission, and operated-sidecar integration.
+- No real Groth16 relation, verifying key, or approved test vectors exist in the repository; therefore production defaults must not produce `accepted`. The ballot collector and authorization model remain unchanged.
+- No wallet, private key, secret, signature, raw transaction, broadcast, contract, KAS/PROM, slash ACL, commit-reveal behavior, or foreign untracked file is accessed or changed. `Prometheus-1.png` remains untouched and uncommitted.
+
+## 2026-07-23 GH-58 implementation milestone
+
+- Added a distinct Rust `UnixThreatHintIngress` with owner/mode/peer-UID validation, bounded exact framing, canonical digest-bound acknowledgements, timeout/error mapping, and separate in-flight request state from ballots.
+- Guardian service config now requires a distinct `threat_hint_socket`; missing/unavailable verifier service maps to `busy`, while unsafe paths or acknowledgements fail closed.
+- Added Python canonical revalidation, trusted `network_id` plus fixed domain-separation verifier context, development-stub rejection, monotonic freshness/replay state, and atomic SQLite admission plus durable analyzer outbox.
+- Removed the unsafe draft mapping from `indicator_type` to analyzer indicators. The durable job carries only canonical wire bytes, digest, trusted network, and admission time until a reviewed analyzer-domain adapter exists.
+- Production `UnavailableThreatProofVerifier` raises an explicit unavailable result and cannot produce `accepted`. Test-only binding proves every semantic field and trusted network context are tamper-sensitive.
+- Local evidence currently passes 12 focused Python tests, 53 Guardian P2P unit/transport tests plus 3 process tests, and 240 Rust workspace tests with two intentional live-network ignores. Rustfmt, warning-free workspace/all-target Clippy, Black, and Pylint above the CI threshold pass. One pre-existing process timing test and one pre-existing ballot timeout assertion each flaked once under combined local load and passed isolated rechecks; the full suites will be rerun before PR.
+- Claude Code was invoked through the required local terminal wrapper as requested, but its configured USD budget stopped the helper before any edits. Sol retained architecture, implementation, review, and verification ownership.
+- Independent Terra review found one high shutdown-lifecycle gap: shielded verifier workers were not tracked by server close. Worker tracking, cancellation/gather, and a no-post-shutdown-admission regression fixed it; recheck approves GH-58 as a fail-closed ingress gate. Residual constraint: Python cannot forcibly terminate arbitrary native code already executing in `to_thread`, so verifier adapters are explicitly required to be bounded and side-effect-free.
+- CI workflow review confirms no workflow edit is required: Rustfmt, warning-free workspace Clippy, locked release build, schema/package verification, workspace tests, Python dependency install, Black, Pylint, full Guardian tests, Pages checks, and the separate security workflow already discover and gate every GH-58 file.
+- No wallet, private key, secret, signature, raw transaction, broadcast, contract, Guardian/reporter authorization, reputation, KAS/PROM, slash ACL, commit-reveal behavior, or foreign untracked file was accessed or changed. `Prometheus-1.png` remains untouched and uncommitted.

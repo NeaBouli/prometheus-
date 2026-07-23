@@ -91,6 +91,25 @@ Operated relay/NAT traversal, broad discovery, trusted membership and key
 assignment, Sybil resistance, proposal submission, and on-chain attestation
 remain separate rollout work.
 
+## ThreatHint Verifier Intake
+
+`jaeger/threat_hint_ingress.py` provides the separate GH-58 owner-only AF_UNIX
+boundary for canonical ThreatHint v1 bytes. It binds an injected verifier to
+the exact canonical payload plus trusted local network/domain context, rejects
+development stubs, enforces freshness and monotonic replay policy, and
+atomically persists both replay identities and a durable analyzer-outbox job.
+The outbox intentionally carries canonical wire data rather than fabricating
+concrete analyzer indicators that are absent from the transport schema.
+
+No production Groth16 relation, verifying key, or approved vectors are bundled.
+`UnavailableThreatProofVerifier` therefore returns fail-closed `busy`, and no
+operated deployment may return `accepted` until an independently approved
+verifier is injected. Outbox consumers must use the bounded `pending_jobs`
+API and an explicit future analyzer-domain adapter. Verifier adapters must be
+side-effect-free and bounded; server shutdown cancels and gathers asyncio
+workers, but Python cannot forcibly terminate arbitrary native verifier code
+already running in a worker thread.
+
 ## Testing
 
 ```bash

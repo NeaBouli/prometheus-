@@ -454,6 +454,28 @@ Exact main: Prometheus CI 29646732936, Security Audit 29646732941, and Pages
             29646732673 passed; live public markers were verified
 ```
 
+## GUARDIAN THREATHINT VERIFIER INGRESS (GH-58 IN VERIFICATION)
+
+```text
+Branch: feature/GH-58-threat-hint-verifier-ingress
+Rust: separate UnixThreatHintIngress, canonical digest-bound ACK, owner/mode/
+      peer-UID checks, bounded framing/timeouts, independent in-flight state
+Service: required distinct threat_hint_socket; unavailable boundary maps busy
+Python: canonical schema reparse, trusted network/domain verifier context,
+        development-stub rejection, freshness plus monotonic replay policy
+Durability: accepted means replay identities and one analyzer-outbox job commit
+            atomically in SQLite; exact retry is duplicate across restart
+Analyzer boundary: outbox retains canonical bytes/digest/network/admission time
+                   and does not fabricate indicators absent from the wire
+Production gate: no approved Groth16 relation/verifying key/vectors are bundled;
+                 default verifier is unavailable and cannot return accepted
+Local evidence: 12 focused Python tests, 53 Guardian P2P tests plus 3 process
+                tests, 240 Rust workspace passes/2 live ignores, Rustfmt,
+                warning-free Clippy, Black, and Pylint pass; final CI pending
+Unchanged: PeerId authorization, ballots, wallet/signing/chain, reputation,
+           KAS/PROM, slash ACL, commit-reveal, and emergency-stop policy
+```
+
 ## MAINNET CONTRACT ADDRESSES (post-verification)
 
 ```

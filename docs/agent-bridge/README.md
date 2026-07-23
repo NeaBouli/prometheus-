@@ -10,7 +10,7 @@ Startpunkt fuer Codex/Claude Code:
 
 Keine Secrets, Tokens, Passwoerter, privaten Keys oder Wallet-Daten in diese Bridge schreiben.
 
-Aktiver Handover: GH-55 ist als exact main `c8a6cb8` verifiziert und liefert ein separates kanonisches ThreatHint-Schema/Protokoll sowie einen Light Client Builder. Issue #58 ist der nächste autonome Slice für owner-only Verifier-Ingress, persistente Freshness/Replay-Abwehr und begrenzten Analyzer-Handoff. Development-Stubs sind in beta/mainnet gesperrt; der operated Sidecar bleibt ohne echten Groth16-Verifier strikt `rejected`. Echte Zwei-Host-Evidence wartet weiterhin auf reparierten `ssh sandbox` Public-Key-Zugriff. Verbindlicher Status und offene Gates stehen in `CODEX_BRIDGE.md`; laufende Schritte stehen in `ACTION_LOG.md`.
+Aktiver Handover: GH-55 ist als exact main `c8a6cb8` verifiziert. Issue #58 implementiert auf `feature/GH-58-threat-hint-verifier-ingress` den separaten owner-only Verifier-IPC, trusted Network/Domain Binding, persistente Freshness/Replay-Abwehr und einen atomaren dauerhaften Analyzer-Outbox. Development-Stubs bleiben gesperrt; ohne unabhängig freigegebenen echten Groth16-Verifier antwortet der operated Sidecar fail-closed mit `busy` und behauptet keine akzeptierte Analyse. Echte Zwei-Host-Evidence wartet weiterhin auf reparierten `ssh sandbox` Public-Key-Zugriff. Verbindlicher Status und offene Gates stehen in `CODEX_BRIDGE.md`; laufende Schritte stehen in `ACTION_LOG.md`.
 <!-- CODEX_CLAUDE_CODE_TERMINAL_BRIDGE_V1 -->
 ## Codex -> Claude Code Terminal Bridge
 

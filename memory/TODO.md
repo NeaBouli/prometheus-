@@ -143,10 +143,10 @@
 
 ## ═══ SPRINT 10: P2P + KRC-20 REAL (Mai-Juni 2026) ═══
 
-- [~] [P0] libp2p Modul komplett implementieren | Codex | GH-42/GH-44/GH-48/GH-52/GH-55 are merged/exact-main verified. The separate canonical ThreatHint core passes 45 Guardian P2P unit + 3 process tests; 229 workspace tests/2 live ignores pass. Real two-host evidence is blocked by rejected `ssh sandbox` public-key authentication. Broad discovery and remaining client/validator paths stay open; mDNS remains excluded by the unresolved compatible RustSec dependency path
+- [~] [P0] libp2p Modul komplett implementieren | Codex | GH-42/GH-44/GH-48/GH-52/GH-55 are merged/exact-main verified; GH-58 adds the separate owner-only ThreatHint verifier IPC and independent in-flight state on its feature branch. Real two-host evidence is blocked by rejected `ssh sandbox` public-key authentication. Broad discovery and remaining client/validator paths stay open; mDNS remains excluded by the unresolved compatible RustSec dependency path
 - [ ] [P0] Echte KRC-20 UTXO-Abfrage für PROM-RULES Tick | Claude Code | Contracts live
 - [ ] [P1] Regel-Download von IPFS via CIDv1 | Claude Code | KRC-20 Reader
-- [~] [P1] Light Client ↔ Guardian P2P Kommunikation | Codex | GH-55 canonical schema, client builder, and independent direct P2P request/ACK core are merged/exact-main verified. Issue #58 tracks the dedicated owner-only verifier ingress, persistent freshness/replay admission, and bounded analyzer handoff. Operated acceptance remains fail-closed until real Groth16 verification exists
+- [~] [P1] Light Client ↔ Guardian P2P Kommunikation | Codex | GH-55 canonical schema, client builder, and independent direct P2P request/ACK core are merged/exact-main verified. GH-58 implements dedicated owner-only verifier IPC, trusted context binding, persistent freshness/replay admission, and an atomic durable outbox. Operated acceptance remains fail-closed `busy` until an independently approved real Groth16 relation, verifying key, and vectors are wired; an explicit analyzer-domain adapter also remains open
 
 ---
 

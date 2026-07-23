@@ -8,12 +8,15 @@ shared canonical schema-v1 envelope, caps the complete frame at 2048 bytes, and
 shares the existing global inbound/outbound admission budget without sharing
 request state or response channels with ballots.
 
-The raw library API can send, receive, and explicitly acknowledge a canonical
-ThreatHint. The operated sidecar has no ThreatHint verifier socket yet and
-therefore returns only `rejected`; it never forwards a hint to the ballot
-collector or analyzer. A dedicated owner-only ingress with real Groth16
-verification, freshness/replay policy, and bounded analyzer admission remains
-required before any accepted production flow.
+GH-58 adds a separate owner-only ThreatHint verifier socket. Exact canonical
+bytes are forwarded independently of ballots; digest-bound responses map only
+to `accepted`, `duplicate`, `rejected`, or `busy`. The Python boundary
+re-parses schema v1, rejects development stubs, binds proof verification to
+trusted local network context, persists freshness/replay identities, and writes
+a durable bounded-drain outbox in the same SQLite transaction. No approved
+Groth16 verifier ships yet, so the default remains fail-closed and returns
+`busy`; it never invents analyzer indicators or reports accepted production
+work.
 
 Transport `PeerId` remains routing metadata only. It is not a reporter identity,
 Guardian membership record, proof of reachability, authorization, or reward key.
@@ -63,6 +66,7 @@ Example owner-only Guardian config:
 role = "guardian"
 identity_path = "/var/lib/prometheus/guardian-p2p/identity"
 collector_socket = "/run/user/1000/prometheus/collector.sock"
+threat_hint_socket = "/run/user/1000/prometheus/threat-hint.sock"
 submission_socket = "/run/user/1000/prometheus/submit.sock"
 listen_addresses = ["/ip4/127.0.0.1/udp/0/quic-v1"]
 health_interval_secs = 30
