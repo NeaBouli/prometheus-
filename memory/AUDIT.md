@@ -1383,9 +1383,10 @@ unknown, reordered, noncanonical, malformed, oversized, expired, future,
 cross-network, wrong-key, wrong-recipient, wrong-nonce, wrong-commitment, and
 tampered-signature inputs with one fixed error. The verifier reparses the exact
 bundle, requires `review_required_v1`, recomputes its commitment from the
-trusted network/report nonce, enforces an inclusive maximum-one-hour validity
-window, and verifies a domain-separated BIP340 digest. Rust and Python also
-derive the same domain-separated approval ID.
+trusted network/report nonce, requires separately trusted current time that
+must never be attacker-controlled, enforces an inclusive maximum-one-hour
+validity window, and verifies a domain-separated BIP340 digest. Rust and Python
+also derive the same domain-separated approval ID.
 
 Cross-language evidence: one public-only fixture binds exact bundle bytes,
 report nonce, trusted x-only key, recipient-scope digest, times, approval
@@ -1433,3 +1434,22 @@ rather than accept a caller-supplied instance. Focused and full checks must be
 rerun after this review fix. The focused and complete Guardian suites passed
 after the fix, and Terra's read-only re-review reports no remaining actionable
 finding.
+
+Protected review: PR #108 initially passed all ten CI/Security/CodeRabbit
+contexts on exact head `7f23e380752599fda27b80d9cd88cdc93130f489`
+(Prometheus CI `30004723271`, Security Audit `30004723262`). CodeRabbit then
+correctly required every trust-boundary description to state that current time
+is independently trusted and never attacker-controlled, and suggested reusing
+one verification-only secp256k1 context. The documentation wording and a static
+`OnceLock<Secp256k1<VerifyOnly>>` are implemented locally. Refreshed checks and
+both review-thread resolutions remain before merge.
+
+A requested Claude Code re-review could not start because its configured
+monthly usage limit was exhausted; it read no repository file. The independent
+Terra fallback review approved the static verification context and found three
+remaining wording gaps in the FAQ Markdown/HTML pair and the later Whitepaper
+description. All three now explicitly require separately trusted current time
+that must never be attacker-controlled. Terra's read-only re-review reports no
+remaining actionable finding. Focused ThreatHint tests, complete workspace
+tests, Rustfmt, warning-free workspace all-target Clippy, Memory/Autodidactic,
+HTML/public-status, and clean-diff checks pass after the review fix.

@@ -69,8 +69,9 @@ maliciousness, privacy approval, or disclosure authorization.
 
 `verify_observable_approval` verifies one exact canonical, BIP340-authenticated
 approval statement for one exact `review_required_v1` bundle. The caller must
-provide a separately trusted report nonce, x-only approver public key,
-recipient-scope digest, network ID, and current time. The verifier recomputes
+provide independently trusted context: report nonce, x-only approver public
+key, recipient-scope digest, network ID, and current time. The current time
+must never be attacker-controlled. The verifier recomputes
 the bundle commitment, enforces an inclusive validity window of at most one
 hour, verifies the signature over a domain-separated canonical body, and
 returns an opaque result with a deterministic approval ID.

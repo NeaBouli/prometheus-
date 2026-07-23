@@ -212,9 +212,10 @@ recipient_scope, network_id, not_before, expires_at, approval_nonce, signature
 The wire is capped at 1024 bytes. `schema_version` is integer `1`; `purpose` is
 exactly `guardian_analysis_v1`; the commitment, x-only BIP340 public key,
 recipient-scope digest, and approval nonce are 32-byte lowercase hexadecimal
-values; and the signature is 64-byte lowercase hexadecimal. The trusted caller
-supplies the exact report nonce, approver key, recipient-scope digest, network,
-and current time. The verifier reparses the exact canonical bundle, requires
+values; and the signature is 64-byte lowercase hexadecimal. The trusted local
+context supplies the exact report nonce, approver key, recipient-scope digest,
+network, and separately trusted current time that must never be
+attacker-controlled. The verifier reparses the exact canonical bundle, requires
 `review_required_v1`, recomputes its commitment from the trusted network and
 report nonce, and compares the trusted key and recipient scope before signature
 verification.

@@ -647,7 +647,8 @@ Status: local candidate on feat/GH-107-local-observable-approval; protected
         PR and exact-main evidence pending
 Input: one canonical approval wire, one exact canonical review_required_v1
        bundle, and separately trusted report nonce, x-only approver key,
-       recipient-scope digest, network, and caller-supplied current time
+       recipient-scope digest, network, and separately trusted current time
+       that must never be attacker-controlled
 Checks: exact 1024-byte-bounded field order/lowercase hex; fixed purpose;
         inclusive nonzero validity capped at 3600 seconds; exact bundle
         reparsing/commitment; trusted key/scope/network; domain-separated

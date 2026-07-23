@@ -370,8 +370,9 @@ performs no transport, proof, analyzer, wallet, signing, or chain operation.
 
 The GH-107 candidate verifies one exact canonical approval envelope for one
 exact `review_required_v1` bundle. The trusted context supplies the report
-nonce, exact x-only approver key, recipient-scope digest, network, and current
-time. Both implementations enforce a 1024-byte wire cap, exact field order and
+nonce, exact x-only approver key, recipient-scope digest, network, and a
+separately trusted current time that must never be attacker-controlled. Both
+implementations enforce a 1024-byte wire cap, exact field order and
 lowercase hex, fixed purpose `guardian_analysis_v1`, inclusive validity of at
 most 3600 seconds, commitment recomputation, and the domain-separated BIP340
 signature. The API contains no signing/private-key path and performs no

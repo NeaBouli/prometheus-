@@ -1,6 +1,8 @@
 //! Local-only verification of canonical Observable Approval statements.
 
-use secp256k1::{schnorr::Signature, Message, Secp256k1, XOnlyPublicKey};
+use std::sync::OnceLock;
+
+use secp256k1::{schnorr::Signature, Message, Secp256k1, VerifyOnly, XOnlyPublicKey};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use subtle::ConstantTimeEq;
@@ -218,7 +220,7 @@ pub fn verify_observable_approval(
         .map_err(|_| ObservableApprovalError::InvalidApproval)?;
     let signature =
         Signature::from_slice(&signature).map_err(|_| ObservableApprovalError::InvalidApproval)?;
-    Secp256k1::verification_only()
+    verification_context()
         .verify_schnorr(&signature, &message, &public_key)
         .map_err(|_| ObservableApprovalError::InvalidApproval)?;
 
@@ -232,6 +234,11 @@ pub fn verify_observable_approval(
         not_before: approval.not_before,
         expires_at: approval.expires_at,
     })
+}
+
+fn verification_context() -> &'static Secp256k1<VerifyOnly> {
+    static CONTEXT: OnceLock<Secp256k1<VerifyOnly>> = OnceLock::new();
+    CONTEXT.get_or_init(Secp256k1::verification_only)
 }
 
 fn decode_fixed_hex<const N: usize>(value: &str) -> Result<[u8; N], ObservableApprovalError> {

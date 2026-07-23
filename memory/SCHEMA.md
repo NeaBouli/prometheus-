@@ -234,9 +234,10 @@ BIP340 message is SHA-256 over
 `prometheus-observable-approval-v1\0 || u32be(body_len) || canonical_body`.
 The deterministic ID uses the separate
 `prometheus-observable-approval-id-v1\0` domain over the full canonical wire.
-Validity is inclusive and capped at 3600 seconds. Verification requires
+Validity is inclusive and capped at 3600 seconds. Verification requires a
 separately trusted report nonce, approver key, recipient-scope digest, network,
-and current time, and recomputes the exact review-required bundle commitment.
+and current time; the current time must never be attacker-controlled. The
+verifier recomputes the exact review-required bundle commitment.
 No signer, replay ledger, transport, promotion, analyzer, proof, wallet, or
 chain schema is introduced. The nonce/ID make repeats identifiable but do not
 prevent replay.
