@@ -1254,3 +1254,23 @@ post-open synchronization. Security Audit's existing manual dispatch correctly
 attached to its requested SHA. Prometheus CI now exposes the same
 `workflow_dispatch` recovery trigger for future default-branch availability;
 no required check is fabricated or bypassed.
+
+## GH-94 EXACT-MAIN CLOSEOUT (2026-07-23)
+
+Result: PASS for the bounded local producer scope. Final PR #97 passed all ten
+protected contexts on exact head `4284a88`, had no unresolved review thread,
+and merged normally without admin bypass as
+`34ab5b7a62b17ef2c9cab672439b77dcf4a66d9c`; issue #94 closed. Exact-main
+Prometheus CI `29989116631`, Security Audit `29989117912`, and Pages
+`29989118948` passed. Because GitHub omitted the automatic main suites, the
+merged CI recovery trigger and existing Security dispatch executed the complete
+workflows on exact main, and the Pages build API queued the exact-main deploy.
+No status or check was fabricated.
+
+Public evidence: raw GitHub README and live Whitepaper, Roadmap, FAQ, and
+`llms.txt` return the GH-94 `byte_pattern` and `review_required_v1` markers.
+This closes only deterministic local derivation and mandatory-review
+serialization. External artifact provenance, wildcard suitability,
+maliciousness, privacy approval, disclosure/transport authorization, v2 proof
+binding, actionable analysis, chain acceptance, and production operation remain
+open.

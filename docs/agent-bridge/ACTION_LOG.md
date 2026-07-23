@@ -888,3 +888,11 @@ Rules for all dev agents:
 - Security Audit's existing manual dispatch attached correctly to its requested SHA. Prometheus CI now exposes the same `workflow_dispatch` recovery trigger for future default-branch availability.
 - Final branch `feat/GH-94-local-byte-pattern-producer-final` is complete before its protected PR is opened, so its initial suites can bind the exact final head without a post-open push.
 - Product behavior and all wallet, signing, chain, KAS/PROM, reputation, slash ACL, commit-reveal, and emergency-stop boundaries remain unchanged. Final protected-PR checks and normal merge remain pending; `Prometheus-1.png` remains untouched and uncommitted.
+
+## 2026-07-23 GH-94 merge and exact-main closeout
+
+- Final PR #97 passed all ten protected contexts on exact head `4284a88`, had no unresolved review thread, and merged normally without admin bypass as `34ab5b7a62b17ef2c9cab672439b77dcf4a66d9c`; issue #94 closed.
+- Exact-main Prometheus CI `29989116631`, Security Audit `29989117912`, and Pages `29989118948` passed. GitHub omitted automatic main suites, so the merged CI recovery trigger, existing Security dispatch, and Pages build API executed the real workflows/deployment on exact main; no check was fabricated or bypassed.
+- Raw GitHub README and live Whitepaper, Roadmap, FAQ, and `llms.txt` expose the merged GH-94 markers. Issue #98 and branch `docs/GH-98-byte-pattern-producer-closeout` reconcile this evidence through the protected documentation workflow.
+- Scope estimates remain core 78-82%, complete vision 44-49%, and 51-56% remaining. GH-94 closes only local mandatory-review pattern derivation; provenance/privacy promotion, transport, proof binding, actionable analysis, real multi-host operation, H-001 execution, six deployments, metrics transition, PROM emission, and production nodes remain open.
+- No wallet, private key, secret, signature, raw transaction, broadcast, contract, Guardian/reporter authorization, reputation, KAS/PROM, slash ACL, commit-reveal behavior, or emergency-stop policy was accessed or changed. `Prometheus-1.png` remains untouched and uncommitted.
