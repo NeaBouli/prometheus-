@@ -72,7 +72,7 @@ atomic durable analyzer outbox; GH-63 adds real manifest-pinned verification.
 GH-74 maps the outbox into a verified analyzer type without inventing IOC data.
 Because v1 carries only a hash commitment and category, that path returns zero
 confidence, no YARA rule, and no submission without invoking LLM or YARA.
-GH-77 isolates failures within each bounded drain and returns only a
+Merged and exact-main-verified GH-77 isolates failures within each bounded drain and returns only a
 data-minimal failure category/index/validated-digest report, so a poison job
 stays pending without starving later safe jobs. No canonical bytes, paths, or
 exception text enter that report. No approved production Groth16 relation,
