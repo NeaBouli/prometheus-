@@ -121,8 +121,8 @@ the merged/exact-main-verified GH-63 verifier and GH-74 analyzer-domain adapter;
 the complete roadmap vision is about 44-49% complete. These values distinguish
 prepared software from real chain operation and are not release guarantees.
 Latest verified product/public main
-`4ce27b28473e8473922badd34b2e0e996d20b1a8` passed Prometheus CI
-`29982309546`, Security Audit `29982309489`, and Pages `29982308694`.
+`e7f34bb438d4d2cee43db9e8c019f05b9ced0f33` passed Prometheus CI
+`29984477087`, Security Audit `29984476876`, and Pages `29984476107`.
 The GH-82 design/public exact main
 `fceff1d3ae6db0f38c0076bc2c8dc82f34c3d96d` passed CI `29977301070`,
 Security `29977301063`, and Pages `29977300539`.
@@ -149,13 +149,15 @@ Rust workspace tests plus two intentional live-network ignores and 179
 Guardian Python tests plus three intentional live-model skips pass. The slice
 does not enable v2 transport or actionable analysis, so progress estimates
 remain unchanged.
-Issue #90 and branch `feat/GH-90-local-file-sha256-producer` are locally green:
-one Rust producer computes a single `file_sha256` internally from exact
-caller-supplied bytes plus typed scope, while Python independently validates
-the shared vectors. The API has no path, caller-supplied digest, generic
-observable, transport, analyzer, proof, wallet, signing, or chain input. This
-is deterministic function-boundary derivation only; protected PR/exact-main
-evidence, external provenance, privacy approval, and proof binding remain open.
+GH-90 is closed after PR #91 merged normally as exact main
+`e7f34bb438d4d2cee43db9e8c019f05b9ced0f33`: one Rust producer computes a
+single `file_sha256` internally from exact caller-supplied bytes plus typed
+scope, while Python independently validates the shared vectors. The API has no
+path, caller-supplied digest, generic observable, transport, analyzer, proof,
+wallet, signing, or chain input. This is deterministic function-boundary
+derivation only; external provenance, privacy approval, and proof binding
+remain open. Exact-main Prometheus CI `29984477087`, Security Audit
+`29984476876`, and Pages `29984476107` passed.
 The unchanged execution-artifact baseline remains exact main `205e1ca`.
 
 ## GH-13 EXPERIMENTAL MINER COMPANION STATUS

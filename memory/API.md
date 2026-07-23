@@ -291,7 +291,7 @@ Rust: prometheus_threat_hint::ObservableBundle
   commitment(network_id, report_nonce_hex)
   commitment_matches(expected, network_id, report_nonce_hex, wire)
 
-Rust GH-90 candidate:
+Rust GH-90 merged/exact-main:
   produce_file_sha256_bundle(&[u8], ScopePlatform, ScopeFormat)
 
 Python: jaeger.threat_observable.ObservableBundle

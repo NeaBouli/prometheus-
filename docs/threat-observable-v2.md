@@ -2,7 +2,7 @@
 
 Status: normative design draft for GH-82. Merged and exact-main-verified GH-86
 implements only the isolated local Rust/Python bundle validators and shared
-vectors in Sections 4-5. The GH-90 candidate adds one local Rust producer for a
+vectors in Sections 4-5. Merged and exact-main-verified GH-90 adds one local Rust producer for a
 single `file_sha256` observable from exact caller-supplied bytes, plus shared
 vectors independently consumed by Python. No v2 wire, proof relation,
 production key, pairing, analyzer promotion, or deployment is approved by this
