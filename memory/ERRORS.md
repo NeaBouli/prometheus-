@@ -43,11 +43,11 @@ Check:    cargo clippy catches many of these cases
 
 ### PATTERN-004: ZK-Proof Parameter Mismatch
 ```
-Problem:  Groth16 parameters not compatible with Kaspa KIP-16
-Symptom:  ZK-Proof rejected on-chain
-Solution: Use parameters from rusty-kaspa repository
-          Do not generate your own parameters
-Check:    Use kaspa-zk-params crate
+Problem:  Groth16 relation, VK, proof, or public-input encoding not compatible with Kaspa KIP-16
+Symptom:  Proof verifies under a local assumption but is rejected by the approved verifier/on-chain precompile
+Solution: Pin the canonical relation manifest by SHA-256, require exact compressed
+          KIP-16/Arkworks serialization, and independently approve source, VK, and vectors
+Check:    Run the manifest-pinned verifier plus independent positive/negative vectors
 ```
 
 ### PATTERN-005: IPFS CID Format

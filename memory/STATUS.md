@@ -478,6 +478,29 @@ Unchanged: PeerId authorization, ballots, wallet/signing/chain, reputation,
            KAS/PROM, slash ACL, commit-reveal, and emergency-stop policy
 ```
 
+## KIP-16 THREATHINT GROTH16 ENGINE (GH-63 IN REVIEW)
+
+```text
+Engine: real BN254/Arkworks Groth16 pairing verification aligned with active
+        KIP-16 and pinned rusty-kaspa v2.0.1 compressed serialization
+Trust: canonical manifest SHA-256 anchor; canonical VK length/hash/arity;
+       owner-only symlink-free files with before/open/after inode checks
+Statement: fixed domain + network + schema + threat hash + confidence +
+           indicator type + report nonce + observation time; proof excluded
+Encoding: SHA-256 split into two injective unsigned 128-bit BN254 inputs
+Service: exact owner-only TOML; unavailable or fully pinned kip16_groth16 mode;
+         fixed no-shell subprocess, clean environment, hard timeout
+Exit contract: 0 valid, 1 invalid, 2 CLI syntax, 3 unavailable/configuration
+Local evidence: 7 focused Rust and 17 focused Python tests; 247 workspace Rust
+                passes/2 live ignores; 143 Guardian passes/3 live-model skips;
+                locked release builds and 6/14/7-file Cargo packages; format,
+                lint, Memory, HTML, Actionlint, and dependency audit pass
+Production gate: no approved production relation, VK, proving key, or
+                 independent vectors are bundled; default remains busy
+Remaining: independent production artifact ceremony/vectors, reviewed
+           analyzer-domain adapter, and real accepted-analysis evidence
+```
+
 ## MAINNET CONTRACT ADDRESSES (post-verification)
 
 ```

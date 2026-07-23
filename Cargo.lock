@@ -3858,6 +3858,28 @@ dependencies = [
 ]
 
 [[package]]
+name = "prometheus-threat-proof"
+version = "0.1.0"
+dependencies = [
+ "ark-bn254",
+ "ark-ff",
+ "ark-groth16",
+ "ark-relations",
+ "ark-serialize",
+ "ark-snark",
+ "ark-std",
+ "clap",
+ "hex",
+ "prometheus-threat-hint",
+ "rustix",
+ "serde",
+ "serde_json",
+ "sha2",
+ "tempfile",
+ "thiserror 2.0.18",
+]
+
+[[package]]
 name = "prometheus-validator"
 version = "0.1.0"
 dependencies = [

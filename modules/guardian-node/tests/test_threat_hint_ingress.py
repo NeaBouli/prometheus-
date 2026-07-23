@@ -17,6 +17,7 @@ import pytest
 
 from jaeger.threat_hint_ingress import (
     CanonicalThreatHint,
+    Kip16Groth16Verifier,
     MAX_HINT_AGE_SECONDS,
     MAX_THREAT_HINT_WIRE_BYTES,
     ThreatHintIngress,
@@ -25,6 +26,7 @@ from jaeger.threat_hint_ingress import (
     ThreatHintIngressServer,
     ThreatHintReplayLedger,
     ThreatProofContext,
+    ThreatProofVerifierUnavailable,
     UnavailableThreatProofVerifier,
     submit_to_threat_hint_ingress,
 )
@@ -87,6 +89,19 @@ def owner_only_directory() -> Path:
     return path
 
 
+def verifier_fixture(
+    directory: Path, exit_code: int, *, delay: bool = False
+) -> tuple[Path, Path]:
+    binary = directory / f"verifier-{exit_code}"
+    wait = "/bin/sleep 1\n" if delay else ""
+    binary.write_text(f"#!/bin/sh\n{wait}/bin/cat >/dev/null\nexit {exit_code}\n")
+    os.chmod(binary, 0o700)
+    manifest = directory / "relation-manifest.json"
+    manifest.write_bytes(b"{}")
+    os.chmod(manifest, 0o600)
+    return binary, manifest
+
+
 def test_canonical_schema_rejects_noncanonical_and_duplicate_fields() -> None:
     hint = make_hint()
     wire = hint.to_wire()
@@ -117,6 +132,46 @@ async def test_unavailable_verifier_is_busy_and_stub_is_rejected() -> None:
         assert unavailable == ThreatHintIngressAck("busy", "")
         assert rejected.status == "rejected"
         assert ledger.pending_jobs(1) == []
+    finally:
+        shutil.rmtree(directory)
+
+
+def test_kip16_adapter_maps_closed_exit_codes() -> None:
+    directory = owner_only_directory().resolve()
+    try:
+        for exit_code, expected in ((0, True), (1, False)):
+            binary, manifest = verifier_fixture(directory, exit_code)
+            verifier = Kip16Groth16Verifier(binary, manifest, "11" * 32)
+            hint = make_hint()
+            assert verifier.verify(hint, hint.to_wire(), CONTEXT) is expected
+            binary.unlink()
+        binary, manifest = verifier_fixture(directory, 3)
+        verifier = Kip16Groth16Verifier(binary, manifest, "11" * 32)
+        with pytest.raises(ThreatProofVerifierUnavailable):
+            verifier.verify(make_hint(), make_hint().to_wire(), CONTEXT)
+    finally:
+        shutil.rmtree(directory)
+
+
+def test_kip16_adapter_timeout_and_permissions_fail_closed() -> None:
+    directory = owner_only_directory().resolve()
+    try:
+        binary, manifest = verifier_fixture(directory, 0, delay=True)
+        verifier = Kip16Groth16Verifier(
+            binary, manifest, "11" * 32, timeout_seconds=0.01
+        )
+        hint = make_hint()
+        with pytest.raises(ThreatProofVerifierUnavailable):
+            verifier.verify(hint, hint.to_wire(), CONTEXT)
+        os.chmod(binary, 0o722)
+        with pytest.raises(ThreatProofVerifierUnavailable):
+            verifier.verify(hint, hint.to_wire(), CONTEXT)
+        with pytest.raises(ThreatHintIngressError, match="not trusted"):
+            Kip16Groth16Verifier(binary, manifest, "11" * 32)
+        os.chmod(binary, 0o700)
+        os.chmod(manifest, 0o644)
+        with pytest.raises(ThreatHintIngressError, match="owner-only"):
+            Kip16Groth16Verifier(binary, manifest, "11" * 32)
     finally:
         shutil.rmtree(directory)
 

@@ -13,8 +13,10 @@ import hashlib
 import json
 import os
 import re
+import signal
 import sqlite3
 import stat
+import subprocess
 from contextlib import closing
 from dataclasses import dataclass, fields
 from pathlib import Path
@@ -29,6 +31,7 @@ MAX_FUTURE_SKEW_SECONDS: Final[int] = 30
 MAX_INGRESS_ACK_BYTES: Final[int] = 384
 DEFAULT_IO_TIMEOUT_SECONDS: Final[float] = 5.0
 DEFAULT_MAX_CONNECTIONS: Final[int] = 32
+DEFAULT_VERIFIER_TIMEOUT_SECONDS: Final[float] = 3.0
 
 _FRAME_PREFIX_BYTES = 4
 _SQLITE_SCHEMA_VERSION = 1
@@ -179,6 +182,77 @@ class UnavailableThreatProofVerifier:  # pylint: disable=too-few-public-methods
         context: ThreatProofContext,
     ) -> bool:
         del envelope, canonical_wire, context
+        raise ThreatProofVerifierUnavailable("approved Groth16 verifier unavailable")
+
+
+class Kip16Groth16Verifier:  # pylint: disable=too-few-public-methods
+    """Bounded adapter for the manifest-pinned Rust Groth16 verifier."""
+
+    def __init__(
+        self,
+        binary_path: Path,
+        manifest_path: Path,
+        expected_manifest_sha256: str,
+        *,
+        timeout_seconds: float = DEFAULT_VERIFIER_TIMEOUT_SECONDS,
+    ) -> None:
+        if not isinstance(expected_manifest_sha256, str) or not _is_hex_32(
+            expected_manifest_sha256
+        ):
+            raise ThreatHintIngressError("verifier manifest anchor is invalid")
+        if not 0 < timeout_seconds <= 60:
+            raise ThreatHintIngressError("verifier timeout must be in (0, 60] seconds")
+        self._binary_path = _validate_verifier_binary(binary_path)
+        self._manifest_path = _validate_owner_input_file(manifest_path)
+        self._manifest_sha256 = expected_manifest_sha256
+        self._timeout_seconds = timeout_seconds
+
+    def verify(
+        self,
+        envelope: CanonicalThreatHint,
+        canonical_wire: bytes,
+        context: ThreatProofContext,
+    ) -> bool:
+        if (
+            envelope.to_wire() != canonical_wire
+            or envelope.proof_system != "groth16_kip16_v1"
+            or context.verification_domain != VERIFICATION_DOMAIN
+        ):
+            return False
+        process: subprocess.Popen[bytes] | None = None
+        try:
+            binary_path = _validate_verifier_binary(self._binary_path)
+            manifest_path = _validate_owner_input_file(self._manifest_path)
+            process = subprocess.Popen(  # noqa: S603 - fixed trusted binary and args
+                [
+                    str(binary_path),
+                    "verify",
+                    "--manifest",
+                    str(manifest_path),
+                    "--expected-manifest-sha256",
+                    self._manifest_sha256,
+                    "--network-id",
+                    context.network_id,
+                ],
+                stdin=subprocess.PIPE,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                close_fds=True,
+                cwd="/",
+                env={"LANG": "C", "LC_ALL": "C"},
+                start_new_session=True,
+            )
+            process.communicate(canonical_wire, timeout=self._timeout_seconds)
+        except (OSError, subprocess.SubprocessError, ThreatHintIngressError) as exc:
+            if process is not None and process.poll() is None:
+                _kill_process_group(process)
+            raise ThreatProofVerifierUnavailable(
+                "approved Groth16 verifier unavailable"
+            ) from exc
+        if process.returncode == 0:
+            return True
+        if process.returncode == 1:
+            return False
         raise ThreatProofVerifierUnavailable("approved Groth16 verifier unavailable")
 
 
@@ -675,6 +749,66 @@ def _prepare_ledger_path(path: Path) -> Path:
             0o600,
         )
         os.close(descriptor)
+    return candidate
+
+
+def _validate_verifier_binary(path: Path) -> Path:
+    if not path.is_absolute() or path.name in {"", ".", ".."}:
+        raise ThreatHintIngressError("verifier binary path must be absolute")
+    try:
+        resolved = path.resolve(strict=True)
+        current = path.lstat()
+    except OSError as exc:
+        raise ThreatHintIngressError("verifier binary is unavailable") from exc
+    if (
+        resolved != path
+        or not stat.S_ISREG(current.st_mode)
+        or current.st_uid not in {0, os.getuid()}
+        or current.st_mode & 0o022
+        or current.st_mode & 0o7000
+        or current.st_mode & 0o100 == 0
+    ):
+        raise ThreatHintIngressError("verifier binary is not trusted")
+    for parent in path.parents:
+        parent_stat = parent.stat()
+        if not stat.S_ISDIR(parent_stat.st_mode) or parent_stat.st_mode & 0o022:
+            raise ThreatHintIngressError("verifier binary parent is not trusted")
+    return resolved
+
+
+def _kill_process_group(process: subprocess.Popen[bytes]) -> None:
+    try:
+        os.killpg(process.pid, signal.SIGKILL)
+    except ProcessLookupError:
+        pass
+    try:
+        process.wait(timeout=1)
+    except (OSError, subprocess.SubprocessError):
+        pass
+
+
+def _validate_owner_input_file(path: Path) -> Path:
+    if not path.is_absolute() or path.name in {"", ".", ".."}:
+        raise ThreatHintIngressError("verifier input path must be absolute")
+    try:
+        parent = path.parent.resolve(strict=True)
+        parent_stat = parent.stat()
+        current = path.lstat()
+    except OSError as exc:
+        raise ThreatHintIngressError("verifier input is unavailable") from exc
+    candidate = parent / path.name
+    if (
+        candidate != path
+        or not stat.S_ISDIR(parent_stat.st_mode)
+        or parent_stat.st_uid != os.getuid()
+        or parent_stat.st_mode & 0o077
+        or not stat.S_ISREG(current.st_mode)
+        or current.st_uid != os.getuid()
+        or current.st_mode & 0o077
+        or current.st_mode & 0o7000
+        or current.st_mode & 0o400 == 0
+    ):
+        raise ThreatHintIngressError("verifier input must be owner-only")
     return candidate
 
 

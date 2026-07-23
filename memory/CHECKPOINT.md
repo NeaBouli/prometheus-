@@ -214,7 +214,7 @@
 | P-001 | KAS/PROM Verwechslung | grep -n "MIN_STAKE" vor Commit |
 | P-002 | Obsoleten `ssc`-Compile/Deploy-Pfad verwenden | Pinned `silverc`-Release-Build plus keyless Repository-Operator verwenden |
 | P-003 | std::sync::Mutex in async | tokio::sync::Mutex |
-| P-004 | Groth16 Parameter-Mismatch | kaspa-zk-params Crate |
+| P-004 | Groth16 Relation/VK-Mismatch | Manifest SHA-256 pinning, exact KIP-16 serialization, independent relation-source/VK/vector approval |
 | P-005 | CIDv0 statt CIDv1 | ipfs add --cid-version 1 |
 | P-006 | float64 Vergleiche | epsilon: abs(a-b) < 0.001 |
 | P-007 | libp2p NAT-Problem | STUN/TURN einrichten |
@@ -304,3 +304,12 @@ Leistungsbasierte Emission. Guardians = "Miner" (KI statt GPU).
 - The owner-only ThreatHint verifier IPC, trusted network/domain binding, persistent monotonic freshness/replay admission, atomic durable analyzer outbox, and shutdown-safe worker accounting are merged. Production acceptance remains fail-closed until an independently approved real Groth16/KIP-16 relation, verifying key, and vectors plus an explicit analyzer-domain adapter exist.
 - Scope-weighted estimates are core 76-80%, complete vision 42-47%, and 53-58% remaining. H-001 execution, remaining deployments, real metrics transition, two-host Guardian evidence, production verifier/analyzer wiring, PROM emission, and production nodes remain open.
 - No wallet, private key, secret, signature, raw transaction, broadcast, contract, reputation, KAS/PROM, slash ACL, commit-reveal formula, emergency-stop policy, or foreign untracked file was accessed or changed. `Prometheus-1.png` remains untouched and uncommitted.
+
+## Checkpoint 2026-07-23: GH-63 implementation candidate
+
+- Active KIP-16 and pinned `rusty-kaspa` v2.0.1 provide the upstream BN254/Arkworks serialization baseline; the old `kaspa-zk-params` assumption is retired.
+- `prometheus-threat-proof` performs real manifest-pinned Groth16 verification with exact canonical VK/proof parsing and complete domain/network/ThreatHint statement binding.
+- The Guardian adapter/service uses owner-only exact-schema configuration, fixed no-shell invocation, clean environment, hard timeout, and distinct valid/invalid/syntax/unavailable exits.
+- No production relation, VK, proving key, or independently approved vectors are invented or bundled. Default operation remains fail-closed `busy`; accepted production analysis is not claimed.
+- Local verification passes 247 workspace Rust tests/2 live ignores, 143 Guardian tests/3 live-model skips, focused verifier/adapter suites, locked optimized builds, all three Cargo packages, formatting/lint, Memory/HTML/workflow checks, and dependency audit. Protected PR and exact-main evidence remain before closeout.
+- Scope-weighted estimates are core 77-81%, complete vision 43-48%, and 52-57% remaining.
