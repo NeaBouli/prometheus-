@@ -478,7 +478,7 @@ Unchanged: PeerId authorization, ballots, wallet/signing/chain, reputation,
            KAS/PROM, slash ACL, commit-reveal, and emergency-stop policy
 ```
 
-## KIP-16 THREATHINT GROTH16 ENGINE (GH-63 IN REVIEW)
+## KIP-16 THREATHINT GROTH16 ENGINE (GH-63 MERGED / EXACT-MAIN VERIFIED)
 
 ```text
 Engine: real BN254/Arkworks Groth16 pairing verification aligned with active
@@ -497,6 +497,8 @@ Local evidence: 7 focused Rust and 18 focused Python tests; 247 workspace Rust
                 lint, Memory, HTML, Actionlint, and dependency audit pass
 Production gate: no approved production relation, VK, proving key, or
                  independent vectors are bundled; default remains busy
+Exact main: f4f9df95848d41c82379ef59044d12453b12279c; Prometheus CI
+            29968203074, Security 29968203053, and Pages 29968202562 pass
 Remaining: independent production artifact ceremony/vectors, reviewed
            analyzer-domain adapter, and real accepted-analysis evidence
 ```

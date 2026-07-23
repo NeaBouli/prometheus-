@@ -134,7 +134,7 @@
 - [x] [P0] H-001 schema-v2 Request/Digest vom exact-main Commit neu bauen | Codex | Deterministic rebuild and live funding preflight pass; signing-request `6b8e6506...a5323`; no signature/broadcast
 - [!] [P0] `ValidatorStakingH001` Canary real ausführen; nie als Full-/Metrics-Readiness promoten | Core Dev + externer Signer | Explicit external BIP340 response + operator verification + one-shot broadcast + confirmation + operator_record receipt capture/verification + independent evidence remain
 - [!] [P0] Full-Profil: sieben Release-Fixtures auf testnet-10 verifizieren und sechs State-Contracts erst danach auf Mainnet ausrollen | Core Dev + Codex | Canary-Evidence + Metrics Oracle + Release Hardening
-- [~] [P0] Echte KIP-16/Groth16 ThreatHint-Verifikation produktiv schalten | Codex + independent reviewer | GH-63 engine/adapter/service implemented; approved production relation, VK, independent vectors, and artifact ceremony remain
+- [~] [P0] Echte KIP-16/Groth16 ThreatHint-Verifikation produktiv schalten | Codex + independent reviewer | GH-63 engine/adapter/service merged and exact-main verified; approved production relation, VK, independent vectors, and artifact ceremony remain
 - [ ] [P0] PROM Emission Contract schreiben + deployen | Claude Code | ssc live
 - [ ] [P0] KAS/PROM Liquiditätspool auf Kasplex DEX eröffnen | Core Dev | Mainnet live
 - [ ] [P1] 10 Team Guardian + Validator Nodes starten | Core Dev | Mainnet live
@@ -143,10 +143,10 @@
 
 ## ═══ SPRINT 10: P2P + KRC-20 REAL (Mai-Juni 2026) ═══
 
-- [~] [P0] libp2p Modul komplett implementieren | Codex | GH-42/GH-44/GH-48/GH-52/GH-55/GH-58 are merged/exact-main verified; GH-63 adds the real manifest-pinned KIP-16 Groth16 engine and bounded owner-only service. Real two-host evidence is blocked by rejected `ssh sandbox` public-key authentication. Broad discovery and remaining client/validator paths stay open; mDNS remains excluded by the unresolved compatible RustSec dependency path
+- [~] [P0] libp2p Modul komplett implementieren | Codex | GH-42/GH-44/GH-48/GH-52/GH-55/GH-58/GH-63 are merged/exact-main verified, including the real manifest-pinned KIP-16 Groth16 engine and bounded owner-aware service. Real two-host evidence is blocked by rejected `ssh sandbox` public-key authentication. Broad discovery and remaining client/validator paths stay open; mDNS remains excluded by the unresolved compatible RustSec dependency path
 - [ ] [P0] Echte KRC-20 UTXO-Abfrage für PROM-RULES Tick | Claude Code | Contracts live
 - [ ] [P1] Regel-Download von IPFS via CIDv1 | Claude Code | KRC-20 Reader
-- [~] [P1] Light Client ↔ Guardian P2P Kommunikation | Codex | GH-55 canonical schema/client builder/direct P2P core and GH-58 durable ingress are merged/exact-main verified; GH-63 implements the real active-KIP-16 BN254/Arkworks verification engine, manifest/VK pinning, and bounded owner-only adapter/service. Operated acceptance remains fail-closed `busy` until independently approved production relation/VK/vectors are installed; an explicit analyzer-domain adapter also remains open
+- [~] [P1] Light Client ↔ Guardian P2P Kommunikation | Codex | GH-55 canonical schema/client builder/direct P2P core, GH-58 durable ingress, and GH-63's real active-KIP-16 BN254/Arkworks verification engine plus bounded owner-aware adapter/service are merged/exact-main verified. Operated acceptance remains fail-closed `busy` until independently approved production relation/VK/vectors are installed; an explicit analyzer-domain adapter also remains open
 
 ---
 

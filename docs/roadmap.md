@@ -144,7 +144,7 @@ public release-hardening evidence for the exact rollout commit.
 - Keep the keyless Toccata-v1 genesis operator tests, deterministic public vectors, public-file handoff, CLI secret-boundary checks, contextual storage-mass commitment, exact live funding-UTXO checks, fee caps, and broadcast acknowledgement gates green
 - Complete explicitly approved external signing, operator verification, one-shot broadcast, deployment receipt, and independent chain-observation evidence for the funded H-001 testnet-10 canary
 - Compile and deploy all six state contracts to Kaspa Mainnet only after the full seven-fixture verification path passes; H-001 remains a proof/canary fixture
-- Implemented in GH-63: manifest-pinned active-KIP-16 BN254/Arkworks Groth16 engine plus bounded owner-only adapter/service; production relation/VK/vector approval and installation remain
+- Merged and exact-main-verified in GH-63: manifest-pinned active-KIP-16 BN254/Arkworks Groth16 engine plus bounded owner-aware adapter/service; production relation/VK/vector approval and installation remain
 - Implement PROM emission contract (minting logic)
 - Deploy first KAS/PROM liquidity pool on Kasplex DEX
 - Start 10 team-operated Guardian + Validator nodes
@@ -158,7 +158,7 @@ public release-hardening evidence for the exact rollout commit.
 - Merged/exact-main-verified GH-52 adds relay-only canonical advertised IP/UDP/QUIC bootstrap routes, bind/advertise separation, and path-free operator events; configured routes are not reachability or authorization proof
 - Merged/exact-main-verified GH-55 adds a separate canonical bounded ThreatHint transport core and development-only Light Client builder
 - Merged/exact-main-verified GH-58 adds separate owner-only verifier IPC, trusted context binding, persistent freshness/replay admission, and an atomic durable analyzer outbox; unavailable production Groth16 verification remains fail-closed as `busy`
-- GH-63 adds real manifest-pinned Groth16 verification aligned with active KIP-16, strict key/proof parsing, complete semantic ThreatHint binding, and a bounded owner-only service; accepted operation still requires approved production artifacts and analyzer mapping
+- Merged and exact-main-verified GH-63 adds real manifest-pinned Groth16 verification aligned with active KIP-16, strict key/proof parsing, complete semantic ThreatHint binding, and a bounded owner-aware service; accepted operation still requires approved production artifacts and analyzer mapping
 - Proven on an isolated three-node harness: relay reservation/delivery, AutoNAT state, DCUtR relay fallback, and disconnect handling; real two-host operation remains pending
 - Pending: public operated relay/NAT infrastructure and broad discovery; mDNS remains excluded while its compatible dependency path has unresolved RustSec advisories
 - Light Client ↔ Guardian communication over P2P
