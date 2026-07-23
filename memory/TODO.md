@@ -148,7 +148,7 @@
 - [ ] [P1] Regel-Download von IPFS via CIDv1 | Claude Code | KRC-20 Reader
 - [~] [P1] Light Client ↔ Guardian P2P Kommunikation | Codex | GH-55 canonical schema/client builder/direct P2P core, GH-58 durable ingress, GH-63's real active-KIP-16 BN254/Arkworks verification engine plus bounded owner-aware adapter/service, GH-74's bounded digest/network/time-bound analyzer adapter, and GH-77's per-job batch isolation/data-minimal report are merged/exact-main verified. Hash-only v1 input remains an exact non-submittable no-LLM/no-YARA result. Operated acceptance stays fail-closed `busy` until independently approved production relation/VK/vectors are installed; actionable analysis also requires a reviewed privacy-preserving concrete-observable channel or future schema
 - [x] [P1] Threat Observable v2 privacy contract | Codex + independent reviewers | GH-82/PR #83 merged/exact-main verified as `fceff1d`; separate artifact hash and observable commitment, strict canonical bounds, deny-by-default disclosure, and corrected public claims
-- [~] [P1] Local Threat Observable bundle validators and vectors | Codex + helper agents | GH-86 implementation/review locally complete: matching Rust/Python canonical validation and commitment against 5 valid, 35 invalid-bundle, and 9 invalid-context shared vectors; 257 Rust workspace and 179 Guardian Python tests pass; refreshed PR/protected exact-main verification remains
+- [x] [P1] Local Threat Observable bundle validators and vectors | Codex + helper agents | GH-86/PR #87 merged/exact-main verified as `2bfe5a3`; matching Rust/Python canonical validation and commitment against 5 valid, 35 invalid-bundle, and 9 invalid-context shared vectors; CI `29981646898`, Security `29981646867`, and Pages `29981646320` pass
 
 ---
 

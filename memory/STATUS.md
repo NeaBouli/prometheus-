@@ -120,15 +120,19 @@ Scope-weighted status estimate on 2026-07-23: H-001 canary preparation is about
 the merged/exact-main-verified GH-63 verifier and GH-74 analyzer-domain adapter;
 the complete roadmap vision is about 44-49% complete. These values distinguish
 prepared software from real chain operation and are not release guarantees.
-Latest verified operational product main
-`4cada95ed2f97c2d0251dd82ef40290b0c664c41` passed Prometheus CI
-`29975041446`, Security Audit `29975041416`, and Pages `29975040944`.
+Latest verified product/public main
+`2bfe5a3cd5df68bd9d17433748c06bb010070fae` passed Prometheus CI
+`29981646898`, Security Audit `29981646867`, and Pages `29981646320`.
 The GH-82 design/public exact main
 `fceff1d3ae6db0f38c0076bc2c8dc82f34c3d96d` passed CI `29977301070`,
 Security `29977301063`, and Pages `29977300539`.
 Its documentation closeout exact main
 `6659ab18a94f92d006fe24efe5a451d74322d1c6` passed CI `29977755581`,
 Security `29977755619`, and Pages `29977755074`.
+GH-86 is closed after PR #87 merged normally as exact main
+`2bfe5a3cd5df68bd9d17433748c06bb010070fae`. Prometheus CI `29981646898`,
+Security Audit `29981646867`, and Pages `29981646320` passed for that exact
+SHA.
 Issue #77 is closed after PR #79 merged normally. Accepted proof verification remains gated on an independently
 approved real Groth16 relation/key/vectors; actionable analysis additionally
 requires a reviewed privacy-preserving concrete-observable channel or future
@@ -137,14 +141,14 @@ GH-82 is closed after PR #83 merged normally. The v2 design boundary is now
 public and exact-main verified: v1 `threat_hash` is caller-supplied and not
 protocol-derived; the preferred v2 keeps artifact hash and observable
 commitment separate. Commitment matching proves canonical-byte consistency
-only. GH-86 now has locally complete isolated Rust/Python canonical validators
+only. GH-86 now has merged/exact-main-verified isolated Rust/Python canonical validators
 against 5 valid, 35 invalid-bundle, and 9 invalid-context shared vectors.
 Direct unvalidated construction and value-bearing debug/repr output are closed.
 Independent re-review reports no remaining blocking/high/medium finding; 257
 Rust workspace tests plus two intentional live-network ignores and 179
 Guardian Python tests plus three intentional live-model skips pass. The slice
 does not enable v2 transport or actionable analysis, so progress estimates
-remain unchanged pending PR and exact-main verification.
+remain unchanged.
 The unchanged execution-artifact baseline remains exact main `205e1ca`.
 
 ## GH-13 EXPERIMENTAL MINER COMPANION STATUS
