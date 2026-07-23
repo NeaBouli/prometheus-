@@ -8,6 +8,10 @@ vectors independently consumed by Python. Merged and exact-main-verified GH-94 a
 Rust producer for a bounded `byte_pattern` derived from exact caller-supplied
 bytes, offset, and boolean wildcard mask; it is always
 `review_required_v1`, and Python independently validates the shared vectors.
+GH-103 adds one local Rust producer for a checked `api_import` selected from
+exact caller-supplied Linux ELF bytes. It derives scope internally, bounds
+artifact bytes and dynamic symbols, always emits `review_required_v1`, and is
+independently checked against shared exact-byte ELF vectors by Python.
 No v2 wire, proof relation,
 production key, pairing, analyzer promotion, or deployment is approved by this
 document.
@@ -177,6 +181,15 @@ pattern string and uses checked range arithmetic. Its output is always
 does not authorize disclosure or transport. Wildcard selection, external
 artifact provenance, maliciousness, semantic privacy approval, and proof
 binding remain unproved.
+
+GH-103 applies the same no-path/no-arbitrary-value boundary to Linux ELF
+imports. The caller supplies exact artifact bytes and a checked index only. A
+pinned read-only parser inspects at most 16 MiB and 4096 dynamic symbols,
+rejects malformed or non-ELF input and any import outside the closed grammar,
+then sorts and deduplicates exact names before selection. Scope is derived as
+`linux`/`elf`; every output is `review_required_v1`. The index remains a local
+selection, not provenance, maliciousness, privacy approval, disclosure
+authorization, or proof binding.
 
 `review_required_v1` is local-only in the first implementation. Any IPC, P2P,
 Guardian analyzer, committee, IPFS, chain, or public-rule boundary must reject

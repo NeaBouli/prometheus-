@@ -279,7 +279,7 @@ consumption path, not accepted rule generation. A future observable-bearing
 schema/channel and any side-effecting multi-process consumer require separate
 review.
 
-### Local Threat Observable bundle APIs (GH-82/GH-86/GH-90) and GH-94 producer
+### Local Threat Observable bundle APIs (GH-82/GH-86/GH-90/GH-94/GH-103)
 
 `docs/threat-observable-v2.md` remains the normative design draft for the
 future protocol. Merged and exact-main-verified GH-86 implements only its local canonical bundle boundary:
@@ -299,6 +299,9 @@ Rust GH-94 merged/exact-main (validated with separate producer vectors):
     &[u8], usize, &[bool], ScopePlatform, ScopeFormat
   )
 
+Rust GH-103 local Linux ELF producer:
+  produce_elf_api_import_bundle(&[u8], usize)
+
 Python: jaeger.threat_observable.ObservableBundle
   parse_canonical(bytes)
   canonical_bytes
@@ -310,6 +313,10 @@ The Rust/Python bundle validators consume the shared
 `modules/threat-hint/tests/vectors/threat-observable-bundle-v1.json` corpus.
 GH-94 producer validation separately consumes
 `modules/threat-hint/tests/vectors/threat-observable-byte-pattern-producer-v1.json`.
+GH-103 producer validation consumes
+`modules/threat-hint/tests/vectors/threat-observable-elf-api-import-producer-v1.json`;
+Python independently parses that exact ELF64 dynamic-symbol fixture before
+validating the canonical bundle bytes.
 Rust public bundle types cannot be deserialized directly, and Python direct
 constructors are disabled; commitment calculation is reachable through a
 validated parsed bundle. Value-bearing Rust `Debug` and Python `repr` output is
@@ -337,6 +344,15 @@ positions and lowercase hex for fixed positions; at least eight positions must
 remain fixed. It accepts no pattern string, always emits exactly one
 `review_required_v1` observable, and enables no transport. Python independently
 derives and validates the shared vector outputs without gaining a producer API.
+
+The GH-103 producer accepts exact artifact bytes plus a checked import index
+only. It parses Linux ELF dynamic symbols through exactly pinned `object
+0.39.1` read-only features, rejects empty/non-ELF/malformed/oversized input,
+rejects any import outside the closed grammar, bounds input to 16 MiB and 4096
+dynamic symbols, sorts and deduplicates by exact ASCII bytes, and derives
+`linux`/`elf` scope internally. Every result is `review_required_v1`. It
+accepts no path, import string, caller-supplied scope, or generic value and
+performs no transport, proof, analyzer, wallet, signing, or chain operation.
 
 ---
 

@@ -215,6 +215,15 @@ not arbitrary observable text. The bundle is always `review_required_v1` and
 remains local-only; no transport, approval envelope, proof, analyzer, wallet,
 or chain schema is added.
 
+GH-103 adds one Rust-only producer for one Linux ELF `api_import`. Public
+inputs are exact artifact bytes plus a checked index into the byte-sorted,
+deduplicated dynamic-import names. Scope is fixed internally to `linux`/`elf`;
+the parser accepts at most 16 MiB and inspects at most 4096 dynamic symbols.
+Malformed/non-ELF input and names outside the existing closed grammar fail
+with fixed errors. The resulting bundle is always `review_required_v1`;
+no path/string/generic builder, wire, approval envelope, proof, analyzer,
+wallet, or chain schema is added.
+
 ### 2.2 ScanResult (Phi-3-mini Output)
 
 ```rust

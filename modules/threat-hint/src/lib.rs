@@ -3,10 +3,15 @@
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
+mod api_import_producer;
 mod byte_pattern_producer;
 mod file_sha256_producer;
 pub mod observable_bundle;
 
+pub use api_import_producer::{
+    produce_elf_api_import_bundle, ElfApiImportProducerError, MAX_ELF_API_IMPORT_ARTIFACT_BYTES,
+    MAX_ELF_DYNAMIC_SYMBOLS,
+};
 pub use byte_pattern_producer::produce_byte_pattern_bundle;
 pub use file_sha256_producer::produce_file_sha256_bundle;
 pub use observable_bundle::{

@@ -8,6 +8,8 @@
 
 **GH-94 merged and exact-main verified — July 2026:** One local Rust producer derives a bounded `byte_pattern` from exact caller-supplied bytes, a checked offset, a boolean wildcard mask, and typed scope; Python independently validates the shared producer vectors. It accepts no path or pattern string, requires at least eight fixed bytes, and always emits local-only `review_required_v1`. It does not authorize disclosure or transport and proves no external provenance, maliciousness, privacy approval, or proof binding.
 
+**GH-103 local ELF extractor — July 2026:** One local Rust producer derives a single `api_import` from exact caller-supplied Linux ELF bytes and a checked index. The pinned parser is read-only and bounded to 16 MiB plus 4096 dynamic symbols; scope is derived as `linux`/`elf`, names must satisfy the closed ASCII grammar, and sorting/deduplication is deterministic. The API accepts no path, import string, platform, format, or generic observable value. Every output is local-only `review_required_v1`, and Python independently parses the shared exact-byte ELF vectors. This does not prove external provenance or authorize disclosure, transport, proof acceptance, analysis, or publication.
+
 **Keyless operator update — July 2026:** The repository contains `prometheus-silverc-deployer`, pinned to official `rusty-kaspa` v2.0.1 and the exact Silverc source compiler revision. Its covenant-genesis path constructs transaction version 1 with compute budget 10 and the exact contextual `storage_mass` commitment, derives the official covenant ID, validates the exact live unspent funding UTXO during preflight and immediately before broadcast, and models the final 66-byte Schnorr signature script before exporting the 32-byte `SIG_HASH_ALL` digest. Signing-request schema v2 binds compute, transient, storage, normalized noncontextual/overall mass, the pinned relay rate, and both relay and conservative operator fee floors. The `reportMetrics` path recompiles exact predecessor and successor state, preserves the covenant value, uses a separate P2PK fee sponsor, derives two `SIG_HASH_ALL` digests, verifies both external BIP340 signatures plus every covenant/P2PK input, and revalidates both UTXOs before guarded broadcast. Both paths reject normalized input/output collisions, persist exclusive intent before acknowledged submission, reconcile retry state by transaction ID, enforce wRPC deadlines, and rebuild verified transactions before observation. The Rust package has 49 unit/security tests, including 11 focused metrics-transition tests. No private-key, seed, wallet, keystore, or raw-transaction input exists. Public testnet-10 funding plus an exact-main H-001 schema-v2 request/digest are confirmed. The H-001 canary and real metrics transition still require explicitly approved external signatures, complete operator verification, broadcast, confirmation, and independent chain evidence. Those results cannot authorize the full release by themselves.
 
 The deploy capability gate and repository operator both bind the official SilverScript covenant-genesis profile: transaction version 1, `pay_to_script_hash_script` over the compiled contract script, covenant-ID derivation from the funding outpoint and unbound genesis output, and `CovenantBinding` only after the ID is derived. The repository assembles, verifies, broadcasts, and observes public transactions but delegates all signing to an external vault/HSM and never accepts key material. The current official PSKT/PSKB implementation is not used because its audited v1 path still constructs legacy sigop-count input commitments instead of Toccata compute-budget commitments.
@@ -100,9 +102,17 @@ artifact-byte selection and boolean wildcard mask. It is always local-only
 `review_required_v1`; no transport or privacy approval follows from successful
 construction. None of these slices is connected to v1 transport, proof
 verification, Guardian analysis, or rule publication. Reviewed privacy gates,
-the remaining kind-specific extractors, a v2 wire and statement/relation,
+remaining platform/format extractors, a v2 wire and statement/relation,
 approved proof artifacts, and owner-only pairing remain required before
 actionable analysis.
+
+GH-103 adds one further local-only producer for Linux ELF `api_import` values.
+It parses exact caller-supplied bytes through a pinned read-only parser, derives
+the scope internally, bounds both artifact size and dynamic-symbol count,
+sorts and deduplicates grammar-valid imports, and selects one checked index.
+Every output is `review_required_v1`; no arbitrary import string or path API,
+transport authorization, external provenance, privacy approval, or proof
+binding is introduced.
 
 ---
 
