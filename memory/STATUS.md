@@ -117,15 +117,17 @@ confirmation, successor evidence, and release evidence remain.
 
 Scope-weighted status estimate on 2026-07-23: H-001 canary preparation is about
 96% complete; rollout-capable core-network work is about 78-82% complete with
-the merged/exact-main-verified GH-63 verifier and the locally verified GH-74
-analyzer-domain candidate; the complete roadmap vision is about 44-49% complete. These values distinguish
+the merged/exact-main-verified GH-63 verifier and GH-74 analyzer-domain adapter;
+the complete roadmap vision is about 44-49% complete. These values distinguish
 prepared software from real chain operation and are not release guarantees.
-Latest verified product/status main `a53fe88ffc29903432a5311111936f70b19b483e`
-passed Prometheus CI `29971776459`, Security Audit `29971776509`, and Pages
-`29971775911`; GitHub Pages reports built and public GH-63 markers retain all rollout gates.
-Issue #74 tracks the analyzer adapter candidate. Accepted proof verification remains gated on an independently
+Latest verified product/status main `17d8ceb34b32f5a81104cc3ad19bc7cff4061266`
+passed Prometheus CI `29973290911`, Security Audit `29973290913`, and Pages
+`29973290610`; GitHub Pages reports built and public GH-74 markers retain all rollout gates.
+Issue #74 is closed after PR #75 merged normally. Issue #77 tracks the bounded
+batch-progress fix found during independent post-merge review. Accepted proof verification remains gated on an independently
 approved real Groth16 relation/key/vectors; actionable analysis additionally
-requires a concrete-observable channel or future schema rather than fabricated v1 indicators.
+requires a reviewed privacy-preserving concrete-observable channel or future
+schema rather than fabricated v1 indicators.
 The unchanged execution-artifact baseline remains exact main `205e1ca`.
 
 ## GH-13 EXPERIMENTAL MINER COMPANION STATUS
@@ -505,7 +507,7 @@ Remaining: independent production artifact ceremony/vectors, reviewed
            accepted-analysis evidence
 ```
 
-## THREATHINT V1 ANALYZER ADAPTER (GH-74 CANDIDATE)
+## THREATHINT V1 ANALYZER ADAPTER (GH-74 MERGED / EXACT-MAIN VERIFIED)
 
 ```text
 Input: durable VerifiedThreatHintJob from the GH-58 SQLite outbox
@@ -520,6 +522,8 @@ Drain: maximum 32 jobs, per-instance serialization, mark-delivered only after
 Local evidence: 24 focused analyzer/adapter tests and 158 complete Guardian
                 passes with three intentional live-model skips; Black, Ruff,
                 and focused Pylint 10.00/10 pass
+Exact main: 17d8ceb34b32f5a81104cc3ad19bc7cff4061266; Prometheus CI
+            29973290911, Security 29973290913, and Pages 29973290610 pass
 Boundary: no approved production proof artifacts, concrete observable channel,
           live-model evidence, proposal submission, or production acceptance
 Unchanged: PeerId authorization, wallets/signing/chain, reputation, KAS/PROM,
