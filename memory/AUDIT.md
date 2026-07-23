@@ -945,3 +945,35 @@ untouched and uncommitted.
 
 *Original pre-hardfork audit completed 2026-04-02 by Claude Code (5 parallel agents, 7 levels, 35 checks); GH-48 merge update completed 2026-07-16 by Codex.*
 *The fire belongs to humanity.*
+
+## GH-63 KIP-16 VERIFIER AUDIT UPDATE (2026-07-23)
+
+GH-63 replaces the nonexistent `kaspa-zk-params` assumption with a real
+manifest-pinned BN254/Arkworks Groth16 verifier aligned to active KIP-16 and the
+pinned `rusty-kaspa` v2.0.1 serialization. Canonical manifest, verifying key,
+proof, network, domain, and every semantic ThreatHint field are bound before a
+pairing check. Inputs, files, process runtime, and output channels are bounded;
+unsafe or incomplete configuration maps to unavailable and preserves `busy`.
+
+Independent read-only review confirmed canonical parse/roundtrip checks,
+public-input arity, real pairing verification, owner/mode enforcement, inode
+race checks, and negative tests. Its production-vector finding is an explicit
+rollout gate rather than a fabricated fix: the repository intentionally ships
+no production relation/VK/proving key or approval claim. The relation-source
+hash is documented as manifest-bound attested metadata that the artifact
+ceremony must independently verify. CLI unavailable moved to exit 3 so Clap's
+syntax exit 2 is unambiguous. Locked Cargo resolution controls test-only
+dependencies. No blocking/high/medium implementation finding remains in the
+current review scope; production proof-artifact approval and analyzer mapping
+remain blocking operational evidence.
+
+Final independent re-review after full process-group timeout cleanup, service
+connection/path bounds, special-mode rejection, and public documentation
+synchronization reports no remaining blocking, high, or medium finding.
+
+Protected CodeRabbit review subsequently found that binary ancestors rejected
+group/other-writable modes but did not restrict directory ownership. GH-63 now
+requires every verifier-binary ancestor to be owned by root or the effective
+user and includes a non-root/non-user owner regression. The complete Guardian
+suite passes under Python 3.11 with 144 passes and three intentional live-model
+skips; 18 focused ingress/service tests, Black, Ruff, and Pylint 9.80/10 pass.

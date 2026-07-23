@@ -4,6 +4,7 @@ members = [
     "modules/client",
     "modules/guardian-p2p",
     "modules/silverc-deployer",
+    "modules/threat-proof",
     "modules/validator-node",
     "modules/threat-hint",
 ]
@@ -55,3 +56,7 @@ libp2p-tls = "=0.6.2"
 libp2p-yamux = "=0.47.0"
 thiserror = "=2.0.18"
 rustix = { version = "=1.1.4", features = ["fs", "process"] }
+ark-bn254 = "=0.6.0"
+ark-ff = "=0.6.0"
+ark-groth16 = "=0.6.0"
+ark-serialize = "=0.6.0"

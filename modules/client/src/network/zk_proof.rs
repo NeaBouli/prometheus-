@@ -1,11 +1,12 @@
 //! ZK-Proof generation stub module.
 //!
 //! Generates zero-knowledge proofs for anonymous threat reporting.
-//! PATTERN-004 applied: will use kaspa-zk-params crate for Groth16
-//! parameters when available post Covenant-Hardfork (2026-05-05).
+//! PATTERN-004 applied: production proving requires an independently approved
+//! relation, proving key, verifying key, and interoperability vectors.
 //!
 //! Current implementation: placeholder proof for development/testing.
-//! Real Groth16 implementation requires kaspa-zk-params crate.
+//! Real KIP-16-compatible verification lives in `prometheus-threat-proof`;
+//! production proof generation remains intentionally unavailable here.
 
 use anyhow::Result;
 use sha2::{Digest, Sha256};
@@ -26,7 +27,7 @@ pub struct ZkProof {
 
 /// Generates ZK proofs for anonymous threat reporting.
 /// Current: stub implementation using SHA-256 commitments.
-/// Post Covenant-Hardfork: real Groth16 proofs via kaspa-zk-params.
+/// Production: real Groth16 proofs from explicitly approved proving artifacts.
 pub struct ZkProofGenerator {
     /// Generator version identifier
     version: String,
@@ -34,10 +35,9 @@ pub struct ZkProofGenerator {
 
 impl ZkProofGenerator {
     /// Create a new ZK proof generator.
-    /// Returns stub generator until kaspa-zk-params is available.
+    /// Returns a stub generator until approved proving artifacts are integrated.
     pub fn new() -> Result<Self> {
-        // Replace with real Groth16 when kaspa-zk-params is available
-        // post Covenant-Hardfork (see memory/TODO.md Sprint 2)
+        // Production proving remains a separate reviewed rollout gate.
         Ok(Self {
             version: "stub-v0.1.0".to_string(),
         })
@@ -50,8 +50,7 @@ impl ZkProofGenerator {
         require_stub_allowed("ZK proof")?;
 
         // Stub implementation: commitment = SHA-256(threat_hash || "prometheus-zk")
-        // Replace with real Groth16 when kaspa-zk-params is available
-        // post Covenant-Hardfork
+        // Never promote this commitment to a production Groth16 proof.
         let mut hasher = Sha256::new();
         hasher.update(threat_hash);
         hasher.update(b"prometheus-zk-stub");
@@ -86,9 +85,7 @@ impl ZkProofGenerator {
 
             proof.proof_data.len() >= 32 && proof.proof_data[..32] == expected[..]
         } else {
-            // Real Groth16 verification — requires kaspa-zk-params
-            // Replace with real Groth16 when kaspa-zk-params is available
-            // post Covenant-Hardfork
+            // Production verification is isolated in `prometheus-threat-proof`.
             false
         }
     }

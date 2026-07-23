@@ -101,16 +101,43 @@ atomically persists both replay identities and a durable analyzer-outbox job.
 The outbox intentionally carries canonical wire data rather than fabricating
 concrete analyzer indicators that are absent from the transport schema.
 
-No production Groth16 relation, verifying key, or approved vectors are bundled.
-`UnavailableThreatProofVerifier.verify()` raises
-`ThreatProofVerifierUnavailable`; `ThreatHintIngress.process()` catches that
-boundary signal and returns the fail-closed `busy` acknowledgement. Verifier
-adapters and tests must target this contract, and no operated deployment may
-return `accepted` until an independently approved verifier is injected. Outbox
-consumers must use the bounded `pending_jobs` API and an explicit future
-analyzer-domain adapter. Verifier adapters must be side-effect-free and bounded;
-server shutdown cancels and gathers asyncio workers, but Python cannot forcibly
-terminate arbitrary native verifier code already running in a worker thread.
+GH-63 adds `prometheus-threat-proof`, a real BN254/Arkworks Groth16 verification
+engine aligned with active KIP-16 and the pinned `rusty-kaspa` v2.0.1 encoding.
+It accepts exact canonical ThreatHint bytes only on stdin, binds every semantic
+field to two 128-bit field inputs, rejects trailing/noncanonical proof or key
+bytes, and loads a canonical relation manifest plus verifying key from
+owner-only files. The operator-configured manifest SHA-256 is the trust anchor.
+`relation_source_sha256` is manifest-bound attested metadata; release tooling
+must independently verify it against the reviewed relation source before an
+artifact can be approved.
+
+`Kip16Groth16Verifier` invokes that binary with fixed arguments, a clean
+environment, no shell, no payload in argv or output, and a hard timeout. Exit 0
+means valid, 1 means invalid, and 3 means unavailable; Clap syntax errors remain
+distinct at 2. `jaeger.threat_hint_service` loads an exact-schema owner-only TOML
+configuration and supports an explicit `unavailable` default or a fully pinned
+`kip16_groth16` mode. Example shape:
+
+```toml
+schema_version = 1
+network_id = "testnet-10"
+socket_path = "/run/user/1000/prometheus/threat-hint.sock"
+ledger_path = "/var/lib/prometheus/threat-hint/replay.sqlite3"
+max_connections = 32
+io_timeout_seconds = 5.0
+
+[verifier]
+mode = "unavailable"
+```
+
+Start it with `python -m jaeger.threat_hint_service --config /absolute/config.toml`.
+No production Groth16 relation, verifying key, proving key, or independently
+approved vectors are bundled. Until those public artifacts are reviewed and the
+complete trusted `kip16_groth16` configuration is installed, the default
+verifier raises `ThreatProofVerifierUnavailable` and the ingress returns
+fail-closed `busy`. Test keys are generated at test runtime and are never a
+deployment default. Outbox consumers still require an explicit reviewed
+analyzer-domain adapter before accepted hints can become analyzer indicators.
 
 ## Testing
 
