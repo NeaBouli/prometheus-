@@ -1,9 +1,12 @@
 # Threat Observable v2 Protocol Draft
 
-Status: normative design draft for GH-82. Merged and exact-main-verified GH-86 implements only the isolated
-local Rust/Python bundle validators and shared vectors in Sections 4-5. No v2
-wire, proof relation, production key, pairing, analyzer promotion, or
-deployment is approved by this document.
+Status: normative design draft for GH-82. Merged and exact-main-verified GH-86
+implements only the isolated local Rust/Python bundle validators and shared
+vectors in Sections 4-5. The GH-90 candidate adds one local Rust producer for a
+single `file_sha256` observable from exact caller-supplied bytes, plus shared
+vectors independently consumed by Python. No v2 wire, proof relation,
+production key, pairing, analyzer promotion, or deployment is approved by this
+document.
 
 ## 1. Purpose
 
@@ -152,6 +155,14 @@ must not expose an arbitrary-string bundle builder to callers. Extractor
 allowlists, provenance binding, and privacy review remain promotion gates; the
 first local parser must not describe structurally valid input as
 `privacy_safe`, `approved`, or equivalent.
+
+The GH-90 producer is the first kind-specific local implementation of this
+rule. It accepts exact bytes and typed scope, computes the lowercase SHA-256
+value internally, and exposes no path, caller-supplied digest, or generic
+observable builder. Its result establishes only deterministic derivation from
+the supplied byte slice. It does not prove that those bytes came from a real
+file, that the file is malicious, that disclosure is privacy-approved, or that
+the digest is bound by a proof. It performs no transport or analysis.
 
 `review_required_v1` is local-only in the first implementation. Any IPC, P2P,
 Guardian analyzer, committee, IPFS, chain, or public-rule boundary must reject

@@ -279,7 +279,7 @@ consumption path, not accepted rule generation. A future observable-bearing
 schema/channel and any side-effecting multi-process consumer require separate
 review.
 
-### Local Threat Observable bundle APIs (GH-82/GH-86)
+### Local Threat Observable bundle APIs (GH-82/GH-86/GH-90)
 
 `docs/threat-observable-v2.md` remains the normative design draft for the
 future protocol. Merged and exact-main-verified GH-86 implements only its local canonical bundle boundary:
@@ -290,6 +290,9 @@ Rust: prometheus_threat_hint::ObservableBundle
   to_canonical_bytes()
   commitment(network_id, report_nonce_hex)
   commitment_matches(expected, network_id, report_nonce_hex, wire)
+
+Rust GH-90 candidate:
+  produce_file_sha256_bundle(&[u8], ScopePlatform, ScopeFormat)
 
 Python: jaeger.threat_observable.ObservableBundle
   parse_canonical(bytes)
@@ -313,6 +316,13 @@ ordering, bounds, and commitment context only. It does not prove that an
 grammar-valid value is semantically safe to disclose. The producer must use
 separately reviewed kind-specific extractors; no arbitrary-string builder is an
 approved disclosure API.
+
+The GH-90 function is the first such kind-specific producer. It computes one
+lowercase SHA-256 internally from exact caller-supplied bytes, always emits the
+structural `public_auto_v1` profile, and accepts no path, digest string, or
+generic observable value. That profile does not authorize disclosure or
+transport. Python remains an independent validator consumer rather than
+gaining an unused producer API.
 
 ---
 

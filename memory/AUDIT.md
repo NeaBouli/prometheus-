@@ -1132,3 +1132,42 @@ Exact-main Prometheus CI `29981646898`, Security Audit `29981646867`, and Pages
 `29981646320` passed. GH-86 is complete only as the isolated local
 structural/commitment boundary; all extractor, privacy, v2 wire/proof/pairing,
 actionable-analysis, chain, and production-operation gates remain.
+
+## GH-90 LOCAL FILE-SHA256 PRODUCER CANDIDATE (2026-07-23)
+
+Scope: one local Rust producer in `prometheus-threat-hint`, one shared
+producer-vector corpus, independent Python consumption, and synchronized
+internal/public documentation. ThreatHint v1, P2P, verifier, analyzer, proof,
+wallet, signing, contracts, and chain paths remain out of scope.
+
+Result: CONDITIONAL PASS pending protected PR and exact-main evidence. The only
+new public function accepts exact artifact bytes plus typed platform/format
+scope. It computes SHA-256 internally, reaches the existing validated bundle
+type through a crate-private fixed-digest constructor, and exposes no path,
+caller-supplied digest, generic observable value, or builder. Empty, text, and
+binary vectors bind canonical artifact hex, digest, scope, and exact wire;
+Rust produces them and Python independently hashes the input and validates the
+wire. A one-bit regression proves byte sensitivity.
+
+Security boundary: deterministic derivation is established only from the byte
+slice supplied to the function. The implementation does not prove external
+file provenance, truth, maliciousness, semantic privacy approval, transport
+authorization, or proof binding. `public_auto_v1` remains a structural label
+only. No logging or filesystem/network operation exists in the producer.
+
+Evidence: 13 focused Rust tests and 17 focused Python tests pass; the complete
+workspace passes 260 Rust tests plus one compile-fail doctest with two
+intentional live-network ignores; Guardian passes 180 tests with three
+intentional live-model skips. Rustfmt, warning-free workspace all-target
+Clippy, verified 12-file ThreatHint package including both vector corpora,
+Black, Ruff, Guardian Pylint 9.86/10, Memory Integrity, six Autodidactic tests,
+HTML/JSON-LD/public-status checks, workflow YAML parsing, Actionlint 1.7.12,
+Cargo Audit with no vulnerabilities and eight known allowed warnings, and
+clean diff checks pass. Gitleaks 8.30.1 reports no leak in the staged diff;
+protected CI remains authoritative for the full-history secret gate.
+
+Claude Code supplied a no-tool architecture review after an earlier helper
+attempt was stopped when its search scope exceeded the explicit file allowlist.
+That stopped process returned no file content and its output was discarded. A
+separate Terra diff review reports no blocking, high, or medium finding. Sol
+retains implementation, integration, and final verification responsibility.

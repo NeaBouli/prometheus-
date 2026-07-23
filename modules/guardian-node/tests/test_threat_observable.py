@@ -2,17 +2,22 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
 
 import pytest
 
 from jaeger.threat_observable import (
+    DisclosurePolicy,
     MAX_CANONICAL_BYTES,
     Observable,
     ObservableBundle,
     ObservableBundleError,
+    ObservableKind,
     ObservableScope,
+    ScopeFormat,
+    ScopePlatform,
 )
 
 _VECTOR_PATH = (
@@ -21,6 +26,13 @@ _VECTOR_PATH = (
     / "tests"
     / "vectors"
     / "threat-observable-bundle-v1.json"
+)
+_PRODUCER_VECTOR_PATH = (
+    Path(__file__).resolve().parents[2]
+    / "threat-hint"
+    / "tests"
+    / "vectors"
+    / "threat-observable-file-sha256-producer-v1.json"
 )
 
 
@@ -253,3 +265,42 @@ def test_observable_grammar_precedes_disclosure_policy() -> None:
         ObservableBundle.parse_canonical(wire)
 
     assert str(exc_info.value) == "invalid observable"
+
+
+def test_rust_file_sha256_producer_vectors_validate_independently() -> None:
+    raw = _PRODUCER_VECTOR_PATH.read_text(encoding="utf-8")
+    producer_vectors = json.loads(raw, object_pairs_hook=_unique_object)
+
+    assert set(producer_vectors.keys()) == {"vector_schema_version", "cases"}
+    assert producer_vectors["vector_schema_version"] == 1
+    assert len(producer_vectors["cases"]) >= 3
+
+    names = set()
+    for case in producer_vectors["cases"]:
+        assert set(case.keys()) == {
+            "name",
+            "artifact_hex",
+            "platform",
+            "format",
+            "file_sha256",
+            "wire_hex",
+        }
+        assert case["name"] not in names
+        names.add(case["name"])
+
+        artifact = bytes.fromhex(case["artifact_hex"])
+        wire = bytes.fromhex(case["wire_hex"])
+        assert artifact.hex() == case["artifact_hex"]
+        assert wire.hex() == case["wire_hex"]
+
+        expected_digest = hashlib.sha256(artifact).hexdigest()
+        assert expected_digest == case["file_sha256"]
+
+        bundle = ObservableBundle.parse_canonical(wire)
+        assert bundle.canonical_bytes == wire
+        assert bundle.disclosure_policy == DisclosurePolicy.PUBLIC_AUTO_V1
+        assert bundle.scope.platform == ScopePlatform(case["platform"])
+        assert bundle.scope.format == ScopeFormat(case["format"])
+        assert len(bundle.observables) == 1
+        assert bundle.observables[0].kind == ObservableKind.FILE_SHA256
+        assert bundle.observables[0].value == expected_digest
