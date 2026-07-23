@@ -11,10 +11,10 @@
 |------|------|
 | Projekt | Prometheus — Decentralized AI Threat Intelligence |
 | Repo | https://github.com/NeaBouli/prometheus- |
-| Branch | `docs/GH-65-kip16-closeout`; all product and status changes remain PR-only |
+| Branch | `main`; all product and status changes remain PR-only |
 | Lokaler Pfad | `$REPO_ROOT` |
 | Letzter grün verifizierter Produkt-/Tooling-Commit | `f4f9df9` — GH-63 manifest-pinned KIP-16 verifier; Prometheus CI `29968203074`, Security `29968203053`, and Pages `29968202562` green |
-| Aktueller Entwicklungs-Slice | GH-65 synchronisiert den GH-63 exact-main/public closeout. Ohne unabhängig freigegebene Produktionsrelation, VK, Vektoren und expliziten Analyzer-Domain-Adapter bleibt der Sidecar fail-closed `busy`; echter Zwei-Host-Nachweis wartet weiterhin auf reparierten `ssh sandbox` Public-Key-Zugriff |
+| Aktueller Entwicklungs-Slice | GH-63 plus GH-65 public closeout are complete and exact-main verified. Next repository-owned slice: explicit bounded analyzer-domain adapter without inventing fields absent from canonical ThreatHint. Ohne unabhängig freigegebene Produktionsrelation, VK und Vektoren bleibt der Sidecar fail-closed `busy`; echter Zwei-Host-Nachweis wartet weiterhin auf reparierten `ssh sandbox` Public-Key-Zugriff |
 | Aktuelle Tooling-Baseline | Exact main `f4f9df9` includes merged GH-58 durable ingress and GH-63's active-KIP-16-aligned manifest-pinned BN254/Arkworks verifier plus bounded owner-aware adapter/service. Public/multi-host operation, trusted membership/key assignment, Sybil resistance, approved production proof artifacts, real accepted analysis, and on-chain attestation remain open. Execution artifacts remain bound to `205e1ca`; GH-9 remains ready for explicitly approved external signing. |
 | Aktueller HEAD | Mit `git log --oneline -1` prüfen; Bridge-/Status-Commits können neuer sein |
 | Rollback-Tag | `pre-session-20260413` → `6347b85` |
