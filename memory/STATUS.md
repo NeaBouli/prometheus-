@@ -120,12 +120,10 @@ Scope-weighted status estimate on 2026-07-23: H-001 canary preparation is about
 the merged/exact-main-verified GH-63 verifier and GH-74 analyzer-domain adapter;
 the complete roadmap vision is about 44-49% complete. These values distinguish
 prepared software from real chain operation and are not release guarantees.
-Latest verified docs/status main `a896e4ccc8407ad88b2fb145e62e716ce81756f2`
-passed Prometheus CI `29973996881`, Security Audit `29973996917`, and Pages
-`29973996526`; GitHub Pages reports built and public GH-74 markers retain all rollout gates.
-Exact product main remains `17d8ceb34b32f5a81104cc3ad19bc7cff4061266`.
-Issue #77 implements the bounded batch-progress fix found during independent
-post-merge review on its protected feature branch. Accepted proof verification remains gated on an independently
+Latest verified product/docs/status main `4cada95ed2f97c2d0251dd82ef40290b0c664c41`
+passed Prometheus CI `29975041446`, Security Audit `29975041416`, and Pages
+`29975040944`; GitHub Pages reports built and public GH-77 markers retain all rollout gates.
+Issue #77 is closed after PR #79 merged normally. Accepted proof verification remains gated on an independently
 approved real Groth16 relation/key/vectors; actionable analysis additionally
 requires a reviewed privacy-preserving concrete-observable channel or future
 schema rather than fabricated v1 indicators.
@@ -532,7 +530,7 @@ Unchanged: PeerId authorization, wallets/signing/chain, reputation, KAS/PROM,
            slash ACL, commit-reveal, and emergency-stop policy
 ```
 
-## THREATHINT BOUNDED DRAIN PROGRESS (GH-77 CANDIDATE)
+## THREATHINT BOUNDED DRAIN PROGRESS (GH-77 MERGED / EXACT-MAIN VERIFIED)
 
 ```text
 Problem: one failed leading GH-74 outbox job aborted the whole bounded drain and
@@ -550,7 +548,8 @@ Ordering: v1 jobs are independent and have no submission side effects; FIFO
 Local evidence: 19 focused adapter tests and 163 complete Guardian passes with
                 three intentional live-model skips; Black, scoped Ruff, focused
                 Pylint 10.00/10, and clean diff checks pass
-Pending: protected PR review, merge, and exact-main CI/Security/Pages evidence
+Exact main: 4cada95ed2f97c2d0251dd82ef40290b0c664c41; Prometheus CI
+            29975041446, Security 29975041416, and Pages 29975040944 pass
 ```
 
 ## MAINNET CONTRACT ADDRESSES (post-verification)

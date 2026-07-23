@@ -767,3 +767,10 @@ Rules for all dev agents:
 - Local evidence is 19 focused adapter tests and 163 complete Guardian passes with three intentional live-model skips, Black, scoped Ruff, focused Pylint 10.00/10, and clean diff checks. One unchanged unused import in `tests/test_analyzer.py` prevents a whole-test-tree Ruff run; the changed files are Ruff-clean and CI does not run Ruff on tests.
 - Claude Code was retried for the preceding read-only review but remained blocked before work by its monthly spend limit. Spark/Terra supplied bounded help; Sol retained architecture, correction, integration, and complete verification ownership.
 - No wallet, private key, secret, signature, raw transaction, broadcast, contract, Guardian/reporter authorization, reputation, KAS/PROM, slash ACL, commit-reveal behavior, emergency-stop policy, or foreign untracked file was accessed or changed. `Prometheus-1.png` remains untouched and uncommitted.
+
+## 2026-07-23 GH-77 merge and exact-main closeout
+
+- PR #79 passed all ten protected CI/Security/CodeRabbit contexts with no open review thread and merged normally without admin bypass as `4cada95ed2f97c2d0251dd82ef40290b0c664c41`; issue #77 closed.
+- Exact-main Prometheus CI `29975041446`, Security Audit `29975041416`, and Pages `29975040944` all passed. Raw GitHub README plus live Whitepaper, Roadmap, and `llms.txt` returned HTTP success with the GH-77 markers.
+- Issue #80 tracks this documentation-only evidence reconciliation. Scope estimates remain core 78-82%, complete vision 44-49%, and 51-56% remaining because external proof artifacts, concrete observables/actionable analysis, real multi-host operation, H-001 execution evidence, six deployments, metrics transition, PROM emission, and production nodes remain open.
+- No wallet, private key, secret, signature, raw transaction, broadcast, contract, Guardian/reporter authorization, reputation, KAS/PROM, slash ACL, commit-reveal behavior, emergency-stop policy, or foreign untracked file was accessed or changed. `Prometheus-1.png` remains untouched and uncommitted.

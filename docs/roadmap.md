@@ -160,7 +160,7 @@ public release-hardening evidence for the exact rollout commit.
 - Merged/exact-main-verified GH-58 adds separate owner-only verifier IPC, trusted context binding, persistent freshness/replay admission, and an atomic durable analyzer outbox; unavailable production Groth16 verification remains fail-closed as `busy`
 - Merged and exact-main-verified GH-63 adds real manifest-pinned Groth16 verification aligned with active KIP-16, strict key/proof parsing, complete semantic ThreatHint binding, and a bounded owner-aware service
 - Merged and exact-main-verified GH-74 adds a bounded digest/network/time-bound outbox-to-analyzer adapter; hash-only ThreatHint v1 is consumed as an exact zero-confidence, no-rule, non-submittable result without invoking LLM or YARA generation
-- GH-77 isolates failed jobs inside each bounded analyzer drain, preserves them as pending, lets later safe jobs progress, and emits only data-minimal fixed failure metadata
+- Merged and exact-main-verified GH-77 isolates failed jobs inside each bounded analyzer drain, preserves them as pending, lets later safe jobs progress, and emits only data-minimal fixed failure metadata
 - Pending: approved production proof artifacts plus a separately reviewed privacy-preserving concrete-observable channel or future schema before actionable analysis
 - Proven on an isolated three-node harness: relay reservation/delivery, AutoNAT state, DCUtR relay fallback, and disconnect handling; real two-host operation remains pending
 - Pending: public operated relay/NAT infrastructure and broad discovery; mDNS remains excluded while its compatible dependency path has unresolved RustSec advisories

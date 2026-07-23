@@ -1033,4 +1033,6 @@ failures with later progress, valid-looking mismatched digest redaction, unsafe
 results, clock rollback, cancellation in analysis and delivery, serialization,
 and batch limits. All 163 complete Guardian tests pass with three intentional
 live-model skips; Black, scoped Ruff, focused Pylint 10.00/10, and diff checks
-pass. Protected review, merge, and exact-main evidence remain pending.
+pass. PR #79 merged normally as `4cada95ed2f97c2d0251dd82ef40290b0c664c41`;
+exact-main Prometheus CI `29975041446`, Security Audit `29975041416`, and Pages
+`29975040944` pass. No protected review thread remained open.
