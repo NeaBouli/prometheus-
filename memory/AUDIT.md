@@ -1098,9 +1098,9 @@ serialization/commitment, a mutation regression covers both operations, and a
 shared non-string-policy vector exercises both languages. Final targeted
 re-review reports no remaining blocking, high, or medium finding.
 
-Evidence: 15 focused Rust tests plus one compile-fail doctest; 15 focused
+Evidence: 15 focused Rust tests plus one compile-fail doctest; 16 focused
 Python tests; 256 complete Rust workspace passes with two intentional
-live-network ignores; 178 complete Guardian Python passes with three
+live-network ignores; 179 complete Guardian Python passes with three
 intentional live-model skips; Rustfmt; warning-free workspace all-target
 Clippy; locked optimized Guardian/proof builds; verified 9-file ThreatHint and
 14/7-file Guardian/proof package sets; Black; Ruff; full Guardian Pylint
@@ -1109,3 +1109,11 @@ code and vectors; no workflow change is required. One unchanged client
 microbenchmark failed once at 1.84 ms against its 1 ms local threshold; the
 immediate isolated rerun measured 41 microseconds and the following complete
 workspace run passed all 256 tests. No GH-86 code path was involved.
+
+Protected review update: initial CI/Security contexts, including Secret
+Detection, passed on `1abb4ce`. CodeRabbit found one actionable Python/Rust
+validation-order mismatch and one maintenance nit on the manual Rust
+constant-time loop. Python now validates grammar before disclosure policy,
+matching Rust, with a focused regression. Rust now uses the already-locked
+`subtle 2.6.1` `ConstantTimeEq` primitive through an explicit workspace
+dependency. Refreshed protected checks remain required.

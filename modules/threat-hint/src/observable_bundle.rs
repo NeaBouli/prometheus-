@@ -4,6 +4,7 @@ use core::cmp::Ordering;
 
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
+use subtle::ConstantTimeEq;
 use thiserror::Error;
 
 const OBSERVABLE_BUNDLE_SCHEMA_VERSION: u16 = 1;
@@ -282,18 +283,10 @@ impl ObservableBundle {
             return Err(ObservableBundleError::InvalidCommitment);
         }
 
-        let mut expected_array = [0u8; 32];
-        expected_array.copy_from_slice(expected);
-
         let bundle = ObservableBundle::parse_canonical(bundle_wire)?;
         let observed = bundle.commitment(network_id, report_nonce_hex)?;
 
-        let mut diff = 0u8;
-        for i in 0..32 {
-            diff |= expected_array[i] ^ observed[i];
-        }
-
-        Ok(diff == 0)
+        Ok(bool::from(expected.ct_eq(&observed)))
     }
 
     fn validate(&self) -> Result<(), ObservableBundleError> {

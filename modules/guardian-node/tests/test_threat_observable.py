@@ -241,3 +241,15 @@ def test_mutated_frozen_bundle_cannot_serialize_or_commit(vector: dict) -> None:
         _ = bundle.canonical_bytes
     with pytest.raises(ObservableBundleError):
         bundle.commitment(case["network_id"], case["report_nonce_hex"])
+
+
+def test_observable_grammar_precedes_disclosure_policy() -> None:
+    wire = (
+        b'{"schema_version":1,"disclosure_policy":"public_auto_v1",'
+        b'"scope":{"platform":"linux","format":"elf"},'
+        b'"observables":[{"kind":"byte_pattern","value":"aa"}]}'
+    )
+    with pytest.raises(ObservableBundleError) as exc_info:
+        ObservableBundle.parse_canonical(wire)
+
+    assert str(exc_info.value) == "invalid observable"

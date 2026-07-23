@@ -357,6 +357,8 @@ def _parse_observables(
                 ObservableBundleErrorCode.INVALID_OBSERVABLE
             ) from None
 
+        _validate_observable(kind, value_raw)
+
         if (
             disclosure_policy == DisclosurePolicy.PUBLIC_AUTO_V1
             and kind == ObservableKind.BYTE_PATTERN
@@ -364,8 +366,6 @@ def _parse_observables(
             raise _ObservableBundleException(
                 ObservableBundleErrorCode.INVALID_DISCLOSURE_POLICY
             )
-
-        _validate_observable(kind, value_raw)
 
         current = (kind.value.encode("utf-8"), value_raw.encode("utf-8"))
         if current in seen:
