@@ -12,7 +12,7 @@ GH-103 adds one local Rust producer for a checked `api_import` selected from
 exact caller-supplied Linux ELF bytes. It derives scope internally, bounds
 artifact bytes and dynamic symbols, always emits `review_required_v1`, and is
 independently checked against shared exact-byte ELF vectors by Python.
-The GH-107 candidate adds an isolated local Rust/Python verifier for one
+Merged and exact-main-verified GH-107 adds an isolated local Rust/Python verifier for one
 canonical, short-lived BIP340 approval statement over one exact
 `review_required_v1` bundle. It authenticates a statement only and is not
 connected to transport, analysis, disclosure, publication, proof, wallet, or
@@ -201,7 +201,7 @@ committee, IPFS, chain, or public-rule boundary must reject the complete bundle
 even if the sender labels it reviewed. Self-labeling a bundle is never
 approval.
 
-The GH-107 candidate defines and verifies the first local Observable Approval
+Merged and exact-main-verified GH-107 defines and verifies the first local Observable Approval
 v1 statement. Its strict canonical JSON field order is:
 
 ```text
@@ -277,7 +277,7 @@ network or analyzer promotion requires:
 - frozen cross-language test vectors for valid and invalid canonical bundles
   (implemented locally and exact-main verified by GH-86);
 - a canonical authenticated approval statement and cross-language verification
-  (implemented locally by the GH-107 candidate, without consumption or
+  (implemented locally and exact-main verified by GH-107, without consumption or
   promotion);
 - a separate ThreatHint v2 schema and protocol identifier;
 - an exact v2 statement specification and reviewed relation source;

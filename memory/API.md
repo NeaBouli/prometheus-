@@ -368,7 +368,7 @@ dynamic symbols, sorts and deduplicates by exact ASCII bytes, and derives
 accepts no path, import string, caller-supplied scope, or generic value and
 performs no transport, proof, analyzer, wallet, signing, or chain operation.
 
-The GH-107 candidate verifies one exact canonical approval envelope for one
+Merged and exact-main-verified GH-107 verifies one exact canonical approval envelope for one
 exact `review_required_v1` bundle. The trusted context supplies the report
 nonce, exact x-only approver key, recipient-scope digest, network, and a
 separately trusted current time that must never be attacker-controlled. Both
