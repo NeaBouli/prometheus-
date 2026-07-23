@@ -142,6 +142,25 @@ fn secure_write(path: &Path, bytes: &[u8]) {
 }
 
 fn run(fixture: &Fixture, wire: &[u8], network: &str, expected_hash: &str) -> Output {
+    run_with_stdin_policy(fixture, wire, network, expected_hash, false)
+}
+
+fn run_allowing_preflight_exit(
+    fixture: &Fixture,
+    wire: &[u8],
+    network: &str,
+    expected_hash: &str,
+) -> Output {
+    run_with_stdin_policy(fixture, wire, network, expected_hash, true)
+}
+
+fn run_with_stdin_policy(
+    fixture: &Fixture,
+    wire: &[u8],
+    network: &str,
+    expected_hash: &str,
+    allow_preflight_exit: bool,
+) -> Output {
     let mut child = Command::new(env!("CARGO_BIN_EXE_prometheus-threat-proof"))
         .args([
             "verify",
@@ -157,12 +176,12 @@ fn run(fixture: &Fixture, wire: &[u8], network: &str, expected_hash: &str) -> Ou
         .stderr(Stdio::piped())
         .spawn()
         .expect("spawn verifier");
-    child
-        .stdin
-        .take()
-        .expect("child stdin")
-        .write_all(wire)
-        .expect("write wire");
+    let write_result = child.stdin.take().expect("child stdin").write_all(wire);
+    match write_result {
+        Ok(()) => {}
+        Err(error) if allow_preflight_exit && error.kind() == std::io::ErrorKind::BrokenPipe => {}
+        Err(error) => panic!("write wire: {error}"),
+    }
     child.wait_with_output().expect("wait for verifier")
 }
 
@@ -257,17 +276,15 @@ fn unsafe_manifest_mode_is_unavailable() {
     let fixture = fixture();
     fs::set_permissions(&fixture.manifest_path, fs::Permissions::from_mode(0o644))
         .expect("make manifest unsafe");
-    assert_eq!(
-        run(
-            &fixture,
-            &fixture.wire,
-            "testnet-10",
-            &fixture.manifest_sha256
-        )
-        .status
-        .code(),
-        Some(3)
+    let output = run_allowing_preflight_exit(
+        &fixture,
+        &fixture.wire,
+        "testnet-10",
+        &fixture.manifest_sha256,
     );
+    assert_eq!(output.status.code(), Some(3));
+    assert!(output.stdout.is_empty());
+    assert!(output.stderr.is_empty());
 }
 
 #[test]
