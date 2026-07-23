@@ -11,10 +11,10 @@
 |------|------|
 | Projekt | Prometheus — Decentralized AI Threat Intelligence |
 | Repo | https://github.com/NeaBouli/prometheus- |
-| Branch | `feat/GH-94-local-byte-pattern-producer`; all product and status changes remain PR-only |
+| Branch | `feat/GH-94-local-byte-pattern-producer-r2`; replacement PR #96; all product and status changes remain PR-only |
 | Lokaler Pfad | `$REPO_ROOT` |
 | Letzter grün verifizierter Produkt-/Public-Baseline | Exact main `2ad2c44` merged the GH-90 evidence/documentation reconciliation through PR #93 with CI `29985377659`, Security `29985377455`, and Pages `29985377181`; the GH-90 product implementation itself merged through PR #91 as `e7f34bb` |
-| Aktueller Entwicklungs-Slice | Issue #94 and branch `feat/GH-94-local-byte-pattern-producer` add one local Rust producer from exact artifact bytes, checked offset, boolean wildcard mask, and typed scope. It accepts no path or pattern string, requires 8..=64 positions and at least eight fixed bytes, and always emits local-only `review_required_v1`. Python independently validates shared vectors. |
+| Aktueller Entwicklungs-Slice | Issue #94, replacement PR #96, and branch `feat/GH-94-local-byte-pattern-producer-r2` add one local Rust producer from exact artifact bytes, checked offset, boolean wildcard mask, and typed scope. It accepts no path or pattern string, requires 8..=64 positions and at least eight fixed bytes, and always emits local-only `review_required_v1`. Python independently validates shared vectors. |
 | Aktuelle Tooling-Baseline | Exact main `2ad2c44` includes GH-58 durable ingress, GH-63's active-KIP-16-aligned manifest-pinned BN254/Arkworks verifier plus bounded owner-aware adapter/service, GH-69's deterministic manifest-preflight CLI tests, GH-74's bounded hash-only v1 analyzer adapter, GH-77's per-job drain isolation/data-minimal report, GH-86's isolated canonical observable validators, and GH-90's local bytes-only `file_sha256` producer. GH-94 is a branch candidate for one mandatory-review byte-pattern producer. Public/multi-host operation, trusted membership/key assignment, Sybil resistance, approved production proof artifacts, privacy-reviewed concrete observables/actionable analysis, and on-chain attestation remain open. Execution artifacts remain bound to `205e1ca`; GH-9 remains ready for explicitly approved external signing. |
 | Aktueller HEAD | Branch from exact main `2ad2c44f37ec15ab2004b83daa5a8891945db1b3`; mit `git log --oneline -1` prüfen |
 | Rollback-Tag | `pre-session-20260413` → `6347b85` |

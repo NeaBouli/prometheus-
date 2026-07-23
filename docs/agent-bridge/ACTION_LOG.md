@@ -880,3 +880,10 @@ Rules for all dev agents:
 - CodeRabbit's only valid finding was a minor documentation ambiguity in `memory/API.md`: generic Rust/Python bundle validation uses `threat-observable-bundle-v1.json`, while GH-94 producer validation uses the separate `threat-observable-byte-pattern-producer-v1.json` corpus.
 - The API memory now names both corpora explicitly. Audit and Bridge record the review result; no product code, public behavior, workflow, wallet, signing, chain, KAS/PROM, reputation, slash ACL, commit-reveal, or emergency-stop boundary changed.
 - Refreshed checks, normal merge without admin bypass, exact-main CI/Security/Pages, and protected documentation reconciliation remain next. `Prometheus-1.png` remains untouched and uncommitted.
+
+## 2026-07-23 GH-94 stale PR-ref recovery
+
+- GitHub accepted review-fix commit `91275ce` and synchronization commit `96a6f8e` on the #95 source branch, but repeatedly attached reopened workflow suites to stale initial SHA `6daa9f3`; Branch Protection correctly refused to treat those suites as current-head evidence.
+- PR #95 was closed and replaced by PR #96 on branch `feat/GH-94-local-byte-pattern-producer-r2` with the identical current commit set. No review or required check was bypassed.
+- Security Audit's existing manual dispatch started correctly on current head `96a6f8e`. Prometheus CI now exposes the same `workflow_dispatch` recovery trigger, allowing both protected workflows to run on the exact branch head when GitHub drops a pull-request synchronization event.
+- Product behavior and all wallet, signing, chain, KAS/PROM, reputation, slash ACL, commit-reveal, and emergency-stop boundaries remain unchanged. Replacement-PR checks and normal merge remain pending; `Prometheus-1.png` remains untouched and uncommitted.

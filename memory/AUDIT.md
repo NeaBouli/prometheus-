@@ -1241,3 +1241,13 @@ that GH-94 producer validation reused the generic bundle corpus. The API now
 distinguishes the generic bundle corpus from the separate GH-94 byte-pattern
 producer corpus. No product or workflow behavior changed; refreshed protected
 checks and normal merge remain required.
+
+CI recovery note: GitHub registered both review-fix pushes on #95 but retained
+the original PR tracking SHA for the first push and attached reopened workflow
+suites to stale commit `6daa9f3` even after the PR commit list reached current
+head `96a6f8e`. PR #95 was therefore closed, and replacement PR #96 uses the
+identical current commit set on branch
+`feat/GH-94-local-byte-pattern-producer-r2`. Security Audit's existing manual
+dispatch correctly attached to the current SHA. Prometheus CI now exposes the
+same `workflow_dispatch` recovery trigger so both required workflows can be
+executed and reviewed on the exact head without admin bypass.
