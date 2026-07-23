@@ -681,3 +681,41 @@ Remaining: durable one-time approval consumption, trusted authority rotation,
            recipient-scope policy, owner-only pairing, v2 wire/proof relation,
            actionable analysis, and all existing rollout gates
 ```
+
+## GH-111 LOCAL DURABLE OBSERVABLE APPROVAL CONSUMPTION
+
+```text
+Status: local feature branch; protected PR and exact-main evidence remain
+Base: f71740cd79e0ae788fa732f42e7f000276ea1741
+Issue: #111
+Policy: owner-only exact-schema TOML fixes one network, x-only approver public
+        key, opaque recipient-scope digest, and absolute owner-only ledger path
+Call path: service accepts canonical approval/bundle bytes plus trusted
+           in-process report nonce/current time; it constructs the GH-107
+           context itself and accepts no caller-supplied verified object,
+           authority key, recipient scope, or network
+Persistence: separate SQLite STRICT tables; BEGIN IMMEDIATE; synchronous FULL;
+             unique approval ID and (approver key, approval nonce);
+             persistent clock high-water; owner-only parent/file, no symlink
+Output: data-only local receipt with approval ID, observable commitment, and
+        consumption time; no downstream authority
+Evidence: 24 focused consumption tests; 32 combined approval tests; 214
+          complete Guardian passes with 3 intentional live-model skips;
+          280 complete Rust workspace passes with 2 intentional live-network
+          ignores; Rustfmt; warning-free all-target Clippy; locked release
+          builds; strict 21-file package; Black; full Guardian Pylint 9.78/10;
+          Memory/Autodidactic; HTML/public status; workflow YAML/Actionlint;
+          Cargo/Python audits; staged Gitleaks; clean staged diff;
+          changed production/tests Pylint 10.00/10;
+          Spark findings fixed; Terra security review found no finding and its
+          constructor-lock, transaction-abort, and corrupt/unknown-ledger
+          recommendations pass; exact STRICT table/index shape is validated
+          and only real SQLite busy/locked codes are retryable
+Boundary: no transport, pairing, promotion, disclosure, analyzer, outbox,
+          publication, proof, signing, wallet, chain, reputation, KAS/PROM,
+          slash ACL, commit-reveal, or emergency-stop change
+Remaining: protected PR and exact-main/live evidence; authority
+           ownership/rotation, scope assignment, privacy
+           review, verified hint/bundle/approval pairing, v2 relation/artifacts,
+           crash-safe external side effects, actionable analysis, and rollout
+```

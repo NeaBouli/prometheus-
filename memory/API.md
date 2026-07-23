@@ -279,7 +279,7 @@ consumption path, not accepted rule generation. A future observable-bearing
 schema/channel and any side-effecting multi-process consumer require separate
 review.
 
-### Local Threat Observable bundle APIs (GH-82/GH-86/GH-90/GH-94/GH-103/GH-107)
+### Local Threat Observable bundle APIs (GH-82/GH-86/GH-90/GH-94/GH-103/GH-107/GH-111)
 
 `docs/threat-observable-v2.md` remains the normative design draft for the
 future protocol. Merged and exact-main-verified GH-86 implements only its local canonical bundle boundary:
@@ -317,6 +317,18 @@ Python: jaeger.threat_observable.ObservableBundle
 Python GH-107 local approval verifier:
   jaeger.observable_approval.ObservableApprovalContext
   jaeger.observable_approval.verify_observable_approval(bytes, bytes, context)
+
+Python GH-111 local durable consumer:
+  jaeger.observable_approval_consumption.load_observable_approval_policy(Path)
+  jaeger.observable_approval_consumption.ObservableApprovalConsumptionService(
+    policy_path
+  )
+  service.consume(
+    approval_wire,
+    bundle_wire,
+    report_nonce=trusted_report_nonce,
+    current_time=trusted_current_time,
+  )
 ```
 
 The Rust/Python bundle validators consume the shared
@@ -378,8 +390,25 @@ most 3600 seconds, commitment recomputation, and the domain-separated BIP340
 signature. The API contains no signing/private-key path and performs no
 transport, persistence, promotion, disclosure, analysis, proof, wallet, or
 chain action. `approval_id` and `approval_nonce` identify repeated submissions
-but do not prevent replay; future consumption requires a durable one-time-use
-store and separately reviewed authority/recipient policy.
+but do not prevent replay on their own.
+
+GH-111 adds the separate local Python consumer. Its constructor loads an
+owner-only exact-schema TOML policy containing one network, x-only approver
+public key, opaque recipient-scope digest, and absolute owner-only SQLite path.
+`consume` accepts no caller-supplied verified result, authority key, recipient
+scope, or network. It constructs the GH-107 context internally from policy plus
+the trusted in-process report nonce and current time, verifies in the same call
+path, and only then commits the approval ID and `(approver key, approval nonce)`
+uniqueness marker under `BEGIN IMMEDIATE`. A persistent time high-water rejects
+clock rollback. Busy, replay, policy, verification, corruption, and storage
+failures are closed and redacted.
+
+The returned receipt contains only approval ID, observable commitment, and
+consumption time and grants no downstream authority. The API performs no
+transport, hint/bundle pairing, promotion, disclosure, analyzer invocation,
+outbox delivery, proof, signing, wallet, or chain action. Approver-key ownership
+and rotation, recipient-scope meaning/assignment, privacy policy, pairing, and
+crash-safe execution of any future external side effect remain separate gates.
 
 ---
 

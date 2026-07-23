@@ -242,6 +242,31 @@ No signer, replay ledger, transport, promotion, analyzer, proof, wallet, or
 chain schema is introduced. The nonce/ID make repeats identifiable but do not
 prevent replay.
 
+GH-111 adds a separate local Guardian persistence schema, not a protocol wire:
+
+```text
+approval_consumptions(
+  approval_id BLOB(32) PRIMARY KEY,
+  approver_xonly_public_key BLOB(32),
+  approval_nonce BLOB(32),
+  observable_commitment BLOB(32),
+  recipient_scope BLOB(32),
+  network_id TEXT,
+  not_before INTEGER,
+  expires_at INTEGER,
+  consumed_at INTEGER,
+  UNIQUE(approver_xonly_public_key, approval_nonce)
+)
+ledger_state(singleton = 1, high_water_seconds INTEGER)
+```
+
+The exact-schema owner-only TOML policy fixes `schema_version = 1`,
+`network_id`, `approver_xonly_public_key`, `recipient_scope`, and an absolute
+`ledger_path`. This schema is local replay state only. It does not define a v2
+network message, approver rotation, recipient-scope semantics, verified
+hint/bundle pairing, promotion, analyzer/outbox behavior, proof, wallet, or
+chain state.
+
 ### 2.2 ScanResult (Phi-3-mini Output)
 
 ```rust

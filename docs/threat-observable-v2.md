@@ -244,13 +244,26 @@ after Unix time zero, and is limited to 3600 seconds. All invalid input returns
 one fixed redacted error. The verifier contains no signer and performs no
 transport, persistence, promotion, disclosure, analysis, proof, wallet, or
 chain action. The signed nonce and approval ID make repeat submissions
-identifiable; they do not prevent replay. A future consuming boundary must
-persist one-time use and separately define trusted approver rotation,
-recipient-scope policy, owner-only pairing, and promotion semantics before any
-bundle may leave the local boundary.
+identifiable; the verifier alone does not prevent replay.
 In Python, the returned object is data only and its object identity is not an
-authority boundary. A future consumer must invoke verification in the same
-trusted call path and must never accept a caller-supplied result instance.
+authority boundary.
+
+GH-111 adds a separate local Python consumption boundary. It loads one exact
+`(network_id, approver_xonly_public_key, recipient_scope)` policy tuple from an
+owner-only TOML file, constructs the verification context internally, invokes
+the verifier in the same trusted call path, and only then commits the approval
+ID plus authority-bound approval nonce to a separate owner-only SQLite ledger.
+`BEGIN IMMEDIATE`, unique constraints, full synchronous durability, and a
+persistent time high-water make duplicate, concurrent, restarted, and
+clock-rollback consumption fail closed. The service never accepts a
+caller-supplied verified result, authority key, recipient scope, or network.
+Ledger rows grant no downstream authority and trigger no external action.
+
+This local gate does not define approver-key ownership or rotation, explain the
+semantics of the opaque recipient-scope digest, pair an approval with a verified
+v2 hint, authorize disclosure, or provide exactly-once execution for a future
+external side effect. Those policies and an outbox/claim design remain required
+before any bundle may leave the local boundary.
 
 ## 7. Processing Boundary
 
@@ -262,8 +275,11 @@ The safe sequence is:
 4. Canonicalize and compute `observable_commitment`.
 5. Produce a v2 proof only with an approved relation and artifacts.
 6. Verify the exact hint and bundle independently at the Guardian.
-7. Analyze only the validated observable values.
-8. Treat generated rule bytes as potentially public before committee, IPFS, or
+7. Verify and durably consume the exact local approval through the trusted
+   policy boundary.
+8. Analyze only the validated observable values after separately reviewed
+   hint/bundle/approval pairing.
+9. Treat generated rule bytes as potentially public before committee, IPFS, or
    chain submission.
 
 No v1 hint may be silently upgraded, paired with an unbound bundle, or routed
@@ -283,8 +299,11 @@ network or analyzer promotion requires:
 - an exact v2 statement specification and reviewed relation source;
 - independently approved relation, proving/verifying keys, and vectors;
 - owner-only durable pairing of one verified hint with one validated bundle;
-- durable one-time approval consumption plus replay, freshness, size,
-  concurrency, logging, and cancellation tests;
+- local durable one-time approval consumption with trusted fixed policy,
+  replay, freshness, size, concurrency, restart, lock, and owner-only storage
+  tests (implemented by GH-111 without pairing, promotion, or side effects);
+- reviewed authority rotation, recipient-scope assignment, promotion semantics,
+  and a crash-safe outbox/claim boundary for any future external action;
 - privacy review of every observable class and generated-rule publication;
 - real multi-host evidence and protected CI/Security/Pages success.
 

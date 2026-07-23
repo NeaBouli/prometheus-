@@ -946,3 +946,36 @@ Rules for all dev agents:
 - GH-109 local Memory Integrity, six Autodidactic tests, HTML/JSON-LD/public-status, stale-candidate scan, and clean-diff checks pass. Spark found two short merge-SHA references in Checkpoint/TODO; both now use the full exact SHA, and its read-only re-review reports no remaining actionable finding.
 - Scope estimates remain core 78-82%, complete vision 44-49%, and 51-56% remaining. Durable one-time approval consumption, authority/policy management, external provenance/privacy promotion, v2 proof artifacts, actionable analysis, real multi-host operation, H-001 execution, six deployments, metrics transition, PROM emission, and production nodes remain open.
 - No wallet, private key, secret, signature, raw transaction, broadcast, contract, Guardian/reporter authorization, reputation, KAS/PROM, slash ACL, commit-reveal behavior, emergency-stop policy, or foreign untracked file was accessed or changed. `Prometheus-1.png` remains untouched and uncommitted.
+## 2026-07-23 — GH-111 local durable Observable Approval consumption started
+
+- Created issue #111 and branch `feat/GH-111-local-observable-approval-consumption`
+  from exact main `f71740cd79e0ae788fa732f42e7f000276ea1741`.
+- Added an owner-only exact-schema fixed network/approver-key/recipient-scope
+  policy loader and a separate owner-only SQLite consumption ledger.
+- The service constructs trusted verification context internally, invokes
+  GH-107 verification in the same call path, then atomically consumes approval
+  ID and authority-bound nonce with persistent clock high-water.
+- Added restart, concurrent duplicate, nonce reuse, wrong authority/scope/
+  network/report nonce, expiry, malformed bundle, lock/retry, constructor lock,
+  transaction rollback, unsafe path/mode/symlink, corrupt/unknown schema, API
+  closure, and redacted-error coverage.
+- Focused consumption tests pass (24), combined approval tests pass (32), all
+  214 Guardian tests pass with three intentional live-model skips, and
+  changed-file Pylint is 10.00/10 (complete package 9.78/10). Repository-wide
+  and protected checks remain.
+- Spark review findings on bounded busy retry and relative policy paths were
+  fixed. Terra security review found no finding; all three residual test
+  recommendations were implemented. Final Sol review added exact STRICT
+  table/index-shape validation and retryable classification only for real
+  SQLite busy/locked codes. Claude Code could not read the branch because its
+  monthly usage limit remains exhausted.
+- No transport, pairing, promotion, disclosure, analyzer, outbox, proof,
+  signing, wallet, chain, KAS/PROM, slash ACL, commit-reveal, reputation, or
+  emergency-stop behavior changed. `Prometheus-1.png` remains untouched.
+- Complete local gates pass: 280 Rust workspace tests with two intentional
+  live-network ignores; Rustfmt; warning-free all-target Clippy; locked
+  optimized Guardian/proof builds; strict 21-file ThreatHint package; Black;
+  complete Guardian Pylint 9.78/10; Memory Integrity; six Autodidactic tests;
+  HTML/JSON-LD/public status; workflow YAML; Actionlint 1.7.12; Cargo Audit
+  with no vulnerabilities and eight allowed warnings; Python Audit with no
+  known vulnerabilities; staged Gitleaks 8.30.1; and clean staged diff.
