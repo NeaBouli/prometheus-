@@ -8,10 +8,12 @@ import json
 import os
 import shutil
 import sqlite3
+import stat
 import tempfile
 import threading
 from dataclasses import replace
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -163,7 +165,7 @@ def test_kip16_adapter_timeout_and_permissions_fail_closed() -> None:
         hint = make_hint()
         with pytest.raises(ThreatProofVerifierUnavailable):
             verifier.verify(hint, hint.to_wire(), CONTEXT)
-        os.chmod(binary, 0o722)
+        binary.chmod(binary.stat().st_mode | stat.S_IWOTH)
         with pytest.raises(ThreatProofVerifierUnavailable):
             verifier.verify(hint, hint.to_wire(), CONTEXT)
         with pytest.raises(ThreatHintIngressError, match="not trusted"):
@@ -171,6 +173,30 @@ def test_kip16_adapter_timeout_and_permissions_fail_closed() -> None:
         os.chmod(binary, 0o700)
         os.chmod(manifest, 0o644)
         with pytest.raises(ThreatHintIngressError, match="owner-only"):
+            Kip16Groth16Verifier(binary, manifest, "11" * 32)
+    finally:
+        shutil.rmtree(directory)
+
+
+def test_kip16_adapter_rejects_untrusted_binary_ancestor(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    directory = owner_only_directory().resolve()
+    try:
+        binary, manifest = verifier_fixture(directory, 0)
+        original_stat = Path.stat
+
+        def stat_with_untrusted_owner(path: Path, *args: object, **kwargs: object):
+            result = original_stat(path, *args, **kwargs)
+            if path == directory:
+                return SimpleNamespace(
+                    st_mode=result.st_mode,
+                    st_uid=os.getuid() + 1,
+                )
+            return result
+
+        monkeypatch.setattr(Path, "stat", stat_with_untrusted_owner)
+        with pytest.raises(ThreatHintIngressError, match="parent is not trusted"):
             Kip16Groth16Verifier(binary, manifest, "11" * 32)
     finally:
         shutil.rmtree(directory)

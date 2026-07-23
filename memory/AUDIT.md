@@ -970,3 +970,10 @@ remain blocking operational evidence.
 Final independent re-review after full process-group timeout cleanup, service
 connection/path bounds, special-mode rejection, and public documentation
 synchronization reports no remaining blocking, high, or medium finding.
+
+Protected CodeRabbit review subsequently found that binary ancestors rejected
+group/other-writable modes but did not restrict directory ownership. GH-63 now
+requires every verifier-binary ancestor to be owned by root or the effective
+user and includes a non-root/non-user owner regression. The complete Guardian
+suite passes under Python 3.11 with 144 passes and three intentional live-model
+skips; 18 focused ingress/service tests, Black, Ruff, and Pylint 9.80/10 pass.

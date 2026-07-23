@@ -771,7 +771,11 @@ def _validate_verifier_binary(path: Path) -> Path:
         raise ThreatHintIngressError("verifier binary is not trusted")
     for parent in path.parents:
         parent_stat = parent.stat()
-        if not stat.S_ISDIR(parent_stat.st_mode) or parent_stat.st_mode & 0o022:
+        if (
+            not stat.S_ISDIR(parent_stat.st_mode)
+            or parent_stat.st_mode & 0o022
+            or parent_stat.st_uid not in {0, os.getuid()}
+        ):
             raise ThreatHintIngressError("verifier binary parent is not trusted")
     return resolved
 

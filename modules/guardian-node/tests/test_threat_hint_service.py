@@ -106,7 +106,10 @@ def test_config_rejects_unknown_fields_and_unsafe_mode() -> None:
             load_service_config(clean)
         traversal = oversized.replace(
             "max_connections = 1025", "max_connections = 4"
-        ).replace(str(directory / "threat-hint.sock"), "/tmp/../threat-hint.sock")
+        ).replace(
+            str(directory / "threat-hint.sock"),
+            str(directory / ".." / "threat-hint.sock"),
+        )
         clean.write_text(traversal, encoding="ascii")
         with pytest.raises(ThreatHintIngressError, match="canonical path"):
             load_service_config(clean)

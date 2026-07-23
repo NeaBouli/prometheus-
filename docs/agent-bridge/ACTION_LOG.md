@@ -696,3 +696,11 @@ Rules for all dev agents:
 - Locked optimized builds pass for `prometheus-guardian-p2p` and `prometheus-threat-proof`; Cargo packages contain 6 schema files, 14 Guardian files, and 7 verifier files. One unchanged ballot timeout test failed once only under concurrent heavy Cargo load; the earlier and final isolated complete Guardian runs passed.
 - PR #64's first Python Guardian job exposed a Linux-only fixture issue: default `tempfile` used world-writable `/tmp`, which the verifier correctly rejects as an untrusted binary ancestor. The fixture now creates its owner-only directory under the test user's home and resolves it canonically; production validation was not weakened.
 - No wallet, private key, secret, signature, raw transaction, broadcast, contract, Guardian/reporter authorization, reputation, KAS/PROM, slash ACL, commit-reveal behavior, emergency-stop policy, or foreign untracked file was accessed or changed. `Prometheus-1.png` remains untouched and uncommitted.
+
+## 2026-07-23 GH-63 protected review hardening
+
+- All nine GitHub CI/Security jobs passed on PR #64 before review completion. CodeRabbit then identified that verifier-binary ancestor directories were checked for type and writable mode but not owner identity.
+- Ancestor validation now requires every directory to be owned by root or the effective user in addition to being a non-writable directory. A regression simulates a non-root, non-user owner and proves fail-closed construction.
+- The traversal fixture now derives its deliberately noncanonical path from the owner-only test directory. The unsafe-mode fixture still sets a real non-owner write bit through a symbolic mode expression; the suggested `0o744` was not used because the production policy intentionally allows read-only group/world bits and that value would invalidate the negative test.
+- CodeRabbit's date warning is not a repository defect: the work was completed on 2026-07-23 EEST while the GitHub review timestamp was still 2026-07-22 UTC. Project logs consistently use the configured local timezone.
+- No wallet, private key, secret, signature, raw transaction, broadcast, contract, Guardian/reporter authorization, reputation, KAS/PROM, slash ACL, commit-reveal behavior, emergency-stop policy, or foreign untracked file was accessed or changed. `Prometheus-1.png` remains untouched and uncommitted.
