@@ -1368,3 +1368,68 @@ Non-claims: the index is a local selection and the scope label is parser
 policy, not proof of external artifact provenance, host OS, maliciousness,
 privacy approval, disclosure authorization, v2 relation binding, analysis,
 publication, or production acceptance.
+
+## GH-107 LOCAL OBSERVABLE APPROVAL VERIFIER (2026-07-23)
+
+Scope: one isolated Rust/Python verifier authenticates one canonical,
+short-lived BIP340 approval statement for one exact `review_required_v1`
+Observable Bundle. It is not imported by ThreatHint v1, P2P, proof, Guardian
+ingress/analyzer, committee, IPFS, chain, wallet, signing, reputation, or
+reward paths.
+
+Result: PASS for the focused local statement-authentication boundary. Both
+implementations cap the canonical approval at 1024 bytes, reject duplicate,
+unknown, reordered, noncanonical, malformed, oversized, expired, future,
+cross-network, wrong-key, wrong-recipient, wrong-nonce, wrong-commitment, and
+tampered-signature inputs with one fixed error. The verifier reparses the exact
+bundle, requires `review_required_v1`, recomputes its commitment from the
+trusted network/report nonce, enforces an inclusive maximum-one-hour validity
+window, and verifies a domain-separated BIP340 digest. Rust and Python also
+derive the same domain-separated approval ID.
+
+Cross-language evidence: one public-only fixture binds exact bundle bytes,
+report nonce, trusted x-only key, recipient-scope digest, times, approval
+nonce, signing body/digest, signature, full wire, and approval ID. Rust and
+Python independently recompute the commitment and both SHA-256 domains and
+verify the same signature. No private key, signing API, raw transaction, or
+wallet material is present.
+
+Review: Sol found and fixed a Python field-order parity gap before closeout.
+Claude Code then reviewed both production modules. Its high-severity concern
+about an implicit Python rehash was disproved against pinned `coincurve
+21.0.0`: `PublicKeyXOnly.verify` forwards the supplied message and length
+directly to `secp256k1_schnorrsig_verify`. Its valid `u64` parity and explicit
+replay non-claim recommendations were implemented. The pinned constructor and
+verify paths raise the already redacted `ValueError`/`TypeError` classes for
+malformed inputs.
+
+Evidence: all 15 Rust unit tests, 23 Rust integration tests, and one
+compile-fail doctest in `prometheus-threat-hint` pass. The 27 focused Python
+observable/approval tests pass. Complete local evidence is 280 Rust workspace
+passes with two intentional live-network ignores and 190 Guardian passes with
+three intentional live-model skips. Rustfmt, warning-free workspace all-target
+Clippy, locked Guardian/proof release builds, the verified 21/14/7-file package
+set, Black, Guardian Pylint 9.78/10, Memory Integrity, six Autodidactic tests,
+HTML/JSON-LD/public-status checks, workflow YAML, Actionlint 1.7.12, Cargo
+Audit with no vulnerabilities and eight known allowed warnings, Python audit
+with no vulnerabilities, staged Gitleaks 8.30.1 with no leak, and clean diff
+checks pass.
+
+Non-claims: verification authenticates one local statement only. It performs
+no signing, durable replay prevention, transport, promotion, disclosure,
+analysis, publication, proof acceptance, wallet, chain, reputation, KAS/PROM,
+slash ACL, commit-reveal, or emergency-stop action. The signed nonce and
+approval ID identify repeats but do not prevent replay. Durable one-time
+consumption, trusted authority rotation, recipient-scope policy, owner-only
+pairing, v2 proof binding, and actionable analysis remain separate gates.
+
+Independent Terra follow-up found one high-severity Python subclass bypass and
+one medium object-forgery integration risk. The verifier now requires the exact
+`ObservableApprovalContext` type before calling its validator, and an
+adversarial subclass with overridden validation/comparisons is rejected. The
+Python result is explicitly data only: its object identity grants no authority,
+and future consumers must invoke verification in the same trusted call path
+rather than accept a caller-supplied instance. Focused and full checks must be
+rerun after this review fix. The focused and complete Guardian suites passed
+after the fix, and Terra's read-only re-review reports no remaining actionable
+finding.

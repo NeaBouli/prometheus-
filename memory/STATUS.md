@@ -639,3 +639,41 @@ Remaining: external provenance/privacy approval; other platform/format
            extractors; v2 wire/proof/pairing; actionable analysis and all
            existing rollout gates
 ```
+
+## GH-107 LOCAL OBSERVABLE APPROVAL VERIFIER
+
+```text
+Status: local candidate on feat/GH-107-local-observable-approval; protected
+        PR and exact-main evidence pending
+Input: one canonical approval wire, one exact canonical review_required_v1
+       bundle, and separately trusted report nonce, x-only approver key,
+       recipient-scope digest, network, and caller-supplied current time
+Checks: exact 1024-byte-bounded field order/lowercase hex; fixed purpose;
+        inclusive nonzero validity capped at 3600 seconds; exact bundle
+        reparsing/commitment; trusted key/scope/network; domain-separated
+        BIP340 signature
+Output: opaque verified result with deterministic approval ID and signed nonce
+Vectors: one public-only shared corpus; no private key or signer ships
+Evidence: 15 Rust unit tests, 23 Rust integration tests plus 1 compile-fail
+          doctest across prometheus-threat-hint; 27 focused Python
+          observable/approval tests; 280 complete workspace Rust passes with
+          2 intentional live-network ignores; 190 complete Guardian passes
+          with 3 intentional live-model skips; Rustfmt, warning-free workspace
+          all-target Clippy, locked release builds, package checks, Black,
+          Pylint 9.78/10, Memory/Autodidactic, HTML/JSON-LD, Actionlint,
+          Cargo/Python audits, and staged Gitleaks pass
+Review: Claude Code suspected coincurve rehashing; inspection of pinned
+        coincurve 21.0.0 proves direct message forwarding to
+        secp256k1_schnorrsig_verify. Its valid u64-parity/replay-documentation
+        recommendations are implemented. Sol fixed Python field-order parity.
+        Terra found and then rechecked exact context-type enforcement for a
+        subclass bypass plus Python result-authority documentation; no
+        unresolved finding remains.
+Boundary: authenticates a local statement only; no signing/private key,
+          replay persistence, transport, promotion, disclosure, analyzer,
+          publication, proof, wallet, chain, reputation, KAS/PROM, slash ACL,
+          commit-reveal, or emergency-stop change
+Remaining: durable one-time approval consumption, trusted authority rotation,
+           recipient-scope policy, owner-only pairing, v2 wire/proof relation,
+           actionable analysis, and all existing rollout gates
+```

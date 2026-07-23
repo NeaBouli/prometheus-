@@ -533,7 +533,7 @@ fn validate_byte_pattern(value: &str) -> Result<(), ObservableBundleError> {
     Ok(())
 }
 
-fn validate_network_id(network_id: &str) -> Result<(), ObservableBundleError> {
+pub(crate) fn validate_network_id(network_id: &str) -> Result<(), ObservableBundleError> {
     if network_id.len() < MIN_NETWORK_LEN || network_id.len() > MAX_NETWORK_LEN {
         return Err(ObservableBundleError::InvalidNetworkId);
     }

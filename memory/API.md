@@ -279,7 +279,7 @@ consumption path, not accepted rule generation. A future observable-bearing
 schema/channel and any side-effecting multi-process consumer require separate
 review.
 
-### Local Threat Observable bundle APIs (GH-82/GH-86/GH-90/GH-94/GH-103)
+### Local Threat Observable bundle APIs (GH-82/GH-86/GH-90/GH-94/GH-103/GH-107)
 
 `docs/threat-observable-v2.md` remains the normative design draft for the
 future protocol. Merged and exact-main-verified GH-86 implements only its local canonical bundle boundary:
@@ -302,11 +302,21 @@ Rust GH-94 merged/exact-main (validated with separate producer vectors):
 Rust GH-103 local Linux ELF producer:
   produce_elf_api_import_bundle(&[u8], usize)
 
+Rust GH-107 local approval verifier:
+  ObservableApprovalContext::new(
+    &[u8; 32], &[u8; 32], &[u8; 32], &str, u64
+  )
+  verify_observable_approval(&[u8], &[u8], &ObservableApprovalContext)
+
 Python: jaeger.threat_observable.ObservableBundle
   parse_canonical(bytes)
   canonical_bytes
   commitment(network_id, report_nonce_hex)
   commitment_matches(expected, network_id, report_nonce_hex, wire)
+
+Python GH-107 local approval verifier:
+  jaeger.observable_approval.ObservableApprovalContext
+  jaeger.observable_approval.verify_observable_approval(bytes, bytes, context)
 ```
 
 The Rust/Python bundle validators consume the shared
@@ -317,6 +327,10 @@ GH-103 producer validation consumes
 `modules/threat-hint/tests/vectors/threat-observable-elf-api-import-producer-v1.json`;
 Python independently parses that exact ELF64 dynamic-symbol fixture before
 validating the canonical bundle bytes.
+GH-107 consumes the public-only
+`modules/threat-hint/tests/vectors/threat-observable-approval-v1.json` vector;
+Rust and Python independently recompute the bundle commitment, signing digest,
+BIP340 verification result, and deterministic approval ID.
 Rust public bundle types cannot be deserialized directly, and Python direct
 constructors are disabled; commitment calculation is reachable through a
 validated parsed bundle. Value-bearing Rust `Debug` and Python `repr` output is
@@ -353,6 +367,18 @@ dynamic symbols, sorts and deduplicates by exact ASCII bytes, and derives
 `linux`/`elf` scope internally. Every result is `review_required_v1`. It
 accepts no path, import string, caller-supplied scope, or generic value and
 performs no transport, proof, analyzer, wallet, signing, or chain operation.
+
+The GH-107 candidate verifies one exact canonical approval envelope for one
+exact `review_required_v1` bundle. The trusted context supplies the report
+nonce, exact x-only approver key, recipient-scope digest, network, and current
+time. Both implementations enforce a 1024-byte wire cap, exact field order and
+lowercase hex, fixed purpose `guardian_analysis_v1`, inclusive validity of at
+most 3600 seconds, commitment recomputation, and the domain-separated BIP340
+signature. The API contains no signing/private-key path and performs no
+transport, persistence, promotion, disclosure, analysis, proof, wallet, or
+chain action. `approval_id` and `approval_nonce` identify repeated submissions
+but do not prevent replay; future consumption requires a durable one-time-use
+store and separately reviewed authority/recipient policy.
 
 ---
 

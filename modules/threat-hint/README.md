@@ -55,8 +55,7 @@ emits one `public_auto_v1` digest. `produce_byte_pattern_bundle` selects a
 bounded 8..=64-byte range from exact caller-supplied bytes, replaces positions
 chosen by a boolean mask with `??`, requires at least eight fixed bytes, and
 always emits `review_required_v1`. Neither profile authorizes transport, and
-the byte-pattern result must remain local until a separate authenticated
-approval protocol is specified and reviewed.
+the byte-pattern result must remain local.
 
 `produce_elf_api_import_bundle` accepts exact Linux ELF bytes plus one checked
 index, derives scope internally, validates and byte-sorts/deduplicates dynamic
@@ -65,3 +64,23 @@ parser rejects artifacts above 16 MiB and dynamic-symbol tables above 4096
 entries. It accepts no path, caller-supplied import string, platform, format,
 or generic value. The result remains local and does not prove provenance,
 maliciousness, privacy approval, or disclosure authorization.
+
+## Observable Approval v1 (local verification only)
+
+`verify_observable_approval` verifies one exact canonical, BIP340-authenticated
+approval statement for one exact `review_required_v1` bundle. The caller must
+provide a separately trusted report nonce, x-only approver public key,
+recipient-scope digest, network ID, and current time. The verifier recomputes
+the bundle commitment, enforces an inclusive validity window of at most one
+hour, verifies the signature over a domain-separated canonical body, and
+returns an opaque result with a deterministic approval ID.
+
+The Rust verifier and isolated Python counterpart consume one shared
+public-only vector. No signing or private-key API exists. Verification performs
+no transport, persistence, analyzer promotion, disclosure, publication, proof,
+wallet, or chain action. The approval nonce and ID identify repeated
+submissions but do not prevent replay; any future consumer must implement
+durable one-time use and a separately reviewed authority and recipient policy.
+The Python return value is data only: object identity is never authorization,
+and a future consumer must invoke verification within its own trusted call
+path rather than accept a caller-supplied result object.
