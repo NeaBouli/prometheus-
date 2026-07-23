@@ -3,9 +3,11 @@
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
+mod byte_pattern_producer;
 mod file_sha256_producer;
 pub mod observable_bundle;
 
+pub use byte_pattern_producer::produce_byte_pattern_bundle;
 pub use file_sha256_producer::produce_file_sha256_bundle;
 pub use observable_bundle::{
     DisclosurePolicy, ObservableBundle, ObservableBundleError, ObservableKind, ObservableScope,

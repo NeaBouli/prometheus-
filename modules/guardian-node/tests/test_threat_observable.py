@@ -34,6 +34,13 @@ _PRODUCER_VECTOR_PATH = (
     / "vectors"
     / "threat-observable-file-sha256-producer-v1.json"
 )
+_BYTE_PATTERN_PRODUCER_VECTOR_PATH = (
+    Path(__file__).resolve().parents[2]
+    / "threat-hint"
+    / "tests"
+    / "vectors"
+    / "threat-observable-byte-pattern-producer-v1.json"
+)
 
 
 def _unique_object(items: list[tuple[str, object]]) -> dict:
@@ -304,3 +311,56 @@ def test_rust_file_sha256_producer_vectors_validate_independently() -> None:
         assert len(bundle.observables) == 1
         assert bundle.observables[0].kind == ObservableKind.FILE_SHA256
         assert bundle.observables[0].value == expected_digest
+
+
+def test_rust_byte_pattern_producer_vectors_validate_independently() -> None:
+    raw = _BYTE_PATTERN_PRODUCER_VECTOR_PATH.read_text(encoding="utf-8")
+    producer_vectors = json.loads(raw, object_pairs_hook=_unique_object)
+
+    assert set(producer_vectors.keys()) == {"vector_schema_version", "cases"}
+    assert producer_vectors["vector_schema_version"] == 1
+    assert len(producer_vectors["cases"]) >= 3
+
+    names = set()
+    for case in producer_vectors["cases"]:
+        assert set(case.keys()) == {
+            "name",
+            "artifact_hex",
+            "start",
+            "wildcard_mask",
+            "platform",
+            "format",
+            "byte_pattern",
+            "wire_hex",
+        }
+        assert case["name"] not in names
+        names.add(case["name"])
+        assert type(case["start"]) is int
+        assert case["start"] >= 0
+        assert isinstance(case["wildcard_mask"], list)
+        assert all(type(wildcard) is bool for wildcard in case["wildcard_mask"])
+        assert 8 <= len(case["wildcard_mask"]) <= 64
+        assert sum(not wildcard for wildcard in case["wildcard_mask"]) >= 8
+
+        artifact = bytes.fromhex(case["artifact_hex"])
+        wire = bytes.fromhex(case["wire_hex"])
+        assert artifact.hex() == case["artifact_hex"]
+        assert wire.hex() == case["wire_hex"]
+
+        end = case["start"] + len(case["wildcard_mask"])
+        assert end <= len(artifact)
+        selected = artifact[case["start"] : end]
+        expected_pattern = " ".join(
+            "??" if wildcard else f"{byte:02x}"
+            for byte, wildcard in zip(selected, case["wildcard_mask"], strict=True)
+        )
+        assert expected_pattern == case["byte_pattern"]
+
+        bundle = ObservableBundle.parse_canonical(wire)
+        assert bundle.canonical_bytes == wire
+        assert bundle.disclosure_policy == DisclosurePolicy.REVIEW_REQUIRED_V1
+        assert bundle.scope.platform == ScopePlatform(case["platform"])
+        assert bundle.scope.format == ScopeFormat(case["format"])
+        assert len(bundle.observables) == 1
+        assert bundle.observables[0].kind == ObservableKind.BYTE_PATTERN
+        assert bundle.observables[0].value == expected_pattern

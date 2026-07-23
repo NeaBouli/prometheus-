@@ -121,8 +121,8 @@ the merged/exact-main-verified GH-63 verifier and GH-74 analyzer-domain adapter;
 the complete roadmap vision is about 44-49% complete. These values distinguish
 prepared software from real chain operation and are not release guarantees.
 Latest verified product/public main
-`e7f34bb438d4d2cee43db9e8c019f05b9ced0f33` passed Prometheus CI
-`29984477087`, Security Audit `29984476876`, and Pages `29984476107`.
+`2ad2c44f37ec15ab2004b83daa5a8891945db1b3` passed Prometheus CI
+`29985377659`, Security Audit `29985377455`, and Pages `29985377181`.
 The GH-82 design/public exact main
 `fceff1d3ae6db0f38c0076bc2c8dc82f34c3d96d` passed CI `29977301070`,
 Security `29977301063`, and Pages `29977300539`.
@@ -158,6 +158,20 @@ wallet, signing, or chain input. This is deterministic function-boundary
 derivation only; external provenance, privacy approval, and proof binding
 remain open. Exact-main Prometheus CI `29984477087`, Security Audit
 `29984476876`, and Pages `29984476107` passed.
+Issue #94 and branch `feat/GH-94-local-byte-pattern-producer` add one local
+Rust producer for a bounded `byte_pattern` derived from exact caller-supplied
+bytes, checked offset, boolean wildcard mask, and typed scope. It accepts no
+path or pattern string, requires 8..=64 positions and at least eight fixed
+bytes, and always emits local-only `review_required_v1`. Shared vectors cover
+fixed, offset/wildcard, script, and 64-token/minimum-fixed boundaries; Python
+independently derives and validates the expected wire. Focused Rust and Python
+checks pass, and independent Terra review reports no blocking/high/medium
+finding. The complete workspace passes 265 Rust tests plus one compile-fail
+doctest with two intentional live-network ignores; Guardian passes 181 tests
+with three intentional live-model skips. Full formatting, lint, package,
+Memory, Pages, workflow, and dependency checks pass. Protected PR/exact-main
+evidence remains open. External provenance, maliciousness, privacy approval,
+disclosure authorization, transport, and proof binding remain unproved.
 The unchanged execution-artifact baseline remains exact main `205e1ca`.
 
 ## GH-13 EXPERIMENTAL MINER COMPANION STATUS

@@ -15,8 +15,9 @@ const MIN_NETWORK_LEN: usize = 2;
 const MAX_NETWORK_LEN: usize = 64;
 const MAX_API_IMPORT_LEN: usize = 96;
 const NONCE_BYTES: usize = 32;
-const MIN_BYTE_PATTERN_TOKENS: usize = 8;
-const MAX_BYTE_PATTERN_TOKENS: usize = 64;
+pub(crate) const MIN_BYTE_PATTERN_TOKENS: usize = 8;
+pub(crate) const MAX_BYTE_PATTERN_TOKENS: usize = 64;
+pub(crate) const MIN_FIXED_BYTE_PATTERN_TOKENS: usize = 8;
 const COMMITMENT_DOMAIN: &[u8] = b"prometheus-threat-observable-bundle-v1\0";
 
 #[derive(Debug, Error, PartialEq, Eq)]
@@ -205,6 +206,41 @@ impl ObservableBundle {
             observables: vec![ObservableBundleObservable {
                 kind: ObservableKind::FileSha256,
                 value: hex::encode(digest),
+            }],
+        };
+        bundle.to_canonical_bytes()?;
+        Ok(bundle)
+    }
+
+    pub(crate) fn from_byte_pattern_tokens(
+        platform: ScopePlatform,
+        format: ScopeFormat,
+        tokens: &[Option<u8>],
+    ) -> Result<Self, ObservableBundleError> {
+        if !(MIN_BYTE_PATTERN_TOKENS..=MAX_BYTE_PATTERN_TOKENS).contains(&tokens.len())
+            || tokens.iter().flatten().count() < MIN_FIXED_BYTE_PATTERN_TOKENS
+        {
+            return Err(ObservableBundleError::InvalidObservable);
+        }
+
+        let mut value = String::with_capacity(tokens.len() * 3 - 1);
+        for (index, token) in tokens.iter().enumerate() {
+            if index != 0 {
+                value.push(' ');
+            }
+            match token {
+                Some(byte) => value.push_str(&hex::encode([*byte])),
+                None => value.push_str("??"),
+            }
+        }
+
+        let bundle = ObservableBundle {
+            schema_version: Self::SCHEMA_VERSION,
+            disclosure_policy: DisclosurePolicy::ReviewRequiredV1,
+            scope: ObservableScope { platform, format },
+            observables: vec![ObservableBundleObservable {
+                kind: ObservableKind::BytePattern,
+                value,
             }],
         };
         bundle.to_canonical_bytes()?;
@@ -471,7 +507,7 @@ fn validate_byte_pattern(value: &str) -> Result<(), ObservableBundleError> {
         fixed += 1;
     }
 
-    if fixed < 8 {
+    if fixed < MIN_FIXED_BYTE_PATTERN_TOKENS {
         return Err(ObservableBundleError::InvalidObservable);
     }
 
