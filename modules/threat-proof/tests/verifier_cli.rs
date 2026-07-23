@@ -185,7 +185,7 @@ fn run_with_stdin_policy(
     child.wait_with_output().expect("wait for verifier")
 }
 
-fn assert_preflight_unavailable(output: Output) {
+fn assert_unavailable_silently(output: Output) {
     assert_eq!(output.status.code(), Some(3));
     assert!(output.stdout.is_empty());
     assert!(output.stderr.is_empty());
@@ -258,13 +258,13 @@ fn semantic_tamper_and_trailing_proof_fail_as_invalid() {
 #[test]
 fn wrong_network_or_manifest_anchor_is_unavailable() {
     let fixture = fixture();
-    assert_preflight_unavailable(run_allowing_preflight_exit(
+    assert_unavailable_silently(run(
         &fixture,
         &fixture.wire,
         "testnet-11",
         &fixture.manifest_sha256,
     ));
-    assert_preflight_unavailable(run_allowing_preflight_exit(
+    assert_unavailable_silently(run_allowing_preflight_exit(
         &fixture,
         &fixture.wire,
         "testnet-10",
@@ -277,7 +277,7 @@ fn unsafe_manifest_mode_is_unavailable() {
     let fixture = fixture();
     fs::set_permissions(&fixture.manifest_path, fs::Permissions::from_mode(0o644))
         .expect("make manifest unsafe");
-    assert_preflight_unavailable(run_allowing_preflight_exit(
+    assert_unavailable_silently(run_allowing_preflight_exit(
         &fixture,
         &fixture.wire,
         "testnet-10",
@@ -293,7 +293,7 @@ fn placeholder_relation_source_anchor_is_unavailable() {
     manifest.relation_source_sha256 = "00".repeat(32);
     let placeholder = serde_json::to_vec(&manifest).expect("serialize placeholder manifest");
     secure_write(&fixture.manifest_path, &placeholder);
-    assert_preflight_unavailable(run_allowing_preflight_exit(
+    assert_unavailable_silently(run_allowing_preflight_exit(
         &fixture,
         &fixture.wire,
         "testnet-10",
