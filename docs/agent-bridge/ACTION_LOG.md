@@ -1000,3 +1000,65 @@ Rules for all dev agents:
 - No secret, wallet, signing, transaction, broadcast, KAS/PROM, slash ACL,
   commit-reveal, reputation, emergency-stop, or foreign untracked file was
   accessed or changed. `Prometheus-1.png` remains untouched.
+
+## 2026-07-24 - GH-114 canonical ThreatHint v2 statement started
+
+- Opened issue https://github.com/NeaBouli/prometheus-/issues/114 and branch
+  `feat/GH-114-local-threat-hint-v2-statement` from exact documentation-closeout
+  main `e096ee52bace485faed0d0a0e70c25f6aa3311e5`.
+- The acceptance contract defines a separate local canonical v2 statement with
+  exact ordered fields for schema version, artifact hash, observable
+  commitment, confidence, disclosure class, report nonce, observed time, and
+  network. A separately trusted network must match the wire exactly.
+- Existing ThreatHint v1 remains byte- and API-identical. This slice adds no
+  signer, proof acceptance/promotion, transport, persistence, approval pairing,
+  analyzer, outbox, wallet, transaction, chain, KAS/PROM, slash ACL,
+  commit-reveal, reputation, or emergency-stop behavior.
+- The Claude Code terminal probe passed, but the bounded read-only helper
+  request stopped before repository access with `Exceeded USD budget (0.25)`;
+  Claude produced no review or edit. Independent Terra review confirmed the
+  full preferred statement shape and the required Rust/Python parity, shared
+  vectors, domain separation, trusted-network check, and explicit non-claims.
+  Sol retains implementation and final-review ownership.
+- No secret, wallet, signing material, private key, raw transaction, broadcast,
+  or foreign untracked file was accessed. `Prometheus-1.png` remains untouched.
+- Implemented separate Rust and Python canonical parsers with private parsed
+  state, exact reserialization, 1024-byte cap, fixed lowercase hashes/nonces,
+  confidence/u64/disclosure/network checks, separately trusted network
+  equality, and one length-prefixed domain-separated statement digest.
+- Added one shared exact-byte corpus with 8 valid and 20 invalid cases. Every
+  field mutation changes the digest; duplicate/unknown/reordered/whitespace/
+  escaping/type/range/network/trailing cases fail closed with one redacted
+  error in both languages.
+- Focused evidence passes all 20 ThreatHint unit tests, every crate integration
+  suite, two compile-fail doctests, nine Python tests, Rustfmt, warning-free
+  crate all-target Clippy, Black, and changed-source Pylint 10.00/10.
+- Terra architecture review and Spark focused parity/security review found no
+  initial issue. Final Terra review found one medium Python valid-shape
+  mutation/forged-object gap. An identity-bound weak parse snapshot plus
+  valid-shape mutation and manually forged exact-class regressions close it;
+  targeted re-review reports no remaining blocking, high, or medium issue.
+  This hardens parsed-object integrity but grants no authority against arbitrary
+  code in the same interpreter.
+- Complete local gates pass: 290 Rust workspace tests with two intentional
+  live-network ignores; 223 Guardian tests with three intentional live-model
+  skips; two compile-fail doctests; Rustfmt; warning-free workspace all-target
+  Clippy; locked optimized Guardian/proof builds; verified 24/14/7-file package
+  set; Black; changed-file Pylint 10.00/10; complete Guardian Pylint 9.80/10;
+  Memory Integrity; six Autodidactic tests; HTML/SEO/JSON-LD/public status;
+  workflow YAML; Actionlint 1.7.12; Cargo Audit with no vulnerabilities and
+  eight allowed warnings; Python Audit with no known vulnerabilities; staged
+  Gitleaks 8.30.1 with no leak; and clean staged diff.
+- Commit `b923643` was pushed and protected PR
+  https://github.com/NeaBouli/prometheus-/pull/115 opened. Its first Prometheus
+  CI `30017135102` and Security Audit `30017136619` round passed every technical
+  job without admin bypass.
+- CodeRabbit found four minor consistency points: distinguish statement
+  `network_id` digest input from separately trusted parser context, name
+  positive-u64 `observed_at` precisely, make the Python network regex itself
+  enforce the existing two-character minimum, and synchronize the public HTML
+  digest wording. All four are fixed. Post-fix evidence passes nine focused and
+  223 complete Guardian tests with three intentional skips, Black, source
+  Pylint 10.00/10, HTML/SEO/JSON-LD/public-status checks, Memory Integrity, six
+  Autodidactic tests, and clean diff checks. Second-round protected checks,
+  thread resolution, merge, exact-main runs, and live markers remain.

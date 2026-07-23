@@ -346,9 +346,9 @@ BIP340 verification result, and deterministic approval ID.
 Rust public bundle types cannot be deserialized directly, and Python direct
 constructors are disabled; commitment calculation is reachable through a
 validated parsed bundle. Value-bearing Rust `Debug` and Python `repr` output is
-disabled. A new ThreatHint v2 wire, proof statement/relation, owner-only
-pairing, analyzer promotion, and network protocol require separate review and
-remain unavailable.
+disabled. GH-114 adds only isolated canonical ThreatHint v2 statement parsing
+and digest parity. A reviewed v2 relation/proof, owner-only pairing, analyzer
+promotion, and network protocol require separate review and remain unavailable.
 
 The local validator checks canonical structure, exact kind/value grammar,
 ordering, bounds, and commitment context only. It does not prove that an
@@ -471,11 +471,38 @@ Both require exact EOF. QUIC-v1 direct and relay-circuit routes are implemented.
 No TCP port, generic PROM header, handshake-based identity, or transport ZK
 authentication is implemented. `PeerId` never grants application authority.
 
+### Isolated local ThreatHint v2 statement
+
+```text
+Rust:
+  ThreatHintV2Statement::parse_canonical(wire, trusted_network_id)
+  statement.to_canonical_bytes()
+  statement.statement_digest()
+
+Python:
+  ThreatHintV2Statement.parse_canonical(wire, trusted_network_id)
+  statement.canonical_bytes
+  statement.statement_digest()
+```
+
+The exact 1024-byte-bounded JSON field order is `schema_version`,
+`artifact_hash`, `observable_commitment`, `confidence_bps`,
+`disclosure_class`, `report_nonce`, `observed_at`, `network_id`. Schema version
+is 2; the three hash/nonce values are 32-byte lowercase hex; confidence is
+1..=10000; observed time is positive u64; and network must match separately
+trusted local context. The digest is SHA-256 over
+`prometheus-threat-hint-statement-v2\0`, a u32 big-endian wire length, and the
+exact canonical bytes.
+
+This local parser is not a P2P protocol or authority API. It is not imported by
+v1 ingress, proof, approval consumption, analyzer, outbox, wallet, or chain
+paths.
+
 ### Still open
 
 ```text
 1. Independently approved production Groth16 relation, keys, and vectors
-2. Reviewed observable extractors, provenance/privacy gates, and v2 wire/pairing
+2. Reviewed observable extractors, provenance/privacy gates, v2 relation/pairing/transport
 3. Broad discovery and trusted Guardian membership/key assignment
 4. Light Client rule-update subscription
 ```

@@ -1,5 +1,5 @@
 # PROMETHEUS — SESSION CHECKPOINT
-# Last updated: 2026-07-23
+# Last updated: 2026-07-24
 # Purpose: Full recovery document. If Claude (Architect) or Claude Code
 # loses context, read this file first. It contains the complete project state.
 
@@ -14,12 +14,12 @@
 | Branch | Canonical target `main`; product/public/status changes remain PR-only |
 | Lokaler Pfad | `$REPO_ROOT` |
 | Letzter grün verifizierter Produkt-/Public-Baseline | Exact main `60166bd6d8d3c7d8e88727c2f6d507b206a308ad` merges GH-111 through protected PR #112; Prometheus CI `30011976919`, Security `30011976853`, and Pages `30011975363` pass, and raw/live README/Whitepaper/Roadmap/FAQ/llms markers were verified |
-| Aktueller Entwicklungs-Slice | GH-111 is complete; no product branch is active. Next internally buildable: isolated canonical ThreatHint v2 wire/statement binding without transport, proof promotion, analyzer, wallet, or chain effects |
+| Aktueller Entwicklungs-Slice | GH-114 is active on `feat/GH-114-local-threat-hint-v2-statement`: isolated Rust/Python canonical schema-2 statement parsing, trusted-network equality, shared exact-byte corpus, and domain-separated digest without v1, relation, proof, pairing, transport, analyzer, wallet, or chain effects |
 | Aktuelle Tooling-Baseline | Exact main `60166bd6d8d3c7d8e88727c2f6d507b206a308ad` includes GH-58 durable ingress, GH-63's active-KIP-16-aligned verifier, GH-69 manifest preflight, GH-74 hash-only analyzer adapter, GH-77 batch isolation, GH-86 observable validators, GH-90 `file_sha256`, GH-94 mandatory-review `byte_pattern`, GH-100 pre-readiness signal registration, GH-98 public/license reconciliation, GH-103 bounded review-required Linux ELF `api_import` derivation, GH-107 local canonical Observable Approval verification, and GH-111 local fixed-policy durable approval consumption. Public/multi-host operation, trusted membership/key assignment, authority rotation/scope assignment, Sybil resistance, approved production proof artifacts, privacy-reviewed pairing/promotion/actionable analysis, and on-chain attestation remain open. Execution artifacts remain bound to `205e1ca`; GH-9 remains ready for explicitly approved external signing. |
 | Aktueller HEAD | Latest verified product/public baseline is exact main `60166bd6d8d3c7d8e88727c2f6d507b206a308ad`; status-only closeout commits may be newer, so inspect `git log --oneline -1` |
 | Rollback-Tag | `pre-session-20260413` → `6347b85` |
-| Whitepaper | WHITEPAPER.md (root) + whitepaper.html (styled); miner companion, reward boundaries, GH-36/GH-39 trust boundaries, and GH-48/GH-52/GH-55/GH-58/GH-63/GH-74/GH-94/GH-107/GH-111 boundaries remain synchronized |
-| Status | Rollout-capable core remains estimated at 78-82%. GH-111 closes only local fixed-policy one-time approval consumption. Authority rotation/scope assignment, owner-only hint/bundle/approval pairing, external provenance/privacy promotion, post-Toccata canary execution, approved v2 proof artifacts, actionable analysis, crash-safe external side effects, and full rollout evidence remain gated. |
+| Whitepaper | WHITEPAPER.md (root) + whitepaper.html (styled); miner companion, reward boundaries, GH-36/GH-39 trust boundaries, and GH-48/GH-52/GH-55/GH-58/GH-63/GH-74/GH-94/GH-107/GH-111/GH-114 boundaries remain synchronized |
+| Status | Rollout-capable core remains estimated at 78-82%. GH-114 adds local structural v2 statement binding only. Authority rotation/scope assignment, owner-only hint/bundle/approval pairing, external provenance/privacy promotion, post-Toccata canary execution, reviewed v2 relation/proof artifacts, transport, actionable analysis, crash-safe external side effects, and full rollout evidence remain gated. |
 | GitHub Pages | https://neabouli.github.io/prometheus-/ |
 | Google Search Console | Verified: googleaa2902079481c7a8 |
 
@@ -247,7 +247,7 @@
 | Gate | Milestone |
 |------|-----------|
 | Current | GH-9 H-001 testnet-10 canary external signature, broadcast, receipt, and independent evidence |
-| Core rollout | Remaining state deployments, real metrics transition, reviewed observable extractors/privacy gates, separate v2 wire and statement/relation, approved proof artifacts, privacy-preserving pairing/channel, PROM emission, operated multi-host network |
+| Core rollout | Remaining state deployments, real metrics transition, reviewed observable extractors/privacy gates, reviewed v2 relation and approved proof artifacts, privacy-preserving pairing/transport, PROM emission, operated multi-host network |
 | Client rollout | Production AI, rule distribution, desktop installer, and security evidence |
 | Mobile rollout | Platform-specific Flutter implementation and review after core/client readiness |
 | Future research | vProgs integration under a separately reviewed protocol |
@@ -320,3 +320,33 @@ Leistungsbasierte Emission. Guardians = "Miner" (KI statt GPU).
 - Per-instance drains are serialized and capped at 32; delivery follows only an exact safe result. Parse/network/analyzer/result/clock failures remain pending.
 - Local evidence is 24 focused tests, 158 complete Guardian passes with three intentional live-model skips, Black, Ruff, and focused Pylint 10.00/10. PR #75 passed all ten protected contexts twice with no open review thread and merged normally as `17d8ceb`; exact-main Prometheus CI `29973290911`, Security Audit `29973290913`, and Pages `29973290610` pass.
 - Scope-weighted estimates are core 78-82%, complete vision 44-49%, and 51-56% remaining. Production proof artifacts, a concrete-observable channel or future schema, real actionable analysis, and all existing external rollout gates remain open.
+
+## Checkpoint 2026-07-24: GH-114 local v2 statement candidate
+
+- Issue #114 and branch `feat/GH-114-local-threat-hint-v2-statement` add one
+  isolated canonical schema-2 statement boundary without changing ThreatHint
+  v1.
+- Rust and Python independently require exact field order/bytes, separate
+  artifact hash and observable commitment, confidence, structural disclosure
+  class, report nonce, positive u64 observed time, and exact equality with
+  separately trusted network context.
+- One shared corpus contains 8 valid and 20 invalid exact-byte cases. Every
+  bound field changes the length-prefixed domain-separated digest. Complete
+  local gates pass 290 Rust workspace tests/2 live ignores, 223 Guardian
+  tests/3 live-model skips, workspace all-target Clippy, locked release builds,
+  verified 24/14/7-file packages, Black, changed-file Pylint 10.00/10, full
+  Pylint 9.80/10, Memory/Autodidactic, HTML/JSON-LD/public status,
+  Actionlint, dependency audits, and staged Gitleaks.
+- Terra and Spark found no initial issue. Final Terra review found one medium
+  Python valid-shape mutation/forged-object gap; an identity-bound parse
+  snapshot and two regressions closed it, and re-review reports no remaining
+  blocking, high, or medium issue. Claude Code was reachable, but its read-only
+  helper call stopped before repository access on the configured USD budget.
+- Protected PR #115 first-round CI/Security technical jobs passed. CodeRabbit's
+  four minor digest-context, positive-u64, network-regex, and public-HTML
+  consistency findings are fixed; affected post-fix tests and document gates
+  pass. Second-round protected checks and thread resolution remain.
+- Relation/proof artifacts, privacy approval, authority semantics,
+  hint/bundle/approval pairing, replay/external-side-effect policy, transport,
+  actionable analysis, and all external rollout gates remain open. Completion
+  estimates remain core 78-82%, complete vision 44-49%, and 51-56% remaining.

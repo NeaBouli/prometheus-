@@ -636,7 +636,7 @@ Boundary: no path/import-string/generic builder, transport, analyzer, proof,
           wallet, signing, chain, reputation, KAS/PROM, slash ACL,
           commit-reveal, or emergency-stop change
 Remaining: external provenance/privacy approval; other platform/format
-           extractors; v2 wire/proof/pairing; actionable analysis and all
+           extractors; v2 relation/proof/pairing/transport; actionable analysis and all
            existing rollout gates
 ```
 
@@ -679,7 +679,7 @@ Boundary: authenticates a local statement only; no signing/private key,
           commit-reveal, or emergency-stop change
 Remaining: GH-111 separately closes fixed-policy local consumption; trusted
            authority rotation, recipient-scope assignment, owner-only pairing,
-           v2 wire/proof relation, actionable analysis, and all existing
+           v2 relation/proof/transport, actionable analysis, and all existing
            rollout gates remain
 ```
 
@@ -720,4 +720,46 @@ Boundary: no transport, pairing, promotion, disclosure, analyzer, outbox,
 Remaining: authority ownership/rotation, scope assignment, privacy
            review, verified hint/bundle/approval pairing, v2 relation/artifacts,
            crash-safe external side effects, actionable analysis, and rollout
+```
+
+## GH-114 LOCAL CANONICAL THREATHINT V2 STATEMENT
+
+```text
+Status: implementation candidate on feat/GH-114-local-threat-hint-v2-statement
+Issue: #114
+Input: exact canonical statement bytes plus separately trusted local network
+Shape: schema 2; separate artifact hash and observable commitment; confidence;
+       structural disclosure class; report nonce; positive observed time;
+       network
+Checks: exact field order and bytes; closed scalar grammar; positive u64
+        observed_at; 1024 byte cap; trusted-network equality; one redacted
+        failure
+Digest: SHA256("prometheus-threat-hint-statement-v2\0" ||
+               u32be(canonical_length) || canonical_statement)
+Parity: independent Rust/Python parsers consume 8 valid and 20 invalid shared
+        exact-byte vectors; every field mutation changes the digest
+Evidence: 290 complete Rust workspace tests with 2 intentional live-network
+          ignores; 223 complete Guardian tests with 3 intentional live-model
+          skips; 2 compile-fail doctests; Rustfmt; warning-free workspace
+          all-target Clippy; locked optimized Guardian/proof builds; verified
+          24/14/7-file packages; Black; changed-file Pylint 10.00/10; complete
+          Guardian Pylint 9.80/10; Memory/Autodidactic; HTML/JSON-LD/public
+          status; workflow YAML/Actionlint; Cargo/Python audits; staged
+          Gitleaks 8.30.1; clean staged diff
+Review: Terra architecture and Spark parity/security review found no initial
+        issue; final Terra review found one medium Python valid-shape
+        mutation/forged-object gap, fixed by an identity-bound parse snapshot
+        and two regressions; re-review reports no blocking/high/medium issue;
+        PR #115 first technical CI/Security round passed; CodeRabbit's four
+        minor wording/regex consistency findings are fixed and post-fix checks
+        pass; second protected round remains;
+        Claude Code terminal probe passed but the bounded read-only request
+        stopped before repository access on its USD budget
+Boundary: no v1 change, relation, proof acceptance, signer, approval pairing,
+          persistence, replay authority, transport, analyzer, outbox, wallet,
+          chain, reputation, KAS/PROM, slash ACL, commit-reveal, or
+          emergency-stop behavior
+Remaining: protected PR review/CI and exact-main/live verification; then
+           reviewed relation/artifacts, privacy/pairing, transport, actionable
+           analysis, and external rollout gates
 ```
