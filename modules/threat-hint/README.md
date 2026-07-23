@@ -19,8 +19,32 @@ points and is never transported as a float.
 `development_stub_v1` is only a local-development representation. The Light
 Client refuses to build it in beta or mainnet modes. `groth16_kip16_v1` bytes
 remain opaque here and require a separate audited verifier before Guardian
-analysis. The operated Guardian sidecar therefore rejects all ThreatHints until
-that dedicated owner-only verifier ingress exists.
+analysis. The owner-only verifier ingress exists, but operated acceptance stays
+fail-closed as `busy` until independently approved production relation
+artifacts and vectors are installed.
 
-No `PeerId`, wallet, address, chain, Guardian identity, membership, signing key,
-reporter reward, KAS/PROM, slash, or commit-reveal field is part of the schema.
+No `PeerId`, wallet, address, chain, Guardian identity, membership,
+signing key, reporter reward, KAS/PROM, slash, commit-reveal field is part of
+this schema.
+
+## Canonical Observable Bundle v1 (local-only)
+
+`ObservableBundle` is a separate local schema utility for canonical observable
+bundles. It is not connected to any client, P2P, proof, transport, or analyzer
+path. The Rust utility and the isolated Python counterpart consume the same
+byte-exact valid/invalid vector corpus.
+
+The utility:
+
+- only accepts local canonical JSON;
+- keeps disclosure policy and enum spaces closed and exact;
+- rejects non-canonical encodings, duplicate keys, duplicate observables,
+  non-UTF-8, and malformed byte order;
+- rejects `public_auto_v1` bundles that contain `byte_pattern`.
+
+No arbitrary-string builder is exposed; bundle values enter this API only
+through strict canonical parsing. Validation proves structural conformance, not
+extractor provenance or semantic privacy. There is no transport or semantic
+privacy guarantee for any bundle, including `review_required_v1`. No logger or
+payload is emitted on validation failure, fixed errors never include rejected
+values, and value-bearing debug/repr output is disabled.

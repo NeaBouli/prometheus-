@@ -279,19 +279,40 @@ consumption path, not accepted rule generation. A future observable-bearing
 schema/channel and any side-effecting multi-process consumer require separate
 review.
 
-### Threat Observable v2 design boundary (GH-82)
+### Local Threat Observable bundle APIs (GH-82/GH-86)
 
-`docs/threat-observable-v2.md` is a normative design draft, not an implemented
-API. It separates `artifact_hash` from `observable_commitment` and defines the
-latter as SHA-256 over a domain, trusted network, report nonce, length, and
-strict canonical observable bundle. Equality with that commitment establishes
-byte consistency only. It does not prove truth, maliciousness, authorship, or
-derivation from the artifact.
+`docs/threat-observable-v2.md` remains the normative design draft for the
+future protocol. GH-86 implements only its local canonical bundle boundary:
 
-The first implementation slice is local Rust/Python canonical bundle
-validation plus shared vectors. A new ThreatHint v2 wire, proof statement,
-relation, owner-only pairing, analyzer promotion, and network protocol require
-separate review and remain unavailable.
+```text
+Rust: prometheus_threat_hint::ObservableBundle
+  parse_canonical(&[u8])
+  to_canonical_bytes()
+  commitment(network_id, report_nonce_hex)
+  commitment_matches(expected, network_id, report_nonce_hex, wire)
+
+Python: jaeger.threat_observable.ObservableBundle
+  parse_canonical(bytes)
+  canonical_bytes
+  commitment(network_id, report_nonce_hex)
+  commitment_matches(expected, network_id, report_nonce_hex, wire)
+```
+
+Both consume the shared
+`modules/threat-hint/tests/vectors/threat-observable-bundle-v1.json` corpus.
+Rust public bundle types cannot be deserialized directly, and Python direct
+constructors are disabled; commitment calculation is reachable through a
+validated parsed bundle. Value-bearing Rust `Debug` and Python `repr` output is
+disabled. A new ThreatHint v2 wire, proof statement/relation, owner-only
+pairing, analyzer promotion, and network protocol require separate review and
+remain unavailable.
+
+The local validator checks canonical structure, exact kind/value grammar,
+ordering, bounds, and commitment context only. It does not prove that an
+`api_import` value came from a reviewed binary-import extractor or that a
+grammar-valid value is semantically safe to disclose. The producer must use
+separately reviewed kind-specific extractors; no arbitrary-string builder is an
+approved disclosure API.
 
 ---
 
@@ -357,11 +378,10 @@ authentication is implemented. `PeerId` never grants application authority.
 ### Still open
 
 ```text
-1. Dedicated owner-only ThreatHint verifier ingress
-2. Real Groth16 relation and verification
-3. Freshness/replay persistence and bounded analyzer admission
-4. Broad discovery and trusted Guardian membership/key assignment
-5. Light Client rule-update subscription
+1. Independently approved production Groth16 relation, keys, and vectors
+2. Reviewed observable extractors, provenance/privacy gates, and v2 wire/pairing
+3. Broad discovery and trusted Guardian membership/key assignment
+4. Light Client rule-update subscription
 ```
 
 ---

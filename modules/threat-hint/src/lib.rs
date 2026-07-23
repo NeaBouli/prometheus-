@@ -3,6 +3,13 @@
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
+pub mod observable_bundle;
+
+pub use observable_bundle::{
+    DisclosurePolicy, ObservableBundle, ObservableBundleError, ObservableKind, ObservableScope,
+    ScopeFormat, ScopePlatform,
+};
+
 pub const MAX_CANONICAL_BYTES: usize = 2048;
 pub const HASH_HEX_LEN: usize = 64;
 const MIN_PROOF_BYTES: usize = 1;

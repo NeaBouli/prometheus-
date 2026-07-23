@@ -161,8 +161,9 @@ public release-hardening evidence for the exact rollout commit.
 - Merged and exact-main-verified GH-63 adds real manifest-pinned Groth16 verification aligned with active KIP-16, strict key/proof parsing, complete semantic ThreatHint binding, and a bounded owner-aware service
 - Merged and exact-main-verified GH-74 adds a bounded digest/network/time-bound outbox-to-analyzer adapter; hash-only ThreatHint v1 is consumed as an exact zero-confidence, no-rule, non-submittable result without invoking LLM or YARA generation
 - Merged and exact-main-verified GH-77 isolates failed jobs inside each bounded analyzer drain, preserves them as pending, lets later safe jobs progress, and emits only data-minimal fixed failure metadata
-- GH-82 candidate freezes a Threat Observable v2 draft with separate artifact hash and observable commitment, strict canonical bounds, deny-by-default disclosure classes, and exact non-claims; no v2 wire or analyzer promotion is implemented by the draft
-- Pending: local cross-language v2 bundle validators/vectors, then a separately reviewed v2 statement/relation and approved production proof artifacts before actionable analysis
+- Merged and exact-main-verified GH-82 freezes a Threat Observable v2 draft with separate artifact hash and observable commitment, strict canonical bounds, deny-by-default disclosure classes, and exact non-claims
+- GH-86 adds isolated Rust/Python canonical bundle validators and one shared byte-exact valid/invalid corpus; no v1, P2P, proof, analyzer, committee, IPFS, chain, or public-rule wiring is introduced
+- Pending: reviewed kind-specific extractors and privacy gates, then a separate v2 wire, statement/relation, approved production proof artifacts, owner-only pairing, and actionable analysis
 - Proven on an isolated three-node harness: relay reservation/delivery, AutoNAT state, DCUtR relay fallback, and disconnect handling; real two-host operation remains pending
 - Pending: public operated relay/NAT infrastructure and broad discovery; mDNS remains excluded while its compatible dependency path has unresolved RustSec advisories
 - Light Client ↔ Guardian communication over P2P
