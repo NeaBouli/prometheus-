@@ -712,3 +712,11 @@ Rules for all dev agents:
 - Exact-main Prometheus CI `29968203074`, Security Audit `29968203053`, and Pages `29968202562` all passed for the merge SHA. The public files now contain the merged implementation, while their status wording is being finalized through issue #65 and branch `docs/GH-65-kip16-closeout`.
 - The merged verifier remains deliberately unavailable as `busy` without an independently approved production relation, verifying key, vectors, and installation ceremony. The analyzer-domain adapter, real accepted-analysis evidence, two-host operation, H-001 external signing/execution, remaining deployments, metrics transition, PROM emission, and production nodes remain open.
 - No wallet, private key, secret, signature, raw transaction, broadcast, contract, Guardian/reporter authorization, reputation, KAS/PROM, slash ACL, commit-reveal behavior, emergency-stop policy, or foreign untracked file was accessed or changed. `Prometheus-1.png` remains untouched and uncommitted.
+
+## 2026-07-23 GH-65 public closeout complete
+
+- PR #66 passed all ten protected CI/Security/CodeRabbit contexts with no open review thread and merged normally without admin bypass as `7189a45cb9a512767c6976e7d3078ab506e91a4c`; issue #65 closed automatically.
+- Exact-main Prometheus CI `29968860590`, Security Audit `29968860614`, and Pages `29968860165` all passed for that SHA. GitHub Pages reports `built` from `main`.
+- Direct HTTP 200 verification found the exact merged GH-63 markers in live README, Bridge, Whitepaper, Roadmap, and `llms.txt`. Scope estimates remain core 77-81%, complete vision 43-48%, and 52-57% remaining.
+- The next repository-owned product slice is the explicit bounded analyzer-domain adapter. Production proof-artifact approval/installation, real accepted-analysis evidence, two-host operation, H-001 external signing/execution, remaining deployments, metrics transition, PROM emission, and production nodes remain open.
+- No wallet, private key, secret, signature, raw transaction, broadcast, contract, Guardian/reporter authorization, reputation, KAS/PROM, slash ACL, commit-reveal behavior, emergency-stop policy, or foreign untracked file was accessed or changed. `Prometheus-1.png` remains untouched and uncommitted.
