@@ -120,11 +120,12 @@ Scope-weighted status estimate on 2026-07-23: H-001 canary preparation is about
 the merged/exact-main-verified GH-63 verifier and GH-74 analyzer-domain adapter;
 the complete roadmap vision is about 44-49% complete. These values distinguish
 prepared software from real chain operation and are not release guarantees.
-Latest verified product/status main `17d8ceb34b32f5a81104cc3ad19bc7cff4061266`
-passed Prometheus CI `29973290911`, Security Audit `29973290913`, and Pages
-`29973290610`; GitHub Pages reports built and public GH-74 markers retain all rollout gates.
-Issue #74 is closed after PR #75 merged normally. Issue #77 tracks the bounded
-batch-progress fix found during independent post-merge review. Accepted proof verification remains gated on an independently
+Latest verified docs/status main `a896e4ccc8407ad88b2fb145e62e716ce81756f2`
+passed Prometheus CI `29973996881`, Security Audit `29973996917`, and Pages
+`29973996526`; GitHub Pages reports built and public GH-74 markers retain all rollout gates.
+Exact product main remains `17d8ceb34b32f5a81104cc3ad19bc7cff4061266`.
+Issue #77 implements the bounded batch-progress fix found during independent
+post-merge review on its protected feature branch. Accepted proof verification remains gated on an independently
 approved real Groth16 relation/key/vectors; actionable analysis additionally
 requires a reviewed privacy-preserving concrete-observable channel or future
 schema rather than fabricated v1 indicators.
@@ -518,7 +519,8 @@ Domain: frozen VerifiedThreatHint preserves only v1 wire/job fields and has no
 Decision: exact confidence 0.0, no YARA rule, should_submit false; LLM and YARA
           generation are not invoked for hash-only v1 claims
 Drain: maximum 32 jobs, per-instance serialization, mark-delivered only after
-       exact safe result; failures and clock rollback remain pending
+       exact safe result; ordinary per-job failures remain pending while later
+       independent v1 jobs can progress; no FIFO acknowledgement is promised
 Local evidence: 24 focused analyzer/adapter tests and 158 complete Guardian
                 passes with three intentional live-model skips; Black, Ruff,
                 and focused Pylint 10.00/10 pass
@@ -528,6 +530,27 @@ Boundary: no approved production proof artifacts, concrete observable channel,
           live-model evidence, proposal submission, or production acceptance
 Unchanged: PeerId authorization, wallets/signing/chain, reputation, KAS/PROM,
            slash ACL, commit-reveal, and emergency-stop policy
+```
+
+## THREATHINT BOUNDED DRAIN PROGRESS (GH-77 CANDIDATE)
+
+```text
+Problem: one failed leading GH-74 outbox job aborted the whole bounded drain and
+         could repeatedly starve later independent v1 jobs
+Decision: isolate ordinary adapt, analysis, clock, and delivery failures per job;
+          failed jobs stay pending and later safe jobs continue
+Report: structurally immutable tuples; each success and failure retains its
+        bounded batch index; failures expose only fixed category plus a digest
+        validated through full adaptation or None
+Privacy: no canonical bytes, paths, analyzer output, or arbitrary exception text
+Cancellation: BaseException is not swallowed; cancellation during threaded
+              SQLite acknowledgement waits for its durable outcome, then propagates
+Ordering: v1 jobs are independent and have no submission side effects; FIFO
+          acknowledgement is explicitly not guaranteed
+Local evidence: 19 focused adapter tests and 163 complete Guardian passes with
+                three intentional live-model skips; Black, scoped Ruff, focused
+                Pylint 10.00/10, and clean diff checks pass
+Pending: protected PR review, merge, and exact-main CI/Security/Pages evidence
 ```
 
 ## MAINNET CONTRACT ADDRESSES (post-verification)
