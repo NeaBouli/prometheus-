@@ -175,6 +175,35 @@ extractors, privacy gates, a separate v2 wire/proof/pairing design, and
 production evidence remain required before any observable leaves its local
 producer boundary.
 
+## Local Observable Approval Consumption
+
+`jaeger.observable_approval_consumption` is a local-only policy and persistence
+boundary for the canonical Observable Approval verifier. An owner-only,
+exact-schema TOML file fixes one network, x-only approver public key, opaque
+recipient-scope digest, and absolute owner-only SQLite ledger path:
+
+```toml
+schema_version = 1
+network_id = "testnet-10"
+approver_xonly_public_key = "<64 lowercase hex characters>"
+recipient_scope = "<64 lowercase hex characters>"
+ledger_path = "/absolute/owner-only/observable-approval.sqlite3"
+```
+
+`ObservableApprovalConsumptionService.consume(...)` accepts only canonical
+approval and bundle bytes plus a trusted in-process report nonce and current
+time. It constructs the verification context itself, verifies in the same call
+path, and atomically consumes both the approval ID and authority-bound approval
+nonce. Owner-only path checks, `BEGIN IMMEDIATE`, full synchronous SQLite
+durability, uniqueness constraints, and a persistent time high-water close
+restart, concurrency, retry, and clock-rollback replay paths.
+
+The receipt is data only. This module has no transport, analyzer, outbox,
+pairing, promotion, disclosure, signer, proof, wallet, or chain behavior. The
+fixed policy does not establish real-world key ownership, key rotation,
+recipient-scope semantics, privacy approval, or exactly-once execution of a
+future external action.
+
 ## Testing
 
 ```bash

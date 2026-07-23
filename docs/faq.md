@@ -86,6 +86,15 @@ persist the bundle. Its signed nonce and deterministic approval ID identify
 repeats but do not prevent replay; durable one-time consumption and trusted
 approver policy remain required before promotion.
 
+GH-111 adds that local consumption boundary in Guardian Node. One owner-only
+policy fixes the network, approver public key, and opaque recipient-scope
+digest; the service verifies in the same call path and atomically records the
+approval ID and authority-bound nonce in an owner-only SQLite ledger. This
+prevents local reuse across retries, concurrency, and restarts, but the receipt
+grants no external authority. Key ownership/rotation, scope semantics,
+hint/bundle pairing, privacy approval, transport, analyzer execution,
+promotion, outbox delivery, wallet, and chain behavior remain unimplemented.
+
 **Q: What is Commit-Reveal voting?**
 A cryptographic protocol that prevents validators from copying each
 other's votes. In the commit phase, each validator submits

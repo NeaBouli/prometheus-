@@ -2,7 +2,7 @@
 # Every completed module is audited by Claude (Architect) before proceeding to the next sprint.
 # Format: | Module | Version | Date | Auditor | Result | Notes |
 # Result: ACCEPTED | REJECTED | NEEDS_CHANGES
-# Last Updated: 2026-07-16
+# Last Updated: 2026-07-23
 
 ---
 
@@ -1482,3 +1482,58 @@ checks. Spark found two short merge-SHA references in Checkpoint/TODO; both now
 use the full exact SHA, and its read-only re-review reports no remaining
 actionable finding. Protected PR and documentation exact-main/live verification
 remain.
+## GH-111 LOCAL DURABLE OBSERVABLE APPROVAL CONSUMPTION (2026-07-23)
+
+Issue #111 and branch `feat/GH-111-local-observable-approval-consumption` add
+the smallest local durable consumer after the merged GH-107 verifier. The
+Guardian service loads one exact network, x-only approver public key, and opaque
+recipient-scope digest from an owner-only exact-schema TOML policy. The public
+consume API accepts only canonical approval/bundle bytes plus a trusted
+in-process report nonce and current time; it constructs the verification
+context internally and invokes GH-107 verification in the same call path. It
+does not accept a caller-supplied verified result, key, scope, or network.
+
+After verification, a separate owner-only SQLite ledger atomically records the
+32-byte approval ID and enforces uniqueness of the authority-bound
+`(approver_xonly_public_key, approval_nonce)` tuple. `BEGIN IMMEDIATE`,
+`synchronous = FULL`, a STRICT schema, and a persistent clock high-water close
+restart, concurrent duplicate, lock/retry, and rollback replay paths. Existing
+unsafe parent/file modes, symlinks, relative paths, unknown policy fields,
+malformed values, corrupt databases, and unsupported schema versions fail with
+one redacted public message. An injected transaction integrity failure proves
+that neither consumption nor the high-water advances partially.
+
+Local evidence currently includes 24 focused consumption tests, 32 combined
+approval tests, 214 complete Guardian passes with three intentional live-model
+skips, Pylint 10.00/10 for changed production/tests, and complete Guardian
+Pylint 9.78/10. Spark found
+one possible parallel-test busy flake and missing relative policy-path coverage;
+both were fixed. Independent Terra security review found no finding and
+recommended constructor-lock, transaction-abort, and corrupt/unknown-ledger
+tests; all were added and pass. Claude Code was requested as a helper but its
+monthly usage limit remains exhausted and it read no GH-111 file. Complete
+Guardian/project, documentation/security, protected-PR, and exact-main checks
+remain before merge.
+
+Final Sol review found that a pre-existing version-zero SQLite file with the
+wrong table shape needed explicit startup rejection. The ledger now validates
+the exact STRICT column and unique-index shape after initialization, maps only
+real `SQLITE_BUSY`/`SQLITE_LOCKED` codes to retryable failure, and treats other
+operational errors as closed corruption. A dedicated regression passes.
+
+Complete local gates pass: 280 Rust workspace tests with two intentional
+live-network ignores, Rustfmt, warning-free workspace all-target Clippy, locked
+optimized Guardian/proof builds, strict 21-file ThreatHint packaging, Black,
+complete Guardian Pylint 9.78/10, Memory Integrity, six Autodidactic tests,
+HTML/JSON-LD/public-status checks, workflow YAML parsing, Actionlint 1.7.12,
+Cargo Audit with no vulnerabilities and eight allowed warnings, Python Audit
+with no known vulnerabilities, staged Gitleaks 8.30.1, and clean staged diff.
+Protected PR plus exact-main/live evidence remain before acceptance.
+
+The receipt is data only and grants no downstream authority. This slice does
+not establish real-world approver-key ownership or rotation, recipient-scope
+semantics, privacy approval, verified hint/bundle/approval pairing, transport,
+promotion, disclosure, analyzer invocation, outbox delivery, proof, signing,
+wallet, chain, reputation, KAS/PROM, slash ACL, commit-reveal, or emergency-stop
+behavior. A future external action requires a separate crash-safe claim/outbox
+design and review. Foreign untracked `Prometheus-1.png` remains untouched.
