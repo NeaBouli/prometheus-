@@ -60,15 +60,21 @@ pipeline reports the bounded false positive rate on-chain.
 GovernanceAutoTuning then deterministically raises the confidence
 threshold for new rules. The guardian who submitted the bad rule
 loses 50% of their reputation score.
-No human intervention required.
+The transition still requires authenticated metrics, external signatures, and
+confirmed on-chain execution; those production steps remain gated.
 
 **Q: How does Prometheus protect my privacy?**
-Your device never sends raw files, paths, or metadata. Only a
-SHA-256 hash of the suspicious file is transmitted — this is a
-one-way fingerprint, the original cannot be reconstructed from it.
-The report is wrapped in a Groth16 ZK-proof that proves you are a
-legitimate network participant without revealing your identity.
-Raw data never leaves your device.
+The implemented ThreatHint v1 path never sends raw files or paths. It does send
+bounded metadata: a caller-supplied 32-byte hash commitment, confidence,
+indicator category, proof bytes, nonce, and timestamp. A hash is not encryption
+and may allow correlation or matching against known content.
+
+The manifest-pinned Groth16 engine binds the v1 statement to its network and
+domain, but no approved production relation or keys ship yet, so operated
+verification remains fail-closed. V1 does not prove how the hash was derived,
+that a report is true, or that its sender is anonymous. The
+[Threat Observable v2 draft](threat-observable-v2.md) defines the additional
+privacy and proof boundaries required before concrete indicators are sent.
 
 **Q: What is Commit-Reveal voting?**
 A cryptographic protocol that prevents validators from copying each
@@ -103,14 +109,18 @@ on a public blockchain that no organization can modify or censor.
 Prometheus complements existing tools — it does not replace them.
 
 **Q: Can Prometheus be shut down?**
-No. There is no foundation, no central server, no emergency stop.
-The protocol exists as long as the Kaspa blockchain exists.
-No government, corporation, or court can disable it.
-This is a deliberate architectural decision, not an oversight.
+Prometheus has no repository-controlled emergency stop, foundation server, or
+central protocol operator. Once deployed, covenant state transitions follow
+their scripts rather than a developer kill switch. Availability still depends
+on Kaspa, participating nodes, clients, and network access; infrastructure can
+be disrupted or blocked. The absence of an emergency-stop path is a deliberate
+architectural decision, not an availability guarantee.
 
 **Q: When will the mobile app be available?**
-iOS and Android clients are targeted for September 2026.
-Desktop clients (Windows, macOS, Linux) target August 2026.
+Desktop and mobile releases are readiness-gated rather than date-gated.
+Production proof artifacts, the v2 observable path, operated networking,
+security review, and core rollout evidence must pass first. Flutter remains the
+mobile implementation target.
 
 ---
 
@@ -186,12 +196,15 @@ Guardian Node A sees malware X in Germany.
 Guardian Node B sees malware X in Japan.
 Guardian Node C sees malware X in Brazil.
 
-None of them send the malware itself. Each sends only mathematical
-gradients — the direction in which the model should improve.
+In the target architecture, none sends the malware itself. Each sends a bounded
+model update. Such updates can still leak information, so production requires
+clipping, secure aggregation, privacy accounting, authentication, and
+validation.
 A rotating coordinator (chosen by reputation) aggregates all
 gradients and distributes an improved global model to all nodes.
 Every Guardian Node becomes smarter simultaneously.
-Nobody knows the data of anyone else.
+This reduces direct record sharing; it is not an anonymity or
+non-reconstruction guarantee.
 
 After 1 month: 50 nodes x 1,000 threats = 50,000 new patterns learned.
 After 6 months: the model outperforms commercial solutions because

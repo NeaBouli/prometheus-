@@ -279,6 +279,20 @@ consumption path, not accepted rule generation. A future observable-bearing
 schema/channel and any side-effecting multi-process consumer require separate
 review.
 
+### Threat Observable v2 design boundary (GH-82)
+
+`docs/threat-observable-v2.md` is a normative design draft, not an implemented
+API. It separates `artifact_hash` from `observable_commitment` and defines the
+latter as SHA-256 over a domain, trusted network, report nonce, length, and
+strict canonical observable bundle. Equality with that commitment establishes
+byte consistency only. It does not prove truth, maliciousness, authorship, or
+derivation from the artifact.
+
+The first implementation slice is local Rust/Python canonical bundle
+validation plus shared vectors. A new ThreatHint v2 wire, proof statement,
+relation, owner-only pairing, analyzer promotion, and network protocol require
+separate review and remain unavailable.
+
 ---
 
 ## 4. SILVERSCRIPT CONTRACT API

@@ -179,6 +179,14 @@ independently approved Groth16 relation, verifying key, and vectors remain
 open, so the production verifier is unavailable and returns fail-closed
 `busy`.
 
+`threat_hash` is supplied by the v1 client caller. The v1 protocol validates
+its shape and statement binding but does not define or verify derivation from a
+file or observable. GH-82's normative draft in
+`docs/threat-observable-v2.md` therefore leaves v1 unchanged and specifies a
+future separate `artifact_hash` plus domain-separated
+`observable_commitment`. A matching reveal proves commitment consistency only;
+no v2 wire schema is implemented yet.
+
 ### 2.2 ScanResult (Phi-3-mini Output)
 
 ```rust

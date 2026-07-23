@@ -31,7 +31,7 @@
 <meta name="ai-status" content="post-toccata-verification, active-development, audited">
 <!-- Schema.org -->
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"FAQPage","name":"Prometheus FAQ","description":"Frequently asked questions about Prometheus decentralized AI threat intelligence protocol.","url":"https://neabouli.github.io/prometheus-/faq.html","mainEntity":[{"@type":"Question","name":"What is the difference between KAS and PROM?","acceptedAnswer":{"@type":"Answer","text":"KAS is Kaspa's native token used as economic collateral by validators. PROM is an earned-only reward and governance token for verified contributions. Canonical Guardian reputation is separate Kaspa L1 state. KAS = economic security; PROM = contribution rewards and governance."}},{"@type":"Question","name":"How does PROM enter the market?","acceptedAnswer":{"@type":"Answer","text":"Zero PROM exist at launch. First PROM minted when first threat rule passes consensus. KAS/PROM liquidity pool opens on Kasplex DEX. No ICO, no presale."}},{"@type":"Question","name":"Can Prometheus be shut down?","acceptedAnswer":{"@type":"Answer","text":"No. There is no foundation, no central server, no emergency stop. The protocol exists as long as the Kaspa blockchain exists."}}]}
+{"@context":"https://schema.org","@type":"FAQPage","name":"Prometheus FAQ","description":"Frequently asked questions about Prometheus decentralized AI threat intelligence protocol.","url":"https://neabouli.github.io/prometheus-/faq.html","mainEntity":[{"@type":"Question","name":"What is the difference between KAS and PROM?","acceptedAnswer":{"@type":"Answer","text":"KAS is Kaspa's native token used as economic collateral by validators. PROM is an earned-only reward and governance token for verified contributions. Canonical Guardian reputation is separate Kaspa L1 state. KAS = economic security; PROM = contribution rewards and governance."}},{"@type":"Question","name":"How does PROM enter the market?","acceptedAnswer":{"@type":"Answer","text":"Zero PROM exist at launch. First PROM minted when first threat rule passes consensus. KAS/PROM liquidity pool opens on Kasplex DEX. No ICO, no presale."}},{"@type":"Question","name":"Can Prometheus be shut down?","acceptedAnswer":{"@type":"Answer","text":"The contract design has no repository-controlled emergency-stop entrypoint or central protocol server. Availability still depends on Kaspa, nodes, clients, and network access; this is not an uninterrupted-availability guarantee."}}]}
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -351,7 +351,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
           <span class="faq-icon"></span>
         </button>
         <div class="faq-a"><div class="faq-a-inner">
-          <p>Affected users report the false detection. The signed metrics-oracle pipeline reports the bounded false positive rate on-chain. The <code>GovernanceAutoTuning</code> contract deterministically raises the confidence threshold for new rules — without any human intervention.</p>
+          <p>Affected users report the false detection. After authenticated metrics, external signatures, and confirmed on-chain execution, <code>GovernanceAutoTuning</code> deterministically raises the confidence threshold for new rules. Those production steps remain gated.</p>
           <p>The Guardian who submitted the bad rule loses 50% of their reputation score. Reputation halving is a strong deterrent: it takes many accepted proposals to rebuild what one rejection destroys.</p>
           <p>The target false positive rate is under 0.5%. Auto-tuning continuously adjusts parameters to stay within this range.</p>
         </div></div>
@@ -363,9 +363,9 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
           <span class="faq-icon"></span>
         </button>
         <div class="faq-a"><div class="faq-a-inner">
-          <p>Your device never sends raw files, paths, or metadata. Only a <strong>SHA-256 hash</strong> of the suspicious file is transmitted — a one-way fingerprint from which the original cannot be reconstructed.</p>
-          <p>The report is wrapped in a <strong>Groth16 ZK-proof</strong> that proves you are a legitimate network participant without revealing your identity or the details of the threat.</p>
-          <div class="callout"><p><strong>Privacy by design, not by policy.</strong> No personal data is processed on-chain. The GDPR is not applicable — not as a compliance workaround, but as a direct consequence of the system design (EDSA Guidelines 02/2025).</p></div>
+          <p>The implemented ThreatHint v1 path never sends raw files or paths. It does send bounded metadata: a caller-supplied 32-byte hash commitment, confidence, indicator category, proof bytes, nonce, and timestamp. A hash is not encryption and may allow correlation or matching against known content.</p>
+          <p>The manifest-pinned <strong>Groth16</strong> engine binds the v1 statement to its network and domain, but no approved production relation or keys ship yet, so operated verification remains fail-closed. V1 does not prove how the hash was derived, that a report is true, or that its sender is anonymous. The <a href="https://github.com/NeaBouli/prometheus-/blob/main/docs/threat-observable-v2.md">Threat Observable v2 draft</a> defines the additional privacy and proof boundaries required before concrete indicators are sent.</p>
+          <div class="callout"><p><strong>Privacy by design.</strong> The protocol minimizes on-chain data, but applicable privacy obligations depend on the deployed data flows and jurisdiction. This FAQ is not a legal determination.</p></div>
         </div></div>
       </div>
 
@@ -441,7 +441,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
           <span class="faq-icon"></span>
         </button>
         <div class="faq-a"><div class="faq-a-inner">
-          <p>Through <strong>federated learning via the Fed-DART protocol</strong> (Fraunhofer Institute, open source). No raw data is ever shared — only mathematical gradients.</p>
+          <p>Target architecture: <strong>federated learning via the Fed-DART protocol</strong> keeps training records local and sends bounded model updates. Updates can still leak information, so production requires clipping, secure aggregation, privacy accounting, authentication, and validation.</p>
           <div class="flow">
             Guardian Node A sees threat X in Germany → local gradient<br>
             Guardian Node B sees threat X in Japan ··· → local gradient<br>
@@ -515,9 +515,9 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
           <span class="faq-icon"></span>
         </button>
         <div class="faq-a"><div class="faq-a-inner">
-          <p>No. There is no foundation to dissolve, no central server to seize, no CEO to arrest, no emergency stop to trigger.</p>
-          <p>The protocol exists as long as the Kaspa blockchain exists. Its rules are encoded in immutable smart contracts. Its governance is fully automated. No human has the power to pause, halt, or modify it.</p>
-          <div class="callout"><p><strong>This is a deliberate architectural decision, not an oversight.</strong> The absence of a kill switch is a feature. The fire belongs to humanity.</p></div>
+          <p>Prometheus has no repository-controlled emergency stop, foundation server, or central protocol operator. Once deployed, covenant state transitions follow their scripts rather than a developer kill switch.</p>
+          <p>Availability still depends on Kaspa, participating nodes, clients, and network access; infrastructure can be disrupted or blocked. The absence of an emergency-stop path is a deliberate architectural decision, not an availability guarantee.</p>
+          <div class="callout"><p><strong>No central kill switch.</strong> This invariant does not justify absolute claims about uninterrupted access or network operation.</p></div>
         </div></div>
       </div>
 
@@ -527,8 +527,8 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
           <span class="faq-icon"></span>
         </button>
         <div class="faq-a"><div class="faq-a-inner">
-          <p>Desktop clients (Windows, macOS, Linux) are targeted for <strong>August 2026</strong>. iOS and Android mobile clients target <strong>September 2026</strong>.</p>
-          <p>Mobile uses Flutter for cross-platform development. Phi-3-mini runs on iOS via Core ML and on Android via ONNX Runtime Mobile. Background scanning uses native OS mechanisms (iOS Background App Refresh, Android WorkManager).</p>
+          <p>Desktop and mobile releases are <strong>readiness-gated</strong>, not date-gated. Production proof artifacts, the v2 observable path, operated networking, security review, and core rollout evidence must pass first.</p>
+          <p>Flutter remains the mobile implementation target. Production inference and background-scanning behavior still require platform-specific implementation and review.</p>
         </div></div>
       </div>
     </div>

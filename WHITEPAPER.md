@@ -42,7 +42,10 @@ The protocol combines three layers:
 - **Guardian nodes** (LLaMA 3 70B/8B) for advanced threat analysis and YARA rule generation
 - **Kaspa L1 consensus** (high-throughput BlockDAG / DAGKnight path) for immutable rule storage and governance
 
-Key properties: 0% pre-mine, no emergency stop, fully automated governance, GDPR non-applicable (no personal data on-chain).
+Key properties: 0% pre-mine, no emergency stop, automated governance target,
+and data-minimal on-chain state. Applicable privacy obligations depend on the
+deployed data flows and jurisdiction; this whitepaper is not a legal
+determination.
 
 ---
 
@@ -68,13 +71,21 @@ Light Client (Phi-3-mini)          Guardian (LLaMA 3)           Kaspa L1
  - Rule updates from L1             - L1 reputation tracking     - Developer grants
 ```
 
-**Threat Lifecycle (< 60 seconds):**
+**Target Threat Lifecycle (< 60 seconds after all rollout gates pass):**
 1. Light Client detects anomaly via Phi-3-mini + YARA rules
-2. Anonymous threat hint submitted with ZK proof
+2. Data-minimal threat hint submitted with an approved ZK proof
 3. Guardian node analyzes threat, generates YARA rule
 4. Validators vote via Commit-Reveal (2/3 majority required)
 5. Accepted rule state anchored on-chain; PROM-RULES asset representation remains deployment orchestration
 6. All light clients receive and load the new rule
+
+The current verified v1 path stops before step 3: it transports a
+caller-supplied hash commitment and bounded metadata but no concrete IOC. It
+therefore returns zero confidence, no rule, and no submission. V1 does not
+derive the hash from an artifact or prove report truth, artifact derivation, or
+reporter anonymity. GH-82's [Threat Observable v2 draft](docs/threat-observable-v2.md)
+defines the separate artifact hash and observable commitment required before
+actionable analysis.
 
 ---
 
@@ -101,7 +112,7 @@ Light Client (Phi-3-mini)          Guardian (LLaMA 3)           Kaspa L1
 
 - **Light Client AI**: Phi-3-mini 3.8B (4-bit quantized, 4GB RAM, no GPU)
 - **Guardian AI**: LLaMA 3 8B (default) / LLaMA 3 70B (confidence escalation)
-- **Federated Learning**: Fed-DART protocol — only gradients transmitted, never raw data
+- **Federated Learning target**: Fed-DART with local training records and bounded model updates; gradients still require privacy controls
 
 ---
 
@@ -274,9 +285,10 @@ This section describes the target Light Client architecture. The current Rust cl
 
 ### 8.3 ZK Proofs
 
-- Target: anonymous threat reporting via Groth16 ZK proofs
+- Target: data-minimal threat reporting with precisely scoped Groth16 claims
 - Active KIP-16 / BN254 Arkworks Groth16 verification is implemented in the manifest-pinned `prometheus-threat-proof` engine
-- Every canonical ThreatHint semantic field except the proof is domain/network-bound into two injective 128-bit BN254 public inputs
+- The v1 statement domain/network-binds schema version, caller-supplied `threat_hash`, confidence, indicator category, nonce, and timestamp into two injective 128-bit BN254 public inputs; `proof_system` is separately restricted to `groth16_kip16_v1`
+- V1 does not specify how `threat_hash` is derived. Matching separately revealed bytes to a commitment would prove consistency only, not truth, maliciousness, or artifact derivation
 - No production relation, verifying key, proving key, or independently approved vectors ship yet; operated verification therefore remains fail-closed `busy`
 - The manifest SHA-256 is the runtime trust anchor; its relation-source hash is attested metadata that must be independently checked during artifact approval
 
@@ -366,14 +378,16 @@ Current-Silverc verification status:
 
 ### 11.1 Fed-DART Protocol
 
-Architecture Decision #10: Privacy-preserving distributed model improvement.
+Architecture Decision #10 target: privacy-preserving distributed model
+improvement.
 
 ```
-PRIVACY GUARANTEE:
-- Only mathematical gradients are transmitted
-- Raw data NEVER leaves the device
-- Client IDs are anonymized (SHA-256 hash)
-- Gradient validation: NaN/Inf values rejected (anti-poisoning)
+PRIVACY BOUNDARY:
+- Training records remain local in the target architecture
+- Bounded model updates can still leak information
+- Client IDs are pseudonymous hashes, not an anonymity guarantee
+- Production requires clipping, aggregation, privacy accounting, authentication,
+  and stronger anti-poisoning controls beyond NaN/Inf rejection
 ```
 
 ### 11.2 Model Updates
@@ -382,7 +396,7 @@ PRIVACY GUARANTEE:
 @dataclass
 class ModelUpdate:
     gradients: List[float]   # Differential weight updates ONLY
-    client_id: bytes         # Anonymized (32 bytes)
+    client_id: bytes         # Pseudonymous (32 bytes), not anonymous
     data_size: int           # Sample count, no content
     signature: bytes         # Authenticity proof
 ```
@@ -391,7 +405,9 @@ class ModelUpdate:
 
 ## 12. Governance Auto-Tuning
 
-Fully automated parameter adjustment (Architecture Decision #5):
+Target: deterministic bounded parameter adjustment from authenticated metrics
+(Architecture Decision #5). Real state/sponsor inputs, external signatures,
+confirmed successor evidence, and production operation remain gated:
 
 | Parameter | Start Value | Target |
 |-----------|------------|--------|
@@ -429,11 +445,16 @@ MIN_CONFIDENCE_KI = 0.85 threshold prevents low-quality proposals:
 - Commit-Reveal with salted hashes prevents vote-copying
 - Bond system (10% of stake) deters frivolous voting
 - Escalating slashing: repeat offenders face up to 3x base penalty
-- No emergency stop (Architecture Decision #3): no single point of failure
+- No emergency-stop entrypoint (Architecture Decision #3); this removes a
+  repository-controlled kill switch, not every availability dependency
 
 ### 13.4 No Emergency Stop
 
-This is a deliberate design decision, not an oversight. Architecture Decision #3 states: "Ultimate decentralization — feature, not a bug." The protocol cannot be paused, halted, or modified by any individual or foundation. Code is law.
+This is a deliberate contract-design decision, not an oversight. No
+repository-controlled emergency-stop entrypoint is introduced. Once deployed,
+covenant transitions follow their scripts rather than an individual developer
+kill switch. Availability still depends on Kaspa, nodes, clients, and network
+access; the invariant is not an uninterrupted-availability guarantee.
 
 ---
 
