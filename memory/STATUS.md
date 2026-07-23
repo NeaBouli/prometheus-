@@ -1,7 +1,7 @@
 # PROMETHEUS – MODULE STATUS
 # Format: | Module | Status | Progress | Last Update | Audit | Testnet Address |
 # Status: PENDING | IN_PROGRESS | DONE | BLOCKED | PENDING_AUDIT | ACCEPTED | REJECTED
-# Last Updated: 2026-07-16
+# Last Updated: 2026-07-23
 
 ---
 
@@ -115,16 +115,16 @@ independent review pass. Exact-main Prometheus CI `29453756167`, Security Audit
 real signature or broadcast occurred. Real state/sponsor inputs, signatures,
 confirmation, successor evidence, and release evidence remain.
 
-Scope-weighted status estimate on 2026-07-19: H-001 canary preparation is about
-96% complete; rollout-capable core-network work is about 74-78% complete with
-the merged/exact-main-verified fail-closed GH-55 ThreatHint transport core; the complete roadmap vision is about
-40-45% complete. These values distinguish
+Scope-weighted status estimate on 2026-07-23: H-001 canary preparation is about
+96% complete; rollout-capable core-network work is about 76-80% complete with
+the merged/exact-main-verified GH-58 durable fail-closed ThreatHint verifier ingress; the complete roadmap vision is about
+42-47% complete. These values distinguish
 prepared software from real chain operation and are not release guarantees.
-Latest verified product/status main `a78d3ed7d3f05c41a9adfa3746aa2a9884dd60b0`
-passed Prometheus CI `29647112173`, Security Audit `29647112172`, and Pages
-`29647111845`; live README, Markdown Whitepaper, Bridge, and Pages GH-55 markers pass.
-Issue #58 tracks the next owner-only verifier-ingress, persistent replay/freshness,
-and bounded analyzer-admission slice; accepted hints remain real-Groth16 gated.
+Latest verified product/status main `22bc55a72bf441a2abc0372bc0eb789fb89fbb0b`
+passed Prometheus CI `29962533693`, Security Audit `29962533720`, and Pages
+`29962533075`; GitHub Pages reports built and public GH-58 markers retain all rollout gates.
+Issue #58 is closed after PR #60. Accepted hints remain gated on an independently
+approved real Groth16 relation/key/vectors and an explicit analyzer-domain adapter.
 The unchanged execution-artifact baseline remains exact main `205e1ca`.
 
 ## GH-13 EXPERIMENTAL MINER COMPANION STATUS
@@ -454,10 +454,10 @@ Exact main: Prometheus CI 29646732936, Security Audit 29646732941, and Pages
             29646732673 passed; live public markers were verified
 ```
 
-## GUARDIAN THREATHINT VERIFIER INGRESS (GH-58 IN VERIFICATION)
+## GUARDIAN THREATHINT VERIFIER INGRESS (GH-58 EXACT-MAIN VERIFIED)
 
 ```text
-Branch: feature/GH-58-threat-hint-verifier-ingress
+Merge: PR #60 -> 22bc55a72bf441a2abc0372bc0eb789fb89fbb0b
 Rust: separate UnixThreatHintIngress, canonical digest-bound ACK, owner/mode/
       peer-UID checks, bounded framing/timeouts, independent in-flight state
 Service: required distinct threat_hint_socket; unavailable boundary maps busy
@@ -469,9 +469,11 @@ Analyzer boundary: outbox retains canonical bytes/digest/network/admission time
                    and does not fabricate indicators absent from the wire
 Production gate: no approved Groth16 relation/verifying key/vectors are bundled;
                  default verifier is unavailable and cannot return accepted
-Local evidence: 12 focused Python tests, 53 Guardian P2P tests plus 3 process
-                tests, 240 Rust workspace passes/2 live ignores, Rustfmt,
-                warning-free Clippy, Black, and Pylint pass; final CI pending
+Evidence: 12 focused Python tests, 138 full Guardian passes/3 live-model skips,
+          53 Guardian P2P tests plus 3 process tests, 240 Rust workspace passes/
+          2 live ignores, Rustfmt, warning-free Clippy, Black, and Pylint pass
+Exact main: Prometheus CI 29962533693, Security Audit 29962533720, and Pages
+            29962533075 passed; GitHub Pages status is built
 Unchanged: PeerId authorization, ballots, wallet/signing/chain, reputation,
            KAS/PROM, slash ACL, commit-reveal, and emergency-stop policy
 ```
