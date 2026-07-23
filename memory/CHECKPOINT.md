@@ -11,15 +11,15 @@
 |------|------|
 | Projekt | Prometheus — Decentralized AI Threat Intelligence |
 | Repo | https://github.com/NeaBouli/prometheus- |
-| Branch | `main`; all product and status changes remain PR-only |
+| Branch | `feat/GH-90-local-file-sha256-producer`; all product and status changes remain PR-only |
 | Lokaler Pfad | `$REPO_ROOT` |
-| Letzter grün verifizierter Produkt-/Tooling-Commit | Exact main `2bfe5a3` merged GH-86 with CI `29981646898`, Security `29981646867`, and Pages `29981646320` |
-| Aktueller Entwicklungs-Slice | Issue #88 and branch `docs/GH-88-local-observable-closeout` reconcile GH-86 merge evidence only. The validators are merged/exact-main verified; v1 remains unchanged and non-actionable, with no new wire, proof, analyzer, or transport path. |
-| Aktuelle Tooling-Baseline | Exact main `2bfe5a3` includes GH-58 durable ingress, GH-63's active-KIP-16-aligned manifest-pinned BN254/Arkworks verifier plus bounded owner-aware adapter/service, GH-69's deterministic manifest-preflight CLI tests, GH-74's bounded hash-only v1 analyzer adapter, GH-77's per-job drain isolation/data-minimal report, and GH-86's isolated canonical observable validators. Public/multi-host operation, trusted membership/key assignment, Sybil resistance, approved production proof artifacts, concrete observables/actionable analysis, and on-chain attestation remain open. Execution artifacts remain bound to `205e1ca`; GH-9 remains ready for explicitly approved external signing. |
-| Aktueller HEAD | Branch from exact main `2bfe5a3cd5df68bd9d17433748c06bb010070fae`; mit `git log --oneline -1` prüfen |
+| Letzter grün verifizierter Produkt-/Tooling-Commit | Exact main `4ce27b2` closed out GH-86 through PR #89 with CI `29982309546`, Security `29982309489`, and Pages `29982308694` |
+| Aktueller Entwicklungs-Slice | Issue #90 and branch `feat/GH-90-local-file-sha256-producer` add one local Rust producer from exact artifact bytes plus typed scope. It computes the digest internally and exposes no path, caller-supplied digest, arbitrary observable builder, transport, proof, analyzer, wallet, signing, or chain path. Python remains an independent validator consumer of shared vectors. |
+| Aktuelle Tooling-Baseline | Exact main `4ce27b2` includes GH-58 durable ingress, GH-63's active-KIP-16-aligned manifest-pinned BN254/Arkworks verifier plus bounded owner-aware adapter/service, GH-69's deterministic manifest-preflight CLI tests, GH-74's bounded hash-only v1 analyzer adapter, GH-77's per-job drain isolation/data-minimal report, and GH-86's isolated canonical observable validators. GH-90 is a branch candidate for one local bytes-only `file_sha256` producer. Public/multi-host operation, trusted membership/key assignment, Sybil resistance, approved production proof artifacts, privacy-reviewed concrete observables/actionable analysis, and on-chain attestation remain open. Execution artifacts remain bound to `205e1ca`; GH-9 remains ready for explicitly approved external signing. |
+| Aktueller HEAD | Branch from exact main `4ce27b28473e8473922badd34b2e0e996d20b1a8`; mit `git log --oneline -1` prüfen |
 | Rollback-Tag | `pre-session-20260413` → `6347b85` |
 | Whitepaper | WHITEPAPER.md (root) + whitepaper.html (styled); miner companion, reward boundaries, GH-36/GH-39 trust boundaries, and GH-48/GH-52/GH-55/GH-58/GH-63/GH-74 merged boundaries remain synchronized |
-| Status | Rollout-capable core remains estimated at 78-82%. GH-86 is merged/exact-main verified with no remaining blocking/high/medium finding, but the local-only slice does not raise the estimate; extractor provenance/privacy, post-Toccata canary execution, approved v2 proof artifacts, concrete-observable/actionable analysis, and full rollout evidence remain gated. |
+| Status | Rollout-capable core remains estimated at 78-82%. GH-90 is locally green and independently reviewed but awaits protected PR/exact-main evidence; its local-only deterministic derivation does not raise the estimate. External provenance/privacy promotion, post-Toccata canary execution, approved v2 proof artifacts, actionable analysis, and full rollout evidence remain gated. |
 | GitHub Pages | https://neabouli.github.io/prometheus-/ |
 | Google Search Console | Verified: googleaa2902079481c7a8 |
 

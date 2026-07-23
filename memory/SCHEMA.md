@@ -197,6 +197,15 @@ not imported by ThreatHint v1, P2P, proof, ingress, analyzer, committee, IPFS,
 chain, or public-rule paths. Structural validity proves neither extractor
 provenance nor semantic privacy.
 
+The GH-90 branch candidate adds one Rust-only producer for exactly one
+`file_sha256` observable. Its public inputs are an exact byte slice and typed
+platform/format scope; the SHA-256 digest is computed internally and the
+digest constructor remains crate-private. Shared vectors bind empty, text, and
+binary artifact bytes to the expected digest and canonical wire, which Python
+independently validates. This establishes only deterministic derivation from
+the supplied bytes and adds no path, transport, proof, analyzer, wallet, or
+chain schema.
+
 ### 2.2 ScanResult (Phi-3-mini Output)
 
 ```rust

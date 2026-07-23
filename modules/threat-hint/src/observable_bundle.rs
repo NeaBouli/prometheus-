@@ -193,6 +193,24 @@ impl ObservableBundle {
         &self.observables
     }
 
+    pub(crate) fn from_file_sha256_digest(
+        platform: ScopePlatform,
+        format: ScopeFormat,
+        digest: [u8; 32],
+    ) -> Result<Self, ObservableBundleError> {
+        let bundle = ObservableBundle {
+            schema_version: Self::SCHEMA_VERSION,
+            disclosure_policy: DisclosurePolicy::PublicAutoV1,
+            scope: ObservableScope { platform, format },
+            observables: vec![ObservableBundleObservable {
+                kind: ObservableKind::FileSha256,
+                value: hex::encode(digest),
+            }],
+        };
+        bundle.to_canonical_bytes()?;
+        Ok(bundle)
+    }
+
     /// Parses bytes and accepts them only when they are valid canonical JSON.
     pub fn parse_canonical(bytes: &[u8]) -> Result<Self, ObservableBundleError> {
         if bytes.is_empty() {
