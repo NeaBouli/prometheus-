@@ -120,20 +120,23 @@ Scope-weighted status estimate on 2026-07-23: H-001 canary preparation is about
 the merged/exact-main-verified GH-63 verifier and GH-74 analyzer-domain adapter;
 the complete roadmap vision is about 44-49% complete. These values distinguish
 prepared software from real chain operation and are not release guarantees.
-Latest verified product main `4cada95ed2f97c2d0251dd82ef40290b0c664c41`
-passed Prometheus CI `29975041446`, Security Audit `29975041416`, and Pages
-`29975040944`. The GH-80 docs/status closeout exact main
-`e1756f966e66d92e00dbdeb161dd57641808ba4e` passed CI `29975474205`,
-Security `29975474202`, and Pages `29975473701`.
+Latest verified operational product main
+`4cada95ed2f97c2d0251dd82ef40290b0c664c41` passed Prometheus CI
+`29975041446`, Security Audit `29975041416`, and Pages `29975040944`.
+The GH-82 design/public exact main
+`fceff1d3ae6db0f38c0076bc2c8dc82f34c3d96d` passed CI `29977301070`,
+Security `29977301063`, and Pages `29977300539`.
 Issue #77 is closed after PR #79 merged normally. Accepted proof verification remains gated on an independently
 approved real Groth16 relation/key/vectors; actionable analysis additionally
 requires a reviewed privacy-preserving concrete-observable channel or future
 schema rather than fabricated v1 indicators.
-GH-82 now freezes that v2 design boundary before code: v1 `threat_hash` is
-caller-supplied and not protocol-derived; the preferred v2 keeps artifact hash
-and observable commitment separate. Commitment matching proves canonical-byte
-consistency only. The draft does not enable v2 transport or actionable
-analysis, so progress estimates remain unchanged.
+GH-82 is closed after PR #83 merged normally. The v2 design boundary is now
+public and exact-main verified: v1 `threat_hash` is caller-supplied and not
+protocol-derived; the preferred v2 keeps artifact hash and observable
+commitment separate. Commitment matching proves canonical-byte consistency
+only. Local Rust/Python canonical validators and shared vectors are next. The
+draft does not enable v2 transport or actionable analysis, so progress
+estimates remain unchanged.
 The unchanged execution-artifact baseline remains exact main `205e1ca`.
 
 ## GH-13 EXPERIMENTAL MINER COMPANION STATUS
