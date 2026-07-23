@@ -10,6 +10,7 @@ description = "Canonical threat hint envelope definitions and parsing utilities"
 [dependencies]
 hex.workspace = true
 object.workspace = true
+secp256k1.workspace = true
 sha2.workspace = true
 subtle.workspace = true
 serde.workspace = true

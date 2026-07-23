@@ -12,6 +12,11 @@ GH-103 adds one local Rust producer for a checked `api_import` selected from
 exact caller-supplied Linux ELF bytes. It derives scope internally, bounds
 artifact bytes and dynamic symbols, always emits `review_required_v1`, and is
 independently checked against shared exact-byte ELF vectors by Python.
+The GH-107 candidate adds an isolated local Rust/Python verifier for one
+canonical, short-lived BIP340 approval statement over one exact
+`review_required_v1` bundle. It authenticates a statement only and is not
+connected to transport, analysis, disclosure, publication, proof, wallet, or
+chain paths.
 No v2 wire, proof relation,
 production key, pairing, analyzer promotion, or deployment is approved by this
 document.
@@ -191,14 +196,61 @@ then sorts and deduplicates exact names before selection. Scope is derived as
 selection, not provenance, maliciousness, privacy approval, disclosure
 authorization, or proof binding.
 
-`review_required_v1` is local-only in the first implementation. Any IPC, P2P,
-Guardian analyzer, committee, IPFS, chain, or public-rule boundary must reject
-the complete bundle even if the sender labels it reviewed. A later release may
-promote it only through a separately specified authenticated approval envelope
-that binds the exact `observable_commitment`, approver authority, purpose,
-recipient scope, expiry, and nonce. Self-labeling a bundle is never approval.
-Until that protocol exists and passes review, reviewed bundles may be
-canonicalized and tested locally but must not leave the producer boundary.
+`review_required_v1` remains local-only. Any IPC, P2P, Guardian analyzer,
+committee, IPFS, chain, or public-rule boundary must reject the complete bundle
+even if the sender labels it reviewed. Self-labeling a bundle is never
+approval.
+
+The GH-107 candidate defines and verifies the first local Observable Approval
+v1 statement. Its strict canonical JSON field order is:
+
+```text
+schema_version, observable_commitment, approver_xonly_public_key, purpose,
+recipient_scope, network_id, not_before, expires_at, approval_nonce, signature
+```
+
+The wire is capped at 1024 bytes. `schema_version` is integer `1`; `purpose` is
+exactly `guardian_analysis_v1`; the commitment, x-only BIP340 public key,
+recipient-scope digest, and approval nonce are 32-byte lowercase hexadecimal
+values; and the signature is 64-byte lowercase hexadecimal. The trusted local
+context supplies the exact report nonce, approver key, recipient-scope digest,
+network, and separately trusted current time that must never be
+attacker-controlled. The verifier reparses the exact canonical bundle, requires
+`review_required_v1`, recomputes its commitment from the trusted network and
+report nonce, and compares the trusted key and recipient scope before signature
+verification.
+
+The unsigned signing body contains the first nine fields in the order above.
+Its 32-byte BIP340 message is:
+
+```text
+SHA256(
+  "prometheus-observable-approval-v1\0" ||
+  u32be(len(canonical_unsigned_body)) || canonical_unsigned_body
+)
+```
+
+The deterministic approval identifier is:
+
+```text
+SHA256(
+  "prometheus-observable-approval-id-v1\0" ||
+  u32be(len(canonical_full_wire)) || canonical_full_wire
+)
+```
+
+Validity is inclusive (`not_before <= current_time <= expires_at`), starts
+after Unix time zero, and is limited to 3600 seconds. All invalid input returns
+one fixed redacted error. The verifier contains no signer and performs no
+transport, persistence, promotion, disclosure, analysis, proof, wallet, or
+chain action. The signed nonce and approval ID make repeat submissions
+identifiable; they do not prevent replay. A future consuming boundary must
+persist one-time use and separately define trusted approver rotation,
+recipient-scope policy, owner-only pairing, and promotion semantics before any
+bundle may leave the local boundary.
+In Python, the returned object is data only and its object identity is not an
+authority boundary. A future consumer must invoke verification in the same
+trusted call path and must never accept a caller-supplied result instance.
 
 ## 7. Processing Boundary
 
@@ -224,11 +276,15 @@ network or analyzer promotion requires:
 
 - frozen cross-language test vectors for valid and invalid canonical bundles
   (implemented locally and exact-main verified by GH-86);
+- a canonical authenticated approval statement and cross-language verification
+  (implemented locally by the GH-107 candidate, without consumption or
+  promotion);
 - a separate ThreatHint v2 schema and protocol identifier;
 - an exact v2 statement specification and reviewed relation source;
 - independently approved relation, proving/verifying keys, and vectors;
 - owner-only durable pairing of one verified hint with one validated bundle;
-- replay, freshness, size, concurrency, logging, and cancellation tests;
+- durable one-time approval consumption plus replay, freshness, size,
+  concurrency, logging, and cancellation tests;
 - privacy review of every observable class and generated-rule publication;
 - real multi-host evidence and protected CI/Security/Pages success.
 

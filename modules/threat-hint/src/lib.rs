@@ -6,6 +6,7 @@ use thiserror::Error;
 mod api_import_producer;
 mod byte_pattern_producer;
 mod file_sha256_producer;
+mod observable_approval;
 pub mod observable_bundle;
 
 pub use api_import_producer::{
@@ -14,6 +15,10 @@ pub use api_import_producer::{
 };
 pub use byte_pattern_producer::produce_byte_pattern_bundle;
 pub use file_sha256_producer::produce_file_sha256_bundle;
+pub use observable_approval::{
+    verify_observable_approval, ObservableApprovalContext, ObservableApprovalError,
+    VerifiedObservableApproval, MAX_APPROVAL_LIFETIME_SECONDS, MAX_CANONICAL_APPROVAL_BYTES,
+};
 pub use observable_bundle::{
     DisclosurePolicy, ObservableBundle, ObservableBundleError, ObservableKind, ObservableScope,
     ScopeFormat, ScopePlatform,

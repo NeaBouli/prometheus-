@@ -224,6 +224,24 @@ with fixed errors. The resulting bundle is always `review_required_v1`;
 no path/string/generic builder, wire, approval envelope, proof, analyzer,
 wallet, or chain schema is added.
 
+The GH-107 candidate adds a local Observable Approval v1 envelope and matching
+Rust/Python verification only. Canonical field order is `schema_version`,
+`observable_commitment`, `approver_xonly_public_key`, `purpose`,
+`recipient_scope`, `network_id`, `not_before`, `expires_at`,
+`approval_nonce`, `signature`; the full wire is capped at 1024 bytes.
+Fixed-size fields use lowercase hex, purpose is `guardian_analysis_v1`, and the
+BIP340 message is SHA-256 over
+`prometheus-observable-approval-v1\0 || u32be(body_len) || canonical_body`.
+The deterministic ID uses the separate
+`prometheus-observable-approval-id-v1\0` domain over the full canonical wire.
+Validity is inclusive and capped at 3600 seconds. Verification requires a
+separately trusted report nonce, approver key, recipient-scope digest, network,
+and current time; the current time must never be attacker-controlled. The
+verifier recomputes the exact review-required bundle commitment.
+No signer, replay ledger, transport, promotion, analyzer, proof, wallet, or
+chain schema is introduced. The nonce/ID make repeats identifiable but do not
+prevent replay.
+
 ### 2.2 ScanResult (Phi-3-mini Output)
 
 ```rust
