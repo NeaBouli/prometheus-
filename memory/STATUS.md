@@ -158,27 +158,29 @@ wallet, signing, or chain input. This is deterministic function-boundary
 derivation only; external provenance, privacy approval, and proof binding
 remain open. Exact-main Prometheus CI `29984477087`, Security Audit
 `29984476876`, and Pages `29984476107` passed.
-GH-94 is closed after protected PR #97 merged normally as exact main
-`34ab5b7a62b17ef2c9cab672439b77dcf4a66d9c`: one local Rust producer derives a
-bounded `byte_pattern` from exact caller-supplied bytes, checked offset, boolean
-wildcard mask, and typed scope. It accepts no path or pattern string, requires
-8..=64 positions and at least eight fixed bytes, and always emits local-only
-`review_required_v1`. Exact-main Prometheus CI `29989116631`, Security Audit
-`29989117912`, and Pages `29989118948` pass. External provenance, maliciousness,
-privacy approval, disclosure authorization, transport, and proof binding remain
-unproved; documentation reconciliation continues under GH-98.
-GH-100 and branch `fix/GH-100-sidecar-signal-readiness` close the Guardian
-sidecar readiness/signal race exposed while rerunning GH-98 CI. Tokio signal
-receivers are now installed before `OperatorOutput::start()` can emit any
-operator record: the explicitly Unix-only crate creates SIGINT/SIGTERM
-listeners synchronously. Registration errors fail before readiness. The old
-compiled binary reproduced the process assertion at
-iteration 24; the patch passed 64/64 stress iterations, the focused regression,
-ten repeated process-suite runs, all Guardian P2P tests, and the complete Rust
-workspace. Claude Code independently found the Unix change sound; its
-non-Unix question is inapplicable because the crate rejects non-Unix targets.
-Protected PR/exact-main evidence remains open; no protocol or security
-invariant changed.
+GH-94 is closed after PR #97 merged normally as exact main
+`34ab5b7a62b17ef2c9cab672439b77dcf4a66d9c`. One local Rust producer derives
+a bounded `byte_pattern` from exact caller-supplied bytes, checked offset,
+boolean wildcard mask, and typed scope. It accepts no path or pattern string,
+requires 8..=64 positions and at least eight fixed bytes, and always emits
+local-only `review_required_v1`. Shared vectors cover fixed, offset/wildcard,
+script, and 64-token/minimum-fixed boundaries; Python independently derives and
+validates the expected wire. Independent Terra review found no
+blocking/high/medium issue, and CodeRabbit's one valid corpus-documentation
+ambiguity is fixed. Exact-main Prometheus CI `29989116631`, Security Audit
+`29989117912`, and Pages `29989118948` pass. External provenance,
+maliciousness, privacy approval, disclosure authorization, transport, and proof
+binding remain unproved.
+GH-100 is closed after protected PR #101 merged normally as exact main
+`83bdfe0e52e9308e28c8f0984a1219f203aa1f74`. The explicitly Unix-only Guardian
+sidecar now constructs SIGINT/SIGTERM listeners before
+`OperatorOutput::start()` can emit any operator record, and registration errors
+fail before readiness. Pre-fix compiled-binary stress reproduced the process
+assertion at iteration 24; the patch passed 64/64 stress iterations, ten
+process-suite repetitions, local complete suites, and remote Rust Workspace.
+Claude Code independently found the Unix lifetime/error handling sound.
+Exact-main Prometheus CI `29994190542`, Security Audit `29994190564`, and Pages
+`29994189428` pass. No protocol or security invariant changed.
 The unchanged execution-artifact baseline remains exact main `205e1ca`.
 
 ## GH-13 EXPERIMENTAL MINER COMPANION STATUS

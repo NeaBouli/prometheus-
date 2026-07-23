@@ -206,7 +206,7 @@ independently validates. This establishes only deterministic derivation from
 the supplied bytes and adds no path, transport, proof, analyzer, wallet, or
 chain schema.
 
-The GH-94 branch candidate adds one Rust-only producer for exactly one
+Merged and exact-main-verified GH-94 adds one Rust-only producer for exactly one
 `byte_pattern` observable. It selects 8..=64 positions from exact
 caller-supplied bytes using checked offset arithmetic and a same-length boolean
 wildcard mask, requires at least eight fixed positions, and accepts no pattern
