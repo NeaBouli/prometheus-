@@ -79,10 +79,12 @@ SHA256(
 )
 ```
 
-This digest structurally binds every field, including the distinct artifact
-hash, observable commitment, report nonce, and trusted network. It is not a
-signature or proof and supplies no replay, privacy, disclosure, or analysis
-authority.
+This digest structurally binds every field in the canonical statement,
+including its distinct artifact hash, observable commitment, report nonce, and
+`network_id`. Parser acceptance separately requires `network_id` to equal the
+trusted local network; that external context is not part of the digest input.
+The digest is not a signature or proof and supplies no replay, privacy,
+disclosure, or analysis authority.
 
 Both hashes must be statement-bound by a new reviewed relation. Existing
 ThreatHint v1 bytes, schema version, statement prefix, public-input encoding,

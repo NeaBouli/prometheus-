@@ -731,8 +731,9 @@ Input: exact canonical statement bytes plus separately trusted local network
 Shape: schema 2; separate artifact hash and observable commitment; confidence;
        structural disclosure class; report nonce; positive observed time;
        network
-Checks: exact field order and bytes; closed scalar grammar; u64 parity; 1024
-        byte cap; trusted-network equality; one redacted failure
+Checks: exact field order and bytes; closed scalar grammar; positive u64
+        observed_at; 1024 byte cap; trusted-network equality; one redacted
+        failure
 Digest: SHA256("prometheus-threat-hint-statement-v2\0" ||
                u32be(canonical_length) || canonical_statement)
 Parity: independent Rust/Python parsers consume 8 valid and 20 invalid shared
@@ -749,6 +750,9 @@ Review: Terra architecture and Spark parity/security review found no initial
         issue; final Terra review found one medium Python valid-shape
         mutation/forged-object gap, fixed by an identity-bound parse snapshot
         and two regressions; re-review reports no blocking/high/medium issue;
+        PR #115 first technical CI/Security round passed; CodeRabbit's four
+        minor wording/regex consistency findings are fixed and post-fix checks
+        pass; second protected round remains;
         Claude Code terminal probe passed but the bounded read-only request
         stopped before repository access on its USD budget
 Boundary: no v1 change, relation, proof acceptance, signer, approval pairing,

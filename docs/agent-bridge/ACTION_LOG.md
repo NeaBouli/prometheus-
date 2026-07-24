@@ -1049,3 +1049,16 @@ Rules for all dev agents:
   workflow YAML; Actionlint 1.7.12; Cargo Audit with no vulnerabilities and
   eight allowed warnings; Python Audit with no known vulnerabilities; staged
   Gitleaks 8.30.1 with no leak; and clean staged diff.
+- Commit `b923643` was pushed and protected PR
+  https://github.com/NeaBouli/prometheus-/pull/115 opened. Its first Prometheus
+  CI `30017135102` and Security Audit `30017136619` round passed every technical
+  job without admin bypass.
+- CodeRabbit found four minor consistency points: distinguish statement
+  `network_id` digest input from separately trusted parser context, name
+  positive-u64 `observed_at` precisely, make the Python network regex itself
+  enforce the existing two-character minimum, and synchronize the public HTML
+  digest wording. All four are fixed. Post-fix evidence passes nine focused and
+  223 complete Guardian tests with three intentional skips, Black, source
+  Pylint 10.00/10, HTML/SEO/JSON-LD/public-status checks, Memory Integrity, six
+  Autodidactic tests, and clean diff checks. Second-round protected checks,
+  thread resolution, merge, exact-main runs, and live markers remain.

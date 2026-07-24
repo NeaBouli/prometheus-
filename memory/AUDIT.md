@@ -1590,6 +1590,17 @@ high, or medium issue. Claude Code's terminal probe passed, but the bounded
 read-only review exited before repository access because its configured USD
 budget was exhausted.
 
+Protected PR #115 first-round Prometheus CI `30017135102` and Security Audit
+`30017136619` passed every technical job. CodeRabbit found four minor
+consistency points: distinguish canonical statement `network_id` from
+separately trusted parser context in digest wording, state positive-u64
+`observed_at` precisely, make the Python regex itself enforce the existing
+two-character network minimum, and synchronize public HTML digest wording.
+All four are fixed. Nine focused and 223 complete Guardian tests with three
+intentional skips, Black, source Pylint 10.00/10, HTML/SEO/JSON-LD/public
+status, Memory Integrity, six Autodidactic tests, and clean diff checks pass
+after the fixes. Second-round protected checks and thread resolution remain.
+
 Non-claims: the asserted artifact hash and commitment are not proven to derive
 from real bytes. The statement digest is not a signature or proof. Structural
 `disclosure_class` does not authorize disclosure. No relation, proof

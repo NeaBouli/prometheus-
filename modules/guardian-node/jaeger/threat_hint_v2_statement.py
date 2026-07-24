@@ -220,5 +220,5 @@ def _validate_network_id(value: Any) -> str:
 
 
 _LOWER_HEX_RE = re.compile(r"[0-9a-f]{64}")
-_NETWORK_RE = re.compile(r"[a-z0-9](?:[a-z0-9-]{0,62}[a-z0-9])?")
+_NETWORK_RE = re.compile(r"[a-z0-9][a-z0-9-]{0,62}[a-z0-9]")
 _PARSED_CANONICAL: weakref.WeakKeyDictionary[Any, bytes] = weakref.WeakKeyDictionary()

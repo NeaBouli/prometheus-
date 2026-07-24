@@ -342,6 +342,10 @@ Leistungsbasierte Emission. Guardians = "Miner" (KI statt GPU).
   snapshot and two regressions closed it, and re-review reports no remaining
   blocking, high, or medium issue. Claude Code was reachable, but its read-only
   helper call stopped before repository access on the configured USD budget.
+- Protected PR #115 first-round CI/Security technical jobs passed. CodeRabbit's
+  four minor digest-context, positive-u64, network-regex, and public-HTML
+  consistency findings are fixed; affected post-fix tests and document gates
+  pass. Second-round protected checks and thread resolution remain.
 - Relation/proof artifacts, privacy approval, authority semantics,
   hint/bundle/approval pairing, replay/external-side-effect policy, transport,
   actionable analysis, and all external rollout gates remain open. Completion
