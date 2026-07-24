@@ -95,7 +95,7 @@ grants no external authority. Key ownership/rotation, scope semantics,
 hint/bundle pairing, privacy approval, transport, analyzer execution,
 promotion, outbox delivery, wallet, and chain behavior remain unimplemented.
 
-GH-114 adds an isolated local ThreatHint v2 statement parser in Rust and
+Merged and exact-main-verified GH-114 adds an isolated local ThreatHint v2 statement parser in Rust and
 Python. It requires exact canonical bytes for separate artifact hash and
 observable commitment fields plus bounded confidence, structural disclosure
 class, report nonce, positive observed time, and a network matching separately

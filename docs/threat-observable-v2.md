@@ -17,7 +17,7 @@ canonical, short-lived BIP340 approval statement over one exact
 `review_required_v1` bundle. It authenticates a statement only and is not
 connected to transport, analysis, disclosure, publication, proof, wallet, or
 chain paths.
-GH-114 adds isolated local Rust/Python parsers for the canonical v2 statement
+Merged and exact-main-verified GH-114 adds isolated local Rust/Python parsers for the canonical v2 statement
 defined in Section 3 plus one shared exact-byte corpus. No proof relation,
 production key, pairing, transport, analyzer promotion, or deployment is
 approved by this document.
