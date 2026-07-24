@@ -1546,3 +1546,54 @@ promotion, disclosure, analyzer invocation, outbox delivery, proof, signing,
 wallet, chain, reputation, KAS/PROM, slash ACL, commit-reveal, or emergency-stop
 behavior. A future external action requires a separate crash-safe claim/outbox
 design and review. Foreign untracked `Prometheus-1.png` remains untouched.
+
+## GH-114 LOCAL CANONICAL THREATHINT V2 STATEMENT (2026-07-24)
+
+Scope: one isolated Rust parser and one isolated Python parser for a canonical
+ThreatHint schema-2 statement. The type is not imported by ThreatHint v1,
+Guardian ingress, proof verification, approval consumption, analyzer, outbox,
+P2P, wallet, signing, transaction, chain, reputation, or reward paths.
+
+Result: PASS for the focused structural-binding boundary. Both implementations
+cap the exact wire at 1024 bytes and require ordered schema version, distinct
+artifact hash and observable commitment, bounded confidence, closed structural
+disclosure class, report nonce, positive u64 observed time, and a network equal
+to separately trusted local context. Unknown, duplicate, reordered,
+noncanonical, malformed, wrong-type, cross-network, oversized, escaped, and
+trailing inputs fail with one redacted error.
+
+Cross-language evidence: one shared exact-byte corpus contains 8 valid and 20
+invalid cases. Rust and Python independently reproduce the same canonical
+bytes and
+`SHA256("prometheus-threat-hint-statement-v2\0" || u32be(length) || wire)`
+digest. Mutating any bound field changes that digest. Python rejects direct and
+subclass construction, binds each parsed object identity to its original
+canonical bytes, and rejects both valid-shape mutation and manually forged
+exact-class instances before serialization or digesting. This is object
+integrity hardening, not authority against arbitrary code in the same
+interpreter.
+
+Complete local evidence: 290 Rust workspace tests with two intentional
+live-network ignores, 223 Guardian tests with three intentional live-model
+skips, and two compile-fail doctests pass. Rustfmt, warning-free workspace
+all-target Clippy, locked optimized Guardian/proof builds, verified
+24/14/7-file packages, Black, changed-file Pylint 10.00/10, complete Guardian
+Pylint 9.80/10, Memory Integrity, six Autodidactic tests,
+HTML/SEO/JSON-LD/public-status checks, workflow YAML, Actionlint 1.7.12, Cargo
+Audit with no vulnerabilities and eight allowed warnings, Python Audit with no
+known vulnerabilities, staged Gitleaks 8.30.1 with no leak, and clean staged
+diff pass. Terra architecture and Spark parity/security review found no initial
+issue. Final Terra review found one medium Python valid-shape mutation/
+forged-object gap; the identity-bound parse snapshot and two adversarial
+regressions closed it, and targeted re-review reports no remaining blocking,
+high, or medium issue. Claude Code's terminal probe passed, but the bounded
+read-only review exited before repository access because its configured USD
+budget was exhausted.
+
+Non-claims: the asserted artifact hash and commitment are not proven to derive
+from real bytes. The statement digest is not a signature or proof. Structural
+`disclosure_class` does not authorize disclosure. No relation, proof
+acceptance, signer, approval pairing, replay authority, persistence, transport,
+analysis, publication, wallet, or chain action is added. Protected PR
+review/CI, exact-main evidence, and live public verification remain before this
+slice is accepted.

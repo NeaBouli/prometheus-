@@ -171,9 +171,23 @@ Direct construction and value-bearing representations are disabled.
 This module is not imported by ThreatHint v1, verifier ingress, the analyzer,
 committee, IPFS, chain, or public-rule paths. Structural acceptance proves
 neither extractor provenance nor semantic privacy. Reviewed kind-specific
-extractors, privacy gates, a separate v2 wire/proof/pairing design, and
-production evidence remain required before any observable leaves its local
-producer boundary.
+extractors, privacy gates, a reviewed v2 relation/proof/pairing and transport
+design, and production evidence remain required before any observable leaves
+its local producer boundary. The isolated local v2 statement parser below does
+not satisfy those promotion gates.
+
+## Local ThreatHint v2 Statement Parsing
+
+`jaeger.threat_hint_v2_statement` independently mirrors the Rust canonical
+ThreatHint v2 statement parser. Both consume one shared exact-byte corpus,
+require the wire network to match separately trusted local context, and compute
+the same length-prefixed domain-separated digest over separate artifact-hash
+and observable-commitment fields plus confidence, structural disclosure class,
+report nonce, and observed time.
+
+The returned Python object is data only. This module is not imported by v1
+ingress, proof verification, approval consumption, analyzer, outbox, wallet, or
+chain paths and grants no disclosure, replay, or promotion authority.
 
 ## Local Observable Approval Consumption
 

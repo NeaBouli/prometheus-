@@ -8,6 +8,7 @@ mod byte_pattern_producer;
 mod file_sha256_producer;
 mod observable_approval;
 pub mod observable_bundle;
+mod threat_hint_v2_statement;
 
 pub use api_import_producer::{
     produce_elf_api_import_bundle, ElfApiImportProducerError, MAX_ELF_API_IMPORT_ARTIFACT_BYTES,
@@ -22,6 +23,10 @@ pub use observable_approval::{
 pub use observable_bundle::{
     DisclosurePolicy, ObservableBundle, ObservableBundleError, ObservableKind, ObservableScope,
     ScopeFormat, ScopePlatform,
+};
+pub use threat_hint_v2_statement::{
+    ThreatHintV2DisclosureClass, ThreatHintV2Statement, ThreatHintV2StatementError,
+    MAX_CANONICAL_V2_STATEMENT_BYTES,
 };
 
 pub const MAX_CANONICAL_BYTES: usize = 2048;

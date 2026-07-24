@@ -183,9 +183,11 @@ open, so the production verifier is unavailable and returns fail-closed
 its shape and statement binding but does not define or verify derivation from a
 file or observable. GH-82's normative draft in
 `docs/threat-observable-v2.md` therefore leaves v1 unchanged and specifies a
-future separate `artifact_hash` plus domain-separated
+separate `artifact_hash` plus domain-separated
 `observable_commitment`. A matching reveal proves commitment consistency only;
-no v2 wire schema is implemented yet.
+GH-114 implements the isolated local canonical schema-2 statement described in
+Section 4.4, but no v2 protocol, relation, proof acceptance, pairing, transport,
+or analyzer promotion exists.
 
 Merged and exact-main-verified GH-86 implements the local Canonical Observable Bundle v1 parser in Rust and
 Python against one shared byte-exact valid/invalid corpus. The local schema is
@@ -505,3 +507,30 @@ schemas.
   "active": true
 }
 ```
+
+### 4.4 Local ThreatHint v2 Statement (GH-114)
+
+The isolated local canonical statement is exact UTF-8 JSON:
+
+```text
+schema_version: exact integer 2
+artifact_hash: 64 lowercase hex characters
+observable_commitment: 64 lowercase hex characters
+confidence_bps: integer 1..=10000
+disclosure_class: public_auto_v1 | review_required_v1
+report_nonce: 64 lowercase hex characters
+observed_at: positive u64
+network_id: 2..=64 lowercase alphanumeric/hyphen bytes
+```
+
+These fields appear in exactly that order and the complete wire is at most 1024
+bytes. The wire network must equal a separately trusted local network. Unknown,
+duplicate, missing, reordered, alternatively encoded, non-integer, trailing,
+or oversized input fails with one redacted error.
+
+The statement digest is
+`SHA256("prometheus-threat-hint-statement-v2\0" || u32be(wire_len) || wire)`.
+It binds the exact fields structurally but is not a signature, proof, replay
+ledger, privacy decision, approval, disclosure grant, or analyzer input.
+ThreatHint v1 schema, relation, verifier, transport, and analyzer types remain
+unchanged.

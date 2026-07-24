@@ -65,6 +65,21 @@ entries. It accepts no path, caller-supplied import string, platform, format,
 or generic value. The result remains local and does not prove provenance,
 maliciousness, privacy approval, or disclosure authorization.
 
+## ThreatHint v2 Statement (local parsing only)
+
+`ThreatHintV2Statement` is separate from the schema-v1 transport envelope. It
+parses only exact canonical JSON containing schema version 2, distinct artifact
+hash and observable commitment, bounded confidence, a closed structural
+disclosure class, report nonce, positive observed time, and a network that must
+match separately trusted local context. Its length-prefixed domain-separated
+digest binds every canonical field.
+
+The Rust parser and isolated Python counterpart consume one shared exact-byte
+valid/invalid corpus. No generic producer, signer, relation, proof acceptance,
+pairing, transport, replay authority, analyzer, wallet, or chain integration is
+provided. The type proves structural binding only, not artifact derivation,
+truth, maliciousness, privacy safety, authorization, or anonymity.
+
 ## Observable Approval v1 (local verification only)
 
 `verify_observable_approval` verifies one exact canonical, BIP340-authenticated

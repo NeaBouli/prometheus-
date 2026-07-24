@@ -17,9 +17,10 @@ canonical, short-lived BIP340 approval statement over one exact
 `review_required_v1` bundle. It authenticates a statement only and is not
 connected to transport, analysis, disclosure, publication, proof, wallet, or
 chain paths.
-No v2 wire, proof relation,
-production key, pairing, analyzer promotion, or deployment is approved by this
-document.
+GH-114 adds isolated local Rust/Python parsers for the canonical v2 statement
+defined in Section 3 plus one shared exact-byte corpus. No proof relation,
+production key, pairing, transport, analyzer promotion, or deployment is
+approved by this document.
 
 ## 1. Purpose
 
@@ -49,14 +50,39 @@ A hash is a commitment and correlation identifier, not encryption. A
 content-addressed CID is not access control. A public YARA rule can reveal every
 literal or byte pattern it contains.
 
-## 3. Preferred v2 Statement
+## 3. Canonical v2 Statement
 
-The preferred ThreatHint v2 statement has separate public fields for:
+The local ThreatHint v2 statement is strict UTF-8 JSON with this exact field
+order:
 
-- `artifact_hash`: SHA-256 of the locally scanned artifact;
-- `observable_commitment`: commitment to the canonical bundle below;
-- `confidence_bps`, `disclosure_class`, `report_nonce`, and `observed_at`;
-- trusted `network_id` and a new v2 statement domain.
+```json
+{"schema_version":2,"artifact_hash":"0000000000000000000000000000000000000000000000000000000000000000","observable_commitment":"1111111111111111111111111111111111111111111111111111111111111111","confidence_bps":7500,"disclosure_class":"review_required_v1","report_nonce":"2222222222222222222222222222222222222222222222222222222222222222","observed_at":1700000000,"network_id":"testnet-10"}
+```
+
+The canonical wire is 1..=1024 bytes. `schema_version` is exact integer `2`.
+`artifact_hash`, `observable_commitment`, and `report_nonce` are each exactly
+32 bytes encoded as 64 lowercase hexadecimal characters. `confidence_bps` is
+an integer in 1..=10000. `disclosure_class` is the closed structural set
+`public_auto_v1` or `review_required_v1`; it grants no disclosure authority.
+`observed_at` is a positive unsigned 64-bit integer. `network_id` follows the
+existing 2..=64-byte lowercase alphanumeric-and-hyphen grammar and must equal a
+separately trusted local network argument.
+
+Unknown, duplicate, missing, reordered, alternatively escaped, non-integer,
+noncanonical, whitespace-padded, oversized, and trailing input is rejected.
+Parsers reserialize and require byte identity. The statement digest is:
+
+```text
+SHA256(
+  "prometheus-threat-hint-statement-v2\0" ||
+  u32be(len(canonical_statement)) || canonical_statement
+)
+```
+
+This digest structurally binds every field, including the distinct artifact
+hash, observable commitment, report nonce, and trusted network. It is not a
+signature or proof and supplies no replay, privacy, disclosure, or analysis
+authority.
 
 Both hashes must be statement-bound by a new reviewed relation. Existing
 ThreatHint v1 bytes, schema version, statement prefix, public-input encoding,
@@ -295,8 +321,10 @@ network or analyzer promotion requires:
 - a canonical authenticated approval statement and cross-language verification
   (implemented locally and exact-main verified by GH-107, without consumption or
   promotion);
-- a separate ThreatHint v2 schema and protocol identifier;
-- an exact v2 statement specification and reviewed relation source;
+- a separate ThreatHint v2 protocol identifier beyond the local statement
+  parser (the exact local schema/digest and parity corpus are implemented by
+  GH-114 without transport or proof acceptance);
+- a reviewed v2 relation source that constrains the exact statement fields;
 - independently approved relation, proving/verifying keys, and vectors;
 - owner-only durable pairing of one verified hint with one validated bundle;
 - local durable one-time approval consumption with trusted fixed policy,
