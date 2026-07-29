@@ -203,12 +203,11 @@ identities, and returns two claimed 16-byte digest halves.
 The Python result is immutable under supported use and uses an identity-bound
 weak snapshot of both exact wires and the trusted network to fail closed on
 valid-shape mutation or forgery. This is in-process object-integrity hardening,
-not authority against arbitrary interpreter code. The slice is a local
-review-ready candidate only: it verifies no Groth16 proof, loads or approves no
-source or key, and performs no transport, analyzer, promotion, wallet, chain,
-or rollout action.
+not authority against arbitrary interpreter code. The merged GH-117 structural
+slice alone verifies no Groth16 proof, loads or approves no source or key, and
+performs no transport, analyzer, promotion, wallet, chain, or rollout action.
 
-## Local ThreatHint v2 Privacy/Proof Preflight Candidate
+## Local ThreatHint v2 Privacy/Proof Preflight
 
 `jaeger.threat_hint_v2_preflight` composes the local v2 structural boundaries
 without consuming authority. An owner-only read-only TOML policy pins one
@@ -225,17 +224,17 @@ By itself this layer is not acceptance; the local verifier and atomic
 composition below supply the mechanical call order, while production artifact
 approval and independent review remain mandatory.
 
-The sibling Rust package now has a local review-ready `verify-v2` candidate
-that performs real Groth16 checks against owner-only manifest,
-relation-source, and verifying-key artifacts. This Python preflight does not
-invoke it. Only deterministic test artifacts exist, so production
+The sibling Rust package now has the merged and exact-main-verified GH-117
+`verify-v2` boundary that performs real Groth16 checks against owner-only
+manifest, relation-source, and verifying-key artifacts. This Python preflight
+does not invoke it. Only deterministic test artifacts exist, so production
 relation/key/ceremony approval remains required; the separate acceptance
-candidate below composes the local test-artifact verifier with consumption.
+boundary below composes the local test-artifact verifier with consumption.
 
 ### Non-consuming ThreatHint v2 verified preflight
 
 `jaeger.threat_hint_v2_verified_preflight.ThreatHintV2VerifiedPreflightService`
-is a separate POSIX-only local candidate that composes the standalone
+is a separate POSIX-only local boundary that composes the standalone
 preflight with the Rust verifier. Its owner-only exact-schema TOML config pins
 an absolute verifier executable path, its exact SHA-256, one absolute relation
 manifest path, and a timeout from 100 through 60000 milliseconds. Network and
@@ -256,10 +255,9 @@ behavior. An owner-bounded hash-to-`execve` race remains because Python cannot
 portably execute the already-hashed descriptor; therefore the executable and
 all ancestors must be owned by the current user or root and cannot be
 group/world writable. Final production acceptance still requires independent
-artifact review; the atomic mechanical boundary is the separate local
-candidate below.
+artifact review; the atomic mechanical boundary is documented below.
 
-### Atomic ThreatHint v2 acceptance candidate
+### Atomic ThreatHint v2 acceptance
 
 `jaeger.threat_hint_v2_acceptance.ThreatHintV2AcceptanceService` is a
 raw-input-only local composition of verified preflight and durable approval
@@ -276,9 +274,9 @@ is recovered as replay on the next identical call, never double consumption.
 The returned receipt is non-constructible, non-serializable data only and
 grants no downstream authority. Production relation/key/ceremony approval,
 independent cryptographic review, privacy promotion, transport, analysis,
-outbox effects, wallet, chain, and rollout remain outside this candidate.
+outbox effects, wallet, chain, and rollout remain outside this boundary.
 
-### Owner-policy ThreatHint v2 promotion candidate
+### Owner-policy ThreatHint v2 promotion
 
 `jaeger.threat_hint_v2_promotion.ThreatHintV2PromotionService` is the
 raw-input-only local boundary above atomic acceptance. A separate owner-only,
@@ -301,7 +299,7 @@ meaning, semantic per-kind privacy safety, production relation/key/ceremony
 approval, transport, analysis, publication, crash-safe external effects,
 wallet, chain, or rollout authority.
 
-### Owner-local outbox retention-governance candidate
+### Owner-local outbox retention governance
 
 `jaeger.outbox_retention_policy.load_outbox_retention_policy(...)` is a pure,
 read-only policy loader for a possible future local recoverable analysis
@@ -322,7 +320,7 @@ approval.
 This module opens no SQLite database and creates no ledger row, outbox record,
 worker, transport, disclosure, or external effect. It proves no key ownership,
 scope authorization, extractor provenance, or privacy safety. The governed
-promotion composition below is the only local candidate allowed to consume
+promotion composition below is the only local boundary allowed to consume
 this exact snapshot for durable enqueue.
 
 ### Enforceable ThreatHint v2 authority and privacy governance

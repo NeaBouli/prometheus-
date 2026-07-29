@@ -1,9 +1,9 @@
 # PROMETHEUS CODEX BRIDGE
 
-Last updated: 2026-07-24 EEST
+Last updated: 2026-07-29 EEST
 Repo: Prometheus working-tree root
-Operational product/public baseline: exact product main `70bb8ab0ba4cbb0e32a107d0d426736fa5020ba4` merges GH-114 through protected PR #115. Prometheus CI `30019079713`, Security Audit `30019079960`, and Pages `30019075639` pass on that exact commit; raw README and live Whitepaper/Roadmap/FAQ/`llms.txt` markers were verified. All product, public-site, and status changes remain PR-only, and foreign untracked `Prometheus-1.png` remains untouched.
-Current handoff: GH-114 is complete. This status-only closeout branch updates Bridge, Memory, README, Whitepaper, Roadmap, FAQ, and `llms.txt` from candidate wording to the verified product baseline; it changes no product code or architectural boundary. Authority ownership/rotation, recipient-scope assignment, privacy approval, owner-only hint/bundle/approval pairing, approved relation/artifacts, actionable analysis, replay/external-side-effect semantics, and production operation remain later gates.
+Operational product/public baseline: exact product main `cb3d076d0e698361ce410e993de3edb869c0770e` merges GH-117 through protected PR #118. Prometheus CI `30423663562`, Security Audit `30423663566`, and Pages `30423663016` pass on that exact commit. All product, public-site, and status changes remain PR-only, and foreign untracked `Prometheus-1.png` remains untouched.
+Current handoff: GH-117 is merged and exact-main verified. This documentation-only closeout branch synchronizes Bridge, Memory, README, Whitepaper, Roadmap, FAQ, protocol/Guardian docs, and `llms.txt`; it changes no product code or architectural boundary. Production relation/key/ceremony approval, independent cryptographic/privacy review, real semantic/actionable analysis, v2 transport, and operated rollout evidence remain later gates.
 GH-114 final evidence: issue https://github.com/NeaBouli/prometheus-/issues/114 is closed after protected PR https://github.com/NeaBouli/prometheus-/pull/115 merged by the repository-allowed squash method without admin bypass as exact product main `70bb8ab0ba4cbb0e32a107d0d426736fa5020ba4`. Both PR rounds passed all ten contexts; final head `b225a7f4058eb657fd6b29ef1086d046c218263b` has zero unresolved threads. CodeRabbit's four minor digest-context, positive-u64, network-regex, and public-HTML findings were fixed. Exact-main Prometheus CI `30019079713`, Security Audit `30019079960`, and Pages `30019075639` pass; raw README and live Whitepaper/Roadmap/FAQ/`llms.txt` markers were verified. Complete local evidence passes 290 Rust workspace tests with two intentional live-network ignores, 223 Guardian tests with three intentional live-model skips, two compile-fail doctests, Rustfmt, warning-free workspace all-target Clippy, locked optimized Guardian/proof builds, verified 24/14/7-file packages, Black, changed-source Pylint 10.00/10, complete Guardian Pylint 9.80/10, Memory Integrity, six Autodidactic tests, HTML/SEO/JSON-LD/public-status checks, workflow YAML, Actionlint 1.7.12, Cargo Audit with no vulnerabilities and eight allowed warnings, Python Audit with no known vulnerabilities, staged Gitleaks 8.30.1 with no leak, and clean staged diff. Terra's medium Python valid-shape mutation/forged-object finding was closed by an identity-bound parse snapshot and two regressions; targeted re-review reports no remaining blocking, high, or medium issue. The parser snapshot is object-integrity hardening, not authority against arbitrary code in the same interpreter. Claude Code was reachable but its bounded read-only helper request exited before repository access at its configured USD budget and produced no review or edit. Sol retained architecture, implementation, integration, and final review ownership.
 GH-111 final evidence: issue #111 closed after protected PR #112 merged by the repository-allowed squash method without admin bypass as exact main `60166bd6d8d3c7d8e88727c2f6d507b206a308ad`. PR head `ec4a5d264abb47d08b263bdda1eddf33d42c72bd` passed all ten attached contexts in Prometheus CI `30011641764` and Security Audit `30011641778`; there were no review threads. CodeRabbit's required status passed but its content review was rate-limited. Exact-main Prometheus CI `30011976919`, Security Audit `30011976853`, and Pages `30011975363` pass, and raw/live public markers were verified. Local evidence is 24 focused consumption tests, 32 combined approval tests, 214 complete Guardian tests with three intentional live-model skips, and 280 complete Rust workspace tests with two intentional live-network ignores. Rustfmt, warning-free workspace all-target Clippy, Black, changed-file Pylint 10.00/10, complete Guardian Pylint 9.78/10, locked optimized Guardian/proof builds, strict 21-file ThreatHint package verification, Memory Integrity, six Autodidactic tests, HTML/JSON-LD/public-status, workflow YAML, Actionlint 1.7.12, Cargo/Python audits, staged Gitleaks 8.30.1, and clean staged-diff checks pass. Spark's low-risk parallel-test and relative-policy-path findings were fixed. Independent Terra security review found no finding; its constructor-lock, transaction-abort, and corrupt/unknown-ledger recommendations were added and pass. Final Sol review added exact STRICT table/index-shape validation and maps only real SQLite busy/locked codes to retryable failure. Claude Code was requested as helper but its monthly limit remained exhausted, so it read no GH-111 file.
 GH-109 final evidence: protected PR #110 merged normally without admin bypass as exact main `f71740cd79e0ae788fa732f42e7f000276ea1741`; issue #109 closed. Prometheus CI `30008005279`, Security Audit `30008005305`, and Pages `30008004574` pass on that exact commit, and raw/live public markers were verified.
@@ -16,19 +16,18 @@ Current GH-100 evidence: PR #101 passed every attached protected context on exac
 Current GH-103 evidence: PR #104 passed all nine attached protected CI/Security contexts on exact head `0774358250c72f60a00ed6326a04fcb427fe6f26` and merged by the repository-allowed squash method without admin bypass as exact main `42d9cd939c635474547d1bac7058f30451c926e7`; issue #103 closed. Exact-main Prometheus CI `29999873100`, Security Audit `29999873126`, and Pages `29999872424` pass. Five focused producer security tests, one shared-vector Rust integration test, all 30 ThreatHint tests plus one compile-fail doctest, 19 focused Python observable tests, 182 complete Guardian tests with three intentional live-model skips, and the complete Rust workspace with two intentional live-network ignores pass. Rustfmt, warning-free crate/workspace all-target Clippy, Black, and Guardian Pylint 9.86/10 pass. Claude Code independently approved the bytes-only slice but suggested filesystem output and a Tokio timeout; Sol rejected those side-effecting/async mismatches, retained the existing in-memory API, and adopted mandatory review policy plus strict bounds. Terra found no blocking/high/medium or actionable low finding; its residual full-import materialization concern was closed by streaming dynamic-symbol iteration and a 4096-symbol budget.
 Current GH-63 evidence: 7 focused Rust verifier tests; 18 focused Python ingress/service tests; 247 complete workspace Rust passes with two intentional live-network ignores; 144 complete Guardian Python passes with three intentional live-model skips; Rustfmt; warning-free workspace all-target Clippy plus a final focused verifier recheck; locked optimized Guardian and verifier builds; 6-file schema, 14-file Guardian, and 7-file verifier packages; Black; Ruff; Pylint 9.80/10; Memory Integrity; six Autodidactic tests; YAML/HTML/public-status checks; Actionlint 1.7.12; Cargo Audit with no vulnerabilities and eight known allowed warnings; and clean diff checks. One unchanged ballot timeout test failed once only while a heavy concurrent Rust build was running; the earlier and final isolated complete Guardian runs passed. Final independent Terra re-review reports no blocking/high/medium finding. CodeRabbit's later ancestor-owner finding was fixed, all review threads resolved, and all ten protected PR contexts passed before normal merge. Exact-main CI/Security/Pages are green as recorded above.
 Current GH-58 evidence: issue https://github.com/NeaBouli/prometheus-/issues/58 is closed after PR https://github.com/NeaBouli/prometheus-/pull/60 merged normally as exact main `22bc55a72bf441a2abc0372bc0eb789fb89fbb0b`. Local evidence is 12 focused Python security/lifecycle tests, 138 full Guardian passes with three intentional live-model skips, 53 Guardian P2P unit/transport tests plus 3 process tests, and 240 Rust workspace passes with two intentional live-network ignores. Rustfmt, warning-free workspace/all-target Clippy, locked optimized Guardian build, the 14-file Guardian package set, Black, Pylint, Memory, HTML, YAML, and dependency/security checks pass. Exact-main Prometheus CI `29962533693`, Security Audit `29962533720`, and Pages `29962533075` all passed; GitHub Pages reports `built`. A local Claude Code terminal handoff was attempted as requested but stopped before edits because its configured USD budget was exhausted; Sol retained implementation, review, and verification ownership.
-Latest verified product/public baseline is GH-114 exact product main `70bb8ab0ba4cbb0e32a107d0d426736fa5020ba4`; Prometheus CI `30019079713`, Security Audit `30019079960`, and Pages `30019075639` pass, and raw/live public markers were verified. Status-only closeout commits may be newer without changing this product baseline.
-Latest completed product task: issue https://github.com/NeaBouli/prometheus-/issues/114 is closed after PR https://github.com/NeaBouli/prometheus-/pull/115 merged by the repository-allowed squash method without admin bypass. Local canonical ThreatHint v2 statement parsing is merged/exact-main/live green. No v1, relation, proof acceptance, pairing, transport, analyzer, outbox, wallet, signing, chain, KAS/PROM, slash ACL, commit-reveal, reputation, or emergency-stop boundary changed.
+Latest verified product/public baseline is GH-117 exact product main `cb3d076d0e698361ce410e993de3edb869c0770e`; Prometheus CI `30423663562`, Security Audit `30423663566`, and Pages `30423663016` pass. Status-only closeout commits may be newer without changing this product baseline.
+Latest completed product task: issue https://github.com/NeaBouli/prometheus-/issues/117 is closed after PR https://github.com/NeaBouli/prometheus-/pull/118 merged by the repository-allowed squash method. The local ThreatHint v2 binding, test-artifact verifier, preflight, atomic consumption, governance, recoverable outbox, and deterministic non-actionable worker are merged/exact-main green. No production artifact approval, real semantic/actionable analyzer, v2 transport, wallet, signing, chain, KAS/PROM, slash ACL, commit-reveal, reputation, or emergency-stop boundary changed.
 
-Current local task `GIO-PROM-20260726-005` uses isolated worktree
+Current local task `GIO-PROM-20260729-015` uses isolated worktree
 `/Users/gio/Desktop/repos/prometheus-v2-proof-binding` on
-`feat/local-v2-proof-binding`, based on exact public main
-`b556fbbae428e7f6eef07c6d502b32e13e759813`. It is limited to a data-only
-Rust/Python binding between the separate review-ready v2 proof-envelope and
-RelationManifest-v2 candidates. A separately trusted manifest SHA-256 and
-network are mandatory. No proof verification, artifact approval, ceremony,
-promotion, transport, analyzer, wallet, chain, commit, push, or external write
-is authorized. Sol owns architecture and complete validation; Kimi K3 is the
-bounded senior review/implementation partner.
+`docs/GH-117-merge-closeout`, based on exact product/public main
+`cb3d076d0e698361ce410e993de3edb869c0770e`. It is limited to synchronizing
+public status docs, Memory, and Bridge after the protected GH-117 merge.
+No product code, production artifact approval, semantic/actionable analyzer,
+transport, wallet, chain, server, secret, or production deployment is in
+scope. Sol owns publication and complete validation; Kimi K3 provides bounded
+read-only consistency review.
 Previous GH-52 CI note: final GH-52 product PR passed all ten protected contexts in Prometheus CI `29644104499` and Security Audit `29644104466`; independent review found no remaining blocker, high, or medium issue. Exact main `f2e52beebe5ec7d6a3e6e0e8d36bced8f6f68ac7` passed Prometheus CI `29644233106`, Security Audit `29644233098`, and Pages `29644232771`. Real two-host operation remains unproven because `ssh sandbox` rejects public-key authentication.
 Current GH-55 verification note: PR #56 passed all ten protected CI/Security/CodeRabbit contexts with every review thread resolved. CodeRabbit found one major shared-admission defect: the ballot handler counted only ballot work while the ThreatHint handler counted both protocols. Both paths now use one shared inbound counter, and a mixed-protocol saturation regression proves the global cap. Local post-fix evidence is 6 schema tests, 8 focused client tests, 45 Guardian P2P unit tests plus 3 process tests, 229 workspace tests with two intentional live-network ignores, Rustfmt, warning-free workspace/all-target Clippy, locked optimized builds, package verification, Python/Memory/HTML/YAML checks, and Cargo Audit with no vulnerabilities. Exact-main Prometheus CI `29646732936`, Security Audit `29646732941`, and Pages `29646732673` pass. Rollout issue https://github.com/NeaBouli/prometheus-/issues/9 remains open.
 Current GH-48 note: the service config and all IPC paths fail closed on unsafe owner/mode/symlink/type conditions and do not expose local paths or ballot/collector bytes in JSON. Service paths now reject parent-directory components before identity/IPC use. Local submission frames require canonical PeerId, bounded exact ballot bytes, and request/response EOF. Signal shutdown stops admission/listeners and drains admitted work to a bounded deadline; a bounded dedicated JSON writer isolates stdout backpressure from the async owner loop, and `stopped` is emitted only after submission-server shutdown succeeds. The same-host process test proves exact relay delivery, ACK propagation, socket cleanup, and stable transport identity but is not public or multi-host evidence. No wallet, chain, contract, signing, reputation, KAS/PROM, slash ACL, commit-reveal, or Guardian authorization boundary changed.
@@ -1727,3 +1726,75 @@ Residual: operation on a filesystem that reports but does not enforce POSIX
 sticky deletion semantics remains unsupported; normal Linux/macOS local
 filesystems and GitHub's runner filesystem enforce it. Status remains
 `In Progress` pending the updated PR-head checks.
+
+## 2026-07-29 - Ticket 015 merged and exact-main verified
+
+Pull request [#118](https://github.com/NeaBouli/prometheus-/pull/118) was
+squash-merged through protected `main` as
+`cb3d076d0e698361ce410e993de3edb869c0770e`; issue
+[#117](https://github.com/NeaBouli/prometheus-/issues/117) closed
+automatically. The remote feature branch was deleted.
+
+Exact PR-head CI `30423242793` and Security `30423242744` passed all nine
+required checks. Exact-main CI `30423663562`, Security `30423663566`, and
+Pages deployment `30423663016` also completed successfully. The published
+site remains HTTPS-served from `main` at
+<https://neabouli.github.io/prometheus-/>.
+
+CodeRabbit remained pending without findings when the merge occurred. Branch
+protection required zero approving reviews and exactly the nine green
+CI/Security checks; CodeRabbit was not required. Independent Kimi review
+`session_971020af-c8d2-49e5-adea-4df6af9922b9` had already found no
+P0/P1/P2. A local/GitHub clock offset made an earlier bot-age estimate
+unreliable; this correction is recorded explicitly.
+
+README, Whitepaper, Roadmap, FAQ, `llms.txt`, protocol/Guardian docs, Memory,
+and Bridge are being synchronized on a separate documentation-only closeout
+branch. The implementation is merged and exact-main verified, but it is not
+production-deployed or rollout-ready. Real privacy-reviewed semantic/actionable
+analysis, production relation/proving/verifying-key/ceremony approval,
+independent cryptographic review, v2 transport, and operated rollout evidence
+remain open. Estimates remain core `84-88%`, complete vision `50-55%`, and
+`45-50%` remaining.
+
+## 2026-07-29 - Ticket 015 documentation closeout review-ready
+
+Issue [#119](https://github.com/NeaBouli/prometheus-/issues/119) owns the
+documentation-only closeout. Sixteen public-status, Memory, and Bridge files
+now identify GH-117 as merged and exact-main verified while preserving every
+production and rollout blocker.
+
+Kimi read-only review
+`session_3346c819-941a-4268-a471-c74e14266bf6` found stale Roadmap estimates,
+Whitepaper callouts, Bridge/Memory baselines, and current-reference
+candidate wording. Sol fixed every P1/P2. Targeted re-review
+`session_7cb16fa9-06a0-46ce-be6c-e39992b59280` found one remaining stale
+`Current local task` block; Sol replaced it with this docs-only Ticket-015
+scope. No Kimi file change occurred.
+
+Local evidence after the fixes:
+
+- Memory Integrity: pass;
+- Autodidactic: `6 passed`;
+- five HTML parses and four JSON-LD/SEO checks: pass;
+- public launch wording, GH-117 stale-status, and local Markdown links: pass;
+- `git diff --check`: pass;
+- added-line high-confidence secret scan: pass;
+- Gitleaks is not installed locally; protected Security Audit remains
+  authoritative.
+
+Status is review-ready for commit, push, protected PR, required CI/Security,
+and Pages verification. No product code, production artifact, semantic or
+actionable analyzer, transport, wallet, chain, server, secret, or production
+deployment changed.
+
+## 2026-07-29 - Ticket 015 closeout PR opened
+
+Commit `588d91f` (`docs: record GH-117 merged status`) is pushed on
+`docs/GH-117-merge-closeout`. Pull request
+[#120](https://github.com/NeaBouli/prometheus-/pull/120) targets protected
+`main` and closes docs issue
+[#119](https://github.com/NeaBouli/prometheus-/issues/119).
+
+Status remains `In Progress` pending the full protected CI/Security review.
+No direct `main` push or production action occurred.

@@ -1,7 +1,7 @@
 # PROMETHEUS – MODULE STATUS
 # Format: | Module | Status | Progress | Last Update | Audit | Testnet Address |
 # Status: PENDING | IN_PROGRESS | DONE | BLOCKED | PENDING_AUDIT | ACCEPTED | REJECTED
-# Last Updated: 2026-07-27
+# Last Updated: 2026-07-29
 
 ---
 
@@ -17,7 +17,7 @@ Goal:     Complete the non-promotable H-001 canary, then the full state-contract
 ## LOCAL THREATHINT V2 PRIVACY/PROOF PREFLIGHT CANDIDATE (2026-07-26)
 
 ```text
-State: review-ready local candidate; not committed, merged, published, or deployed
+Historical ticket-close state: local review-ready; superseded by GH-117 merged status
 Ticket: GIO-PROM-20260726-006
 Worktree: /Users/gio/Desktop/repos/prometheus-v2-proof-binding
 Policy: owner-only read-only exact schema pins network, BIP340 approver,
@@ -326,7 +326,7 @@ Repo current-Silverc public release-hardening evidence verifier: `scripts/verify
 Signed-int boundary decision: current upstream Silverc entrypoint `int` values are deployable only in the nonnegative signed range `0..=i64::MAX`; Rust retains raw `u64` H-001 vectors for byte compatibility and uses `build_silverc_checked` / `validate_silverc_commitment_bounds` for deployment calls.
 Rusty-Kaspa workspace dependencies pinned to `v2.0.1`; `cargo audit` now reports no vulnerabilities, only allowed warnings.
 GitHub Security Audit workflow re-enabled and dependency audits now fail on findings instead of using `|| true`; after `c673766`, Dependency Audit was hardened with explicit job/step timeouts and split cargo-audit install/run steps. GH-30 extends explicit job-level runtime bounds to every required CI/Security context and pins `cargo-audit 0.22.2`, `pip-audit 2.10.1`, Rust 1.95.0, and Python 3.11 without renaming protected contexts. PR #31 merged as `71e5783`; exact-main Prometheus CI `29457601210`, Security Audit `29457601183`, and Pages `29457600490` passed, including the jointly pinned Dependency Audit in 2m54s and Current Silverc Runtime in 2m35s.
-Current remote verification baseline: exact product/public main `70bb8ab0ba4cbb0e32a107d0d426736fa5020ba4` passed Prometheus CI `30019079713`, Security Audit `30019079960`, and Pages `30019075639` on 2026-07-24. All required contexts are bounded and green through GH-114; real two-host Guardian operation, v2 relation/artifacts/pairing/actionable analysis, authority rotation/scope assignment, and H-001 execution gates remain open. H-001 execution artifacts remain intentionally bound to `205e1ca`.
+Current remote verification baseline: exact product/public main `cb3d076d0e698361ce410e993de3edb869c0770e` passed Prometheus CI `30423663562`, Security Audit `30423663566`, and Pages `30423663016` on 2026-07-29. All required contexts are bounded and green through GH-117; real two-host Guardian operation, production v2 relation/artifact approval, independent cryptographic/privacy review, v2 transport, semantic/actionable analysis, and H-001 execution gates remain open. H-001 execution artifacts remain intentionally bound to `205e1ca`.
 Remote verification baseline: Prometheus CI `29456156122` attempt 2, Security Audit `29456155263` attempt 2, and Pages `29456154432` passed for exact operational main `3ba90a9` on 2026-07-16. The first CI/Security attempts were cancelled after remaining in progress in runtime/dependency paths and then passed unchanged on the same SHA. Exact public-status main `e9a970a` passed Prometheus CI `29455597727`, Security Audit `29455597677`, and Pages `29455597066`; live GitHub Pages exposes the `205e1ca` handoff and unchanged rollout gates. Earlier exact artifact baseline `205e1ca` passed Prometheus CI `29454591518`, Security Audit `29454591555`, and Pages `29454590793`. Earlier GH-9 profile CI `29412667386`, Security Audit `29412667410`, and Pages `29412666483` passed for `6213c559`. The prior official SilverScript covenant-genesis capability baseline `9d74c0c` passed on 2026-07-12. The prior `40bb9a0` baseline passed after adding public release-hardening evidence verification; live GitHub Pages contains both release-hardening and genesis-capability wording. The prior `48a6743` baseline passed after adding public oracle tx-evidence verification. The prior `9a1ac59` baseline passed after recording the Autodidactic workflow-helper regression suite CI run. The prior `4816444` baseline passed after adding the Autodidactic workflow-helper regression suite to CI. The prior `ffbad55` baseline passed after the public receipt-evidence verifier documentation follow-up. The prior `4d7a6b8` baseline passed after adding public node/explorer deployment receipt-evidence verification. The prior `181cde2` baseline passed after adding raw/serialized transaction field rejection to public deploy-result import and deployment receipt verification. The prior `6cc000c` baseline passed after adding public external-operator capability verification. The prior `3d02326` baseline passed after adding public oracle status-draft staging. The prior `a86c1b5` baseline passed after adding the public deploy operator procedure gate for verified Silverc deploy request sets. The prior `442853f` baseline passed after public external oracle operator procedure coverage for signer-ready metrics tx requests. The prior `8bf6a14` baseline passed after public release-readiness audit coverage for generated handoff packages. The prior `fa719fc` baseline passed after public oracle tx-result verification, generated operator receipt verification/status staging, operator handoff import mode, and public result handoff mode; the interim `119fa89` CI failure was workflow-only missing `hashlib` import in the metrics-oracle tx-result fixture block and is fixed by `fa719fc`.
 GitHub branch governance: `main` requires pull requests, strict up-to-date branches, linear history, resolved conversations, and nine successful CI/Security contexts. Admin enforcement is enabled; force pushes and deletion are disabled. Solo-maintainer mode uses zero formal approvals because only one collaborator exists and self-approval is impossible; raise the count to one when a second collaborator is added.
 Public docs refreshed by 2026-07-16: README, WHITEPAPER.md, whitepaper.html, docs/roadmap.md, roadmap.html, index.html, modules/contracts/silverc/README.md, and llms.txt state deployment-gated post-Toccata status, verified seven-contract runtime gates, the repository-owned keyless genesis execution boundary, public request/receipt/evidence/status guards, metrics-oracle and exact-commit release gates, target-only PROM-RULES asset orchestration, and no Kasplex dependency for Guardian reputation. Expired June-September launch promises are replaced by readiness gates.
@@ -795,7 +795,7 @@ Remaining: reviewed relation/artifacts, privacy/pairing, transport, actionable
 ## LOCAL THREATHINT V2 PROOF-BINDING CANDIDATE (2026-07-26)
 
 ```text
-State: review-ready local candidate; not committed, merged, published, or deployed
+Historical ticket-close state: local review-ready; superseded by GH-117 merged status
 Baseline: b556fbbae428e7f6eef07c6d502b32e13e759813
 Branch: feat/local-v2-proof-binding
 Worktree: /Users/gio/Desktop/repos/prometheus-v2-proof-binding
@@ -822,7 +822,7 @@ Remaining: approved relation source and keys, real proof verification/acceptance
 ## LOCAL THREATHINT V2 GROTH16 VERIFIER CANDIDATE (2026-07-26)
 
 ```text
-State: review-ready local candidate; not committed, merged, published, or deployed
+Historical ticket-close state: local review-ready; superseded by GH-117 merged status
 Ticket: GIO-PROM-20260726-007
 Baseline: b556fbbae428e7f6eef07c6d502b32e13e759813
 Loader: one retained canonical manifest plus fixed owner-only
@@ -849,10 +849,28 @@ Remaining: independent production artifact/ceremony approval, then one atomic
 Estimates: core 79-83%; complete vision 45-50%; 50-55% remains
 ```
 
+## GH-117 MERGED THREATHINT V2 PIPELINE (2026-07-29)
+
+```text
+State: merged and exact-main verified; not production-deployed or rollout-ready
+Issue/PR: GH-117 / GH-118
+Main: cb3d076d0e698361ce410e993de3edb869c0770e
+PR evidence: CI 30423242793; Security 30423242744; all protected checks pass
+Main evidence: CI 30423663562; Security 30423663566; Pages 30423663016; pass
+Review: Kimi no P0/P1/P2; CodeRabbit pending without findings and non-required
+Shipped boundary: strict v2 binding, test-artifact Groth16 verification,
+                  owner-only preflight, atomic consumption, enforceable
+                  governance, recoverable outbox, durable non-actionable worker
+Not shipped: production artifacts/ceremony approval, real semantic/actionable
+             analyzer, v2 transport, wallet/chain effects, production rollout
+Remaining: independent cryptographic/privacy review and operated evidence
+Estimates: core 84-88%; complete vision 50-55%; 45-50% remains
+```
+
 ## LOCAL THREATHINT V2 DURABLE NON-ACTIONABLE WORKER (2026-07-29)
 
 ```text
-State: review-ready local candidate; not committed, merged, published, or deployed
+Historical ticket-close state: local review-ready; superseded by GH-117 merged status
 Ticket: GIO-PROM-20260728-014
 Baseline: b556fbbae428e7f6eef07c6d502b32e13e759813
 Schema: governed v4; exact statement/digest, report nonce, bundle, approval,
@@ -878,7 +896,7 @@ Estimates: core 84-88%; complete vision 50-55%; 45-50% remains
 ## LOCAL THREATHINT V2 RECOVERABLE OUTBOX (2026-07-28)
 
 ```text
-State: review-ready local candidate; not committed, merged, published, or deployed
+Historical ticket-close state: local review-ready; superseded by GH-117 merged status
 Ticket: GIO-PROM-20260728-013
 Baseline: b556fbbae428e7f6eef07c6d502b32e13e759813
 Schema: legacy v1 unchanged; governed v0/v1/v2 -> v3 preserving consumption,
@@ -933,7 +951,7 @@ Estimates: core 83-87%; complete vision 49-54%; 46-51% remains
 ## LOCAL OUTBOX RETENTION-GOVERNANCE CANDIDATE (2026-07-27)
 
 ```text
-State: review-ready local candidate; not committed, merged, published, or deployed
+Historical ticket-close state: local review-ready; superseded by GH-117 merged status
 Ticket: GIO-PROM-20260727-011
 Baseline: b556fbbae428e7f6eef07c6d502b32e13e759813
 Policy: owner-only exact ASCII TOML bound to expected network, approver key,
@@ -969,7 +987,7 @@ Estimates: core 81-85%; complete vision 47-52%; 48-53% remains
 ## LOCAL THREATHINT V2 OWNER-POLICY PROMOTION CANDIDATE (2026-07-27)
 
 ```text
-State: review-ready local candidate; not committed, merged, published, or deployed
+Historical ticket-close state: local review-ready; superseded by GH-117 merged status
 Ticket: GIO-PROM-20260727-010
 Baseline: b556fbbae428e7f6eef07c6d502b32e13e759813
 Policy: owner-only exact ASCII TOML; platform, format, duplicate-free allowed
@@ -1004,7 +1022,7 @@ Estimates: core 81-85%; complete vision 47-52%; 48-53% remains
 ## LOCAL THREATHINT V2 ATOMIC ACCEPTANCE CANDIDATE (2026-07-27)
 
 ```text
-State: review-ready local candidate; not committed, merged, published, or deployed
+Historical ticket-close state: local review-ready; superseded by GH-117 merged status
 Ticket: GIO-PROM-20260727-009
 Baseline: b556fbbae428e7f6eef07c6d502b32e13e759813
 Construction: exact preflight/consumption network, BIP340 approver key, and
@@ -1035,7 +1053,7 @@ Estimates: core 80-84%; complete vision 46-51%; 49-54% remains
 ## LOCAL THREATHINT V2 VERIFIED PREFLIGHT COMPOSITION (2026-07-27)
 
 ```text
-State: review-ready local candidate; not committed, merged, published, or deployed
+Historical ticket-close state: local review-ready; superseded by GH-117 merged status
 Ticket: GIO-PROM-20260727-008
 Baseline: b556fbbae428e7f6eef07c6d502b32e13e759813
 Policy: existing owner-only preflight policy is the sole network and raw-

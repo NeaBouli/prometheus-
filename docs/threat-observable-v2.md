@@ -22,7 +22,7 @@ defined in Section 3 plus one shared exact-byte corpus. No proof relation,
 production key, pairing, transport, analyzer promotion, or deployment is
 approved by this document.
 
-A local review-ready candidate, not yet merged or deployed, adds strict
+Merged and exact-main-verified GH-117, but not production-deployed, adds strict
 canonical Rust/Python parsers for a bounded opaque-proof envelope and a
 19-field `RelationManifest-v2`, plus one atomic data-only binding. The binding
 requires a separately trusted network and exact raw-manifest SHA-256 before
@@ -31,7 +31,7 @@ claimed 16-byte big-endian public-input halves. It performs no Groth16
 verification, source/key loading or approval, ceremony, transport, promotion,
 analysis, wallet, chain, or rollout action.
 
-A second local review-ready candidate adds a Python-only, non-consuming
+The merged GH-117 pipeline also adds a Python-only, non-consuming
 privacy/proof preflight. Its owner-only read-only TOML policy pins one network,
 BIP340 approver key, opaque recipient scope, and exact nonzero raw-manifest
 SHA-256. The public call accepts no independent statement, network, key, scope,
@@ -42,17 +42,17 @@ It opens no SQLite database and returns only data hashes and identifiers.
 Success is not Groth16 verification, privacy approval, disclosure authority,
 replay consumption, transport admission, analyzer promotion, or rollout state.
 
-A separate local Rust `verify-v2` candidate now closes the mechanical proof
+A separate merged local Rust `verify-v2` boundary closes the mechanical proof
 verification step. It owner-loads retained canonical manifest bytes plus fixed
 `relation-source.bin` and `verifying-key.bin` siblings, binds their exact
 manifest sizes and SHA-256 anchors, accepts only canonical compressed BN254
 keys/proofs, derives both field inputs only through the v2 binding, and emits
 silent process status. Runtime never resolves or loads a proving key. The
 generated test relation, keys, and proofs are explicitly non-production; no
-relation, key, or ceremony is approved, and Guardian does not consume an
-approval in this candidate.
+relation, key, or ceremony is approved, and this standalone verifier does not
+consume a Guardian approval.
 
-A third local candidate,
+The merged verified-preflight boundary,
 `jaeger.threat_hint_v2_verified_preflight.ThreatHintV2VerifiedPreflightService`,
 composes the two checks without making them authoritative. It owner-loads the
 same policy-anchored manifest, runs the Python approval/privacy preflight
@@ -64,7 +64,7 @@ non-serializable data only. The composition opens no SQLite file, consumes no
 approval, and grants no privacy, disclosure, transport, analysis, promotion,
 wallet, chain, or rollout authority.
 
-A fourth local candidate,
+The merged atomic-acceptance boundary,
 `jaeger.threat_hint_v2_acceptance.ThreatHintV2AcceptanceService`, closes the
 mechanical acceptance order without promoting test artifacts. Construction
 requires the preflight and consumption policies to match exactly on network,
@@ -344,12 +344,13 @@ caller-supplied verified result, authority key, recipient scope, or network.
 Ledger rows grant no downstream authority and trigger no external action.
 
 This local gate does not define approver-key ownership or rotation, explain the
-semantics of the opaque recipient-scope digest, pair an approval with a verified
-v2 hint, authorize disclosure, or provide exactly-once execution for a future
-external side effect. Those policies and an outbox/claim design remain required
-before any bundle may leave the local boundary.
+semantics of the opaque recipient-scope digest, authorize disclosure, or
+provide exactly-once execution for a future external side effect. GH-117 adds
+the separately governed pairing and recoverable local outbox/claim boundaries,
+but no bundle may leave the local boundary without future transport and
+semantic privacy approval.
 
-The local ticket-010 promotion candidate closes only the mechanical
+The merged ticket-010 promotion boundary closes only the mechanical
 hint/bundle/approval pairing and owner-policy restriction above atomic
 acceptance. Its exact owner-only policy requires one platform, one format, a
 non-empty duplicate-free allowed-kind set, and a 1..=16 count cap. It reparses
@@ -360,7 +361,7 @@ semantic privacy, extractor provenance, maliciousness, approver-key ownership,
 recipient-scope meaning, production artifact approval, or permission to
 transport, analyze, publish, or perform an external effect.
 
-The local ticket-011 retention-governance candidate adds only a pure,
+The merged ticket-011 retention-governance boundary adds only a pure,
 read-only owner-policy declaration for a possible future recoverable analysis
 queue. The exact policy is bound to the expected network, approver key, and
 recipient scope and fixes purpose `local_recoverable_analysis_queue_v1`,
@@ -369,8 +370,8 @@ allowlist, at most 100,000 pending records, and at most 30 days of retention.
 Its risk model is explicit: file hashes remain corpus-matchable, API imports
 fingerprint software capabilities, and byte patterns may retain proprietary
 content. The loader creates no ledger, outbox, worker, transport, disclosure,
-or authority. Ticket 013 is the only local candidate that consumes this exact
-snapshot for a recoverable enqueue.
+or authority. The merged ticket-013 governed outbox is the only local boundary
+that consumes this exact snapshot for a recoverable enqueue.
 
 Ticket 012 composes the promotion, governance, and retention policies into an
 enforceable local boundary. The governance policy binds network, approver key,

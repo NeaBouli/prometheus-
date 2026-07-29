@@ -2202,3 +2202,53 @@ Rules for all dev agents:
   no file change. Sticky semantics on non-POSIX-like network/FUSE mounts stays
   an unsupported residual environment.
 - **Status:** `In Progress`, fix commit and updated PR checks pending.
+
+## 2026-07-29 - Ticket 015 merge and exact-main evidence
+
+- Fix commit `3ac90d7` passed PR-head CI `30423242793` and Security
+  `30423242744`, including Python Guardian on Linux.
+- PR [#118](https://github.com/NeaBouli/prometheus-/pull/118) was marked ready
+  and squash-merged through protected `main`.
+- Exact merge commit:
+  `cb3d076d0e698361ce410e993de3edb869c0770e`.
+- Issue [#117](https://github.com/NeaBouli/prometheus-/issues/117) closed and
+  the remote feature branch was deleted.
+- Exact-main CI `30423663562`, Security `30423663566`, and Pages
+  `30423663016`: all `success`.
+- CodeRabbit was pending without findings and was not a required branch check.
+  Required review count was zero; all nine protected checks were green.
+  Kimi's independent security review had no P0/P1/P2.
+- Corrected record: local clock and GitHub server timestamps were offset, so
+  the earlier CodeRabbit-age estimate was not reliable.
+- Public status documentation is being reconciled on a separate docs-only
+  closeout branch. No production artifact approval, semantic/actionable
+  analyzer, wallet, chain, server, secret, or production deployment occurred.
+- **Status:** implementation merged and exact-main verified; documentation
+  closeout in progress; operated rollout still blocked.
+
+## 2026-07-29 - Ticket 015 documentation reconciliation
+
+- Created docs-only issue
+  [#119](https://github.com/NeaBouli/prometheus-/issues/119).
+- Updated 16 public-status, Memory, and Bridge files from stale candidate/
+  GH-114 baselines to merged exact-main GH-117 state.
+- Preserved explicit non-production boundaries and the core `84-88%`,
+  complete-vision `50-55%`, remaining `45-50%` estimates.
+- Kimi review `session_3346c819-941a-4268-a471-c74e14266bf6` found the first
+  consistency gaps. Targeted re-review
+  `session_7cb16fa9-06a0-46ce-be6c-e39992b59280` reduced the result to one
+  stale current-task Bridge block; Sol fixed it. Kimi changed no file.
+- Memory Integrity, six Autodidactic tests, five HTML parses, four
+  JSON-LD/SEO checks, public launch and GH-117 stale-status scans, Markdown
+  links, diff check, and added-line high-confidence secret scan pass.
+- Gitleaks is unavailable locally; protected Security Audit will supply the
+  authoritative repository scan.
+- **Status:** review-ready; commit/push/PR and protected checks pending.
+
+## 2026-07-29 - Ticket 015 closeout published for review
+
+- Commit `588d91f` pushed to `docs/GH-117-merge-closeout`.
+- PR [#120](https://github.com/NeaBouli/prometheus-/pull/120) targets
+  protected `main` and closes
+  [#119](https://github.com/NeaBouli/prometheus-/issues/119).
+- **Status:** `In Progress`, waiting for required CI/Security checks.

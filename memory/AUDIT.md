@@ -2041,3 +2041,26 @@ write occurred. Real semantic analysis/actionable rules require a separate
 explicit high-risk ticket and independent privacy/security review. Production
 relation source, proving/verifying keys, ceremony evidence, and independent
 cryptographic evidence remain rollout blockers.
+
+## 2026-07-29 - GH-117 protected integration audit
+
+**Result:** PASS for repository integration and exact-main verification; no
+production-deployment approval is implied.
+
+The cumulative ThreatHint v2 work was published through issue #117 and PR
+#118, never by direct `main` push. PR-head CI `30423242793` and Security
+`30423242744` passed every protected check after the Linux sticky-directory
+portability fix. Squash commit
+`cb3d076d0e698361ce410e993de3edb869c0770e` then passed exact-main CI
+`30423663562`, Security `30423663566`, and Pages `30423663016`.
+
+CodeRabbit was still pending without findings and was not part of the required
+branch-check set. Required approving-review count was zero. Independent Kimi
+security review `session_971020af-c8d2-49e5-adea-4df6af9922b9` reported no
+P0/P1/P2. A local/GitHub clock offset invalidated an earlier bot-age estimate;
+the merge decision instead rests on the actual protection rules and green
+required checks.
+
+No production relation, proving/verifying key, ceremony, real semantic or
+actionable analyzer, v2 transport, wallet, signature, transaction, chain,
+server, secret, or production deployment was approved or exercised.
