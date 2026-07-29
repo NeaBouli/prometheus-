@@ -18,7 +18,7 @@ const MAINNET_RPC: &str = "ws://127.0.0.1:16110";
 let client = RpcClient::connect(rpc_url, NetworkId::with_suffix(NetworkType::Testnet, 10)).await?;
 ```
 
-## Local ThreatHint v2 proof binding candidate (2026-07-26)
+## Merged GH-117 local ThreatHint v2 proof binding
 
 Rust:
 
@@ -48,7 +48,7 @@ digest, and two claimed 16-byte public-input halves. They perform no file or
 network I/O and do not verify the opaque proof. All failures collapse to one
 redacted `invalid threat-hint v2 proof binding` error.
 
-## Local ThreatHint v2 privacy/proof preflight candidate (2026-07-26)
+## Merged GH-117 local ThreatHint v2 privacy/proof preflight
 
 ```python
 ThreatHintV2PreflightService(policy_path: pathlib.Path).preflight(
@@ -72,7 +72,7 @@ This API is non-consuming. It performs no Groth16 verification and no SQLite,
 transport, analyzer, promotion, wallet, chain, or external action. A receipt
 must never be treated as proof acceptance or approval consumption.
 
-## Local ThreatHint v2 trusted Groth16 verifier candidate (2026-07-26)
+## Merged GH-117 local ThreatHint v2 trusted Groth16 verifier
 
 ```rust
 TrustedGroth16V2Verifier::load(

@@ -535,7 +535,7 @@ ledger, privacy decision, approval, disclosure grant, or analyzer input.
 ThreatHint v1 schema, relation, verifier, transport, and analyzer types remain
 unchanged.
 
-### 4.5 Local ThreatHint v2 proof envelope, manifest, and binding candidate
+### 4.5 Merged GH-117 local ThreatHint v2 proof envelope, manifest, and binding
 
 The proof envelope is exact canonical JSON with six ordered fields:
 `schema_version`, `protocol_id`, `relation_id`, embedded canonical `statement`,
@@ -556,7 +556,7 @@ both canonical objects, recomputes the statement digest from the
 manifest-declared domain, and splits the 32-byte digest into two 16-byte
 big-endian claimed inputs for `sha256_split_u128_bn254_v2`.
 
-The shared binding corpus has 5 valid and 28 invalid cases. This candidate
+The shared binding corpus has 5 valid and 28 invalid cases. This boundary
 defines structural compatibility only; it is not a Groth16 verifier, artifact
 approval, transport wire, analyzer input, promotion receipt, or rollout state.
 

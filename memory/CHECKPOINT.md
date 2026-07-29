@@ -1,5 +1,5 @@
 # PROMETHEUS — SESSION CHECKPOINT
-# Last updated: 2026-07-27
+# Last updated: 2026-07-29
 # Purpose: Full recovery document. If Claude (Architect) or Claude Code
 # loses context, read this file first. It contains the complete project state.
 
@@ -13,13 +13,13 @@
 | Repo | https://github.com/NeaBouli/prometheus- |
 | Branch | Canonical target `main`; product/public/status changes remain PR-only |
 | Lokaler Pfad | `$REPO_ROOT` |
-| Letzter grün verifizierter Produkt-/Public-Baseline | Exact product main `70bb8ab0ba4cbb0e32a107d0d426736fa5020ba4` merges GH-114 through protected PR #115; Prometheus CI `30019079713`, Security `30019079960`, and Pages `30019075639` pass, and raw/live README/Whitepaper/Roadmap/FAQ/llms markers were verified |
-| Aktueller Entwicklungs-Slice | Local uncommitted `GIO-PROM-20260727-009` on `feat/local-v2-proof-binding`: raw-input-only ThreatHint-v2 verified proof/privacy preflight followed by final durable approval consumption; no production artifact approval or external effect |
-| Aktuelle Tooling-Baseline | Exact product main `70bb8ab0ba4cbb0e32a107d0d426736fa5020ba4` includes GH-58 durable ingress, GH-63's active-KIP-16-aligned verifier, GH-69 manifest preflight, GH-74 hash-only analyzer adapter, GH-77 batch isolation, GH-86 observable validators, GH-90 `file_sha256`, GH-94 mandatory-review `byte_pattern`, GH-100 pre-readiness signal registration, GH-98 public/license reconciliation, GH-103 bounded review-required Linux ELF `api_import` derivation, GH-107 local canonical Observable Approval verification, GH-111 local fixed-policy durable approval consumption, and GH-114 local canonical ThreatHint v2 statement parsing. Public/multi-host operation, trusted membership/key assignment, authority rotation/scope assignment, Sybil resistance, approved production proof artifacts, privacy-reviewed pairing/promotion/actionable analysis, and on-chain attestation remain open. Execution artifacts remain bound to `205e1ca`; GH-9 remains ready for explicitly approved external signing. |
-| Aktueller HEAD | Latest verified product/public baseline is exact product main `70bb8ab0ba4cbb0e32a107d0d426736fa5020ba4`; status-only closeout commits may be newer, so inspect `git log --oneline -1` |
+| Letzter grün verifizierter Produkt-/Public-Baseline | Exact product main `cb3d076d0e698361ce410e993de3edb869c0770e` merges GH-117 through protected PR #118; Prometheus CI `30423663562`, Security `30423663566`, and Pages `30423663016` pass |
+| Aktueller Entwicklungs-Slice | Documentation-only GH-117 merge closeout on `docs/GH-117-merge-closeout`; no product code, production artifact approval, external effect, or rollout action |
+| Aktuelle Tooling-Baseline | Exact product main `cb3d076d0e698361ce410e993de3edb869c0770e` includes strict v2 binding, test-artifact Groth16 verification, owner-only preflight, atomic consumption, enforceable governance, recoverable outbox, and bounded deterministic non-actionable worker. Production artifacts/ceremony, independent cryptographic/privacy review, real semantic/actionable analysis, v2 transport, and operated rollout remain open. Execution artifacts remain bound to `205e1ca`; GH-9 remains ready for explicitly approved external signing. |
+| Aktueller HEAD | Latest verified product/public baseline is exact product main `cb3d076d0e698361ce410e993de3edb869c0770e`; status-only closeout commits may be newer, so inspect `git log --oneline -1` |
 | Rollback-Tag | `pre-session-20260413` → `6347b85` |
-| Whitepaper | WHITEPAPER.md (root) + whitepaper.html (styled); miner companion, reward boundaries, GH-36/GH-39 trust boundaries, and GH-48/GH-52/GH-55/GH-58/GH-63/GH-74/GH-94/GH-107/GH-111/GH-114 plus local v2 binding/preflight/test-verifier/atomic-acceptance boundaries remain synchronized |
-| Status | Rollout-capable core is estimated at 80-84%. Local v2 canonical binding, non-consuming preflight, real test-artifact Groth16 verification, and raw-input-only atomic acceptance are review-ready but uncommitted. Production relation/key/ceremony approval and independent cryptographic review, authority rotation/scope assignment, privacy promotion, post-Toccata canary execution, transport, actionable analysis, crash-safe external side effects, and full rollout evidence remain gated. |
+| Whitepaper | WHITEPAPER.md (root) + whitepaper.html (styled); miner companion, reward boundaries, GH-36/GH-39 trust boundaries, GH-48/GH-52/GH-55/GH-58/GH-63/GH-74/GH-94/GH-107/GH-111/GH-114, and merged GH-117 binding/verifier/preflight/acceptance/governance/outbox/non-actionable-worker boundaries remain synchronized |
+| Status | Rollout-capable core is estimated at 84-88%. GH-117 is merged and exact-main verified but not production-deployed. Production relation/key/ceremony approval and independent cryptographic/privacy review, post-Toccata canary execution, v2 transport, real semantic/actionable analysis, crash-safe external side effects, and full rollout evidence remain gated. |
 | GitHub Pages | https://neabouli.github.io/prometheus-/ |
 | Google Search Console | Verified: googleaa2902079481c7a8 |
 
@@ -592,3 +592,16 @@ Leistungsbasierte Emission. Guardians = "Miner" (KI statt GPU).
   analysis/actionable rules. Production relation/key/ceremony evidence and
   independent cryptographic review remain mandatory.
 - Estimates: core 84-88%, complete vision 50-55%, 45-50% remaining.
+
+## Checkpoint 2026-07-29: GH-117 merged and exact-main verified
+
+- PR #118 squash-merged the cumulative ThreatHint v2 pipeline to protected
+  `main` as `cb3d076d0e698361ce410e993de3edb869c0770e`; issue #117 closed.
+- PR-head and exact-main CI/Security passed all nine required checks.
+- Exact-main Pages deployment `30423663016` succeeded from `main`.
+- The public implementation status is now merged, not merely local
+  review-ready. It remains non-production and non-actionable.
+- Production relation/key/ceremony approval, independent cryptographic review,
+  real privacy-reviewed semantic/actionable analysis, v2 transport, and
+  operated rollout evidence remain mandatory.
+- Estimates remain core 84-88%, complete vision 50-55%, 45-50% remaining.
