@@ -8,6 +8,7 @@ mod byte_pattern_producer;
 mod file_sha256_producer;
 mod observable_approval;
 pub mod observable_bundle;
+mod threat_hint_v2_proof_envelope;
 mod threat_hint_v2_statement;
 
 pub use api_import_producer::{
@@ -23,6 +24,10 @@ pub use observable_approval::{
 pub use observable_bundle::{
     DisclosurePolicy, ObservableBundle, ObservableBundleError, ObservableKind, ObservableScope,
     ScopeFormat, ScopePlatform,
+};
+pub use threat_hint_v2_proof_envelope::{
+    ThreatHintV2ProofEnvelope, ThreatHintV2ProofEnvelopeError,
+    MAX_CANONICAL_V2_PROOF_ENVELOPE_BYTES, THREAT_HINT_V2_PROTOCOL_ID, THREAT_HINT_V2_RELATION_ID,
 };
 pub use threat_hint_v2_statement::{
     ThreatHintV2DisclosureClass, ThreatHintV2Statement, ThreatHintV2StatementError,

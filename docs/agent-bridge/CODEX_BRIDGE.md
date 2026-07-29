@@ -18,6 +18,17 @@ Current GH-63 evidence: 7 focused Rust verifier tests; 18 focused Python ingress
 Current GH-58 evidence: issue https://github.com/NeaBouli/prometheus-/issues/58 is closed after PR https://github.com/NeaBouli/prometheus-/pull/60 merged normally as exact main `22bc55a72bf441a2abc0372bc0eb789fb89fbb0b`. Local evidence is 12 focused Python security/lifecycle tests, 138 full Guardian passes with three intentional live-model skips, 53 Guardian P2P unit/transport tests plus 3 process tests, and 240 Rust workspace passes with two intentional live-network ignores. Rustfmt, warning-free workspace/all-target Clippy, locked optimized Guardian build, the 14-file Guardian package set, Black, Pylint, Memory, HTML, YAML, and dependency/security checks pass. Exact-main Prometheus CI `29962533693`, Security Audit `29962533720`, and Pages `29962533075` all passed; GitHub Pages reports `built`. A local Claude Code terminal handoff was attempted as requested but stopped before edits because its configured USD budget was exhausted; Sol retained implementation, review, and verification ownership.
 Latest verified product/public baseline is GH-114 exact product main `70bb8ab0ba4cbb0e32a107d0d426736fa5020ba4`; Prometheus CI `30019079713`, Security Audit `30019079960`, and Pages `30019075639` pass, and raw/live public markers were verified. Status-only closeout commits may be newer without changing this product baseline.
 Latest completed product task: issue https://github.com/NeaBouli/prometheus-/issues/114 is closed after PR https://github.com/NeaBouli/prometheus-/pull/115 merged by the repository-allowed squash method without admin bypass. Local canonical ThreatHint v2 statement parsing is merged/exact-main/live green. No v1, relation, proof acceptance, pairing, transport, analyzer, outbox, wallet, signing, chain, KAS/PROM, slash ACL, commit-reveal, reputation, or emergency-stop boundary changed.
+
+Current local task `GIO-PROM-20260726-005` uses isolated worktree
+`/Users/gio/Desktop/repos/prometheus-v2-proof-binding` on
+`feat/local-v2-proof-binding`, based on exact public main
+`b556fbbae428e7f6eef07c6d502b32e13e759813`. It is limited to a data-only
+Rust/Python binding between the separate review-ready v2 proof-envelope and
+RelationManifest-v2 candidates. A separately trusted manifest SHA-256 and
+network are mandatory. No proof verification, artifact approval, ceremony,
+promotion, transport, analyzer, wallet, chain, commit, push, or external write
+is authorized. Sol owns architecture and complete validation; Kimi K3 is the
+bounded senior review/implementation partner.
 Previous GH-52 CI note: final GH-52 product PR passed all ten protected contexts in Prometheus CI `29644104499` and Security Audit `29644104466`; independent review found no remaining blocker, high, or medium issue. Exact main `f2e52beebe5ec7d6a3e6e0e8d36bced8f6f68ac7` passed Prometheus CI `29644233106`, Security Audit `29644233098`, and Pages `29644232771`. Real two-host operation remains unproven because `ssh sandbox` rejects public-key authentication.
 Current GH-55 verification note: PR #56 passed all ten protected CI/Security/CodeRabbit contexts with every review thread resolved. CodeRabbit found one major shared-admission defect: the ballot handler counted only ballot work while the ThreatHint handler counted both protocols. Both paths now use one shared inbound counter, and a mixed-protocol saturation regression proves the global cap. Local post-fix evidence is 6 schema tests, 8 focused client tests, 45 Guardian P2P unit tests plus 3 process tests, 229 workspace tests with two intentional live-network ignores, Rustfmt, warning-free workspace/all-target Clippy, locked optimized builds, package verification, Python/Memory/HTML/YAML checks, and Cargo Audit with no vulnerabilities. Exact-main Prometheus CI `29646732936`, Security Audit `29646732941`, and Pages `29646732673` pass. Rollout issue https://github.com/NeaBouli/prometheus-/issues/9 remains open.
 Current GH-48 note: the service config and all IPC paths fail closed on unsafe owner/mode/symlink/type conditions and do not expose local paths or ballot/collector bytes in JSON. Service paths now reject parent-directory components before identity/IPC use. Local submission frames require canonical PeerId, bounded exact ballot bytes, and request/response EOF. Signal shutdown stops admission/listeners and drains admitted work to a bounded deadline; a bounded dedicated JSON writer isolates stdout backpressure from the async owner loop, and `stopped` is emitted only after submission-server shutdown succeeds. The same-host process test proves exact relay delivery, ACK propagation, socket cleanup, and stable transport identity but is not public or multi-host evidence. No wallet, chain, contract, signing, reputation, KAS/PROM, slash ACL, commit-reveal, or Guardian authorization boundary changed.
@@ -650,3 +661,1069 @@ Rules for all dev agents:
 - If a probe returns `401 Invalid authentication credentials`, the integration is using the wrong path: API instead of terminal.
 - Keep secrets, tokens, passwords, private keys, and keychain material out of bridge files.
 <!-- /CODEX_CLAUDE_CODE_TERMINAL_BRIDGE_V1 -->
+
+## 2026-07-26 - Current local ticket checkpoint
+
+Ticket `GIO-PROM-20260726-005` in
+`/Users/gio/Desktop/repos/prometheus-v2-proof-binding` is implemented and
+independently reviewed, but remains local and uncommitted. It adds strict
+canonical Rust/Python ThreatHint-v2 proof-envelope and RelationManifest-v2
+parsers plus one data-only atomic binding with a separately trusted network
+and raw-manifest SHA-256. The binding derives claimed public-input halves; it
+does not verify Groth16 or approve relation/key artifacts.
+
+Sol closed one Python exact-envelope substitution gap after Kimi's
+implementation by snapshotting both exact wires and the trusted network and
+adding a same-statement/different-proof regression. Complete Rust, Guardian,
+format, lint, locked release, package, dependency-audit, Memory, and
+Autodidactic gates pass. Final Kimi read-only review reports no actionable
+finding. Public and Memory documentation is updated locally with explicit
+candidate/non-claim wording; final documentation checks are pending.
+
+No commit, push, PR, Pages deployment, signer interaction, transaction,
+broadcast, chain action, secret access, or foreign-file change is authorized
+or performed. Overall estimates remain core 78-82%, complete vision 44-49%,
+and 51-56% remaining because production proof artifacts and acceptance,
+pairing/privacy, transport, actionable analysis, deployments, and external
+rollout evidence remain open.
+
+## 2026-07-26 - Final local status for GIO-PROM-20260726-005
+
+The local proof-binding ticket is `Done` within its authorized uncommitted
+scope. Final Pages/SEO/stale-status, HTML/JSON-LD, workflow YAML, Actionlint
+1.7.12, Memory, Autodidactic, diff, and changed-file Gitleaks checks pass after
+the public documentation update. The complete code/test/release/package/audit
+evidence and final no-finding Kimi review are recorded in `ACTION_LOG.md`.
+
+No external repository or Pages state changed. Exact HEAD remains
+`b556fbbae428e7f6eef07c6d502b32e13e759813` on local branch
+`feat/local-v2-proof-binding`; all candidate files remain uncommitted. The
+parent rollout goal is active, with approved production proof artifacts and
+acceptance, owner-only pairing/privacy promotion, transport/actionable
+analysis, real deployments, external signatures, confirmations, and public
+chain evidence still open.
+
+## 2026-07-26 - GIO-PROM-20260726-006 started
+
+Status: `In Progress` / local repository only / no external write.
+
+Codex Sol continues in the existing isolated worktree
+`/Users/gio/Desktop/repos/prometheus-v2-proof-binding` on exact public baseline
+`b556fbbae428e7f6eef07c6d502b32e13e759813`. The next bounded block is a
+non-authoritative ThreatHint-v2 privacy/proof preflight that closes two
+cross-candidate confusion gaps: the relation-manifest SHA-256 must come from
+one owner-only trusted policy, and the observable statement must be derived
+only from the canonically bound proof envelope rather than accepted as an
+independent input.
+
+The preflight may verify canonical statement/bundle/approval compatibility and
+return a data-only result. It must not consume an approval, migrate or write a
+ledger, claim Groth16 verification, approve relation/key artifacts, or trigger
+transport, analyzer, outbox, promotion, wallet, signing, transaction, chain,
+reputation, KAS/PROM, slash, commit-reveal, or emergency-stop behavior. Actual
+durable acceptance remains blocked until an approved v2 Groth16 verifier runs
+in the same trusted call path before the final atomic ledger write.
+
+Kimi K3 completed the required secret-free read-only architecture review. It
+identified the unauthenticated bare manifest-anchor input and independent
+statement input as high-risk composition gaps, plus forward-only SQLite
+migration and documentation-conflict risks. Sol owns the stricter no-consume
+architecture, implementation, integration, complete tests, and final review.
+No commit, push, PR, merge, Pages deployment, signing, broadcast, or external
+system action is authorized.
+
+## 2026-07-26 - GIO-PROM-20260726-006 final local status
+
+The local non-consuming ThreatHint-v2 privacy/proof preflight is `Done` within
+its authorized uncommitted scope. Its owner-only exact-schema policy pins the
+network, BIP340 approver key, opaque recipient scope, and raw-manifest SHA-256.
+The public call derives the statement only from the bound envelope, verifies
+review-required bundle/approval compatibility, and returns data hashes and IDs
+without opening SQLite or consuming the approval.
+
+Kimi K3 completed the bounded architecture review, initial implementation, and
+final read-only review. Sol reviewed every write, retained the stricter
+non-consuming architecture, and fixed Kimi's low-priority deeply nested JSON
+redaction finding. The final review has no P0/P1/P2. The owner-local
+lstat/read TOCTOU window and manifest hashing before the parser size cap remain
+documented non-blocking hardening limits.
+
+Complete local evidence passes 31 focused preflight cases, 95 combined
+v2/observable cases, 282 Guardian tests with three intentional skips, changed
+Pylint 10.00/10, complete Guardian Pylint 9.81/10, Black, Rustfmt,
+warning-free workspace all-target Clippy, 317 regular Rust tests, five
+doctests, two intentional live-network ignores, Cargo/Python dependency
+audits, Memory Integrity, six Autodidactic tests, Pages/HTML/JSON-LD checks,
+workflow YAML, Actionlint 1.7.12, and redacted Gitleaks 8.30.1.
+
+Exact HEAD remains `b556fbbae428e7f6eef07c6d502b32e13e759813` on
+`feat/local-v2-proof-binding`. Nothing is committed, pushed, merged,
+published, deployed, signed, or broadcast. The parent rollout goal remains
+active. Approved v2 relation/key/ceremony evidence and real Groth16
+verification must precede one atomic durable acceptance path; transport,
+actionable analysis, deployments, external signatures, confirmations, and
+public chain evidence remain open. Estimates remain core 78-82%, complete
+vision 44-49%, and 51-56% remaining.
+
+## 2026-07-26 - GIO-PROM-20260726-007 started
+
+Status: `In Progress` / local repository only / no external write.
+
+The next bounded block adds the missing trusted ThreatHint-v2 Groth16
+verification boundary above the canonical envelope/manifest binding. The
+candidate may pin owner-only local relation-source and verifying-key artifacts
+to one separately trusted manifest SHA-256, deserialize exact canonical BN254
+artifacts, verify the two manifest-declared public inputs, and expose a silent
+local CLI gate.
+
+Only deterministic test fixtures may create relation/key/proof data. This
+ticket cannot approve or invent production relation source, proving/verifying
+keys, or ceremony evidence. It cannot consume an approval, write SQLite,
+authorize privacy/disclosure, or trigger transport, analysis, promotion,
+wallet, signing, transaction, broadcast, deployment, chain, reputation,
+KAS/PROM, slash, commit-reveal, or emergency-stop behavior.
+
+Kimi K3 performs a bounded secret-free architecture/security review before
+implementation. Sol owns cryptographic architecture, integration, every
+writing diff, full verification, and final status. No commit, push, PR,
+protected CI, Pages publish, deployment, signing, broadcast, or other external
+action is authorized.
+
+## 2026-07-27 - GIO-PROM-20260726-007 implementation checkpoint
+
+The trusted v2 verifier is implemented locally. It freezes one trusted
+network/manifest anchor, owner-loads retained canonical manifest bytes plus
+fixed relation-source and verifying-key siblings, and performs canonical BN254
+Groth16 verification only over the two inputs produced by the existing
+binding. `verify-v2` is silent and preserves the v1 exit map. Runtime has no
+proving-key path.
+
+Kimi completed architecture review, initial implementation, and final
+read-only review; the final verdict is PASS with no P0/P1/P2/P3. Sol added
+deserialization-, owner-directory-, and anchor-path adversarial coverage.
+Sixteen focused cases, 44 ThreatProof tests, 333 complete workspace passes,
+five doctests, 282 Guardian passes, fmt, warning-free Clippy, optimized build,
+and the verified 15-file package pass. Two Rust live-network tests and three
+Python live-model tests remain intentionally skipped.
+
+All generated relation/key/proof data is deterministic and test-only. No
+production artifact, key, ceremony, atomic approval consumption, privacy
+authority, transport, chain action, or rollout evidence is claimed. Public
+docs and Memory are synchronized locally; final documentation, dependency,
+integrity, and leak checks remain in progress. Estimates are now core 79-83%,
+complete vision 45-50%, and 50-55% remaining.
+
+## 2026-07-27 - GIO-PROM-20260726-007 final local status
+
+Status: `Done` for the bounded local ticket; parent rollout goal remains
+`In Progress`.
+
+The trusted ThreatHint-v2 Groth16 verifier boundary, silent `verify-v2` CLI,
+owner-only manifest/relation/VK loading, canonical BN254 checks, and
+binding-derived two-input verification are locally complete. Runtime has no
+proving-key path, approval-consumption path, privacy authority, transport, or
+chain side effect. Deterministic relation/key/proof generation exists only in
+test fixtures and confers no production approval.
+
+Kimi K3 completed the secret-free architecture review, bounded implementation,
+and final read-only review with no P0/P1/P2/P3. Sol reviewed all writes, added
+adversarial malformed-proof, hash-matched-invalid-key, unsafe-directory,
+uppercase-anchor, and zero-anchor cases, and ran the full integration chain.
+
+Final evidence passes 16 focused verifier-v2 cases, 44 ThreatProof tests, 333
+complete-workspace regular Rust tests plus five doctests, 282 Guardian tests,
+Rustfmt, warning-free workspace Clippy, Black, complete Guardian Pylint
+9.81/10, optimized verifier build, exact 15-file package inspection,
+Cargo/Python dependency audits, Memory Integrity, six Autodidactic tests,
+Pages/HTML/JSON-LD checks, workflow YAML, Actionlint 1.7.12,
+`git diff --check`, and complete-candidate redacted Gitleaks 8.30.1. Two Rust
+live-network tests and three Python live-model tests remain intentionally
+ignored/skipped. Known M-002 first-run timing jitter passed both its isolated
+rerun and the complete rerun without a code change.
+
+README, Whitepaper, Roadmap, FAQ, `llms.txt`, protocol/Guardian docs, Memory,
+and Bridge are synchronized locally. Current estimates are core 79-83%,
+complete vision 45-50%, and 50-55% remaining. Exact HEAD remains
+`b556fbbae428e7f6eef07c6d502b32e13e759813`; nothing is committed, pushed,
+published, deployed, signed, transacted, or broadcast.
+
+The immediate rollout proof gate is still external and security-sensitive:
+approve the production v2 relation, proving/verifying keys, ceremony evidence,
+and independent cryptographic review, then compose verification with final
+durable approval consumption atomically. Pairing/privacy promotion, transport,
+actionable analysis, real deployments, signatures, confirmations, and public
+chain evidence remain open.
+
+## 2026-07-27 - GIO-PROM-20260727-008 started
+
+Status: `In Progress` / local repository only / no external write.
+
+The next bounded local block composes the existing Python ThreatHint-v2
+approval/privacy preflight with the real Rust `verify-v2` process. One
+owner-configured executable path and exact executable SHA-256 must be trusted
+locally; the existing policy network and raw-manifest anchor must be reused by
+both checks, and the exact envelope bytes must reach the verifier through
+stdin. Execution must be bounded, silent, shell-free, fail-closed, and
+non-consuming.
+
+The result remains data only. This ticket cannot open or mutate SQLite,
+consume an approval, approve or generate a production relation/key/ceremony,
+prove, transport, analyze, promote, sign, transact, broadcast, deploy, or
+touch chain/reputation/KAS/PROM/slash/commit-reveal/emergency-stop behavior.
+Kimi performs the secret-free architecture review; Sol owns trust-boundary
+design, all write review, integration, full verification, and final status.
+
+## 2026-07-27 - GIO-PROM-20260727-008 implementation checkpoint
+
+Status: `In Progress`; implementation, independent review, code suites, and
+public/Memory synchronization are complete. Final dependency, integrity,
+Pages/workflow, diff, and leak gates remain in progress.
+
+The new POSIX-only Guardian service uses the existing policy as the sole
+network/manifest anchor, owner-loads the manifest, runs approval/privacy
+preflight first, and sends the same exact envelope to an owner-configured
+executable pinned by SHA-256. The verifier process is shell-free, scrubbed,
+bounded, reaped, serialized per service, and fail-closed. Its receipt is
+non-constructible, non-serializable data only; no SQLite access or approval
+consumption occurs.
+
+Kimi K3 final review is PASS with no P0/P1/P2. Current evidence passes 59
+focused, 310 Guardian/3 intentional skips, 333 Rust/2 intentional ignores plus
+5 doctests, Black, Pylint 10.00 focused/9.81 full, Rustfmt, and warning-free
+Clippy. Public docs and Memory are synchronized. Production relation/key/
+ceremony approval, independent cryptographic review, and one final atomic
+verify-plus-consume boundary remain P0. No external action or secret access
+occurred.
+
+## 2026-07-27 - GIO-PROM-20260727-008 final local status
+
+Status: `Done` for the bounded local ticket; parent rollout goal remains
+`In Progress`.
+
+The owner-configured, executable-hash-pinned, non-consuming Guardian
+verified-preflight composition is implemented, independently reviewed, fully
+tested, and documented. Final evidence passes 59 focused, 310 Guardian/3
+intentional skips, 333 Rust/2 intentional ignores plus 5 doctests, Rustfmt,
+warning-free Clippy, Black, Pylint, Cargo/Python audits, Memory/Autodidactic,
+Pages/HTML/JSON-LD, workflow YAML/Actionlint, clean diff, and complete-candidate
+redacted Gitleaks. Kimi final verdict is PASS with no P0/P1/P2.
+
+The owner-local hash-to-`execve` race is documented and bounded by per-call
+rehash plus current-user/root ownership and non-writable ancestors. The older
+standalone receipt serialization follow-up is P3. Three pre-existing
+historical test-format deviations outside CI/ticket scope remain untouched.
+
+Exact HEAD is still
+`b556fbbae428e7f6eef07c6d502b32e13e759813`; nothing is committed, pushed,
+published, deployed, signed, transacted, or broadcast. Production relation/
+keys/ceremony and independent cryptographic review plus one final atomic
+verify-and-consume boundary remain P0. Estimates stay core 79-83%, complete
+vision 45-50%, and 50-55% remaining.
+
+## 2026-07-27 - GIO-PROM-20260727-009 started
+
+Status: `In Progress` / local repository only / no external write.
+
+The next P0-reducing local block adds one trusted ThreatHint-v2 acceptance
+service. It accepts raw candidate bytes only, requires exact preflight/
+consumption policy identity, runs the ticket-008 proof/privacy composition
+first, and performs existing durable Approval consumption only as the final
+state-changing step. No caller receipt or verified object is accepted.
+
+The result remains local data only. Production relation/key/ceremony approval,
+privacy promotion, transport, analyzer/outbox behavior, signing, transaction,
+broadcast, deployment, chain, reputation, KAS/PROM, slash, commit-reveal, and
+emergency-stop behavior remain outside scope. Kimi performs the secret-free
+architecture/security review; Sol retains every write and final decision.
+
+## 2026-07-27 - GIO-PROM-20260727-009 architecture checkpoint
+
+Kimi review `session_5ceb9fa9-6841-40c7-99c2-fc79ab5fb884` reports no P0
+or hard blocker. The required P1 is exact preflight/consumption identity before
+ledger creation. The selected design adds a restrictive exact-authority
+consumption factory, pre-insert approval-ID/commitment binding, and one
+raw-input-only acceptance service. Consumption remains the final atomic
+state-changing step; receipts/verified objects are never caller inputs.
+Crash-after-commit/replay semantics and owner-local residuals remain explicit.
+No external or secret-bearing action occurred.
+
+## 2026-07-27 - GIO-PROM-20260727-009 implementation checkpoint
+
+Kimi K3 supplied the bounded initial Python implementation and focused tests;
+Sol reviewed every changed line and stopped the worker when it moved beyond
+that block. The raw-input-only service now proves exact network/approver/scope
+identity before ledger creation, runs verified proof/privacy preflight first,
+and re-verifies the expected approval ID and observable commitment before the
+existing atomic durable consumption. Stable invalid, unavailable, replay, and
+busy errors remain redacted.
+
+Sol hardened concurrency timing and source-boundary coverage, corrected an
+absolute crash-semantics statement, and simplified exact type/identity checks.
+Current evidence passes 158 focused Guardian tests, Black over all eight ticket
+files, focused Pylint 10.00/10, and `git diff --check`. Final Kimi review,
+complete suites, public/Memory synchronization, and final gates remain open.
+No external action, secret access, or foreign-file change occurred.
+
+## 2026-07-27 - GIO-PROM-20260727-009 final-review checkpoint
+
+Kimi final read-only session
+`session_65b5a37b-3dc7-4696-9a40-8713c6776fa8` reports static PASS with no
+P0/P1/P2 code findings. Its isolated environment lacked `coincurve`, so its
+pytest attempt collected no tests and it performed no install or network
+action. Sol closed its one P3 finding by making the older data-only preflight
+receipt non-serializable with direct/replace/pickle regressions.
+
+Sol then reran the dependency-complete focused matrix: 158/158 pass in 32.50
+seconds; Black passes all eight ticket files and focused Pylint is 10.00/10.
+Complete Guardian/Rust/integrity/documentation gates remain open, so the ticket
+is still `In Progress`. No external or secret-bearing action occurred.
+
+## 2026-07-27 - GIO-PROM-20260727-009 final local status
+
+Status: `Done` for the bounded local ticket; parent rollout goal remains
+`In Progress`.
+
+The raw-input-only Guardian acceptance boundary now proves exact
+network/approver/scope policy identity before ledger creation, runs verified
+proof/privacy preflight first, and binds the re-verified approval ID and
+observable commitment before final atomic durable consumption. Failed checks
+consume nothing and do not advance ledger time; stable invalid, unavailable,
+replay, and busy outcomes remain redacted. All three data-only receipt types
+are non-constructible and non-serializable.
+
+Kimi final static review is PASS with no P0/P1/P2; Sol fixed its sole P3.
+Evidence passes 158 focused and 349 complete Guardian tests/3 intentional
+skips, Black, Pylint 10.00 focused/9.82 full, Rustfmt, warning-free workspace
+Clippy, and the complete Rust workspace/2 intentional ignores plus 5 doctests.
+Known M-002 first failed at 2.466 ms and 2.274 ms, then passed at 42.982
+microseconds and in the full rerun without code/threshold change.
+
+Cargo/Python audits, Memory/Autodidactic, Pages/HTML/JSON-LD,
+workflow/Actionlint, diff, and complete-candidate redacted Gitleaks pass. The
+full local global cross-project Bridge has one pre-existing historical finding
+outside this ticket; the new Prometheus sections scan clean and no finding
+content was output or changed.
+
+Public docs and Memory are synchronized. Estimates are core 80-84%, complete
+vision 46-51%, and 49-54% remaining. Exact HEAD is still
+`b556fbbae428e7f6eef07c6d502b32e13e759813`; no commit, push, publish, deploy,
+signing, transaction, broadcast, secret access, or foreign-file change
+occurred. Immediate P0 is independent production relation/key/ceremony and
+cryptographic approval; pairing/privacy promotion, transport, actionable
+analysis, external effects, deployments, confirmations, and public evidence
+remain open.
+
+## 2026-07-27 - GIO-PROM-20260727-010 started
+
+Status: `In Progress` / local repository only / no external write.
+
+The next repository-solvable rollout gate is one owner-only exact-schema
+ThreatHint-v2 privacy promotion and pairing boundary above ticket 009. It may
+apply explicit scope, observable-kind, and count restrictions to raw candidate
+bytes before invoking the raw acceptance call and may return only hardened
+local data. Failed promotion checks must not consume or advance ledger time;
+caller receipts and verified objects remain forbidden.
+
+Analyzer/LLM/YARA invocation, outbox, transport, publication, production proof
+artifacts, wallet, signing, transaction, chain, reputation, KAS/PROM, slash,
+commit-reveal, emergency-stop, deployment, and external effects remain outside
+scope. Kimi reviews architecture read-only; Sol owns privacy semantics, writes,
+integration, full tests, docs, and closeout.
+
+## 2026-07-27 - GIO-PROM-20260727-010 architecture checkpoint
+
+Kimi review `session_d9dbd858-46ab-4db7-bca1-36d1ab122f85` reports PASS for
+implementation readiness with no P0. The chosen exact-schema owner policy pins
+one platform, one format, a non-empty duplicate-free allowed-kind list, and a
+1..16 maximum count; it does not duplicate ticket-009 network/key/scope trust
+anchors.
+
+The public call remains raw-only. It parses and restricts the same exact bundle
+bytes before invoking acceptance, so rejected promotion never reaches the
+verifier or ledger. Success may expose canonical observables only in one
+non-constructible/non-serializable in-memory result. No analyzer, transport,
+publication, external effect, or production artifact approval is added.
+
+## 2026-07-27 - GIO-PROM-20260727-010 implementation checkpoint
+
+Status: `In Progress`; bounded implementation and Sol's focused verification
+are complete. Independent final review, full integration/security gates,
+public documentation, Memory, and final closeout remain open.
+
+Kimi K3 added only
+`modules/guardian-node/jaeger/threat_hint_v2_promotion.py` and its focused test
+file. The service owner-loads an exact-schema ASCII policy, enforces
+review-required disclosure, exact platform/format, allowed observable kinds,
+and a maximum count before the same original raw wires may enter ticket-009
+acceptance. Failed restriction checks never invoke the verifier and leave
+approval-consumption count and ledger high-water unchanged.
+
+Success returns a frozen, non-constructible, non-serializable local data object
+containing only accepted digest/IDs/time, the policy-pinned scope, and
+canonical observable string pairs. Stable invalid, unavailable, replay, and
+busy errors are redacted; busy alone is retryable. Kimi and Sol each ran the
+50 focused tests successfully; Sol's run completed in 17.19 seconds. Black,
+Pylint 10.00/10, `py_compile`, and `git diff --check` pass. No external action,
+secret access, or foreign-file change occurred.
+
+## 2026-07-27 - GIO-PROM-20260727-010 final-review checkpoint
+
+Kimi re-review `session_21d9bcff-80a6-4445-8d0a-3cd90e381b1e` is PASS with no
+P0/P1/P2. Sol closed its initial P2 by adopting the repository's established
+`O_NOFOLLOW` plus descriptor `fstat` identity/mode/size validation, bounded
+read, and guaranteed-close trusted-file pattern. Check-to-open symlink and
+regular-inode swaps now fail before acceptance.
+
+All P3 coverage observations are also closed: symlinked parent, exact bytes/int
+subclasses, valid reuse after an acceptance-stage candidate failure, and an
+embedded-NUL path's stable unavailable mapping. Sol's dependency-complete
+environment passes 57 promotion tests and the combined 207-test tickets
+005-010 Guardian matrix; Black, Pylint 10.00/10, `py_compile`, and
+`git diff --check` pass. Kimi's own pytest collection lacked `coincurve` and
+performed no install. Full repository gates and docs/Memory closeout remain
+open, so status stays `In Progress`.
+
+## 2026-07-27 - GIO-PROM-20260727-010 final local status
+
+Status: `Done` for the bounded local ticket; parent rollout goal remains
+`In Progress`.
+
+The raw-only owner-policy promotion boundary now applies canonical
+review-required disclosure plus exact platform/format/kind/count restrictions
+before the same original wires enter atomic acceptance. Rejected candidates
+never reach proof verification or the ledger. Success is frozen,
+non-constructible, non-serializable restricted local data only. The policy
+reader uses `O_NOFOLLOW`, descriptor identity/mode/size checks, bounded input,
+and guaranteed close.
+
+Kimi final review is PASS with no P0/P1/P2 after Sol closed its initial P2 and
+all P3 observations. Evidence passes 57 focused, 207 combined ticket, and 406
+complete Guardian tests/3 intentional skips; Black, Pylint 10.00 focused/9.82
+full, Rustfmt, warning-free all-target Clippy, 333 complete Rust tests/2
+intentional ignores plus five doctests, locked release builds, Cargo packages,
+dependency audits, Memory/Autodidactic, Pages/HTML/JSON-LD,
+workflow/Actionlint, diff, and final redacted candidate Gitleaks.
+
+M-002 failed at 1.751 ms and 1.261 ms, then passed at 43.083 microseconds and
+in the full rerun without changes. Public docs and Memory are synchronized;
+estimates are core 81-85%, complete vision 47-52%, and 48-53% remaining.
+
+Exact HEAD remains
+`b556fbbae428e7f6eef07c6d502b32e13e759813`; the real index is empty. Nothing
+was committed, pushed, published, deployed, signed, transacted, broadcast, or
+sent to chain, and no secret or foreign file was touched. Production v2
+relation/key/ceremony and cryptographic approval remains external P0.
+Authority/scope/privacy governance, transport, actionable analysis, crash-safe
+effects, deployments, confirmations, and public evidence remain open.
+
+## 2026-07-27 - GIO-PROM-20260727-011 started
+
+Status: `In Progress` / local repository only / architecture before product
+write.
+
+The next crash-consistency gate is a default-off local promotion-outbox
+foundation. Any durable enqueue must share the exact SQLite transaction with
+approval consumption and high-water; a second write after `promote()` is not
+acceptable. A separate database cannot provide this atomicity.
+
+The review must also prevent a privacy regression: observable values,
+canonical bundle bytes, proofs, approvals, paths, or transport payloads may not
+be persisted until authority/scope governance and semantic per-kind privacy
+policy are explicitly bound. A digest-only journal is not recoverable work and
+must not be described as an outbox payload.
+
+Kimi reviews migration, identity, payload, default-off and future claim/lease
+contracts read-only. No analyzer, worker, transport, publication, external
+effect, production artifact, wallet, signing, transaction, chain, deployment,
+or secret access is in scope. Sol owns the architecture decision, writes,
+integration, tests, docs, and closeout.
+
+## 2026-07-27 - GIO-PROM-20260727-011 architecture checkpoint
+
+Kimi's bounded read-only architecture/security review is `NO-GO` for a real
+recoverable outbox before explicit durable-retention governance. Recovery
+requires observable values or canonical bundle material; persisting either
+would create a new privacy surface. A digest-only journal is not recoverable
+work and will not be mislabeled as an outbox.
+
+The selected next build slice is therefore an owner-only, exact-schema,
+default-deny local retention-governance policy. It binds the already trusted
+network/approver/scope identity, a fixed local-only purpose, one closed payload
+form, an explicit durable-kind allowlist, and a bounded pending-record limit.
+It is only a local operator declaration: it proves no key ownership,
+recipient authorization, extractor provenance, semantic privacy safety,
+transport authority, or disclosure authority.
+
+A later real outbox must place its recoverable enqueue in the same existing
+`BEGIN IMMEDIATE` SQLite transaction as high-water advancement and approval
+consumption. No second database or post-`promote()` write is acceptable. No
+product file or external system changed at this checkpoint; the real index is
+empty and all publication/deployment/signing/chain boundaries remain closed.
+
+## 2026-07-27 - GIO-PROM-20260727-011 implementation checkpoint
+
+Kimi K3 session `session_a5ae0f2a-6d7a-41b3-a357-c404d11a010e` added only the
+pure read-only owner retention-policy loader and 109 focused adversarial tests.
+Sol read both files fully and independently confirms 109/109 in 2.20 seconds,
+Black unchanged, `py_compile` pass, and Pylint 10.00/10.
+
+The exact policy binds the expected network/approver/scope identity before any
+filesystem access, a fixed local-only retention purpose, canonical bundle
+payload form, explicit default-deny observable kinds, at most 100000 pending
+records, and at most 30 days of retention. Trusted reading uses owner-only
+path controls, no-follow open, descriptor device/inode/mode/size checks,
+bounded input, and guaranteed close.
+
+This is governance data only. It performs no SQLite access or write and grants
+no key, recipient, extractor, privacy, analyzer, transport, disclosure, or
+rollout authority. Final independent review and complete repository gates are
+still open; the real index remains empty and no external action occurred.
+
+## 2026-07-27 - GIO-PROM-20260727-011 local closeout
+
+Ticket 011 is `Done` only as a review-ready local candidate; the parent rollout
+goal remains `In Progress`. The new pure retention-policy loader and 114
+adversarial tests create no database, outbox, worker, transport, disclosure, or
+external effect. Expected network/approver/scope identity is validated before
+file access; the owner-only exact policy fixes purpose, canonical payload,
+durable kinds, 100000 pending records maximum, and 30 days maximum.
+
+Kimi sessions `session_a5ae0f2a-6d7a-41b3-a357-c404d11a010e`,
+`session_5e151e8b-0312-4f21-926d-709a96b56549`, and
+`session_537040c8-9ee0-44eb-8175-6de9b4ab4292` finish with no P0/P1/P2 after
+Sol closed deep-recursion, pre-file identity, setgid/sticky, and mandatory
+no-follow coverage. Final evidence passes 114 focused and 520 complete
+Guardian tests/3 intentional skips, Black, `py_compile`, focused Pylint
+10.00/10, complete Pylint 9.81/10, Rustfmt, warning-free Clippy, 333 regular
+Rust tests/2 intentional ignores/5 doctests, locked release builds/packages,
+Cargo/Python audits, Memory, Autodidactic, Pages/HTML/JSON-LD, both workflow
+YAMLs, Actionlint 1.7.12, diff check, and a final redacted no-leak Gitleaks
+8.30.1 candidate scan.
+
+Public-facing README, Markdown/HTML Whitepaper, design docs, Guardian README,
+`llms.txt`, Memory, and Bridges are synchronized locally. The Whitepaper now
+correctly separates GH-107 non-consuming verification from GH-111 durable
+local replay consumption. No GitHub or deployment write occurred.
+
+A recoverable outbox remains `NO-GO` before authority/key/scope and enforceable
+per-kind privacy governance. Future enqueue must commit in the same existing
+`BEGIN IMMEDIATE` transaction as approval consumption and high-water; a
+digest-only journal is not recoverable work. Production relation/key/ceremony
+approval and independent cryptographic evidence, real outbox/transport/
+actionable analysis, deployments, signatures, confirmations, and public
+evidence remain P0. Estimates stay core 81-85%, complete vision 47-52%, and
+48-53% remaining.
+
+HEAD is still `b556fbbae428e7f6eef07c6d502b32e13e759813`, the real index is
+empty, and the cumulative ticket-005-through-011 candidate is preserved. No
+commit, push, PR, publish, deploy, signing, broadcast, chain action, secret, or
+foreign-file change occurred.
+
+## 2026-07-27 - GIO-PROM-20260727-012 enforceable governance kickoff
+
+Ticket 012 is `In Progress` as a local candidate. It targets the real gate
+between ticket-010 promotion, ticket-011 retention declaration, and a future
+atomic recoverable outbox: authority epoch/validity, concrete recipient
+semantics, and explicit kind-specific privacy decisions must be checked before
+proof invocation and approval consumption.
+
+The architecture review will determine the smallest coherent integration that
+also prevents restart rollback. The intended invariant is stronger than a
+read-only declaration: allowed kinds must match promotion and retention
+snapshots, approval validity must remain inside the active authority window,
+and authority epoch/policy identity must advance atomically with ledger
+high-water and approval consumption. Rejection changes no durable state.
+
+Kimi K3 reviews this boundary read-only and secret-free. Sol retains migration,
+security, implementation, integration, complete test, documentation, and
+closeout responsibility. No outbox, analyzer, transport, external effect,
+production artifact, wallet, signing, chain, deployment, GitHub write, secret,
+or foreign-file change is in scope.
+
+## 2026-07-27 - GIO-PROM-20260727-012 architecture checkpoint
+
+Kimi review `session_3b8073c8-1891-4930-8527-945d89459dde` is conditional
+`GO`. Governance must inspect verified approval times before consumption,
+cross-policy checks must use one immutable snapshot per file before ledger
+open, and stale authority requires a cheap advisory pre-verifier read plus the
+authoritative transaction check. The latter may still lose a benign race and
+waste pure local verification; it can never permit a durable effect.
+
+The privacy schema is closed and explicit for all three observable kinds:
+`deny_v1` or the kind's own risk-acknowledging local-analysis token. Its
+derived allowed set must exactly equal promotion and retention sets.
+
+Sol chooses signed-use activation instead of construction-time rotation.
+Schema v2 starts with no pinned authority row. The first valid governed consume
+pins epoch plus governance/retention digests; a higher epoch advances them only
+inside the same `BEGIN IMMEDIATE` transaction as high-water and approval
+consumption. Lower epochs and same-epoch digest equivocation fail closed.
+Migration and rotation preserve all prior replay rows and high-water. Merely
+loading a mistaken future policy cannot permanently rotate or lock the ledger.
+
+Kimi's implementation scope is limited to the new pure governance loader and
+focused tests. Sol owns every ledger/composition write and the final full
+integration review.
+
+## 2026-07-27 - GIO-PROM-20260727-012 implementation checkpoint
+
+Ticket 012 remains `In Progress` and local-only. The enforceable path now pins
+the exact promotion, governance, and retention file digests together with the
+network, approver key, recipient scope, epoch, and authority window. The pin or
+higher-epoch advance occurs only with a valid governed approval in the same
+`BEGIN IMMEDIATE` transaction as replay high-water and consumption.
+
+A higher epoch using the same key and scope must have a strictly later,
+non-overlapping authority window. Key or scope rotation may overlap for
+recovery because old approvals then fail the new identity. Any lower epoch or
+same-epoch policy equivocation fails closed. v0/v1 migration rejects a
+pre-existing authority table; SQLite extended lock codes and integer overflow
+now preserve the documented retry/redaction taxonomy.
+
+Verified locally: `372` focused tests pass, all `15` governed integration tests
+pass, and the complete Guardian suite reports `683 passed, 3 skipped`. Black
+is clean and the exact CI Pylint command passes at `9.81/10`. Kimi's follow-up
+review and the repo-wide Rust/workflow/security gates remain open. Nothing has
+been committed, pushed, deployed, signed, broadcast, or published.
+
+## 2026-07-27 - GIO-PROM-20260727-012 closeout
+
+Ticket 012 is `Done` as a review-ready local candidate; the rollout goal stays
+active. Final schema v2 atomically binds the exact promotion, governance, and
+retention file digests plus network, approver, recipient scope, authority
+epoch, and window with valid signed consumption. Same-identity epoch windows
+cannot overlap; key/scope rotation remains possible. Regression, equivocation,
+hidden migration state, replay, lock, overflow, and failed inserts are
+fail-closed.
+
+Kimi's final follow-up review
+`session_074cbd8e-4b8a-4751-a16d-a215dd96a005` approves with no P0/P1/P2; all
+P3 test gaps are closed. Evidence: governed `18 passed`, Guardian `686 passed,
+3 skipped`, Black, Pylint `10.00` focused/`9.81` CI, Rustfmt, warning-free
+Clippy, complete Rust rerun, release build, package verification, audits,
+Memory, Pages, Actionlint, clean diff, and a redacted 53.92 MB Gitleaks scan.
+
+README, Whitepaper Markdown/HTML, Roadmap Markdown/HTML, protocol/Guardian
+documentation, `llms.txt`, Memory, and Bridges are synchronized. Estimates:
+core `82-86%`, complete vision `48-53%`, remaining `47-52%`.
+
+HEAD remains `b556fbbae428e7f6eef07c6d502b32e13e759813`, the real index is empty,
+and no commit, push, PR, publish, deploy, wallet, signing, transaction,
+broadcast, chain, secret, primary-worktree, or external GitHub write occurred.
+Next local task: atomic recoverable outbox/claim sharing the consumption
+transaction.
+
+## 2026-07-28 - GIO-PROM-20260728-013 Definition-of-Ready
+
+Ticket 013 is `Awaiting explicit high-risk execution approval`. Its bounded
+goal is a local recoverable ThreatHint-v2 outbox/claim path whose enqueue shares
+the existing SQLite `BEGIN IMMEDIATE` transaction with approval consumption,
+replay high-water, and authority snapshot activation or advancement.
+
+This is high risk under the new workspace AUTOSTART policy because it changes
+the durable approval transaction and requires a conservative schema migration.
+No product code will change before Gio explicitly approves this exact slice.
+
+The intended scope is limited to schema/API integration, deterministic claim
+or lease state, bounded recovery, and adversarial atomicity, rollback,
+concurrency, migration, and redaction tests. Worker execution, analysis,
+transport, disclosure, production artifacts, wallets, signing, transactions,
+broadcast, chain state, deployments, secrets, and external GitHub writes remain
+out of scope.
+
+After approval, Kimi K3 receives a bounded secret-free architecture review.
+Sol owns every write, migration decision, integration review, full relevant
+Guardian/Rust/CI/security verification, documentation, and closeout.
+
+Kimi read-only DoR review
+`session_b7f0a95f-9867-4e93-bbf1-357a5efe47e6` returns conditional `GO` and
+changes no file. The implementation must first pin four bounded decisions:
+schema `user_version 2 -> 3` with a governed-only outbox; full-outbox failure
+that rolls back without consuming the approval; exact pending/leased/terminal
+claim transitions; and retention behavior for active and expired leases.
+
+The v2 outbox must remain distinct from the historical v1
+`analyzer_outbox`. One successful governed consumption produces at most one
+approval-bound record containing the full canonical observable bundle, never
+only a digest. Replay creates no duplicate; post-commit restart leaves the
+record claimable; cap, enqueue, migration, lock, overflow, or integrity failure
+leaves consumption, high-water, and authority unchanged.
+
+Required tests cover four-way atomic commit and rollback, pending-cap
+boundaries, replay/restart recovery, single-winner claim concurrency, lease
+expiry, retention boundaries, v0/v1/v2 preservation into v3,
+downgrade/pre-existing-table rejection, lock/overflow/schema adversaries, and
+redacted errors. Complete Guardian/Rust/lint/build/audit/CI/docs/leak gates
+remain mandatory after implementation.
+
+Kimi's attempted focused test collection could not run because
+`coincurve==21.0.0` was absent from the Python environments it was allowed to
+inspect; this is recorded as an environment limitation, not a product failure.
+Sol will use the established project test environment after execution
+approval. Ticket status remains `ready`, not `approved_for_execution`.
+
+## 2026-07-28 - GIO-PROM-20260728-013 execution approved
+
+Gio explicitly approved Ticket 013. Status is now `approved_for_execution` and
+`in_progress`, repository/test only. The schema decision is a governed-only
+SQLite `user_version 3`; legacy v1 receives no outbox, while v2 migration must
+preserve every consumption, high-water value, and authority snapshot.
+
+The capacity check and recoverable enqueue occur inside the exact existing
+transaction before commit. A full outbox or enqueue failure rolls back
+authority, high-water, consumption, and outbox together and leaves the
+approval usable. Each record stores the full canonical bundle wire, never only
+a digest.
+
+The pinned claim state machine is `pending -> leased -> terminal deletion`.
+Claim internally creates a 32-byte lease token and deterministically selects
+the oldest eligible row; an expired lease becomes eligible again. Acknowledge
+deletes only with exact approval-id and lease-token binding. A lease may never
+extend past the record's retention deadline, so active leases are never
+removed by retention cleanup.
+
+Kimi receives one bounded secret-free implementation block. Sol owns every
+architecture and migration decision, reviews every write, runs the complete
+relevant verification chain, and closes the ticket. Worker execution,
+analysis, transport, disclosure, production, wallet, signing, transaction,
+broadcast, chain, deployment, secrets, and external GitHub writes remain
+outside authorization.
+
+## 2026-07-28 - GIO-PROM-20260728-013 local closeout
+
+Ticket 013 is `Done` only as a review-ready local candidate; the wider rollout
+goal remains `In Progress`. Governed ledgers migrate to schema v3 while legacy
+v1 remains unchanged. One governed promotion stores the full canonical bundle
+in the same `BEGIN IMMEDIATE` transaction as authority activation or
+advancement, replay high-water, and approval consumption. Full queue or
+enqueue failure rolls all state back and leaves the approval usable.
+
+Owner-local claim is oldest-first and single-winner, generates an opaque
+32-byte token internally, recovers after restart or lease expiry, bounds every
+lease by retention, purges expired-retention rows before selection, and
+terminally deletes only an exact approval-ID/token acknowledgement. Direct
+governed acceptance does not enqueue.
+
+Kimi implementation
+`session_624d0bad-f6fb-41be-b167-3c611b1b34dd` and independent review
+`session_3a07dfa5-4464-408c-90aa-afa342f4e15c` are complete with no actionable
+P0/P1/P2. Sol closed lease-bound, retention-cleanup, and random-source
+redaction hardening, reviewed every diff, and ran the authoritative test
+environment.
+
+Evidence passes 282 focused tests; complete Guardian `716 passed, 3 skipped`;
+changed-file Black; exact CI Pylint `9.84/10`; compileall; Rustfmt;
+warning-free Clippy; 333 regular Rust tests/two intentional ignores/five
+doctests; locked release build/packages; Cargo/Python audits; Memory,
+Autodidactic, Pages/SEO/JSON-LD/stale-status, internal links, workflow YAML,
+Actionlint 1.7.12, diff, and redacted Gitleaks 8.30.1 gates.
+
+README, Whitepaper Markdown/HTML, Roadmap Markdown/HTML, Guardian/protocol
+documentation, `llms.txt`, Memory, and Bridges are synchronized locally.
+Estimates are core `83-87%`, complete vision `49-54%`, and `46-51%` remaining.
+
+HEAD remains `b556fbbae428e7f6eef07c6d502b32e13e759813`; the real index is empty.
+No commit, push, PR, publish, Pages deploy, worker/analyzer execution,
+transport, disclosure, wallet, signing, transaction, broadcast, chain,
+deployment, secret, primary-worktree product change, or external GitHub write
+occurred.
+
+Next repository-owned task: a separately reviewed bounded outbox worker and
+actionable-analysis integration. Production relation/key/ceremony approval and
+independent cryptographic evidence remain mandatory before operated v2 proof
+acceptance.
+
+`TASK COMPLETE — TARGET STOP ACTIVE`
+
+## 2026-07-29 17:27 EEST - Ticket 015 GitHub issue and branch
+
+GitHub issue
+[#117](https://github.com/NeaBouli/prometheus-/issues/117) now owns the
+cumulative integration acceptance criteria and explicit non-goals. The local
+branch is `feat/GH-117-threat-hint-v2-verified-pipeline`.
+
+The next bounded actions are explicit staging of the known candidate, index
+inspection, one integration commit, branch push, and a pull request to
+protected `main`.
+
+## 2026-07-29 17:25 EEST - GIO-PROM-20260729-015 GitHub integration started
+
+Gio explicitly authorized the necessary commit, push, publication, and
+deployment steps for the completed work. Ticket 015 is limited to integrating
+the already reviewed cumulative ThreatHint-v2 repository candidate from
+Tickets 005 through 014 through the protected GitHub workflow.
+
+Current baseline and remote `main` are exactly
+`b556fbbae428e7f6eef07c6d502b32e13e759813`; there is no open pull request and
+no branch divergence. The known worktree consists of the cumulative v2
+proof-envelope/relation/binding/verifier/preflight/acceptance/promotion/
+governance/outbox/worker implementation, adversarial tests, synchronized
+README/Whitepaper/Roadmap/protocol docs, Memory, and Bridge history.
+`Prometheus-1.png` is untouched and excluded.
+
+Authorized actions:
+
+- create one GitHub issue with exact acceptance and non-goals;
+- rename the local feature branch to the issue-scoped name;
+- stage only the known repository candidate, commit it, and push that branch;
+- open a pull request against protected `main`;
+- monitor and remediate repository CI within the existing scope;
+- merge only through the pull request after required checks are green, then
+  verify exact-main CI and Pages if triggered.
+
+No production relation/key/ceremony approval, real LLM/YARA/actionable
+analysis, wallet, signature, transaction, broadcast, chain, reward, server,
+DNS, secret, or production deployment is authorized or implied.
+
+Status: `In Progress`.
+
+## 2026-07-28 - GIO-PROM-20260728-014 Definition-of-Ready
+
+Ticket 014 is `Awaiting explicit high-risk execution approval`. Its bounded
+goal is the smallest owner-local v2 worker/result contract that can safely
+follow Ticket 013 without losing an analysis result or silently duplicating a
+non-idempotent analyzer run.
+
+This is high risk because it would cross retained privacy-approved observable
+values into an analyzer and change terminal durable-state semantics. No
+product code changes before Gio explicitly approves this exact slice.
+
+Read-only inspection found two mandatory design blockers:
+
+1. Ticket-013 claims expose approval ID, observable commitment, canonical
+   bundle, lease token, and lease expiry, but not the trusted network/report
+   nonce needed to recompute the bundle commitment independently.
+2. Current acknowledgement terminally deletes the row without persisting an
+   analysis result. A crash after analyzer completion but before ack can rerun
+   non-deterministic LLM/YARA work; a crash after ack but before result handoff
+   can lose the only result.
+
+The existing v1 adapter cannot be reused directly. It intentionally returns a
+zero-confidence, no-rule result because v1 has no concrete observables. The
+legacy `Analyzer.process_threat_hint` accepts a hash plus free-form strings,
+contacts a localhost vLLM endpoint, performs only basic YARA string checks,
+uses heuristic confidence, and may set `should_submit=True`; it is not an
+approved v2 publication or submission authority.
+
+Proposed bounded scope after approval:
+
+- pin whether v3 can be extended without migration or whether a governed-only
+  schema v4 must retain network/report nonce and durable terminal result;
+- introduce an exact typed v2 analyzer-input/result contract with no
+  transport, publication, committee, IPFS, chain, reward, or submission
+  authority;
+- require one atomic completion transition that binds approval ID, lease
+  token, exact input identity, and a bounded canonical local result before
+  deleting or terminalizing work;
+- preserve lease recovery, retention, redaction, owner-only storage, and
+  bounded concurrency;
+- keep real LLM/YARA execution dependency-injected and disabled by default
+  until its privacy, idempotency, result schema, YARA validation, and
+  non-submittable boundary pass separate review.
+
+Required adversarial evidence covers commitment revalidation, tampered rows,
+crash before/after analysis and completion, stale token, lease rotation,
+duplicate completion, result-size cap, cancellation, analyzer timeout,
+malformed/high-confidence output, database lock/overflow, migration/downgrade,
+and redacted errors.
+
+No worker, LLM, YARA, transport, disclosure, wallet, signature, transaction,
+broadcast, chain, deployment, commit, push, PR, publish, or external GitHub
+write has occurred. Kimi receives a bounded secret-free read-only architecture
+review; Sol retains every migration, security, implementation, integration,
+test, documentation, and closeout decision.
+
+### Ticket 014 independent review and pinned executable scope
+
+Kimi read-only review
+`session_6718d8d3-554b-4d81-bad6-7b38a49807e5` confirms `NO-GO` for direct
+v2 worker -> existing `Analyzer` -> `acknowledge()`, and conditional `GO` for a
+governed schema-v4 typed-input/result and atomic-completion substrate. No file
+was changed and no test, network, secret, wallet, or external action occurred.
+
+The final Sol architecture is stricter than the minimum review recommendation:
+
+- governed-only schema v4 adds the canonical v2 `statement_wire`, exact
+  `statement_digest`, and 32-byte `report_nonce` to each new outbox row;
+- claim re-parses the statement against the owner-pinned network, re-parses the
+  canonical bundle, recomputes the network/nonce-bound commitment, and binds
+  statement, bundle, approval ID, commitment, and lease into one
+  domain-separated input identity;
+- v3 -> v4 migration is allowed only when `approval_outbox` is empty. Existing
+  v3 rows cannot be upgraded safely because their report nonce and statement
+  are not recoverable; a non-empty v3 queue leaves schema and all rows
+  unchanged and fails closed. v0/v1/v2 data still migrate without loss;
+- a new STRICT `observable_analysis_results` table stores one bounded canonical
+  result, result digest, input identity, completion-token digest, completion
+  time, and inherited retention deadline, keyed and foreign-keyed by approval
+  ID;
+- `complete(...)` is one `BEGIN IMMEDIATE` transaction: same unexpired lease,
+  exact input identity, canonical bounded result, result insert, and outbox
+  delete. Retry after a committed-but-unreturned completion succeeds only for
+  the exact completion token/input/result identity; stale or rotated leases
+  fail closed;
+- result cleanup shares the original retention deadline, and a completed result
+  remains owner-local/readable until that deadline so a post-commit crash does
+  not lose it;
+- Ticket 014's worker uses a new frozen typed v2 protocol and a deterministic
+  test analyzer only. It emits one explicitly non-actionable local completion
+  record with no YARA/rule body and no `should_submit` field. Real LLM/YARA,
+  semantic findings, candidate rules, and publication are deferred to a
+  separate approved ticket.
+
+Exact task template:
+
+```text
+Task-ID: GIO-PROM-20260728-014
+Project: prometheus
+Goal: crash-safe owner-local v2 input binding and durable non-actionable
+      completion substrate
+Scope: observable_approval_consumption.py; threat_hint_v2_acceptance.py;
+       new observable_analysis_worker.py; outbox and worker tests
+Non-goals: existing Analyzer/LLM/YARA changes; actionable rule generation;
+           transport/publication/committee/IPFS/chain/rewards; external writes
+Dependencies: locally completed Tickets 009-013
+Acceptance: exact statement/bundle/commitment revalidation; governed v4;
+            empty-v3 migration only; atomic single-winner idempotent complete;
+            restart result recovery; retention; redaction; bounded cancellation
+Tests: migration/downgrade/tamper; every crash window; lease rotation/staleness;
+       duplicate completion; result cap/canonicality; timeout/cancellation;
+       malformed analyzer; full Guardian/Rust/lint/build/audit/docs/leak gates
+Artifacts: four bounded product/test files plus synchronized docs/Memory/Bridge
+Risk: high (durable migration and privacy-approved analyzer boundary)
+Primary: Codex Sol with bounded Kimi implementation/review
+Status: ready; awaiting explicit high-risk execution approval
+```
+
+No KAS/PROM, Guardian reputation, badge/NFT/Kasplex, slash access control,
+commit-reveal formula, emergency-stop policy, contract, wallet, signature,
+transaction, broadcast, chain, deployment, or external-effect behavior is in
+scope.
+
+## 2026-07-29 10:23 EEST - GIO-PROM-20260728-014 execution approved
+
+Gio explicitly approved execution of Ticket 014 in the documented
+repository-only scope. Status is now `In Progress`.
+
+Codex Sol owns architecture, migration/security decisions, integration,
+complete verification, documentation, and closeout. Kimi K3 receives one
+bounded, secret-free implementation slice and may change only the four
+approved Guardian files. Sol will inspect every resulting diff and rerun the
+full relevant verification chain.
+
+The authorization does not include any existing Analyzer/LLM/YARA change,
+actionable rule generation, transport, publication, committee, IPFS, chain,
+reward, wallet, signature, transaction, broadcast, deployment, push, PR, or
+other external write.
+
+## 2026-07-29 11:38 EEST - Ticket 014 review-ready local closure
+
+Ticket `GIO-PROM-20260728-014` is complete inside its approved repository-only
+scope. It is not committed, merged, published, deployed, or rollout-ready.
+
+Governed schema v4 stores the canonical statement wire/digest and report nonce
+with the full Bundle and approval state. Enqueue, claim, and completion
+re-parse and revalidate the owner-network statement, nonce-bound commitment,
+canonical bundle, approval, lease, input identity, and inherited retention.
+Empty v3 outboxes migrate; nonempty v3 outboxes roll back unchanged because
+their missing trusted statement and nonce cannot be reconstructed.
+
+Atomic completion persists one exact bounded
+`non_actionable_local_v1` result before deleting the corresponding leased work.
+The result record digest binds canonical result bytes, completion time, and
+retention deadline. Exact completion-token plus lease-token retry is
+idempotent; stale, rotated, expired, tampered, oversized, noncanonical,
+high-confidence-shaped, or actionable-shaped inputs fail closed.
+
+The async worker is bounded by concurrency, batch, lease, and analyzer timeout.
+Its shipped analyzer is deterministic and explicitly non-actionable. Existing
+Analyzer/LLM/YARA, confidence, `should_submit`, candidate rule generation,
+transport, disclosure, publication, wallet, chain, reward, and deployment are
+absent.
+
+Kimi's implementation attempt changed no file. Independent final review
+`session_754656a0-ce35-4dfb-99d1-173463dd8ffc` found no P0/P1/P2. Sol retained
+two P3 semantics deliberately: a worker claimant needs governed `outbox()`
+access without enqueue authority, and the durable completion boundary retains
+its fixed redacted outbox exception class.
+
+Final evidence:
+
+- focused Ticket-014 matrix: `72 passed`;
+- complete Guardian: `740 passed, 3 skipped`;
+- Black: 25 files unchanged; full Pylint `9.83/10`; Ticket lint `10.00/10`;
+  scoped isort and py_compile: pass;
+- Rustfmt, warning-free workspace Clippy, 333 Rust tests/two intentional
+  ignores/five doctests, and locked workspace release build: pass;
+- first M-002 timing benchmark measured 2.211647 ms, then passed isolated at
+  713.161 microseconds and in the complete workspace rerun;
+- Cargo audit: no denied vulnerability, eight existing allowed warnings;
+  Python audit: no known vulnerability;
+- Memory integrity, six Autodidactic tests, Pages/SEO/infrastructure/
+  stale-status, five HTML parses, diff check, and redacted secret review: pass.
+  The one heuristic match was an existing dummy wallet-key field in a
+  fail-closed Rust negative test.
+
+README, Whitepaper Markdown/HTML, Roadmap Markdown/HTML, Guardian/protocol docs,
+`llms.txt`, Memory, and all Bridge layers are synchronized locally. Current
+estimate: core `84-88%`; complete vision `50-55%`; `45-50%` remains.
+
+No secret, production artifact approval, real semantic/actionable analysis,
+transport, disclosure, wallet, signature, transaction, broadcast, chain,
+reward, deployment, commit, push, PR, publish, Pages deployment, or external
+write occurred. A new explicit high-risk ticket and independent
+security/privacy review are required for real semantic analysis and actionable
+rules. Production relation source, proving/verifying keys, ceremony evidence,
+and independent cryptographic evidence remain rollout blockers.
+
+`TASK COMPLETE — TARGET STOP ACTIVE`
+
+## 2026-07-29 17:31 EEST - Ticket 015 branch published
+
+- GitHub issue:
+  [#117](https://github.com/NeaBouli/prometheus-/issues/117).
+- Commit: `587629c` (`feat: integrate verified ThreatHint v2 pipeline`).
+- Remote branch: `feat/GH-117-threat-hint-v2-verified-pipeline`.
+- Draft pull request:
+  [#118](https://github.com/NeaBouli/prometheus-/pull/118) against protected
+  `main`.
+- The committed index contains 56 known candidate files, no unstaged residue,
+  no `Prometheus-1.png`, no high-confidence staged secret finding, and no
+  whitespace error.
+
+Status remains `In Progress` while required GitHub checks run. No direct
+`main` push, merge, Pages deployment, production artifact approval, wallet,
+chain, server, secret, or production action occurred.
+
+## 2026-07-29 17:42 EEST - Ticket 015 Linux CI portability remediation
+
+PR-head run `30422417539` passed Rust Workspace, Silverc smoke, contracts,
+Memory, and Pages. Security run `30422417540` passed Secret Detection,
+Dependency Audit, and summary. Python Guardian alone failed with `85 failed,
+655 passed, 3 skipped`; every new failure originated from strict executable
+ancestor validation rejecting Linux CI's root-owned sticky `/tmp` ancestor.
+macOS used a private non-writable temporary ancestor, which explains the local
+green result.
+
+The bounded fix permits a group/world-writable executable ancestor only when
+it is root-owned and sticky. Symlink rejection, root/current-user ownership
+for every descendant, non-writable executable mode, `O_NOFOLLOW`, dev/inode/
+size identity checks, executable hash pinning, and the fail-closed return map
+remain unchanged. Root-owned writable non-sticky and current-user-owned
+sticky-writable ancestors are explicitly rejected.
+
+Verification after the fix:
+
+- complete Guardian: `741 passed, 3 skipped`;
+- verified-preflight: `30 passed`;
+- changed product Pylint: `10.00/10`;
+- Black, isort, py_compile, and diff check: pass;
+- Kimi read-only security review
+  `session_971020af-c8d2-49e5-adea-4df6af9922b9`: no P0/P1/P2 and no file
+  change. Sol fixed the stale docstring and added the suggested integration
+  rejection for a current-user-owned `1777` ancestor.
+
+Residual: operation on a filesystem that reports but does not enforce POSIX
+sticky deletion semantics remains unsupported; normal Linux/macOS local
+filesystems and GitHub's runner filesystem enforce it. Status remains
+`In Progress` pending the updated PR-head checks.

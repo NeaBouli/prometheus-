@@ -1,7 +1,7 @@
 # PROMETHEUS – API DEFINITIONEN
 # Stabile Schnittstellen-Definitionen für alle Module.
 # Änderungen hier erfordern einen Audit durch Claude.
-# Last Updated: 2026-07-16
+# Last Updated: 2026-07-27
 
 ---
 
@@ -17,6 +17,88 @@ const MAINNET_RPC: &str = "ws://127.0.0.1:16110";
 // Verbindung aufbauen
 let client = RpcClient::connect(rpc_url, NetworkId::with_suffix(NetworkType::Testnet, 10)).await?;
 ```
+
+## Local ThreatHint v2 proof binding candidate (2026-07-26)
+
+Rust:
+
+```rust
+ThreatHintV2ProofBinding::bind_canonical(
+    envelope_wire: &[u8],
+    manifest_wire: &[u8],
+    trusted_network_id: &str,
+    trusted_manifest_sha256_hex: &str,
+) -> Result<ThreatHintV2ProofBinding, ThreatHintV2ProofBindingError>
+```
+
+Python:
+
+```python
+ThreatHintV2ProofBinding.bind_canonical(
+    envelope_wire: bytes,
+    manifest_wire: bytes,
+    trusted_network_id: str,
+    trusted_manifest_sha256_hex: str,
+) -> ThreatHintV2ProofBinding
+```
+
+Both APIs return immutable in-memory structural data with read-only access to
+the parsed envelope/manifest, the raw manifest digest, the recomputed statement
+digest, and two claimed 16-byte public-input halves. They perform no file or
+network I/O and do not verify the opaque proof. All failures collapse to one
+redacted `invalid threat-hint v2 proof binding` error.
+
+## Local ThreatHint v2 privacy/proof preflight candidate (2026-07-26)
+
+```python
+ThreatHintV2PreflightService(policy_path: pathlib.Path).preflight(
+    envelope_wire: bytes,
+    manifest_wire: bytes,
+    bundle_wire: bytes,
+    approval_wire: bytes,
+    *,
+    report_nonce: bytes,
+    current_time: int,
+) -> ThreatHintV2PreflightReceipt
+```
+
+The policy, not the public call, supplies the trusted network, BIP340 approver
+key, opaque recipient-scope digest, and raw-manifest SHA-256. The call accepts
+no independent statement or trust anchor. It returns only data hashes and IDs
+and collapses every rejected policy/input/verification into
+`invalid threat-hint v2 preflight`.
+
+This API is non-consuming. It performs no Groth16 verification and no SQLite,
+transport, analyzer, promotion, wallet, chain, or external action. A receipt
+must never be treated as proof acceptance or approval consumption.
+
+## Local ThreatHint v2 trusted Groth16 verifier candidate (2026-07-26)
+
+```rust
+TrustedGroth16V2Verifier::load(
+    manifest_path: &Path,
+    expected_manifest_sha256: &str,
+    trusted_network_id: &str,
+) -> Result<TrustedGroth16V2Verifier, ThreatHintV2VerifierError>
+
+verifier.verify_wire(
+    envelope_wire: &[u8],
+) -> Result<bool, ThreatHintV2VerifierError>
+```
+
+CLI:
+
+```text
+prometheus-threat-proof verify-v2 \
+  --manifest /absolute/owner-only/relation-manifest-v2.json \
+  --expected-manifest-sha256 <64 lowercase nonzero hex> \
+  --network-id testnet-10
+```
+
+The canonical v2 envelope is read from stdin. Exit 0 means a valid proof, 1
+means invalid input/proof, 2 is CLI syntax, and 3 means unavailable or
+untrusted configuration/artifacts. The verifier emits no data. It loads no
+proving key and performs no approval consumption or external action.
 
 ### Wichtige Endpoints
 
@@ -498,6 +580,54 @@ This local parser is not a P2P protocol or authority API. It is not imported by
 v1 ingress, proof, approval consumption, analyzer, outbox, wallet, or chain
 paths.
 
+### Local ThreatHint v2 verified-preflight composition
+
+```python
+service = ThreatHintV2VerifiedPreflightService(
+    config_path: Path,
+    preflight_policy_path: Path,
+)
+
+receipt = service.preflight(
+    envelope_wire: bytes,
+    bundle_wire: bytes,
+    approval_wire: bytes,
+    *,
+    report_nonce: bytes,
+    current_time: int,
+)
+```
+
+The existing preflight policy is the sole network and raw-manifest-SHA-256
+authority. The verified-preflight config supplies only an absolute verifier
+executable path, its exact SHA-256, one absolute relation-manifest path, and a
+100..60000 millisecond timeout. The service owner-loads the exact manifest,
+runs the existing approval/privacy preflight first, then sends the same exact
+envelope bytes to the hash-pinned Rust executable using:
+
+```text
+verify-v2
+  --manifest <absolute manifest path>
+  --expected-manifest-sha256 <policy anchor>
+  --network-id <policy network>
+```
+
+stdin is the canonical envelope and stdout/stderr are discarded. Invocation is
+POSIX-only, absolute-path, shell-free, environment-scrubbed, bounded, and
+process-group-cleaned. One service instance permits only one in-flight
+verifier call. Rust exit 0 returns a data receipt, exit 1 maps to
+`ThreatHintV2VerifiedPreflightError`, and exit 2, 3, any other exit, signal,
+timeout, process/config/artifact failure, or concurrent invocation maps to
+`ThreatHintV2VerifiedPreflightUnavailableError`.
+
+The returned receipt is frozen, cannot be directly constructed or pickled, and
+contains only statement digest, approval ID, observable commitment, raw
+manifest SHA-256, envelope SHA-256, and verifier executable SHA-256. Callers
+must rerun the service and must never accept a supplied receipt as authority.
+This API performs no SQLite access or approval consumption and grants no
+privacy, disclosure, transport, analysis, promotion, wallet, chain, or rollout
+authority.
+
 ### Still open
 
 ```text
@@ -506,6 +636,169 @@ paths.
 3. Broad discovery and trusted Guardian membership/key assignment
 4. Light Client rule-update subscription
 ```
+
+## Local ThreatHint v2 Atomic Acceptance Candidate (2026-07-27)
+
+```python
+ThreatHintV2AcceptanceService(
+    config_path: Path,
+    preflight_policy_path: Path,
+    consumption_policy_path: Path,
+).accept(
+    envelope_wire: bytes,
+    bundle_wire: bytes,
+    approval_wire: bytes,
+    *,
+    report_nonce: bytes,
+    current_time: int,
+) -> ThreatHintV2AcceptanceReceipt
+```
+
+The constructor reads owner-only trusted material and requires exact network,
+BIP340 approver-key, and recipient-scope identity between preflight and
+consumption policies before creating or opening the ledger. Expected values
+restrict the consumption policy and never override it.
+
+`accept` runs `ThreatHintV2VerifiedPreflightService.preflight` first. Only its
+success reaches `ObservableApprovalConsumptionService.consume_expected`,
+which re-verifies the raw approval/bundle and compares the expected approval
+ID and observable commitment before final atomic ledger consumption. The
+public API accepts no caller receipt, verified object, policy value, statement,
+manifest anchor, ledger path, network, key, or scope.
+
+Stable redacted outcomes are
+`ThreatHintV2AcceptanceError` (invalid),
+`ThreatHintV2AcceptanceUnavailableError`,
+`ThreatHintV2AcceptanceReplayError`, and
+`ThreatHintV2AcceptanceBusyError` (the only retryable class). The receipt
+contains statement digest, approval ID, observable commitment, consumption
+time, manifest/envelope hashes, and verifier executable hash. Direct
+construction, `dataclasses.replace`, and serialization are disabled. It grants
+no downstream authority or external effect.
+
+## Local ThreatHint v2 Owner-Policy Promotion Candidate (2026-07-27)
+
+```python
+ThreatHintV2PromotionService(
+    config_path: Path,
+    preflight_policy_path: Path,
+    consumption_policy_path: Path,
+    promotion_policy_path: Path,
+).promote(
+    envelope_wire: bytes,
+    bundle_wire: bytes,
+    approval_wire: bytes,
+    *,
+    report_nonce: bytes,
+    current_time: int,
+) -> ThreatHintV2PromotionResult
+```
+
+The public call accepts exact built-in raw bytes and trusted nonce/time only.
+It reparses the canonical bundle, requires `review_required_v1`, then enforces
+the owner policy platform, format, allowed observable kinds, and maximum count
+before forwarding the same original wires to atomic acceptance. It accepts no
+caller receipt, verified object, policy value, statement, manifest, key, scope,
+network, ledger path, or observable list.
+
+The promotion policy is exact-schema owner-only ASCII TOML capped at 4096
+bytes. It is opened no-follow and checked by descriptor device/inode,
+ownership, mode, and size before a bounded read. Stable redacted outcomes are
+invalid, unavailable, replay, and busy; busy alone is retryable. The frozen,
+non-constructible, non-serializable result contains only statement digest,
+approval ID, observable commitment, consumption time, platform, format, and
+immutable canonical `(kind, value)` string pairs.
+
+This API grants no semantic privacy or disclosure authority, key ownership or
+rotation, recipient-scope meaning, production artifact approval, transport,
+analysis, publication, external effect, wallet, chain, or rollout state.
+
+## Local Owner-Only Outbox Retention Policy Candidate (2026-07-27)
+
+```python
+load_outbox_retention_policy(
+    path: Path,
+    *,
+    expected_network_id: str,
+    expected_approver_xonly_public_key: bytes,
+    expected_recipient_scope: bytes,
+) -> OutboxRetentionPolicy
+```
+
+The pure loader accepts one exact built-in `Path`, one closed protocol network
+string, and two exact 32-byte identities. It validates expected identity before
+file access, then owner-loads one capped exact-schema ASCII TOML policy with
+required no-follow and descriptor identity/mode/size checks. The returned
+frozen, non-constructible, non-serializable value contains only the matched
+identity, fixed local retention purpose/payload form, an immutable durable-kind
+allowlist, and bounded pending-record/retention maxima.
+
+Stable `OutboxRetentionPolicyError` failures are redacted. This API imports no
+SQLite, analyzer, promotion, acceptance, transport, or chain runtime and writes
+nothing. It grants no key ownership, recipient authorization, semantic privacy,
+extractor provenance, recoverability, enqueue authority, or external effect.
+
+## Governed ThreatHint v2 Promotion Candidate (2026-07-27)
+
+```python
+ThreatHintV2PromotionService.from_governed_policies(
+    config_path,
+    preflight_policy_path,
+    consumption_policy_path,
+    promotion_policy_path,
+    governance_policy_path,
+    retention_policy_path,
+) -> ThreatHintV2PromotionService
+```
+
+Construction loads each owner policy once. Promotion, governance, and
+retention allowed-kind sets must be exactly equal before ledger access. The
+governance policy binds the same expected network, approver key, and recipient
+scope plus authority epoch/window, fixed same-Guardian local-analysis
+semantics, denied external disclosure, and one explicit decision for every
+closed observable kind.
+
+`promote(...)` accepts only the original canonical envelope, bundle, and
+approval bytes plus trusted report nonce/time. A governed precheck verifies the
+approval and authority window before the proof subprocess. The final consume
+re-verifies all candidate data and atomically pins or advances the authority
+snapshot with high-water and approval consumption.
+
+Stable invalid, unavailable, replay, and retryable busy outcomes remain
+redacted. This API creates no outbox or claim, invokes no analyzer or worker,
+transports or publishes nothing, and grants no production artifact, wallet,
+chain, token, or rollout authority.
+
+## Governed ThreatHint v2 Recoverable Outbox (2026-07-28)
+
+```python
+outbox = governed_consumption_service.outbox()
+
+claim = outbox.claim(
+    current_time: int,
+    lease_seconds: int,
+) -> ObservableApprovalOutboxClaim | None
+
+outbox.acknowledge(
+    approval_id: bytes,
+    lease_token: bytes,
+) -> None
+```
+
+Only `ThreatHintV2PromotionService.from_governed_policies(...)` enables
+durable enqueue. Successful promotion writes the full canonical bundle in the
+same transaction as authority state, high-water, and approval consumption.
+Direct governed acceptance and legacy consumption do not enqueue.
+
+`claim` selects the oldest eligible row, internally creates an opaque 32-byte
+lease token, and never leases beyond retention. Pending work survives restart;
+expired leases can be reclaimed. `acknowledge` terminally deletes only an
+exact approval-ID/token match. Claim data is frozen, non-constructible,
+non-serializable, and token-redacted in representations.
+
+Stable `ObservableApprovalOutboxError` failures are redacted. The API executes
+no worker or analyzer, transports or discloses nothing, and performs no
+wallet, signing, transaction, chain, deployment, or external action.
 
 ---
 
@@ -539,3 +832,42 @@ pub enum PrometheusError {
     NotFound(String),
 }
 ```
+
+## Governed ThreatHint v2 Durable Completion (Ticket 014)
+
+Schema v4 claims additionally expose canonical `statement_wire`, exact
+`statement_digest`, trusted `report_nonce`, and one domain-separated
+`input_identity`. Construction remains disabled and representations remain
+payload/token-redacted.
+
+```python
+completion = outbox.complete(
+    approval_id=claim.approval_id,
+    lease_token=claim.lease_token,
+    completion_token=completion_token,
+    input_identity=claim.input_identity,
+    result_wire=canonical_non_actionable_result,
+    current_time=current_time,
+)
+
+stored = outbox.result(
+    approval_id=claim.approval_id,
+    current_time=current_time,
+)
+```
+
+`complete` requires the exact unexpired lease and v2 input identity, reparses
+the statement and bundle, validates the exact non-actionable result schema,
+inserts the result, and deletes the outbox row in one `BEGIN IMMEDIATE`
+transaction. The stored completion-token digest is also bound to the lease.
+The result-record digest binds the canonical wire, completion time, and
+inherited retention deadline. Exact committed-but-unreturned retries succeed;
+changed lease, token, input, result, or retention fails closed.
+
+`acknowledge(...)` is retained only as a compatibility surface and always
+rejects under schema v4; no row can be deleted without a durable result.
+`ObservableAnalysisWorker.process_next(...)` is async, concurrency- and
+timeout-bounded, cancellation-safe, and currently accepts only an injected
+typed analyzer. The included `DeterministicNonActionableAnalyzer` validates and
+counts observables and emits no confidence, `should_submit`, YARA/rule body,
+semantic finding, or external authority.

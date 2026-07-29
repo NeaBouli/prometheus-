@@ -22,6 +22,62 @@ defined in Section 3 plus one shared exact-byte corpus. No proof relation,
 production key, pairing, transport, analyzer promotion, or deployment is
 approved by this document.
 
+A local review-ready candidate, not yet merged or deployed, adds strict
+canonical Rust/Python parsers for a bounded opaque-proof envelope and a
+19-field `RelationManifest-v2`, plus one atomic data-only binding. The binding
+requires a separately trusted network and exact raw-manifest SHA-256 before
+parsing, recomputes the manifest-domain statement digest, and derives two
+claimed 16-byte big-endian public-input halves. It performs no Groth16
+verification, source/key loading or approval, ceremony, transport, promotion,
+analysis, wallet, chain, or rollout action.
+
+A second local review-ready candidate adds a Python-only, non-consuming
+privacy/proof preflight. Its owner-only read-only TOML policy pins one network,
+BIP340 approver key, opaque recipient scope, and exact nonzero raw-manifest
+SHA-256. The public call accepts no independent statement, network, key, scope,
+or manifest anchor: it derives the statement only from the bound envelope,
+requires `review_required_v1`, recomputes the bundle commitment against one
+trusted report nonce, and verifies the short-lived approval in the same call.
+It opens no SQLite database and returns only data hashes and identifiers.
+Success is not Groth16 verification, privacy approval, disclosure authority,
+replay consumption, transport admission, analyzer promotion, or rollout state.
+
+A separate local Rust `verify-v2` candidate now closes the mechanical proof
+verification step. It owner-loads retained canonical manifest bytes plus fixed
+`relation-source.bin` and `verifying-key.bin` siblings, binds their exact
+manifest sizes and SHA-256 anchors, accepts only canonical compressed BN254
+keys/proofs, derives both field inputs only through the v2 binding, and emits
+silent process status. Runtime never resolves or loads a proving key. The
+generated test relation, keys, and proofs are explicitly non-production; no
+relation, key, or ceremony is approved, and Guardian does not consume an
+approval in this candidate.
+
+A third local candidate,
+`jaeger.threat_hint_v2_verified_preflight.ThreatHintV2VerifiedPreflightService`,
+composes the two checks without making them authoritative. It owner-loads the
+same policy-anchored manifest, runs the Python approval/privacy preflight
+first, then invokes an absolute executable pinned by exact SHA-256 and sends
+the same exact envelope bytes to `verify-v2` over stdin. The POSIX-only child
+is shell-free, environment-scrubbed, time-bounded, process-group-cleaned, and
+serialized per service instance. Its receipt is non-constructible,
+non-serializable data only. The composition opens no SQLite file, consumes no
+approval, and grants no privacy, disclosure, transport, analysis, promotion,
+wallet, chain, or rollout authority.
+
+A fourth local candidate,
+`jaeger.threat_hint_v2_acceptance.ThreatHintV2AcceptanceService`, closes the
+mechanical acceptance order without promoting test artifacts. Construction
+requires the preflight and consumption policies to match exactly on network,
+approver key, and recipient scope before ledger creation. The public call
+accepts only raw envelope, bundle, and approval bytes plus trusted nonce/time,
+runs the verified preflight first, and re-verifies the approval ID and
+observable commitment before durable consumption runs last. Failed
+proof/privacy checks never consume an approval or advance the ledger
+high-water. Its non-constructible, non-serializable receipt is data only.
+Production relation/key/ceremony approval, independent cryptographic review,
+privacy promotion, transport, actionable analysis, signing, chain effects,
+and rollout evidence remain separate gates.
+
 ## 1. Purpose
 
 ThreatHint v1 is a bounded, canonical claim about an opaque 32-byte
@@ -293,6 +349,59 @@ v2 hint, authorize disclosure, or provide exactly-once execution for a future
 external side effect. Those policies and an outbox/claim design remain required
 before any bundle may leave the local boundary.
 
+The local ticket-010 promotion candidate closes only the mechanical
+hint/bundle/approval pairing and owner-policy restriction above atomic
+acceptance. Its exact owner-only policy requires one platform, one format, a
+non-empty duplicate-free allowed-kind set, and a 1..=16 count cap. It reparses
+the raw canonical bundle and requires `review_required_v1` before the same
+original wires may enter proof/privacy verification and durable consumption.
+Rejected restrictions never reach the verifier or ledger. This does not prove
+semantic privacy, extractor provenance, maliciousness, approver-key ownership,
+recipient-scope meaning, production artifact approval, or permission to
+transport, analyze, publish, or perform an external effect.
+
+The local ticket-011 retention-governance candidate adds only a pure,
+read-only owner-policy declaration for a possible future recoverable analysis
+queue. The exact policy is bound to the expected network, approver key, and
+recipient scope and fixes purpose `local_recoverable_analysis_queue_v1`,
+payload form `canonical_observable_bundle_v1`, a default-deny durable-kind
+allowlist, at most 100,000 pending records, and at most 30 days of retention.
+Its risk model is explicit: file hashes remain corpus-matchable, API imports
+fingerprint software capabilities, and byte patterns may retain proprietary
+content. The loader creates no ledger, outbox, worker, transport, disclosure,
+or authority. Ticket 013 is the only local candidate that consumes this exact
+snapshot for a recoverable enqueue.
+
+Ticket 012 composes the promotion, governance, and retention policies into an
+enforceable local boundary. The governance policy binds network, approver key,
+recipient scope, authority epoch/window, fixed same-Guardian local-analysis
+semantics, denied external disclosure, and one explicit per-kind decision.
+Every allowed-kind set must be exactly equal before ledger access.
+
+The first valid governed acceptance atomically pins the three exact raw policy
+digests, identity, epoch, and authority window with ledger high-water and
+approval consumption. Lower epochs, same-epoch digest equivocation,
+overlapping same-key/scope windows, hidden legacy authority state, replay, and
+failed inserts change no durable state. This still creates no outbox, claim,
+worker, transport, disclosure, or actionable analyzer input by itself.
+
+Ticket 014 advances the governed queue to schema v4. One successful governed
+promotion stores the canonical statement/digest, trusted report nonce, full
+canonical bundle, approval binding, and retention in the exact
+`BEGIN IMMEDIATE` transaction that pins or advances authority, moves ledger
+high-water, and consumes the approval. Empty v3 queues migrate atomically;
+nonempty v3 queues fail closed unchanged because their missing statement and
+nonce are unrecoverable.
+
+The owner-local claim API leases the oldest eligible row with an internally
+generated opaque 32-byte token, allows recovery after restart or lease expiry,
+and caps every lease at the row's retention deadline. Claim reparses the
+owner-network statement and bundle, recomputes the nonce-bound commitment, and
+derives one identity bound to the exact input, lease, and retention. Atomic
+completion stores a canonical explicitly non-actionable result before deleting
+the queue row; `acknowledge` cannot bypass result durability. Expired records
+are removed at their inherited deadline.
+
 ## 7. Processing Boundary
 
 The safe sequence is:
@@ -303,11 +412,17 @@ The safe sequence is:
 4. Canonicalize and compute `observable_commitment`.
 5. Produce a v2 proof only with an approved relation and artifacts.
 6. Verify the exact hint and bundle independently at the Guardian.
-7. Verify and durably consume the exact local approval through the trusted
-   policy boundary.
-8. Analyze only the validated observable values after separately reviewed
-   hint/bundle/approval pairing.
-9. Treat generated rule bytes as potentially public before committee, IPFS, or
+7. Apply the owner-only platform/format/kind/count promotion restrictions to
+   the raw canonical bundle.
+8. Verify proof/privacy and durably consume the exact local approval through
+   the same governed raw-input acceptance path, atomically pinning or advancing
+   the authority snapshot.
+9. Atomically enqueue the complete recoverable local analysis payload in the
+   same transaction as approval consumption (implemented locally by ticket
+   013 for governed promotion only).
+10. Produce only the deterministic non-actionable local completion currently
+    implemented; real semantic/LLM/YARA analysis requires a separate review.
+11. Treat generated rule bytes as potentially public before committee, IPFS, or
    chain submission.
 
 No v1 hint may be silently upgraded, paired with an unbound bundle, or routed
@@ -332,8 +447,21 @@ network or analyzer promotion requires:
 - local durable one-time approval consumption with trusted fixed policy,
   replay, freshness, size, concurrency, restart, lock, and owner-only storage
   tests (implemented by GH-111 without pairing, promotion, or side effects);
-- reviewed authority rotation, recipient-scope assignment, promotion semantics,
-  and a crash-safe outbox/claim boundary for any future external action;
+- owner-only exact platform/format/kind/count promotion and raw pairing
+  (implemented locally by ticket 010 without semantic privacy authority,
+  transport, analysis, or side effects);
+- owner-only exact retention declaration for a possible local recoverable
+  analysis queue (implemented locally by ticket 011 without persistence,
+  runtime, or privacy authority);
+- reviewed local authority epoch/window, fixed recipient semantics, exact
+  per-kind risk decisions, and atomic anti-rollback policy pinning
+  (implemented locally by ticket 012 without worker, transport, or
+  production identity attestation);
+- a crash-safe atomic recoverable outbox/claim boundary for future actionable
+  analysis (implemented locally by ticket 013 without worker execution,
+  analyzer invocation, transport, or external effect);
+- an independently reviewed bounded outbox worker and real actionable-analysis
+  integration;
 - privacy review of every observable class and generated-rule publication;
 - real multi-host evidence and protected CI/Security/Pages success.
 

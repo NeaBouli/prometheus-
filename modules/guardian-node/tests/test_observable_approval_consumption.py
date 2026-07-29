@@ -14,13 +14,18 @@ from pathlib import Path
 import pytest
 from coincurve import PrivateKey, PublicKeyXOnly
 
-from jaeger.observable_approval import APPROVAL_SIGNING_DOMAIN
+from jaeger.observable_approval import (
+    APPROVAL_SIGNING_DOMAIN,
+    VerifiedObservableApproval,
+)
 from jaeger.observable_approval_consumption import (
     ObservableApprovalBusyError,
     ObservableApprovalConsumptionError,
     ObservableApprovalConsumptionReceipt,
     ObservableApprovalConsumptionService,
     ObservableApprovalReplayError,
+    _ObservableApprovalLedger,
+    _raise_operational_error,
     load_observable_approval_policy,
 )
 from jaeger.threat_observable import ObservableBundle
@@ -36,6 +41,9 @@ _VECTOR_PATH = (
 
 def _vector() -> dict:
     return json.loads(_VECTOR_PATH.read_text(encoding="utf-8"))
+
+
+_UNSET = object()
 
 
 def _owner_directory(tmp_path: Path, name: str = "state") -> Path:
@@ -152,6 +160,58 @@ def _consumption_count(ledger_path: Path) -> int:
         ).fetchone()[0]
 
 
+def _high_water(ledger_path: Path) -> int:
+    with sqlite3.connect(ledger_path) as connection:
+        return connection.execute(
+            "SELECT high_water_seconds FROM ledger_state WHERE singleton = 1"
+        ).fetchone()[0]
+
+
+def _expected_identity(vector: dict) -> dict:
+    return {
+        "expected_network_id": vector["network_id"],
+        "expected_approver_xonly_public_key": bytes.fromhex(
+            vector["trusted_approver_xonly_public_key_hex"]
+        ),
+        "expected_recipient_scope": bytes.fromhex(
+            vector["trusted_recipient_scope_hex"]
+        ),
+    }
+
+
+# pylint: disable-next=too-many-arguments
+def _consume_expected(
+    service: ObservableApprovalConsumptionService,
+    vector: dict,
+    *,
+    approval_wire: bytes | None = None,
+    bundle_wire: bytes | None = None,
+    report_nonce: bytes | None = None,
+    current_time: int | None = None,
+    expected_approval_id: object = _UNSET,
+    expected_observable_commitment: object = _UNSET,
+) -> ObservableApprovalConsumptionReceipt:
+    fixture_approval, fixture_bundle, fixture_nonce, fixture_time = _fixture_inputs(
+        vector
+    )
+    return service.consume_expected(
+        fixture_approval if approval_wire is None else approval_wire,
+        fixture_bundle if bundle_wire is None else bundle_wire,
+        report_nonce=fixture_nonce if report_nonce is None else report_nonce,
+        current_time=fixture_time if current_time is None else current_time,
+        expected_approval_id=(
+            bytes.fromhex(vector["approval_id_hex"])
+            if expected_approval_id is _UNSET
+            else expected_approval_id
+        ),
+        expected_observable_commitment=(
+            bytes.fromhex(vector["observable_commitment_hex"])
+            if expected_observable_commitment is _UNSET
+            else expected_observable_commitment
+        ),
+    )
+
+
 def test_valid_approval_is_consumed_once_and_rejected_after_restart(
     tmp_path: Path,
 ) -> None:
@@ -264,6 +324,45 @@ def test_sqlite_lock_is_retryable_without_consuming(tmp_path: Path) -> None:
 
     _consume(service, vector)
     assert _consumption_count(ledger_path) == 1
+
+
+@pytest.mark.parametrize(
+    "primary_code",
+    [sqlite3.SQLITE_BUSY, sqlite3.SQLITE_LOCKED],
+)
+def test_extended_sqlite_lock_codes_remain_retryable(primary_code: int) -> None:
+    error = sqlite3.OperationalError()
+    error.sqlite_errorcode = primary_code | (2 << 8)
+
+    with pytest.raises(ObservableApprovalBusyError):
+        _raise_operational_error(error)
+
+
+def test_sqlite_integer_overflow_is_redacted_and_rolls_back(tmp_path: Path) -> None:
+    directory = _owner_directory(tmp_path)
+    ledger_path = directory / "approval-consumption.sqlite3"
+    ledger = _ObservableApprovalLedger(ledger_path)
+    verified = object.__new__(VerifiedObservableApproval)
+    for field, value in {
+        "approval_id": b"\x01" * 32,
+        "observable_commitment": b"\x02" * 32,
+        "approver_xonly_public_key": b"\x03" * 32,
+        "recipient_scope": b"\x04" * 32,
+        "approval_nonce": b"\x05" * 32,
+        "network_id": "testnet-10",
+        "not_before": 1 << 63,
+        "expires_at": 1 << 63,
+    }.items():
+        object.__setattr__(verified, field, value)
+
+    with pytest.raises(
+        ObservableApprovalConsumptionError,
+        match=r"^observable approval was not consumed$",
+    ):
+        ledger.consume(verified, 1 << 63)
+
+    assert _consumption_count(ledger_path) == 0
+    assert _high_water(ledger_path) == 0
 
 
 def test_constructor_lock_is_retryable_without_initializing_schema(
@@ -488,6 +587,119 @@ def test_public_service_api_cannot_accept_preverified_or_policy_fields() -> None
     assert "network_id" not in parameters
     assert "approver_xonly_public_key" not in parameters
     assert "recipient_scope" not in parameters
+
+
+def test_restrictive_factory_builds_from_one_exact_policy_snapshot(
+    tmp_path: Path,
+) -> None:
+    vector = _vector()
+    directory = _owner_directory(tmp_path)
+    policy_path = _write_policy(directory, vector)
+
+    service = ObservableApprovalConsumptionService.from_expected_identity(
+        policy_path, **_expected_identity(vector)
+    )
+    receipt = _consume(service, vector)
+
+    assert receipt.approval_id.hex() == vector["approval_id_hex"]
+    assert _consumption_count(directory / "approval-consumption.sqlite3") == 1
+
+
+@pytest.mark.parametrize(
+    "changes",
+    [
+        {"expected_network_id": "testnet-11"},
+        {"expected_network_id": 10},
+        {"expected_approver_xonly_public_key": b"\x55" * 32},
+        {"expected_approver_xonly_public_key": "aa" * 32},
+        {"expected_recipient_scope": b"\x66" * 32},
+        {"expected_recipient_scope": None},
+    ],
+)
+def test_restrictive_factory_mismatch_fails_before_ledger_creation(
+    tmp_path: Path, changes: dict
+) -> None:
+    vector = _vector()
+    directory = _owner_directory(tmp_path)
+    policy_path = _write_policy(directory, vector)
+    ledger_path = directory / "approval-consumption.sqlite3"
+    expected = _expected_identity(vector)
+    expected.update(changes)
+
+    with pytest.raises(
+        ObservableApprovalConsumptionError,
+        match=r"^observable approval was not consumed$",
+    ):
+        ObservableApprovalConsumptionService.from_expected_identity(
+            policy_path, **expected
+        )
+    assert not ledger_path.exists()
+
+
+def test_consume_expected_consumes_on_exact_verified_identity(tmp_path: Path) -> None:
+    vector = _vector()
+    directory = _owner_directory(tmp_path)
+    policy_path = _write_policy(directory, vector)
+    service = ObservableApprovalConsumptionService(policy_path)
+
+    receipt = _consume_expected(service, vector)
+
+    assert receipt.approval_id.hex() == vector["approval_id_hex"]
+    assert receipt.observable_commitment.hex() == vector["observable_commitment_hex"]
+    assert receipt.consumed_at == vector["current_time"]
+    with pytest.raises(ObservableApprovalReplayError):
+        _consume_expected(service, vector)
+    assert _consumption_count(directory / "approval-consumption.sqlite3") == 1
+
+
+@pytest.mark.parametrize(
+    "changes",
+    [
+        {"expected_approval_id": b"\x00" * 32},
+        {"expected_observable_commitment": b"\x00" * 32},
+        {"expected_approval_id": b"\x00" * 31},
+        {"expected_observable_commitment": b"\x00" * 33},
+        {"expected_approval_id": "aa" * 32},
+        {"expected_observable_commitment": None},
+    ],
+)
+def test_consume_expected_mismatch_never_consumes_or_advances_high_water(
+    tmp_path: Path, changes: dict
+) -> None:
+    vector = _vector()
+    directory = _owner_directory(tmp_path)
+    policy_path = _write_policy(directory, vector)
+    service = ObservableApprovalConsumptionService(policy_path)
+    ledger_path = directory / "approval-consumption.sqlite3"
+
+    with pytest.raises(
+        ObservableApprovalConsumptionError,
+        match=r"^observable approval was not consumed$",
+    ):
+        _consume_expected(service, vector, **changes)
+    assert _consumption_count(ledger_path) == 0
+    assert _high_water(ledger_path) == 0
+
+    _consume(service, vector)
+
+
+def test_consume_expected_api_takes_raw_wires_and_expected_identity_only() -> None:
+    parameters = set(
+        inspect.signature(
+            ObservableApprovalConsumptionService.consume_expected
+        ).parameters
+    )
+    assert parameters == {
+        "self",
+        "approval_wire",
+        "bundle_wire",
+        "report_nonce",
+        "current_time",
+        "expected_approval_id",
+        "expected_observable_commitment",
+    }
+    assert "verified" not in parameters
+    assert "network_id" not in parameters
 
 
 def test_closed_errors_do_not_disclose_policy_values(tmp_path: Path) -> None:
