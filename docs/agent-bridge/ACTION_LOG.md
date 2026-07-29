@@ -2244,3 +2244,11 @@ Rules for all dev agents:
 - Gitleaks is unavailable locally; protected Security Audit will supply the
   authoritative repository scan.
 - **Status:** review-ready; commit/push/PR and protected checks pending.
+
+## 2026-07-29 - Ticket 015 closeout published for review
+
+- Commit `588d91f` pushed to `docs/GH-117-merge-closeout`.
+- PR [#120](https://github.com/NeaBouli/prometheus-/pull/120) targets
+  protected `main` and closes
+  [#119](https://github.com/NeaBouli/prometheus-/issues/119).
+- **Status:** `In Progress`, waiting for required CI/Security checks.
