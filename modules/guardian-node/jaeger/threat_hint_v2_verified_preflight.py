@@ -9,8 +9,10 @@ chain, or rollout action.
 The executable is revalidated and rehashed for every invocation. A small
 owner-bounded race remains between the final hash check and ``execve`` because
 Python cannot portably execute an already-open file descriptor. The executable
-and all ancestors are therefore restricted to the current user or root and
-must not be group/world writable.
+and all ancestors are therefore restricted to the current user or root.
+Group/world-writable ancestors are rejected except for root-owned sticky
+directories such as the standard POSIX temporary root; every descendant and
+the executable remain subject to the stricter ownership and write checks.
 """
 
 # Exact built-in types and repeated closed-schema checks are protocol
@@ -388,11 +390,7 @@ def _validate_and_hash_executable(path: Path, expected_sha256: str) -> Path:
             raise ThreatHintV2VerifiedPreflightUnavailableError()
         for parent in path.parents:
             parent_stat = parent.lstat()
-            if (
-                not stat.S_ISDIR(parent_stat.st_mode)
-                or parent_stat.st_uid not in {0, os.getuid()}
-                or parent_stat.st_mode & 0o022
-            ):
+            if not _is_safe_executable_ancestor(parent_stat):
                 raise ThreatHintV2VerifiedPreflightUnavailableError()
 
         before = path.lstat()
@@ -430,6 +428,14 @@ def _validate_and_hash_executable(path: Path, expected_sha256: str) -> Path:
     ):
         raise ThreatHintV2VerifiedPreflightUnavailableError()
     return resolved
+
+
+def _is_safe_executable_ancestor(current: os.stat_result) -> bool:
+    if not stat.S_ISDIR(current.st_mode) or current.st_uid not in {0, os.getuid()}:
+        return False
+    if not current.st_mode & 0o022:
+        return True
+    return current.st_uid == 0 and bool(current.st_mode & stat.S_ISVTX)
 
 
 def _read_descriptor(descriptor: int, limit: int) -> bytes:

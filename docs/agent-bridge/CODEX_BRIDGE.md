@@ -1694,3 +1694,36 @@ and independent cryptographic evidence remain rollout blockers.
 Status remains `In Progress` while required GitHub checks run. No direct
 `main` push, merge, Pages deployment, production artifact approval, wallet,
 chain, server, secret, or production action occurred.
+
+## 2026-07-29 17:42 EEST - Ticket 015 Linux CI portability remediation
+
+PR-head run `30422417539` passed Rust Workspace, Silverc smoke, contracts,
+Memory, and Pages. Security run `30422417540` passed Secret Detection,
+Dependency Audit, and summary. Python Guardian alone failed with `85 failed,
+655 passed, 3 skipped`; every new failure originated from strict executable
+ancestor validation rejecting Linux CI's root-owned sticky `/tmp` ancestor.
+macOS used a private non-writable temporary ancestor, which explains the local
+green result.
+
+The bounded fix permits a group/world-writable executable ancestor only when
+it is root-owned and sticky. Symlink rejection, root/current-user ownership
+for every descendant, non-writable executable mode, `O_NOFOLLOW`, dev/inode/
+size identity checks, executable hash pinning, and the fail-closed return map
+remain unchanged. Root-owned writable non-sticky and current-user-owned
+sticky-writable ancestors are explicitly rejected.
+
+Verification after the fix:
+
+- complete Guardian: `741 passed, 3 skipped`;
+- verified-preflight: `30 passed`;
+- changed product Pylint: `10.00/10`;
+- Black, isort, py_compile, and diff check: pass;
+- Kimi read-only security review
+  `session_971020af-c8d2-49e5-adea-4df6af9922b9`: no P0/P1/P2 and no file
+  change. Sol fixed the stale docstring and added the suggested integration
+  rejection for a current-user-owned `1777` ancestor.
+
+Residual: operation on a filesystem that reports but does not enforce POSIX
+sticky deletion semantics remains unsupported; normal Linux/macOS local
+filesystems and GitHub's runner filesystem enforce it. Status remains
+`In Progress` pending the updated PR-head checks.

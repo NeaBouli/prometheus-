@@ -2185,3 +2185,20 @@ Rules for all dev agents:
 - Pre-push index checks: no unstaged residue, `git diff --cached --check`
   clean, 56 staged blobs scanned with no high-confidence secret finding.
 - **Status:** `In Progress`, waiting for required GitHub checks.
+
+## 2026-07-29 17:42 EEST - Ticket 015 Guardian CI fix
+
+- PR-head CI: all completed Rust/Silverc/contracts/Memory/Pages/security gates
+  passed; Python Guardian failed `85` cases because root-owned sticky `/tmp`
+  was rejected before test verifier execution.
+- Fix: writable ancestor acceptance is now exactly root-owned plus sticky;
+  all descendant ownership, symlink, mode, inode, size, hash, and execution
+  checks remain.
+- Added predicate matrix and integration rejection for a user-owned `1777`
+  ancestor; updated the module boundary documentation.
+- Local: verified-preflight `30 passed`; complete Guardian `741 passed,
+  3 skipped`; product Pylint `10.00/10`; Black/isort/pycompile/diff pass.
+- Kimi review `session_971020af-c8d2-49e5-adea-4df6af9922b9`: no P0/P1/P2,
+  no file change. Sticky semantics on non-POSIX-like network/FUSE mounts stays
+  an unsupported residual environment.
+- **Status:** `In Progress`, fix commit and updated PR checks pending.

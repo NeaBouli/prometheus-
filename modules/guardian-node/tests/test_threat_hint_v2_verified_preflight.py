@@ -12,11 +12,11 @@ import stat
 import threading
 import time
 from pathlib import Path
+from types import SimpleNamespace
 from typing import Any
 
-import pytest
-
 import jaeger.threat_hint_v2_verified_preflight as verified_preflight_module
+import pytest
 from jaeger.threat_hint_v2_verified_preflight import (
     MAX_VERIFIER_EXECUTABLE_BYTES,
     ThreatHintV2VerifiedPreflightBusyError,
@@ -125,6 +125,20 @@ def _snapshot(root: Path) -> dict[str, tuple[int, bytes]]:
                 path.read_bytes(),
             )
     return result
+
+
+def test_executable_ancestor_allows_only_root_owned_sticky_write_access() -> None:
+    safe = (
+        verified_preflight_module._is_safe_executable_ancestor
+    )  # pylint: disable=protected-access
+    directory = stat.S_IFDIR
+
+    assert safe(SimpleNamespace(st_mode=directory | 0o755, st_uid=os.getuid()))
+    assert safe(SimpleNamespace(st_mode=directory | 0o1777, st_uid=0))
+    assert not safe(SimpleNamespace(st_mode=directory | 0o0777, st_uid=0))
+    if os.getuid() != 0:
+        assert not safe(SimpleNamespace(st_mode=directory | 0o1777, st_uid=os.getuid()))
+    assert not safe(SimpleNamespace(st_mode=stat.S_IFREG | 0o755, st_uid=0))
 
 
 def test_valid_call_uses_exact_argv_stdin_and_scrubbed_environment(
@@ -353,9 +367,13 @@ def test_executable_rejects_unsafe_ancestor_and_oversize(tmp_path: Path) -> None
     )
     config = _write_config(scenario.directory, executable, manifest)
     service = ThreatHintV2VerifiedPreflightService(config, scenario.policy_path)
-    unsafe.chmod(0o777)
-    with pytest.raises(ThreatHintV2VerifiedPreflightUnavailableError):
-        _run(service, scenario)
+    unsafe_modes = [0o777]
+    if os.getuid() != 0:
+        unsafe_modes.append(0o1777)
+    for mode in unsafe_modes:
+        unsafe.chmod(mode)
+        with pytest.raises(ThreatHintV2VerifiedPreflightUnavailableError):
+            _run(service, scenario)
     unsafe.chmod(0o700)
 
     executable.write_bytes(b"\x00")
