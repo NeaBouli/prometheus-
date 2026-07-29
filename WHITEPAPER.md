@@ -10,7 +10,7 @@
 
 **GH-103 merged and exact-main verified — July 2026:** One local Rust producer derives a single `api_import` from exact caller-supplied Linux ELF bytes and a checked index. The pinned parser is read-only and bounded to 16 MiB plus 4096 dynamic symbols; scope is derived as `linux`/`elf`, names must satisfy the closed ASCII grammar, and sorting/deduplication is deterministic. The API accepts no path, import string, platform, format, or generic observable value. Every output is local-only `review_required_v1`, and Python independently parses the shared exact-byte ELF vectors. This does not prove external provenance or authorize disclosure, transport, proof acceptance, analysis, or publication.
 
-**Local Windows PE import review candidate — July 2026:** One isolated Rust producer derives a checked `api_import` from exact caller-supplied PE32 or PE32+ bytes. Scope is fixed to `windows`/`pe`; parsing is bounded to 16 MiB, 4096 import descriptors, and 4096 thunk entries; ordinal and grammar-invalid imports fail closed; named functions are byte-sorted and deduplicated before selection. Rust covers both PE architectures, while Python independently parses the synthetic shared PE32+ vector. Library names never become observables and every output remains local-only `review_required_v1`. No path/string/generic, transport, proof, analyzer, wallet, chain, or promotion behavior is added. This candidate is locally verified but not yet merged or live.
+**GH-121 merged and exact-main verified — July 2026:** One isolated Rust producer derives a checked `api_import` from exact caller-supplied PE32 or PE32+ bytes. Scope is fixed to `windows`/`pe`; parsing is bounded to 16 MiB, 4096 import descriptors, and 4096 thunk entries; ordinal and grammar-invalid imports fail closed; named functions are byte-sorted and deduplicated before selection. Rust covers both PE architectures, while Python independently parses the synthetic shared PE32+ vector. Library names never become observables and every output remains local-only `review_required_v1`. No path/string/generic, transport, proof, analyzer, wallet, chain, or promotion behavior is added. Protected PR #122 is merged as exact-main `2e3e1e1`; CI, Security, and Pages pass on that SHA.
 
 **GH-107 merged and exact-main verified — July 2026:** Rust and Python locally verify one canonical, short-lived BIP340 approval statement over one exact `review_required_v1` bundle. Verification is bound to a separately trusted approver key, recipient-scope digest, network, report nonce, and separately trusted current time that must never be attacker-controlled; it recomputes the observable commitment and caps inclusive validity at one hour. The shared vector contains only public material. No signer, transport, persistence, promotion, disclosure, analyzer, proof, wallet, or chain action is added. The nonce and deterministic approval ID identify repeats but do not prevent replay; durable one-time consumption and trusted authority/policy management remain open.
 
@@ -140,14 +140,14 @@ Every output is `review_required_v1`; no arbitrary import string or path API,
 transport authorization, external provenance, privacy approval, or proof
 binding is introduced.
 
-The local Windows PE review candidate applies the same deny-by-default boundary
+Merged and exact-main-verified GH-121 applies the same deny-by-default boundary
 to PE32 and PE32+ import tables. It derives `windows`/`pe` internally, bounds
 artifact size, import-descriptor count, and thunk-entry count, rejects ordinal or grammar-invalid
 imports, and selects only after exact byte sorting and deduplication. Library
 names never become observables. The synthetic shared PE32+ vector is parsed
 independently by Python and Rust also exercises PE32-specific thunk and ordinal
-handling. Every output remains `review_required_v1`; this candidate is not yet
-merged, deployed, or authorized for transport, proof, analysis, publication,
+handling. Every output remains `review_required_v1`. The producer is merged
+but not deployed or authorized for transport, proof, analysis, publication,
 wallet, or chain use.
 
 Merged and exact-main-verified GH-107 adds a local authenticated-statement boundary for these

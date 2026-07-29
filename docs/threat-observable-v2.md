@@ -12,7 +12,7 @@ GH-103 adds one local Rust producer for a checked `api_import` selected from
 exact caller-supplied Linux ELF bytes. It derives scope internally, bounds
 artifact bytes and dynamic symbols, always emits `review_required_v1`, and is
 independently checked against shared exact-byte ELF vectors by Python.
-A local review candidate applies the same boundary to Windows PE32 and PE32+
+Merged and exact-main-verified GH-121 applies the same boundary to Windows PE32 and PE32+
 imports. It accepts exact artifact bytes plus a checked index, derives
 `windows`/`pe`, caps artifacts at 16 MiB, import descriptors at 4096, and
 thunk entries at 4096, rejects
@@ -287,7 +287,7 @@ then sorts and deduplicates exact names before selection. Scope is derived as
 selection, not provenance, maliciousness, privacy approval, disclosure
 authorization, or proof binding.
 
-The local Windows PE review candidate follows the same contract for PE32 and
+The merged GH-121 Windows PE producer follows the same contract for PE32 and
 PE32+ import tables. The pinned read-only parser accepts at most 16 MiB and
 4096 import descriptors and 4096 thunk entries, rejects malformed PE, ordinal
 imports, and names outside

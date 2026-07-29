@@ -226,7 +226,7 @@ with fixed errors. The resulting bundle is always `review_required_v1`;
 no path/string/generic builder, wire, approval envelope, proof, analyzer,
 wallet, or chain schema is added.
 
-The local Windows PE review candidate adds no new wire kind or schema. It
+Merged and exact-main-verified GH-121 adds no new wire kind or schema. It
 produces the existing `api_import` kind from exact PE32/PE32+ bytes plus one
 checked index, fixes scope to `windows`/`pe`, caps input at 16 MiB and both
 descriptors and thunk entries at 4096, and rejects malformed descriptors,
