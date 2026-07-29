@@ -2,7 +2,7 @@
 # Format: - [ ] [PRIO] Beschreibung | Verantwortlich | Dependencies
 # PRIO: P0=Kritisch, P1=Hoch, P2=Mittel, P3=Niedrig
 # Status: [ ]=offen, [~]=in Arbeit, [x]=erledigt, [!]=blockiert
-# Last Updated: 2026-07-23
+# Last Updated: 2026-07-27
 
 ---
 
@@ -237,3 +237,16 @@
 - [x] Nav synced across all 5 pages (Architecture + Tokens restored) | Claude Code | 2026-03-22
 - [x] PROM coin logo integrated — index, manifest, llms.txt, og:image | Claude Code | 2026-03-22
 - [x] KAS official logo added to token card | Claude Code | 2026-03-22
+- [x] [P1] Local canonical ThreatHint-v2 proof-envelope, RelationManifest-v2, and atomic data-only binding candidate | Codex Sol + Kimi K3 | 2026-07-26 | 5 valid/28 invalid shared binding vectors; full local gates and final no-finding review pass; not committed, merged, published, or deployed
+- [x] [P1] Local non-consuming ThreatHint-v2 privacy/proof preflight candidate | Codex Sol + Kimi K3 | 2026-07-26 | Owner-only policy pins network/approver/scope/manifest; statement derived only from bound envelope; 31 focused cases and full local gates pass; no proof verification, approval consumption, SQLite mutation, commit, publish, or deploy
+- [x] [P1] Local trusted ThreatHint-v2 Groth16 verifier candidate | Codex Sol + Kimi K3 | 2026-07-26 | Owner-only manifest/source/VK binding, no runtime proving key, real Arkworks verification, 16 adversarial CLI cases and full gates pass; deterministic fixtures only, not committed/published/deployed
+- [x] [P1] Local non-consuming ThreatHint-v2 verified-preflight composition | Codex Sol + Kimi K3 | 2026-07-27 | Owner-pinned executable SHA-256, sole policy network/manifest anchors, Python preflight before bounded shell-free `verify-v2`, 59 focused and 310 complete Guardian cases pass; no SQLite, consumption, commit, publish, or deploy
+- [x] [P1] Local raw-input-only ThreatHint-v2 atomic acceptance candidate | Codex Sol + Kimi K3 | 2026-07-27 | Exact policy identity before ledger creation; verified proof/privacy preflight first; approval-ID/commitment binding before final durable consume; 158 focused and 349 complete Guardian cases pass; no production artifact approval, external effect, commit, publish, or deploy
+- [x] [P1] Local owner-policy ThreatHint-v2 promotion/pairing candidate | Codex Sol + Kimi K3 | 2026-07-27 | Exact owner-only platform/format/kind/count policy before raw atomic acceptance; check-to-open race hardening; 57 focused, 207 combined, and 406 complete Guardian cases pass; no semantic privacy, transport, analysis, external effect, commit, publish, or deploy
+- [x] [P1] Local owner-only outbox retention-governance candidate | Codex Sol + Kimi K3 | 2026-07-27 | Exact network/approver/scope-bound retention declaration; 114 focused and 520 complete Guardian cases pass; no database, outbox, runtime, external effect, commit, publish, or deploy
+- [ ] [P0] Approve real v2 relation source, proving/verifying keys, ceremony evidence, and independent cryptographic evidence for the trusted verifier | Core Dev + independent cryptography review | Blocks operated v2 proof rollout; local test-artifact verification and atomic acceptance mechanics are not production artifact approval
+- [x] [P0] Define and locally enforce authority/key governance, fixed recipient semantics, and per-kind privacy decisions | Codex Sol + Kimi K3 | Ticket 012 local candidate pins exact promotion/governance/retention digests plus authority identity/window atomically with valid approval consumption; no production identity attestation, commit, merge, or deploy
+- [x] [P0] Implement an atomic recoverable local outbox/claim before v2 transport or actionable analysis | Codex Sol + Kimi K3 | Ticket 013 governed-only schema v3 stores the full canonical bundle atomically with authority/high-water/consumption; bounded claim/lease/recovery/ack tests and complete local gates pass; no worker, external effect, commit, merge, publish, or deploy
+- [x] [P0] Implement and independently review the bounded v2 outbox worker plus durable non-actionable completion substrate | Codex Sol + Kimi K3 | Ticket 014 governed schema v4 binds statement/nonce/bundle/approval/lease/retention, atomically stores one canonical non-actionable result before deleting work, and keeps existing Analyzer/LLM/YARA/actionable output disabled; 72 focused and Guardian 740 pass/3 skip plus complete Rust/lint/build/audit/docs gates
+- [ ] [P0] Design and separately approve real privacy-reviewed semantic analysis and actionable-rule integration | Core Dev + independent security/privacy review | Must not reuse the legacy heuristic Analyzer as v2 submission authority; requires deterministic result semantics, YARA validation, privacy review, crash-safe downstream effects, and a new explicit high-risk ticket
+- [x] [P3] Disable reconstruction/serialization of the older data-only `ThreatHintV2PreflightReceipt` | Codex Sol | Closed in ticket 009 with direct, `dataclasses.replace`, and pickle regressions

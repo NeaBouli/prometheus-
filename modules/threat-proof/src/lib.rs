@@ -1,5 +1,9 @@
 #![deny(warnings)]
 
+pub mod relation_manifest_v2;
+pub mod threat_hint_v2_groth16_verifier;
+pub mod threat_hint_v2_proof_binding;
+
 use std::fs::File;
 use std::io::Read;
 use std::path::{Component, Path};
@@ -271,7 +275,7 @@ fn valid_relation_id(value: &str) -> bool {
             .is_some_and(|byte| byte.is_ascii_alphanumeric())
 }
 
-fn valid_network_id(value: &str) -> bool {
+pub(crate) fn valid_network_id(value: &str) -> bool {
     (2..=64).contains(&value.len())
         && value
             .bytes()
@@ -286,7 +290,7 @@ fn valid_network_id(value: &str) -> bool {
             .is_some_and(u8::is_ascii_alphanumeric)
 }
 
-fn is_lower_hex_32(value: &str) -> bool {
+pub(crate) fn is_lower_hex_32(value: &str) -> bool {
     value.len() == 64
         && value
             .bytes()
@@ -294,7 +298,7 @@ fn is_lower_hex_32(value: &str) -> bool {
         && value.bytes().any(|byte| byte != b'0')
 }
 
-fn read_owner_file(path: &Path, limit: usize) -> Result<Vec<u8>, ThreatProofError> {
+pub(crate) fn read_owner_file(path: &Path, limit: usize) -> Result<Vec<u8>, ThreatProofError> {
     #[cfg(unix)]
     use std::os::unix::fs::MetadataExt;
 

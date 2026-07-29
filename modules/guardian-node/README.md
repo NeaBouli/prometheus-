@@ -189,6 +189,214 @@ The returned Python object is data only. This module is not imported by v1
 ingress, proof verification, approval consumption, analyzer, outbox, wallet, or
 chain paths and grants no disclosure, replay, or promotion authority.
 
+## Local ThreatHint v2 Proof Binding
+
+`jaeger.threat_hint_v2_proof_envelope`,
+`jaeger.relation_manifest_v2`, and
+`jaeger.threat_hint_v2_proof_binding` mirror the Rust canonical envelope,
+manifest, and atomic compatibility binding. The binding requires exact raw
+bytes, a separately trusted network, and a separately trusted nonzero
+lowercase manifest SHA-256. It hashes the raw manifest before parsing, reparses
+both canonical objects, closes protocol/relation/network/domain/public-input
+identities, and returns two claimed 16-byte digest halves.
+
+The Python result is immutable under supported use and uses an identity-bound
+weak snapshot of both exact wires and the trusted network to fail closed on
+valid-shape mutation or forgery. This is in-process object-integrity hardening,
+not authority against arbitrary interpreter code. The slice is a local
+review-ready candidate only: it verifies no Groth16 proof, loads or approves no
+source or key, and performs no transport, analyzer, promotion, wallet, chain,
+or rollout action.
+
+## Local ThreatHint v2 Privacy/Proof Preflight Candidate
+
+`jaeger.threat_hint_v2_preflight` composes the local v2 structural boundaries
+without consuming authority. An owner-only read-only TOML policy pins one
+network, BIP340 approver key, opaque recipient scope, and nonzero raw-manifest
+SHA-256. The service binds canonical envelope/manifest bytes, derives the
+statement only from the bound envelope, checks the review-required bundle
+commitment against the trusted report nonce, and verifies the canonical
+short-lived approval in the same call.
+
+The receipt is data only. The service performs no Groth16 verification, opens
+or migrates no SQLite ledger, consumes no approval, and triggers no transport,
+analysis, disclosure, promotion, wallet, chain, or external side effect.
+By itself this layer is not acceptance; the local verifier and atomic
+composition below supply the mechanical call order, while production artifact
+approval and independent review remain mandatory.
+
+The sibling Rust package now has a local review-ready `verify-v2` candidate
+that performs real Groth16 checks against owner-only manifest,
+relation-source, and verifying-key artifacts. This Python preflight does not
+invoke it. Only deterministic test artifacts exist, so production
+relation/key/ceremony approval remains required; the separate acceptance
+candidate below composes the local test-artifact verifier with consumption.
+
+### Non-consuming ThreatHint v2 verified preflight
+
+`jaeger.threat_hint_v2_verified_preflight.ThreatHintV2VerifiedPreflightService`
+is a separate POSIX-only local candidate that composes the standalone
+preflight with the Rust verifier. Its owner-only exact-schema TOML config pins
+an absolute verifier executable path, its exact SHA-256, one absolute relation
+manifest path, and a timeout from 100 through 60000 milliseconds. Network and
+manifest SHA-256 remain sourced only from the existing preflight policy.
+
+Each call owner-loads and hashes the exact manifest, runs the Python preflight
+first, then revalidates the executable and passes the same exact envelope bytes
+to `verify-v2` over stdin. Invocation is shell-free, uses a closed argument
+set, `LANG=C`/`LC_ALL=C`, `/` as working directory, closed output streams, a
+new process group, bounded timeout, and fail-closed exit handling. Concurrent
+calls on one service instance fail closed. The result is a non-constructible,
+non-serializable data receipt only.
+
+This composition does not open or mutate SQLite, consume an approval, approve
+production relation/key/ceremony artifacts, authorize privacy or disclosure,
+or trigger transport, analysis, promotion, wallet, chain, or rollout
+behavior. An owner-bounded hash-to-`execve` race remains because Python cannot
+portably execute the already-hashed descriptor; therefore the executable and
+all ancestors must be owned by the current user or root and cannot be
+group/world writable. Final production acceptance still requires independent
+artifact review; the atomic mechanical boundary is the separate local
+candidate below.
+
+### Atomic ThreatHint v2 acceptance candidate
+
+`jaeger.threat_hint_v2_acceptance.ThreatHintV2AcceptanceService` is a
+raw-input-only local composition of verified preflight and durable approval
+consumption. Construction compares the preflight and consumption policy
+network, BIP340 approver key, and recipient scope before the ledger is created
+or opened. Each call runs proof/privacy verification first, then re-verifies
+the raw approval and bundle and compares the expected approval ID and
+observable commitment before the final atomic SQLite consume.
+
+Invalid, unavailable, replay, and busy outcomes are fixed redacted classes.
+Proof, privacy, timeout, or process failures do not consume an approval or
+advance ledger high-water. Crash after the commit but before receipt delivery
+is recovered as replay on the next identical call, never double consumption.
+The returned receipt is non-constructible, non-serializable data only and
+grants no downstream authority. Production relation/key/ceremony approval,
+independent cryptographic review, privacy promotion, transport, analysis,
+outbox effects, wallet, chain, and rollout remain outside this candidate.
+
+### Owner-policy ThreatHint v2 promotion candidate
+
+`jaeger.threat_hint_v2_promotion.ThreatHintV2PromotionService` is the
+raw-input-only local boundary above atomic acceptance. A separate owner-only,
+exact-schema ASCII TOML policy fixes one platform, one format, a non-empty
+duplicate-free observable-kind allowlist, and a maximum count from 1 through
+16. The policy file is opened with no-follow semantics, checked by descriptor
+device/inode, ownership, mode, and size, and read through a fixed cap.
+
+Each call reparses the canonical bundle, requires `review_required_v1`, and
+applies every platform/format/kind/count restriction before the same original
+envelope, bundle, and approval bytes may enter atomic acceptance. Rejection
+does not invoke `verify-v2`, consume an approval, or advance ledger high-water.
+Success returns only a frozen, non-constructible, non-serializable local result
+with the accepted digest/IDs/time, policy-pinned scope, and immutable canonical
+observable string pairs.
+
+This boundary mechanically pairs and restricts one accepted local candidate.
+It does not establish approver-key ownership or rotation, recipient-scope
+meaning, semantic per-kind privacy safety, production relation/key/ceremony
+approval, transport, analysis, publication, crash-safe external effects,
+wallet, chain, or rollout authority.
+
+### Owner-local outbox retention-governance candidate
+
+`jaeger.outbox_retention_policy.load_outbox_retention_policy(...)` is a pure,
+read-only policy loader for a possible future local recoverable analysis
+queue. Its exact owner-only ASCII TOML schema binds the expected network,
+BIP340 approver key, and opaque recipient scope, then fixes purpose
+`local_recoverable_analysis_queue_v1`, payload form
+`canonical_observable_bundle_v1`, a non-empty duplicate-free durable-kind
+allowlist, `max_pending_records` in `1..=100000`, and
+`max_retention_seconds` in `1..=2592000`.
+
+The policy file is capped at 4096 bytes and requires POSIX ownership,
+owner-only permissions, `O_NOFOLLOW`, and descriptor identity/mode/size
+validation. File hashes remain corpus-matchable, API imports fingerprint
+software capabilities, and byte patterns may retain proprietary content;
+allowing a kind is therefore a retention declaration, not semantic privacy
+approval.
+
+This module opens no SQLite database and creates no ledger row, outbox record,
+worker, transport, disclosure, or external effect. It proves no key ownership,
+scope authorization, extractor provenance, or privacy safety. The governed
+promotion composition below is the only local candidate allowed to consume
+this exact snapshot for durable enqueue.
+
+### Enforceable ThreatHint v2 authority and privacy governance
+
+`jaeger.threat_hint_v2_governance.load_threat_hint_v2_governance_policy(...)`
+loads one exact owner-only policy bound to the expected network, approver key,
+and recipient scope. It fixes an authority epoch and inclusive validity
+window, purpose `guardian_local_analysis_v1`, boundary
+`same_guardian_owner_v1`, external disclosure `deny_v1`, and exactly one
+decision for every closed observable kind. A kind is either denied or allowed
+only by its own risk-specific local-analysis token.
+
+`ThreatHintV2PromotionService.from_governed_policies(...)` composes one
+immutable promotion, governance, and retention snapshot before ledger access.
+All three allowed-kind sets must be exactly equal. On the first valid governed
+promotion, governed schema v4 atomically pins the exact raw SHA-256 digest of every
+policy plus network, key, scope, epoch, and authority window in the same
+`BEGIN IMMEDIATE` transaction as high-water and approval consumption.
+
+A lower epoch, same-epoch policy change, or overlapping higher-epoch window
+using the same key and scope fails closed. Key or scope rotation may overlap
+for controlled recovery because an approval under the old identity cannot
+verify under the new one. Existing replay rows and high-water survive v1/v2
+migration; hidden preexisting authority state is rejected.
+
+This boundary still invokes no analyzer or worker, transports or publishes
+nothing, and grants no production
+relation/key/ceremony, wallet, chain, token, or rollout authority. Authority
+times are protocol uint64 values, while SQLite storage is signed 64-bit; a
+far-future value above `2^63-1` therefore fails closed as a redacted
+unavailable consumption rather than being persisted.
+
+### Governed recoverable ThreatHint v2 outbox
+
+Only `ThreatHintV2PromotionService.from_governed_policies(...)` enables durable
+enqueue. Governed schema v4 stores the approval ID, observable commitment,
+canonical statement wire and digest, trusted report nonce, canonical bundle
+wire, enqueue time, and retention deadline in the exact `BEGIN IMMEDIATE`
+transaction that pins or advances authority state, moves ledger high-water,
+and consumes the approval. The pending-record cap is checked in that
+transaction. Capacity, enqueue, schema, lock, integrity, or overflow failure
+rolls everything back and leaves the approval unconsumed.
+
+An empty schema-v3 outbox migrates transactionally to v4. A nonempty v3 outbox
+cannot be upgraded because its report nonce and statement are unrecoverable;
+opening it fails closed without changing its version, schema, or rows.
+
+`ObservableApprovalConsumptionService.outbox().claim(...)` opens one
+owner-local claim capability. It removes expired-retention rows, selects the
+oldest eligible pending or expired-lease row, generates an opaque 32-byte
+lease token internally, and caps lease expiry at retention. Restart leaves
+committed pending work available; lost work can be reclaimed after lease
+expiry. Every claim reparses the owner-network-pinned statement and canonical
+bundle, recomputes statement and bundle commitments, and derives one
+domain-separated input identity bound to approval, lease, and retention.
+Claim results cannot be constructed or serialized and reveal no token in
+`repr`.
+
+`complete(...)` is the only v4 terminal transition. It requires the exact
+unexpired lease, input identity, canonical non-actionable result, and
+completion token; one transaction inserts the retained result and deletes the
+outbox row. Exact post-commit retry is idempotent, while changed tokens, leases,
+inputs, or results fail closed. `acknowledge(...)` cannot delete v4 work without
+a durable result. Results inherit the original retention deadline and remain
+owner-local/readable until lazy cleanup at that deadline.
+
+`jaeger.observable_analysis_worker` provides a bounded async worker protocol and
+one deterministic test analyzer. The analyzer only validates and counts the
+canonical observables. It emits no confidence, `should_submit`, YARA/rule body,
+semantic finding, transport, publication, wallet, chain, reward, or external
+authority. Legacy consumption remains schema v1; governed acceptance uses
+schema v4 but enqueues only when promotion explicitly enables the durable
+outbox.
+
 ## Local Observable Approval Consumption
 
 `jaeger.observable_approval_consumption` is a local-only policy and persistence

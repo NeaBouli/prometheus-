@@ -1,7 +1,7 @@
 # PROMETHEUS – MODULE STATUS
 # Format: | Module | Status | Progress | Last Update | Audit | Testnet Address |
 # Status: PENDING | IN_PROGRESS | DONE | BLOCKED | PENDING_AUDIT | ACCEPTED | REJECTED
-# Last Updated: 2026-07-23
+# Last Updated: 2026-07-27
 
 ---
 
@@ -12,6 +12,34 @@ Sprint 9: Post-Toccata deployment and production-protocol gates
 Status:   BLOCKED on external H-001 signing/execution evidence
 Start:    2026-07-08
 Goal:     Complete the non-promotable H-001 canary, then the full state-contract, oracle, ZK, P2P, and release-evidence path.
+```
+
+## LOCAL THREATHINT V2 PRIVACY/PROOF PREFLIGHT CANDIDATE (2026-07-26)
+
+```text
+State: review-ready local candidate; not committed, merged, published, or deployed
+Ticket: GIO-PROM-20260726-006
+Worktree: /Users/gio/Desktop/repos/prometheus-v2-proof-binding
+Policy: owner-only read-only exact schema pins network, BIP340 approver,
+        opaque recipient scope, and nonzero raw-manifest SHA-256
+Composition: bind envelope/manifest; derive statement only from envelope;
+             require review_required_v1; match trusted nonce and bundle
+             commitment; verify canonical short-lived approval in same call
+Persistence: none; no SQLite open/create/migration/write; no approval consumption
+Receipt: data-only statement/approval/commitment IDs plus manifest/envelope hashes
+Evidence: 31 focused preflight cases; 95 combined relevant Python cases;
+          282 Guardian pass/3 intentional skips; changed Pylint 10.00;
+          full Pylint 9.81; Black; 317 Rust regular + 5 doctests pass with
+          2 intentional live ignores; fmt and warning-free Clippy pass
+Review: Kimi final review 0 P0/P1/P2; Sol fixed the P3 deep-JSON redaction gap
+Boundary: no Groth16 verification, proof/artifact approval, privacy/disclosure
+          authority, replay consumption, transport, analyzer, promotion,
+          wallet, signing, transaction, chain, reputation, KAS/PROM, slash,
+          commit-reveal, or emergency-stop change
+Remaining: approved v2 relation/keys/ceremony and real proof verification,
+           then final atomic durable acceptance; transport, actionable
+           analysis, deployments, signatures, chain evidence, production
+Estimates: core 78-82%; complete vision 44-49%; 51-56% remains
 ```
 
 ## GH-4 DEPLOY OPERATOR STATUS
@@ -762,4 +790,278 @@ Boundary: no v1 change, relation, proof acceptance, signer, approval pairing,
           emergency-stop behavior
 Remaining: reviewed relation/artifacts, privacy/pairing, transport, actionable
            analysis, and external rollout gates
+```
+
+## LOCAL THREATHINT V2 PROOF-BINDING CANDIDATE (2026-07-26)
+
+```text
+State: review-ready local candidate; not committed, merged, published, or deployed
+Baseline: b556fbbae428e7f6eef07c6d502b32e13e759813
+Branch: feat/local-v2-proof-binding
+Worktree: /Users/gio/Desktop/repos/prometheus-v2-proof-binding
+Implemented: canonical Rust/Python v2 proof envelope, strict 19-field
+             RelationManifest-v2, and one atomic data-only binding
+Trust: separately trusted network plus nonzero lowercase raw-manifest SHA-256
+Binding: raw hash before parse; canonical reparse; protocol/relation/network/
+         domain/public-input closure; two claimed 16-byte digest halves
+Evidence: 5 valid/28 invalid shared binding vectors; full Rust workspace
+          317 regular tests + 5 doctests pass with 2 intentional live ignores;
+          full Guardian 251 pass/3 intentional skips; fmt, all-target Clippy,
+          locked release, 27/14/13 packages, Black, Pylint 9.80, dependency
+          audits, Memory Integrity, and 6 Autodidactic tests pass
+Review: Sol closed exact-envelope Python substitution with a snapshot regression;
+        final Kimi read-only review reports no actionable finding
+Boundary: no Groth16 verification, source/key loading or approval, ceremony,
+          I/O, transport, analyzer, promotion, wallet, chain, reputation,
+          KAS/PROM, slash ACL, commit-reveal, or emergency-stop change
+Remaining: approved relation source and keys, real proof verification/acceptance,
+           owner-only pairing, privacy/promotion, transport, actionable analysis,
+           deployments, signatures, chain evidence, and production operation
+```
+
+## LOCAL THREATHINT V2 GROTH16 VERIFIER CANDIDATE (2026-07-26)
+
+```text
+State: review-ready local candidate; not committed, merged, published, or deployed
+Ticket: GIO-PROM-20260726-007
+Baseline: b556fbbae428e7f6eef07c6d502b32e13e759813
+Loader: one retained canonical manifest plus fixed owner-only
+        relation-source.bin and verifying-key.bin siblings
+Trust: separately trusted network and nonzero lowercase raw-manifest SHA-256;
+       exact source/VK sizes and hashes; canonical compressed BN254 VK
+Runtime: no proving-key path or load; no manifest disk reread during verify
+Verification: exact canonical v2 envelope/binding; two 16-byte big-endian Fr
+              inputs; canonical compressed proof; real Arkworks Groth16 check
+CLI: silent verify-v2; exit 0 valid, 1 invalid, 2 syntax, 3 unavailable
+Evidence: 16 focused; ThreatProof 44 all-target + 2 doctests; workspace
+          333 pass/2 intentional ignores + 5 doctests; Guardian 282 pass/
+          3 intentional skips; fmt, warning-free Clippy, optimized build,
+          verified 15-file package
+Review: Kimi final PASS with no P0/P1/P2/P3; Sol added malformed proof,
+        anchor-matched invalid VK, unsafe parent, uppercase/zero anchor cases
+Boundary: deterministic test relation/keys/proofs only; no production
+          relation/key/ceremony approval, proving-key runtime, approval
+          consumption, privacy/disclosure authority, transport, analyzer,
+          wallet, signing, transaction, chain, deployment, or rollout evidence
+Remaining: independent production artifact/ceremony approval, then one atomic
+           verifier-plus-final-consumption acceptance path; transport,
+           actionable analysis, deployments, signatures, chain evidence
+Estimates: core 79-83%; complete vision 45-50%; 50-55% remains
+```
+
+## LOCAL THREATHINT V2 DURABLE NON-ACTIONABLE WORKER (2026-07-29)
+
+```text
+State: review-ready local candidate; not committed, merged, published, or deployed
+Ticket: GIO-PROM-20260728-014
+Baseline: b556fbbae428e7f6eef07c6d502b32e13e759813
+Schema: governed v4; exact statement/digest, report nonce, bundle, approval,
+        authority/high-water, lease, input identity, result, and retention
+Migration: empty v3 outbox only; nonempty v3 fails closed unchanged
+Completion: one BEGIN IMMEDIATE inserts canonical non-actionable result before
+            conditional outbox deletion; exact completion retry is idempotent
+Worker: bounded async concurrency/batch/timeout; deterministic test analyzer only
+Evidence: 72 focused pass; Guardian 740 pass/3 intentional skips; Black;
+          Pylint 10.00 focused/9.83 full; isort; py_compile; Rustfmt;
+          warning-free Clippy; 333 Rust pass/2 intentional ignores + 5 doctests;
+          locked release build; Cargo/Python audits; Memory/Pages/HTML/diff/leak
+Review: Kimi final no P0/P1/P2; two deliberate P3 API semantics accepted by Sol
+Boundary: no existing Analyzer/LLM/YARA, confidence, should_submit, actionable
+          rule, transport, disclosure, wallet, signature, transaction, chain,
+          reward, deployment, commit, push, PR, publish, or external write
+Remaining: real privacy-reviewed semantic/actionable analysis requires a new
+           explicit high-risk ticket; production relation/key/ceremony and
+           independent cryptographic evidence still block operated rollout
+Estimates: core 84-88%; complete vision 50-55%; 45-50% remains
+```
+
+## LOCAL THREATHINT V2 RECOVERABLE OUTBOX (2026-07-28)
+
+```text
+State: review-ready local candidate; not committed, merged, published, or deployed
+Ticket: GIO-PROM-20260728-013
+Baseline: b556fbbae428e7f6eef07c6d502b32e13e759813
+Schema: legacy v1 unchanged; governed v0/v1/v2 -> v3 preserving consumption,
+        high-water, and authority state; downgrade/hidden outbox rejected
+Atomicity: capacity plus full canonical bundle enqueue share the exact
+           BEGIN IMMEDIATE transaction with authority, high-water, consumption
+Rollback: full queue, enqueue, schema, lock, integrity, random-source, or
+          overflow failure consumes no approval and advances no durable state
+Claim: oldest eligible row; internally generated opaque 32-byte token;
+       pending -> leased -> exact-ID/token terminal deletion
+Recovery: restart preserves pending work; expired lease is reclaimable;
+          every lease is capped by retention; expired rows purge before claim
+Isolation: only governed promotion enqueues; direct governed acceptance and
+           legacy consumption do not
+Evidence: 282 focused pass; complete Guardian 716 pass/3 intentional skips;
+          Black clean for changed files; exact CI Pylint 9.84/10; Rustfmt,
+          warning-free Clippy, complete workspace tests and 5 doctests pass
+Review: Kimi independent read-only review found no actionable P0/P1/P2/P3
+Boundary: no worker/analyzer execution, transport, disclosure, wallet,
+          signing, transaction, broadcast, chain, deployment, or external write
+Remaining: production relation/key/ceremony approval and cryptographic review;
+           bounded worker/actionable analysis; v2 transport; rollout gates
+Estimates: core 83-87%; complete vision 49-54%; 46-51% remains
+```
+
+## Checkpoint 2026-07-27: local enforceable v2 governance review-ready
+
+- Ticket `GIO-PROM-20260727-012` composes promotion, governance, and retention
+  into the first enforceable owner-local ThreatHint v2 policy boundary.
+- One exact policy fixes network, approver key, recipient scope, authority
+  epoch/window, same-Guardian local-analysis semantics, denied external
+  disclosure, and distinct deny-or-kind-specific-risk decisions.
+- All three kind sets must match exactly before ledger access. First valid use
+  atomically pins all three exact policy digests plus identity/window; a
+  higher epoch advances only with a valid signed approval in the same
+  transaction as high-water and consumption.
+- Lower epochs, same-epoch policy equivocation, overlapping same-identity
+  windows, hidden v0/v1 authority state, replay, failed inserts, integer
+  overflow, and lock contention are fail-closed and regression-tested.
+- Kimi architecture and two integration reviews found no P0/P1/P2. All review
+  test gaps were closed by Sol. Current evidence includes 18 governed
+  integration tests, `683 passed, 3 skipped` in the complete Guardian suite,
+  Black, focused Pylint `10.00/10`, CI Pylint `9.81/10`, Rustfmt,
+  warning-free Clippy, and a complete Rust workspace rerun. Final release,
+  audit, workflow, secret, and documentation gates are recorded at closeout.
+- No outbox, claim, analyzer, worker, transport, publication, chain action,
+  production artifact approval, commit, push, or deployment is part of this
+  ticket. The next repository-owned task is an atomic recoverable local
+  outbox/claim boundary.
+- Estimates: core `82-86%`, complete vision `48-53%`, remaining `47-52%`.
+
+## LOCAL OUTBOX RETENTION-GOVERNANCE CANDIDATE (2026-07-27)
+
+```text
+State: review-ready local candidate; not committed, merged, published, or deployed
+Ticket: GIO-PROM-20260727-011
+Baseline: b556fbbae428e7f6eef07c6d502b32e13e759813
+Policy: owner-only exact ASCII TOML bound to expected network, approver key,
+        and recipient scope; fixed local recoverable-analysis purpose and
+        canonical Observable Bundle payload form
+Bounds: non-empty duplicate-free closed durable kinds; 1..100000 pending
+        records; 1..2592000 retention seconds
+Risk: file hashes remain corpus-matchable; API imports fingerprint software
+      capabilities; byte patterns may retain proprietary content
+Read: POSIX/getuid/O_NOFOLLOW required; owner-only parent/file; descriptor
+      device/inode/mode/size checks; 4096-byte cap; guaranteed close
+Result: frozen, non-constructible, non-serializable policy data only
+Evidence: 114 focused cases; Guardian 520 pass/3 intentional skips; Black;
+          focused Pylint 10.00/10; full Pylint 9.81/10; Rustfmt; warning-free
+          workspace Clippy; Rust 333 pass/2 intentional ignores + 5 doctests;
+          release builds/packages, dependency audits, Memory, Pages/workflow,
+          diff, and candidate-secret gates pass
+Review: Kimi final PASS with no P0/P1/P2 after Sol fixed deep-recursion,
+        expected-identity, mode, and mandatory-no-follow regressions
+Boundary: no database, ledger row, outbox record, worker, runtime import,
+          transport, disclosure, external effect, wallet, signing, chain,
+          deployment, or rollout evidence
+Atomicity: future recoverable enqueue must share the BEGIN IMMEDIATE
+           transaction with approval consumption and ledger high-water;
+           a digest-only journal is not recoverable work
+Remaining: production relation/key/ceremony approval and cryptographic review;
+           authority/key/scope and enforceable semantic privacy governance;
+           real atomic outbox, transport/actionable analysis; deployments,
+           signatures, confirmations, and public evidence
+Estimates: core 81-85%; complete vision 47-52%; 48-53% remains
+```
+
+## LOCAL THREATHINT V2 OWNER-POLICY PROMOTION CANDIDATE (2026-07-27)
+
+```text
+State: review-ready local candidate; not committed, merged, published, or deployed
+Ticket: GIO-PROM-20260727-010
+Baseline: b556fbbae428e7f6eef07c6d502b32e13e759813
+Policy: owner-only exact ASCII TOML; platform, format, duplicate-free allowed
+        kinds, and max count 1..16 only; no duplicate network/key/scope anchors
+Input: raw envelope, bundle, approval bytes plus trusted nonce/time only
+Order: exact types; canonical bundle; review-required disclosure; platform/
+       format/kind/count restrictions; same original wires to atomic acceptance
+Owner read: O_NOFOLLOW; descriptor dev/inode/mode/size validation; bounded read
+Failure: rejected promotion never invokes verify-v2, consumes approval, or
+         advances ledger high-water
+Result: frozen, non-constructible, non-serializable accepted IDs/time, pinned
+        scope, and immutable canonical observable string pairs only
+Errors: stable redacted invalid, unavailable, replay, retryable busy
+Evidence: 57 focused; ticket 005-010 matrix 207; Guardian 406 pass/3 intentional
+          skips; Black 22 modules; Pylint 10.00 focused/9.82 full; Rustfmt;
+          warning-free all-target Clippy; workspace 333 pass/2 intentional
+          ignores + 5 doctests; release builds/packages; audits; Memory;
+          Pages/HTML/JSON-LD; workflow YAML/Actionlint; candidate Gitleaks
+Review: Kimi final PASS, no P0/P1/P2; initial trusted-file P2 and all P3
+        coverage/classification observations fixed and regression-tested by Sol
+Residual: established owner-local same-size content/ancestor race assumptions;
+          existing verifier hash-to-exec race; M-002 debug timing jitter
+Boundary: no semantic privacy, authority/key governance, production artifact/
+          ceremony approval, transport, analysis, publication, external effect,
+          wallet, signing, transaction, chain, deployment, or rollout evidence
+Remaining: independent production relation/key/ceremony and cryptographic
+           review; authority/scope/privacy governance; transport/actionable
+           analysis; crash-safe effects; deployments, signatures, public evidence
+Estimates: core 81-85%; complete vision 47-52%; 48-53% remains
+```
+
+## LOCAL THREATHINT V2 ATOMIC ACCEPTANCE CANDIDATE (2026-07-27)
+
+```text
+State: review-ready local candidate; not committed, merged, published, or deployed
+Ticket: GIO-PROM-20260727-009
+Baseline: b556fbbae428e7f6eef07c6d502b32e13e759813
+Construction: exact preflight/consumption network, BIP340 approver key, and
+              recipient scope before ledger creation/open
+Input: raw envelope, bundle, and approval bytes plus trusted nonce/time only
+Order: verified proof/privacy preflight first; raw approval/bundle reverify;
+       expected approval ID and observable commitment compare; durable consume last
+Errors: stable redacted invalid, unavailable, replay, and retryable busy
+Receipt: frozen, direct construction/replace/pickle disabled; data only
+Failure: proof/privacy/process/config failures consume nothing and do not
+         advance approval ledger high-water
+Crash: post-commit/pre-receipt retry returns replay; no double consumption
+Evidence: 158 focused pass; Guardian 349 pass/3 intentional skips; Black;
+          Pylint 10.00 focused/9.82 full; Rustfmt; warning-free Clippy;
+          complete Rust workspace pass/2 intentional ignores + 5 doctests
+Review: Kimi static PASS with no P0/P1/P2; sole P3 receipt serialization
+        parity finding fixed and regression-tested by Sol
+Residual: owner-bounded verifier hash-to-exec race; M-002 debug timing jitter
+Boundary: deterministic test proof artifacts only; no production artifact/
+          ceremony approval, privacy promotion, transport, analyzer/outbox,
+          wallet, signing, transaction, chain, deployment, or rollout evidence
+Remaining: independent production relation/key/ceremony and cryptographic
+           review; owner-only pairing/privacy promotion; transport/actionable
+           analysis; deployments, signatures, confirmations, public evidence
+Estimates: core 80-84%; complete vision 46-51%; 49-54% remains
+```
+
+## LOCAL THREATHINT V2 VERIFIED PREFLIGHT COMPOSITION (2026-07-27)
+
+```text
+State: review-ready local candidate; not committed, merged, published, or deployed
+Ticket: GIO-PROM-20260727-008
+Baseline: b556fbbae428e7f6eef07c6d502b32e13e759813
+Policy: existing owner-only preflight policy is the sole network and raw-
+        manifest SHA-256 authority
+Config: owner-only exact TOML pins absolute verifier path, exact executable
+        SHA-256, absolute manifest path, and 100..60000 ms timeout
+Order: owner-read/hash manifest; Python approval/privacy preflight first;
+       exact envelope bytes over stdin to verify-v2
+Process: POSIX-only; absolute argv; no shell; scrubbed C locale; cwd=/;
+         stdout/stderr discarded; new process group; timeout/reap; one
+         in-flight verifier per service
+Exit: 0 data receipt; 1 stable invalid; 2/3/other/signal/timeout/config/
+      artifact/concurrency stable unavailable
+Receipt: frozen, direct construction and pickle disabled; data only
+Evidence: 59 focused cases; Guardian 310 pass/3 intentional skips; workspace
+          333 pass/2 intentional ignores + 5 doctests; Black; changed Pylint
+          10.00/10; full Pylint 9.81/10; Rustfmt; warning-free Clippy
+Review: Kimi final PASS with no P0/P1/P2; Sol closed non-POSIX,
+        communicate-ValueError, and concurrency-test hardening points
+Residual: owner-bounded executable hash-to-exec race; older standalone
+          preflight receipt serialization hardening remains P3
+Boundary: no SQLite access, approval consumption, production artifact/
+          ceremony approval, privacy/disclosure authority, transport,
+          analyzer, promotion, wallet, signing, transaction, chain,
+          deployment, or rollout evidence
+Remaining: independent production relation/key/ceremony approval and one
+           final atomic verify-plus-consume boundary; external rollout gates
+Estimates: core 79-83%; complete vision 45-50%; 50-55% remains
 ```

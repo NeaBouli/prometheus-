@@ -2,7 +2,7 @@
 
 **Whitepaper v4.0 — March 2026**
 
-**Status update — July 2026:** Kaspa Toccata is treated as a post-fork deployment environment for Prometheus. Current Silverc compile/runtime, release-bundle, request/receipt/evidence, metrics-oracle, and exact-commit gates cover the seven contract fixtures without holding signing material. Closed profiles separate the full path from the non-promotable `testnet-10-validator-staking-h001` canary. Public funding and the deterministic schema-v2 H-001 request/digest remain verified and byte-identical; no signature or broadcast has occurred. Sprint 10B includes fail-closed 8B-first/70B escalation, complete 5+ Guardian strict-majority voting, per-session BIP340 authenticated replay-safe intake, and GH-42/GH-44/GH-48/GH-52 ballot transport, persistent identity, relay/AutoNAT operation, packaged sidecars, and explicit bootstrap routes. Merged and exact-main-verified GH-55/GH-58/GH-63/GH-74 provide the canonical bounded ThreatHint channel, owner-only durable ingress, a real manifest-pinned BN254/Arkworks Groth16 verifier aligned with active KIP-16, and the bounded analyzer-domain adapter. Merged and exact-main-verified GH-77 isolates per-job drain failures: failed jobs remain pending, later safe jobs progress, and the structurally immutable report contains only a bounded index, fixed failure category, and validated digest or `None`. Merged and exact-main-verified GH-86 adds local-only Rust/Python canonical Observable Bundle validators and one shared byte-exact corpus without wiring them into v1, proof, transport, analysis, or publication. Merged and exact-main-verified GH-114 adds isolated local canonical v2 statement parsing and digest parity while leaving relation, proof, pairing, transport, and analysis disconnected. The adapter revalidates queued canonical bytes, digest, trusted network, proof mode, and admission time, but hash-only v1 has no concrete IOC strings and therefore produces only a zero-confidence, no-rule, non-submittable result without invoking LLM or YARA generation. No approved production relation, relation vectors, verifying key, or proving key ships yet, so unavailable verification remains fail-closed as `busy` and actionable analysis is not claimed. Real two-host relay operation, broad discovery, trusted membership/key assignment, Sybil protection, reviewed extractors/privacy gates, the reviewed v2 relation/proof/pairing/transport path and real actionable ThreatHint analysis, on-chain ensemble attestation, live model evidence, and production operation remain open. Mainnet remains gated by the explicitly approved external canary signature and evidence, remaining deployments, real oracle/sponsor signatures and successor evidence, and exact-commit rollout evidence.
+**Status update — July 2026:** Kaspa Toccata is treated as a post-fork deployment environment for Prometheus. Current Silverc compile/runtime, release-bundle, request/receipt/evidence, metrics-oracle, and exact-commit gates cover the seven contract fixtures without holding signing material. Closed profiles separate the full path from the non-promotable `testnet-10-validator-staking-h001` canary. Public funding and the deterministic schema-v2 H-001 request/digest remain verified and byte-identical; no signature or broadcast has occurred. Sprint 10B includes fail-closed 8B-first/70B escalation, complete 5+ Guardian strict-majority voting, per-session BIP340 authenticated replay-safe intake, and GH-42/GH-44/GH-48/GH-52 ballot transport, persistent identity, relay/AutoNAT operation, packaged sidecars, and explicit bootstrap routes. Merged and exact-main-verified GH-55/GH-58/GH-63/GH-74 provide the canonical bounded ThreatHint channel, owner-only durable ingress, a real manifest-pinned BN254/Arkworks Groth16 verifier aligned with active KIP-16, and the bounded analyzer-domain adapter. Merged and exact-main-verified GH-77 isolates per-job drain failures: failed jobs remain pending, later safe jobs progress, and the structurally immutable report contains only a bounded index, fixed failure category, and validated digest or `None`. Merged and exact-main-verified GH-86 adds local-only Rust/Python canonical Observable Bundle validators and one shared byte-exact corpus without wiring them into v1, proof, transport, analysis, or publication. Merged and exact-main-verified GH-114 adds isolated local canonical v2 statement parsing and digest parity while leaving relation, proof, pairing, transport, and analysis disconnected. The adapter revalidates queued canonical bytes, digest, trusted network, proof mode, and admission time, but hash-only v1 has no concrete IOC strings and therefore produces only a zero-confidence, no-rule, non-submittable result without invoking LLM or YARA generation. No approved production relation or production relation vectors, verifying key, or proving key ships yet, so unavailable verification remains fail-closed as `busy` and actionable analysis is not claimed. Real two-host relay operation, broad discovery, trusted membership/key assignment, Sybil protection, reviewed extractors/privacy gates, the reviewed v2 relation/proof/pairing/transport path and real actionable ThreatHint analysis, on-chain ensemble attestation, live model evidence, and production operation remain open. Mainnet remains gated by the explicitly approved external canary signature and evidence, remaining deployments, real oracle/sponsor signatures and successor evidence, and exact-commit rollout evidence.
 
 **GH-90 merged and exact-main verified — July 2026:** One local Rust producer computes a single `file_sha256` observable from exact caller-supplied bytes and typed scope; Python independently validates the shared producer vectors. The API accepts no path, caller-supplied digest, or generic observable value and performs no transport. It proves deterministic function-boundary derivation only, not external file provenance, maliciousness, privacy approval, or proof binding.
 
@@ -15,6 +15,22 @@
 **GH-111 merged and exact-main verified — local durable approval consumption, July 2026:** Guardian Node now loads one fixed network, approver public key, and opaque recipient-scope digest from an owner-only exact-schema policy, invokes the GH-107 verifier in the same trusted call path, and atomically consumes both the approval ID and authority-bound nonce in a separate owner-only SQLite ledger. Full synchronous durability, a persistent clock high-water, and restart/concurrency/lock handling close local replay without accepting caller-supplied verified objects. The resulting receipt has no external authority or side effect. Key ownership and rotation, scope semantics, privacy approval, verified hint/bundle pairing, promotion, transport, analyzer, outbox, proof, wallet, and chain behavior remain open.
 
 **Merged and exact-main-verified GH-114 local canonical ThreatHint v2 statement, July 2026:** Independent Rust and Python parsers enforce one exact canonical statement containing schema version 2, separate artifact hash and observable commitment, confidence, structural disclosure class, report nonce, positive observed time, and a network that must match separately trusted local context. The wire is capped at 1024 bytes and every field is bound by a new length-prefixed, domain-separated digest. Shared exact-byte valid/invalid vectors prove parser parity only. No relation, proof, signer, pairing, transport, approval, replay authority, analyzer, wallet, or chain path consumes this statement, and it proves no artifact derivation, report truth, maliciousness, privacy safety, authorization, or anonymity.
+
+**Local review-ready ThreatHint v2 proof-binding candidate, July 2026 (not merged or deployed):** A bounded canonical opaque-proof envelope, a strict 19-field `RelationManifest-v2`, and one atomic Rust/Python binding now consume shared adversarial corpora. The binding first validates a separately trusted network and nonzero lowercase manifest SHA-256, hashes the exact raw manifest bytes before parsing, reparses both canonical wires, closes protocol, relation, network, statement-domain, and public-input identities, and derives two claimed 16-byte big-endian halves from the statement digest. These are structural compatibility checks and claimed inputs only. No Groth16 proof is verified, no source or key artifact is loaded or approved, and no ceremony, signer, transport, analyzer, promotion, wallet, chain, reputation, KAS/PROM, slash, commit-reveal, or rollout authority is added.
+
+**Local review-ready ThreatHint v2 Groth16 verifier candidate, July 2026 (not merged or deployed):** A separate Rust `verify-v2` boundary owner-loads exact canonical manifest bytes and fixed sibling relation-source/verifying-key files, verifies their manifest-declared sizes and SHA-256 anchors, requires canonical compressed BN254 keys and proofs, derives both field inputs only from the reviewed v2 binding, and performs real Arkworks Groth16 verification. Runtime resolves no proving-key file and the CLI is silent with distinct valid, invalid, syntax, and unavailable exits. Deterministic setup, keys, proofs, and relation source in tests are non-production fixtures. This provides no production relation, artifact or ceremony approval, privacy/disclosure authority, approval consumption, transport, chain action, or rollout evidence.
+
+**Local review-ready ThreatHint v2 privacy/proof preflight candidate, July 2026 (not merged or deployed):** One owner-only exact-schema policy pins the network, BIP340 approver key, opaque recipient-scope digest, and nonzero raw-manifest SHA-256. Guardian Node binds the envelope and manifest against that policy, derives the statement only from the bound envelope, requires `review_required_v1`, recomputes the exact bundle commitment against the same trusted report nonce, and verifies the canonical short-lived approval in the same call. The data-only receipt contains hashes and identifiers only. This preflight verifies no Groth16 proof, consumes no approval, opens or migrates no ledger, and authorizes no privacy, disclosure, transport, analysis, promotion, wallet, chain, reputation, KAS/PROM, slash, commit-reveal, or rollout action. A future durable acceptance path must run approved v2 proof verification first and commit approval consumption only as its final atomic step.
+
+**Local review-ready ThreatHint v2 verified-preflight composition, July 2026 (not merged or deployed):** A separate POSIX-only Guardian service pins one absolute verifier executable by owner-only configuration and exact SHA-256, reads the policy-anchored manifest itself, runs the existing approval/privacy preflight first, and passes the same exact envelope bytes to the silent Rust `verify-v2` process. Invocation is shell-free, environment-scrubbed, time-bounded, process-group-cleaned, and fail-closed; one service instance rejects overlapping calls. Its non-constructible, non-serializable receipt is data only. This layer deliberately opens no SQLite ledger and consumes no approval; the separate local acceptance candidate below adds that final mechanical step. Neither layer provides production relation/key/ceremony approval, privacy/disclosure authority, transport, analysis, promotion, wallet, chain, reputation, KAS/PROM, slash, commit-reveal, or rollout evidence.
+
+**Local review-ready ThreatHint v2 atomic acceptance candidate, July 2026 (not merged or deployed):** A raw-input-only Guardian service now requires exact network, approver-key, and recipient-scope identity across the preflight and consumption policies before ledger creation. Each call runs the verified proof/privacy preflight first, then re-verifies the raw approval and bundle and binds the expected approval ID and observable commitment before the existing SQLite consume is allowed to commit as the final state-changing step. Failed proof/privacy checks leave approval count and time high-water unchanged; invalid, unavailable, replay, and busy are stable redacted outcomes. The returned receipt is non-constructible, non-serializable data only. This closes the local mechanical verify-plus-consume path but does not approve production relation/key/ceremony artifacts, establish privacy or disclosure authority, trigger transport or analysis, sign or broadcast a transaction, alter KAS/PROM, reputation, slash or commit-reveal behavior, or prove rollout readiness.
+
+**Local review-ready ThreatHint v2 owner-policy promotion candidate, July 2026 (not merged or deployed):** A separate raw-input-only Guardian boundary owner-loads an exact-schema policy and requires review-required disclosure, exact platform and format, allowed observable kinds, and a bounded count before forwarding the same original envelope, bundle, and approval bytes into atomic acceptance. The owner file is read through a no-follow, descriptor-identity-checked, bounded path. Policy rejection never reaches the proof verifier or approval ledger. Success returns only frozen local data with accepted IDs/time, the pinned scope, and canonical observable string pairs. This is mechanical owner-policy pairing and restriction, not semantic privacy review, authority/key governance, production relation/key/ceremony approval, transport, analysis, publication, an external effect, chain authority, or rollout evidence.
+
+**Local review-ready ThreatHint v2 enforceable governance candidate, July 2026 (not merged or deployed):** An owner-only exact policy now fixes the network, approver, recipient scope, authority epoch/window, same-Guardian local-analysis semantics, denied external disclosure, and one deny-or-kind-specific-risk decision for every closed observable kind. Its allowed set must exactly match promotion and retention before ledger access. The first valid governed acceptance atomically pins all three exact policy-file digests and authority state with high-water and approval consumption; lower epochs, same-epoch equivocation, overlapping same-identity windows, hidden legacy state, replay, and failed inserts change no durable state. This grants no analyzer execution, worker, transport, publication, chain action, or production artifact approval.
+
+**Local review-ready ThreatHint v2 durable analysis substrate, July 2026 (not merged or deployed):** Governed schema v4 atomically stores the canonical statement/digest, trusted report nonce, full Observable Bundle, approval binding, authority state, replay high-water, and retention. Claims revalidate the owner-network statement and nonce-bound bundle commitment and derive a lease-bound input identity. Atomic completion stores one canonical explicitly non-actionable local result before removing work; exact retries recover safely after a committed-but-unreturned completion. Empty schema-v3 queues migrate, while nonempty v3 queues fail closed unchanged because their missing nonce and statement are unrecoverable. The bounded worker contains only a deterministic test analyzer and emits no confidence, `should_submit`, YARA/rule body, semantic finding, transport, disclosure, wallet, signature, transaction, chain, deployment, reward, or external effect.
 
 **Keyless operator update — July 2026:** The repository contains `prometheus-silverc-deployer`, pinned to official `rusty-kaspa` v2.0.1 and the exact Silverc source compiler revision. Its covenant-genesis path constructs transaction version 1 with compute budget 10 and the exact contextual `storage_mass` commitment, derives the official covenant ID, validates the exact live unspent funding UTXO during preflight and immediately before broadcast, and models the final 66-byte Schnorr signature script before exporting the 32-byte `SIG_HASH_ALL` digest. Signing-request schema v2 binds compute, transient, storage, normalized noncontextual/overall mass, the pinned relay rate, and both relay and conservative operator fee floors. The `reportMetrics` path recompiles exact predecessor and successor state, preserves the covenant value, uses a separate P2PK fee sponsor, derives two `SIG_HASH_ALL` digests, verifies both external BIP340 signatures plus every covenant/P2PK input, and revalidates both UTXOs before guarded broadcast. Both paths reject normalized input/output collisions, persist exclusive intent before acknowledged submission, reconcile retry state by transaction ID, enforce wRPC deadlines, and rebuild verified transactions before observation. The Rust package has 49 unit/security tests, including 11 focused metrics-transition tests. No private-key, seed, wallet, keystore, or raw-transaction input exists. Public testnet-10 funding plus an exact-main H-001 schema-v2 request/digest are confirmed. The H-001 canary and real metrics transition still require explicitly approved external signatures, complete operator verification, broadcast, confirmation, and independent chain evidence. Those results cannot authorize the full release by themselves.
 
@@ -129,8 +145,9 @@ trusted current time that must never be attacker-controlled, enforce a one-hour
 inclusive validity window, and verify the same domain-separated BIP340 digest.
 Successful verification is not disclosure authorization and triggers no
 transport, analysis, publication, proof, wallet, or chain side effect. No
-replay ledger or approver registry exists yet, so network/analyzer promotion
-remains blocked.
+approver registry exists yet. GH-111 separately adds fixed-policy local durable
+one-time consumption, while authority rotation, scope semantics, enforceable
+privacy governance, and network/analyzer promotion remain blocked.
 
 ---
 
@@ -555,6 +572,66 @@ All development is subject to continuous architect audit. Key findings:
 | PATTERN-011: Heuristic confidence | LOW | Replace with LLM confidence extraction in Sprint 6+ |
 
 Total audit rounds: 10 | Sprint findings: 11 | Critical issues fixed; remaining deployment gates are tracked before beta/mainnet
+
+### July 2026 local outbox retention-governance addendum
+
+A local review-ready, read-only Guardian loader now requires an owner-only
+exact-schema policy whose network, approver key, and recipient scope equal the
+separately expected identity. It declares one local recoverable-analysis
+purpose, canonical Observable Bundle payloads, an explicit default-deny
+durable-kind allowlist, a 100,000-record maximum, and a 30-day maximum.
+
+The policy treats file hashes as corpus-matchable, API imports as software
+fingerprints, and byte patterns as potentially proprietary content. The pure
+loader persists nothing and authorizes no key, recipient, extractor, privacy,
+analyzer, transport, disclosure, or external effect. Governed promotion is
+the only local candidate allowed to turn the exact policy snapshot into a
+durable enqueue.
+
+### July 2026 enforceable authority and privacy-governance addendum
+
+A local review-ready Guardian composition now enforces one exact owner policy
+before proof invocation and durable approval consumption. The policy binds the
+network, BIP340 approver, recipient scope, authority epoch and inclusive
+validity window, fixed same-owner local-analysis purpose and boundary, denied
+external disclosure, and one explicit decision for each closed observable
+kind. File hashes, API imports, and byte patterns use distinct risk-acceptance
+tokens; a cross-kind token is invalid.
+
+Promotion, governance, and retention kind sets must be exactly equal. The
+first valid governed acceptance atomically pins the exact raw SHA-256 digests
+of all three policies together with authority identity and window. A higher
+epoch advances only with a valid signed approval in the same SQLite
+transaction as high-water and consumption. Same-identity authority windows
+must not overlap; lower epochs and same-epoch changes fail closed.
+
+This is local enforcement, not real-world key ownership or recipient
+attestation. It invokes no analyzer or worker, transports or publishes
+nothing, and provides no production relation/key/ceremony, chain, token, or
+rollout authority.
+
+### July 2026 atomic recoverable outbox addendum
+
+The governed promotion composition now migrates governed ledgers from schema
+v2 to v3 and inserts one approval-bound recoverable record containing the full
+canonical Observable Bundle. Enqueue, authority activation or advancement,
+replay high-water, and approval consumption share the exact same
+`BEGIN IMMEDIATE` transaction. A full queue, failed enqueue, lock, overflow,
+or schema error leaves every component unchanged and does not consume the
+approval. Legacy schema v1 remains separate and has no outbox.
+
+The owner-local claim API deterministically selects the oldest eligible row,
+creates a fresh opaque 32-byte lease token internally, and caps lease expiry
+at the row's retention deadline. A lost worker can be replaced after lease
+expiry; restart leaves committed pending work recoverable. Acknowledge
+terminally deletes only the row matching both approval ID and lease token.
+Expired-retention rows are removed atomically before claim. Claim results are
+non-constructible, non-serializable, and redact the lease token from their
+representation.
+
+This boundary provides local recoverable delivery only. It executes no worker
+or analyzer, sends or discloses nothing, and performs no wallet, signature,
+transaction, broadcast, chain, deployment, or other external action.
 
 ---
 

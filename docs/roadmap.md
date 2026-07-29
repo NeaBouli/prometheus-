@@ -1,14 +1,14 @@
 # Prometheus — Full Deployment Roadmap
 *Readiness-gated roadmap; no fixed public-release date is claimed.*
-*Last status reconciliation: 2026-07-23 (Europe/Athens project time).*
+*Last status reconciliation: 2026-07-28 (Europe/Athens project time).*
 
 ## Progress Snapshot
 
 | Scope | Estimated complete | Estimated remaining | Current gate |
 |-------|-------------------:|--------------------:|--------------|
 | H-001 testnet-10 canary preparation | 96% | 4% | External BIP340 signature, verification, one-shot broadcast, confirmation, receipt, independent evidence |
-| Rollout-capable core network | 78–82% | 18–22% | Six state deployments, approved production Groth16 artifacts, a concrete-observable channel and actionable ThreatHint analysis, PROM emission, real metrics-oracle execution/evidence, public multi-host P2P/rule distribution, production node evidence |
-| Complete roadmap vision | 44–49% | 51–56% | Production AI, desktop/mobile clients, installers, operated network, vProgs, plus all core-network gates |
+| Rollout-capable core network | 83–87% | 13–17% | Production v2 relation/key/ceremony approval and independent cryptographic review, outbox worker plus v2 transport and actionable ThreatHint analysis, six state deployments, PROM emission, real metrics-oracle execution/evidence, public multi-host P2P/rule distribution, production node evidence |
+| Complete roadmap vision | 49–54% | 46–51% | Production AI, desktop/mobile clients, installers, operated network, vProgs, plus all core-network gates |
 
 Percentages are scope-weighted engineering estimates. They are not release dates,
 financial forecasts, or evidence that any contract is live.
@@ -169,7 +169,16 @@ public release-hardening evidence for the exact rollout commit.
 - Merged and exact-main-verified GH-107 adds matching local Rust/Python verification of one canonical, maximum-one-hour BIP340 approval statement bound to the exact review-required bundle, separately trusted approver key, recipient-scope digest, network, report nonce, and separately trusted current time that must never be attacker-controlled; it adds no signer, replay ledger, transport, promotion, disclosure, analyzer, proof, wallet, or chain action
 - Merged and exact-main-verified GH-111 adds local durable consumption through one owner-only fixed network/approver-key/recipient-scope policy, same-call verification, atomic approval-ID and authority-nonce persistence, persistent clock high-water, and restart/concurrency/lock/path hardening; it adds no pairing, promotion, analyzer, outbox, wallet, or chain action
 - Merged and exact-main-verified GH-114 adds isolated local Rust/Python canonical ThreatHint v2 statement parsers and one shared exact-byte corpus, binding separate artifact hash and observable commitment plus confidence, disclosure class, nonce, time, and separately trusted network under a new digest; it adds no relation, proof acceptance, pairing, transport, analyzer, wallet, or chain action
-- Pending: remaining reviewed kind-specific extractors, authority rotation, scope assignment, privacy/promotion policy, then a reviewed v2 relation and production proof artifacts, owner-only hint/bundle/approval pairing, crash-safe outbox semantics, transport, and actionable analysis
+- Local review-ready candidate, not merged or deployed: strict Rust/Python ThreatHint-v2 proof-envelope and `RelationManifest-v2` parsers plus an atomic raw-manifest-anchor/network/domain/public-input compatibility binding; Groth16 verification, approved artifacts, transport, analysis, promotion, and rollout remain separate gates
+- Local review-ready candidate, not merged or deployed: silent Rust `verify-v2` owner-loads manifest/relation-source/verifying-key bytes, checks exact size/hash/canonical BN254 encodings, and verifies only binding-derived inputs; all generated relation/key/proof fixtures are test-only, no proving key is loaded, and production artifact/ceremony approval plus atomic acceptance remain open
+- Local review-ready candidate, not merged or deployed: an owner-only read-only v2 preflight pins network/approver/scope/manifest anchors, derives the statement only from the bound envelope, and verifies bundle/approval compatibility without proof verification, approval consumption, SQLite mutation, disclosure authority, or operational side effects
+- Local review-ready candidate, not merged or deployed: a POSIX-only Guardian verified-preflight service owner-pins the absolute Rust verifier by exact SHA-256, reuses the preflight policy network and manifest anchor, runs approval/privacy checks first, and sends the same envelope bytes to `verify-v2` under bounded, scrubbed, shell-free, fail-closed process control; its receipt is data only and no SQLite access or approval consumption occurs
+- Local review-ready candidate, not merged or deployed: a raw-input-only Guardian acceptance service proves exact policy identity before ledger creation, runs verified proof/privacy preflight first, and binds approval ID plus observable commitment before final durable consumption; failed verification never consumes or advances ledger time
+- Local review-ready candidate, not merged or deployed: an owner-only exact-schema promotion boundary requires review-required disclosure, exact platform/format, allowed observable kinds, and a count cap before forwarding the same raw wires into atomic acceptance; rejection never reaches proof verification or the ledger, while success remains restricted local data
+- Local review-ready candidate, not merged or deployed: an owner-only retention policy declares the exact recoverable local bundle form, allowed durable kinds, pending cap, and retention cap without creating a queue or effect
+- Local review-ready candidate, not merged or deployed: enforceable authority/privacy governance binds network, key, scope, epoch/window, same-Guardian recipient semantics, denied external disclosure, and explicit per-kind risk decisions; all three policy digests and authority state pin or advance atomically with valid consumption
+- Local review-ready candidate, not merged or deployed: governed schema v4 binds canonical statement/digest, trusted nonce, canonical bundle, approval, lease and retention; atomic completion stores one canonical non-actionable result before deleting work. The bounded worker uses only a deterministic test analyzer and has no LLM/YARA, actionable rule, transport, publication, chain, reward, deployment, or external effect
+- Pending: production authority/key/recipient attestation, independent approval of the v2 relation/production proof artifacts and cryptographic review, outbox worker execution, transport, and actionable analysis
 - Proven on an isolated three-node harness: relay reservation/delivery, AutoNAT state, DCUtR relay fallback, and disconnect handling; real two-host operation remains pending
 - Pending: public operated relay/NAT infrastructure and broad discovery; mDNS remains excluded while its compatible dependency path has unresolved RustSec advisories
 - Light Client ↔ Guardian communication over P2P

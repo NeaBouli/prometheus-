@@ -1,7 +1,7 @@
 # PROMETHEUS – DATA SCHEMAS
 # Kanonische Datenmodelle für das gesamte Projekt.
 # Claude Code MUSS diese exakt verwenden. Keine Abweichungen ohne Audit-Approval.
-# Last Updated: 2026-07-16
+# Last Updated: 2026-07-27
 
 ---
 
@@ -534,3 +534,322 @@ It binds the exact fields structurally but is not a signature, proof, replay
 ledger, privacy decision, approval, disclosure grant, or analyzer input.
 ThreatHint v1 schema, relation, verifier, transport, and analyzer types remain
 unchanged.
+
+### 4.5 Local ThreatHint v2 proof envelope, manifest, and binding candidate
+
+The proof envelope is exact canonical JSON with six ordered fields:
+`schema_version`, `protocol_id`, `relation_id`, embedded canonical `statement`,
+`statement_digest`, and lowercase opaque `proof`. It is capped at 4096 bytes;
+proof bytes are bounded to 1..1024 and are never interpreted.
+
+`RelationManifest-v2` is exact canonical JSON with 19 ordered fields binding
+schema, protocol, relation, statement-digest domain, proof-system identity,
+KIP-16 tag, public-input encoding/count, network, relation-source size/hash,
+proving-key size/hash, verifying-key size/hash, KIP-16 status commit,
+rusty-kaspa tag/commit, and Arkworks version. The canonical wire is capped at
+4096 bytes. Relation/key hashes and sizes are inert assertions.
+
+`bind_canonical(envelope_wire, manifest_wire, trusted_network_id,
+trusted_manifest_sha256_hex)` requires exact built-in byte/string types,
+validates the trusted context, hashes the raw manifest before parsing, reparses
+both canonical objects, recomputes the statement digest from the
+manifest-declared domain, and splits the 32-byte digest into two 16-byte
+big-endian claimed inputs for `sha256_split_u128_bn254_v2`.
+
+The shared binding corpus has 5 valid and 28 invalid cases. This candidate
+defines structural compatibility only; it is not a Groth16 verifier, artifact
+approval, transport wire, analyzer input, promotion receipt, or rollout state.
+
+### 4.6 Local ThreatHint v2 Privacy/Proof Preflight Candidate
+
+The owner-only read-only policy is exact TOML:
+
+```toml
+schema_version = 1
+network_id = "testnet-10"
+approver_xonly_public_key = "<64 lowercase hex characters>"
+recipient_scope = "<64 lowercase hex characters>"
+relation_manifest_sha256 = "<64 lowercase nonzero hex characters>"
+```
+
+It contains no ledger path. The public preflight accepts exact envelope,
+manifest, bundle, and approval bytes plus a trusted 32-byte report nonce and
+positive u64 current time. It derives the statement only from the bound
+envelope and returns a frozen data object containing the 32-byte statement
+digest, approval ID, observable commitment, raw manifest SHA-256, and exact
+envelope SHA-256.
+
+No table or durable receipt is added. The schema represents neither proof
+acceptance nor privacy/disclosure authority and cannot authorize transport,
+analysis, promotion, wallet, chain, reputation, token, slash, or
+commit-reveal behavior.
+
+### 4.7 Local ThreatHint v2 Trusted Verifier Bundle Candidate
+
+The verifier bundle directory has three owner-only files:
+
+```text
+relation-manifest-v2.json  # exact path supplied with separately trusted hash
+relation-source.bin        # fixed sibling; exact manifest size/SHA-256
+verifying-key.bin          # fixed sibling; exact manifest size/SHA-256
+```
+
+The manifest filename itself is operator-selected but its absolute canonical
+path and raw SHA-256 are trusted configuration. The two artifact filenames are
+code-fixed. The directory and files must be owned by the effective user,
+non-symlink regular objects with no group/other permissions; the existing
+owner-file loader pins open-file device/inode identity and enforces declared
+size caps.
+
+No `proving-key.bin` runtime file exists or is consulted. Manifest proving-key
+size/hash fields remain inert ceremony metadata. A successful `verify-v2`
+status means only that one canonical proof verifies under the locally pinned
+verifying key for the two inputs derived by the v2 binding. It is not a
+durable receipt, privacy approval, artifact/ceremony approval, or rollout
+state.
+
+### 4.8 Local ThreatHint v2 Verified-Preflight Candidate
+
+The owner-only configuration is exact ASCII TOML:
+
+```toml
+schema_version = 1
+verifier_executable_path = "/absolute/path/to/prometheus-threat-proof"
+verifier_executable_sha256 = "<64 lowercase nonzero hex characters>"
+relation_manifest_path = "/absolute/path/to/relation-manifest-v2.json"
+verifier_timeout_ms = 30000
+```
+
+Only these five fields are accepted. Both paths must be absolute canonical
+non-symlink paths under ancestors owned by the current user or root with no
+group/world write permission. The manifest and config are owner-only regular
+files capped at 4096 bytes. The executable must be an owner-executable regular
+file without set-id or group/world write bits, is capped at 64 MiB, and is
+rehashed before every invocation.
+
+The frozen data-only receipt has exactly:
+
+```text
+statement_digest: 32 bytes
+approval_id: 32 bytes
+observable_commitment: 32 bytes
+raw_manifest_sha256_hex: 64 lowercase hex characters
+envelope_sha256_hex: 64 lowercase hex characters
+verifier_executable_sha256_hex: 64 lowercase hex characters
+```
+
+Construction and serialization are disabled. The receipt is neither durable
+state nor an authority object. No database schema, migration, approval
+consumption, production artifact approval, privacy/disclosure grant, transport
+admission, analyzer input, chain acceptance, or rollout status is added.
+
+### 4.9 Local ThreatHint v2 Atomic Acceptance Candidate
+
+The acceptance service introduces no new persistent schema. It reuses the
+existing owner-only Observable Approval policy and SQLite schema version 1.
+The preflight and consumption policies must match exactly on:
+
+```text
+network_id: closed protocol network identifier
+approver_xonly_public_key: exactly 32 bytes
+recipient_scope: exactly 32 opaque bytes
+```
+
+Mismatch fails before ledger creation or open. The final consumption receives
+only the raw approval/bundle plus the preflight-derived expected 32-byte
+`approval_id` and 32-byte `observable_commitment`; both are re-verified and
+compared before the existing `BEGIN IMMEDIATE` insert.
+
+The frozen data-only acceptance receipt has exactly:
+
+```text
+statement_digest: 32 bytes
+approval_id: 32 bytes
+observable_commitment: 32 bytes
+consumed_at: trusted uint64-compatible time
+raw_manifest_sha256_hex: 64 lowercase hex characters
+envelope_sha256_hex: 64 lowercase hex characters
+verifier_executable_sha256_hex: 64 lowercase hex characters
+```
+
+Construction, replacement, and serialization are disabled. This receipt is
+not a privacy grant, transport admission, analyzer input, artifact approval,
+chain record, or rollout status.
+
+### 4.10 Local ThreatHint v2 Owner-Policy Promotion Candidate
+
+The exact owner-only ASCII TOML policy has only:
+
+```toml
+schema_version = 1
+scope_platform = "linux"
+scope_format = "elf"
+allowed_observable_kinds = ["api_import", "file_sha256"]
+max_observables = 4
+```
+
+`scope_platform` and `scope_format` use the existing closed enums.
+`allowed_observable_kinds` is non-empty, duplicate-free, and contains only
+existing closed observable kinds. `max_observables` is an exact integer in
+`1..=16`. The schema deliberately repeats no network, approver key, recipient
+scope, manifest, relation, or ledger authority.
+
+The frozen data-only promotion result has exactly:
+
+```text
+statement_digest: 32 bytes
+approval_id: 32 bytes
+observable_commitment: 32 bytes
+consumed_at: trusted uint64-compatible time
+scope_platform: canonical enum string
+scope_format: canonical enum string
+observables: immutable ordered tuple of canonical (kind, value) strings
+```
+
+Construction, replacement, and serialization are disabled. The result is not
+semantic privacy approval, authority/key governance, transport admission,
+analyzer input, publication permission, artifact approval, external-effect
+receipt, chain record, or rollout state.
+
+### 4.11 Local Outbox Retention-Governance Candidate
+
+The exact owner-only ASCII TOML policy has only:
+
+```toml
+schema_version = 1
+network_id = "testnet-10"
+approver_xonly_public_key = "<64 lowercase hex characters>"
+recipient_scope = "<64 lowercase hex characters>"
+retention_purpose = "local_recoverable_analysis_queue_v1"
+payload_form = "canonical_observable_bundle_v1"
+durable_observable_kinds = ["file_sha256", "api_import"]
+max_pending_records = 10000
+max_retention_seconds = 604800
+```
+
+The identity tuple must exactly equal separately expected values.
+`durable_observable_kinds` is non-empty, duplicate-free, and contains only the
+closed observable kinds. `max_pending_records` is an exact integer in
+`1..=100000`; `max_retention_seconds` is an exact integer in `1..=2592000`.
+File hashes remain corpus-matchable, API imports fingerprint software
+capabilities, and byte patterns may retain proprietary content.
+
+This declaration introduces no database schema, migration, outbox table,
+ledger row, queue item, worker, disclosure, or transport. A future recoverable
+enqueue must share the existing `BEGIN IMMEDIATE` transaction with approval
+consumption and ledger high-water; a digest-only journal is not a recoverable
+payload.
+
+### 4.12 Governed Approval Ledger Schema v2
+
+Ticket 012 migrates the existing owner-only approval ledger from schema v1 to
+v2 without changing `approval_consumptions` or `ledger_state`. The new strict
+singleton table is:
+
+```sql
+CREATE TABLE authority_state (
+    singleton INTEGER PRIMARY KEY CHECK (singleton = 1),
+    authority_epoch INTEGER NOT NULL CHECK (authority_epoch >= 1),
+    governance_policy_sha256 BLOB NOT NULL
+        CHECK(length(governance_policy_sha256) = 32),
+    retention_policy_sha256 BLOB NOT NULL
+        CHECK(length(retention_policy_sha256) = 32),
+    promotion_policy_sha256 BLOB NOT NULL
+        CHECK(length(promotion_policy_sha256) = 32),
+    network_id TEXT NOT NULL,
+    approver_xonly_public_key BLOB NOT NULL
+        CHECK(length(approver_xonly_public_key) = 32),
+    recipient_scope BLOB NOT NULL
+        CHECK(length(recipient_scope) = 32),
+    authority_not_before INTEGER NOT NULL,
+    authority_not_after INTEGER NOT NULL
+) STRICT;
+```
+
+Migration requires the v1 schema to validate exactly and rejects any
+pre-existing `authority_state`. The new table starts empty. First valid
+governed consumption inserts the snapshot; a higher epoch updates it only in
+the same `BEGIN IMMEDIATE` transaction as high-water and the consumption row.
+Lower epochs and same-epoch digest or identity/window changes fail. With an
+unchanged key and scope, a new epoch must start strictly after the prior
+inclusive window; key or scope rotation may overlap.
+
+Authority instants follow the protocol uint64 domain. SQLite integers are
+signed 64-bit; a farther-future value above `2^63-1` is therefore rejected
+fail-closed during atomic persistence with a redacted error and rollback.
+
+### Governed approval ledger schema v3 (Ticket 013)
+
+Only governed ledgers migrate to schema v3. Legacy consumption remains schema
+v1. Migration from governed v0/v1/v2 preserves `approval_consumptions`,
+`ledger_state`, and `authority_state`; a hidden preexisting outbox or attempted
+downgrade fails closed.
+
+```sql
+CREATE TABLE approval_outbox (
+    approval_id BLOB PRIMARY KEY CHECK(length(approval_id) = 32),
+    observable_commitment BLOB NOT NULL
+        CHECK(length(observable_commitment) = 32),
+    bundle_wire BLOB NOT NULL CHECK(length(bundle_wire) >= 1),
+    enqueued_at INTEGER NOT NULL CHECK(enqueued_at >= 1),
+    retention_deadline INTEGER NOT NULL
+        CHECK(retention_deadline >= enqueued_at),
+    lease_token BLOB CHECK(
+        lease_token IS NULL OR length(lease_token) = 32
+    ),
+    lease_expires_at INTEGER
+        CHECK(lease_expires_at IS NULL OR lease_expires_at >= 1),
+    CHECK((lease_token IS NULL) = (lease_expires_at IS NULL)),
+    CHECK(
+        lease_expires_at IS NULL
+        OR lease_expires_at <= retention_deadline
+    )
+) STRICT;
+```
+
+Capacity check and enqueue run inside the same `BEGIN IMMEDIATE` transaction
+as authority state, ledger high-water, and approval consumption. Claim removes
+expired-retention rows, selects the oldest pending or expired-lease row, and
+sets an internal 32-byte token plus retention-bounded expiry atomically.
+Acknowledge deletes only the exact approval-ID/token row. Application
+validation additionally enforces the canonical bundle's 4096-byte protocol
+cap both before enqueue and when reading a claimed row.
+
+### Governed approval ledger schema v4 (Ticket 014)
+
+Governed v0/v1/v2 ledgers migrate losslessly. A v3 ledger migrates only when
+`approval_outbox` is empty; a nonempty v3 queue remains unchanged and fails
+closed because its statement and report nonce cannot be recovered. Legacy
+non-governed consumption remains schema v1.
+
+Schema v4 extends `approval_outbox` with:
+
+```sql
+statement_wire BLOB NOT NULL CHECK(length(statement_wire) >= 1),
+statement_digest BLOB NOT NULL CHECK(length(statement_digest) = 32),
+report_nonce BLOB NOT NULL CHECK(length(report_nonce) = 32)
+```
+
+It also adds:
+
+```sql
+CREATE TABLE observable_analysis_results (
+    approval_id BLOB PRIMARY KEY
+        CHECK(length(approval_id) = 32)
+        REFERENCES approval_consumptions(approval_id),
+    result_wire BLOB NOT NULL CHECK(length(result_wire) >= 1),
+    result_digest BLOB NOT NULL CHECK(length(result_digest) = 32),
+    input_identity BLOB NOT NULL CHECK(length(input_identity) = 32),
+    completion_token_digest BLOB NOT NULL
+        CHECK(length(completion_token_digest) = 32),
+    completed_at INTEGER NOT NULL CHECK(completed_at >= 1),
+    retention_deadline INTEGER NOT NULL
+        CHECK(retention_deadline >= completed_at)
+) STRICT;
+```
+
+Foreign-key enforcement is enabled on every connection. Completion inserts one
+result and deletes the leased outbox row in the same transaction. The result
+references the persistent consumption row, so it survives outbox deletion.
+Its deadline is inherited from the original outbox record and bound into both
+the lease input identity and the result-record digest.
