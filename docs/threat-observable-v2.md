@@ -12,6 +12,13 @@ GH-103 adds one local Rust producer for a checked `api_import` selected from
 exact caller-supplied Linux ELF bytes. It derives scope internally, bounds
 artifact bytes and dynamic symbols, always emits `review_required_v1`, and is
 independently checked against shared exact-byte ELF vectors by Python.
+A local review candidate applies the same boundary to Windows PE32 and PE32+
+imports. It accepts exact artifact bytes plus a checked index, derives
+`windows`/`pe`, caps artifacts at 16 MiB, import descriptors at 4096, and
+thunk entries at 4096, rejects
+ordinal or grammar-invalid imports, and is independently checked against a
+synthetic shared PE32+ vector by Python. PE32 and PE32+ parser dispatch plus
+their architecture-specific thunk and ordinal handling are covered in Rust.
 Merged and exact-main-verified GH-107 adds an isolated local Rust/Python verifier for one
 canonical, short-lived BIP340 approval statement over one exact
 `review_required_v1` bundle. It authenticates a statement only and is not
@@ -279,6 +286,16 @@ then sorts and deduplicates exact names before selection. Scope is derived as
 `linux`/`elf`; every output is `review_required_v1`. The index remains a local
 selection, not provenance, maliciousness, privacy approval, disclosure
 authorization, or proof binding.
+
+The local Windows PE review candidate follows the same contract for PE32 and
+PE32+ import tables. The pinned read-only parser accepts at most 16 MiB and
+4096 import descriptors and 4096 thunk entries, rejects malformed PE, ordinal
+imports, and names outside
+the closed grammar, then byte-sorts and deduplicates function names before one
+checked selection. Scope is fixed to `windows`/`pe`, every output is
+`review_required_v1`, and library names never become observable values. This
+adds no provenance, privacy approval, disclosure authority, proof binding,
+transport, analyzer, wallet, or chain behavior.
 
 `review_required_v1` remains local-only. Any IPC, P2P, Guardian analyzer,
 committee, IPFS, chain, or public-rule boundary must reject the complete bundle

@@ -8,6 +8,7 @@ mod byte_pattern_producer;
 mod file_sha256_producer;
 mod observable_approval;
 pub mod observable_bundle;
+mod pe_api_import_producer;
 mod threat_hint_v2_proof_envelope;
 mod threat_hint_v2_statement;
 
@@ -24,6 +25,10 @@ pub use observable_approval::{
 pub use observable_bundle::{
     DisclosurePolicy, ObservableBundle, ObservableBundleError, ObservableKind, ObservableScope,
     ScopeFormat, ScopePlatform,
+};
+pub use pe_api_import_producer::{
+    produce_pe_api_import_bundle, PeApiImportProducerError, MAX_PE_API_IMPORT_ARTIFACT_BYTES,
+    MAX_PE_IMPORTS,
 };
 pub use threat_hint_v2_proof_envelope::{
     ThreatHintV2ProofEnvelope, ThreatHintV2ProofEnvelopeError,

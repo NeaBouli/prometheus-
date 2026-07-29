@@ -849,6 +849,46 @@ Remaining: independent production artifact/ceremony approval, then one atomic
 Estimates: core 79-83%; complete vision 45-50%; 50-55% remains
 ```
 
+## LOCAL WINDOWS PE API_IMPORT EXACT-MAIN REINTEGRATION (2026-07-29)
+
+```text
+Ticket: GIO-20260726-004
+Status: In Progress; repository-only, not published
+Baseline: origin/main 12a08d4f07f219d0b7892ff962ac9e5f754a263c
+Input: exact PE32/PE32+ bytes plus checked import index
+Parser/bounds: object 0.39.1 PE support; 16 MiB; 4096 import descriptors;
+4096 thunk entries
+Behavior: reject malformed/ordinal/grammar-invalid imports; byte-sort and
+          deduplicate named functions; fixed windows/pe scope
+Output: exactly one review_required_v1 bundle; library names excluded
+Initial evidence: Rust producer tests 9/9; focused independent Python parity
+                  1/1; Rustfmt check PASS
+Remaining in slice: exact-main Kimi review and complete local verification
+Boundary: no commit/push/PR/merge/pages/deploy, transport, analyzer, wallet,
+          signing, transaction, chain, server, secret, KAS/PROM, reputation,
+          slash ACL, commit-reveal, or emergency-stop change
+```
+
+## LOCAL WINDOWS PE API_IMPORT EXACT-MAIN CLOSEOUT (2026-07-29)
+
+```text
+Status: Local Done; review-ready, not committed or published
+Final producer evidence: 11 focused Rust tests plus 1 shared-vector test
+Complete Rust: 345 passed, 2 intentional live-network ignores, 5 doctests
+Complete Guardian: 742 passed, 3 intentional live-model skips
+Build/package: Guardian and Threat-Proof locked release builds PASS;
+               ThreatHint verified package 30 files; package set 30/14/15
+Quality: Rustfmt, warning-free workspace all-target Clippy, Black 26 files,
+         Pylint 9.83/10, Memory Integrity, 6 Autodidactic tests PASS
+Docs/CI: 5 HTML, 4 JSON-LD, SEO/infrastructure/public-status, two workflow
+         YAML parses, Actionlint 1.7.12 and diff checks PASS
+Security: Cargo Audit 0 vulnerabilities/8 allowed warnings; Pip Audit 0;
+          final redacted Gitleaks 8.30.1 complete-diff scan, no leaks
+Review: Kimi sessions session_05b560ca-d9b8-402e-b22b-651a9f440dbe and
+        session_20f14e1a-e615-4ad7-9dc9-8ae5e253512e; no P0/P1/P2 remains
+Publishing: requires separate scoped authorization
+```
+
 ## GH-117 MERGED THREATHINT V2 PIPELINE (2026-07-29)
 
 ```text

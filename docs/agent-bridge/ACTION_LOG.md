@@ -2252,3 +2252,144 @@ Rules for all dev agents:
   protected `main` and closes
   [#119](https://github.com/NeaBouli/prometheus-/issues/119).
 - **Status:** `In Progress`, waiting for required CI/Security checks.
+
+## 2026-07-29 - GIO-20260726-004 exact-main reintegration
+
+- Created the isolated exact-main worktree on
+  `feat/local-pe-api-import-producer-main` from exact `origin/main`
+  `12a08d4`.
+- Preserved the original dirty PE branch and did not inspect, hash, stage,
+  copy, or modify `Prometheus-1.png`.
+- Ported only the reviewed Cargo PE feature, Rust producer/export, synthetic
+  vector, Rust vector tests, independent Python parser/parity test, and
+  matching public/Memory documentation.
+- Resolved the sole code overlap additively: both the merged ThreatHint-v2
+  proof-envelope export and the PE producer export remain present.
+- Initial exact-main checks: Rustfmt PASS; focused Rust producer tests
+  `9 passed`; focused independent Python parity `1 passed`.
+- **Status:** `In Progress`; Kimi review and complete local checks pending.
+  No commit, push, PR, merge, publishing, deployment, wallet, chain, server,
+  secret, or production action occurred.
+
+## 2026-07-29 - GIO-20260726-004 local closeout
+
+- Kimi exact-main review
+  `session_05b560ca-d9b8-402e-b22b-651a9f440dbe` reported no high/medium
+  finding. Sol closed its bound-IAT low finding by rejecting bound
+  `FirstThunk` data when no unbound lookup table exists.
+- Both contract sides are regression-tested: bound OFT-zero/nonzero-timestamp
+  fails closed; unbound OFT-zero/zero-timestamp continues through the valid
+  `FirstThunk` fallback. Targeted Kimi remediation review
+  `session_20f14e1a-e615-4ad7-9dc9-8ae5e253512e` passed; its fallback-coverage
+  P3 was then closed by the positive regression.
+- Final evidence: 11 focused PE tests; one Rust shared-vector test; focused
+  independent Python parity; 345 complete Rust passes with 2 intentional
+  ignores and 5 doctests; 742 Guardian passes with 3 intentional skips.
+- Rustfmt, warning-free workspace all-target Clippy, locked Guardian and
+  Threat-Proof release builds, verified 30-file ThreatHint package, 30/14/15
+  package set, Black over 26 files, Pylint 9.83/10, Memory Integrity and six
+  Autodidactic tests pass.
+- Five HTML and four JSON-LD parses, SEO/infrastructure/public-status checks,
+  two workflow YAML parses, Actionlint 1.7.12 and diff checks pass.
+- Cargo Audit reports no vulnerabilities and 8 unchanged allowed warnings;
+  Pip Audit reports no known vulnerabilities; redacted Gitleaks 8.30.1 scans
+  the 85.92-KB complete diff with no leak.
+- System Python lacked pytest and the first `uvx pip-audit` launcher was
+  broken; repo-scoped `uv run` and `python -m pip_audit` replacements passed.
+  A first custom added-line scan had a quoting-only syntax error; the corrected
+  scan passed. None was a product failure.
+- **Status:** Local Done / review-ready. No commit, push, PR, merge, Pages,
+  deployment, wallet, signing, transaction, chain, server, secret or
+  production action occurred.
+
+### 2026-07-29 - Post-handoff verification
+
+- After the final Bridge, Memory, Backlog and review-state updates:
+  `git diff HEAD --check`, Memory Integrity, all six Autodidactic tests,
+  Actionlint 1.7.12 and a fresh redacted Gitleaks 8.30.1 scan of the complete
+  diff pass with no leak.
+
+## 2026-07-30 10:00 EEST - GIO-PROM-20260730-016 publishing start
+
+- Gio authorized the immediately described protected publication slice.
+- Confirmed the isolated candidate still has exactly 24 known files and is
+  based on current `origin/main`
+  `12a08d4f07f219d0b7892ff962ac9e5f754a263c`.
+- Confirmed GitHub authentication, only issue #9 open, and no open pull
+  request.
+- Planned path: issue, named feature branch, explicit staging, commit, push,
+  protected PR, required CI/Security, normal merge, exact-main and Pages
+  verification.
+- No product edit, direct `main` push, bypass, deployment, wallet, chain,
+  server, or secret action occurred in this start step.
+- **Status:** `In Progress / Publishing`.
+
+### 2026-07-30 10:04 EEST - GitHub issue and branch
+
+- Opened
+  [#121](https://github.com/NeaBouli/prometheus-/issues/121) with bounded
+  acceptance criteria and explicit non-goals.
+- Renamed the isolated local branch to
+  `feat/GH-121-windows-pe-api-import-producer`.
+- Fresh pre-publication checks: diff, Memory Integrity, six Autodidactic,
+  Rustfmt, 11 focused Rust producer tests, one Rust vector, independent Python
+  parity, and redacted Gitleaks 8.30.1 over 93.13 KB all pass.
+- Corrected an environment-only missing-`pytest` invocation and a shell-only
+  read-only variable collision; corrected reruns pass.
+- **Status:** `In Progress`; explicit staging and index review next.
+
+### 2026-07-30 10:06 EEST - GH-121 candidate published
+
+- Committed the exact 24-file candidate as
+  `87bd175b43f3181ad414bebd97366fb79a5cfe65`.
+- Pushed only `feat/GH-121-windows-pe-api-import-producer`.
+- Opened draft PR
+  [#122](https://github.com/NeaBouli/prometheus-/pull/122) against protected
+  `main`; issue #121 closes only on merge.
+- Initial state: mergeable, draft/required-check blocked, CI/Security queued
+  or running, CodeRabbit success without a finding.
+- No direct `main` push, bypass, merge, deployment, wallet, chain, server,
+  signing, transaction, key, or secret action.
+- **Status:** `In Progress / Exact-head CI`.
+
+### 2026-07-30 10:18 EEST - Review remediation
+
+- Exact head `b8e680f` passed all nine required checks and CodeRabbit.
+- CodeRabbit supplied three inline comments plus one optional descriptor
+  nitpick.
+- Accepted: redact two newly added absolute worktree paths, cap PE import
+  descriptors in addition to thunks, add an over-budget empty-table
+  regression, and document both new Python fixture helpers.
+- Rejected as stale: GitHub's `2026-07-29T21:*Z` is the same instant as the
+  verified Europe/Athens `2026-07-30` Bridge entries; #121, both commits,
+  branch, push, and #122 are real evidence.
+- **Status:** `Changes Requested`; no merge or production action.
+
+### 2026-07-30 10:30 EEST - Kimi review and complete local reruns
+
+- Kimi review `session_50c61638-d48c-4ee5-afc3-8c3b1b98b6aa`: no P0/P1;
+  descriptor logic and over-limit fixture are sound.
+- Remaining P2: stale generic 4,096-entry wording in `llms.txt`, Roadmap
+  Markdown/HTML, `memory/STATUS.md`, and `memory/TODO.md`.
+- Accepted P3: add a positive exact-4,096-descriptor boundary assertion.
+- Sol full: Rust 346 pass/2 ignored/5 doctests; workspace Clippy clean;
+  Guardian 742 pass/3 skip; Memory/Autodidactic; Pages/five HTML; redacted
+  100.13-KB Gitleaks diff with zero findings.
+- Two corrected environment calls then passed: Guardian with repository
+  requirements and the exact five CI HTML pages.
+- **Status:** `In Progress / P2 remediation`.
+
+### 2026-07-30 10:35 EEST - Remediation approved locally
+
+- Kimi targeted re-review
+  `session_998a3a6f-c2af-4e2b-981c-1a28f90c38bb`: PASS, no P0/P1/P2.
+- Exact 4,096 descriptors produce `NoImports`; 4,097 produce
+  `TooManyImports`. All stale public/Memory bounds and the final code-comment
+  nit are synchronized.
+- Final focused: Rustfmt, 12 PE units, one PE vector, 20 observable tests,
+  ThreatHint Clippy, Memory, six Autodidactic, five HTML/SEO, diff and
+  redacted 103.00-KB Gitleaks scan all pass.
+- Complete unchanged-logic baselines remain Rust 346/2 ignored/5 doctests,
+  workspace Clippy clean, Guardian 742/3.
+- **Status:** `Approved locally / ready to publish`; no merge or production
+  action.

@@ -76,3 +76,19 @@
 
 ---
 *Zuletzt aktualisiert: 2026-07-16*
+
+---
+
+## Lokaler Review-Stand 2026-07-29
+
+- [x] `GIO-20260726-004`: Windows-PE-`api_import`-Producer auf aktuellem
+  exact-main `12a08d4` reintegriert; PE32/PE32+, feste `windows`/`pe`-Scope,
+  16-MiB-/4096-Entry-Bounds, Ordinal-/Malformed-Fail-Closed,
+  Shared-Vector und unabhaengige Python-Paritaet.
+- [x] Abschlussgates dieses Slices: Kimi exact-main Tiefenreview,
+  Bound-IAT-Haertung und vollstaendige lokale
+  Rust/Python/Doku/Security-Pruefkette.
+- [ ] Publishing bleibt separat: kein Commit, Push, PR, Merge oder
+  Pages-Update in diesem repository-only Scope.
+
+*Lokaler Handoff aktualisiert: 2026-07-29*

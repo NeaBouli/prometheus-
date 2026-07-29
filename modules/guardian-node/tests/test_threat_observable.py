@@ -48,6 +48,13 @@ _ELF_API_IMPORT_PRODUCER_VECTOR_PATH = (
     / "vectors"
     / "threat-observable-elf-api-import-producer-v1.json"
 )
+_PE_API_IMPORT_PRODUCER_VECTOR_PATH = (
+    Path(__file__).resolve().parents[2]
+    / "threat-hint"
+    / "tests"
+    / "vectors"
+    / "threat-observable-pe-api-import-producer-v1.json"
+)
 
 
 def _unique_object(items: list[tuple[str, object]]) -> dict:
@@ -472,3 +479,145 @@ def test_rust_elf_api_import_producer_vectors_validate_independently() -> None:
         assert len(bundle.observables) == 1
         assert bundle.observables[0].kind == ObservableKind.API_IMPORT
         assert bundle.observables[0].value == case["api_import"]
+
+
+def _read_test_pe_cstring(artifact: bytes, offset: int, section_end: int) -> bytes:
+    """Read one nonempty ASCII C string from the bounded synthetic PE section."""
+    assert offset < section_end
+    end = artifact.index(b"\x00", offset, section_end)
+    value = artifact[offset:end]
+    assert value
+    value.decode("ascii")
+    return value
+
+
+def _extract_test_pe32_plus_imports(artifact: bytes) -> list[str]:
+    """Parses exactly the synthetic single-section PE32+ fixture form."""
+    assert len(artifact) >= 512
+    assert artifact[:2] == b"MZ"
+    pe_offset = _read_test_elf_integer(artifact, 0x3C, 4)
+    assert pe_offset == 64
+    assert artifact[pe_offset : pe_offset + 4] == b"PE\x00\x00"
+
+    coff = pe_offset + 4
+    assert _read_test_elf_integer(artifact, coff, 2) == 0x8664
+    section_count = _read_test_elf_integer(artifact, coff + 2, 2)
+    assert section_count == 1
+    optional_size = _read_test_elf_integer(artifact, coff + 16, 2)
+    assert optional_size == 240
+
+    optional = coff + 20
+    assert _read_test_elf_integer(artifact, optional, 2) == 0x20B
+    assert _read_test_elf_integer(artifact, optional + 108, 4) == 16
+    import_rva = _read_test_elf_integer(artifact, optional + 120, 4)
+    import_size = _read_test_elf_integer(artifact, optional + 124, 4)
+    assert import_size == 40
+
+    section_header = optional + optional_size
+    assert section_header + 40 <= len(artifact)
+    assert artifact[section_header : section_header + 8] == b".idata\x00\x00"
+    virtual_size = _read_test_elf_integer(artifact, section_header + 8, 4)
+    virtual_address = _read_test_elf_integer(artifact, section_header + 12, 4)
+    raw_size = _read_test_elf_integer(artifact, section_header + 16, 4)
+    raw_offset = _read_test_elf_integer(artifact, section_header + 20, 4)
+    assert import_rva == virtual_address
+    assert virtual_size == raw_size
+    assert raw_offset == 512
+    assert raw_offset + raw_size == len(artifact)
+    section_end = raw_offset + raw_size
+
+    def rva_to_offset(rva: int) -> int:
+        assert virtual_address <= rva < virtual_address + virtual_size
+        return raw_offset + (rva - virtual_address)
+
+    names = []
+    descriptor_rva = import_rva
+    for _ in range(section_end // 20):
+        descriptor = rva_to_offset(descriptor_rva)
+        assert descriptor + 20 <= section_end
+        original_first_thunk = _read_test_elf_integer(artifact, descriptor, 4)
+        library_name_rva = _read_test_elf_integer(artifact, descriptor + 12, 4)
+        first_thunk = _read_test_elf_integer(artifact, descriptor + 16, 4)
+        if original_first_thunk == 0 and library_name_rva == 0 and first_thunk == 0:
+            break
+        library_name = _read_test_pe_cstring(
+            artifact, rva_to_offset(library_name_rva), section_end
+        )
+        assert library_name == b"KERNEL32.dll"
+        thunk_rva = original_first_thunk or first_thunk
+        assert thunk_rva != 0
+
+        thunk_offset = rva_to_offset(thunk_rva)
+        for _ in range(section_end // 8):
+            assert thunk_offset + 8 <= section_end
+            thunk = _read_test_elf_integer(artifact, thunk_offset, 8)
+            thunk_offset += 8
+            if thunk == 0:
+                break
+            assert thunk & (1 << 63) == 0, "ordinal-only import not representable"
+            hint_name_offset = rva_to_offset(thunk & 0x7FFFFFFF)
+            assert hint_name_offset + 2 < section_end
+            name = _read_test_pe_cstring(artifact, hint_name_offset + 2, section_end)
+            names.append(name.decode("ascii"))
+        else:
+            raise AssertionError("unterminated import thunk table")
+        descriptor_rva += 20
+    else:
+        raise AssertionError("unterminated import descriptor table")
+
+    return names
+
+
+def test_rust_pe_api_import_producer_vectors_validate_independently() -> None:
+    """Validate the shared Rust PE producer vector with the independent parser."""
+    raw = _PE_API_IMPORT_PRODUCER_VECTOR_PATH.read_text(encoding="utf-8")
+    producer_vectors = json.loads(raw, object_pairs_hook=_unique_object)
+
+    assert set(producer_vectors.keys()) == {
+        "vector_schema_version",
+        "artifact_sha256",
+        "artifact_hex",
+        "cases",
+    }
+    assert producer_vectors["vector_schema_version"] == 1
+    assert len(producer_vectors["cases"]) == 3
+
+    artifact = bytes.fromhex(producer_vectors["artifact_hex"])
+    assert artifact.hex() == producer_vectors["artifact_hex"]
+    assert hashlib.sha256(artifact).hexdigest() == producer_vectors["artifact_sha256"]
+
+    encountered = _extract_test_pe32_plus_imports(artifact)
+    assert encountered == ["ReadFile", "CreateFileW", "VirtualAlloc", "ReadFile"]
+    imports = sorted(set(encountered), key=lambda name: name.encode("ascii"))
+    assert imports == ["CreateFileW", "ReadFile", "VirtualAlloc"]
+
+    names = set()
+    indexes = set()
+    observable_values = set()
+    for case in producer_vectors["cases"]:
+        assert set(case.keys()) == {
+            "name",
+            "import_index",
+            "api_import",
+            "wire_hex",
+        }
+        assert case["name"] not in names
+        names.add(case["name"])
+        assert isinstance(case["import_index"], int)
+        assert not isinstance(case["import_index"], bool)
+        assert case["import_index"] not in indexes
+        indexes.add(case["import_index"])
+        assert case["api_import"] not in observable_values
+        observable_values.add(case["api_import"])
+        assert imports[case["import_index"]] == case["api_import"]
+
+        wire = bytes.fromhex(case["wire_hex"])
+        bundle = ObservableBundle.parse_canonical(wire)
+        assert bundle.canonical_bytes == wire
+        assert bundle.disclosure_policy == DisclosurePolicy.REVIEW_REQUIRED_V1
+        assert bundle.scope.platform == ScopePlatform.WINDOWS
+        assert bundle.scope.format == ScopeFormat.PE
+        assert len(bundle.observables) == 1
+        assert bundle.observables[0].kind == ObservableKind.API_IMPORT
+        assert bundle.observables[0].value == case["api_import"]
+    assert indexes == {0, 1, 2}
