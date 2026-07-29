@@ -2040,3 +2040,31 @@ No direct `main` push or production action occurred.
 - No direct `main` push, bypass, product, production, wallet, chain, server,
   deployment, or secret action occurred.
 - **Status:** `In Progress / Exact-head CI and review`.
+
+### 2026-07-30 11:05 EEST - GH-123 exact-main closeout complete
+
+- PR [#124](https://github.com/NeaBouli/prometheus-/pull/124) passed all nine
+  protected checks plus CodeRabbit and merged normally without bypass as
+  exact-main `90420e3a07690bff0ac0be79b1bb75a0f7efac72`; issue
+  [#123](https://github.com/NeaBouli/prometheus-/issues/123) closed
+  automatically.
+- Exact-main Prometheus CI `30494613937`, Security Audit `30494612685`, and
+  Pages `30494611207` all passed. GitHub Pages remains built from `main` with
+  HTTPS enforced.
+- Live public FAQ, Roadmap, and Whitepaper each expose the merged
+  exact-main-verified GH-121 marker. The Whitepaper also exposes exact product
+  merge SHA `2e3e1e1`; no stale Windows-PE candidate wording remains.
+- The Pages run reports one non-blocking GitHub-managed Node.js 20
+  deprecation annotation for managed Pages actions forced onto Node.js 24.
+  It is not emitted by a repository workflow dependency and did not affect
+  build or deployment.
+- The original dirty feature worktree and untracked `Prometheus-1.png` remain
+  untouched.
+- **Status:** `Done / Exact-main and live Pages verified`.
+- **Remaining project blockers:** unchanged. Production proof
+  relation/key/ceremony approval, real testnet operator signatures/broadcast
+  and receipts, remaining genesis deployments, actionable-analysis/privacy
+  approval, real multi-host operation, and final release hardening remain
+  outside GH-121/GH-123.
+
+`TASK COMPLETE - TARGET STOP ACTIVE`
