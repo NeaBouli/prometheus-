@@ -2434,3 +2434,17 @@ Rules for all dev agents:
   [#124](https://github.com/NeaBouli/prometheus-/pull/124), closing #123 only
   on merge.
 - **Status:** `In Progress / Exact-head CI and review`.
+
+### 2026-07-30 11:05 EEST - GH-123 complete
+
+- PR #124 passed all nine protected checks plus CodeRabbit and merged normally
+  without bypass as `90420e3`; issue #123 closed.
+- Exact-main CI `30494613937`, Security `30494612685`, and Pages
+  `30494611207` passed.
+- Live FAQ, Roadmap, and Whitepaper expose the merged GH-121 marker; no stale
+  Windows-PE candidate wording remains.
+- One GitHub-managed Pages Node.js 20 deprecation annotation is non-blocking
+  and outside repository workflow ownership.
+- **Status:** `Done / Exact-main and live Pages verified`.
+
+`TASK COMPLETE - TARGET STOP ACTIVE`
