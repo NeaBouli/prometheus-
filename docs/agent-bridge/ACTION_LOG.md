@@ -2338,3 +2338,17 @@ Rules for all dev agents:
 - Corrected an environment-only missing-`pytest` invocation and a shell-only
   read-only variable collision; corrected reruns pass.
 - **Status:** `In Progress`; explicit staging and index review next.
+
+### 2026-07-30 10:06 EEST - GH-121 candidate published
+
+- Committed the exact 24-file candidate as
+  `87bd175b43f3181ad414bebd97366fb79a5cfe65`.
+- Pushed only `feat/GH-121-windows-pe-api-import-producer`.
+- Opened draft PR
+  [#122](https://github.com/NeaBouli/prometheus-/pull/122) against protected
+  `main`; issue #121 closes only on merge.
+- Initial state: mergeable, draft/required-check blocked, CI/Security queued
+  or running, CodeRabbit success without a finding.
+- No direct `main` push, bypass, merge, deployment, wallet, chain, server,
+  signing, transaction, key, or secret action.
+- **Status:** `In Progress / Exact-head CI`.
