@@ -1798,3 +1798,84 @@ Commit `588d91f` (`docs: record GH-117 merged status`) is pushed on
 
 Status remains `In Progress` pending the full protected CI/Security review.
 No direct `main` push or production action occurred.
+
+---
+
+## 2026-07-29 — GIO-20260726-004 exact-main Reintegration
+
+- **Status:** `In Progress / Repository Only`.
+- Isolierter Worktree:
+  `/Users/gio/Desktop/repos/prometheus-pe-api-import-main`, Branch
+  `feat/local-pe-api-import-producer-main`, Basis `origin/main`
+  `12a08d4f07f219d0b7892ff962ac9e5f754a263c`.
+- Quelle ist der unveraenderte review-fertige Dirty-Branch
+  `feat/local-pe-api-import-producer` auf `b556fbb`. Portiert werden nur der
+  bekannte Windows-PE-`api_import`-Producer, seine synthetischen Vektoren,
+  unabhaengige Rust/Python-Tests und die dazugehoerige Statusdokumentation.
+- Ueberschneidungen mit dem gemergten ThreatHint-v2-Stand werden manuell
+  integriert. Der Quell-Worktree und `Prometheus-1.png` bleiben unberuehrt.
+- Kimi prueft den finalen exact-main Diff read-only. Sol verantwortet
+  Integration, Security und die vollstaendige relevante lokale Test- und
+  Auditkette.
+- Kein Commit, Push, PR, Merge, Publishing, Deployment, Wallet-, Signatur-,
+  Transaktions-, Chain-, Server- oder Secret-Effekt ist autorisiert.
+
+### 2026-07-29 — GIO-20260726-004 local Done
+
+- Der Windows-PE-`api_import`-Producer ist verlustfrei auf exact-main
+  `12a08d4` reintegriert. Der gemergte ThreatHint-v2-Export bleibt erhalten.
+- Kimi fand keine High-/Medium-Probleme. Der gebundene-IAT-Randfall ist jetzt
+  fail-closed; ein positiver Gegenregressionstest erhaelt den gueltigen
+  ungebundenen OFT-zero-Fallback.
+- Final PASS: 11 fokussierte PE-Tests, ein Rust-Vector, unabhaengige
+  Python-Paritaet, Rust komplett 345/2 ignored/5 Doctests, Guardian
+  742/3 skipped, Format/Lint, Release-Builds, Packages, Memory/Doku/Workflow,
+  Dependency-Audits und redigierter Leak-Scan.
+- **Status:** `Local Done / Review Ready`. Kein Commit, Push, PR, Merge,
+  Publishing, Deployment oder externer Effekt. Publishing benoetigt eine
+  neue exakt begrenzte Freigabe.
+
+`TASK COMPLETE — TARGET STOP ACTIVE`
+
+## 2026-07-30 10:00 EEST - GIO-PROM-20260730-016 protected publication started
+
+- **Owner:** Codex Sol; **Status:** `In Progress / Publishing`.
+- Gio authorized the immediately described publication slice with
+  "ok weiter bitte".
+- Exact base and current `origin/main`:
+  `12a08d4f07f219d0b7892ff962ac9e5f754a263c`.
+- Scope is limited to the already reviewed 24-file Windows PE `api_import`
+  producer candidate: create a GitHub issue, commit the known files on a
+  feature branch, open a protected pull request, require the normal CI and
+  Security checks, review all findings, merge without bypass, and verify the
+  resulting exact-main CI/Security/Pages state.
+- The original dirty worktree and `Prometheus-1.png` remain untouched.
+- No direct `main` push, admin bypass, production approval, wallet, key,
+  signing, transaction, chain, server, secret, or deployment action is in
+  scope.
+- **Risk:** Medium because a local executable parser becomes a supported
+  producer; malformed and ambiguous inputs remain fail-closed.
+- **Next:** final pre-publication diff/leak checks, issue creation, explicit
+  staging, commit, push, protected PR, and required-check observation.
+
+### 2026-07-30 10:04 EEST - Issue and feature branch established
+
+- GitHub issue:
+  [#121](https://github.com/NeaBouli/prometheus-/issues/121).
+- Branch: `feat/GH-121-windows-pe-api-import-producer`.
+- The issue records the parser budgets, deterministic privacy-preserving
+  output, fail-closed cases, unbound fallback, parity evidence, documentation
+  sync, and protected-check requirements.
+- Non-goals explicitly exclude semantic/actionable analysis, transport,
+  disclosure, rewards, wallet, signing, chain, server, deployment, production
+  approval, contracts, commit-reveal, slash ACL, KAS/PROM, reputation, and
+  cryptographic relation/key changes.
+- Pre-publication evidence remains green: diff check, Memory Integrity, six
+  Autodidactic tests, 11 focused Rust unit tests, one shared Rust vector,
+  independent Python parity, Rustfmt, and a redacted Gitleaks 8.30.1 scan of
+  93.13 KB with zero findings.
+- One first Python command omitted the ephemeral `pytest` tool and one first
+  shell wrapper used zsh's read-only `status` variable. Corrected commands
+  passed; neither was a product failure.
+- **Next:** explicitly stage only the 24 known files and inspect the complete
+  index before committing.

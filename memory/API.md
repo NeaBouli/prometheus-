@@ -361,7 +361,7 @@ consumption path, not accepted rule generation. A future observable-bearing
 schema/channel and any side-effecting multi-process consumer require separate
 review.
 
-### Local Threat Observable bundle APIs (GH-82/GH-86/GH-90/GH-94/GH-103/GH-107/GH-111)
+### Local Threat Observable bundle APIs (GH-82/GH-86/GH-90/GH-94/GH-103/GH-107/GH-111 plus local PE review candidate)
 
 `docs/threat-observable-v2.md` remains the normative design draft for the
 future protocol. Merged and exact-main-verified GH-86 implements only its local canonical bundle boundary:
@@ -383,6 +383,9 @@ Rust GH-94 merged/exact-main (validated with separate producer vectors):
 
 Rust GH-103 local Linux ELF producer:
   produce_elf_api_import_bundle(&[u8], usize)
+
+Rust local Windows PE review candidate:
+  produce_pe_api_import_bundle(&[u8], usize)
 
 Rust GH-107 local approval verifier:
   ObservableApprovalContext::new(
@@ -421,6 +424,10 @@ GH-103 producer validation consumes
 `modules/threat-hint/tests/vectors/threat-observable-elf-api-import-producer-v1.json`;
 Python independently parses that exact ELF64 dynamic-symbol fixture before
 validating the canonical bundle bytes.
+The Windows PE review candidate consumes
+`modules/threat-hint/tests/vectors/threat-observable-pe-api-import-producer-v1.json`;
+Python independently parses that exact synthetic PE32+ import-table fixture,
+while Rust separately exercises PE32 and PE32+ thunk and ordinal dispatch.
 GH-107 consumes the public-only
 `modules/threat-hint/tests/vectors/threat-observable-approval-v1.json` vector;
 Rust and Python independently recompute the bundle commitment, signing digest,
@@ -461,6 +468,16 @@ dynamic symbols, sorts and deduplicates by exact ASCII bytes, and derives
 `linux`/`elf` scope internally. Every result is `review_required_v1`. It
 accepts no path, import string, caller-supplied scope, or generic value and
 performs no transport, proof, analyzer, wallet, signing, or chain operation.
+
+The local Windows PE review candidate accepts exact artifact bytes plus a
+checked import index only. The same pinned `object 0.39.1` dependency reads
+PE32 and PE32+ import tables with a 16 MiB artifact cap and 4096-entry budget.
+Malformed PE, ordinal imports, invalid library references, and function names
+outside the closed grammar fail closed. Named functions are byte-sorted and
+deduplicated before selection; scope is fixed to `windows`/`pe` and every
+bundle is `review_required_v1`. Library names never become observables. The API
+adds no path, caller-supplied import string, generic value, transport, proof,
+analyzer, wallet, chain, or promotion behavior.
 
 Merged and exact-main-verified GH-107 verifies one exact canonical approval envelope for one
 exact `review_required_v1` bundle. The trusted context supplies the report

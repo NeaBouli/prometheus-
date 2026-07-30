@@ -605,3 +605,32 @@ Leistungsbasierte Emission. Guardians = "Miner" (KI statt GPU).
   real privacy-reviewed semantic/actionable analysis, v2 transport, and
   operated rollout evidence remain mandatory.
 - Estimates remain core 84-88%, complete vision 50-55%, 45-50% remaining.
+
+## Checkpoint 2026-07-29: Windows PE producer exact-main reintegration
+
+- `GIO-20260726-004` is isolated on
+  `feat/local-pe-api-import-producer-main` from exact `origin/main`
+  `12a08d4`.
+- The reviewed PE32/PE32+ producer, shared vector, Rust tests and independent
+  Python parser are ported without changing the merged ThreatHint-v2
+  envelope/export surface.
+- Initial exact-main evidence: Rust producer tests `9 passed`; focused Python
+  parity `1 passed`; Rustfmt check PASS.
+- Kimi final review and the complete relevant local verification matrix remain
+  before local Done. No commit, push, PR, merge, publishing, deployment or
+  external effect occurred.
+
+## Checkpoint 2026-07-29: Windows PE producer locally complete
+
+- Kimi's exact-main review found no high/medium issue. Sol remediated the
+  bound-IAT low finding, then added both rejecting-bound and accepting-unbound
+  fallback regressions; Kimi's targeted remediation review passed.
+- Final exact-main evidence: 11 focused PE tests, one Rust vector test,
+  independent Python parity, 345 complete Rust passes with 2 intentional
+  ignores and 5 doctests, and 742 Guardian passes with 3 intentional skips.
+- Rustfmt, workspace all-target Clippy, locked Guardian/Threat-Proof release
+  builds, verified 30-file ThreatHint package, 30/14/15 package set, Black,
+  Pylint 9.83/10, Memory/Autodidactic, HTML/JSON-LD, workflow/Actionlint,
+  dependency audits, redacted Gitleaks and diff checks pass.
+- Status is Local Done / review-ready. Commit, push, PR, merge, Pages and every
+  production or external action remain outside this authorization.

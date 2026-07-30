@@ -65,6 +65,15 @@ entries. It accepts no path, caller-supplied import string, platform, format,
 or generic value. The result remains local and does not prove provenance,
 maliciousness, privacy approval, or disclosure authorization.
 
+`produce_pe_api_import_bundle` applies the same boundary to exact Windows PE32
+or PE32+ bytes. It derives `windows`/`pe` internally, rejects artifacts above
+16 MiB, stops after 4096 import entries, rejects ordinal imports and names
+outside the closed grammar, rejects a bound IAT when no unbound lookup table is
+available, and byte-sorts/deduplicates named imports before a checked index
+selects one. Library names are never observable values. Every result is
+`review_required_v1`; the API exposes no path, caller-supplied import string,
+transport, proof, analyzer, wallet, chain, or promotion operation.
+
 ## ThreatHint v2 Statement (local parsing only)
 
 `ThreatHintV2Statement` is separate from the schema-v1 transport envelope. It
