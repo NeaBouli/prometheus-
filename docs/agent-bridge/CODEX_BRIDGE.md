@@ -1976,3 +1976,56 @@ No direct `main` push or production action occurred.
   ambiguous states remain bounded and fail closed.
 - **Next:** commit and push only this 16-file remediation, answer each review
   thread with evidence, and require renewed exact-head CI/Security/CodeRabbit.
+
+### 2026-07-30 10:45 EEST - GH-121 merged and exact-main verified
+
+- Remediation commit `8caa95779e890cd2b4b0dab60e94c5d91b0da2d1`
+  passed all nine protected checks. All three CodeRabbit threads are resolved;
+  CodeRabbit confirmed the path fix and withdrew both UTC/EEST date findings.
+- PR [#122](https://github.com/NeaBouli/prometheus-/pull/122) merged normally
+  without bypass as exact-main
+  `2e3e1e1250c1ab979335ca8f9aee9dad4409fa34`; issue
+  [#121](https://github.com/NeaBouli/prometheus-/issues/121) closed
+  automatically.
+- Exact-main Prometheus CI run `30493381824`, Security Audit run
+  `30493381812`, and Pages run `30493381150` all completed successfully.
+  GitHub Pages reports `built` from `main` with HTTPS enforced.
+- Worktree sanity check: the isolated integration worktree is clean on
+  `main`. The original dirty feature worktree remains on `b556fbb` with its
+  existing user-owned changes and untracked `Prometheus-1.png`; neither was
+  inspected or modified.
+- **Status:** `Merged / Exact-main verified / Documentation closeout in
+  progress`.
+- **Next:** replace only stale local-candidate wording in public, Memory, and
+  Bridge status surfaces, run documentation/security checks, publish through
+  a separate protected docs PR, then verify exact-main Pages again.
+
+### 2026-07-30 10:46 EEST - GH-123 documentation closeout opened
+
+- Issue [#123](https://github.com/NeaBouli/prometheus-/issues/123) and branch
+  `docs/GH-123-pe-import-merge-closeout` own the docs-only closeout.
+- Scope is limited to replacing stale local-candidate wording with the
+  verified GH-121/PR #122 exact-main evidence in README, Whitepaper, Roadmap,
+  FAQ, `llms.txt`, Memory, and append-only Bridge surfaces.
+- Parser limits, privacy boundaries, rollout estimates, and all product and
+  production non-goals remain unchanged.
+- **Status:** `In Progress / Repository documentation only`.
+
+### 2026-07-30 10:54 EEST - GH-123 locally approved
+
+- Kimi read-only review
+  `session_02119132-3ec5-47fe-81d0-051762f912b4`: PASS, no P0/P1/P2. Its
+  sole optional P3 was a Whitepaper heading-style difference; Sol normalized
+  the heading to the established neighboring format.
+- Local documentation evidence passes: Memory Integrity; all six
+  Autodidactic tests; five HTML parser checks; required JSON-LD/Open Graph
+  markers; public launch-status guard; stale Windows-PE candidate scan; diff
+  check; and a redacted Gitleaks 8.30.1 scan of the complete 45.67-KB diff
+  with zero findings.
+- The diff remains 15 documentation files only. No product, workflow,
+  manifest, dependency, rollout estimate, parser limit, privacy boundary, or
+  production state changed.
+- **Status:** `Local PASS / Ready for protected publication`.
+- **Next:** commit only these 15 files, push the GH-123 branch, open a
+  protected PR, require normal CI/Security/review, merge without bypass, and
+  verify exact-main Pages.

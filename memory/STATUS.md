@@ -889,6 +889,24 @@ Review: Kimi sessions session_05b560ca-d9b8-402e-b22b-651a9f440dbe and
 Publishing: requires separate scoped authorization
 ```
 
+## WINDOWS PE API_IMPORT PROTECTED PUBLICATION (2026-07-30)
+
+```text
+Issue/PR: GH-121 / PR #122
+Status: Merged and exact-main verified
+Exact main: 2e3e1e1250c1ab979335ca8f9aee9dad4409fa34
+Protected evidence: Prometheus CI 30493381824 PASS
+                    Security Audit 30493381812 PASS
+                    Pages 30493381150 PASS
+Review: CodeRabbit threads resolved; UTC/EEST findings withdrawn
+        Kimi sessions session_50c61638-d48c-4ee5-afc3-8c3b1b98b6aa and
+        session_998a3a6f-c2af-4e2b-981c-1a28f90c38bb; no P0/P1/P2 remains
+Boundary: local-only review_required_v1 extraction; no transport, proof,
+          analyzer, wallet, signing, transaction, chain, deployment,
+          promotion, or production authorization
+Original worktree: user-owned dirty changes and Prometheus-1.png untouched
+```
+
 ## GH-117 MERGED THREATHINT V2 PIPELINE (2026-07-29)
 
 ```text

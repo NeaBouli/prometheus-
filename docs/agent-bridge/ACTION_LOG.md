@@ -2393,3 +2393,36 @@ Rules for all dev agents:
   workspace Clippy clean, Guardian 742/3.
 - **Status:** `Approved locally / ready to publish`; no merge or production
   action.
+
+### 2026-07-30 10:45 EEST - GH-121 merge and exact-main gates
+
+- Published remediation commit `8caa957`; all nine protected checks passed.
+  All CodeRabbit threads are resolved and its two UTC/EEST date findings were
+  explicitly withdrawn.
+- PR [#122](https://github.com/NeaBouli/prometheus-/pull/122) merged normally
+  without bypass as `2e3e1e1`; issue
+  [#121](https://github.com/NeaBouli/prometheus-/issues/121) closed.
+- Exact-main Prometheus CI `30493381824`, Security Audit `30493381812`, and
+  Pages `30493381150` passed. Pages is built from `main` with HTTPS enforced.
+- The clean integration worktree is on `main`; the original dirty worktree
+  and `Prometheus-1.png` remain untouched.
+- **Status:** `Merged / Exact-main verified`; a docs-only protected closeout
+  is now in progress to remove stale local-candidate wording.
+
+### 2026-07-30 10:46 EEST - GH-123 docs closeout
+
+- Opened [#123](https://github.com/NeaBouli/prometheus-/issues/123) and branch
+  `docs/GH-123-pe-import-merge-closeout`.
+- Updating only stale public, Memory, and Bridge status wording to the
+  verified GH-121/PR #122 merge state.
+- Product logic, parser limits, privacy boundaries, rollout estimates, and
+  production state remain unchanged.
+
+### 2026-07-30 10:54 EEST - GH-123 local checks
+
+- Kimi review `session_02119132-3ec5-47fe-81d0-051762f912b4`: PASS, no
+  P0/P1/P2. Sol closed its optional heading-style P3.
+- Memory Integrity, six Autodidactic tests, five HTML parses, SEO markers,
+  public-status/stale-candidate guards, diff check, and redacted Gitleaks
+  8.30.1 over 45.67 KB all pass with zero leak.
+- **Status:** `Local PASS / Ready for protected publication`.

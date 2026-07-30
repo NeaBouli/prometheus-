@@ -229,3 +229,15 @@ Core Dev benötigt: Apple Developer Account + Google Play Account (vor Sprint 13
   Wallet-, Chain- oder Promotion-Effekt.
 - Der alte Dirty-Branch und `Prometheus-1.png` bleiben fremde, unberuehrte
   Arbeit. Publishing benoetigt eine getrennte Freigabe.
+
+## 2026-07-30 — Windows-PE-Producer exact-main veroeffentlicht
+
+- GH-121 wurde per geschuetztem PR #122 ohne Bypass als exact-main `2e3e1e1`
+  gemergt. Prometheus CI `30493381824`, Security Audit `30493381812` und
+  Pages `30493381150` sind auf diesem SHA erfolgreich.
+- Die Parser-, Privacy- und Non-Goal-Grenzen bleiben unveraendert: 16 MiB,
+  4096 Import-Deskriptoren, 4096 Thunk-Eintraege, ausschliesslich
+  `review_required_v1`, keine Transport-, Proof-, Analyzer-, Wallet-, Chain-
+  oder Promotion-Autoritaet.
+- Der alte Dirty-Branch und `Prometheus-1.png` bleiben fremde, unberuehrte
+  Arbeit.

@@ -361,7 +361,7 @@ consumption path, not accepted rule generation. A future observable-bearing
 schema/channel and any side-effecting multi-process consumer require separate
 review.
 
-### Local Threat Observable bundle APIs (GH-82/GH-86/GH-90/GH-94/GH-103/GH-107/GH-111 plus local PE review candidate)
+### Local Threat Observable bundle APIs (GH-82/GH-86/GH-90/GH-94/GH-103/GH-107/GH-111/GH-121)
 
 `docs/threat-observable-v2.md` remains the normative design draft for the
 future protocol. Merged and exact-main-verified GH-86 implements only its local canonical bundle boundary:
@@ -384,7 +384,7 @@ Rust GH-94 merged/exact-main (validated with separate producer vectors):
 Rust GH-103 local Linux ELF producer:
   produce_elf_api_import_bundle(&[u8], usize)
 
-Rust local Windows PE review candidate:
+Rust GH-121 merged/exact-main Windows PE producer:
   produce_pe_api_import_bundle(&[u8], usize)
 
 Rust GH-107 local approval verifier:
@@ -424,7 +424,7 @@ GH-103 producer validation consumes
 `modules/threat-hint/tests/vectors/threat-observable-elf-api-import-producer-v1.json`;
 Python independently parses that exact ELF64 dynamic-symbol fixture before
 validating the canonical bundle bytes.
-The Windows PE review candidate consumes
+The GH-121 Windows PE producer consumes
 `modules/threat-hint/tests/vectors/threat-observable-pe-api-import-producer-v1.json`;
 Python independently parses that exact synthetic PE32+ import-table fixture,
 while Rust separately exercises PE32 and PE32+ thunk and ordinal dispatch.
@@ -469,7 +469,7 @@ dynamic symbols, sorts and deduplicates by exact ASCII bytes, and derives
 accepts no path, import string, caller-supplied scope, or generic value and
 performs no transport, proof, analyzer, wallet, signing, or chain operation.
 
-The local Windows PE review candidate accepts exact artifact bytes plus a
+The merged and exact-main-verified GH-121 Windows PE producer accepts exact artifact bytes plus a
 checked import index only. The same pinned `object 0.39.1` dependency reads
 PE32 and PE32+ import tables with a 16 MiB artifact cap plus separate
 4096-descriptor and 4096-thunk-entry budgets.
