@@ -856,7 +856,8 @@ Ticket: GIO-20260726-004
 Status: In Progress; repository-only, not published
 Baseline: origin/main 12a08d4f07f219d0b7892ff962ac9e5f754a263c
 Input: exact PE32/PE32+ bytes plus checked import index
-Parser/bounds: object 0.39.1 PE support; 16 MiB; 4096 import entries
+Parser/bounds: object 0.39.1 PE support; 16 MiB; 4096 import descriptors;
+4096 thunk entries
 Behavior: reject malformed/ordinal/grammar-invalid imports; byte-sort and
           deduplicate named functions; fixed windows/pe scope
 Output: exactly one review_required_v1 bundle; library names excluded

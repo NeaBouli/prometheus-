@@ -482,6 +482,7 @@ def test_rust_elf_api_import_producer_vectors_validate_independently() -> None:
 
 
 def _read_test_pe_cstring(artifact: bytes, offset: int, section_end: int) -> bytes:
+    """Read one nonempty ASCII C string from the bounded synthetic PE section."""
     assert offset < section_end
     end = artifact.index(b"\x00", offset, section_end)
     value = artifact[offset:end]
@@ -568,6 +569,7 @@ def _extract_test_pe32_plus_imports(artifact: bytes) -> list[str]:
 
 
 def test_rust_pe_api_import_producer_vectors_validate_independently() -> None:
+    """Validate the shared Rust PE producer vector with the independent parser."""
     raw = _PE_API_IMPORT_PRODUCER_VECTOR_PATH.read_text(encoding="utf-8")
     producer_vectors = json.loads(raw, object_pairs_hook=_unique_object)
 

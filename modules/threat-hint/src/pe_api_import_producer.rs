@@ -11,8 +11,10 @@ use crate::{ObservableBundle, ScopeFormat, ScopePlatform};
 
 /// Maximum PE artifact size accepted by the bounded local parser.
 pub const MAX_PE_API_IMPORT_ARTIFACT_BYTES: usize = 16 * 1024 * 1024;
-/// Maximum number of import entries inspected per artifact.
+/// Maximum number of import thunk entries inspected per artifact.
 pub const MAX_PE_IMPORTS: usize = 4096;
+/// Maximum number of import descriptors inspected per artifact.
+const MAX_PE_IMPORT_DESCRIPTORS: usize = MAX_PE_IMPORTS;
 
 /// Fail-closed errors returned by the local PE import producer.
 #[derive(Debug, Error, PartialEq, Eq)]
@@ -100,6 +102,7 @@ fn extract_named_imports<'data, Pe: ImageNtHeaders>(
 
     let mut names = Vec::new();
     let mut processed = 0usize;
+    let mut processed_descriptors = 0usize;
     let mut descriptors = import_table
         .descriptors()
         .map_err(|_| PeApiImportProducerError::InvalidArtifact)?;
@@ -107,6 +110,11 @@ fn extract_named_imports<'data, Pe: ImageNtHeaders>(
         .next()
         .map_err(|_| PeApiImportProducerError::InvalidArtifact)?
     {
+        if processed_descriptors == MAX_PE_IMPORT_DESCRIPTORS {
+            return Err(PeApiImportProducerError::TooManyImports);
+        }
+        processed_descriptors += 1;
+
         let library_name = import_table
             .name(descriptor.name.get(LE))
             .map_err(|_| PeApiImportProducerError::InvalidArtifact)?;
@@ -581,6 +589,29 @@ mod tests {
         let imports = vec![b"ReadFile".as_slice(); MAX_PE_IMPORTS + 1];
         assert!(matches!(
             produce_pe_api_import_bundle(&named_fixture(&imports), 0),
+            Err(PeApiImportProducerError::TooManyImports)
+        ));
+    }
+
+    #[test]
+    fn descriptor_count_budget_is_inclusive_and_rejects_overflow() {
+        let fixture = |descriptor_count| {
+            let libraries: Vec<TestImportLibrary<'_>> = (0..descriptor_count)
+                .map(|_| TestImportLibrary {
+                    name: b"KERNEL32.dll",
+                    thunks: &[],
+                })
+                .collect();
+            pe32_plus_multi_library_fixture(&libraries)
+        };
+
+        assert!(matches!(
+            produce_pe_api_import_bundle(&fixture(MAX_PE_IMPORT_DESCRIPTORS), 0),
+            Err(PeApiImportProducerError::NoImports)
+        ));
+
+        assert!(matches!(
+            produce_pe_api_import_bundle(&fixture(MAX_PE_IMPORT_DESCRIPTORS + 1), 0),
             Err(PeApiImportProducerError::TooManyImports)
         ));
     }

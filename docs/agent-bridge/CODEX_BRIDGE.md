@@ -1804,8 +1804,7 @@ No direct `main` push or production action occurred.
 ## 2026-07-29 — GIO-20260726-004 exact-main Reintegration
 
 - **Status:** `In Progress / Repository Only`.
-- Isolierter Worktree:
-  `/Users/gio/Desktop/repos/prometheus-pe-api-import-main`, Branch
+- Isolierter exact-main Worktree: Branch
   `feat/local-pe-api-import-producer-main`, Basis `origin/main`
   `12a08d4f07f219d0b7892ff962ac9e5f754a263c`.
 - Quelle ist der unveraenderte review-fertige Dirty-Branch
@@ -1900,3 +1899,80 @@ No direct `main` push or production action occurred.
   chain, server, key, signing, transaction, or secret action occurred.
 - **Next:** publish this append-only Bridge head, then evaluate only its exact
   renewed CI/Security/review results.
+
+### 2026-07-30 10:18 EEST - CodeRabbit review remediation started
+
+- Exact head `b8e680f053a9ed99f92a8a4422773d3cc2ff7971` passed all nine
+  required protected checks plus CodeRabbit.
+- CodeRabbit review `1ace4cd4-2665-4b12-a899-921265c1b1d4` reported three
+  inline comments and one optional nitpick.
+- Accepted:
+  - redact the two newly added absolute worktree paths from the public diff;
+  - add an explicit import-descriptor budget alongside the existing thunk
+    budget and a regression with more than 4,096 empty import tables;
+  - document the two new independent Python fixture helpers.
+- Rejected as factually stale: the two date comments compare GitHub UTC
+  `2026-07-29T21:*Z` with the Bridge's explicit Europe/Athens basis. Verified
+  local time is `2026-07-30 10:17 EEST +0300`, and issue #121, commits
+  `87bd175`/`b8e680f`, branch push, and PR #122 all exist as recorded.
+- The broad 70% docstring warning reflects the pre-existing test-file style;
+  the two new helper boundaries will nevertheless both carry concise
+  docstrings after remediation.
+- **Status:** `In Progress / Changes Requested`. No merge or production action.
+- **Next:** apply the bounded patch, rerun focused and complete relevant local
+  checks, obtain a targeted Kimi review, publish remediation, answer every
+  thread, and require renewed exact-head CI/Security/CodeRabbit.
+
+### 2026-07-30 10:30 EEST - Kimi remediation review findings
+
+- Kimi read-only review
+  `session_50c61638-d48c-4ee5-afc3-8c3b1b98b6aa` found no P0/P1 and
+  confirmed the descriptor check permits exactly 4,096, rejects the 4,097th
+  before per-descriptor work, and is isolated by the empty-thunk fixture.
+- Kimi's only P2 is documentation drift in `llms.txt`, Roadmap Markdown/HTML,
+  `memory/STATUS.md`, and `memory/TODO.md`, which still state one generic
+  4,096-entry limit instead of separate descriptor and thunk limits.
+- Kimi P3: add a positive exact-4,096 descriptor boundary test. Sol accepts it
+  to make the inclusive boundary executable, not merely inferred.
+- Clarification: `_extract_test_pe32_plus_imports` already had a docstring;
+  remediation adds the missing C-string helper docstring and a concise
+  independent-vector test docstring. Both helper boundaries are documented.
+- Sol complete reruns after the first patch: Rust 346 passed, 2 intentional
+  live-network ignores, 5 compile-fail doctests; warning-free workspace
+  Clippy; Guardian 742 passed, 3 skipped; Pages contract and five HTML parses;
+  Memory Integrity and six Autodidactic tests; 100.13-KB redacted Gitleaks
+  diff scan with zero findings.
+- Corrected environment-only attempts: a pytest-only `uv` run omitted
+  Guardian requirements; the repository-requirements rerun passed 742/3. An
+  HTML smoke named absent `privacy.html`; the exact five CI pages passed.
+- **Status:** `In Progress / P2 remediation`.
+- **Next:** synchronize the five stale status surfaces, prove the inclusive
+  descriptor boundary, rerun focused gates, and request targeted re-review.
+
+### 2026-07-30 10:35 EEST - Remediation locally approved
+
+- Targeted Kimi re-review
+  `session_998a3a6f-c2af-4e2b-981c-1a28f90c38bb`: PASS, no
+  P0/P1/P2. The former documentation P2 and positive-boundary P3 are closed.
+- Exact behavior is executable: 4,096 valid empty import descriptors reach
+  `NoImports`; the 4,097th fails before any per-descriptor work with
+  `TooManyImports`. The independent 4,096-thunk budget remains unchanged.
+- All public/Memory surfaces now state separate 4,096-descriptor and
+  4,096-thunk-entry limits. No stale generic PE bound and no newly added
+  absolute local path remains.
+- Final focused gates after the last comment clarification: Rustfmt; 12 PE
+  unit tests; one shared PE vector; 20 complete observable tests; warning-free
+  ThreatHint all-target Clippy; Memory Integrity; six Autodidactic tests; five
+  HTML parses and SEO; diff check; and redacted Gitleaks 8.30.1 over the
+  103.00-KB complete PR diff, zero findings.
+- Earlier complete Sol reruns remain applicable to the unchanged production
+  logic: Rust 346 passed, 2 intentional live-network ignores, 5 compile-fail
+  doctests; workspace all-target Clippy clean; Guardian 742 passed, 3 skipped.
+- CodeRabbit date comments remain factually stale because they compare GitHub
+  UTC with verified EEST. The absolute-path comment is fixed; its descriptor
+  nitpick is fixed beyond the request with an inclusive boundary test.
+- **Status:** `Approved locally / Remediation ready to publish`.
+- **Risk:** Low residual parser risk within this slice; all malformed and
+  ambiguous states remain bounded and fail closed.
+- **Next:** commit and push only this 16-file remediation, answer each review
+  thread with evidence, and require renewed exact-head CI/Security/CodeRabbit.

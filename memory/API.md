@@ -471,7 +471,8 @@ performs no transport, proof, analyzer, wallet, signing, or chain operation.
 
 The local Windows PE review candidate accepts exact artifact bytes plus a
 checked import index only. The same pinned `object 0.39.1` dependency reads
-PE32 and PE32+ import tables with a 16 MiB artifact cap and 4096-entry budget.
+PE32 and PE32+ import tables with a 16 MiB artifact cap plus separate
+4096-descriptor and 4096-thunk-entry budgets.
 Malformed PE, ordinal imports, invalid library references, and function names
 outside the closed grammar fail closed. Named functions are byte-sorted and
 deduplicated before selection; scope is fixed to `windows`/`pe` and every

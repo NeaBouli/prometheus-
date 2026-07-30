@@ -2255,8 +2255,7 @@ Rules for all dev agents:
 
 ## 2026-07-29 - GIO-20260726-004 exact-main reintegration
 
-- Created isolated worktree
-  `/Users/gio/Desktop/repos/prometheus-pe-api-import-main` on
+- Created the isolated exact-main worktree on
   `feat/local-pe-api-import-producer-main` from exact `origin/main`
   `12a08d4`.
 - Preserved the original dirty PE branch and did not inspect, hash, stage,
@@ -2352,3 +2351,45 @@ Rules for all dev agents:
 - No direct `main` push, bypass, merge, deployment, wallet, chain, server,
   signing, transaction, key, or secret action.
 - **Status:** `In Progress / Exact-head CI`.
+
+### 2026-07-30 10:18 EEST - Review remediation
+
+- Exact head `b8e680f` passed all nine required checks and CodeRabbit.
+- CodeRabbit supplied three inline comments plus one optional descriptor
+  nitpick.
+- Accepted: redact two newly added absolute worktree paths, cap PE import
+  descriptors in addition to thunks, add an over-budget empty-table
+  regression, and document both new Python fixture helpers.
+- Rejected as stale: GitHub's `2026-07-29T21:*Z` is the same instant as the
+  verified Europe/Athens `2026-07-30` Bridge entries; #121, both commits,
+  branch, push, and #122 are real evidence.
+- **Status:** `Changes Requested`; no merge or production action.
+
+### 2026-07-30 10:30 EEST - Kimi review and complete local reruns
+
+- Kimi review `session_50c61638-d48c-4ee5-afc3-8c3b1b98b6aa`: no P0/P1;
+  descriptor logic and over-limit fixture are sound.
+- Remaining P2: stale generic 4,096-entry wording in `llms.txt`, Roadmap
+  Markdown/HTML, `memory/STATUS.md`, and `memory/TODO.md`.
+- Accepted P3: add a positive exact-4,096-descriptor boundary assertion.
+- Sol full: Rust 346 pass/2 ignored/5 doctests; workspace Clippy clean;
+  Guardian 742 pass/3 skip; Memory/Autodidactic; Pages/five HTML; redacted
+  100.13-KB Gitleaks diff with zero findings.
+- Two corrected environment calls then passed: Guardian with repository
+  requirements and the exact five CI HTML pages.
+- **Status:** `In Progress / P2 remediation`.
+
+### 2026-07-30 10:35 EEST - Remediation approved locally
+
+- Kimi targeted re-review
+  `session_998a3a6f-c2af-4e2b-981c-1a28f90c38bb`: PASS, no P0/P1/P2.
+- Exact 4,096 descriptors produce `NoImports`; 4,097 produce
+  `TooManyImports`. All stale public/Memory bounds and the final code-comment
+  nit are synchronized.
+- Final focused: Rustfmt, 12 PE units, one PE vector, 20 observable tests,
+  ThreatHint Clippy, Memory, six Autodidactic, five HTML/SEO, diff and
+  redacted 103.00-KB Gitleaks scan all pass.
+- Complete unchanged-logic baselines remain Rust 346/2 ignored/5 doctests,
+  workspace Clippy clean, Guardian 742/3.
+- **Status:** `Approved locally / ready to publish`; no merge or production
+  action.

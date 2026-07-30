@@ -228,8 +228,9 @@ wallet, or chain schema is added.
 
 The local Windows PE review candidate adds no new wire kind or schema. It
 produces the existing `api_import` kind from exact PE32/PE32+ bytes plus one
-checked index, fixes scope to `windows`/`pe`, caps input at 16 MiB and import
-entries at 4096, and rejects malformed descriptors, ordinal imports, or names
+checked index, fixes scope to `windows`/`pe`, caps input at 16 MiB and both
+descriptors and thunk entries at 4096, and rejects malformed descriptors,
+ordinal imports, or names
 outside the same closed grammar. Library names are never observable values.
 Every output remains `review_required_v1`; no path, arbitrary string,
 transport, approval, proof, analyzer, wallet, chain, or promotion schema is
