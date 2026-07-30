@@ -2029,3 +2029,14 @@ No direct `main` push or production action occurred.
 - **Next:** commit only these 15 files, push the GH-123 branch, open a
   protected PR, require normal CI/Security/review, merge without bypass, and
   verify exact-main Pages.
+
+### 2026-07-30 10:55 EEST - GH-123 protected PR opened
+
+- Commit `6b3ddbd` (`docs: close GH-121 exact-main publication`) contains
+  exactly the 15 reviewed documentation files.
+- Branch `docs/GH-123-pe-import-merge-closeout` is pushed and protected PR
+  [#124](https://github.com/NeaBouli/prometheus-/pull/124) targets `main` and
+  closes issue #123 on merge.
+- No direct `main` push, bypass, product, production, wallet, chain, server,
+  deployment, or secret action occurred.
+- **Status:** `In Progress / Exact-head CI and review`.

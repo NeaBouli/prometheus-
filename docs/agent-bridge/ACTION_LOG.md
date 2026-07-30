@@ -2426,3 +2426,11 @@ Rules for all dev agents:
   public-status/stale-candidate guards, diff check, and redacted Gitleaks
   8.30.1 over 45.67 KB all pass with zero leak.
 - **Status:** `Local PASS / Ready for protected publication`.
+
+### 2026-07-30 10:55 EEST - GH-123 published for review
+
+- Committed the exact 15-file docs closeout as `6b3ddbd`.
+- Pushed `docs/GH-123-pe-import-merge-closeout` and opened protected PR
+  [#124](https://github.com/NeaBouli/prometheus-/pull/124), closing #123 only
+  on merge.
+- **Status:** `In Progress / Exact-head CI and review`.
