@@ -2155,3 +2155,15 @@ No direct `main` push or production action occurred.
 - Cached diff check and a redacted Gitleaks 8.30.1 scan over 78.52 KB pass
   with zero findings.
 - **Status:** `Approved locally / Ready to commit and open protected PR`.
+
+### 2026-07-31 13:09 EEST - GH-9 protected PR opened
+
+- Commit `22422d8` contains exactly the 14 reviewed documentation, Memory,
+  Bridge, and public-evidence files.
+- Branch `ops/GH-9-exact-main-handoff-refresh` is pushed and protected PR
+  [#126](https://github.com/NeaBouli/prometheus-/pull/126) targets `main`.
+- PR #126 deliberately does not close GH-9; the issue remains open for the
+  separately authorized external signature/broadcast/evidence flow.
+- No direct `main` push, bypass, merge, signing, broadcast, deployment,
+  wallet, or chain action occurred.
+- **Status:** `In Progress / Exact-head CI and review`.

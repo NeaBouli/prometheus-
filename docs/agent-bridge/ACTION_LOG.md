@@ -2491,3 +2491,11 @@ Rules for all dev agents:
 - Terra final re-review: former P2 closed, no remaining P0/P1/P2.
 - Cached diff and redacted 78.52-KB Gitleaks scan pass.
 - **Status:** `Approved locally / Protected PR next`.
+
+### 2026-07-31 13:09 EEST - GH-9 PR #126 opened
+
+- Committed the exact 14-file publication set as `22422d8`.
+- Pushed `ops/GH-9-exact-main-handoff-refresh` and opened protected PR #126.
+- GH-9 remains open for real external execution; no direct main push or
+  chain-capable action occurred.
+- **Status:** `In Progress / Exact-head CI and review`.
