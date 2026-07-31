@@ -2068,3 +2068,90 @@ No direct `main` push or production action occurred.
   outside GH-121/GH-123.
 
 `TASK COMPLETE - TARGET STOP ACTIVE`
+
+### 2026-07-31 11:37 EEST - GH-9 exact-main H-001 handoff refresh started
+
+- Existing issue [#9](https://github.com/NeaBouli/prometheus-/issues/9) and
+  branch `ops/GH-9-exact-main-handoff-refresh` own this repository-only
+  readiness refresh from exact main `0b0b74335024ee21cd87b83e18cbe1663dbd1065`.
+- Scope: deterministically rebuild the seven-artifact release archive, closed
+  one-request `testnet-10-validator-staking-h001` handoff, live read-only node
+  and funding-UTXO preflight, two independent schema-v2 prepare runs,
+  public-only integrity/leak checks, Kimi review, and synchronized
+  Bridge/Memory evidence.
+- The existing public deployer address, x-only public key, and funding outpoint
+  from GH-9 may be used. No wallet, private key, seed, mnemonic, password,
+  signature, raw transaction, signing, broadcast, deployment, or chain
+  mutation is authorized or in scope.
+- Operator-relevant files under `scripts/`, `modules/contracts/silverc/`, and
+  the genesis runbook are unchanged since the accepted `205e1ca` handoff;
+  current-main reproduction is still required because workspace dependencies
+  have advanced.
+- **Status:** `In Progress / Read-only readiness refresh`.
+- **Next:** rebuild outside Git, verify live public inputs and determinism,
+  then obtain an independent Kimi review before recording conclusions.
+
+### 2026-07-31 13:00 EEST - GH-9 readiness refresh locally approved
+
+- Exact main `0b0b74335024ee21cd87b83e18cbe1663dbd1065`
+  reproduced the accepted seven-artifact archive SHA-256
+  `4989f0768f2d2fc749fdd3aea227c1be6e55f5cbf35ac9c83e891b6abdf3977d`,
+  closed one-request H-001 set, request
+  `c0cad33f23acfee4114092e0211dd642cb97c44891cc8f8826f4656f406f42fa`,
+  funding spec, and schema-v2 signing request byte-for-byte.
+- Two independent prepare runs and the accepted `205e1ca` handoff match.
+  Signing-request hash remains
+  `6b8e65065ca5ae2ca561ddd3fcb9659c384496fd31db32c137fcc9d811fa5323`;
+  sighash remains
+  `174ccbe80d1d37e62d2bbabfbfba48245372df2bcf9e6724ac79ebc16b4e0bcd`.
+- Live read-only preflight reached a synced, UTXO-indexed
+  `rusty-kaspa 2.0.1` node at virtual DAA `530956976`, above activation, and
+  reconfirmed the public funding output unspent/non-coinbase.
+- The owner-only public handoff uses 0700 directories and 0600 files.
+  Checksum-verified Gitleaks 8.30.1 scanned 1.28 MB with zero findings.
+- Kimi review was attempted first but its configured external monthly quota
+  is exhausted. Claude's bounded review also exhausted its configured budget.
+  Independent Terra review found one P2 missing-provenance file; Sol added the
+  public-only `exact-main-rebuild-evidence.json`, and targeted re-review
+  closed it with no remaining P0/P1/P2.
+- Local code gates: release operator build; Rustfmt; H-001 profile regression;
+  49 focused deployer tests; 346 workspace tests, 2 intentional live ignores,
+  5 compile-fail doctests; warning-free workspace Clippy; Guardian 742 passed,
+  3 skipped.
+- Documentation gates: Memory Integrity; six Autodidactic tests; five
+  HTML/JSON-LD parses; Pages existence, SEO, infrastructure, and stale-launch
+  guards; diff check; and redacted 69.48-KB Gitleaks diff scan, zero findings.
+- Updated status only in README, index, Whitepaper, Roadmap, `llms.txt`,
+  Memory, and append-only Bridge surfaces. Percentages remain H-001 96%,
+  rollout-capable core 84-88%, complete vision 50-55%.
+- No product code, dependency, workflow, wallet, private key, signature, raw
+  transaction, signing, broadcast, deployment, or chain mutation changed or
+  occurred.
+- **Status:** `Local PASS / Ready for protected publication`.
+- **Remaining blocker:** explicitly approved external BIP340 response,
+  canonical import/full transaction verification, separately approved
+  one-shot broadcast, confirmation, one public `operator_record` receipt, and
+  independent chain evidence. The canary remains non-promotable.
+
+### 2026-07-31 13:08 EEST - GH-9 provenance publication P2 remediated
+
+- Final Terra publication review correctly noted that the owner-local
+  provenance record was not verifiable from the repository diff.
+- Added the same secret-free evidence as versioned
+  `docs/evidence/gh-9-h001-readiness-refresh-2026-07-31.json` and linked it
+  from README. It contains only public hashes, node/UTXO observation,
+  exact-main CI run IDs, safety booleans, and unchanged blockers.
+- No local path, signature, raw transaction, wallet material, secret, or
+  production claim is included.
+- **Status:** `Changes Requested / P2 remediated / Targeted re-review pending`.
+
+### 2026-07-31 13:08 EEST - GH-9 publication set approved
+
+- The exact 14-file publication set is staged; the public evidence JSON is
+  tracked as an added file and every README/Bridge/Audit/Checkpoint reference
+  resolves to its repository path.
+- Terra's final procedural re-review closes the former P2 with no remaining
+  P0/P1/P2.
+- Cached diff check and a redacted Gitleaks 8.30.1 scan over 78.52 KB pass
+  with zero findings.
+- **Status:** `Approved locally / Ready to commit and open protected PR`.

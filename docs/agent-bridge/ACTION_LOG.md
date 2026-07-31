@@ -2448,3 +2448,46 @@ Rules for all dev agents:
 - **Status:** `Done / Exact-main and live Pages verified`.
 
 `TASK COMPLETE - TARGET STOP ACTIVE`
+
+### 2026-07-31 11:37 EEST - GH-9 readiness refresh opened
+
+- Reopened the existing GH-9 canary work only for an exact-main,
+  repository-only handoff refresh on
+  `ops/GH-9-exact-main-handoff-refresh`.
+- Baseline is exact main `0b0b743`; no open PR existed at task start.
+- Allowed work is deterministic artifact/request/preflight preparation plus
+  live read-only public-node and public-UTXO verification.
+- Signing, wallet access, signature import, raw transaction creation,
+  broadcast, deployment, and chain mutation remain excluded.
+- **Status:** `In Progress`.
+
+### 2026-07-31 13:00 EEST - GH-9 readiness refresh local PASS
+
+- Reproduced the accepted archive, request set, funding spec, and schema-v2
+  signing request from exact main `0b0b743`; two prepares and the `205e1ca`
+  baseline are byte-identical.
+- Live read-only TN10 preflight reconfirmed a synced/UTXO-indexed
+  `rusty-kaspa 2.0.1` node above Toccata and the funding output
+  unspent/non-coinbase.
+- Added a public-only exact-main provenance record after Terra identified the
+  missing file as P2; targeted re-review closed it with no remaining P0/P1/P2.
+  Kimi and Claude attempts were usage-budget blocked.
+- Full Rust, Guardian, Memory, Pages, mode, parity, diff, and Gitleaks gates
+  pass. No product code or chain-capable action changed.
+- **Status:** `Local PASS / Ready for protected publication`.
+
+### 2026-07-31 13:08 EEST - Public provenance evidence added
+
+- Final Terra review found the owner-local provenance record was not
+  repository-verifiable.
+- Added and README-linked the sanitized public record at
+  `docs/evidence/gh-9-h001-readiness-refresh-2026-07-31.json`.
+- **Status:** `P2 remediated / Targeted re-review pending`.
+
+### 2026-07-31 13:08 EEST - GH-9 publication set approved
+
+- Staged exactly 14 documentation/status/evidence files; public evidence is
+  tracked and linked.
+- Terra final re-review: former P2 closed, no remaining P0/P1/P2.
+- Cached diff and redacted 78.52-KB Gitleaks scan pass.
+- **Status:** `Approved locally / Protected PR next`.

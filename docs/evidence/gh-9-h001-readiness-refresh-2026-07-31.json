@@ -1,0 +1,65 @@
+{
+  "blockers": [
+    "explicitly approved external BIP340 signature response",
+    "full signature import and transaction verification",
+    "separately approved one-shot broadcast",
+    "confirmation, operator_record receipt, and independent public chain evidence"
+  ],
+  "exact_main_checks": {
+    "pages": {
+      "conclusion": "success",
+      "run_id": 30495214832
+    },
+    "prometheus_ci": {
+      "conclusion": "success",
+      "run_id": 30495215304
+    },
+    "security_audit": {
+      "conclusion": "success",
+      "run_id": 30495215501
+    }
+  },
+  "generated_at": "2026-07-31T09:43:29Z",
+  "kind": "prometheus.silverc.h001_exact_main_rebuild_evidence",
+  "live_preflight": {
+    "funding_outpoint": "24e81339f3656689643ca86e3c53c4c5336e4273bb127d25bdaf328e5da241c7:0",
+    "node_preflight_file_sha256": "7d853becec7512cf01708feafd8df1b3f225f686188df474a2ca48ba459564dc",
+    "non_coinbase": true,
+    "resolved_rpc_url": "wss://vector-10.kaspa.green/kaspa/testnet-10/wrpc/borsh",
+    "server_version": "2.0.1",
+    "toccata_active": true,
+    "unspent": true,
+    "utxo_index_enabled": true,
+    "virtual_daa_score": 530956976
+  },
+  "release": {
+    "archive_sha256": "4989f0768f2d2fc749fdd3aea227c1be6e55f5cbf35ac9c83e891b6abdf3977d",
+    "manifest_file_sha256": "5861281ccfefc63705edf064dd9f3161cc5eef11c473804ae0379d7c0f4fa662",
+    "request_set_sha256": "b9f4d7a5ee72148165e5479e67551197682f416eb91d3155c4abba9f4fe2f6ed",
+    "request_sha256": "c0cad33f23acfee4114092e0211dd642cb97c44891cc8f8826f4656f406f42fa"
+  },
+  "repository": {
+    "commit": "0b0b74335024ee21cd87b83e18cbe1663dbd1065",
+    "operator_paths_unchanged_since": "205e1ca928d3048109575cf7a21810c9e6609120",
+    "product_and_operator_paths_match_commit": true,
+    "tree": "0fbbe9876f672c96858a938dabefb727899b6eeb"
+  },
+  "safety": {
+    "broadcast_attempted": false,
+    "private_key_accessed": false,
+    "raw_transaction_exported": false,
+    "signature_produced": false,
+    "wallet_accessed": false
+  },
+  "schema_version": 1,
+  "signing_request": {
+    "byte_identical_to_205e1ca_baseline": true,
+    "byte_identical_two_pass_rebuild": true,
+    "covenant_id": "8cdb49adc2511ed5fa11f71317b66f203f37ce376a2603cd9b118236c1f8219f",
+    "file_sha256": "d309ef414c347cda02a3e94129e18c9a6bf8983e79513ce58af6416399b4aafc",
+    "sighash_hex": "174ccbe80d1d37e62d2bbabfbfba48245372df2bcf9e6724ac79ebc16b4e0bcd",
+    "signing_request_sha256": "6b8e65065ca5ae2ca561ddd3fcb9659c384496fd31db32c137fcc9d811fa5323",
+    "unsigned_transaction_id": "c85fd1e79607370ff63faabbc3158e011158d2bde1af40d4eecd642189d8c22f"
+  },
+  "status": "READY_FOR_EXTERNAL_SCHNORR_SIGNATURE"
+}
