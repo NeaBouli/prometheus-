@@ -2414,6 +2414,24 @@ jobs:
         run: cargo test --workspace
         timeout-minutes: 30
 
+  # Keep the optimized latency gate isolated from the aggregate workspace job.
+  rust-performance-check:
+    name: Rust Performance
+    needs: rust-check
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: dtolnay/rust-toolchain@1.95.0
+      - uses: Swatinem/rust-cache@v2
+      - name: Commitment Build Release Performance Gate
+        run: >-
+          cargo test --release --locked -p prometheus-client --test performance
+          test_commitment_build_performance_budget -- --exact
+        timeout-minutes: 35
+
   # ─── Python Guardian Node Check ─────────────────────────────────────────────
   python-check:
     name: Python Guardian

@@ -2605,3 +2605,39 @@ Rules for all dev agents:
   Gitleaks scan.
 - Terra final read-only review: PASS, no actionable P0/P1/P2/P3.
 - **Status:** `Approved locally / Protected PR next`.
+
+### 2026-08-01 - M-002 fix started
+
+- Opened issue [#131](https://github.com/NeaBouli/prometheus-/issues/131)
+  and branch `fix/GH-131-m002-performance-gate` from exact main `bfde024`.
+- Planned change: robust repeated debug measurement plus an explicit strict
+  release-mode performance gate in the existing Rust CI context.
+- No runtime, protocol, wallet, deployment, or chain behavior is in scope.
+- **Status:** `In Progress`.
+
+### 2026-08-01 12:20 EEST - M-002 local candidate approved
+
+- Implemented warmed 65-sample median timing, a 2 ms debug smoke budget, and
+  the unchanged strict 1 ms optimized gate in a dedicated cached CI job with
+  45/35-minute job/step budgets after the Rust workspace job.
+- README records ten required checks; `Rust Performance` is now the tenth
+  strict protected context, so GH-131 cannot merge without its first PASS.
+- PASS: debug 64/64, release 32/32, complete workspace 351 passed / 2 ignored,
+  Rustfmt, locked all-target Clippy, Memory, Autodidactic, YAML, Actionlint,
+  diff, audit, and leak gates.
+- Kimi was quota-blocked. Terra's two P2 and one P3 findings were remediated;
+  complete relevant tests were rerun by Sol. Final targeted re-review: PASS,
+  no actionable P0/P1/P2/P3.
+- Cargo Audit has zero vulnerabilities and nine allowed warnings. New
+  transitive `RUSTSEC-2026-0221` follow-up is isolated in GH-132.
+- **Status:** `Approved locally / Protected PR next`.
+
+### 2026-08-01 12:37 EEST - PR #133 review fixes
+
+- Exact head `617bc39` passed all ten required checks; `Rust Performance`
+  passed its first protected run in 3m39s.
+- Accepted all three CodeRabbit comments: no persisted checkout credential,
+  current `bfde024` Startflow/Status baseline and ten-check governance, plus a
+  `text` language tag on the edited audit block.
+- Actionlint and Memory Integrity pass after the minimal fixes.
+- **Status:** `Review fixes validated / Refreshed checks pending`.

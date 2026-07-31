@@ -1,8 +1,9 @@
 # prometheus — Backlog
 
 ## 🔴 Aktiv (diese Session)
-- Latest documented green baseline is exact main `b14d36fc79ddc7e0b407b42cb4a271e29cb1ddea`; run `git log --oneline -1` for the current working HEAD.
-- Prometheus CI `29481830688`, Security Audit `29481830686`, and GitHub Pages `29481830054` are green for exact main. Current-Silverc CI validates the keyless Toccata-v1 operator, operator runbook, request/receipt/evidence pipeline, release-readiness audit, metrics-oracle handoff, and exact-commit hardening gates.
+- Latest documented green baseline is exact main `bfde0249851af2a11ff9f48b854d61595b8b72ea`; run `git log --oneline -1` for the current working HEAD.
+- Prometheus CI `30598666699`, Security Audit `30598666673`, and GitHub Pages `30598666135` are green for exact main. Current-Silverc CI validates the keyless Toccata-v1 operator, operator runbook, request/receipt/evidence pipeline, release-readiness audit, metrics-oracle handoff, and exact-commit hardening gates.
+- GH-131 implements a locally verified M-002 candidate that separates a scheduler-jitter-resistant debug smoke budget from the strict optimized one-millisecond CI performance gate; protected CI and exact-main evidence remain.
 - Runtime stub gates added for Rust client; current-Silverc contract gates now cover H-001, ValidatorStaking, GuardianReputation, RuleStorage, CommunityDonations, DevIncentivePool, and GovernanceAutoTuning.
 - Local current-Silverc release-bundle smoke now compiles all 7 fixtures through pinned upstream `silverc` and writes a deterministic manifest plus optional archive with source/artifact/script hashes; deploy preflight validates the bundle/operator public inputs, emits a Markdown operator runbook, and confirms upstream `silverc` has no network deploy command.
 - Deployment receipt verifier validates public receipt records against the release bundle, rejects secret-like fields, and keeps synthetic `ci_fixture` receipts separate from real `operator_record` deployment evidence.
@@ -22,7 +23,7 @@
 
 ### Pflicht VOR neuem Code:
 1. `cd /Users/gio/Desktop/repos/prometheus`
-2. `git log --oneline -5` — aktuellen HEAD prüfen; letzter dokumentierter grüner Baseline-Commit ist `b14d36fc`
+2. `git log --oneline -5` — aktuellen HEAD prüfen; letzter dokumentierter grüner Baseline-Commit ist `bfde024`
 3. Lies `memory/CHECKPOINT.md` — vollständiger Projektstatus
 4. Lies `memory/AUDIT.md` ab Zeile 337 — Pre-Hardfork-Audit-Ergebnisse
 5. Lies `memory/ERRORS.md` — 12 bekannte Patterns
@@ -38,7 +39,7 @@
 3. **[P1] Sprint 10B: Guardian Decentralization** — GH-33/36/39 plus merged/exact-main-verified GH-42/GH-44/GH-48/GH-52/GH-55/GH-58/GH-63 are implemented; GH-74 tracks the bounded hash-only v1 analyzer adapter. Production proof artifacts, a privacy-preserving concrete-observable channel, real two-host operation, broad discovery, trusted membership/key assignment and rotation, Sybil resistance, and an explicit on-chain-attestation decision follow.
 4. **[P2] fp_rate Oracle** — Q-003 current-Silverc contract gate uses signed metrics input; public report/request/result verification is covered; production external transaction assembly/signing/broadcast/deploy operation remains
 5. **[P2] M-001** — Heuristic confidence in yara_generator.py durch LLM-Confidence ersetzen
-6. **[P2] M-002** — Performance test threshold (1ms → 2ms) oder --release gate
+6. **[P2] M-002** — **LOCAL PASS / GH-131 protected PR pending:** repeated-sample debug smoke gate plus strict `--release` one-millisecond CI gate
 7. **[P3] L-001/L-003** — DevIncentivePool ACL, CEI borderline
 
 ### Wartet auf externe Events:
@@ -75,7 +76,7 @@
 - [x] Cargo.lock + Logo Variants + Gitignore Cleanup — `9a8c344` (02.04.2026)
 
 ---
-*Zuletzt aktualisiert: 2026-07-16*
+*Zuletzt aktualisiert: 2026-08-01*
 
 ---
 
