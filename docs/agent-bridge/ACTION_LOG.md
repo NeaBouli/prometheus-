@@ -2499,3 +2499,59 @@ Rules for all dev agents:
 - GH-9 remains open for real external execution; no direct main push or
   chain-capable action occurred.
 - **Status:** `In Progress / Exact-head CI and review`.
+
+### 2026-07-31 13:16 EEST - Dependency security fix opened
+
+- Started `GIO-PROM-20260731-RUINT` and GitHub issue
+  [#127](https://github.com/NeaBouli/prometheus-/issues/127) from exact main
+  `0b0b743`.
+- Root cause: `RUSTSEC-2026-0220` affects transitive `ruint 1.19.0` through
+  `risc0-binfmt -> kaspa-txscript`, including the deployment-operator graph.
+- Planned remediation is the minimum safe lockfile update to `ruint >=1.20.0`
+  with full audit and Rust integration evidence.
+- No advisory suppression, workflow change, protocol change, production,
+  wallet, signing, broadcast, deployment, or chain action.
+- **Status:** `In Progress`.
+
+### 2026-07-31 14:14 EEST - Local security verification PASS
+
+- Final Cargo diff is only `ruint 1.19.0 -> 1.20.0`; targeted lockfile
+  re-resolution removed an unrelated `syn` edge identified as P2 by Terra.
+- Audit: zero vulnerabilities, eight unchanged allowed warnings; old `ruint`
+  absent and the safe version present throughout the Kaspa operator path.
+- PASS: Rustfmt, Memory Integrity, 55 current-SilverC fixture tests, 49 focused
+  deployer tests, 346 workspace tests with two intentional live ignores, and
+  warning-free workspace all-target Clippy.
+- Corrected environment events: generated targets from an isolated prior
+  worktree were cleaned after a disk-full stop. One response-channel race test
+  then failed once, passed five focused repetitions, and passed in the complete
+  rerun; no unrelated source edit was introduced.
+- Kimi quota remains exhausted. Terra targeted re-review is pending.
+- **Status:** `Local PASS / Review pending`.
+
+### 2026-07-31 14:16 EEST - Security candidate approved
+
+- Terra targeted re-review: PASS, no P0/P1/P2; unrelated lockfile churn is
+  absent and only the safe `ruint` version/checksum changed.
+- Final locked metadata/tree checks, diff check, and redacted Gitleaks 8.30.1
+  scan of the complete 5.58-KB diff pass with zero findings.
+- Exact publication set: `Cargo.lock`, `docs/agent-bridge/ACTION_LOG.md`, and
+  `docs/agent-bridge/CODEX_BRIDGE.md`.
+- **Status:** `Approved locally / Protected PR next`.
+
+### 2026-07-31 14:18 EEST - Issue #127 candidate published
+
+- Committed the exact three-file security candidate as `db8adba`.
+- Pushed `fix/ruint-rustsec-2026-0220` and opened protected PR
+  [#128](https://github.com/NeaBouli/prometheus-/pull/128), closing #127 only
+  after a normal protected merge.
+- **Status:** `In Progress / Exact-head CI and review`.
+
+### 2026-07-31 14:27 EEST - Security merge complete; PR #126 rebased by merge
+
+- PR #128 merged normally as exact main `143a8a0`; exact-main CI
+  `30596194766`, Security `30596194775`, and Pages `30596194216` pass.
+- Merged secured `origin/main` into the GH-9 branch without rewriting its
+  published history. Resolved only parallel append-only Bridge tails and kept
+  both histories complete and chronological.
+- **Status:** `In Progress / Combined branch validation`.
