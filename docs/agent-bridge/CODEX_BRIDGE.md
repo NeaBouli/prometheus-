@@ -2130,3 +2130,13 @@ No direct `main` push or production action occurred.
 - **Status:** `Approved locally / Ready for protected publication`.
 - **Next:** commit the exact three-file set, push the issue #127 branch, open a
   protected PR, and require exact-head CI/Security/review before merge.
+
+### 2026-07-31 14:18 EEST - RUSTSEC protected PR opened
+
+- Commit `db8adba` contains the exact reviewed three-file candidate.
+- Branch `fix/ruint-rustsec-2026-0220` is pushed and protected PR
+  [#128](https://github.com/NeaBouli/prometheus-/pull/128) targets `main` and
+  closes issue #127 only on merge.
+- No direct main push, bypass, workflow weakening, production, wallet,
+  signing, broadcast, deployment, or chain action occurred.
+- **Status:** `In Progress / Exact-head CI and review`.

@@ -2487,3 +2487,11 @@ Rules for all dev agents:
 - Exact publication set: `Cargo.lock`, `docs/agent-bridge/ACTION_LOG.md`, and
   `docs/agent-bridge/CODEX_BRIDGE.md`.
 - **Status:** `Approved locally / Protected PR next`.
+
+### 2026-07-31 14:18 EEST - Issue #127 candidate published
+
+- Committed the exact three-file security candidate as `db8adba`.
+- Pushed `fix/ruint-rustsec-2026-0220` and opened protected PR
+  [#128](https://github.com/NeaBouli/prometheus-/pull/128), closing #127 only
+  after a normal protected merge.
+- **Status:** `In Progress / Exact-head CI and review`.
