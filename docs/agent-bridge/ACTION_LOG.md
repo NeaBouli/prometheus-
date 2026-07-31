@@ -2449,6 +2449,57 @@ Rules for all dev agents:
 
 `TASK COMPLETE - TARGET STOP ACTIVE`
 
+### 2026-07-31 11:37 EEST - GH-9 readiness refresh opened
+
+- Reopened the existing GH-9 canary work only for an exact-main,
+  repository-only handoff refresh on
+  `ops/GH-9-exact-main-handoff-refresh`.
+- Baseline is exact main `0b0b743`; no open PR existed at task start.
+- Allowed work is deterministic artifact/request/preflight preparation plus
+  live read-only public-node and public-UTXO verification.
+- Signing, wallet access, signature import, raw transaction creation,
+  broadcast, deployment, and chain mutation remain excluded.
+- **Status:** `In Progress`.
+
+### 2026-07-31 13:00 EEST - GH-9 readiness refresh local PASS
+
+- Reproduced the accepted archive, request set, funding spec, and schema-v2
+  signing request from exact main `0b0b743`; two prepares and the `205e1ca`
+  baseline are byte-identical.
+- Live read-only TN10 preflight reconfirmed a synced/UTXO-indexed
+  `rusty-kaspa 2.0.1` node above Toccata and the funding output
+  unspent/non-coinbase.
+- Added a public-only exact-main provenance record after Terra identified the
+  missing file as P2; targeted re-review closed it with no remaining P0/P1/P2.
+  Kimi and Claude attempts were usage-budget blocked.
+- Full Rust, Guardian, Memory, Pages, mode, parity, diff, and Gitleaks gates
+  pass. No product code or chain-capable action changed.
+- **Status:** `Local PASS / Ready for protected publication`.
+
+### 2026-07-31 13:08 EEST - Public provenance evidence added
+
+- Final Terra review found the owner-local provenance record was not
+  repository-verifiable.
+- Added and README-linked the sanitized public record at
+  `docs/evidence/gh-9-h001-readiness-refresh-2026-07-31.json`.
+- **Status:** `P2 remediated / Targeted re-review pending`.
+
+### 2026-07-31 13:08 EEST - GH-9 publication set approved
+
+- Staged exactly 14 documentation/status/evidence files; public evidence is
+  tracked and linked.
+- Terra final re-review: former P2 closed, no remaining P0/P1/P2.
+- Cached diff and redacted 78.52-KB Gitleaks scan pass.
+- **Status:** `Approved locally / Protected PR next`.
+
+### 2026-07-31 13:09 EEST - GH-9 PR #126 opened
+
+- Committed the exact 14-file publication set as `22422d8`.
+- Pushed `ops/GH-9-exact-main-handoff-refresh` and opened protected PR #126.
+- GH-9 remains open for real external execution; no direct main push or
+  chain-capable action occurred.
+- **Status:** `In Progress / Exact-head CI and review`.
+
 ### 2026-07-31 13:16 EEST - Dependency security fix opened
 
 - Started `GIO-PROM-20260731-RUINT` and GitHub issue
@@ -2495,3 +2546,40 @@ Rules for all dev agents:
   [#128](https://github.com/NeaBouli/prometheus-/pull/128), closing #127 only
   after a normal protected merge.
 - **Status:** `In Progress / Exact-head CI and review`.
+
+### 2026-07-31 14:27 EEST - Security merge complete; PR #126 rebased by merge
+
+- PR #128 merged normally as exact main `143a8a0`; exact-main CI
+  `30596194766`, Security `30596194775`, and Pages `30596194216` pass.
+- Merged secured `origin/main` into the GH-9 branch without rewriting its
+  published history. Resolved only parallel append-only Bridge tails and kept
+  both histories complete and chronological.
+- **Status:** `In Progress / Combined branch validation`.
+
+### 2026-07-31 14:50 EEST - H-001 reproduced after security merge
+
+- Fresh release operator and owner-only handoff from secured exact main
+  `143a8a0` reproduce the accepted archive/request/signing-request bytes.
+- Live read-only preflight: synced/UTXO-indexed `rusty-kaspa 2.0.1`, DAA
+  `531038718`, Toccata active, exact funding output unspent/non-coinbase.
+- Handoff mode checks and redacted 1.27-MB Gitleaks scan pass with zero leaks.
+- Updated all current public/Memory/evidence references from `0b0b743` to
+  `143a8a0`; blockers and percentages remain unchanged.
+- **Status:** `Local PASS / Documentation gates pending`.
+
+### 2026-07-31 14:56 EEST - Final review remediation
+
+- Terra P2 closed by synchronizing the stale `index.html` estimates to
+  84-88% core and 50-55% complete vision.
+- Removed one public local-path disclosure from the Bridge.
+- Remaining Terra P1 is expected publication state and closes only after
+  commit/push plus renewed exact-head PR checks.
+- **Status:** `Changes remediated / Targeted re-review pending`.
+
+### 2026-07-31 14:58 EEST - Final content review PASS
+
+- Terra targeted re-review closes the former percentage P2 with no remaining
+  content P0/P1/P2.
+- Complete documentation, Memory, JSON, diff, audit, handoff-mode, and
+  redacted leak checks pass.
+- **Status:** `Approved locally / Publication next`.

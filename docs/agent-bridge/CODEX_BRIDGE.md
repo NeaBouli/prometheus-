@@ -2069,6 +2069,105 @@ No direct `main` push or production action occurred.
 
 `TASK COMPLETE - TARGET STOP ACTIVE`
 
+### 2026-07-31 11:37 EEST - GH-9 exact-main H-001 handoff refresh started
+
+- Existing issue [#9](https://github.com/NeaBouli/prometheus-/issues/9) and
+  branch `ops/GH-9-exact-main-handoff-refresh` own this repository-only
+  readiness refresh from exact main `0b0b74335024ee21cd87b83e18cbe1663dbd1065`.
+- Scope: deterministically rebuild the seven-artifact release archive, closed
+  one-request `testnet-10-validator-staking-h001` handoff, live read-only node
+  and funding-UTXO preflight, two independent schema-v2 prepare runs,
+  public-only integrity/leak checks, Kimi review, and synchronized
+  Bridge/Memory evidence.
+- The existing public deployer address, x-only public key, and funding outpoint
+  from GH-9 may be used. No wallet, private key, seed, mnemonic, password,
+  signature, raw transaction, signing, broadcast, deployment, or chain
+  mutation is authorized or in scope.
+- Operator-relevant files under `scripts/`, `modules/contracts/silverc/`, and
+  the genesis runbook are unchanged since the accepted `205e1ca` handoff;
+  current-main reproduction is still required because workspace dependencies
+  have advanced.
+- **Status:** `In Progress / Read-only readiness refresh`.
+- **Next:** rebuild outside Git, verify live public inputs and determinism,
+  then obtain an independent Kimi review before recording conclusions.
+
+### 2026-07-31 13:00 EEST - GH-9 readiness refresh locally approved
+
+- Exact main `0b0b74335024ee21cd87b83e18cbe1663dbd1065`
+  reproduced the accepted seven-artifact archive SHA-256
+  `4989f0768f2d2fc749fdd3aea227c1be6e55f5cbf35ac9c83e891b6abdf3977d`,
+  closed one-request H-001 set, request
+  `c0cad33f23acfee4114092e0211dd642cb97c44891cc8f8826f4656f406f42fa`,
+  funding spec, and schema-v2 signing request byte-for-byte.
+- Two independent prepare runs and the accepted `205e1ca` handoff match.
+  Signing-request hash remains
+  `6b8e65065ca5ae2ca561ddd3fcb9659c384496fd31db32c137fcc9d811fa5323`;
+  sighash remains
+  `174ccbe80d1d37e62d2bbabfbfba48245372df2bcf9e6724ac79ebc16b4e0bcd`.
+- Live read-only preflight reached a synced, UTXO-indexed
+  `rusty-kaspa 2.0.1` node at virtual DAA `530956976`, above activation, and
+  reconfirmed the public funding output unspent/non-coinbase.
+- The owner-only public handoff uses 0700 directories and 0600 files.
+  Checksum-verified Gitleaks 8.30.1 scanned 1.28 MB with zero findings.
+- Kimi review was attempted first but its configured external monthly quota
+  is exhausted. Claude's bounded review also exhausted its configured budget.
+  Independent Terra review found one P2 missing-provenance file; Sol added the
+  public-only `exact-main-rebuild-evidence.json`, and targeted re-review
+  closed it with no remaining P0/P1/P2.
+- Local code gates: release operator build; Rustfmt; H-001 profile regression;
+  49 focused deployer tests; 346 workspace tests, 2 intentional live ignores,
+  5 compile-fail doctests; warning-free workspace Clippy; Guardian 742 passed,
+  3 skipped.
+- Documentation gates: Memory Integrity; six Autodidactic tests; five
+  HTML/JSON-LD parses; Pages existence, SEO, infrastructure, and stale-launch
+  guards; diff check; and redacted 69.48-KB Gitleaks diff scan, zero findings.
+- Updated status only in README, index, Whitepaper, Roadmap, `llms.txt`,
+  Memory, and append-only Bridge surfaces. Percentages remain H-001 96%,
+  rollout-capable core 84-88%, complete vision 50-55%.
+- No product code, dependency, workflow, wallet, private key, signature, raw
+  transaction, signing, broadcast, deployment, or chain mutation changed or
+  occurred.
+- **Status:** `Local PASS / Ready for protected publication`.
+- **Remaining blocker:** explicitly approved external BIP340 response,
+  canonical import/full transaction verification, separately approved
+  one-shot broadcast, confirmation, one public `operator_record` receipt, and
+  independent chain evidence. The canary remains non-promotable.
+
+### 2026-07-31 13:08 EEST - GH-9 provenance publication P2 remediated
+
+- Final Terra publication review correctly noted that the owner-local
+  provenance record was not verifiable from the repository diff.
+- Added the same secret-free evidence as versioned
+  `docs/evidence/gh-9-h001-readiness-refresh-2026-07-31.json` and linked it
+  from README. It contains only public hashes, node/UTXO observation,
+  exact-main CI run IDs, safety booleans, and unchanged blockers.
+- No local path, signature, raw transaction, wallet material, secret, or
+  production claim is included.
+- **Status:** `Changes Requested / P2 remediated / Targeted re-review pending`.
+
+### 2026-07-31 13:08 EEST - GH-9 publication set approved
+
+- The exact 14-file publication set is staged; the public evidence JSON is
+  tracked as an added file and every README/Bridge/Audit/Checkpoint reference
+  resolves to its repository path.
+- Terra's final procedural re-review closes the former P2 with no remaining
+  P0/P1/P2.
+- Cached diff check and a redacted Gitleaks 8.30.1 scan over 78.52 KB pass
+  with zero findings.
+- **Status:** `Approved locally / Ready to commit and open protected PR`.
+
+### 2026-07-31 13:09 EEST - GH-9 protected PR opened
+
+- Commit `22422d8` contains exactly the 14 reviewed documentation, Memory,
+  Bridge, and public-evidence files.
+- Branch `ops/GH-9-exact-main-handoff-refresh` is pushed and protected PR
+  [#126](https://github.com/NeaBouli/prometheus-/pull/126) targets `main`.
+- PR #126 deliberately does not close GH-9; the issue remains open for the
+  separately authorized external signature/broadcast/evidence flow.
+- No direct `main` push, bypass, merge, signing, broadcast, deployment,
+  wallet, or chain action occurred.
+- **Status:** `In Progress / Exact-head CI and review`.
+
 ### 2026-07-31 13:16 EEST - RUSTSEC-2026-0220 remediation started
 
 - Ticket `GIO-PROM-20260731-RUINT` and GitHub issue
@@ -2140,3 +2239,67 @@ No direct `main` push or production action occurred.
 - No direct main push, bypass, workflow weakening, production, wallet,
   signing, broadcast, deployment, or chain action occurred.
 - **Status:** `In Progress / Exact-head CI and review`.
+
+### 2026-07-31 14:27 EEST - RUSTSEC merged; GH-9 branch refreshed
+
+- PR [#128](https://github.com/NeaBouli/prometheus-/pull/128) passed every
+  protected check and merged normally without bypass as exact main
+  `143a8a0e0e07931d6b91823e939d5ada8a4e042c`; issue #127 is closed.
+- Exact-main Prometheus CI `30596194766`, Security Audit `30596194775`, and
+  Pages `30596194216` all completed successfully. The dependency audit now
+  accepts `ruint 1.20.0`.
+- PR #126 has merged the secured `origin/main` non-destructively. The only
+  conflicts were parallel append-only Bridge tails; both complete H-001 and
+  RUSTSEC histories are preserved in chronological order.
+- No H-001 artifact, request, hash, protocol formula, product code, wallet,
+  signing, broadcast, deployment, or chain state changed.
+- **Status:** `In Progress / GH-9 exact-head validation`.
+- **Next:** validate the combined branch, push the merge commit, require all
+  renewed PR #126 checks, then merge normally only if exact-head is green.
+
+### 2026-07-31 14:50 EEST - GH-9 exact-main security revalidation passed
+
+- From secured exact main `143a8a0e0e07931d6b91823e939d5ada8a4e042c`,
+  Sol rebuilt the release operator and a fresh owner-only H-001 handoff
+  outside Git.
+- The seven-artifact archive, manifest, closed request set, H-001 request, and
+  two schema-v2 signing-request builds are byte-identical to the accepted
+  `205e1ca` and `0b0b743` baselines. Archive SHA-256 remains
+  `4989f0768f2d2fc749fdd3aea227c1be6e55f5cbf35ac9c83e891b6abdf3977d`;
+  signing-request hash remains
+  `6b8e65065ca5ae2ca561ddd3fcb9659c384496fd31db32c137fcc9d811fa5323`.
+- Live read-only preflight reached synced, UTXO-indexed
+  `rusty-kaspa 2.0.1` at virtual DAA `531038718`, above Toccata, and
+  reconfirmed the exact public funding output unspent/non-coinbase.
+- The handoff remains 0700/0600 and a redacted Gitleaks 8.30.1 scan over
+  1.27 MB found zero leaks. No wallet, key, signature, raw transaction,
+  signing, broadcast, deployment, or chain mutation occurred.
+- README, public pages, Whitepaper, Roadmap, `llms.txt`, Memory, and public
+  evidence now identify secured exact main `143a8a0` and its exact-main CI
+  `30596194766`, Security `30596194775`, and Pages `30596194216`.
+- **Status:** `Local revalidation PASS / Combined docs checks pending`.
+
+### 2026-07-31 14:56 EEST - Final review findings remediated
+
+- Terra found one real P2: `index.html` still exposed obsolete 44-49% /
+  78-82% estimates while all current roadmap surfaces use 50-55% / 84-88%.
+  The public row is now synchronized to the current estimates.
+- Terra's P1 is procedural: GitHub PR #126 cannot contain the reviewed local
+  merge and staged refresh until they are committed and pushed. It will close
+  only after publication and renewed exact-head checks.
+- Removed the owner-local handoff path from the public Bridge while retaining
+  the owner-only/outside-Git security boundary.
+- **Status:** `P2 remediated / Targeted re-review pending`.
+
+### 2026-07-31 14:58 EEST - Combined candidate approved
+
+- Terra targeted re-review: PASS, no remaining content P0/P1/P2. Current
+  rollout estimates, exact-main evidence, public/Memory status, and safety
+  boundaries are consistent.
+- Memory Integrity, six Autodidactic tests, five HTML and all embedded JSON-LD
+  parses, public evidence JSON, stale-current-status guard, diff checks, Cargo
+  Audit, owner-only handoff checks, and redacted Gitleaks scans pass.
+- The complete current PR diff contains no secret, signature, raw transaction,
+  local owner-handoff path, product/protocol, wallet, deployment, or chain
+  mutation.
+- **Status:** `Approved locally / Commit and protected publication next`.

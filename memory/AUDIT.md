@@ -2064,3 +2064,49 @@ required checks.
 No production relation, proving/verifying key, ceremony, real semantic or
 actionable analyzer, v2 transport, wallet, signature, transaction, chain,
 server, secret, or production deployment was approved or exercised.
+
+## 2026-07-31 - GH-9 exact-main H-001 readiness refresh
+
+**Result:** PASS for a repository-only, non-promotable signing handoff refresh;
+no chain execution approval is implied.
+
+Exact main `143a8a0e0e07931d6b91823e939d5ada8a4e042c` reproduced the
+accepted `205e1ca` seven-artifact archive, closed one-request
+`testnet-10-validator-staking-h001` set, public funding specification, and
+schema-v2 signing request byte-for-byte. Archive SHA-256 remains
+`4989f0768f2d2fc749fdd3aea227c1be6e55f5cbf35ac9c83e891b6abdf3977d`;
+request SHA-256 remains
+`c0cad33f23acfee4114092e0211dd642cb97c44891cc8f8826f4656f406f42fa`;
+signing-request SHA-256 remains
+`6b8e65065ca5ae2ca561ddd3fcb9659c384496fd31db32c137fcc9d811fa5323`;
+and the BIP340 sighash remains
+`174ccbe80d1d37e62d2bbabfbfba48245372df2bcf9e6724ac79ebc16b4e0bcd`.
+
+The current release operator built successfully. Live read-only preflight
+reconfirmed the public funding output unspent/non-coinbase through a synced,
+UTXO-indexed `rusty-kaspa 2.0.1` node at virtual DAA `531038718`, above
+Toccata activation. Two prepare runs were byte-identical to each other and
+the prior handoff. Owner-only 0700/0600 modes and a full-directory Gitleaks
+8.30.1 scan over 1.28 MB passed with zero findings.
+
+Independent Terra review initially found one P2: the refreshed directory
+lacked a standalone exact-main provenance record. Sol added and verified the
+public, versioned
+`docs/evidence/gh-9-h001-readiness-refresh-2026-07-31.json`; targeted review
+closed the evidence-content finding. A final publication review then required
+that record to be locatable from the repository, which the versioned file and
+README link now satisfy. Kimi and Claude review attempts were unavailable
+because their configured external usage budgets were exhausted.
+
+Local verification passed Rustfmt, the H-001 profile regression, 49 focused
+deployer tests, 346 workspace tests with two intentional live-network ignores
+and five compile-fail doctests, warning-free workspace Clippy, Guardian
+`742 passed, 3 skipped`, Memory Integrity, and public-handoff leak/mode/parity
+checks.
+
+No wallet, private key, seed, mnemonic, password, signature, raw transaction,
+signing, broadcast, deployment, or chain mutation occurred. Remaining gates
+are an explicitly approved external BIP340 response, complete canonical
+import and transaction verification, separately approved one-shot broadcast,
+confirmation, one public `operator_record` receipt, and independent public
+chain evidence. Canary evidence cannot promote full or metrics readiness.

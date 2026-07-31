@@ -1,6 +1,6 @@
 # Prometheus — Full Deployment Roadmap
 *Readiness-gated roadmap; no fixed public-release date is claimed.*
-*Last status reconciliation: 2026-07-29 (Europe/Athens project time).*
+*Last status reconciliation: 2026-07-31 (Europe/Athens project time).*
 
 ## Progress Snapshot
 
@@ -101,9 +101,10 @@ output. It revalidates the exact live funding UTXO, broadcasts, and observes
 the covenant output. Its funding-free TLS-only official-resolver probe now
 confirms a synced, UTXO-indexed post-Toccata testnet-10 node while preserving
 the mandatory funding-bound preflight. Public H-001 funding and the schema-v2
-request/digest were rebuilt from exact main `205e1ca`; the live UTXO remained
-unspent/non-coinbase and two builds were byte-identical to each other and the
-earlier baseline. External signature, verified broadcast, receipt, and
+request/digest were refreshed from exact main `143a8a0` on 2026-07-31; the live
+UTXO remained unspent/non-coinbase and the archive, request, and two
+signing-request builds stayed byte-identical to the accepted `205e1ca`
+baseline. External signature, verified broadcast, receipt, and
 independent testnet-10 evidence remain required.
 A public release-hardening evidence verifier binds successful CI, Pages,
 branch-control, rollback, and release-note checks to the exact release commit
@@ -325,7 +326,7 @@ This is the final architectural milestone described in the whitepaper.
 | Date | Milestone |
 |------|-----------|
 | March 2026 | All sprints 0-8 accepted. Foundation complete. |
-| July 2026 | Toccata runtime/release gates, public H-001 funding, exact-main `205e1ca` schema-v2 signing handoff, live UTXO revalidation, and byte-identical rebuild verified; external canary execution remains. |
+| July 2026 | Toccata runtime/release gates, public H-001 funding, exact-main `143a8a0` schema-v2 handoff refresh after the dependency-security update, live UTXO revalidation, and byte-identical `205e1ca` parity verified; external canary execution remains. |
 | After H-001 evidence | Deploy the remaining state contracts, execute the metrics-oracle transaction, and complete exact-commit release hardening. |
 | After core-network rollout | Approved production Groth16 artifacts, PROM emission, P2P rule distribution, production Phi-3, and operated Guardian/Validator network. |
 | After production AI/P2P | Desktop client beta and signed installers for Windows, macOS, and Linux. |

@@ -214,6 +214,7 @@ Core Dev benötigt: Apple Developer Account + Google Play Account (vor Sprint 13
 | 2026-07-28 | Claim ist owner-local, lease-basiert und retention-begrenzt | Codex Sol + Kimi Review | Aeltester berechtigter Datensatz, intern erzeugtes opaques 32-Byte-Token, Recovery nach Restart/Lease-Ablauf und terminales Delete nur bei exakter Approval-ID/Token-Bindung; kein Worker oder externer Effekt |
 | 2026-07-29 | v2 Completion speichert Ergebnis vor Work-Delete | Codex Sol + Kimi Review | Governed Schema v4 bindet Statement, Nonce, Bundle, Approval, Lease und Retention; eine atomare Completion speichert exakt ein kanonisches nicht-actionable Ergebnis und loescht erst danach den Outbox-Datensatz |
 | 2026-07-29 | Reale v2 Analyse bleibt separates High-Risk-Ticket | Codex Sol + Kimi Review | Der Ticket-014-Worker nutzt nur einen deterministischen Test-Analyzer ohne LLM, YARA, Confidence oder should_submit; semantische/actionable Analyse braucht eigene Privacy-/Security-Freigabe |
+| 2026-07-31 | H-001 exact-main Readiness-Refresh | Codex Audit | Exact main `143a8a0` reproduziert den akzeptierten `205e1ca` Handoff nach dem Dependency-Security-Fix bytegleich und revalidiert den öffentlichen UTXO; Signatur, Broadcast und Chain-Evidenz bleiben gesondert freizugeben |
 
 ## 2026-07-29 — Windows-PE-Producer exact-main Reintegration
 
