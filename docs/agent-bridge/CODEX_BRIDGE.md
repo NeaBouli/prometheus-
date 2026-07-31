@@ -2303,3 +2303,40 @@ No direct `main` push or production action occurred.
   local owner-handoff path, product/protocol, wallet, deployment, or chain
   mutation.
 - **Status:** `Approved locally / Commit and protected publication next`.
+
+### 2026-07-31 15:08 EEST - PR #126 merged and exact-main verified
+
+- Protected PR [#126](https://github.com/NeaBouli/prometheus-/pull/126)
+  merged normally without admin bypass as exact main
+  `2d03f739b309ed40b7944b3109521a989bb7de67`.
+- Exact-main Prometheus CI `30598044239`, Security Audit `30598044233`, and
+  Pages `30598043838` completed successfully. Live GitHub Pages exposes H-001
+  96%, rollout-capable core 84-88%, and complete vision 50-55%.
+- GH-9 remains open for the separately authorized external BIP340 response,
+  operator verification, one-shot broadcast, confirmation, receipt, and
+  independent evidence.
+- Ticket `GIO-PROM-20260731-GH9-CLOSEOUT` and GitHub issue
+  [#129](https://github.com/NeaBouli/prometheus-/issues/129) own the final
+  documentation-only closeout from exact main.
+- No product/protocol code, wallet, key, signature, raw transaction,
+  broadcast, deployment, chain mutation, direct main push, or protection
+  bypass occurred.
+- **Status:** `In Progress / Documentation closeout validation`.
+- **Next:** validate the minimal Bridge/Memory diff, publish through a
+  protected PR, then require exact-head and exact-main checks.
+
+### 2026-07-31 15:14 EEST - GH-129 closeout candidate approved
+
+- The candidate remains limited to four Bridge/Memory files. Both Bridge
+  histories are append-only; current Memory fields now point to verified main
+  `2d03f739` and its exact run IDs.
+- Memory Integrity, six Autodidactic regressions, five HTML and embedded
+  JSON-LD parses, public evidence JSON, current-status guards, diff checks,
+  and a redacted Gitleaks stdin scan over 15.28 KB pass.
+- Terra's independent read-only final review reports PASS with no actionable
+  P0/P1/P2/P3. It confirms factual consistency, percentages, GH-9's external
+  gate, and absence of secret/local-path or product/protocol changes.
+- Kimi was not delegated because this closeout is smaller than its handoff
+  overhead; its external quota was already confirmed exhausted in the parent
+  work.
+- **Status:** `Approved locally / Protected PR next`.

@@ -2583,3 +2583,25 @@ Rules for all dev agents:
 - Complete documentation, Memory, JSON, diff, audit, handoff-mode, and
   redacted leak checks pass.
 - **Status:** `Approved locally / Publication next`.
+
+### 2026-07-31 15:08 EEST - PR #126 merge verified
+
+- PR #126 merged normally as exact main `2d03f739`; GH-9 remains open.
+- Exact-main CI `30598044239`, Security `30598044233`, and Pages
+  `30598043838` pass; live Pages shows H-001 96%, core 84-88%, and complete
+  vision 50-55%.
+- Opened docs-only issue
+  [#129](https://github.com/NeaBouli/prometheus-/issues/129) for the final
+  Bridge/Memory closeout.
+- No product, protocol, wallet, signing, broadcast, deployment, chain, direct
+  main, or bypass action occurred.
+- **Status:** `In Progress / Closeout validation`.
+
+### 2026-07-31 15:14 EEST - GH-129 candidate approved
+
+- Four-file append-only Bridge/current-Memory closeout validated.
+- PASS: Memory Integrity, six Autodidactic tests, five HTML/JSON-LD parses,
+  evidence JSON, current-status and diff checks, and redacted 15.28-KB
+  Gitleaks scan.
+- Terra final read-only review: PASS, no actionable P0/P1/P2/P3.
+- **Status:** `Approved locally / Protected PR next`.
