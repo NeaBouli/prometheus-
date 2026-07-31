@@ -2448,3 +2448,42 @@ Rules for all dev agents:
 - **Status:** `Done / Exact-main and live Pages verified`.
 
 `TASK COMPLETE - TARGET STOP ACTIVE`
+
+### 2026-07-31 13:16 EEST - Dependency security fix opened
+
+- Started `GIO-PROM-20260731-RUINT` and GitHub issue
+  [#127](https://github.com/NeaBouli/prometheus-/issues/127) from exact main
+  `0b0b743`.
+- Root cause: `RUSTSEC-2026-0220` affects transitive `ruint 1.19.0` through
+  `risc0-binfmt -> kaspa-txscript`, including the deployment-operator graph.
+- Planned remediation is the minimum safe lockfile update to `ruint >=1.20.0`
+  with full audit and Rust integration evidence.
+- No advisory suppression, workflow change, protocol change, production,
+  wallet, signing, broadcast, deployment, or chain action.
+- **Status:** `In Progress`.
+
+### 2026-07-31 14:14 EEST - Local security verification PASS
+
+- Final Cargo diff is only `ruint 1.19.0 -> 1.20.0`; targeted lockfile
+  re-resolution removed an unrelated `syn` edge identified as P2 by Terra.
+- Audit: zero vulnerabilities, eight unchanged allowed warnings; old `ruint`
+  absent and the safe version present throughout the Kaspa operator path.
+- PASS: Rustfmt, Memory Integrity, 55 current-SilverC fixture tests, 49 focused
+  deployer tests, 346 workspace tests with two intentional live ignores, and
+  warning-free workspace all-target Clippy.
+- Corrected environment events: generated targets from an isolated prior
+  worktree were cleaned after a disk-full stop. One response-channel race test
+  then failed once, passed five focused repetitions, and passed in the complete
+  rerun; no unrelated source edit was introduced.
+- Kimi quota remains exhausted. Terra targeted re-review is pending.
+- **Status:** `Local PASS / Review pending`.
+
+### 2026-07-31 14:16 EEST - Security candidate approved
+
+- Terra targeted re-review: PASS, no P0/P1/P2; unrelated lockfile churn is
+  absent and only the safe `ruint` version/checksum changed.
+- Final locked metadata/tree checks, diff check, and redacted Gitleaks 8.30.1
+  scan of the complete 5.58-KB diff pass with zero findings.
+- Exact publication set: `Cargo.lock`, `docs/agent-bridge/ACTION_LOG.md`, and
+  `docs/agent-bridge/CODEX_BRIDGE.md`.
+- **Status:** `Approved locally / Protected PR next`.
