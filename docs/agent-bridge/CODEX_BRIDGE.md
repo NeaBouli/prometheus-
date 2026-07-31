@@ -2068,3 +2068,75 @@ No direct `main` push or production action occurred.
   outside GH-121/GH-123.
 
 `TASK COMPLETE - TARGET STOP ACTIVE`
+
+### 2026-07-31 13:16 EEST - RUSTSEC-2026-0220 remediation started
+
+- Ticket `GIO-PROM-20260731-RUINT` and GitHub issue
+  [#127](https://github.com/NeaBouli/prometheus-/issues/127) own a separate
+  dependency-security fix from exact main
+  `0b0b74335024ee21cd87b83e18cbe1663dbd1065`.
+- PR #126 exposed a real `cargo audit` failure:
+  `ruint 1.19.0` is affected by `RUSTSEC-2026-0220`; the safe range starts at
+  `1.20.0`. The dependency enters through
+  `risc0-binfmt -> kaspa-txscript` and reaches the client, validator, and
+  SilverC deployment operator.
+- Scope is limited to the smallest compatible dependency upgrade, proof that
+  the advisory is absent, complete relevant Rust validation, independent
+  review, and a protected GitHub PR.
+- No audit ignore, workflow weakening, product/protocol change, direct main
+  push, wallet access, signing, broadcast, deployment, or chain mutation is
+  allowed.
+- **Status:** `In Progress / Dependency remediation`.
+- **Next:** update the lockfile to the minimum safe compatible release, inspect
+  the exact diff and dependency tree, then run audit, format, tests, Clippy,
+  and H-001 operator regression checks.
+
+### 2026-07-31 14:14 EEST - RUSTSEC remediation locally validated
+
+- The final lockfile diff contains only `ruint 1.19.0 -> 1.20.0` and its
+  registry checksum. A first Cargo resolution also moved an unrelated
+  `data-encoding-macro-internal` `syn` edge; Terra correctly marked that P2,
+  and a targeted package re-resolution removed the churn while preserving a
+  locked offline metadata pass.
+- `cargo audit` now reports zero vulnerabilities and the eight unchanged,
+  already allowed warnings. `ruint 1.19.0` is absent; `1.20.0` serves the
+  complete `risc0-binfmt -> kaspa-txscript` client, validator, and operator
+  path.
+- Rustfmt, Memory Integrity, H-001/current-SilverC 55-test fixture
+  verification, 49 focused operator tests, 346 complete workspace tests with
+  two intentional live-network ignores, and warning-free workspace all-target
+  Clippy pass.
+- The first complete workspace run was environment-blocked by a full disk.
+  Sol removed only generated Cargo targets from the isolated prior worktree.
+  The next run exposed one Guardian response-channel timing failure; that exact
+  test passed five consecutive focused runs and then passed in the complete
+  workspace rerun. No Guardian source change was made.
+- Kimi review remained unavailable because its external monthly quota is
+  exhausted. Terra's initial P2 is remediated; targeted re-review is pending.
+- **Status:** `Local PASS / Independent re-review pending`.
+- **Next:** obtain the targeted re-review, run final diff/leak checks, then
+  publish issue #127 through a protected PR and require exact-head CI/Security.
+
+### 2026-07-31 14:16 EEST - RUSTSEC candidate independently approved
+
+- Terra targeted re-review: PASS, no remaining P0/P1/P2. The former `syn`
+  lockfile P2 is closed and the `data-encoding-macro-internal` block is
+  byte-identical to `origin/main`.
+- Locked online/offline metadata and dependency-tree checks pass. The final
+  complete diff is limited to the intended `ruint` version/checksum update and
+  append-only Bridge evidence.
+- Final diff check and redacted Gitleaks 8.30.1 stdin scan over the complete
+  5.58-KB diff pass with zero findings.
+- **Status:** `Approved locally / Ready for protected publication`.
+- **Next:** commit the exact three-file set, push the issue #127 branch, open a
+  protected PR, and require exact-head CI/Security/review before merge.
+
+### 2026-07-31 14:18 EEST - RUSTSEC protected PR opened
+
+- Commit `db8adba` contains the exact reviewed three-file candidate.
+- Branch `fix/ruint-rustsec-2026-0220` is pushed and protected PR
+  [#128](https://github.com/NeaBouli/prometheus-/pull/128) targets `main` and
+  closes issue #127 only on merge.
+- No direct main push, bypass, workflow weakening, production, wallet,
+  signing, broadcast, deployment, or chain action occurred.
+- **Status:** `In Progress / Exact-head CI and review`.
