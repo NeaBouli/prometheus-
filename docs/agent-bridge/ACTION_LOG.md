@@ -2555,3 +2555,31 @@ Rules for all dev agents:
   published history. Resolved only parallel append-only Bridge tails and kept
   both histories complete and chronological.
 - **Status:** `In Progress / Combined branch validation`.
+
+### 2026-07-31 14:50 EEST - H-001 reproduced after security merge
+
+- Fresh release operator and owner-only handoff from secured exact main
+  `143a8a0` reproduce the accepted archive/request/signing-request bytes.
+- Live read-only preflight: synced/UTXO-indexed `rusty-kaspa 2.0.1`, DAA
+  `531038718`, Toccata active, exact funding output unspent/non-coinbase.
+- Handoff mode checks and redacted 1.27-MB Gitleaks scan pass with zero leaks.
+- Updated all current public/Memory/evidence references from `0b0b743` to
+  `143a8a0`; blockers and percentages remain unchanged.
+- **Status:** `Local PASS / Documentation gates pending`.
+
+### 2026-07-31 14:56 EEST - Final review remediation
+
+- Terra P2 closed by synchronizing the stale `index.html` estimates to
+  84-88% core and 50-55% complete vision.
+- Removed one public local-path disclosure from the Bridge.
+- Remaining Terra P1 is expected publication state and closes only after
+  commit/push plus renewed exact-head PR checks.
+- **Status:** `Changes remediated / Targeted re-review pending`.
+
+### 2026-07-31 14:58 EEST - Final content review PASS
+
+- Terra targeted re-review closes the former percentage P2 with no remaining
+  content P0/P1/P2.
+- Complete documentation, Memory, JSON, diff, audit, handoff-mode, and
+  redacted leak checks pass.
+- **Status:** `Approved locally / Publication next`.

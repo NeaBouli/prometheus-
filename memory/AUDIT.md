@@ -2070,7 +2070,7 @@ server, secret, or production deployment was approved or exercised.
 **Result:** PASS for a repository-only, non-promotable signing handoff refresh;
 no chain execution approval is implied.
 
-Exact main `0b0b74335024ee21cd87b83e18cbe1663dbd1065` reproduced the
+Exact main `143a8a0e0e07931d6b91823e939d5ada8a4e042c` reproduced the
 accepted `205e1ca` seven-artifact archive, closed one-request
 `testnet-10-validator-staking-h001` set, public funding specification, and
 schema-v2 signing request byte-for-byte. Archive SHA-256 remains
@@ -2084,7 +2084,7 @@ and the BIP340 sighash remains
 
 The current release operator built successfully. Live read-only preflight
 reconfirmed the public funding output unspent/non-coinbase through a synced,
-UTXO-indexed `rusty-kaspa 2.0.1` node at virtual DAA `530956976`, above
+UTXO-indexed `rusty-kaspa 2.0.1` node at virtual DAA `531038718`, above
 Toccata activation. Two prepare runs were byte-identical to each other and
 the prior handoff. Owner-only 0700/0600 modes and a full-directory Gitleaks
 8.30.1 scan over 1.28 MB passed with zero findings.

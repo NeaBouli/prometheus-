@@ -13,10 +13,10 @@
 | Repo | https://github.com/NeaBouli/prometheus- |
 | Branch | Canonical target `main`; product/public/status changes remain PR-only |
 | Lokaler Pfad | `$REPO_ROOT` |
-| Letzter grün verifizierter Produkt-/Public-Baseline | Exact product/public main `0b0b74335024ee21cd87b83e18cbe1663dbd1065`; Prometheus CI `30495215304`, Security `30495215501`, and Pages `30495214832` pass |
+| Letzter grün verifizierter Produkt-/Public-Baseline | Exact product/public main `143a8a0e0e07931d6b91823e939d5ada8a4e042c`; Prometheus CI `30596194766`, Security `30596194775`, and Pages `30596194216` pass |
 | Aktueller Entwicklungs-Slice | GH-9 exact-main H-001 readiness refresh on `ops/GH-9-exact-main-handoff-refresh`; repository status/docs only, no signing, broadcast, deployment, wallet, or chain mutation |
-| Aktuelle Tooling-Baseline | Exact main `0b0b743` includes the merged GH-117/GH-121 product surfaces and independently reproduces the accepted `205e1ca` H-001 archive/request/signing request. Production proof artifacts/ceremony, independent cryptographic/privacy review, real semantic/actionable analysis, v2 transport, H-001 external signing/broadcast/evidence, and operated rollout remain open. |
-| Aktueller HEAD | Exact verified product/public baseline is `0b0b74335024ee21cd87b83e18cbe1663dbd1065`; the current GH-9 branch contains status/Bridge updates only |
+| Aktuelle Tooling-Baseline | Exact main `143a8a0` includes the `ruint 1.20.0` security remediation and independently reproduces the accepted `205e1ca` H-001 archive/request/signing request. Production proof artifacts/ceremony, independent cryptographic/privacy review, real semantic/actionable analysis, v2 transport, H-001 external signing/broadcast/evidence, and operated rollout remain open. |
+| Aktueller HEAD | Exact verified product/public baseline is `143a8a0e0e07931d6b91823e939d5ada8a4e042c`; the current GH-9 branch contains status/Bridge/evidence updates only |
 | Rollback-Tag | `pre-session-20260413` → `6347b85` |
 | Whitepaper | WHITEPAPER.md (root) + whitepaper.html (styled); miner companion, reward boundaries, GH-36/GH-39 trust boundaries, GH-48/GH-52/GH-55/GH-58/GH-63/GH-74/GH-94/GH-107/GH-111/GH-114, and merged GH-117 binding/verifier/preflight/acceptance/governance/outbox/non-actionable-worker boundaries remain synchronized |
 | Status | Rollout-capable core is estimated at 84-88%. GH-117 is merged and exact-main verified but not production-deployed. Production relation/key/ceremony approval and independent cryptographic/privacy review, post-Toccata canary execution, v2 transport, real semantic/actionable analysis, crash-safe external side effects, and full rollout evidence remain gated. |
@@ -140,13 +140,13 @@
 7. Lies memory/ERRORS.md             → 12 bekannte Patterns
 ```
 
-**Status: Feature-complete through Sprint 7. Kaspa Toccata and all seven current-Silverc compile/ABI/runtime gates pass locally and in CI. GH-7 is merged and the live read-only testnet-10 resolver probe passes. GH-9's closed, manifest-bound H-001 canary profile omits the unrelated oracle key and cannot promote full readiness; exact main `0b0b743` reproduced the accepted `205e1ca` public funding-bound archive/request/signing request byte-for-byte and live-preflight revalidated the UTXO. The remaining canary gates are an explicitly approved external BIP340 signature, complete operator verification, separately approved one-shot broadcast, confirmation, receipt, and independent evidence. GH-25 is merged and exact-main verified at `072f04a` with the keyless value-preserving `reportMetrics` transition, separate P2PK fee sponsor, two external signatures, complete input execution, live UTXO revalidation, acknowledged journaled broadcast, and successor observation; real operation remains. GH-13 remains accepted at `2e4b4ec` as a development-only local Testnet-10 wRPC observer. Full rollout still requires all seven release fixtures, six state-contract deployments, real oracle/sponsor inputs/signatures/evidence, and exact-commit release hardening.**
+**Status: Feature-complete through Sprint 7. Kaspa Toccata and all seven current-Silverc compile/ABI/runtime gates pass locally and in CI. GH-7 is merged and the live read-only testnet-10 resolver probe passes. GH-9's closed, manifest-bound H-001 canary profile omits the unrelated oracle key and cannot promote full readiness; exact main `143a8a0` reproduced the accepted `205e1ca` public funding-bound archive/request/signing request byte-for-byte after the dependency-security update and live-preflight revalidated the UTXO. The remaining canary gates are an explicitly approved external BIP340 signature, complete operator verification, separately approved one-shot broadcast, confirmation, receipt, and independent evidence. GH-25 is merged and exact-main verified at `072f04a` with the keyless value-preserving `reportMetrics` transition, separate P2PK fee sponsor, two external signatures, complete input execution, live UTXO revalidation, acknowledged journaled broadcast, and successor observation; real operation remains. GH-13 remains accepted at `2e4b4ec` as a development-only local Testnet-10 wRPC observer. Full rollout still requires all seven release fixtures, six state-contract deployments, real oracle/sponsor inputs/signatures/evidence, and exact-commit release hardening.**
 
 **Offene Tasks (priorisiert):**
 - [x] PATTERN-010 fix: Arc<Phi3Model> statt Arc<Mutex<Phi3Model>> — DONE `6347b85`
 - [x] Rust client production/beta stub gates — DONE 2026-07-08 (`PROMETHEUS_RUNTIME`)
 - [~] H-001: LE encoding Verifikation — repo `silverc` fixture passes for Rust byte vectors; all six current state fixtures compile and their runtime gates pass; release/handoff/evidence tooling, keyless genesis, and keyless value-preserving reportMetrics assembly/dual-signature verification/guarded broadcast/observation pass exact-main checks; real signatures, receipts, and independent evidence remain
-- [~] Sprint 9: H-001 canary handoff was refreshed from exact main `0b0b743`, remains byte-identical to the accepted `205e1ca` baseline, live-preflight verified, and non-promotable; real signature/receipt/evidence execution remains external. The keyless metrics transition operator is merged/exact-main verified; real oracle/sponsor UTXOs, signatures, confirmation/evidence, remaining state contracts, and exact-commit release hardening still block full rollout
+- [~] Sprint 9: H-001 canary handoff was refreshed from exact main `143a8a0`, remains byte-identical to the accepted `205e1ca` baseline after the dependency-security update, live-preflight verified, and non-promotable; real signature/receipt/evidence execution remains external. The keyless metrics transition operator is merged/exact-main verified; real oracle/sponsor UTXOs, signatures, confirmation/evidence, remaining state contracts, and exact-commit release hardening still block full rollout
 - [x] GH-1 covenant-genesis capability gate — merged via PR #2 as `9d74c0c`; transaction version 1, compiled-script P2SH, official funding-outpoint/unbound-output covenant-ID derivation, and funding-input binding after ID derivation are required; four tamper classes reject; main CI, Security Audit, and Pages pass
 - [x] Sprint 10B hybrid routing software: PR #34 merged/exact-main verified as `ce1d213`; 8B first, exact 70B escalation below `0.70`, fail-closed safety envelope, and unchanged `0.85` submission threshold; live model wiring/calibration remains
 - [~] Sprint 10B ensemble voting: GH-36/39 plus merged/exact-main GH-42/GH-44/GH-48/GH-52 are implemented. Real two-host operation, broad discovery, trusted membership/key assignment, Sybil resistance, and on-chain attestation remain
@@ -637,12 +637,12 @@ Leistungsbasierte Emission. Guardians = "Miner" (KI statt GPU).
 
 ## Checkpoint 2026-07-31: GH-9 exact-main readiness refresh
 
-- Exact main `0b0b743` reproduced the accepted `205e1ca` H-001 archive,
+- Exact main `143a8a0` reproduced the accepted `205e1ca` H-001 archive,
   one-request profile, public funding spec, and schema-v2 signing request
   byte-for-byte.
 - Live read-only preflight reconfirmed the public funding output
   unspent/non-coinbase on a synced, UTXO-indexed `rusty-kaspa 2.0.1` node at
-  virtual DAA `530956976`, above Toccata activation.
+  virtual DAA `531038718`, above Toccata activation.
 - Owner-only handoff modes, Gitleaks, Rust release build/fmt/tests/Clippy,
   Guardian 742/3, Memory, Autodidactic, Pages, HTML/JSON-LD, SEO, and diff
   gates pass.

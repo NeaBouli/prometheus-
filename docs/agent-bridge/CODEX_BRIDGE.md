@@ -2256,3 +2256,50 @@ No direct `main` push or production action occurred.
 - **Status:** `In Progress / GH-9 exact-head validation`.
 - **Next:** validate the combined branch, push the merge commit, require all
   renewed PR #126 checks, then merge normally only if exact-head is green.
+
+### 2026-07-31 14:50 EEST - GH-9 exact-main security revalidation passed
+
+- From secured exact main `143a8a0e0e07931d6b91823e939d5ada8a4e042c`,
+  Sol rebuilt the release operator and a fresh owner-only H-001 handoff
+  outside Git.
+- The seven-artifact archive, manifest, closed request set, H-001 request, and
+  two schema-v2 signing-request builds are byte-identical to the accepted
+  `205e1ca` and `0b0b743` baselines. Archive SHA-256 remains
+  `4989f0768f2d2fc749fdd3aea227c1be6e55f5cbf35ac9c83e891b6abdf3977d`;
+  signing-request hash remains
+  `6b8e65065ca5ae2ca561ddd3fcb9659c384496fd31db32c137fcc9d811fa5323`.
+- Live read-only preflight reached synced, UTXO-indexed
+  `rusty-kaspa 2.0.1` at virtual DAA `531038718`, above Toccata, and
+  reconfirmed the exact public funding output unspent/non-coinbase.
+- The handoff remains 0700/0600 and a redacted Gitleaks 8.30.1 scan over
+  1.27 MB found zero leaks. No wallet, key, signature, raw transaction,
+  signing, broadcast, deployment, or chain mutation occurred.
+- README, public pages, Whitepaper, Roadmap, `llms.txt`, Memory, and public
+  evidence now identify secured exact main `143a8a0` and its exact-main CI
+  `30596194766`, Security `30596194775`, and Pages `30596194216`.
+- **Status:** `Local revalidation PASS / Combined docs checks pending`.
+
+### 2026-07-31 14:56 EEST - Final review findings remediated
+
+- Terra found one real P2: `index.html` still exposed obsolete 44-49% /
+  78-82% estimates while all current roadmap surfaces use 50-55% / 84-88%.
+  The public row is now synchronized to the current estimates.
+- Terra's P1 is procedural: GitHub PR #126 cannot contain the reviewed local
+  merge and staged refresh until they are committed and pushed. It will close
+  only after publication and renewed exact-head checks.
+- Removed the owner-local handoff path from the public Bridge while retaining
+  the owner-only/outside-Git security boundary.
+- **Status:** `P2 remediated / Targeted re-review pending`.
+
+### 2026-07-31 14:58 EEST - Combined candidate approved
+
+- Terra targeted re-review: PASS, no remaining content P0/P1/P2. Current
+  rollout estimates, exact-main evidence, public/Memory status, and safety
+  boundaries are consistent.
+- Memory Integrity, six Autodidactic tests, five HTML and all embedded JSON-LD
+  parses, public evidence JSON, stale-current-status guard, diff checks, Cargo
+  Audit, owner-only handoff checks, and redacted Gitleaks scans pass.
+- The complete current PR diff contains no secret, signature, raw transaction,
+  local owner-handoff path, product/protocol, wallet, deployment, or chain
+  mutation.
+- **Status:** `Approved locally / Commit and protected publication next`.

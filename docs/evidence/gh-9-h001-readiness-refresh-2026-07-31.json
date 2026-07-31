@@ -8,29 +8,30 @@
   "exact_main_checks": {
     "pages": {
       "conclusion": "success",
-      "run_id": 30495214832
+      "run_id": 30596194216
     },
     "prometheus_ci": {
       "conclusion": "success",
-      "run_id": 30495215304
+      "run_id": 30596194766
     },
     "security_audit": {
       "conclusion": "success",
-      "run_id": 30495215501
+      "run_id": 30596194775
     }
   },
-  "generated_at": "2026-07-31T09:43:29Z",
+  "generated_at": "2026-07-31T11:49:46Z",
   "kind": "prometheus.silverc.h001_exact_main_rebuild_evidence",
   "live_preflight": {
     "funding_outpoint": "24e81339f3656689643ca86e3c53c4c5336e4273bb127d25bdaf328e5da241c7:0",
-    "node_preflight_file_sha256": "7d853becec7512cf01708feafd8df1b3f225f686188df474a2ca48ba459564dc",
+    "funding_preflight_file_sha256": "0d1df86bd3f677a0ef331a6f0a42ad0fa6fb2e0b70c7c73867dcefa5f54dc727",
+    "node_preflight_file_sha256": "726cce41852644a8c3913b058693b5343cd4b4026c1c4d16a24261bf5c44bb2c",
     "non_coinbase": true,
-    "resolved_rpc_url": "wss://vector-10.kaspa.green/kaspa/testnet-10/wrpc/borsh",
+    "resolved_rpc_url": "wss://muon-10.kaspa.blue/kaspa/testnet-10/wrpc/borsh",
     "server_version": "2.0.1",
     "toccata_active": true,
     "unspent": true,
     "utxo_index_enabled": true,
-    "virtual_daa_score": 530956976
+    "virtual_daa_score": 531038718
   },
   "release": {
     "archive_sha256": "4989f0768f2d2fc749fdd3aea227c1be6e55f5cbf35ac9c83e891b6abdf3977d",
@@ -39,10 +40,10 @@
     "request_sha256": "c0cad33f23acfee4114092e0211dd642cb97c44891cc8f8826f4656f406f42fa"
   },
   "repository": {
-    "commit": "0b0b74335024ee21cd87b83e18cbe1663dbd1065",
+    "commit": "143a8a0e0e07931d6b91823e939d5ada8a4e042c",
     "operator_paths_unchanged_since": "205e1ca928d3048109575cf7a21810c9e6609120",
     "product_and_operator_paths_match_commit": true,
-    "tree": "0fbbe9876f672c96858a938dabefb727899b6eeb"
+    "tree": "adb137341fb886159589b2d02ef7c5eb48d25d25"
   },
   "safety": {
     "broadcast_attempted": false,
