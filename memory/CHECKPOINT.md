@@ -13,10 +13,10 @@
 | Repo | https://github.com/NeaBouli/prometheus- |
 | Branch | Canonical target `main`; product/public/status changes remain PR-only |
 | Lokaler Pfad | `$REPO_ROOT` |
-| Letzter grün verifizierter Produkt-/Public-Baseline | Exact product/public main `143a8a0e0e07931d6b91823e939d5ada8a4e042c`; Prometheus CI `30596194766`, Security `30596194775`, and Pages `30596194216` pass |
-| Aktueller Entwicklungs-Slice | GH-9 exact-main H-001 readiness refresh on `ops/GH-9-exact-main-handoff-refresh`; repository status/docs only, no signing, broadcast, deployment, wallet, or chain mutation |
-| Aktuelle Tooling-Baseline | Exact main `143a8a0` includes the `ruint 1.20.0` security remediation and independently reproduces the accepted `205e1ca` H-001 archive/request/signing request. Production proof artifacts/ceremony, independent cryptographic/privacy review, real semantic/actionable analysis, v2 transport, H-001 external signing/broadcast/evidence, and operated rollout remain open. |
-| Aktueller HEAD | Exact verified product/public baseline is `143a8a0e0e07931d6b91823e939d5ada8a4e042c`; the current GH-9 branch contains status/Bridge/evidence updates only |
+| Letzter grün verifizierter Produkt-/Public-Baseline | Exact product/public main `2d03f739b309ed40b7944b3109521a989bb7de67`; Prometheus CI `30598044239`, Security `30598044233`, and Pages `30598043838` pass |
+| Aktueller Entwicklungs-Slice | GH-129 documentation-only merge closeout on `docs/GH-129-gh9-merge-closeout`; no product/protocol, signing, broadcast, deployment, wallet, or chain mutation |
+| Aktuelle Tooling-Baseline | Exact main `2d03f739` includes the `ruint 1.20.0` security remediation and the public record of the byte-identical H-001 refresh reproduced from `143a8a0`. Production proof artifacts/ceremony, independent cryptographic/privacy review, real semantic/actionable analysis, v2 transport, H-001 external signing/broadcast/evidence, and operated rollout remain open. |
+| Aktueller HEAD | Exact verified product/public baseline is `2d03f739b309ed40b7944b3109521a989bb7de67`; the current GH-129 branch contains Bridge/Memory closeout only |
 | Rollback-Tag | `pre-session-20260413` → `6347b85` |
 | Whitepaper | WHITEPAPER.md (root) + whitepaper.html (styled); miner companion, reward boundaries, GH-36/GH-39 trust boundaries, GH-48/GH-52/GH-55/GH-58/GH-63/GH-74/GH-94/GH-107/GH-111/GH-114, and merged GH-117 binding/verifier/preflight/acceptance/governance/outbox/non-actionable-worker boundaries remain synchronized |
 | Status | Rollout-capable core is estimated at 84-88%. GH-117 is merged and exact-main verified but not production-deployed. Production relation/key/ceremony approval and independent cryptographic/privacy review, post-Toccata canary execution, v2 transport, real semantic/actionable analysis, crash-safe external side effects, and full rollout evidence remain gated. |
@@ -657,3 +657,16 @@ Leistungsbasierte Emission. Guardians = "Miner" (KI statt GPU).
   `operator_record`, and independent evidence remain.
 - Estimates remain H-001 96%, rollout-capable core 84-88%, complete vision
   50-55%, with 45-50% of the complete roadmap vision still open.
+
+## Checkpoint 2026-07-31: GH-9 refresh merged and remotely verified
+
+- Protected PR #126 merged normally without bypass as exact main
+  `2d03f739b309ed40b7944b3109521a989bb7de67`.
+- Exact-main Prometheus CI `30598044239`, Security Audit `30598044233`, and
+  Pages `30598043838` pass. Live Pages exposes H-001 96%, rollout-capable core
+  84-88%, and complete vision 50-55%.
+- GH-9 remains open. External BIP340 signing, operator verification,
+  separately authorized one-shot broadcast, confirmation, receipt, and
+  independent evidence remain the immediate canary gates.
+- No wallet, key, signature, raw transaction, broadcast, deployment, or chain
+  mutation occurred.
