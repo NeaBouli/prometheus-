@@ -2168,11 +2168,11 @@ this performance-only patch.
 - The report is explicitly `synthetic_ci_only`, sets
   `production_authorized=false`, and cannot prove live-model quality,
   production calibration, or authorization.
-- Focused evidence: 29 tests, byte-exact CLI reproduction, Black, and focused
+- Focused evidence: 31 tests, byte-exact CLI reproduction, Black, and focused
   Pylint 10.00 pass. Kimi was quota-blocked and wrote nothing. Terra found no
   P0 and required strict non-authority, rational gate decisions, integrity
   binding, and adversarial coverage; those requirements are incorporated.
-- Complete evidence: Guardian 809 pass / 4 intentional live-model skips; full
+- Complete evidence: Guardian 811 pass / 4 intentional live-model skips; full
   Pylint 9.83; warm Rust workspace pass with two intentional network ignores
   and five compile-fail doctests; Rustfmt; locked all-target Clippy; Memory;
   Autodidactic; YAML/Actionlint; Python 3.11 exact report; HTML/status markers;
@@ -2180,6 +2180,10 @@ this performance-only patch.
   and diff checks. One initial unchanged 10-MiB scanner load outlier passed
   immediately in isolation and in the warm complete rerun without code change.
 - Terra's final exact-diff re-review is PASS with no remaining P0/P1/P2/P3.
+- PR #139 review hardening addresses all six CodeRabbit findings: chronological
+  audit ordering, explicit input/report label mapping, precise non-anchored
+  evidence wording, strict CI shell semantics, pre-read file-size rejection,
+  corpus size boundaries, and complete focused definition docstrings.
 
 No live model, real malware/private telemetry, v2 operation, transport,
 publication, wallet/key/signature, broadcast, deployment, chain, KAS/PROM,

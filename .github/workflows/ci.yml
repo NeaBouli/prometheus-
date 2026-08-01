@@ -2453,6 +2453,7 @@ jobs:
       - name: Deterministic Confidence Calibration Evidence
         working-directory: modules/guardian-node
         run: |
+          set -euo pipefail
           vector_dir="tests/vectors/confidence-calibration-v1"
           PYTHONPATH=. python -m jaeger.confidence_calibration \
             --corpus "$vector_dir/corpus.jsonl" \

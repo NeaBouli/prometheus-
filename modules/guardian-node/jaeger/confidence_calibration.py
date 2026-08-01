@@ -52,6 +52,7 @@ class ConfidenceEvaluationError(ValueError):
     """Stable, redacted confidence-evidence validation failure."""
 
     def __init__(self) -> None:
+        """Create one content-free public validation error."""
         super().__init__("invalid confidence evaluation evidence")
 
 
@@ -469,6 +470,7 @@ def verify_fixture_set(
 def _build_calibration_bins(
     bins: Sequence[Mapping[str, int]], sample_count: int
 ) -> tuple[list[Dict[str, Any]], int]:
+    """Render fixed bins and return their exact aggregate gap."""
     output: list[Dict[str, Any]] = []
     absolute_gap_sum = 0
     for index, values in enumerate(bins):
@@ -511,6 +513,7 @@ def _build_calibration_bins(
 
 
 def _parse_case(value: Mapping[str, Any]) -> BenchmarkCase:
+    """Validate one exact-shape synthetic benchmark case."""
     expected_keys = [
         "case_id",
         "category",
@@ -533,6 +536,7 @@ def _parse_case(value: Mapping[str, Any]) -> BenchmarkCase:
 
 
 def _parse_prediction(value: Mapping[str, Any]) -> ConfidencePrediction:
+    """Validate one exact-shape confidence prediction."""
     if type(value) is not dict or list(value) != ["case_id", "confidence_bps"]:
         raise ConfidenceEvaluationError()
     confidence_bps = _exact_int(value["confidence_bps"])
@@ -547,6 +551,7 @@ def _parse_prediction(value: Mapping[str, Any]) -> ConfidencePrediction:
 def _validate_evaluation_inputs(
     corpus: BenchmarkCorpus, prediction_set: PredictionSet, policy: GatePolicy
 ) -> None:
+    """Revalidate parsed runtime objects before metric calculation."""
     if (
         _lower_hex_32(corpus.sha256) != prediction_set.corpus_sha256
         or _lower_hex_32(prediction_set.sha256) != prediction_set.sha256
@@ -602,6 +607,7 @@ def _validate_evaluation_inputs(
 def _parse_canonical_jsonl(
     raw_bytes: bytes, maximum_bytes: int
 ) -> list[Dict[str, Any]]:
+    """Parse size-bounded compact ASCII JSONL with exact byte identity."""
     if (
         type(raw_bytes) is not bytes
         or not raw_bytes
@@ -636,6 +642,7 @@ def _parse_canonical_jsonl(
 
 
 def _parse_canonical_json(raw_bytes: bytes, maximum_bytes: int) -> Dict[str, Any]:
+    """Parse one size-bounded compact ASCII JSON object exactly."""
     if (
         type(raw_bytes) is not bytes
         or not raw_bytes
@@ -662,6 +669,7 @@ def _parse_canonical_json(raw_bytes: bytes, maximum_bytes: int) -> Dict[str, Any
 
 
 def _reject_duplicate_keys(items: Iterable[tuple[str, Any]]) -> Dict[str, Any]:
+    """Build a mapping while rejecting duplicate JSON member names."""
     output: Dict[str, Any] = {}
     for key, value in items:
         if key in output:
@@ -671,16 +679,19 @@ def _reject_duplicate_keys(items: Iterable[tuple[str, Any]]) -> Dict[str, Any]:
 
 
 def _reject_json_constant(_value: str) -> None:
+    """Reject non-standard JSON numeric constants."""
     raise ConfidenceEvaluationError()
 
 
 def _exact_int(value: Any) -> int:
+    """Require a non-negative literal integer, excluding booleans."""
     if type(value) is not int or value < 0:
         raise ConfidenceEvaluationError()
     return value
 
 
 def _identifier(value: Any, maximum_length: int) -> str:
+    """Validate one bounded lowercase identifier."""
     if (
         type(value) is not str
         or len(value) < 3
@@ -692,6 +703,7 @@ def _identifier(value: Any, maximum_length: int) -> str:
 
 
 def _bounded_ascii_text(value: Any, maximum_length: int) -> str:
+    """Validate bounded printable ASCII plus normal text whitespace."""
     if (
         type(value) is not str
         or not value
@@ -706,12 +718,14 @@ def _bounded_ascii_text(value: Any, maximum_length: int) -> str:
 
 
 def _lower_hex_32(value: Any) -> str:
+    """Validate one canonical lowercase 32-byte hexadecimal value."""
     if type(value) is not str or _LOWER_HEX_32_RE.fullmatch(value) is None:
         raise ConfidenceEvaluationError()
     return value
 
 
 def _nonzero_lower_hex_32(value: Any) -> str:
+    """Validate one nonzero canonical lowercase 32-byte hash."""
     parsed = _lower_hex_32(value)
     if parsed == "0" * 64:
         raise ConfidenceEvaluationError()
@@ -719,20 +733,25 @@ def _nonzero_lower_hex_32(value: Any) -> str:
 
 
 def _round_ratio(numerator: int, denominator: int) -> int:
+    """Round a non-negative rational to the nearest integer, halves up."""
     if denominator <= 0 or numerator < 0:
         raise ConfidenceEvaluationError()
     return (2 * numerator + denominator) // (2 * denominator)
 
 
 def _ratio_bps(numerator: int, denominator: int) -> int | None:
+    """Return a rounded basis-point ratio or None when undefined."""
     if denominator == 0:
         return None
     return _round_ratio(numerator * 10_000, denominator)
 
 
 def _read_bounded(path: Path, maximum_bytes: int) -> bytes:
+    """Read a regular non-symlink file with pre- and post-read bounds."""
     try:
         if not path.is_file() or path.is_symlink():
+            raise ConfidenceEvaluationError()
+        if path.stat().st_size > maximum_bytes:
             raise ConfidenceEvaluationError()
         raw_bytes = path.read_bytes()
     except OSError:
@@ -743,6 +762,7 @@ def _read_bounded(path: Path, maximum_bytes: int) -> bytes:
 
 
 def _main(argv: Sequence[str] | None = None) -> int:
+    """Run exact fixture verification with stable process exit semantics."""
     parser = argparse.ArgumentParser(
         description="Evaluate canonical Guardian confidence evidence offline."
     )

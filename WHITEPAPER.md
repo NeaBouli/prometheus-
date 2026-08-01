@@ -302,12 +302,13 @@ through a float.
 GH-138 adds a separate deterministic development evaluator around this
 boundary. A canonical 24-case synthetic YARA corpus, exact integer-bps
 predictions, fixed policy, expected report, and co-versioned manifest are
-internally consistency-checked by SHA-256. The byte-exact report measures the unchanged `8500`-bps confusion
-matrix, exact-ratio precision and recall, Brier score, and fixed ten-bin
-expected calibration error. Missing, duplicate, reordered, noncanonical,
-weakened-policy, or internally hash-inconsistent evidence fails closed. This
-detects partial fixture drift within a reviewed revision; it is not a signed or
-externally anchored tamper proof.
+internally consistency-checked by SHA-256. The byte-exact report measures the
+unchanged `8500`-bps confusion matrix, exact-ratio precision and recall, Brier
+score, and fixed ten-bin expected calibration error. Missing, duplicate,
+reordered, noncanonical, weakened-policy, or internally hash-inconsistent
+evidence fails closed. This detects partial fixture drift within a reviewed
+revision. It is neither signed nor externally anchored, so it does not provide
+independent tamper evidence.
 
 This is synthetic offline evaluation only. The report explicitly records no
 production authority and invokes no model, network, telemetry, YARA engine,

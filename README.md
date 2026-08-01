@@ -112,7 +112,8 @@ decision boundary, confusion matrix, exact-ratio precision/recall, Brier score,
 and ten-bin expected calibration error. Missing, duplicate, reordered,
 noncanonical, weakened-policy, or internally hash-inconsistent evidence fails
 closed. The manifest detects accidental or partial fixture drift inside one
-reviewed revision; it is not a signed or externally anchored tamper proof. CI
+reviewed revision. It is neither signed nor externally anchored, so it does
+not provide independent tamper evidence. CI
 evidence is explicitly `synthetic_ci_only` with `production_authorized=false`;
 it validates the evaluation machinery, not live-model quality, production
 calibration, or authorization.

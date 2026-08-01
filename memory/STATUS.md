@@ -942,8 +942,8 @@ Metrics: unchanged 8500-bps decision boundary; confusion matrix; exact-ratio
 Fixture: TP 11 / FP 1 / TN 11 / FN 1; precision/recall 9167 bps;
          Brier 36100 ppm; ECE 750 bps; development gate pass
 Evidence: synthetic_ci_only; production_authorized=false
-Focused: 29 tests pass; byte-exact CLI reproduction and focused Pylint 10.00
-Complete: Guardian 809 pass / 4 intentional live skips; full Pylint 9.83;
+Focused: 31 tests pass; byte-exact CLI reproduction and focused Pylint 10.00
+Complete: Guardian 811 pass / 4 intentional live skips; full Pylint 9.83;
           Rust workspace pass / 2 intentional network ignores / 5 compile-fail
           doctests; complete format, lint, memory, CI, audit, and leak gates pass
 Review: Kimi quota-blocked with no write; Terra final PASS after all P2/P3 fixes

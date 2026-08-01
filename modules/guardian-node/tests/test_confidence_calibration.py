@@ -13,9 +13,12 @@ from pathlib import Path
 import pytest
 
 from jaeger.confidence_calibration import (
+    MAX_LINE_BYTES,
+    MAX_POLICY_BYTES,
     BenchmarkCase,
     ConfidenceEvaluationError,
     ConfidencePrediction,
+    _read_bounded,
     canonical_report_bytes,
     evaluate_confidence,
     parse_corpus,
@@ -29,10 +32,12 @@ VECTOR_ROOT = Path(__file__).parent / "vectors" / "confidence-calibration-v1"
 
 
 def _read(name: str) -> bytes:
+    """Read one committed confidence-evaluation fixture."""
     return (VECTOR_ROOT / name).read_bytes()
 
 
 def _load_fixture_set() -> tuple[bytes, bytes, bytes, bytes, bytes]:
+    """Load the complete committed fixture set in verifier order."""
     return (
         _read("corpus.jsonl"),
         _read("predictions.jsonl"),
@@ -43,6 +48,7 @@ def _load_fixture_set() -> tuple[bytes, bytes, bytes, bytes, bytes]:
 
 
 def _jsonl(values: list[dict[str, object]]) -> bytes:
+    """Serialize test mappings as compact canonical-style ASCII JSONL."""
     return b"".join(
         (json.dumps(value, separators=(",", ":"), ensure_ascii=True) + "\n").encode(
             "ascii"
@@ -52,10 +58,12 @@ def _jsonl(values: list[dict[str, object]]) -> bytes:
 
 
 def _decode_jsonl(raw_bytes: bytes) -> list[dict[str, object]]:
+    """Decode trusted test JSONL for controlled fixture mutation."""
     return [json.loads(line) for line in raw_bytes.decode("ascii").splitlines()]
 
 
 def _parsed_fixture():
+    """Return the parsed committed corpus, predictions, and gate policy."""
     corpus = parse_corpus(_read("corpus.jsonl"))
     predictions = parse_predictions(_read("predictions.jsonl"), corpus)
     policy = parse_policy(_read("policy.json"))
@@ -63,6 +71,7 @@ def _parsed_fixture():
 
 
 def _replace_confidences(prediction_set, values: list[int]):
+    """Return a test prediction set with replacement confidence values."""
     assert len(values) == len(prediction_set.predictions)
     return replace(
         prediction_set,
@@ -74,6 +83,7 @@ def _replace_confidences(prediction_set, values: list[int]):
 
 
 def _write_fixture_set(root: Path, confidence_values: list[int]) -> bytes:
+    """Write one internally consistent temporary fixture set for CLI tests."""
     root.mkdir()
     corpus_bytes = _read("corpus.jsonl")
     policy_bytes = _read("policy.json")
@@ -83,9 +93,8 @@ def _write_fixture_set(root: Path, confidence_values: list[int]) -> bytes:
         row["confidence_bps"] = confidence
     predictions_bytes = _jsonl(values)
     predictions = parse_predictions(predictions_bytes, corpus)
-    policy = parse_policy(policy_bytes)
     report_bytes = canonical_report_bytes(
-        evaluate_confidence(corpus, predictions, policy)
+        evaluate_confidence(corpus, predictions, parse_policy(policy_bytes))
     )
     manifest = {
         "schema_version": 1,
@@ -110,6 +119,7 @@ def _write_fixture_set(root: Path, confidence_values: list[int]) -> bytes:
 
 
 def _run_cli(root: Path) -> subprocess.CompletedProcess[bytes]:
+    """Run the standalone evaluator against a temporary fixture set."""
     guardian_root = Path(__file__).parent.parent
     environment = os.environ.copy()
     environment["PYTHONPATH"] = str(guardian_root)
@@ -172,6 +182,25 @@ def test_cli_returns_two_with_redacted_error_and_no_stdout(
     assert completed.stderr == b"confidence evaluation failed\n"
     assert b"sensitive" not in completed.stderr
     assert str(root).encode() not in completed.stderr
+
+
+def test_bounded_reader_rejects_oversized_file_before_read(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """The path size guard rejects oversized evidence before allocation."""
+    path = tmp_path / "oversized-policy.json"
+    with path.open("wb") as handle:
+        handle.seek(MAX_POLICY_BYTES)
+        handle.write(b"\0")
+
+    def fail_read(_path: Path) -> bytes:
+        """Fail if the regression reaches the content-reading operation."""
+        pytest.fail("oversized evidence was read")
+
+    monkeypatch.setattr(Path, "read_bytes", fail_read)
+
+    with pytest.raises(ConfidenceEvaluationError):
+        _read_bounded(path, MAX_POLICY_BYTES)
 
 
 def test_report_metrics_and_non_authority_are_exact() -> None:
@@ -299,6 +328,27 @@ def test_corpus_rejects_unsorted_duplicate_and_class_imbalanced_cases() -> None:
         value["expected_acceptable"] = False
 
     for candidate in (unsorted_values, duplicate_values, imbalanced_values):
+        with pytest.raises(ConfidenceEvaluationError):
+            parse_corpus(_jsonl(candidate))
+
+
+def test_corpus_rejects_case_count_and_line_size_boundaries() -> None:
+    """Corpus row and individual canonical-line budgets fail closed."""
+    values = _decode_jsonl(_read("corpus.jsonl"))
+    under_minimum = [values[0], *values[1:11], *values[13:22]]
+
+    template = values[1]
+    over_maximum = [values[0]]
+    for index in range(257):
+        case = dict(template)
+        case["case_id"] = f"case-{index:03d}"
+        case["expected_acceptable"] = index % 2 == 0
+        over_maximum.append(case)
+
+    oversized_line = [dict(value) for value in values]
+    oversized_line[1]["yara_rule"] = "x" * (MAX_LINE_BYTES + 1)
+
+    for candidate in (under_minimum, over_maximum, oversized_line):
         with pytest.raises(ConfidenceEvaluationError):
             parse_corpus(_jsonl(candidate))
 

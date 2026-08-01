@@ -2595,10 +2595,11 @@ No direct `main` push or production action occurred.
 
 ### 2026-08-01 23:42 EEST - GH-138 complete local gates and review PASS
 
-- Review hardening restricts v1 evidence to `synthetic_ci`, describes the
-  co-versioned manifest only as internal consistency checking rather than an
-  external tamper anchor, restores contiguous historical audit text, and adds
-  direct CLI exit-1/exit-2/redaction/no-partial-output tests.
+- Review hardening restricts the v1 input mode to `synthetic_ci`; the canonical
+  report evidence label is `synthetic_ci_only`. It describes the co-versioned
+  manifest only as internal consistency checking rather than an external
+  tamper anchor, restores contiguous historical audit text, and adds direct
+  CLI exit-1/exit-2/redaction/no-partial-output tests.
 - PASS: 29 focused tests; complete Guardian 809 passed / 4 intentional live
   skips; Black; focused Pylint 10.00 and full Pylint 9.83; Python 3.11 exact
   report; Rustfmt; locked all-target Clippy; warm complete Rust workspace with
@@ -2625,3 +2626,32 @@ No direct `main` push or production action occurred.
   checks, review resolution, ready state, normal merge, and exact-main/Live-
   Pages verification remain.
 - **Status:** `Protected PR open / Required checks pending`.
+
+### 2026-08-01 23:59 EEST - PR #139 review findings locally remediated
+
+- Accepted all six CodeRabbit findings: action history is chronological; input
+  mode `synthetic_ci` and report label `synthetic_ci_only` are distinguished;
+  public wording states the manifest has no independent tamper evidence; the
+  CI shell fails strictly; oversized files are rejected before reading; and
+  corpus row/line boundaries plus complete definition docstrings are covered.
+- Focused PASS: 31 tests, Black, Pylint 10.00/10, and 61/61 Python definitions
+  documented across the evaluator and its focused test module. Diff hygiene
+  also passes.
+- No threshold, fixture, metric, model, telemetry, v2, transport, wallet,
+  signing, broadcast, deployment, chain, protocol, or token behavior changed.
+  Complete local gates, review-fix commit/push, refreshed protected checks,
+  thread resolution, and normal merge remain.
+- **Status:** `Review fixes focused PASS / Complete gates next`.
+
+### 2026-08-02 00:08 EEST - PR #139 review-fix local gates PASS
+
+- Python 3.11 complete Guardian PASS: 811 tests / 4 intentional live-model
+  skips. Black passes all 26 Guardian source files; full Pylint remains 9.83;
+  the exact CLI report comparison, Memory Integrity, six Autodidactic tests,
+  workflow YAML, Actionlint 1.7.12, HTML/SEO/public-status checks, Gitleaks
+  8.30.0 with no leak, and diff checks pass.
+- Rust code was not changed by this review patch. Its complete workspace,
+  Rustfmt, Clippy, performance, audit, and protected CI gates passed on the
+  preceding PR head; refreshed protected checks will rerun those gates after
+  the review-fix push.
+- **Status:** `Review fixes local PASS / Commit and refreshed checks next`.

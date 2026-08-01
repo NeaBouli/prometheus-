@@ -774,10 +774,10 @@ Leistungsbasierte Emission. Guardians = "Miner" (KI statt GPU).
 - The unchanged 8500-bps threshold yields TP 11 / FP 1 / TN 11 / FN 1,
   precision and recall 9167 bps, Brier 36100 ppm, and fixed ten-bin ECE 750
   bps. Policy checks use exact integer ratios/sums, never rounded displays.
-- Focused evidence passes: 29 tests, deterministic CLI byte comparison, Black,
+- Focused evidence passes: 31 tests, deterministic CLI byte comparison, Black,
   and Pylint 10.00. Kimi was provider-quota blocked; Terra's P1/P2/P3
   architecture recommendations are incorporated.
-- Complete evidence passes: Guardian 809/4; full Pylint 9.83; warm Rust
+- Complete evidence passes: Guardian 811/4; full Pylint 9.83; warm Rust
   workspace with two intentional network ignores and five compile-fail
   doctests; format/Clippy; Memory/Autodidactic; Actionlint; Cargo Audit;
   Gitleaks; HTML/status; Python 3.11 exact report; and diff checks. One initial

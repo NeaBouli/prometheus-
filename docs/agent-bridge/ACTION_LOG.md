@@ -2703,24 +2703,6 @@ Rules for all dev agents:
   findings are incorporated; complete repository gates and final review remain.
 - **Status:** `Local implementation PASS / Complete gates next`.
 
-### 2026-08-01 23:42 EEST - GH-138 local completion PASS
-
-- Closed all final Terra findings: synthetic-only v1, truthful internal
-  consistency wording, contiguous audit history, and direct CLI failure-mode
-  tests. Final review is PASS with no P0/P1/P2/P3.
-- Complete Guardian 809/4, full Pylint 9.83, warm Rust workspace, format,
-  Clippy, Memory, Autodidactic, Actionlint, audit, HTML/status, Gitleaks, and
-  diff gates pass. Initial unrelated scanner host-load outlier passed isolated
-  and in the warm full rerun without an out-of-scope change.
-- **Status:** `Local Done / Protected PR next`.
-
-### 2026-08-01 23:48 EEST - GH-138 PR #139 opened
-
-- Pushed local PASS commit `3ff382d` and opened draft PR #139 against protected
-  `main`; no direct-main or bypass action occurred.
-- Required checks and review conversations remain before normal merge.
-- **Status:** `Protected PR open / Required checks pending`.
-
 ### 2026-08-01 22:20 EEST - GH-135 complete local gates and review PASS
 
 - Guardian 774/4, warm Rust workspace 351/2 plus 5 compile-fail doctests,
@@ -2772,11 +2754,49 @@ Rules for all dev agents:
 
 ### 2026-08-01 23:35 EEST - GH-138 focused implementation PASS
 
-- Implemented the internally SHA-256-consistent 24-case synthetic confidence evaluator, exact
-  integer metrics, byte-reproducible report, adversarial parser/integrity tests,
-  explicit CI command, and synchronized public/status documentation.
+- Implemented the internally SHA-256-consistent 24-case synthetic confidence
+  evaluator, exact integer metrics, byte-reproducible report, adversarial
+  parser/integrity tests, explicit CI command, and synchronized public/status
+  documentation.
 - Focused result: 29 tests pass; CLI report comparison, Black, and Pylint 10.00
   pass. Kimi quota-blocked/no write; Terra architecture findings incorporated.
 - Evidence remains offline-only and non-authorizing. Complete gates and final
   review are next.
 - **Status:** `Local implementation PASS / Complete gates next`.
+
+### 2026-08-01 23:42 EEST - GH-138 local completion PASS
+
+- Closed all final Terra findings: synthetic-only v1, truthful internal
+  consistency wording, contiguous audit history, and direct CLI failure-mode
+  tests. Final review is PASS with no P0/P1/P2/P3.
+- Complete Guardian 809/4, full Pylint 9.83, warm Rust workspace, format,
+  Clippy, Memory, Autodidactic, Actionlint, audit, HTML/status, Gitleaks, and
+  diff gates pass. Initial unrelated scanner host-load outlier passed isolated
+  and in the warm full rerun without an out-of-scope change.
+- **Status:** `Local Done / Protected PR next`.
+
+### 2026-08-01 23:48 EEST - GH-138 PR #139 opened
+
+- Pushed local PASS commit `3ff382d` and opened draft PR #139 against protected
+  `main`; no direct-main or bypass action occurred.
+- Required checks and review conversations remain before normal merge.
+- **Status:** `Protected PR open / Required checks pending`.
+
+### 2026-08-01 23:59 EEST - PR #139 review fixes focused PASS
+
+- Addressed all six CodeRabbit findings: chronological action history,
+  explicit input/report label mapping, precise non-anchored evidence wording,
+  strict CI shell execution, pre-read file-size rejection, corpus count/line
+  boundary tests, and complete focused definition docstrings.
+- PASS: 31 focused tests, Black, Pylint 10.00, 61/61 definitions documented,
+  and diff checks. Complete local gates and refreshed protected checks remain.
+- **Status:** `Review fixes focused PASS / Complete gates next`.
+
+### 2026-08-02 00:08 EEST - PR #139 review-fix local gates PASS
+
+- PASS: complete Python 3.11 Guardian 811/4, Black, full Pylint 9.83, exact
+  report, Memory, six Autodidactic tests, YAML, Actionlint 1.7.12, HTML/status,
+  Gitleaks 8.30.0, and diff checks.
+- Rust was unchanged; its complete local and protected gates passed on the
+  preceding PR head and will rerun in refreshed protected CI after push.
+- **Status:** `Review fixes local PASS / Commit and refreshed checks next`.
