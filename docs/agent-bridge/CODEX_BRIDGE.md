@@ -2534,3 +2534,18 @@ No direct `main` push or production action occurred.
   out-of-scope timeout or verifier code was changed. Refreshed protected CI is
   the authoritative complete rerun for this review commit.
 - **Status:** `Review fixes local PASS / Push and refreshed checks next`.
+
+### 2026-08-01 22:55 EEST - GH-135 merged and exact-main verified
+
+- Protected PR #136 merged normally without bypass as exact main
+  `3ff3fa1a33ca7a6a600eba05bb0329cc6b72c96e`; GH-135 is closed.
+- Exact-main PASS: Prometheus CI `30694395348`, Security Audit `30694395356`,
+  and Pages `30694394857`. Live Whitepaper and roadmap expose the new factual
+  model-confidence status.
+- All CodeRabbit findings were remediated before merge and every inline thread
+  is resolved. No secrets, original-worktree files, wallet, signing, broadcast,
+  deployment, chain state, protocol formula, or v2 actionability changed.
+- M-001 repository implementation is done. Live semantic/adversarial model
+  evaluation, calibration, and production authorization remain open rollout
+  gates.
+- **Status:** `Done / Merged / Exact-main verified`.

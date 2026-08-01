@@ -441,7 +441,7 @@ Severity: HIGH (performance under load, noted since Sprint 3)
 
 ### MEDIUM (fix before full release Aug/Sep):
 
-**M-001: Heuristic confidence in yara_generator.py (Check 3.1, PATTERN-011) — GH-135 LOCAL CANDIDATE**
+**M-001: Heuristic confidence in yara_generator.py (Check 3.1, PATTERN-011) — GH-135 MERGED / EXACT-MAIN PASS**
 ```text
 File:     modules/guardian-node/jaeger/yara_generator.py:75-80
 Finding:  The former hardcoded heuristic (base 0.7 + indicator bonus) did not
@@ -538,8 +538,8 @@ Severity: LOW (mitigated by guard, no exploit path found)
 - [PASS] 2.6  cargo clippy — zero warnings
 - [LOCAL PASS / PROTECTED EVIDENCE PENDING] 2.7 cargo test — see M-002
 
-**LEVEL 3 — PYTHON GUARDIAN NODE (3/4 passed; M-001 local candidate)**
-- [LOCAL PASS / PROTECTED EVIDENCE PENDING] 3.1  Strict model confidence — see M-001
+**LEVEL 3 — PYTHON GUARDIAN NODE (4/4 passed)**
+- [PASS] 3.1  Strict model confidence — see M-001; live calibration remains operational evidence
 - [PASS] 3.2  No yara C-binding — custom matcher used
 - [PASS] 3.3  No raw data transmission — gradients only
 - [PASS] 3.4  pytest — 23/23 passed, 3 skipped (LLM gate)
@@ -576,8 +576,8 @@ Severity: LOW (mitigated by guard, no exploit path found)
 Total checks run:       35
 Critical findings:      0
 High findings:          2  (H-001 LE encoding, H-002 Mutex)
-Medium findings:        1 local pass pending protected evidence
-                        (M-001 GH-135; M-002 GH-131 merged)
+Medium findings:        0 open in repository implementation
+                        (M-001 GH-135 and M-002 GH-131 merged)
 Low findings:           3  (L-001 deposit ACL, L-002 fp_rate operator integration, L-003 CEI)
 Passed clean:           28
 

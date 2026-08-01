@@ -1,9 +1,9 @@
 # prometheus — Backlog
 
 ## 🔴 Aktiv (diese Session)
-- Latest documented green baseline is exact main `42acbca54ed14ca5a74f21eff8484d2b3361d7b3`; run `git log --oneline -1` for the current working HEAD.
-- Prometheus CI `30676094287`, Security Audit `30676094290`, and GitHub Pages `30676093914` are green for exact main. Current-Silverc CI validates the keyless Toccata-v1 operator, operator runbook, request/receipt/evidence pipeline, release-readiness audit, metrics-oracle handoff, exact-commit hardening gates, and the strict release performance gate.
-- GH-131/M-002 and GH-132 are merged and exact-main verified. GH-135/M-001 is the active local candidate: strict model-provided integer-bps extraction replaces the indicator-count/YARA-shape heuristic while preserving the `0.85` policy and failing closed on malformed output.
+- Latest documented green baseline is exact main `3ff3fa1a33ca7a6a600eba05bb0329cc6b72c96e`; run `git log --oneline -1` for the current working HEAD.
+- Prometheus CI `30694395348`, Security Audit `30694395356`, and GitHub Pages `30694394857` are green for exact main. Current-Silverc CI validates the keyless Toccata-v1 operator, operator runbook, request/receipt/evidence pipeline, release-readiness audit, metrics-oracle handoff, exact-commit hardening gates, and the strict release performance gate.
+- GH-131/M-002, GH-132, and GH-135/M-001 are merged and exact-main verified. GH-135 strictly parses separate model-provided integer basis points, replaces the indicator-count/YARA-shape heuristic, preserves the `0.85` policy, and fails closed on malformed output.
 - Runtime stub gates added for Rust client; current-Silverc contract gates now cover H-001, ValidatorStaking, GuardianReputation, RuleStorage, CommunityDonations, DevIncentivePool, and GovernanceAutoTuning.
 - Local current-Silverc release-bundle smoke now compiles all 7 fixtures through pinned upstream `silverc` and writes a deterministic manifest plus optional archive with source/artifact/script hashes; deploy preflight validates the bundle/operator public inputs, emits a Markdown operator runbook, and confirms upstream `silverc` has no network deploy command.
 - Deployment receipt verifier validates public receipt records against the release bundle, rejects secret-like fields, and keeps synthetic `ci_fixture` receipts separate from real `operator_record` deployment evidence.
@@ -23,7 +23,7 @@
 
 ### Pflicht VOR neuem Code:
 1. `cd /Users/gio/Desktop/repos/prometheus`
-2. `git log --oneline -5` — aktuellen HEAD prüfen; letzter dokumentierter grüner Baseline-Commit ist `42acbca`
+2. `git log --oneline -5` — aktuellen HEAD prüfen; letzter dokumentierter grüner Baseline-Commit ist `3ff3fa1`
 3. Lies `memory/CHECKPOINT.md` — vollständiger Projektstatus
 4. Lies `memory/AUDIT.md` ab Zeile 337 — Pre-Hardfork-Audit-Ergebnisse
 5. Lies `memory/ERRORS.md` — 12 bekannte Patterns
@@ -38,7 +38,7 @@
 2. **[P1] Oracle Operator Integration** — external signed metrics-oracle transaction assembly/signer/broadcast process für `GovernanceAutoTuningState.sil` operationalisieren; public report preflight, unsigned tx-request builder, operator procedure, public tx-result verifier, and public status-draft staging are local- and CI-covered.
 3. **[P1] Sprint 10B: Guardian Decentralization** — GH-33/36/39 plus merged/exact-main-verified GH-42/GH-44/GH-48/GH-52/GH-55/GH-58/GH-63 are implemented; GH-74 tracks the bounded hash-only v1 analyzer adapter. Production proof artifacts, a privacy-preserving concrete-observable channel, real two-host operation, broad discovery, trusted membership/key assignment and rotation, Sybil resistance, and an explicit on-chain-attestation decision follow.
 4. **[P2] fp_rate Oracle** — Q-003 current-Silverc contract gate uses signed metrics input; public report/request/result verification is covered; production external transaction assembly/signing/broadcast/deploy operation remains
-5. **[P2] M-001 / GH-135** — **LOCAL CANDIDATE:** strict closed-schema model confidence in integer basis points; complete gates, protected PR, and exact-main evidence remain
+5. **[P2] M-001 / GH-135** — **MERGED / EXACT-MAIN PASS:** strict closed-schema model confidence in integer basis points; live semantic/adversarial evaluation and calibration remain
 6. **[P2] M-002** — **MERGED / EXACT-MAIN PASS:** repeated-sample debug smoke gate plus strict `--release` one-millisecond CI gate
 7. **[P2] GH-132** — **MERGED / EXACT-MAIN PASS:** transitive `event-listener` is patched at 5.4.2
 8. **[P3] L-001/L-003** — DevIncentivePool ACL, CEI borderline
