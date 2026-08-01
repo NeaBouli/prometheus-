@@ -453,7 +453,7 @@ Severity: MEDIUM (affects rule quality scoring, not fund safety)
 ```
 
 **M-002: Performance test marginal in debug mode (Check 2.7) - LOCAL PASS 2026-08-01**
-```
+```text
 File:     modules/client/tests/performance.rs:test_commitment_build_performance_budget
 Finding:  The former test_commitment_build_under_1ms failed at 1.17ms in a
           debug build.

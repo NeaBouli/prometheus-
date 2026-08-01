@@ -2631,3 +2631,13 @@ Rules for all dev agents:
 - Cargo Audit has zero vulnerabilities and nine allowed warnings. New
   transitive `RUSTSEC-2026-0221` follow-up is isolated in GH-132.
 - **Status:** `Approved locally / Protected PR next`.
+
+### 2026-08-01 12:37 EEST - PR #133 review fixes
+
+- Exact head `617bc39` passed all ten required checks; `Rust Performance`
+  passed its first protected run in 3m39s.
+- Accepted all three CodeRabbit comments: no persisted checkout credential,
+  current `bfde024` Startflow/Status baseline and ten-check governance, plus a
+  `text` language tag on the edited audit block.
+- Actionlint and Memory Integrity pass after the minimal fixes.
+- **Status:** `Review fixes validated / Refreshed checks pending`.

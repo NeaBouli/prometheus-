@@ -2388,3 +2388,16 @@ No direct `main` push or production action occurred.
 - No product/protocol, commit-reveal, KAS/PROM, reputation, wallet, signing,
   broadcast, deployment, or chain behavior changed.
 - **Status:** `Approved locally / Protected PR next`.
+
+### 2026-08-01 12:37 EEST - PR #133 review remediation
+
+- Exact head `617bc39` passed all ten strict required contexts, including the
+  first `Rust Performance` run in 3m39s. CodeRabbit then raised three valid
+  comments.
+- The dedicated read-only checkout now disables persisted credentials. Active
+  Startflow and Memory baseline/governance fields now identify exact green
+  main `bfde024`, its run IDs, and ten required contexts. The edited M-002
+  audit fence is explicitly tagged `text`.
+- Actionlint 1.7.12 and Memory Integrity pass after remediation. No benchmark,
+  threshold, runtime, protocol, wallet, deployment, or chain behavior changed.
+- **Status:** `Review fixes validated / Refreshed protected checks pending`.

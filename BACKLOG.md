@@ -23,7 +23,7 @@
 
 ### Pflicht VOR neuem Code:
 1. `cd /Users/gio/Desktop/repos/prometheus`
-2. `git log --oneline -5` — aktuellen HEAD prüfen; letzter dokumentierter grüner Baseline-Commit ist `b14d36fc`
+2. `git log --oneline -5` — aktuellen HEAD prüfen; letzter dokumentierter grüner Baseline-Commit ist `bfde024`
 3. Lies `memory/CHECKPOINT.md` — vollständiger Projektstatus
 4. Lies `memory/AUDIT.md` ab Zeile 337 — Pre-Hardfork-Audit-Ergebnisse
 5. Lies `memory/ERRORS.md` — 12 bekannte Patterns
