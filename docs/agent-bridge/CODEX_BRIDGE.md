@@ -2613,3 +2613,15 @@ No direct `main` push or production action occurred.
 - No live model, real telemetry, v2 operation, transport, production, wallet,
   signing, broadcast, deployment, chain, protocol, or token action occurred.
 - **Status:** `Local Done / Protected PR next`.
+
+### 2026-08-01 23:48 EEST - GH-138 protected PR opened
+
+- Local PASS commit `3ff382dc31c27dec84a0ff68aba00d7b26806fd6` is
+  published on `feat/GH-138-confidence-calibration` through draft PR
+  [#139](https://github.com/NeaBouli/prometheus-/pull/139).
+- PR wording preserves the synthetic-only, non-authorizing and non-externally-
+  anchored evidence boundary and links GH-138 for closure.
+- No direct-main push or branch-protection bypass occurred. Exact-head required
+  checks, review resolution, ready state, normal merge, and exact-main/Live-
+  Pages verification remain.
+- **Status:** `Protected PR open / Required checks pending`.
