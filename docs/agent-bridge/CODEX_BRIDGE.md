@@ -2549,3 +2549,67 @@ No direct `main` push or production action occurred.
   evaluation, calibration, and production authorization remain open rollout
   gates.
 - **Status:** `Done / Merged / Exact-main verified`.
+
+### 2026-08-01 23:08 EEST - GH-138 M-003 semantic calibration gate started
+
+- Ticket `GIO-PROM-20260801-M003` and GitHub issue
+  [#138](https://github.com/NeaBouli/prometheus-/issues/138) own the next
+  repository-only Guardian block
+  from exact green main `12b77358f9791b1aeac4582d1b54f75a1554bb57`.
+- Scope is a versioned, deterministic, secret-free evaluation/calibration gate
+  for model-provided YARA confidence: closed canonical inputs/results,
+  fail-closed evidence validation, threshold and calibration metrics,
+  reproducible machine-readable output, adversarial tests, CI, independent
+  review, and synchronized public/status documentation.
+- Offline or synthetic evidence must not be represented as live model quality,
+  production calibration, or authorization. Live model operation, downloads or
+  training, real malware/private telemetry, v2 operational analysis/transport,
+  publication, wallet, signing, broadcast, deployment, chain state, protocol
+  formulas, KAS/PROM, reputation, slash ACL, and emergency-stop behavior are
+  excluded. GH-9 remains separately externally gated.
+- **Status:** `In Progress / Issue and architecture definition next`.
+
+### 2026-08-01 23:35 EEST - GH-138 core implementation PASS
+
+- Added a standalone stdlib-only offline confidence evaluator. Canonical ASCII
+  JSONL binds a sorted 24-case synthetic YARA corpus, exact integer-bps
+  predictions, fixed development policy, byte-exact report, and SHA-256
+  co-versioned consistency manifest; malformed, incomplete, reordered,
+  weakened-policy, or internally hash-inconsistent evidence fails closed. The
+  manifest is not a signed or externally anchored tamper proof.
+- The unchanged 8500-bps boundary reports TP 11 / FP 1 / TN 11 / FN 1,
+  precision and recall 9167 bps, Brier 36100 ppm, and ten-bin ECE 750 bps.
+  Gate decisions use exact integer cross-products/sums, not rounded display
+  values. Evidence is `synthetic_ci_only` and `production_authorized=false`.
+- Focused PASS: 29 tests, byte-exact CLI reproduction, Black, and Pylint
+  10.00. Kimi was provider-quota blocked and wrote nothing. Terra found no P0;
+  its non-authority, exact-ratio, integrity, and adversarial requirements are
+  incorporated.
+- CI, README, Guardian README, Markdown/HTML Whitepaper and Roadmap, Backlog,
+  and Memory are synchronized. Complete repository gates and final independent
+  review remain.
+- No model/network/YARA execution, real telemetry, v2 operation, transport,
+  wallet, signing, broadcast, deployment, chain, protocol, or token behavior
+  changed.
+- **Status:** `Local implementation PASS / Complete gates next`.
+
+### 2026-08-01 23:42 EEST - GH-138 complete local gates and review PASS
+
+- Review hardening restricts v1 evidence to `synthetic_ci`, describes the
+  co-versioned manifest only as internal consistency checking rather than an
+  external tamper anchor, restores contiguous historical audit text, and adds
+  direct CLI exit-1/exit-2/redaction/no-partial-output tests.
+- PASS: 29 focused tests; complete Guardian 809 passed / 4 intentional live
+  skips; Black; focused Pylint 10.00 and full Pylint 9.83; Python 3.11 exact
+  report; Rustfmt; locked all-target Clippy; warm complete Rust workspace with
+  two intentional network ignores and five compile-fail doctests; Memory;
+  six Autodidactic tests; YAML/Actionlint; HTML/status markers; Cargo Audit
+  with zero vulnerabilities/four allowed warnings; Gitleaks 8.30.0; diff.
+- One first unchanged 10-MiB scanner performance test exceeded its budget
+  under concurrent host load; it passed immediately alone at 3.81 seconds and
+  passed in the warm complete workspace rerun. No unrelated code changed.
+- Terra final exact-diff re-review: PASS with no remaining P0/P1/P2/P3. Kimi
+  remained provider-quota blocked and wrote nothing.
+- No live model, real telemetry, v2 operation, transport, production, wallet,
+  signing, broadcast, deployment, chain, protocol, or token action occurred.
+- **Status:** `Local Done / Protected PR next`.

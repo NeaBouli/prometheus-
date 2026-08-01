@@ -2703,6 +2703,17 @@ Rules for all dev agents:
   findings are incorporated; complete repository gates and final review remain.
 - **Status:** `Local implementation PASS / Complete gates next`.
 
+### 2026-08-01 23:42 EEST - GH-138 local completion PASS
+
+- Closed all final Terra findings: synthetic-only v1, truthful internal
+  consistency wording, contiguous audit history, and direct CLI failure-mode
+  tests. Final review is PASS with no P0/P1/P2/P3.
+- Complete Guardian 809/4, full Pylint 9.83, warm Rust workspace, format,
+  Clippy, Memory, Autodidactic, Actionlint, audit, HTML/status, Gitleaks, and
+  diff gates pass. Initial unrelated scanner host-load outlier passed isolated
+  and in the warm full rerun without an out-of-scope change.
+- **Status:** `Local Done / Protected PR next`.
+
 ### 2026-08-01 22:20 EEST - GH-135 complete local gates and review PASS
 
 - Guardian 774/4, warm Rust workspace 351/2 plus 5 compile-fail doctests,
@@ -2740,3 +2751,25 @@ Rules for all dev agents:
   pass; live Whitepaper/roadmap markers were fetched successfully.
 - All CodeRabbit feedback is incorporated and inline threads are resolved.
 - **Status:** `Done / Merged / Exact-main verified`.
+
+### 2026-08-01 23:08 EEST - GH-138 M-003 started
+
+- Opened GH-138 and branch `feat/GH-138-confidence-calibration` from exact
+  green main `12b77358f9791b1aeac4582d1b54f75a1554bb57`.
+- Reserved a repository-only deterministic semantic evaluation/calibration
+  gate for Guardian model-provided YARA confidence. Synthetic/offline evidence
+  cannot authorize live or production use; every production, v2 operational,
+  wallet, signing, broadcast, deployment, chain, protocol, and token boundary
+  remains excluded.
+- **Status:** `In Progress / Architecture definition next`.
+
+### 2026-08-01 23:35 EEST - GH-138 focused implementation PASS
+
+- Implemented the internally SHA-256-consistent 24-case synthetic confidence evaluator, exact
+  integer metrics, byte-reproducible report, adversarial parser/integrity tests,
+  explicit CI command, and synchronized public/status documentation.
+- Focused result: 29 tests pass; CLI report comparison, Black, and Pylint 10.00
+  pass. Kimi quota-blocked/no write; Terra architecture findings incorporated.
+- Evidence remains offline-only and non-authorizing. Complete gates and final
+  review are next.
+- **Status:** `Local implementation PASS / Complete gates next`.

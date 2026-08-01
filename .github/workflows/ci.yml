@@ -2450,6 +2450,19 @@ jobs:
         run: pylint modules/guardian-node/jaeger/ --fail-under=7.0 --disable=C0114,C0115,C0116
       - name: Tests
         run: cd modules/guardian-node && PYTHONPATH=. python -m pytest tests/ --tb=short
+      - name: Deterministic Confidence Calibration Evidence
+        working-directory: modules/guardian-node
+        run: |
+          vector_dir="tests/vectors/confidence-calibration-v1"
+          PYTHONPATH=. python -m jaeger.confidence_calibration \
+            --corpus "$vector_dir/corpus.jsonl" \
+            --predictions "$vector_dir/predictions.jsonl" \
+            --policy "$vector_dir/policy.json" \
+            --expected-report "$vector_dir/expected-report.json" \
+            --manifest "$vector_dir/integrity-manifest.json" \
+            > /tmp/prometheus-confidence-report.json
+          cmp "$vector_dir/expected-report.json" \
+            /tmp/prometheus-confidence-report.json
 
   # ─── HTML Pages Check ──────────────────────────────────────────────────────
   pages-check:

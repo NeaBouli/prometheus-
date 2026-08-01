@@ -299,10 +299,21 @@ count and YARA text shape no longer determine confidence, and the accepted
 basis-point value is preserved through the ensemble path without conversion
 through a float.
 
-This implementation is local orchestration with unit-test evidence. Strict
-schema validation does not establish semantic accuracy, resistance to
-adversarial model inputs, or calibration. Live 8B/70B operation, quality and
-calibration evidence, and P2P delivery remain open.
+GH-138 adds a separate deterministic development evaluator around this
+boundary. A canonical 24-case synthetic YARA corpus, exact integer-bps
+predictions, fixed policy, expected report, and co-versioned manifest are
+internally consistency-checked by SHA-256. The byte-exact report measures the unchanged `8500`-bps confusion
+matrix, exact-ratio precision and recall, Brier score, and fixed ten-bin
+expected calibration error. Missing, duplicate, reordered, noncanonical,
+weakened-policy, or internally hash-inconsistent evidence fails closed. This
+detects partial fixture drift within a reviewed revision; it is not a signed or
+externally anchored tamper proof.
+
+This is synthetic offline evaluation only. The report explicitly records no
+production authority and invokes no model, network, telemetry, YARA engine,
+transport, wallet, or chain component. It validates the evaluation machinery,
+not live 8B/70B semantic accuracy, real adversarial robustness, production
+calibration, P2P delivery, or authorization; those gates remain open.
 
 ### 7.5 Local Guardian Ensemble Vote
 

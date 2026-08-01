@@ -2148,6 +2148,43 @@ transitive `event-listener 5.4.1` `RUSTSEC-2026-0221` warning is fixed upstream
 in 5.4.2 and tracked separately by GH-132; no dependency update is included in
 this performance-only patch.
 
+## 2026-08-01 - GH-138 deterministic confidence evaluation audit
+
+**Result:** LOCAL PASS; protected PR and exact-main evidence remain pending.
+
+- A standalone stdlib-only evaluator imports no Analyzer, LLM, YARA,
+  transport, v2, wallet, deployment, or chain component.
+- Canonical ASCII JSONL rejects duplicate keys, non-standard numbers,
+  whitespace/order drift, unknown/missing/reordered cases, invalid confidence
+  types/ranges, class imbalance, weakened policy, and hash mismatches.
+- One co-versioned manifest internally consistency-checks the 24-case synthetic
+  corpus, exact predictions, fixed policy, and byte-exact expected report. The
+  report additionally commits the three evaluation inputs under a
+  domain-separated digest. Neither mechanism is signed or externally anchored.
+- The unchanged 8500-bps decision boundary produces TP 11, FP 1, TN 11, FN 1.
+  Gate comparisons use integer cross-products and exact sums rather than
+  rounded display metrics. Precision and recall are 9167 bps, Brier score is
+  36100 ppm, and ten-bin ECE is 750 bps.
+- The report is explicitly `synthetic_ci_only`, sets
+  `production_authorized=false`, and cannot prove live-model quality,
+  production calibration, or authorization.
+- Focused evidence: 29 tests, byte-exact CLI reproduction, Black, and focused
+  Pylint 10.00 pass. Kimi was quota-blocked and wrote nothing. Terra found no
+  P0 and required strict non-authority, rational gate decisions, integrity
+  binding, and adversarial coverage; those requirements are incorporated.
+- Complete evidence: Guardian 809 pass / 4 intentional live-model skips; full
+  Pylint 9.83; warm Rust workspace pass with two intentional network ignores
+  and five compile-fail doctests; Rustfmt; locked all-target Clippy; Memory;
+  Autodidactic; YAML/Actionlint; Python 3.11 exact report; HTML/status markers;
+  Cargo Audit with zero vulnerabilities/four allowed warnings; Gitleaks 8.30.0;
+  and diff checks. One initial unchanged 10-MiB scanner load outlier passed
+  immediately in isolation and in the warm complete rerun without code change.
+- Terra's final exact-diff re-review is PASS with no remaining P0/P1/P2/P3.
+
+No live model, real malware/private telemetry, v2 operation, transport,
+publication, wallet/key/signature, broadcast, deployment, chain, KAS/PROM,
+reputation, slash ACL, commit-reveal, or emergency-stop behavior changed.
+
 ## 2026-08-01 - GH-132 local dependency remediation evidence
 
 **Result:** LOCAL PASS; independent review and protected publication remain.

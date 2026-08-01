@@ -54,9 +54,35 @@ count and YARA text shape no longer affect the score. The basis-point value is
 preserved through ensemble commitments without a float round trip.
 
 This is a local orchestration component. A closed response schema provides
-format validation, not semantic trust or calibration. Live model service
-wiring, adversarial prompt/quality evaluation, calibration evidence, P2P
-transport, and production operation remain separate rollout gates.
+format validation, not semantic trust or production calibration.
+
+## Offline Confidence Evaluation
+
+GH-138 adds a standalone development gate over a canonical 24-case synthetic
+YARA benchmark. It internally consistency-checks the corpus, integer-bps
+predictions, fixed policy, and expected report by SHA-256, then reproduces the
+`8500`-bps confusion matrix,
+exact-ratio precision/recall, Brier score, and fixed ten-bin expected
+calibration error without floating-point policy decisions.
+
+```bash
+cd modules/guardian-node
+vector_dir=tests/vectors/confidence-calibration-v1
+PYTHONPATH=. python -m jaeger.confidence_calibration \
+  --corpus "$vector_dir/corpus.jsonl" \
+  --predictions "$vector_dir/predictions.jsonl" \
+  --policy "$vector_dir/policy.json" \
+  --expected-report "$vector_dir/expected-report.json" \
+  --manifest "$vector_dir/integrity-manifest.json"
+```
+
+The committed report is `synthetic_ci_only` and always records
+`production_authorized=false`. This gate performs no model, network, YARA,
+telemetry, transport, wallet, or chain operation. Live model service wiring,
+real adversarial-quality evidence, production calibration, P2P transport, and
+production authorization remain separate rollout gates.
+The co-versioned manifest catches partial or accidental fixture drift during
+review and CI; it is not signed or anchored outside the editable repository.
 
 ## Local Ensemble Voting
 
