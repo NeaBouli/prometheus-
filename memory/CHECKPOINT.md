@@ -711,3 +711,39 @@ Leistungsbasierte Emission. Guardians = "Miner" (KI statt GPU).
   the exact green baseline runs and ten protected contexts, and reported PASS
   with no P0/P1/P2/P3 finding.
 - **Status:** `Approved locally / Protected PR next`.
+
+## Checkpoint 2026-08-01: GH-135 model-confidence implementation
+
+- From exact green main `42acbca`, the Guardian YARA path replaces the former
+  indicator-count/YARA-shape heuristic with one separate bounded model
+  assessment returning exact integer basis points.
+- The parser accepts only one assistant text completion and one closed JSON
+  object containing `confidence_bps` in `0..10000`; malformed envelopes,
+  duplicate/extra/missing keys, wrong types, non-standard numbers, and range
+  violations fail closed with redacted errors.
+- The accepted integer value remains canonical through YARA and ensemble
+  commitments; the `0.85` submission policy is unchanged. The governed v2
+  worker remains non-actionable and is not connected to this legacy path.
+- Focused evidence after Black formatting is 149 passed and 4 intentional
+  live-model skips. Complete repository gates and final independent review are
+  next.
+- Strict schema parsing is not semantic validation or calibration. Live model
+  operation, adversarial quality evaluation, production authorization, and
+  actionable v2 integration remain separate gates.
+- **Status:** `Local implementation PASS / Complete gates pending`.
+
+### GH-135 complete local gate and review evidence
+
+- Complete Guardian rerun: 774 passed, 4 intentional live-model skips. One
+  initial unrelated ballot-ingress timeout was 20/20 green in isolation and
+  green in the complete rerun.
+- Warm complete Rust workspace: 351 passed, 2 intentional live-network
+  ignores, 5 compile-fail doctests, 0 failed. One initial unrelated 10-MiB
+  scanner load outlier passed in isolation and in the warm complete rerun.
+- Black, Pylint 9.82/10, Rustfmt, locked all-target workspace Clippy, Memory
+  Integrity, six Autodidactic tests, HTML/SEO/public-status checks, Actionlint,
+  Cargo Audit with zero vulnerabilities/eight allowed warnings, redacted full
+  Gitleaks, and diff checks pass.
+- Terra's final read-only exact-diff review reports PASS with no actionable
+  P0/P1/P2/P3 finding. Kimi remained provider-quota blocked and wrote nothing.
+- **Status:** `Local Done / Protected PR next`.

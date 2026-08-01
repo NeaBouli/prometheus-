@@ -889,3 +889,25 @@ timeout-bounded, cancellation-safe, and currently accepts only an injected
 typed analyzer. The included `DeterministicNonActionableAnalyzer` validates and
 counts observables and emits no confidence, `should_submit`, YARA/rule body,
 semantic finding, or external authority.
+
+## Guardian YARA Confidence Assessment (GH-135)
+
+`LlmServer.assess_yara_rule(...)` performs a separate bounded local model call
+after YARA generation. The completion must contain exactly one assistant text
+choice. Its content must be one JSON object with one integer field:
+
+```json
+{"confidence_bps":8500}
+```
+
+The parser rejects empty or oversized content, malformed envelopes, duplicate,
+missing, or extra keys, booleans, floats, strings, null, non-standard numeric
+constants, and values outside `0..10000`. Errors are stable and do not echo
+model output. `YaraRule.confidence_bps` is the canonical source value;
+`confidence` is a compatibility view only. Submission still requires at least
+`8500` basis points and basic local YARA-shape validation.
+
+This API validates syntax and range only. It does not prove semantic accuracy,
+model calibration, prompt-injection resistance, production authorization, or
+safe publication. It is not connected to the governed ThreatHint-v2 worker,
+which remains explicitly non-actionable.

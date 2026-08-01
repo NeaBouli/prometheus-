@@ -441,14 +441,16 @@ Severity: HIGH (performance under load, noted since Sprint 3)
 
 ### MEDIUM (fix before full release Aug/Sep):
 
-**M-001: Heuristic confidence in yara_generator.py (Check 3.1, PATTERN-011)**
+**M-001: Heuristic confidence in yara_generator.py (Check 3.1, PATTERN-011) — GH-135 LOCAL CANDIDATE**
 ```
 File:     modules/guardian-node/jaeger/yara_generator.py:75-80
-Finding:  Confidence is hardcoded heuristic (base 0.7 + indicator bonus).
-          Not extracted from LLM output. Does not correlate with actual
-          rule quality.
-Action:   Replace with LLM confidence extraction when live LLM available.
-          Tracked as Sprint 10B / Sprint 11 task.
+Finding:  The former hardcoded heuristic (base 0.7 + indicator bonus) did not
+          correlate with actual rule quality.
+Action:   GH-135 removes the heuristic and accepts a separate model result
+          only as an exact closed JSON object containing integer
+          confidence_bps in 0..10000. Invalid output fails closed and the
+          0.85 policy is unchanged. Live semantic/adversarial evaluation and
+          calibration remain rollout gates.
 Severity: MEDIUM (affects rule quality scoring, not fund safety)
 ```
 
@@ -536,8 +538,8 @@ Severity: LOW (mitigated by guard, no exploit path found)
 - [PASS] 2.6  cargo clippy — zero warnings
 - [LOCAL PASS / PROTECTED EVIDENCE PENDING] 2.7 cargo test — see M-002
 
-**LEVEL 3 — PYTHON GUARDIAN NODE (3/4 passed)**
-- [MED]  3.1  Heuristic confidence — see M-001
+**LEVEL 3 — PYTHON GUARDIAN NODE (3/4 passed; M-001 local candidate)**
+- [LOCAL PASS / PROTECTED EVIDENCE PENDING] 3.1  Strict model confidence — see M-001
 - [PASS] 3.2  No yara C-binding — custom matcher used
 - [PASS] 3.3  No raw data transmission — gradients only
 - [PASS] 3.4  pytest — 23/23 passed, 3 skipped (LLM gate)
@@ -574,8 +576,8 @@ Severity: LOW (mitigated by guard, no exploit path found)
 Total checks run:       35
 Critical findings:      0
 High findings:          2  (H-001 LE encoding, H-002 Mutex)
-Medium findings:        1 open + 1 local pass pending protected evidence
-                        (M-001 heuristic confidence; M-002 GH-131)
+Medium findings:        1 local pass pending protected evidence
+                        (M-001 GH-135; M-002 GH-131 merged)
 Low findings:           3  (L-001 deposit ACL, L-002 fp_rate operator integration, L-003 CEI)
 Passed clean:           28
 
@@ -592,8 +594,8 @@ Audit confidence:       94%
  GovernanceAutoTuning current-silverc compile/ABI/runtime gates are verified
  locally/in CI, and all 7 current-Silverc fixtures compile through a local
  release-bundle manifest gate,
- but network deploy/orchestration tooling, oracle operator integration, and LLM confidence extraction
- remain open)
+ but network deploy/orchestration tooling, oracle operator integration, and
+ live confidence calibration remain open)
 ```
 
 **VERDICT UPDATE 2026-07-11:** Toccata/hardfork no longer looks like the
@@ -608,8 +610,9 @@ DevIncentivePoolState runtime gates, GovernanceAutoTuningState signed
 metrics/auto-tune runtime gates, and all-fixture release-bundle manifest now pass
 locally. Network deploy/orchestration tooling and oracle operator integration
 must pass before Sprint 9 deployment.
-M-001 remains separately gated. M-002 has a local GH-131 candidate and waits
-only for protected CI plus exact-main evidence.
+M-001 has a separate GH-135 local candidate; complete gates, protected CI,
+exact-main evidence, and live semantic/calibration work remain. M-002 is
+merged and exact-main verified.
 
 **AUDIT UPDATE 2026-07-15:** GH-9 no longer uses the obsolete Hello-World/
 `ssc deploy` path. The repository defines two closed deployment profiles bound

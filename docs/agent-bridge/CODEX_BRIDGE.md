@@ -2453,3 +2453,59 @@ No direct `main` push or production action occurred.
 - Review result: PASS with no P0/P1/P2/P3 finding. Residual publication risk
   remains covered by protected exact-head and exact-main checks.
 - **Status:** `Approved locally / Protected PR next`.
+
+### 2026-08-01 21:12 EEST - GH-135 M-001 model confidence started
+
+- Ticket [GH-135](https://github.com/NeaBouli/prometheus-/issues/135) is
+  owned on branch `feat/GH-135-model-confidence` from exact green main
+  `42acbca54ed14ca5a74f21eff8484d2b3361d7b3`.
+- Scope replaces only the isolated Guardian YARA indicator-count/shape
+  heuristic with a separate model assessment returning validated integer
+  basis points through a closed response schema. Invalid model or completion
+  output must fail closed; the existing `0.85` threshold is unchanged.
+- Acceptance includes adversarial unit tests, complete Python and repository
+  gates, independent review, protected PR checks, exact-main verification,
+  and accurate README/Markdown+HTML whitepaper/roadmap/Memory status.
+- ThreatHint v1/v2 wiring, transport, publication, production model rollout,
+  wallet, signing, broadcast, deployment, chain state, protocol formulas,
+  KAS/PROM, reputation, slash ACL, and emergency-stop behavior are excluded.
+  GH-9 remains separately open and externally gated.
+- **Status:** `In Progress / Architecture and compatibility review`.
+
+### 2026-08-01 22:05 EEST - GH-135 implementation and public docs synchronized
+
+- Removed the Guardian indicator-count/YARA-shape confidence heuristic. One
+  separate bounded model call now supplies exact integer `confidence_bps`.
+- The completion envelope and closed JSON object are validated fail-closed;
+  duplicate, missing, extra, wrong-type, non-standard-number, out-of-range,
+  empty, and oversized responses are rejected without echoing model content.
+- The canonical basis-point value flows into ensemble commitments without a
+  float round trip. The `0.85` submission threshold and all protocol, v2,
+  wallet, deployment, and chain boundaries remain unchanged.
+- PASS after Black: 149 focused tests; 4 intentional live-model skips.
+- README, Guardian README, Markdown/HTML whitepaper, Markdown/HTML roadmap,
+  Backlog, and Memory now distinguish strict schema parsing from semantic
+  quality, calibration, live operation, or production authorization.
+- Kimi's secret-free read-only review was provider-quota blocked and wrote
+  nothing. Terra's architecture review found no P0, identified the required
+  fail-closed envelope boundary, and required honest calibration/prompt-risk
+  non-claims; those constraints are implemented and documented.
+- **Status:** `Local implementation PASS / Complete gates and final review next`.
+
+### 2026-08-01 22:20 EEST - GH-135 local completion PASS
+
+- Complete Guardian rerun: 774 passed / 4 intentional live-model skips. The
+  first unrelated ballot timeout reproduced 20/20 green in isolation and was
+  green in the complete rerun.
+- Warm complete Rust workspace: 351 passed / 2 intentional network ignores /
+  5 compile-fail doctests / 0 failed. The first unrelated scanner load outlier
+  passed in isolation and in the warm complete rerun.
+- PASS: Black, Pylint 9.82/10, Rustfmt, locked all-target Clippy, Memory
+  Integrity, six Autodidactic tests, HTML/SEO/status, Actionlint, Cargo Audit
+  with zero vulnerabilities/eight allowed warnings, redacted full Gitleaks,
+  and diff checks.
+- Terra's final exact-diff read-only review is PASS with no actionable
+  P0/P1/P2/P3 finding. Kimi remained provider-quota blocked and wrote nothing.
+- No secrets, original-worktree files, protocol formulas, v2 actionability,
+  wallet, signing, broadcast, deployment, or chain state changed.
+- **Status:** `Local Done / Protected PR publication next`.

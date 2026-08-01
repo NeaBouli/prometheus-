@@ -8,12 +8,14 @@ MIN_CONFIDENCE = 0.85 (from MEMO.md AUTO-TUNING PARAMETER).
 
 from __future__ import annotations
 
+import json
 import time
 from dataclasses import dataclass
 
 from .llm_server import LlmServer
 
-MIN_CONFIDENCE: float = 0.85
+MIN_CONFIDENCE_BPS: int = 8_500
+MIN_CONFIDENCE: float = MIN_CONFIDENCE_BPS / 10_000
 
 
 @dataclass
@@ -23,16 +25,21 @@ class YaraRule:
     Attributes:
         name: Rule name, e.g. "PROM_2026_0001".
         rule_content: Full YARA syntax string.
-        confidence: Confidence score (0.0 - 1.0).
+        confidence_bps: Model-provided confidence in integer basis points.
         threat_hash: SHA-256 hash of the original threat.
         generated_at: Unix timestamp of generation.
     """
 
     name: str
     rule_content: str
-    confidence: float
+    confidence_bps: int
     threat_hash: str
     generated_at: int
+
+    @property
+    def confidence(self) -> float:
+        """Return the compatibility confidence view in the range 0.0 to 1.0."""
+        return self.confidence_bps / 10_000
 
 
 class YaraRuleGenerator:
@@ -61,25 +68,22 @@ class YaraRuleGenerator:
         Returns:
             A YaraRule with generated content and metadata.
         """
-        description = f"Threat hash: {threat_hash}\n" f"Indicators:\n" + "\n".join(
-            f"  - {ind}" for ind in indicators
+        description = json.dumps(
+            {"indicators": indicators, "threat_hash": threat_hash},
+            sort_keys=True,
+            separators=(",", ":"),
+            ensure_ascii=True,
         )
 
         rule_content = await self.llm.generate_yara_rule(description)
+        assessment = await self.llm.assess_yara_rule(description, rule_content)
         self._rule_counter += 1
         name = f"PROM_{time.strftime('%Y')}_{self._rule_counter:04d}"
-
-        # Estimate confidence based on indicator count and rule quality
-        has_strings = "strings:" in rule_content
-        has_condition = "condition:" in rule_content
-        base_confidence = 0.7 if (has_strings and has_condition) else 0.3
-        indicator_bonus = min(len(indicators) * 0.05, 0.3)
-        confidence = min(base_confidence + indicator_bonus, 1.0)
 
         return YaraRule(
             name=name,
             rule_content=rule_content,
-            confidence=confidence,
+            confidence_bps=assessment.confidence_bps,
             threat_hash=threat_hash,
             generated_at=int(time.time()),
         )
@@ -96,6 +100,12 @@ class YaraRuleGenerator:
         Returns:
             True if the rule passes basic syntax validation.
         """
+        if (
+            not isinstance(rule, YaraRule)
+            or type(rule.confidence_bps) is not int
+            or not 0 <= rule.confidence_bps <= 10_000
+        ):
+            return False
         content = rule.rule_content
         has_rule_keyword = "rule " in content
         has_strings = "strings:" in content
@@ -111,4 +121,4 @@ class YaraRuleGenerator:
         Returns:
             True if confidence >= MIN_CONFIDENCE (0.85) and syntax is valid.
         """
-        return rule.confidence >= MIN_CONFIDENCE and self.validate_rule(rule)
+        return rule.confidence_bps >= MIN_CONFIDENCE_BPS and self.validate_rule(rule)

@@ -9,20 +9,16 @@ from __future__ import annotations
 
 import hashlib
 import json
-import math
 import re
 from collections.abc import Sequence
 from dataclasses import dataclass
-from decimal import Decimal, InvalidOperation
 from typing import Literal
 
 from .analyzer import AnalysisResult
-from .yara_generator import MIN_CONFIDENCE, YaraRule
+from .yara_generator import MIN_CONFIDENCE_BPS, YaraRule
 
 ENSEMBLE_PROTOCOL_VERSION: int = 1
 MIN_ENSEMBLE_MEMBERS: int = 5
-MIN_CONFIDENCE_BPS: int = int(MIN_CONFIDENCE * 10_000)
-
 _CANDIDATE_DOMAIN = b"PROMETHEUS_GUARDIAN_ENSEMBLE_CANDIDATE_V1"
 _SNAPSHOT_DOMAIN = b"PROMETHEUS_GUARDIAN_MEMBERSHIP_SNAPSHOT_V1"
 _SHA256_PATTERN = re.compile(r"[0-9a-f]{64}")
@@ -104,8 +100,8 @@ class EnsembleCandidate:  # pylint: disable=too-many-instance-attributes
         if not _is_sha256(model_artifact_sha256):
             raise ValueError("model artifact must be a canonical SHA-256 digest")
 
-        rule_confidence_bps = _confidence_to_bps(rule.confidence)
-        if rule_confidence_bps is None or rule_confidence_bps < MIN_CONFIDENCE_BPS:
+        rule_confidence_bps = rule.confidence_bps
+        if rule_confidence_bps < MIN_CONFIDENCE_BPS:
             raise ValueError(
                 "rule confidence must meet the canonical submission policy"
             )
@@ -227,14 +223,14 @@ class EnsembleVoter:  # pylint: disable=too-few-public-methods
             candidate.rule_confidence_bps,
             *tally.approval_confidences_bps,
         )
-        confidence = aggregate_confidence_bps / 10_000
         approved_rule = YaraRule(
             name=candidate.rule_name,
             rule_content=candidate.rule_content,
-            confidence=confidence,
+            confidence_bps=aggregate_confidence_bps,
             threat_hash=candidate.threat_hash,
             generated_at=candidate.rule_generated_at,
         )
+        confidence = approved_rule.confidence
         return EnsembleDecision(
             analysis=AnalysisResult(
                 threat_hash=candidate.threat_hash,
@@ -468,31 +464,11 @@ def _is_safe_rule(rule: object) -> bool:
         and _is_sha256(rule.threat_hash)
         and _is_rule_name(rule.name)
         and _is_rule_content(rule.name, rule.rule_content)
-        and _confidence_to_bps(rule.confidence) is not None
+        and _is_int(rule.confidence_bps)
+        and 0 <= rule.confidence_bps <= 10_000
         and _is_int(rule.generated_at)
         and rule.generated_at >= 0
     )
-
-
-def _is_valid_confidence(value: object) -> bool:
-    """Require a finite, non-boolean numeric confidence in [0, 1]."""
-    if isinstance(value, bool) or not isinstance(value, (int, float)):
-        return False
-    return math.isfinite(float(value)) and 0.0 <= float(value) <= 1.0
-
-
-def _confidence_to_bps(value: object) -> int | None:
-    """Convert a confidence with at most four decimal places to basis points."""
-    if not _is_valid_confidence(value):
-        return None
-    try:
-        scaled = Decimal(str(value)) * Decimal(10_000)
-    except InvalidOperation:
-        return None
-    integral = scaled.to_integral_value()
-    if scaled != integral:
-        return None
-    return int(integral)
 
 
 def _is_rule_name(value: object) -> bool:

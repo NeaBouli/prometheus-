@@ -291,9 +291,18 @@ out-of-range confidence, malformed submission decisions, and failed or invalid
 70B output fail closed with no submittable rule. The existing minimum network
 submission confidence remains `0.85`.
 
-This implementation is local orchestration with unit-test evidence. It does
-not yet prove live 8B/70B operation, model-calibrated confidence, or P2P
-delivery.
+The local YARA generator now requests source confidence in a separate bounded
+model call and accepts exactly one closed JSON object with integer
+`confidence_bps` in `0..10000`. Duplicate, missing, extra, non-integer, or
+out-of-range fields and malformed completion envelopes fail closed. Indicator
+count and YARA text shape no longer determine confidence, and the accepted
+basis-point value is preserved through the ensemble path without conversion
+through a float.
+
+This implementation is local orchestration with unit-test evidence. Strict
+schema validation does not establish semantic accuracy, resistance to
+adversarial model inputs, or calibration. Live 8B/70B operation, quality and
+calibration evidence, and P2P delivery remain open.
 
 ### 7.5 Local Guardian Ensemble Vote
 
@@ -581,7 +590,7 @@ All development is subject to continuous architect audit. Key findings:
 | FIX-005: Reward formula mismatch | LOW | Corrected to whitepaper formula |
 | PATTERN-009: yara C dependency | LOW | Custom pattern matcher, evaluate yara-x for production |
 | PATTERN-010: Unnecessary Mutex | LOW | Use `Arc<Phi3Model>` instead of `Arc<Mutex<Phi3Model>>` |
-| PATTERN-011: Heuristic confidence | LOW | Replace with LLM confidence extraction in Sprint 6+ |
+| PATTERN-011: Heuristic confidence | LOW | GH-135 removes the indicator-count/YARA-shape heuristic and strictly parses model-provided integer basis points; live calibration and semantic quality evidence remain open |
 
 Total audit rounds: 10 | Sprint findings: 11 | Critical issues fixed; remaining deployment gates are tracked before beta/mainnet
 
