@@ -2800,3 +2800,13 @@ Rules for all dev agents:
 - Rust was unchanged; its complete local and protected gates passed on the
   preceding PR head and will rerun in refreshed protected CI after push.
 - **Status:** `Review fixes local PASS / Commit and refreshed checks next`.
+
+### 2026-08-02 00:19 EEST - GH-138 product merge exact-main PASS
+
+- Review head `a1ce555` passed all eleven protected contexts; all three concrete
+  CodeRabbit threads are resolved. PR #139 merged normally without bypass as
+  exact main `52209cc`; GH-138 closed.
+- Exact-main PASS: CI `30697333650`, Security `30697333643`, Pages
+  `30697333307`; live Whitepaper/Roadmap markers fetched successfully.
+- Public/status documentation is reconciled on a docs-only closeout branch.
+- **Status:** `Product Done / Documentation closeout PR next`.
