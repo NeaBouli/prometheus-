@@ -928,6 +928,32 @@ Remaining: independent cryptographic/privacy review and operated evidence
 Estimates: core 84-88%; complete vision 50-55%; 45-50% remains
 ```
 
+## GH-138 M-003 LOCAL CONFIDENCE EVALUATION CANDIDATE (2026-08-01)
+
+```text
+Baseline: exact green main 12b77358f9791b1aeac4582d1b54f75a1554bb57
+Scope: standalone offline Guardian confidence evaluator; no pipeline wiring
+Corpus: 24 sorted synthetic YARA semantic cases, 12 acceptable / 12 reject
+Binding: canonical corpus, predictions, fixed policy, expected report, and
+         co-versioned manifest are internally SHA-256 consistency-checked;
+         no signed or external tamper anchor
+Metrics: unchanged 8500-bps decision boundary; confusion matrix; exact-ratio
+         precision/recall gate; integer Brier score and fixed ten-bin ECE
+Fixture: TP 11 / FP 1 / TN 11 / FN 1; precision/recall 9167 bps;
+         Brier 36100 ppm; ECE 750 bps; development gate pass
+Evidence: synthetic_ci_only; production_authorized=false
+Focused: 31 tests pass; byte-exact CLI reproduction and focused Pylint 10.00
+Complete: Guardian 811 pass / 4 intentional live skips; full Pylint 9.83;
+          Rust workspace pass / 2 intentional network ignores / 5 compile-fail
+          doctests; complete format, lint, memory, CI, audit, and leak gates pass
+Review: Kimi quota-blocked with no write; Terra final PASS after all P2/P3 fixes
+Boundary: no model, network, YARA execution, telemetry, transport, v2 wiring,
+          wallet, signing, broadcast, deployment, chain, protocol, or token action
+Remaining: protected PR/exact-main evidence, then real live-model
+           semantic/adversarial evaluation and production calibration
+Status: Local Done / Protected PR pending
+```
+
 ## LOCAL THREATHINT V2 DURABLE NON-ACTIONABLE WORKER (2026-07-29)
 
 ```text

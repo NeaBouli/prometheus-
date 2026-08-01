@@ -2549,3 +2549,109 @@ No direct `main` push or production action occurred.
   evaluation, calibration, and production authorization remain open rollout
   gates.
 - **Status:** `Done / Merged / Exact-main verified`.
+
+### 2026-08-01 23:08 EEST - GH-138 M-003 semantic calibration gate started
+
+- Ticket `GIO-PROM-20260801-M003` and GitHub issue
+  [#138](https://github.com/NeaBouli/prometheus-/issues/138) own the next
+  repository-only Guardian block
+  from exact green main `12b77358f9791b1aeac4582d1b54f75a1554bb57`.
+- Scope is a versioned, deterministic, secret-free evaluation/calibration gate
+  for model-provided YARA confidence: closed canonical inputs/results,
+  fail-closed evidence validation, threshold and calibration metrics,
+  reproducible machine-readable output, adversarial tests, CI, independent
+  review, and synchronized public/status documentation.
+- Offline or synthetic evidence must not be represented as live model quality,
+  production calibration, or authorization. Live model operation, downloads or
+  training, real malware/private telemetry, v2 operational analysis/transport,
+  publication, wallet, signing, broadcast, deployment, chain state, protocol
+  formulas, KAS/PROM, reputation, slash ACL, and emergency-stop behavior are
+  excluded. GH-9 remains separately externally gated.
+- **Status:** `In Progress / Issue and architecture definition next`.
+
+### 2026-08-01 23:35 EEST - GH-138 core implementation PASS
+
+- Added a standalone stdlib-only offline confidence evaluator. Canonical ASCII
+  JSONL binds a sorted 24-case synthetic YARA corpus, exact integer-bps
+  predictions, fixed development policy, byte-exact report, and SHA-256
+  co-versioned consistency manifest; malformed, incomplete, reordered,
+  weakened-policy, or internally hash-inconsistent evidence fails closed. The
+  manifest is not a signed or externally anchored tamper proof.
+- The unchanged 8500-bps boundary reports TP 11 / FP 1 / TN 11 / FN 1,
+  precision and recall 9167 bps, Brier 36100 ppm, and ten-bin ECE 750 bps.
+  Gate decisions use exact integer cross-products/sums, not rounded display
+  values. Evidence is `synthetic_ci_only` and `production_authorized=false`.
+- Focused PASS: 29 tests, byte-exact CLI reproduction, Black, and Pylint
+  10.00. Kimi was provider-quota blocked and wrote nothing. Terra found no P0;
+  its non-authority, exact-ratio, integrity, and adversarial requirements are
+  incorporated.
+- CI, README, Guardian README, Markdown/HTML Whitepaper and Roadmap, Backlog,
+  and Memory are synchronized. Complete repository gates and final independent
+  review remain.
+- No model/network/YARA execution, real telemetry, v2 operation, transport,
+  wallet, signing, broadcast, deployment, chain, protocol, or token behavior
+  changed.
+- **Status:** `Local implementation PASS / Complete gates next`.
+
+### 2026-08-01 23:42 EEST - GH-138 complete local gates and review PASS
+
+- Review hardening restricts the v1 input mode to `synthetic_ci`; the canonical
+  report evidence label is `synthetic_ci_only`. It describes the co-versioned
+  manifest only as internal consistency checking rather than an external
+  tamper anchor, restores contiguous historical audit text, and adds direct
+  CLI exit-1/exit-2/redaction/no-partial-output tests.
+- PASS: 29 focused tests; complete Guardian 809 passed / 4 intentional live
+  skips; Black; focused Pylint 10.00 and full Pylint 9.83; Python 3.11 exact
+  report; Rustfmt; locked all-target Clippy; warm complete Rust workspace with
+  two intentional network ignores and five compile-fail doctests; Memory;
+  six Autodidactic tests; YAML/Actionlint; HTML/status markers; Cargo Audit
+  with zero vulnerabilities/four allowed warnings; Gitleaks 8.30.0; diff.
+- One first unchanged 10-MiB scanner performance test exceeded its budget
+  under concurrent host load; it passed immediately alone at 3.81 seconds and
+  passed in the warm complete workspace rerun. No unrelated code changed.
+- Terra final exact-diff re-review: PASS with no remaining P0/P1/P2/P3. Kimi
+  remained provider-quota blocked and wrote nothing.
+- No live model, real telemetry, v2 operation, transport, production, wallet,
+  signing, broadcast, deployment, chain, protocol, or token action occurred.
+- **Status:** `Local Done / Protected PR next`.
+
+### 2026-08-01 23:48 EEST - GH-138 protected PR opened
+
+- Local PASS commit `3ff382dc31c27dec84a0ff68aba00d7b26806fd6` is
+  published on `feat/GH-138-confidence-calibration` through draft PR
+  [#139](https://github.com/NeaBouli/prometheus-/pull/139).
+- PR wording preserves the synthetic-only, non-authorizing and non-externally-
+  anchored evidence boundary and links GH-138 for closure.
+- No direct-main push or branch-protection bypass occurred. Exact-head required
+  checks, review resolution, ready state, normal merge, and exact-main/Live-
+  Pages verification remain.
+- **Status:** `Protected PR open / Required checks pending`.
+
+### 2026-08-01 23:59 EEST - PR #139 review findings locally remediated
+
+- Accepted all six CodeRabbit findings: action history is chronological; input
+  mode `synthetic_ci` and report label `synthetic_ci_only` are distinguished;
+  public wording states the manifest has no independent tamper evidence; the
+  CI shell fails strictly; oversized files are rejected before reading; and
+  corpus row/line boundaries plus complete definition docstrings are covered.
+- Focused PASS: 31 tests, Black, Pylint 10.00/10, and 61/61 Python definitions
+  documented across the evaluator and its focused test module. Diff hygiene
+  also passes.
+- No threshold, fixture, metric, model, telemetry, v2, transport, wallet,
+  signing, broadcast, deployment, chain, protocol, or token behavior changed.
+  Complete local gates, review-fix commit/push, refreshed protected checks,
+  thread resolution, and normal merge remain.
+- **Status:** `Review fixes focused PASS / Complete gates next`.
+
+### 2026-08-02 00:08 EEST - PR #139 review-fix local gates PASS
+
+- Python 3.11 complete Guardian PASS: 811 tests / 4 intentional live-model
+  skips. Black passes all 26 Guardian source files; full Pylint remains 9.83;
+  the exact CLI report comparison, Memory Integrity, six Autodidactic tests,
+  workflow YAML, Actionlint 1.7.12, HTML/SEO/public-status checks, Gitleaks
+  8.30.0 with no leak, and diff checks pass.
+- Rust code was not changed by this review patch. Its complete workspace,
+  Rustfmt, Clippy, performance, audit, and protected CI gates passed on the
+  preceding PR head; refreshed protected checks will rerun those gates after
+  the review-fix push.
+- **Status:** `Review fixes local PASS / Commit and refreshed checks next`.
