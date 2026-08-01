@@ -2401,3 +2401,46 @@ No direct `main` push or production action occurred.
 - Actionlint 1.7.12 and Memory Integrity pass after remediation. No benchmark,
   threshold, runtime, protocol, wallet, deployment, or chain behavior changed.
 - **Status:** `Review fixes validated / Refreshed protected checks pending`.
+
+### 2026-08-01 12:52 EEST - GH-132 dependency advisory remediation started
+
+- GH-131 is complete on exact green main `6687f1e3`; GH-132 now owns the
+  separately scoped `RUSTSEC-2026-0221` remediation from that baseline.
+- The candidate branch is `fix/GH-132-event-listener-advisory`. Scope is a
+  compatible lockfile-only update from transitive `event-listener 5.4.1` to a
+  patched release (`>= 5.4.2`), followed by complete Rust, audit, CI, and
+  integration validation.
+- No direct dependency, product/protocol behavior, commit-reveal formula,
+  KAS/PROM separation, reputation, wallet, signing, broadcast, deployment, or
+  chain state is allowed to change.
+- Acceptance requires removal of `RUSTSEC-2026-0221`, no new advisory
+  regression, full workspace tests, all-target locked Clippy, protected PR
+  checks, and exact-main evidence.
+- **Status:** `In Progress / Compatibility verification`.
+
+### 2026-08-01 13:06 EEST - GH-132 local candidate validated
+
+- Cargo resolves transitive `event-listener 5.4.2` as a lockfile-only change;
+  no direct dependency or pinned rusty-kaspa/workflow version changes.
+- `RUSTSEC-2026-0221` is absent from Cargo Audit. Result: zero
+  vulnerabilities and eight allowed maintenance/yank warnings over 587
+  dependencies.
+- PASS: locked metadata/inverse tree, Rustfmt, locked all-target Clippy,
+  complete workspace 351 passed / 2 intentional live-network ignores / 0
+  failed, optimized Guardian binaries, verified ThreatHint package,
+  three-package set, strict release performance gate, Memory Integrity, and
+  six Autodidactic tests.
+- No product/protocol, commit-reveal, KAS/PROM, reputation, wallet, signing,
+  broadcast, deployment, or chain behavior changed.
+- **Status:** `Local PASS / Independent review and protected PR pending`.
+
+### 2026-08-01 13:12 EEST - GH-132 independent review PASS
+
+- Kimi's bounded secret-free review attempt remained provider-quota blocked
+  and produced no result or diff.
+- Claude independently reproduced Cargo Audit and locked all-target Clippy,
+  verified exact green baseline `6687f1e`, its three run IDs, all ten strict
+  contexts, the lockfile dependency edge, and documentation consistency.
+- Review result: PASS with no P0/P1/P2/P3 finding. Residual publication risk
+  remains covered by protected exact-head and exact-main checks.
+- **Status:** `Approved locally / Protected PR next`.

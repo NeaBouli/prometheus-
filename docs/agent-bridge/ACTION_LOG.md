@@ -2641,3 +2641,32 @@ Rules for all dev agents:
   `text` language tag on the edited audit block.
 - Actionlint and Memory Integrity pass after the minimal fixes.
 - **Status:** `Review fixes validated / Refreshed checks pending`.
+
+### 2026-08-01 12:52 EEST - GH-132 started
+
+- Began the bounded security follow-up from exact green main `6687f1e3` on
+  branch `fix/GH-132-event-listener-advisory`.
+- Dependency tracing confirms vulnerable `event-listener 5.4.1` is transitive
+  through `async-lock` and `event-listener-strategy` in the pinned
+  rusty-kaspa/workflow graph.
+- Planned write scope is lockfile-only plus factual Bridge/Memory closeout;
+  product, protocol, wallet, deployment, and chain behavior remain excluded.
+- **Status:** `In Progress / Lockfile compatibility check`.
+
+### 2026-08-01 13:06 EEST - GH-132 local verification PASS
+
+- Updated only the resolved transitive `event-listener` package from 5.4.1 to
+  patched 5.4.2; direct manifests and pinned upstream versions are unchanged.
+- Cargo Audit: zero vulnerabilities, eight allowed warnings, and no
+  `RUSTSEC-2026-0221` across 587 resolved dependencies.
+- Complete local Rust, release-binary, package, strict performance, Memory,
+  and Autodidactic gates pass; workspace result is 351 passed, 2 intentional
+  live-network ignores, 0 failed.
+- **Status:** `Local PASS / Review next`.
+
+### 2026-08-01 13:12 EEST - GH-132 review PASS
+
+- Kimi review was quota-blocked and wrote nothing. Claude's read-only review
+  independently re-ran Cargo Audit and locked Clippy, checked GitHub baseline and
+  branch protection, and found no P0/P1/P2/P3 issue.
+- **Status:** `Approved locally / Protected PR next`.

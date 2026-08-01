@@ -153,7 +153,8 @@
 - [~] Q-003: fp_rate Oracle — current-Silverc contract gate, public report/request/result/evidence/status gates, and repository-owned value-preserving two-input Rust assembly, dual external-signature verification, guarded broadcast, and successor observation are merged and exact-main verified at `072f04a`; real inputs/signatures/confirmation/evidence remain
 - [ ] Sybil resistance final design — Architect decision needed
 - [ ] M-001: yara_generator.py Heuristic → LLM confidence
-- [~] M-002: GH-131 median-sample debug smoke plus strict release gate passes locally; protected CI and exact-main evidence remain
+- [x] M-002: GH-131 median-sample debug smoke plus strict release gate merged and exact-main verified at `6687f1e`
+- [~] GH-132: lockfile-only `event-listener 5.4.2` candidate removes `RUSTSEC-2026-0221`; local complete gates and independent no-finding review pass, protected publication remains
 - [ ] PLONK evaluation for Light Client ZK-proofs
 
 ### Wartet auf externe Events:
@@ -688,3 +689,25 @@ Leistungsbasierte Emission. Guardians = "Miner" (KI statt GPU).
 - Status is locally approved. Protected PR CI, merge, and exact-main evidence
   remain; no product/protocol, wallet, signing, deployment, or chain action
   occurred.
+
+## Checkpoint 2026-08-01: GH-132 dependency candidate locally validated
+
+- From exact green main `6687f1e`, Cargo resolves transitive `event-listener`
+  5.4.2 without changing any direct dependency or pinned rusty-kaspa/workflow
+  version. The lockfile removes the obsolete `concurrent-queue` edge from that
+  package.
+- Cargo Audit reports zero vulnerabilities and eight allowed warnings;
+  `RUSTSEC-2026-0221` is absent. Metadata and inverse dependency resolution
+  pass with `--locked`.
+- Rustfmt, locked all-target Clippy, complete workspace 351 passed / 2
+  intentional live-network ignores / 0 failed, optimized Guardian security
+  binaries, verified ThreatHint package, three-package set, and strict release
+  performance gate pass. Memory Integrity and six Autodidactic tests pass.
+- Scope remains lockfile plus factual status documentation. No product,
+  protocol, commit-reveal, KAS/PROM, reputation, wallet, signing, broadcast,
+  deployment, or chain behavior changed.
+- Kimi's bounded secret-free review attempt was provider-quota blocked. Claude
+  independently reproduced Cargo Audit and locked all-target Clippy, verified
+  the exact green baseline runs and ten protected contexts, and reported PASS
+  with no P0/P1/P2/P3 finding.
+- **Status:** `Approved locally / Protected PR next`.
