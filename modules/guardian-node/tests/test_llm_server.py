@@ -43,6 +43,7 @@ class TestLlmServer:
     @pytest.mark.parametrize(
         "content",
         [
+            "",
             "not-json",
             "[]",
             '"8500"',
@@ -56,6 +57,7 @@ class TestLlmServer:
             '{"confidence_bps":NaN}',
             '{"confidence_bps":-1}',
             '{"confidence_bps":10001}',
+            '{"confidence_bps":8500}' + " " * 200,
         ],
     )
     def test_confidence_assessment_rejects_noncanonical_payloads(

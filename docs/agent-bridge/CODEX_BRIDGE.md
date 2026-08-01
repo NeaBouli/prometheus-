@@ -2518,3 +2518,19 @@ No direct `main` push or production action occurred.
 - No bypass or direct-main write occurred. Required CI/Security/Pages checks
   and review conversations must pass before ready/normal merge.
 - **Status:** `Protected PR open / Required checks pending`.
+
+### 2026-08-01 22:40 EEST - PR #136 review findings remediated
+
+- All ten CodeRabbit threads were verified and addressed: direct invalid-input
+  submittability now returns `False`; fail-closed analyzer warnings expose only
+  stage and exception type; explicit size-bound/parser and logging-redaction
+  tests were added; helper rounding, docstrings, API failure semantics,
+  Markdown fence, and active checkpoint state were corrected.
+- PASS: 155 focused tests / 4 intentional live-model skips, targeted Ruff,
+  Black, focused Pylint 9.67/10, Memory Integrity, and diff checks.
+- One complete local Guardian run reached 779 pass / 4 skip before an
+  unchanged verifier fixture exceeded its three-second timeout under heavy
+  concurrent host load. The exact test then passed alone in 6.02 seconds; no
+  out-of-scope timeout or verifier code was changed. Refreshed protected CI is
+  the authoritative complete rerun for this review commit.
+- **Status:** `Review fixes local PASS / Push and refreshed checks next`.

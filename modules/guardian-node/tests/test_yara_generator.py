@@ -109,6 +109,15 @@ class TestYaraRuleGenerator:
         rule = make_rule(INVALID_YARA_NO_STRINGS, confidence_bps=9_500)
         assert gen.is_submittable(rule) is False
 
+    @pytest.mark.parametrize("confidence_bps", [None, True, "9000", 9_000.0])
+    def test_is_submittable_rejects_invalid_confidence_type(
+        self, confidence_bps: object
+    ) -> None:
+        """Malformed direct callers fail closed instead of raising."""
+        gen = self._make_generator()
+        rule = make_rule(VALID_YARA, confidence_bps=confidence_bps)  # type: ignore[arg-type]
+        assert gen.is_submittable(rule) is False
+
     @pytest.mark.asyncio
     async def test_generate_rule(self) -> None:
         """Generated rule has correct metadata."""

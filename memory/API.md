@@ -900,10 +900,11 @@ choice. Its content must be one JSON object with one integer field:
 {"confidence_bps":8500}
 ```
 
-The parser rejects empty or oversized content, malformed envelopes, duplicate,
-missing, or extra keys, booleans, floats, strings, null, non-standard numeric
-constants, and values outside `0..10000`. Errors are stable and do not echo
-model output. `YaraRule.confidence_bps` is the canonical source value;
+The call fails closed on timeout or connection failure. The parser rejects
+empty or oversized content, malformed completion envelopes or confidence JSON,
+duplicate, missing, or extra keys, booleans, floats, strings, null,
+non-standard numeric constants, and values outside `0..10000`. Errors are
+stable and do not echo model output. `YaraRule.confidence_bps` is the canonical source value;
 `confidence` is a compatibility view only. Submission still requires at least
 `8500` basis points and basic local YARA-shape validation.
 

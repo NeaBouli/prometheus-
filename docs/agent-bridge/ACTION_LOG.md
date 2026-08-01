@@ -2721,3 +2721,14 @@ Rules for all dev agents:
 - No branch-protection bypass or direct-main write. Required checks and review
   resolution remain before ready state and normal merge.
 - **Status:** `Protected PR open / Checks pending`.
+
+### 2026-08-01 22:40 EEST - PR #136 feedback addressed
+
+- Fixed all ten CodeRabbit comments, including invalid direct-input
+  submittability, redacted stage/type-only failure logging, missing boundary
+  tests, and stale active status documentation.
+- PASS: focused 155/4, Ruff, Black, focused Pylint 9.67, Memory, and diff.
+- Complete local Guardian reached 779/4 before one unchanged three-second
+  verifier fixture timed out under concurrent host load; that exact test passed
+  alone. Refreshed protected CI will provide the complete authoritative rerun.
+- **Status:** `Review fixes local PASS / Refreshed checks next`.

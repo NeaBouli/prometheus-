@@ -174,12 +174,17 @@ class LlmServer:
 
         Args:
             prompt: The user prompt to send.
+            system_prompt: Optional bounded system-role instruction.
+            max_tokens: Maximum number of generated tokens.
+            temperature: Sampling temperature for the request.
 
         Returns:
             The model's response text.
 
         Raises:
             httpx.HTTPStatusError: If the server returns an error status.
+            LlmResponseError: If the completion envelope is not exactly one
+                bounded assistant text choice.
         """
         messages: list[dict[str, str]] = []
         if system_prompt is not None:

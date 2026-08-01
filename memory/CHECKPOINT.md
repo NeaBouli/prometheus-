@@ -132,7 +132,7 @@
 **STARTFLOW — Lies dies zuerst:**
 ```
 1. cd /Users/gio/Desktop/repos/prometheus
-2. git log --oneline -5              → aktuellen HEAD prüfen; letzter dokumentierter grün verifizierter Produkt-/Tooling-Commit = d0f78a9
+2. git log --oneline -5              → aktuellen HEAD prüfen; letzter dokumentierter grün verifizierter Produkt-/Tooling-Commit = 42acbca
 3. git tag -l                        → Rollback: pre-session-20260413
 4. cargo test 2>&1 | tail -5         → Muss grün sein
 5. Lies BACKLOG.md                   → Priorisierte Task-Liste
@@ -152,9 +152,9 @@
 - [~] Sprint 10B ensemble voting: GH-36/39 plus merged/exact-main GH-42/GH-44/GH-48/GH-52 are implemented. Real two-host operation, broad discovery, trusted membership/key assignment, Sybil resistance, and on-chain attestation remain
 - [~] Q-003: fp_rate Oracle — current-Silverc contract gate, public report/request/result/evidence/status gates, and repository-owned value-preserving two-input Rust assembly, dual external-signature verification, guarded broadcast, and successor observation are merged and exact-main verified at `072f04a`; real inputs/signatures/confirmation/evidence remain
 - [ ] Sybil resistance final design — Architect decision needed
-- [ ] M-001: yara_generator.py Heuristic → LLM confidence
+- [~] M-001/GH-135: strict model-provided integer-bps candidate is locally complete and under protected PR review; live semantic/adversarial evaluation and calibration remain
 - [x] M-002: GH-131 median-sample debug smoke plus strict release gate merged and exact-main verified at `6687f1e`
-- [~] GH-132: lockfile-only `event-listener 5.4.2` candidate removes `RUSTSEC-2026-0221`; local complete gates and independent no-finding review pass, protected publication remains
+- [x] GH-132: lockfile-only `event-listener 5.4.2` remediation merged and exact-main verified at `42acbca`
 - [ ] PLONK evaluation for Light Client ZK-proofs
 
 ### Wartet auf externe Events:

@@ -142,10 +142,11 @@ class TestAnalyzer:
     @pytest.mark.asyncio
     async def test_confidence_assessment_failure_is_redacted_and_fail_closed(
         self,
+        caplog: pytest.LogCaptureFixture,
     ) -> None:
         """Malformed model confidence exposes no model text or submit decision."""
         analyzer = make_analyzer()
-        analyzer.llm.assess_yara_rule = AsyncMock(
+        analyzer.yara_gen.llm.assess_yara_rule = AsyncMock(
             side_effect=ValueError("sensitive model output")
         )
 
@@ -156,6 +157,8 @@ class TestAnalyzer:
         assert result.should_submit is False
         assert result.analysis_notes == "YARA generation failed closed."
         assert "sensitive" not in result.analysis_notes
+        assert "stage=yara_generation error_type=ValueError" in caplog.text
+        assert "sensitive" not in caplog.text
 
     @pytest.mark.asyncio
     async def test_notes_contain_confidence(self) -> None:

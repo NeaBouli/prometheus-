@@ -8,11 +8,14 @@ MIN_CONFIDENCE = 0.85 (from MEMO.md).
 
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass
 from typing import Final
 
 from .llm_server import LlmServer
 from .yara_generator import YaraRule, YaraRuleGenerator
+
+_LOGGER = logging.getLogger(__name__)
 
 _VERIFIED_INDICATOR_TYPES: Final[set[str]] = {
     "file_hash",
@@ -163,7 +166,12 @@ class Analyzer:
 
         try:
             await self.llm.analyze_threat(threat_data)
-        except Exception:  # pylint: disable=broad-except
+        except Exception as exc:  # noqa: BLE001  # pylint: disable=broad-except
+            _LOGGER.warning(
+                "guardian analysis failed closed: stage=%s error_type=%s",
+                "llm_analysis",
+                type(exc).__name__,
+            )
             return AnalysisResult(
                 threat_hash=hint.threat_hash,
                 yara_rule=None,
@@ -177,7 +185,12 @@ class Analyzer:
             yara_rule = await self.yara_gen.generate_rule(
                 hint.threat_hash, hint.indicators
             )
-        except Exception:  # pylint: disable=broad-except
+        except Exception as exc:  # noqa: BLE001  # pylint: disable=broad-except
+            _LOGGER.warning(
+                "guardian analysis failed closed: stage=%s error_type=%s",
+                "yara_generation",
+                type(exc).__name__,
+            )
             return AnalysisResult(
                 threat_hash=hint.threat_hash,
                 yara_rule=None,

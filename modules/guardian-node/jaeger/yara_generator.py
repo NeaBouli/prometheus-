@@ -121,4 +121,4 @@ class YaraRuleGenerator:
         Returns:
             True if confidence >= MIN_CONFIDENCE (0.85) and syntax is valid.
         """
-        return rule.confidence_bps >= MIN_CONFIDENCE_BPS and self.validate_rule(rule)
+        return self.validate_rule(rule) and rule.confidence_bps >= MIN_CONFIDENCE_BPS

@@ -30,7 +30,7 @@ def make_analysis(confidence: float, should_submit: bool = False) -> AnalysisRes
         rule = YaraRule(
             name="TEST_RULE",
             rule_content='rule TEST_RULE { strings: $a = "x" condition: $a }',
-            confidence_bps=int(confidence * 10_000),
+            confidence_bps=round(confidence * 10_000),
             threat_hash="a" * 64,
             generated_at=int(time.time()),
         )

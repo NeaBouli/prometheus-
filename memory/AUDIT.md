@@ -442,7 +442,7 @@ Severity: HIGH (performance under load, noted since Sprint 3)
 ### MEDIUM (fix before full release Aug/Sep):
 
 **M-001: Heuristic confidence in yara_generator.py (Check 3.1, PATTERN-011) — GH-135 LOCAL CANDIDATE**
-```
+```text
 File:     modules/guardian-node/jaeger/yara_generator.py:75-80
 Finding:  The former hardcoded heuristic (base 0.7 + indicator bonus) did not
           correlate with actual rule quality.
