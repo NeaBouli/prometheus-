@@ -2144,3 +2144,34 @@ Cargo Audit reports zero vulnerabilities and nine allowed warnings. The new
 transitive `event-listener 5.4.1` `RUSTSEC-2026-0221` warning is fixed upstream
 in 5.4.2 and tracked separately by GH-132; no dependency update is included in
 this performance-only patch.
+
+## 2026-08-01 - GH-132 local dependency remediation evidence
+
+**Result:** LOCAL PASS; independent review and protected publication remain.
+
+From exact green main `6687f1e3fb2611dc4261e66e76bc353fd5f59d94`, the
+lockfile-only candidate updates transitive `event-listener 5.4.1` to 5.4.2.
+No direct dependency or pinned rusty-kaspa/workflow version changes. Cargo's
+resolved inverse tree retains `async-lock 3.4.2` and
+`event-listener-strategy 0.5.4`; the patched package no longer resolves its
+former `concurrent-queue` dependency.
+
+Cargo Audit scanned 587 dependencies, reports zero vulnerabilities and eight
+allowed maintenance/yank warnings, and no longer reports
+`RUSTSEC-2026-0221`. Locked metadata resolution passes.
+
+Regression evidence passes: Rustfmt; warning-free locked workspace all-target
+Clippy; complete workspace 351 passed, two intentional live-network ignores,
+zero failed; optimized Guardian P2P and ThreatProof binaries; verified
+ThreatHint package; the three-package Guardian set; strict optimized
+commitment performance gate; Memory Integrity; and six Autodidactic tests.
+
+No product/protocol, commit-reveal formula, KAS/PROM separation, reputation,
+wallet, signing, broadcast, deployment, or chain-state behavior changed.
+
+Kimi's secret-free bounded review was attempted but blocked by its provider
+billing-cycle quota and produced no diff. Claude's read-only independent
+review reproduced Cargo Audit and warning-free locked all-target Clippy,
+verified the exact baseline run IDs and ten branch-protection contexts, and
+confirmed the lockfile edge and documentation claims. Final review result:
+PASS with no P0/P1/P2/P3 finding.

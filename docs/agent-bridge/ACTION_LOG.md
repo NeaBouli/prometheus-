@@ -2492,6 +2492,13 @@ Rules for all dev agents:
 - Cached diff and redacted 78.52-KB Gitleaks scan pass.
 - **Status:** `Approved locally / Protected PR next`.
 
+### 2026-08-01 13:14 EEST - GH-132 PR #134 opened
+
+- Pushed local approved commit `b0ac3ce` and opened protected PR
+  [#134](https://github.com/NeaBouli/prometheus-/pull/134), closing GH-132 only
+  after merge while GH-9 remains open.
+- **Status:** `In Progress / Protected checks running`.
+
 ### 2026-07-31 13:09 EEST - GH-9 PR #126 opened
 
 - Committed the exact 14-file publication set as `22422d8`.
@@ -2641,3 +2648,32 @@ Rules for all dev agents:
   `text` language tag on the edited audit block.
 - Actionlint and Memory Integrity pass after the minimal fixes.
 - **Status:** `Review fixes validated / Refreshed checks pending`.
+
+### 2026-08-01 12:52 EEST - GH-132 started
+
+- Began the bounded security follow-up from exact green main `6687f1e3` on
+  branch `fix/GH-132-event-listener-advisory`.
+- Dependency tracing confirms vulnerable `event-listener 5.4.1` is transitive
+  through `async-lock` and `event-listener-strategy` in the pinned
+  rusty-kaspa/workflow graph.
+- Planned write scope is lockfile-only plus factual Bridge/Memory closeout;
+  product, protocol, wallet, deployment, and chain behavior remain excluded.
+- **Status:** `In Progress / Lockfile compatibility check`.
+
+### 2026-08-01 13:06 EEST - GH-132 local verification PASS
+
+- Updated only the resolved transitive `event-listener` package from 5.4.1 to
+  patched 5.4.2; direct manifests and pinned upstream versions are unchanged.
+- Cargo Audit: zero vulnerabilities, eight allowed warnings, and no
+  `RUSTSEC-2026-0221` across 587 resolved dependencies.
+- Complete local Rust, release-binary, package, strict performance, Memory,
+  and Autodidactic gates pass; workspace result is 351 passed, 2 intentional
+  live-network ignores, 0 failed.
+- **Status:** `Local PASS / Review next`.
+
+### 2026-08-01 13:12 EEST - GH-132 review PASS
+
+- Kimi review was quota-blocked and wrote nothing. Claude's read-only review
+  independently re-ran Cargo Audit and locked Clippy, checked GitHub baseline and
+  branch protection, and found no P0/P1/P2/P3 issue.
+- **Status:** `Approved locally / Protected PR next`.
