@@ -104,9 +104,10 @@ Protected PR #136 merged without bypass as exact main `3ff3fa1`; Prometheus CI
 `30694395348`, Security Audit `30694395356`, and Pages `30694394857` pass on
 that SHA.
 
-**GH-138 local candidate — deterministic confidence evaluation:** a standalone
-offline Guardian evaluator consumes a canonical 24-case synthetic YARA
-benchmark, exact integer-bps predictions, a fixed development policy, and a
+**GH-138 merged and exact-main verified — deterministic confidence
+evaluation:** a standalone offline Guardian evaluator consumes a canonical
+24-case synthetic YARA benchmark, exact integer-bps predictions, a fixed
+development policy, and a
 co-versioned SHA-256 consistency manifest. It reproduces a byte-exact report with the unchanged `8500`-bps
 decision boundary, confusion matrix, exact-ratio precision/recall, Brier score,
 and ten-bin expected calibration error. Missing, duplicate, reordered,
@@ -117,6 +118,10 @@ not provide independent tamper evidence. CI
 evidence is explicitly `synthetic_ci_only` with `production_authorized=false`;
 it validates the evaluation machinery, not live-model quality, production
 calibration, or authorization.
+
+Protected PR #139 merged normally without bypass as exact main `52209cc`;
+Prometheus CI `30697333650`, Security Audit `30697333643`, and Pages
+`30697333307` pass on that SHA.
 
 **GH-103 merged and exact-main verified — local ELF import extraction:** the Rust Threat Observable boundary can derive one checked `api_import` from exact caller-supplied Linux ELF bytes. It uses the pinned read-only `object` parser, accepts no path, import string, platform, format, or generic observable value, and derives `linux`/`elf` internally. Inputs are capped at 16 MiB and 4096 dynamic symbols; names must match the existing closed ASCII grammar, are byte-sorted and deduplicated, and one checked index is selected. Every result is local-only `review_required_v1`, with shared exact-byte vectors independently parsed by Python. This neither proves external artifact provenance nor authorizes disclosure, transport, proof acceptance, analysis, or publication.
 

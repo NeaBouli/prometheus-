@@ -2150,7 +2150,7 @@ this performance-only patch.
 
 ## 2026-08-01 - GH-138 deterministic confidence evaluation audit
 
-**Result:** LOCAL PASS; protected PR and exact-main evidence remain pending.
+**Result:** MERGED / EXACT-MAIN PASS.
 
 - A standalone stdlib-only evaluator imports no Analyzer, LLM, YARA,
   transport, v2, wallet, deployment, or chain component.
@@ -2184,6 +2184,10 @@ this performance-only patch.
   audit ordering, explicit input/report label mapping, precise non-anchored
   evidence wording, strict CI shell semantics, pre-read file-size rejection,
   corpus size boundaries, and complete focused definition docstrings.
+- Protected PR #139 merged normally without bypass as exact main
+  `52209cc9d25fa283f290e65dcb40666b4abc65c8`; issue GH-138 is closed. Exact-main
+  Prometheus CI `30697333650`, Security Audit `30697333643`, and Pages
+  `30697333307` pass, and the live Whitepaper/Roadmap markers were fetched.
 
 No live model, real malware/private telemetry, v2 operation, transport,
 publication, wallet/key/signature, broadcast, deployment, chain, KAS/PROM,

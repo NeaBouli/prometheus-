@@ -762,7 +762,7 @@ Leistungsbasierte Emission. Guardians = "Miner" (KI statt GPU).
   authority remain separate rollout gates.
 - **Status:** `Done / Merged / Exact-main verified`.
 
-## Checkpoint 2026-08-01: GH-138 M-003 local implementation
+## Checkpoint 2026-08-02: GH-138 M-003 merged exact-main
 
 - From exact green main `12b7735`, GH-138 adds an isolated stdlib-only offline
   confidence evaluator and no operational analyzer or model wiring.
@@ -787,4 +787,6 @@ Leistungsbasierte Emission. Guardians = "Miner" (KI statt GPU).
   operation, real semantic/adversarial quality evidence, production
   calibration, v2 actionable integration, and all external rollout gates
   remain open.
-- **Status:** `Local Done / Protected PR pending`.
+- Protected PR #139 merged normally as exact main `52209cc`; CI
+  `30697333650`, Security `30697333643`, and Pages `30697333307` pass.
+- **Status:** `Done / Merged / Exact-main verified`.

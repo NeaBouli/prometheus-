@@ -928,10 +928,10 @@ Remaining: independent cryptographic/privacy review and operated evidence
 Estimates: core 84-88%; complete vision 50-55%; 45-50% remains
 ```
 
-## GH-138 M-003 LOCAL CONFIDENCE EVALUATION CANDIDATE (2026-08-01)
+## GH-138 M-003 MERGED / EXACT-MAIN VERIFIED (2026-08-02)
 
 ```text
-Baseline: exact green main 12b77358f9791b1aeac4582d1b54f75a1554bb57
+Baseline: exact green main 52209cc9d25fa283f290e65dcb40666b4abc65c8
 Scope: standalone offline Guardian confidence evaluator; no pipeline wiring
 Corpus: 24 sorted synthetic YARA semantic cases, 12 acceptable / 12 reject
 Binding: canonical corpus, predictions, fixed policy, expected report, and
@@ -949,9 +949,11 @@ Complete: Guardian 811 pass / 4 intentional live skips; full Pylint 9.83;
 Review: Kimi quota-blocked with no write; Terra final PASS after all P2/P3 fixes
 Boundary: no model, network, YARA execution, telemetry, transport, v2 wiring,
           wallet, signing, broadcast, deployment, chain, protocol, or token action
-Remaining: protected PR/exact-main evidence, then real live-model
-           semantic/adversarial evaluation and production calibration
-Status: Local Done / Protected PR pending
+Exact main: PR #139 merged normally; CI 30697333650; Security 30697333643;
+            Pages 30697333307; issue GH-138 closed
+Remaining: real live-model semantic/adversarial evaluation and production
+           calibration/authorization
+Status: Done / Merged / Exact-main verified
 ```
 
 ## LOCAL THREATHINT V2 DURABLE NON-ACTIONABLE WORKER (2026-07-29)
