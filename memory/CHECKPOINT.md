@@ -747,3 +747,17 @@ Leistungsbasierte Emission. Guardians = "Miner" (KI statt GPU).
 - Terra's final read-only exact-diff review reports PASS with no actionable
   P0/P1/P2/P3 finding. Kimi remained provider-quota blocked and wrote nothing.
 - **Status:** `Local Done / Protected PR next`.
+
+## Checkpoint 2026-08-01: GH-135 merged and exact-main verified
+
+- Protected PR #136 merged normally without bypass as exact main
+  `3ff3fa1a33ca7a6a600eba05bb0329cc6b72c96e`; GH-135 is closed.
+- Exact-main Prometheus CI `30694395348`, Security Audit `30694395356`, and
+  Pages `30694394857` pass. Live Pages exposes the strict model-confidence
+  Whitepaper and roadmap wording.
+- CodeRabbit's ten findings were remediated before merge; all inline threads
+  are resolved. Terra's independent final review had no P0/P1/P2/P3 finding.
+- M-001 repository implementation is complete. Live model operation,
+  adversarial semantic-quality evaluation, calibration, and production
+  authority remain separate rollout gates.
+- **Status:** `Done / Merged / Exact-main verified`.

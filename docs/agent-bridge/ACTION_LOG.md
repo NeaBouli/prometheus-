@@ -2732,3 +2732,11 @@ Rules for all dev agents:
   verifier fixture timed out under concurrent host load; that exact test passed
   alone. Refreshed protected CI will provide the complete authoritative rerun.
 - **Status:** `Review fixes local PASS / Refreshed checks next`.
+
+### 2026-08-01 22:55 EEST - GH-135 complete
+
+- PR #136 merged normally as exact main `3ff3fa1`; GH-135 closed.
+- Exact-main CI `30694395348`, Security `30694395356`, and Pages `30694394857`
+  pass; live Whitepaper/roadmap markers were fetched successfully.
+- All CodeRabbit feedback is incorporated and inline threads are resolved.
+- **Status:** `Done / Merged / Exact-main verified`.
