@@ -452,13 +452,19 @@ Action:   Replace with LLM confidence extraction when live LLM available.
 Severity: MEDIUM (affects rule quality scoring, not fund safety)
 ```
 
-**M-002: Performance test marginal in debug mode (Check 2.7)**
+**M-002: Performance test marginal in debug mode (Check 2.7) - LOCAL PASS 2026-08-01**
 ```
-File:     modules/client/tests/performance.rs:99
-Finding:  test_commitment_build_under_1ms fails at 1.17ms in debug build.
+File:     modules/client/tests/performance.rs:test_commitment_build_performance_budget
+Finding:  The former test_commitment_build_under_1ms failed at 1.17ms in a
+          debug build.
           All other tests pass. Likely passes in release mode.
-Action:   Either relax threshold to 2ms or gate on --release builds.
+Action:   A warmed, odd-sized sample set uses median steady-state latency to
+          resist scheduler stalls without accepting a consistently slow
+          implementation. Debug keeps a 2ms smoke budget; CI also runs the
+          same test under --release with the strict 1ms budget.
 Severity: MEDIUM (CI flakiness, not a real performance issue)
+Status:   Locally resolved by GH-131; protected CI and exact-main evidence are
+          still required before final closure.
 ```
 
 ---
@@ -528,7 +534,7 @@ Severity: LOW (mitigated by guard, no exploit path found)
 - [PASS] 2.4  CIDv1 "bafy" only — krc20.rs:112, zero CIDv0
 - [PASS] 2.5  Cargo.toml clean — no suspicious deps
 - [PASS] 2.6  cargo clippy — zero warnings
-- [MED]  2.7  cargo test — 1 perf test marginal, see M-002
+- [LOCAL PASS / PROTECTED EVIDENCE PENDING] 2.7 cargo test — see M-002
 
 **LEVEL 3 — PYTHON GUARDIAN NODE (3/4 passed)**
 - [MED]  3.1  Heuristic confidence — see M-001
@@ -568,7 +574,8 @@ Severity: LOW (mitigated by guard, no exploit path found)
 Total checks run:       35
 Critical findings:      0
 High findings:          2  (H-001 LE encoding, H-002 Mutex)
-Medium findings:        2  (M-001 heuristic confidence, M-002 perf test)
+Medium findings:        1 open + 1 local pass pending protected evidence
+                        (M-001 heuristic confidence; M-002 GH-131)
 Low findings:           3  (L-001 deposit ACL, L-002 fp_rate operator integration, L-003 CEI)
 Passed clean:           28
 
@@ -601,7 +608,8 @@ DevIncentivePoolState runtime gates, GovernanceAutoTuningState signed
 metrics/auto-tune runtime gates, and all-fixture release-bundle manifest now pass
 locally. Network deploy/orchestration tooling and oracle operator integration
 must pass before Sprint 9 deployment.
-M-001 and M-002 can wait until full release (Aug/Sep 2026).
+M-001 remains separately gated. M-002 has a local GH-131 candidate and waits
+only for protected CI plus exact-main evidence.
 
 **AUDIT UPDATE 2026-07-15:** GH-9 no longer uses the obsolete Hello-World/
 `ssc deploy` path. The repository defines two closed deployment profiles bound
@@ -2110,3 +2118,29 @@ are an explicitly approved external BIP340 response, complete canonical
 import and transaction verification, separately approved one-shot broadcast,
 confirmation, one public `operator_record` receipt, and independent public
 chain evidence. Canary evidence cannot promote full or metrics readiness.
+
+## 2026-08-01 - M-002 local closure evidence (GH-131)
+
+The commitment microbenchmark now warms the builder, measures 65 varied and
+optimizer-resistant invocations, and evaluates median steady-state latency.
+This rejects a consistently slow implementation while tolerating minority
+scheduler stalls. Debug retains a 2 ms smoke budget; the explicit optimized CI
+invocation retains the strict 1 ms requirement.
+
+Final local evidence: 64/64 direct debug test-binary repetitions pass (final
+median 8.793 us); 32/32 direct release repetitions pass (final median 368 ns);
+the complete workspace passes 351 tests with two intentional live-network
+ignores and no failures. Rustfmt, locked all-target Clippy, Memory Integrity,
+six Autodidactic tests, YAML, Actionlint 1.7.12, diff, and redacted Gitleaks
+checks pass.
+
+Kimi's secret-free read-only review attempt was blocked by its provider quota.
+Terra reported two P2 and one P3: best-of sampling false negatives, aggregate
+CI timeout mismatch, and inconsistent/stale status references. All three were
+remediated before the final test rerun. Protected PR CI and exact-main evidence
+remain before M-002 is finally closed.
+
+Cargo Audit reports zero vulnerabilities and nine allowed warnings. The new
+transitive `event-listener 5.4.1` `RUSTSEC-2026-0221` warning is fixed upstream
+in 5.4.2 and tracked separately by GH-132; no dependency update is included in
+this performance-only patch.

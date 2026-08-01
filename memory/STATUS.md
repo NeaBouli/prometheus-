@@ -354,7 +354,7 @@ Priority tasks:
 - H-001: keep LE encoding and signed-boundary verification gated in CI
 - Oracle: execute the merged/exact-main keyless GovernanceAutoTuning transition operator with real public state/sponsor UTXOs, external oracle/sponsor signatures, confirmed successor evidence, and existing result/evidence/status gates before beta/mainnet governance
 - Sprint 10B: GH-33 hybrid routing, GH-36 local 5+ complete-ballot validation, GH-39 local BIP340 authenticated intake, GH-42 direct QUIC/libp2p ballot transport, GH-44 persistent identity plus isolated operated relay/NAT evidence, and GH-48 strict operated Guardian/relay roles are merged/exact-main verified. Public/multi-host operation, broad discovery, trusted membership/key assignment, Sybil resistance, on-chain attestation, live model wiring/calibration, and production evidence remain
-- M-001/M-002: Medium findings (can wait until Aug/Sep)
+- M-001: semantic confidence remains gated on the separately approved live-LLM/privacy design; M-002 has a locally verified GH-131 candidate with a median-sample debug smoke gate plus strict optimized CI gate, while protected CI and exact-main evidence remain
 ```
 
 ## TESTNET CONTRACT ADDRESSES

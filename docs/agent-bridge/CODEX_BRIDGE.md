@@ -2340,3 +2340,51 @@ No direct `main` push or production action occurred.
   overhead; its external quota was already confirmed exhausted in the parent
   work.
 - **Status:** `Approved locally / Protected PR next`.
+
+### 2026-08-01 - M-002 performance-gate hardening started
+
+- Ticket `GIO-PROM-20260801-M002` and GitHub issue
+  [#131](https://github.com/NeaBouli/prometheus-/issues/131) own a low-risk
+  test/CI reliability fix from exact main `bfde024`.
+- The historical single-sample one-millisecond assertion has repeatedly
+  failed under unrelated debug host load while immediate reruns measured the
+  operation in tens or hundreds of microseconds.
+- Scope is limited to a scheduler-jitter-resistant measurement, an explicit
+  optimized release gate that preserves the one-millisecond requirement,
+  matching M-002 status documentation, complete relevant checks, independent
+  review, and a protected PR.
+- No product/protocol behavior, commit-reveal formula, KAS/PROM separation,
+  reputation, wallet, signing, broadcast, deployment, or chain state may
+  change.
+- **Status:** `In Progress / Implementation`.
+
+### 2026-08-01 12:20 EEST - M-002 candidate independently reviewed
+
+- The earlier pre-hardfork synthesis, known-findings list, and NEA-120 table
+  are historical snapshots; this entry supersedes their M-002 wording.
+- GH-131 now warms the commitment builder and measures the median of 65
+  independently timed, optimizer-resistant builds. Debug mode is a 2 ms smoke
+  budget; the explicit optimized CI invocation retains the strict 1 ms gate.
+- A dedicated `Rust Performance` job runs after `Rust Workspace`, restores the
+  Rust cache, and permits 35 minutes for the release gate inside a 45-minute
+  job budget. The existing aggregate Rust job remains independently bounded.
+  `Rust Performance` is already the tenth strict required branch-protection
+  context, so GH-131 cannot merge without its first protected PASS.
+- Focused evidence: debug 64/64 PASS (final median 8.793 us); release 32/32
+  PASS (final median 368 ns). Full workspace: 351 passed, 2 intentional live
+  ignores, 0 failed. Rustfmt and all-target locked Clippy pass.
+- Memory Integrity, six Autodidactic tests, YAML parse, Actionlint 1.7.12,
+  diff checks, and redacted Gitleaks pass. Cargo Audit reports zero
+  vulnerabilities and nine allowed warnings.
+- The newly published `RUSTSEC-2026-0221` warning for transitive
+  `event-listener 5.4.1` is fixed in 5.4.2 and is isolated as
+  [#132](https://github.com/NeaBouli/prometheus-/issues/132); no dependency
+  change is mixed into GH-131.
+- Kimi review was attempted with a secret-free bounded prompt but blocked by
+  its provider billing-cycle quota. Terra found two P2 and one P3; Sol replaced
+  best-of sampling with a warmed median, aligned CI timeouts, normalized status
+  documentation, and reran the complete relevant checks. Terra's final
+  targeted re-review reports PASS with no actionable P0/P1/P2/P3.
+- No product/protocol, commit-reveal, KAS/PROM, reputation, wallet, signing,
+  broadcast, deployment, or chain behavior changed.
+- **Status:** `Approved locally / Protected PR next`.

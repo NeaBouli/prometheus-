@@ -153,7 +153,7 @@
 - [~] Q-003: fp_rate Oracle — current-Silverc contract gate, public report/request/result/evidence/status gates, and repository-owned value-preserving two-input Rust assembly, dual external-signature verification, guarded broadcast, and successor observation are merged and exact-main verified at `072f04a`; real inputs/signatures/confirmation/evidence remain
 - [ ] Sybil resistance final design — Architect decision needed
 - [ ] M-001: yara_generator.py Heuristic → LLM confidence
-- [ ] M-002: Performance test threshold relaxen oder --release gate
+- [~] M-002: GH-131 median-sample debug smoke plus strict release gate passes locally; protected CI and exact-main evidence remain
 - [ ] PLONK evaluation for Light Client ZK-proofs
 
 ### Wartet auf externe Events:
@@ -670,3 +670,21 @@ Leistungsbasierte Emission. Guardians = "Miner" (KI statt GPU).
   independent evidence remain the immediate canary gates.
 - No wallet, key, signature, raw transaction, broadcast, deployment, or chain
   mutation occurred.
+
+## Checkpoint 2026-08-01: M-002 performance gate locally approved
+
+- GH-131 replaces the flaky one-shot debug measurement with a warmed
+  65-sample median, keeps a 2 ms debug smoke budget, and adds an explicit
+  optimized CI invocation with the unchanged strict 1 ms gate.
+- Final focused evidence is 64/64 debug and 32/32 release repetitions, with
+  final medians of 8.793 us and 368 ns. Complete workspace evidence is 351
+  passed, 2 intentional live ignores, and 0 failed.
+- Rustfmt, locked all-target Clippy, Memory, Autodidactic, YAML, Actionlint,
+  diff, dependency audit, and redacted leak gates pass.
+- Kimi was provider-quota blocked. Terra's two P2 and one P3 findings were
+  remediated and the relevant complete gates rerun.
+- Cargo Audit has zero vulnerabilities and nine allowed warnings; the new
+  transitive `RUSTSEC-2026-0221` follow-up is isolated as GH-132.
+- Status is locally approved. Protected PR CI, merge, and exact-main evidence
+  remain; no product/protocol, wallet, signing, deployment, or chain action
+  occurred.
