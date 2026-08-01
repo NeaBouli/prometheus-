@@ -2509,3 +2509,12 @@ No direct `main` push or production action occurred.
 - No secrets, original-worktree files, protocol formulas, v2 actionability,
   wallet, signing, broadcast, deployment, or chain state changed.
 - **Status:** `Local Done / Protected PR publication next`.
+
+### 2026-08-01 22:25 EEST - GH-135 protected PR opened
+
+- Commit `3317138` is pushed on `feat/GH-135-model-confidence`.
+- Draft PR [#136](https://github.com/NeaBouli/prometheus-/pull/136) targets
+  protected `main`; issue GH-135 is linked for closure.
+- No bypass or direct-main write occurred. Required CI/Security/Pages checks
+  and review conversations must pass before ready/normal merge.
+- **Status:** `Protected PR open / Required checks pending`.

@@ -2713,3 +2713,11 @@ Rules for all dev agents:
   code was changed.
 - Terra final review: PASS, no P0/P1/P2/P3. Kimi quota-blocked, no write.
 - **Status:** `Local Done / Protected PR next`.
+
+### 2026-08-01 22:25 EEST - GH-135 PR #136 opened
+
+- Pushed local PASS commit `3317138` and opened draft PR #136 against protected
+  `main`, linked to GH-135.
+- No branch-protection bypass or direct-main write. Required checks and review
+  resolution remain before ready state and normal merge.
+- **Status:** `Protected PR open / Checks pending`.
