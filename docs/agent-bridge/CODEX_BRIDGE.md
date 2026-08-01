@@ -2341,6 +2341,15 @@ No direct `main` push or production action occurred.
   work.
 - **Status:** `Approved locally / Protected PR next`.
 
+### 2026-08-01 13:14 EEST - GH-132 protected PR published
+
+- Local approved commit `b0ac3cecefd12e84735e60c98e6c2a640f11d7e8`
+  is published through protected PR
+  [#134](https://github.com/NeaBouli/prometheus-/pull/134).
+- PR wording closes only GH-132 and explicitly keeps GH-9 open and externally
+  gated. No direct-main or admin-bypass action occurred.
+- **Status:** `In Progress / Exact-head checks and review pending`.
+
 ### 2026-08-01 - M-002 performance-gate hardening started
 
 - Ticket `GIO-PROM-20260801-M002` and GitHub issue
