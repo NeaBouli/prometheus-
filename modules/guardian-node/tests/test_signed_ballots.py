@@ -63,7 +63,7 @@ def make_rule() -> YaraRule:
         rule_content=(
             'rule PROM_SIGNED_BALLOT { strings: $a = "signed" condition: $a }'
         ),
-        confidence=0.95,
+        confidence_bps=9_500,
         threat_hash=THREAT_HASH,
         generated_at=1_700_000_000,
     )

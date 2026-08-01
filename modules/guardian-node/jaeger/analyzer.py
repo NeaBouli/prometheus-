@@ -8,11 +8,14 @@ MIN_CONFIDENCE = 0.85 (from MEMO.md).
 
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass
 from typing import Final
 
 from .llm_server import LlmServer
-from .yara_generator import MIN_CONFIDENCE, YaraRule, YaraRuleGenerator
+from .yara_generator import YaraRule, YaraRuleGenerator
+
+_LOGGER = logging.getLogger(__name__)
 
 _VERIFIED_INDICATOR_TYPES: Final[set[str]] = {
     "file_hash",
@@ -163,13 +166,18 @@ class Analyzer:
 
         try:
             await self.llm.analyze_threat(threat_data)
-        except Exception as exc:  # pylint: disable=broad-except
+        except Exception as exc:  # noqa: BLE001  # pylint: disable=broad-except
+            _LOGGER.warning(
+                "guardian analysis failed closed: stage=%s error_type=%s",
+                "llm_analysis",
+                type(exc).__name__,
+            )
             return AnalysisResult(
                 threat_hash=hint.threat_hash,
                 yara_rule=None,
                 confidence=0.0,
                 should_submit=False,
-                analysis_notes=f"LLM analysis failed: {exc}",
+                analysis_notes="LLM analysis failed closed.",
             )
 
         # Step 2: Generate YARA rule
@@ -177,19 +185,24 @@ class Analyzer:
             yara_rule = await self.yara_gen.generate_rule(
                 hint.threat_hash, hint.indicators
             )
-        except Exception as exc:  # pylint: disable=broad-except
+        except Exception as exc:  # noqa: BLE001  # pylint: disable=broad-except
+            _LOGGER.warning(
+                "guardian analysis failed closed: stage=%s error_type=%s",
+                "yara_generation",
+                type(exc).__name__,
+            )
             return AnalysisResult(
                 threat_hash=hint.threat_hash,
                 yara_rule=None,
                 confidence=0.0,
                 should_submit=False,
-                analysis_notes=f"YARA generation failed: {exc}",
+                analysis_notes="YARA generation failed closed.",
             )
 
         # Step 3: Validate and determine submission
         is_valid = self.yara_gen.validate_rule(yara_rule)
         confidence = yara_rule.confidence if is_valid else 0.0
-        should_submit = confidence >= MIN_CONFIDENCE
+        should_submit = self.yara_gen.is_submittable(yara_rule)
 
         notes = (
             f"LLM analysis complete. "

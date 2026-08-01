@@ -6,8 +6,8 @@ from unittest.mock import AsyncMock, MagicMock
 import pytest
 
 from jaeger.analyzer import AnalysisResult, Analyzer, ThreatHint
-from jaeger.yara_generator import MIN_CONFIDENCE, YaraRule, YaraRuleGenerator
-
+from jaeger.llm_server import YaraConfidenceAssessment
+from jaeger.yara_generator import YaraRuleGenerator
 
 VALID_YARA = """rule TestThreat {
     strings:
@@ -27,13 +27,18 @@ def make_hint(indicators: list[str] | None = None) -> ThreatHint:
     )
 
 
-def make_analyzer(yara_output: str = VALID_YARA) -> Analyzer:
+def make_analyzer(
+    yara_output: str = VALID_YARA, confidence_bps: int = 9_000
+) -> Analyzer:
     """Create an Analyzer with mocked LLM and YARA generator."""
     mock_llm = MagicMock()
     mock_llm.analyze_threat = AsyncMock(
         return_value={"raw_analysis": "Test analysis", "threat_data": {}}
     )
     mock_llm.generate_yara_rule = AsyncMock(return_value=yara_output)
+    mock_llm.assess_yara_rule = AsyncMock(
+        return_value=YaraConfidenceAssessment(confidence_bps)
+    )
 
     yara_gen = YaraRuleGenerator(mock_llm)
     return Analyzer(mock_llm, yara_gen)
@@ -105,31 +110,26 @@ class TestAnalyzer:
     @pytest.mark.asyncio
     async def test_should_submit_high_confidence(self) -> None:
         """Result with high confidence should be submitted."""
-        analyzer = make_analyzer(VALID_YARA)
-        # Many indicators = higher confidence
-        hint = make_hint(["ind1", "ind2", "ind3", "ind4", "ind5", "ind6"])
+        analyzer = make_analyzer(VALID_YARA, confidence_bps=8_500)
+        hint = make_hint(["single_indicator"])
         result = await analyzer.process_threat_hint(hint)
-        # With 6 indicators: base 0.7 + 6*0.05=0.3 = 1.0 → should_submit
-        if result.confidence >= MIN_CONFIDENCE:
-            assert result.should_submit is True
+        assert result.confidence == 0.85
+        assert result.should_submit is True
 
     @pytest.mark.asyncio
     async def test_should_submit_low_confidence(self) -> None:
         """Result with low confidence should not be submitted."""
-        analyzer = make_analyzer(VALID_YARA)
-        hint = make_hint(["single_indicator"])
+        analyzer = make_analyzer(VALID_YARA, confidence_bps=8_499)
+        hint = make_hint(["ind1", "ind2", "ind3", "ind4", "ind5", "ind6"])
         result = await analyzer.process_threat_hint(hint)
-        # With 1 indicator: base 0.7 + 0.05 = 0.75 → below 0.85
-        if result.confidence < MIN_CONFIDENCE:
-            assert result.should_submit is False
+        assert result.confidence == 0.8499
+        assert result.should_submit is False
 
     @pytest.mark.asyncio
     async def test_llm_failure_handled(self) -> None:
         """LLM failure returns safe AnalysisResult."""
         mock_llm = MagicMock()
-        mock_llm.analyze_threat = AsyncMock(
-            side_effect=ConnectionError("Server down")
-        )
+        mock_llm.analyze_threat = AsyncMock(side_effect=ConnectionError("Server down"))
         yara_gen = YaraRuleGenerator(mock_llm)
         analyzer = Analyzer(mock_llm, yara_gen)
 
@@ -138,6 +138,27 @@ class TestAnalyzer:
         assert result.confidence == 0.0
         assert result.should_submit is False
         assert "failed" in result.analysis_notes.lower()
+
+    @pytest.mark.asyncio
+    async def test_confidence_assessment_failure_is_redacted_and_fail_closed(
+        self,
+        caplog: pytest.LogCaptureFixture,
+    ) -> None:
+        """Malformed model confidence exposes no model text or submit decision."""
+        analyzer = make_analyzer()
+        analyzer.yara_gen.llm.assess_yara_rule = AsyncMock(
+            side_effect=ValueError("sensitive model output")
+        )
+
+        result = await analyzer.process_threat_hint(make_hint())
+
+        assert result.yara_rule is None
+        assert result.confidence == 0.0
+        assert result.should_submit is False
+        assert result.analysis_notes == "YARA generation failed closed."
+        assert "sensitive" not in result.analysis_notes
+        assert "stage=yara_generation error_type=ValueError" in caplog.text
+        assert "sensitive" not in caplog.text
 
     @pytest.mark.asyncio
     async def test_notes_contain_confidence(self) -> None:

@@ -2677,3 +2677,58 @@ Rules for all dev agents:
   independently re-ran Cargo Audit and locked Clippy, checked GitHub baseline and
   branch protection, and found no P0/P1/P2/P3 issue.
 - **Status:** `Approved locally / Protected PR next`.
+
+### 2026-08-01 21:12 EEST - GH-135 started
+
+- Created GH-135 and branch `feat/GH-135-model-confidence` from exact green
+  main `42acbca54ed14ca5a74f21eff8484d2b3361d7b3`.
+- Reserved M-001 for strict model-provided confidence extraction plus tests
+  and factual public/status documentation. Existing submission threshold and
+  every production, transport, protocol, wallet, deployment, and chain
+  boundary remain unchanged.
+- **Status:** `In Progress / Architecture review next`.
+
+### 2026-08-01 22:05 EEST - GH-135 focused implementation PASS
+
+- Replaced heuristic YARA confidence with a separate exact-schema model
+  assessment in integer basis points; malformed model/completion output fails
+  closed and the existing 8500-bps policy is unchanged.
+- Preserved integer basis points through the ensemble path and added
+  adversarial parser, boundary, fail-closed, redaction, and regression tests.
+- Black formatting plus the six affected test modules pass: 149 passed, 4
+  intentional live-model skips.
+- Public README/Whitepaper/roadmap and internal Backlog/Memory status are
+  synchronized without claiming live model calibration or production trust.
+- Kimi review was quota-blocked with no write. Terra's read-only architecture
+  findings are incorporated; complete repository gates and final review remain.
+- **Status:** `Local implementation PASS / Complete gates next`.
+
+### 2026-08-01 22:20 EEST - GH-135 complete local gates and review PASS
+
+- Guardian 774/4, warm Rust workspace 351/2 plus 5 compile-fail doctests,
+  Black, Pylint 9.82, Rustfmt, locked all-target Clippy, Memory, Autodidactic,
+  Pages checks, Actionlint, Cargo Audit, redacted Gitleaks, and diff checks pass.
+- Initial unrelated ballot and scanner timing outliers passed repeated or
+  isolated checks and the corresponding complete warm reruns; no out-of-scope
+  code was changed.
+- Terra final review: PASS, no P0/P1/P2/P3. Kimi quota-blocked, no write.
+- **Status:** `Local Done / Protected PR next`.
+
+### 2026-08-01 22:25 EEST - GH-135 PR #136 opened
+
+- Pushed local PASS commit `3317138` and opened draft PR #136 against protected
+  `main`, linked to GH-135.
+- No branch-protection bypass or direct-main write. Required checks and review
+  resolution remain before ready state and normal merge.
+- **Status:** `Protected PR open / Checks pending`.
+
+### 2026-08-01 22:40 EEST - PR #136 feedback addressed
+
+- Fixed all ten CodeRabbit comments, including invalid direct-input
+  submittability, redacted stage/type-only failure logging, missing boundary
+  tests, and stale active status documentation.
+- PASS: focused 155/4, Ruff, Black, focused Pylint 9.67, Memory, and diff.
+- Complete local Guardian reached 779/4 before one unchanged three-second
+  verifier fixture timed out under concurrent host load; that exact test passed
+  alone. Refreshed protected CI will provide the complete authoritative rerun.
+- **Status:** `Review fixes local PASS / Refreshed checks next`.

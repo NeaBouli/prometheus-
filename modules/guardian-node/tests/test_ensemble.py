@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import math
 from collections.abc import Iterator
 from dataclasses import replace
 
@@ -34,14 +33,14 @@ EXPECTED_SNAPSHOT_ID = (
 )
 
 
-def make_rule(confidence: float = 0.95) -> YaraRule:
+def make_rule(confidence_bps: object = 9_500) -> YaraRule:
     """Build one deterministic candidate rule."""
     return YaraRule(
         name="PROM_TEST_RULE",
         rule_content=(
             'rule PROM_TEST_RULE { strings: $a = "suspicious" condition: $a }'
         ),
-        confidence=confidence,
+        confidence_bps=confidence_bps,  # type: ignore[arg-type]
         threat_hash=THREAT_HASH,
         generated_at=1_700_000_000,
     )
@@ -306,7 +305,7 @@ def test_reject_vote_may_report_low_confidence() -> None:
 
 def test_source_rule_confidence_caps_approved_result() -> None:
     """Committee confidence cannot raise the source rule above its own evidence."""
-    candidate = EnsembleCandidate.create(make_rule(0.86), POLICY_HASH, MODEL_HASH)
+    candidate = EnsembleCandidate.create(make_rule(8_600), POLICY_HASH, MODEL_HASH)
     snapshot = MembershipSnapshot.create(make_members(), MEMBERSHIP_SOURCE_HASH)
     votes = make_votes(candidate, snapshot, ["approve"] * 5, [9_000] * 5)
 
@@ -321,8 +320,8 @@ def test_source_rule_confidence_caps_approved_result() -> None:
 
 def test_source_rule_confidence_changes_candidate_digest() -> None:
     """Canonical source confidence is committed as YARA candidate metadata."""
-    lower = EnsembleCandidate.create(make_rule(0.85), POLICY_HASH, MODEL_HASH)
-    higher = EnsembleCandidate.create(make_rule(0.95), POLICY_HASH, MODEL_HASH)
+    lower = EnsembleCandidate.create(make_rule(8_500), POLICY_HASH, MODEL_HASH)
+    higher = EnsembleCandidate.create(make_rule(9_500), POLICY_HASH, MODEL_HASH)
 
     assert lower.rule_confidence_bps == 8_500
     assert higher.rule_confidence_bps == 9_500
@@ -332,22 +331,20 @@ def test_source_rule_confidence_changes_candidate_digest() -> None:
 def test_source_rule_below_submission_threshold_is_rejected() -> None:
     """Votes cannot promote a source rule that fails the existing 0.85 policy."""
     with pytest.raises(ValueError, match="submission policy"):
-        EnsembleCandidate.create(make_rule(0.8499), POLICY_HASH, MODEL_HASH)
+        EnsembleCandidate.create(make_rule(8_499), POLICY_HASH, MODEL_HASH)
 
 
-@pytest.mark.parametrize("confidence", [0.8499999999999999, 0.84999999999999])
-def test_source_rule_cannot_round_up_across_submission_threshold(
-    confidence: float,
-) -> None:
-    """Float representation tolerance cannot promote a below-policy source rule."""
+@pytest.mark.parametrize("confidence_bps", [8_499.9, "8500", True])
+def test_source_rule_requires_integer_basis_points(confidence_bps: object) -> None:
+    """Non-integer source confidence cannot enter a canonical candidate."""
     with pytest.raises(ValueError, match="canonically bound"):
-        EnsembleCandidate.create(make_rule(confidence), POLICY_HASH, MODEL_HASH)
+        EnsembleCandidate.create(make_rule(confidence_bps), POLICY_HASH, MODEL_HASH)
 
 
 def test_source_rule_confidence_requires_canonical_basis_points() -> None:
-    """Candidate construction rejects silently rounded transport confidence."""
+    """Candidate construction rejects out-of-range source confidence."""
     with pytest.raises(ValueError, match="canonically bound"):
-        EnsembleCandidate.create(make_rule(0.85001), POLICY_HASH, MODEL_HASH)
+        EnsembleCandidate.create(make_rule(10_001), POLICY_HASH, MODEL_HASH)
 
 
 def test_tampered_rule_bytes_invalidate_candidate() -> None:
@@ -470,12 +467,14 @@ def test_non_8b_member_is_rejected() -> None:
         MembershipSnapshot.create(members, MEMBERSHIP_SOURCE_HASH)
 
 
-@pytest.mark.parametrize("confidence", [math.nan, math.inf, -0.1, 1.1, True])
-def test_invalid_candidate_rule_confidence_is_rejected(confidence: object) -> None:
+@pytest.mark.parametrize("confidence_bps", [-1, 10_001, True, False, None])
+def test_invalid_candidate_rule_confidence_is_rejected(
+    confidence_bps: object,
+) -> None:
     """Candidate construction rejects malformed source-rule confidence."""
     with pytest.raises(ValueError, match="valid, canonically bound"):
         EnsembleCandidate.create(
-            make_rule(confidence),  # type: ignore[arg-type]
+            make_rule(confidence_bps),
             POLICY_HASH,
             MODEL_HASH,
         )

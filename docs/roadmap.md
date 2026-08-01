@@ -189,10 +189,11 @@ public release-hardening evidence for the exact rollout commit.
 **Sprint 10B — Guardian Decentralization**
 - Implemented: local fail-closed 8B-first router with exact 70B escalation below confidence `0.70`
 - Implemented: threat-hash binding, finite confidence checks, strict submission types, and unchanged `0.85` submission threshold
+- Implemented: separate bounded model confidence assessment with an exact closed JSON schema and integer basis points; malformed output fails closed and the former indicator-count/YARA-shape heuristic is removed
 - Implemented: local 5+ Guardian complete-ballot validator with canonical candidate/snapshot commitments, strict majority, and conservative confidence
 - Implemented: transport-neutral BIP340 ballot intake with exact key/session/context binding, strict canonical envelopes, freshness checks, and owner-only SQLite replay/equivocation protection across restarts and concurrent submissions
 - Merged/exact-main verified: real Guardian ballot transport over direct QUIC/libp2p request/response with exact 8192-byte-bounded frames, static peers, resource caps, owner-only AF_UNIX collector integration, and cancellation-safe concurrent processing
-- Pending: live 8B/70B service wiring and model-calibrated confidence evidence
+- Pending: live 8B/70B service wiring, adversarial semantic-quality evaluation, and model-calibrated confidence evidence
 - Merged/exact-main verified: persistent transport identity, isolated operated relay/AutoNAT/DCUtR evidence, and explicit bootstrap configuration; real two-host evidence remains
 - Pending: broad discovery, trusted membership and key assignment, Sybil resistance, and on-chain ensemble attestation
 - Pending: reviewed Guardian pooling and final Sybil-resistance design

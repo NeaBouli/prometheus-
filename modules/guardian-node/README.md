@@ -46,9 +46,17 @@ or above, and escalates below that boundary. Invalid confidence, mismatched
 threat hashes, malformed submission decisions, or a failed 70B route fail
 closed. The network submission threshold remains `0.85`.
 
-This is a local orchestration component. Live model service wiring, calibrated
-model-provided confidence, P2P transport, and production evidence remain
-separate rollout gates.
+`YaraRuleGenerator` obtains source confidence through a second bounded model
+call. It accepts exactly one closed JSON object containing an integer
+`confidence_bps` in `0..10000`; malformed completion envelopes, duplicate or
+extra keys, non-integer values, and out-of-range values fail closed. Indicator
+count and YARA text shape no longer affect the score. The basis-point value is
+preserved through ensemble commitments without a float round trip.
+
+This is a local orchestration component. A closed response schema provides
+format validation, not semantic trust or calibration. Live model service
+wiring, adversarial prompt/quality evaluation, calibration evidence, P2P
+transport, and production operation remain separate rollout gates.
 
 ## Local Ensemble Voting
 
