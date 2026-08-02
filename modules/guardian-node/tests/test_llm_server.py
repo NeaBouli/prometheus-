@@ -7,6 +7,7 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
+from jaeger.confidence_calibration import PINNED_LOCAL_MODEL_PROMPT_SHA256
 from jaeger.llm_server import (
     YARA_CONFIDENCE_PROMPT_SHA256,
     YARA_CONFIDENCE_PROMPT_SPEC,
@@ -210,6 +211,7 @@ class TestYaraConfidencePromptSpec:
             YARA_CONFIDENCE_PROMPT_SHA256
             == "b195c55e0825c73706aac06bd77b346d443aa64416955316574b30aaf526facc"
         )
+        assert YARA_CONFIDENCE_PROMPT_SHA256 == PINNED_LOCAL_MODEL_PROMPT_SHA256
 
     def test_build_prompt_is_canonical_and_escapes_untrusted_data(self) -> None:
         """Untrusted fields enter only as sorted JSON-escaped data."""

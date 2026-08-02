@@ -142,9 +142,11 @@ def write_predictions_atomically(output_path: Path, content: bytes) -> None:
     except OSError:
         raise ModelEvidenceError() from None
     handle = None
+    descriptor_open = True
     try:
         os.fchmod(descriptor, 0o600)
         handle = os.fdopen(descriptor, "wb")
+        descriptor_open = False
         handle.write(content)
         handle.flush()
         os.fsync(handle.fileno())
@@ -159,7 +161,7 @@ def write_predictions_atomically(output_path: Path, content: bytes) -> None:
                 handle.close()
             except OSError:
                 pass
-        else:
+        elif descriptor_open:
             try:
                 os.close(descriptor)
             except OSError:

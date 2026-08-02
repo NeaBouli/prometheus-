@@ -16,6 +16,7 @@ from jaeger.confidence_calibration import (
     MAX_LINE_BYTES,
     MAX_POLICY_BYTES,
     NON_AUTHORITY_DISCLAIMER,
+    PINNED_LOCAL_MODEL_PROMPT_SHA256,
     BenchmarkCase,
     ConfidenceEvaluationError,
     ConfidencePrediction,
@@ -534,6 +535,7 @@ def test_candidate_set_has_an_offline_cli_and_api_path(tmp_path: Path) -> None:
     values = _decode_jsonl(_read("predictions.jsonl"))
     values[0]["evaluation_mode"] = "local_model_candidate"
     values[0]["subject_id"] = "meta-llama/Meta-Llama-3-8B-Instruct"
+    values[0]["prompt_sha256"] = PINNED_LOCAL_MODEL_PROMPT_SHA256
     predictions_bytes = _jsonl(values)
     expected = evaluate_candidate_set(corpus_bytes, predictions_bytes, policy_bytes)
     root = tmp_path / "candidate"
@@ -578,5 +580,20 @@ def test_candidate_api_rejects_synthetic_fixture_predictions() -> None:
         evaluate_candidate_set(
             _read("corpus.jsonl"),
             _read("predictions.jsonl"),
+            _read("policy.json"),
+        )
+
+
+def test_candidate_api_rejects_unpinned_prompt_digest() -> None:
+    """Candidate evidence cannot relabel output from an unpinned prompt."""
+    values = _decode_jsonl(_read("predictions.jsonl"))
+    values[0]["evaluation_mode"] = "local_model_candidate"
+    values[0]["subject_id"] = "meta-llama/Meta-Llama-3-8B-Instruct"
+    values[0]["prompt_sha256"] = "1" * 64
+
+    with pytest.raises(ConfidenceEvaluationError):
+        evaluate_candidate_set(
+            _read("corpus.jsonl"),
+            _jsonl(values),
             _read("policy.json"),
         )

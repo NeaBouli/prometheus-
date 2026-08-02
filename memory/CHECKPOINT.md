@@ -814,3 +814,10 @@ Leistungsbasierte Emission. Guardians = "Miner" (KI statt GPU).
   verified. Real semantic/adversarial quality, prompt-injection robustness,
   production calibration and authority remain separate gates.
 - **Status:** `Local Done / Protected PR next`.
+
+## Checkpoint 2026-08-02: GH-141 PR #142 review-fix EOF mirror
+
+- CodeRabbit's prompt-binding and descriptor-ownership findings are fixed with
+  three regressions. Focused Guardian passes 136/4; complete Guardian passes
+  883/4; Black, Pylint 9.84, exact fixture, Memory and diff checks pass.
+- **Status:** `Review fixes local PASS / Refreshed protected checks next`.

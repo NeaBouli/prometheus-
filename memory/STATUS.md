@@ -1197,3 +1197,13 @@ Boundary: no model download, real malware/private telemetry, remote inference,
           v2 operation, transport, wallet, signing, broadcast, deployment,
           chain, protocol formula, KAS/PROM, reputation, slash ACL, or stop switch
 ```
+
+## GH-141 PR #142 REVIEW FIX TRUE EOF MIRROR (2026-08-02)
+
+```text
+Status: review fixes local PASS; refreshed protected checks next
+Fixes: exact pinned prompt digest enforced; descriptor ownership transferred
+       once across fdopen with no raw double close
+Evidence: focused 136 pass/4 skips; Guardian 883/4; Black 56; Pylint 9.84;
+          exact synthetic report; Memory/Autodidactic; diff PASS
+```

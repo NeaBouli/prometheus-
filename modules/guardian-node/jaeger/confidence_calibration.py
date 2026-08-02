@@ -50,6 +50,9 @@ MAX_REPORT_BYTES = 131_072
 MAX_LINE_BYTES = 16_384
 EVALUATION_MODE = "synthetic_ci"
 LOCAL_MODEL_EVALUATION_MODE = "local_model_candidate"
+PINNED_LOCAL_MODEL_PROMPT_SHA256 = (
+    "b195c55e0825c73706aac06bd77b346d443aa64416955316574b30aaf526facc"
+)
 LOCAL_MODEL_NON_AUTHORITY_DISCLAIMER = (
     "Local model candidate evaluation only; development metrics are not "
     "production calibration, quality certification, or authorization."
@@ -460,7 +463,10 @@ def evaluate_candidate_set(
     """Evaluate canonical local-model candidate predictions offline."""
     corpus = parse_corpus(corpus_bytes)
     predictions = parse_predictions(predictions_bytes, corpus)
-    if predictions.evaluation_mode != LOCAL_MODEL_EVALUATION_MODE:
+    if (
+        predictions.evaluation_mode != LOCAL_MODEL_EVALUATION_MODE
+        or predictions.prompt_sha256 != PINNED_LOCAL_MODEL_PROMPT_SHA256
+    ):
         raise ConfidenceEvaluationError()
     policy = parse_policy(policy_bytes)
     return canonical_report_bytes(evaluate_confidence(corpus, predictions, policy))

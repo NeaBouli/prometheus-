@@ -2615,6 +2615,21 @@ No direct `main` push or production action occurred.
   signing, broadcast, deployment, chain, protocol, or token action occurred.
 - **Status:** `Local Done / Protected PR next`.
 
+### 2026-08-02 14:28 EEST - PR #142 review fixes PASS
+
+- Protected head `ed001c3` passed all eleven CI/Security contexts. After the PR
+  became ready, CodeRabbit's full content review found two valid issues.
+- Candidate evaluation now rejects any prediction header whose prompt digest is
+  not the repository-pinned YARA confidence prompt. Atomic output cleanup now
+  tracks raw-descriptor ownership explicitly and cannot double-close after
+  `fdopen()` transfers ownership.
+- Added mismatch, successful-transfer, and failed-transfer regression tests.
+  PASS after fixes: focused 136/4, complete Guardian 883/4, Black 56, full
+  Pylint 9.84, exact synthetic report, Memory/Autodidactic, and diff hygiene.
+- Rust/workflow/public-doc behavior was not changed by the review patch; the
+  full protected suite will rerun after push. Scope exclusions remain intact.
+- **Status:** `Review fixes local PASS / Push and refreshed checks next`.
+
 ### 2026-08-01 23:48 EEST - GH-138 protected PR opened
 
 - Local PASS commit `3ff382dc31c27dec84a0ff68aba00d7b26806fd6` is
@@ -2717,3 +2732,13 @@ No direct `main` push or production action occurred.
   robustness, calibration, production authority, and non-POSIX writer evidence
   remain open. All v2/external/chain/token exclusions remain unchanged.
 - **Status:** `Local Done / Protected PR next`.
+
+### 2026-08-02 14:31 EEST - PR #142 REVIEW FIX TRUE EOF MIRROR
+
+- CodeRabbit's two valid findings are fixed: offline candidate evaluation now
+  requires the exact pinned prompt SHA-256, and the atomic writer explicitly
+  tracks raw-descriptor ownership across `fdopen()`.
+- Three regressions pass. Focused Guardian 136/4, complete Guardian 883/4,
+  Black, full Pylint 9.84, exact synthetic report, Memory/Autodidactic, and
+  diff hygiene pass. Refreshed protected checks remain after push.
+- **Status:** `Review fixes local PASS / Refreshed checks next`.

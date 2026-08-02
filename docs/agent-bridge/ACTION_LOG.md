@@ -2714,6 +2714,14 @@ Rules for all dev agents:
 - Terra final review: PASS, no P0/P1/P2/P3. Kimi quota-blocked, no write.
 - **Status:** `Local Done / Protected PR next`.
 
+### 2026-08-02 14:28 EEST - PR #142 CodeRabbit findings fixed
+
+- Fixed both valid review findings: pinned-prompt enforcement in offline
+  candidate evaluation and exact raw-FD ownership across `fdopen()` cleanup.
+- Added three regressions. PASS: focused 136/4, complete Guardian 883/4,
+  Black, full Pylint 9.84, byte-exact synthetic fixture, Memory and diff.
+- **Status:** `Review fixes local PASS / Refreshed protected checks next`.
+
 ### 2026-08-01 22:25 EEST - GH-135 PR #136 opened
 
 - Pushed local PASS commit `3317138` and opened draft PR #136 against protected
@@ -2834,3 +2842,11 @@ Rules for all dev agents:
 - Scope remains repository-only and non-authorizing; no live model, download,
   production, v2 operation, wallet, deployment, chain, protocol, or token action.
 - **Status:** `Local Done / Protected PR next`.
+
+### 2026-08-02 14:31 EEST - PR #142 REVIEW FIX TRUE EOF MIRROR
+
+- Enforced the pinned prompt digest in candidate evaluation and removed the
+  post-`fdopen()` raw-descriptor double-close path; added three regressions.
+- PASS: focused 136/4, complete Guardian 883/4, Black, Pylint 9.84, exact
+  fixture, Memory/Autodidactic, and diff hygiene.
+- **Status:** `Review fixes local PASS / Refreshed checks next`.

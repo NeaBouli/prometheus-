@@ -2257,3 +2257,11 @@ No live model, model download, real malware/private telemetry, remote endpoint,
 production authorization, v2 operation, transport, publication, wallet/key/
 signature, broadcast, deployment, chain, protocol formula, KAS/PROM,
 reputation, slash ACL, commit-reveal, or emergency-stop behavior changed.
+
+### PR #142 review-fix audit EOF mirror
+
+The offline candidate path now requires the exact repository-pinned prompt
+digest, and atomic writer cleanup cannot raw-close a descriptor after ownership
+passes to `fdopen()`. Three regressions plus focused 136/4 and complete Guardian
+883/4 pass; Black, full Pylint 9.84, exact fixture, Memory, and diff pass.
+Refreshed protected checks remain.

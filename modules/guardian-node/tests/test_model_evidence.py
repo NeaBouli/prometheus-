@@ -445,6 +445,51 @@ def test_link_failure_leaves_no_partial_output(
     assert list(tmp_path.iterdir()) == []
 
 
+def test_success_does_not_raw_close_transferred_descriptor(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Cleanup never closes a descriptor after fdopen takes ownership."""
+    raw_closes = []
+    original_close = os.close
+
+    def track_close(descriptor: int) -> None:
+        raw_closes.append(descriptor)
+        original_close(descriptor)
+
+    monkeypatch.setattr(os, "close", track_close)
+    monkeypatch.setattr("jaeger.model_evidence._fsync_directory", lambda _path: None)
+    output = tmp_path / "predictions.jsonl"
+
+    write_predictions_atomically(output, b'{"ok":1}\n')
+
+    assert output.read_bytes() == b'{"ok":1}\n'
+    assert raw_closes == []
+
+
+def test_fdopen_failure_raw_closes_owned_descriptor(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Cleanup closes the raw descriptor when ownership transfer fails."""
+    raw_closes = []
+    original_close = os.close
+
+    def fail_fdopen(_descriptor: int, _mode: str):
+        raise OSError("simulated ownership-transfer failure")
+
+    def track_close(descriptor: int) -> None:
+        raw_closes.append(descriptor)
+        original_close(descriptor)
+
+    monkeypatch.setattr(os, "fdopen", fail_fdopen)
+    monkeypatch.setattr(os, "close", track_close)
+
+    with pytest.raises(ModelEvidenceError):
+        write_predictions_atomically(tmp_path / "predictions.jsonl", b"{}\n")
+
+    assert len(raw_closes) == 1
+    assert list(tmp_path.iterdir()) == []
+
+
 def test_temporary_file_creation_failure_is_redacted(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
