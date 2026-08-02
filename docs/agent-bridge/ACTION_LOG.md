@@ -2810,3 +2810,27 @@ Rules for all dev agents:
   `30697333307`; live Whitepaper/Roadmap markers fetched successfully.
 - Public/status documentation is reconciled on a docs-only closeout branch.
 - **Status:** `Product Done / Documentation closeout PR next`.
+
+### 2026-08-02 13:10 EEST - GH-141 M-004 started
+
+- Opened GH-141 and branch `feat/GH-141-local-model-evidence` from exact green
+  main `04f350448a30398725fb649bb1faba342b8c91a8`.
+- Reserved a loopback-only, non-authorizing model prediction capture and
+  offline evidence-verification slice. All production, model-download,
+  telemetry, v2 operational, wallet, deployment, chain, protocol, and token
+  boundaries remain excluded.
+- **Status:** `In Progress / Delegation next`.
+
+### 2026-08-02 14:02 EEST - GH-141 local gates and independent review PASS
+
+- Integrated Kimi K3's bounded implementation, added Sol security hardening,
+  and completed Kimi's read-only final review: PASS with no P0/P1/P2.
+- Corrected the two in-scope P3 status/Memory findings. Claude Code attempted
+  the small helper review twice but provider budget ended both attempts before
+  any result or write.
+- PASS: focused 133/4, complete Guardian 880/4, Black, Pylint 9.84, byte-exact
+  synthetic report, Rustfmt/Clippy/workspace, Memory/Autodidactic, YAML/
+  Actionlint, HTML/status, Cargo Audit, Gitleaks, and diff checks.
+- Scope remains repository-only and non-authorizing; no live model, download,
+  production, v2 operation, wallet, deployment, chain, protocol, or token action.
+- **Status:** `Local Done / Protected PR next`.

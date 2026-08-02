@@ -15,11 +15,13 @@ import pytest
 from jaeger.confidence_calibration import (
     MAX_LINE_BYTES,
     MAX_POLICY_BYTES,
+    NON_AUTHORITY_DISCLAIMER,
     BenchmarkCase,
     ConfidenceEvaluationError,
     ConfidencePrediction,
     _read_bounded,
     canonical_report_bytes,
+    evaluate_candidate_set,
     evaluate_confidence,
     parse_corpus,
     parse_integrity_manifest,
@@ -470,3 +472,111 @@ def test_report_serialization_rejects_non_dict() -> None:
     """Only the exact report object shape enters canonical serialization."""
     with pytest.raises(ConfidenceEvaluationError):
         canonical_report_bytes([])  # type: ignore[arg-type]
+
+
+def test_local_model_candidate_mode_reports_separate_evidence_class() -> None:
+    """Local candidate predictions parse but stay non-authorizing evidence."""
+    corpus = parse_corpus(_read("corpus.jsonl"))
+    values = _decode_jsonl(_read("predictions.jsonl"))
+    values[0]["evaluation_mode"] = "local_model_candidate"
+    predictions = parse_predictions(_jsonl(values), corpus)
+    policy = parse_policy(_read("policy.json"))
+
+    report = evaluate_confidence(corpus, predictions, policy)
+
+    assert report["evaluation_mode"] == "local_model_candidate"
+    assert report["evidence_class"] == "local_model_candidate_only"
+    assert report["evidence_class"] != "synthetic_ci_only"
+    assert report["production_authorized"] is False
+    assert report["disclaimer"] == (
+        "Local model candidate evaluation only; development metrics are not "
+        "production calibration, quality certification, or authorization."
+    )
+    assert report["disclaimer"] != NON_AUTHORITY_DISCLAIMER
+    assert "production_authorized" not in report["disclaimer"]
+    synthetic_report = evaluate_confidence(*_parsed_fixture())
+    assert report["disclaimer"] != synthetic_report["disclaimer"]
+    assert canonical_report_bytes(report) != canonical_report_bytes(synthetic_report)
+
+
+@pytest.mark.parametrize(
+    "mode",
+    [
+        "LOCAL_MODEL_CANDIDATE",
+        "local_model",
+        "local_model_candidate_only",
+        "synthetic_ci_only",
+        "",
+    ],
+)
+def test_predictions_reject_unknown_evaluation_modes(mode: str) -> None:
+    """Only the two pinned evaluation modes pass the closed header."""
+    corpus = parse_corpus(_read("corpus.jsonl"))
+    values = _decode_jsonl(_read("predictions.jsonl"))
+    values[0]["evaluation_mode"] = mode
+    with pytest.raises(ConfidenceEvaluationError):
+        parse_predictions(_jsonl(values), corpus)
+
+
+def test_synthetic_fixture_report_remains_byte_exact_after_mode_addition() -> None:
+    """The committed synthetic fixture and report bytes are unchanged."""
+    corpus, predictions, policy, report, manifest = _load_fixture_set()
+    reproduced = verify_fixture_set(corpus, predictions, policy, report, manifest)
+    assert reproduced == report
+    assert json.loads(reproduced)["evidence_class"] == "synthetic_ci_only"
+    assert json.loads(reproduced)["evaluation_mode"] == "synthetic_ci"
+
+
+def test_candidate_set_has_an_offline_cli_and_api_path(tmp_path: Path) -> None:
+    """Captured local predictions can be re-evaluated without live model IO."""
+    corpus_bytes = _read("corpus.jsonl")
+    policy_bytes = _read("policy.json")
+    values = _decode_jsonl(_read("predictions.jsonl"))
+    values[0]["evaluation_mode"] = "local_model_candidate"
+    values[0]["subject_id"] = "meta-llama/Meta-Llama-3-8B-Instruct"
+    predictions_bytes = _jsonl(values)
+    expected = evaluate_candidate_set(corpus_bytes, predictions_bytes, policy_bytes)
+    root = tmp_path / "candidate"
+    root.mkdir()
+    (root / "corpus.jsonl").write_bytes(corpus_bytes)
+    (root / "predictions.jsonl").write_bytes(predictions_bytes)
+    (root / "policy.json").write_bytes(policy_bytes)
+    guardian_root = Path(__file__).parent.parent
+    environment = os.environ.copy()
+    environment["PYTHONPATH"] = str(guardian_root)
+
+    completed = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "jaeger.confidence_calibration",
+            "--candidate",
+            "--corpus",
+            str(root / "corpus.jsonl"),
+            "--predictions",
+            str(root / "predictions.jsonl"),
+            "--policy",
+            str(root / "policy.json"),
+        ],
+        cwd=guardian_root,
+        env=environment,
+        capture_output=True,
+        check=False,
+    )
+
+    assert completed.returncode == 0
+    assert completed.stdout == expected
+    assert completed.stderr == b""
+    report = json.loads(completed.stdout)
+    assert report["evidence_class"] == "local_model_candidate_only"
+    assert report["production_authorized"] is False
+
+
+def test_candidate_api_rejects_synthetic_fixture_predictions() -> None:
+    """The candidate evaluator cannot relabel synthetic CI evidence."""
+    with pytest.raises(ConfidenceEvaluationError):
+        evaluate_candidate_set(
+            _read("corpus.jsonl"),
+            _read("predictions.jsonl"),
+            _read("policy.json"),
+        )

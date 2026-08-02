@@ -1,8 +1,11 @@
 """Deterministic offline evaluation for Guardian YARA confidence evidence.
 
 This module evaluates already collected confidence predictions against a
-versioned synthetic benchmark. It performs no model, network, YARA, telemetry,
-transport, wallet, or chain operation and grants no production authority.
+versioned synthetic benchmark. Synthetic CI and local model candidate
+prediction modes share the closed schema but produce strictly separate,
+non-authorizing evidence classes. It performs no model, network, YARA,
+telemetry, transport, wallet, or chain operation and grants no production
+authority.
 """
 
 # Closed schemas intentionally require exact built-in types and key order.
@@ -46,6 +49,11 @@ MAX_MANIFEST_BYTES = 4_096
 MAX_REPORT_BYTES = 131_072
 MAX_LINE_BYTES = 16_384
 EVALUATION_MODE = "synthetic_ci"
+LOCAL_MODEL_EVALUATION_MODE = "local_model_candidate"
+LOCAL_MODEL_NON_AUTHORITY_DISCLAIMER = (
+    "Local model candidate evaluation only; development metrics are not "
+    "production calibration, quality certification, or authorization."
+)
 
 
 class ConfidenceEvaluationError(ValueError):
@@ -186,12 +194,12 @@ def parse_predictions(raw_bytes: bytes, corpus: BenchmarkCorpus) -> PredictionSe
     if _exact_int(header["schema_version"]) != SCHEMA_VERSION:
         raise ConfidenceEvaluationError()
     evaluation_mode = header["evaluation_mode"]
-    if evaluation_mode != EVALUATION_MODE:
+    if evaluation_mode not in (EVALUATION_MODE, LOCAL_MODEL_EVALUATION_MODE):
         raise ConfidenceEvaluationError()
     corpus_sha256 = _lower_hex_32(header["corpus_sha256"])
     if corpus_sha256 != corpus.sha256:
         raise ConfidenceEvaluationError()
-    subject_id = _identifier(header["subject_id"], 128)
+    subject_id = _subject_identifier(header["subject_id"], 128)
     subject_sha256 = _nonzero_lower_hex_32(header["subject_sha256"])
     prompt_sha256 = _nonzero_lower_hex_32(header["prompt_sha256"])
 
@@ -298,6 +306,14 @@ def evaluate_confidence(
     if len(corpus.cases) != len(prediction_set.predictions):
         raise ConfidenceEvaluationError()
     _validate_evaluation_inputs(corpus, prediction_set, policy)
+    if prediction_set.evaluation_mode == EVALUATION_MODE:
+        evidence_class = "synthetic_ci_only"
+        disclaimer = NON_AUTHORITY_DISCLAIMER
+    elif prediction_set.evaluation_mode == LOCAL_MODEL_EVALUATION_MODE:
+        evidence_class = "local_model_candidate_only"
+        disclaimer = LOCAL_MODEL_NON_AUTHORITY_DISCLAIMER
+    else:
+        raise ConfidenceEvaluationError()
 
     true_positive = false_positive = true_negative = false_negative = 0
     squared_error_sum = 0
@@ -371,9 +387,9 @@ def evaluate_confidence(
     return {
         "schema_version": SCHEMA_VERSION,
         "evaluator_version": EVALUATOR_VERSION,
-        "evidence_class": "synthetic_ci_only",
+        "evidence_class": evidence_class,
         "production_authorized": False,
-        "disclaimer": NON_AUTHORITY_DISCLAIMER,
+        "disclaimer": disclaimer,
         "corpus_id": corpus.corpus_id,
         "corpus_sha256": corpus.sha256,
         "predictions_sha256": prediction_set.sha256,
@@ -436,6 +452,18 @@ def canonical_report_bytes(report: Mapping[str, Any]) -> bytes:
     return (json.dumps(report, separators=(",", ":"), ensure_ascii=True) + "\n").encode(
         "ascii"
     )
+
+
+def evaluate_candidate_set(
+    corpus_bytes: bytes, predictions_bytes: bytes, policy_bytes: bytes
+) -> bytes:
+    """Evaluate canonical local-model candidate predictions offline."""
+    corpus = parse_corpus(corpus_bytes)
+    predictions = parse_predictions(predictions_bytes, corpus)
+    if predictions.evaluation_mode != LOCAL_MODEL_EVALUATION_MODE:
+        raise ConfidenceEvaluationError()
+    policy = parse_policy(policy_bytes)
+    return canonical_report_bytes(evaluate_confidence(corpus, predictions, policy))
 
 
 def verify_fixture_set(
@@ -559,8 +587,10 @@ def _validate_evaluation_inputs(
         != prediction_set.subject_sha256
         or _nonzero_lower_hex_32(prediction_set.prompt_sha256)
         != prediction_set.prompt_sha256
-        or prediction_set.evaluation_mode != EVALUATION_MODE
-        or _identifier(prediction_set.subject_id, 128) != prediction_set.subject_id
+        or prediction_set.evaluation_mode
+        not in (EVALUATION_MODE, LOCAL_MODEL_EVALUATION_MODE)
+        or _subject_identifier(prediction_set.subject_id, 128)
+        != prediction_set.subject_id
         or policy.threshold_bps != SUBMISSION_THRESHOLD_BPS
         or policy.calibration_bin_width_bps != CALIBRATION_BIN_WIDTH_BPS
         or policy.minimum_cases != MIN_CASES
@@ -702,6 +732,20 @@ def _identifier(value: Any, maximum_length: int) -> str:
     return value
 
 
+def _subject_identifier(value: Any, maximum_length: int) -> str:
+    """Validate one relative public model/subject identifier."""
+    if (
+        type(value) is not str
+        or not 1 <= len(value) <= maximum_length
+        or _SUBJECT_IDENTIFIER_RE.fullmatch(value) is None
+    ):
+        raise ConfidenceEvaluationError()
+    components = value.split("/")
+    if any(component in ("", ".", "..") for component in components):
+        raise ConfidenceEvaluationError()
+    return value
+
+
 def _bounded_ascii_text(value: Any, maximum_length: int) -> str:
     """Validate bounded printable ASCII plus normal text whitespace."""
     if (
@@ -762,24 +806,41 @@ def _read_bounded(path: Path, maximum_bytes: int) -> bytes:
 
 
 def _main(argv: Sequence[str] | None = None) -> int:
-    """Run exact fixture verification with stable process exit semantics."""
+    """Run fixture verification or local-candidate evaluation offline."""
     parser = argparse.ArgumentParser(
         description="Evaluate canonical Guardian confidence evidence offline."
     )
     parser.add_argument("--corpus", required=True, type=Path)
     parser.add_argument("--predictions", required=True, type=Path)
     parser.add_argument("--policy", required=True, type=Path)
-    parser.add_argument("--expected-report", required=True, type=Path)
-    parser.add_argument("--manifest", required=True, type=Path)
+    parser.add_argument("--expected-report", type=Path)
+    parser.add_argument("--manifest", type=Path)
+    parser.add_argument(
+        "--candidate",
+        action="store_true",
+        help="evaluate local_model_candidate predictions without fixture files",
+    )
     args = parser.parse_args(argv)
     try:
-        report_bytes = verify_fixture_set(
-            _read_bounded(args.corpus, MAX_CORPUS_BYTES),
-            _read_bounded(args.predictions, MAX_PREDICTIONS_BYTES),
-            _read_bounded(args.policy, MAX_POLICY_BYTES),
-            _read_bounded(args.expected_report, MAX_REPORT_BYTES),
-            _read_bounded(args.manifest, MAX_MANIFEST_BYTES),
-        )
+        corpus_bytes = _read_bounded(args.corpus, MAX_CORPUS_BYTES)
+        predictions_bytes = _read_bounded(args.predictions, MAX_PREDICTIONS_BYTES)
+        policy_bytes = _read_bounded(args.policy, MAX_POLICY_BYTES)
+        if args.candidate:
+            if args.expected_report is not None or args.manifest is not None:
+                raise ConfidenceEvaluationError()
+            report_bytes = evaluate_candidate_set(
+                corpus_bytes, predictions_bytes, policy_bytes
+            )
+        else:
+            if args.expected_report is None or args.manifest is None:
+                raise ConfidenceEvaluationError()
+            report_bytes = verify_fixture_set(
+                corpus_bytes,
+                predictions_bytes,
+                policy_bytes,
+                _read_bounded(args.expected_report, MAX_REPORT_BYTES),
+                _read_bounded(args.manifest, MAX_MANIFEST_BYTES),
+            )
     except ConfidenceEvaluationError:
         print("confidence evaluation failed", file=sys.stderr)
         return 2
@@ -788,6 +849,7 @@ def _main(argv: Sequence[str] | None = None) -> int:
 
 
 _IDENTIFIER_RE = re.compile(r"[a-z0-9][a-z0-9._-]*")
+_SUBJECT_IDENTIFIER_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9._/-]*")
 _LOWER_HEX_32_RE = re.compile(r"[0-9a-f]{64}")
 
 

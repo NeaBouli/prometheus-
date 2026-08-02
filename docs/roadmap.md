@@ -191,10 +191,11 @@ public release-hardening evidence for the exact rollout commit.
 - Implemented: threat-hash binding, finite confidence checks, strict submission types, and unchanged `0.85` submission threshold
 - Implemented: separate bounded model confidence assessment with an exact closed JSON schema and integer basis points; malformed output fails closed and the former indicator-count/YARA-shape heuristic is removed
 - Merged/exact-main verified GH-138: internally SHA-256-consistent deterministic 24-case synthetic confidence evaluation with the unchanged `8500`-bps threshold, confusion matrix, exact-ratio precision/recall, Brier score, and ten-bin expected calibration error; evidence is offline-only and non-authorizing, and the co-versioned manifest is not an external tamper anchor
+- GH-141 candidate: literal-loopback, proxy-independent local model capture binds the canonical corpus, public served-model ID, caller-supplied artifact digest, and pinned prompt specification; atomic owner-only predictions can be re-evaluated offline only as `local_model_candidate_only` with no production authority
 - Implemented: local 5+ Guardian complete-ballot validator with canonical candidate/snapshot commitments, strict majority, and conservative confidence
 - Implemented: transport-neutral BIP340 ballot intake with exact key/session/context binding, strict canonical envelopes, freshness checks, and owner-only SQLite replay/equivocation protection across restarts and concurrent submissions
 - Merged/exact-main verified: real Guardian ballot transport over direct QUIC/libp2p request/response with exact 8192-byte-bounded frames, static peers, resource caps, owner-only AF_UNIX collector integration, and cancellation-safe concurrent processing
-- Pending: live 8B/70B service wiring, real adversarial semantic-quality evaluation, production calibration evidence, and authorization
+- Pending: an independently reproducible real 8B/70B candidate run, independently verified model-artifact provenance, real adversarial semantic-quality evaluation, production calibration evidence, and authorization
 - Merged/exact-main verified: persistent transport identity, isolated operated relay/AutoNAT/DCUtR evidence, and explicit bootstrap configuration; real two-host evidence remains
 - Pending: broad discovery, trusted membership and key assignment, Sybil resistance, and on-chain ensemble attestation
 - Pending: reviewed Guardian pooling and final Sybil-resistance design

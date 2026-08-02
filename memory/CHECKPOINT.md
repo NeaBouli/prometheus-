@@ -790,3 +790,27 @@ Leistungsbasierte Emission. Guardians = "Miner" (KI statt GPU).
 - Protected PR #139 merged normally as exact main `52209cc`; CI
   `30697333650`, Security `30697333643`, and Pages `30697333307` pass.
 - **Status:** `Done / Merged / Exact-main verified`.
+
+## Checkpoint 2026-08-02: GH-141 M-004 local completion
+
+- From exact green main `04f3504`, GH-141 adds a local-only candidate capture
+  boundary for the existing canonical confidence corpus. Inference is fixed to
+  literal `127.0.0.1`, ignores environment proxies, and accepts no endpoint URL.
+- Canonical owner-only JSONL binds corpus bytes, public served-model ID, a
+  caller-supplied artifact SHA-256, and the pinned prompt specification. Atomic
+  no-clobber writing and redacted failures are adversarially tested.
+- Offline candidate evaluation is isolated from synthetic CI and always emits
+  `local_model_candidate_only` with `production_authorized=false`; the original
+  synthetic fixture remains byte-exact.
+- PASS: focused Guardian 133/4; complete Guardian 880/4; Black 56 files; full
+  Pylint 9.84; exact fixture; Rustfmt, locked all-target Clippy and complete
+  workspace; Memory/Autodidactic; YAML/Actionlint 1.7.12; HTML/status; Cargo
+  Audit with zero vulnerabilities/eight allowed warnings; Gitleaks 8.30.0; diff.
+- Kimi K3 implemented the bounded core and independently reviewed the final
+  behavior: no P0/P1/P2. Sol fixed the two in-scope P3 status/Memory findings.
+  Claude Code's two bounded helper attempts exhausted budget before producing
+  output or a diff.
+- No live model was run and no model artifact was downloaded or independently
+  verified. Real semantic/adversarial quality, prompt-injection robustness,
+  production calibration and authority remain separate gates.
+- **Status:** `Local Done / Protected PR next`.
