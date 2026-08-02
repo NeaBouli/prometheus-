@@ -2714,6 +2714,14 @@ Rules for all dev agents:
 - Terra final review: PASS, no P0/P1/P2/P3. Kimi quota-blocked, no write.
 - **Status:** `Local Done / Protected PR next`.
 
+### 2026-08-02 14:28 EEST - PR #142 CodeRabbit findings fixed
+
+- Fixed both valid review findings: pinned-prompt enforcement in offline
+  candidate evaluation and exact raw-FD ownership across `fdopen()` cleanup.
+- Added three regressions. PASS: focused 136/4, complete Guardian 883/4,
+  Black, full Pylint 9.84, byte-exact synthetic fixture, Memory and diff.
+- **Status:** `Review fixes local PASS / Refreshed protected checks next`.
+
 ### 2026-08-01 22:25 EEST - GH-135 PR #136 opened
 
 - Pushed local PASS commit `3317138` and opened draft PR #136 against protected
@@ -2732,6 +2740,12 @@ Rules for all dev agents:
   verifier fixture timed out under concurrent host load; that exact test passed
   alone. Refreshed protected CI will provide the complete authoritative rerun.
 - **Status:** `Review fixes local PASS / Refreshed checks next`.
+
+### 2026-08-02 14:36 EEST - PR #142 review nitpicks fixed
+
+- Added strict zip cardinality and removed the oversize-test magic number.
+  Focused 136/4, Black, and diff checks pass.
+- **Status:** `All known review feedback fixed / Refreshed checks next`.
 
 ### 2026-08-01 22:55 EEST - GH-135 complete
 
@@ -2810,3 +2824,41 @@ Rules for all dev agents:
   `30697333307`; live Whitepaper/Roadmap markers fetched successfully.
 - Public/status documentation is reconciled on a docs-only closeout branch.
 - **Status:** `Product Done / Documentation closeout PR next`.
+
+### 2026-08-02 13:10 EEST - GH-141 M-004 started
+
+- Opened GH-141 and branch `feat/GH-141-local-model-evidence` from exact green
+  main `04f350448a30398725fb649bb1faba342b8c91a8`.
+- Reserved a loopback-only, non-authorizing model prediction capture and
+  offline evidence-verification slice. All production, model-download,
+  telemetry, v2 operational, wallet, deployment, chain, protocol, and token
+  boundaries remain excluded.
+- **Status:** `In Progress / Delegation next`.
+
+### 2026-08-02 14:02 EEST - GH-141 local gates and independent review PASS
+
+- Integrated Kimi K3's bounded implementation, added Sol security hardening,
+  and completed Kimi's read-only final review: PASS with no P0/P1/P2.
+- Corrected the two in-scope P3 status/Memory findings. Claude Code attempted
+  the small helper review twice but provider budget ended both attempts before
+  any result or write.
+- PASS: focused 133/4, complete Guardian 880/4, Black, Pylint 9.84, byte-exact
+  synthetic report, Rustfmt/Clippy/workspace, Memory/Autodidactic, YAML/
+  Actionlint, HTML/status, Cargo Audit, Gitleaks, and diff checks.
+- Scope remains repository-only and non-authorizing; no live model, download,
+  production, v2 operation, wallet, deployment, chain, protocol, or token action.
+- **Status:** `Local Done / Protected PR next`.
+
+### 2026-08-02 14:31 EEST - PR #142 REVIEW FIX TRUE EOF MIRROR
+
+- Enforced the pinned prompt digest in candidate evaluation and removed the
+  post-`fdopen()` raw-descriptor double-close path; added three regressions.
+- PASS: focused 136/4, complete Guardian 883/4, Black, Pylint 9.84, exact
+  fixture, Memory/Autodidactic, and diff hygiene.
+- **Status:** `Review fixes local PASS / Refreshed checks next`.
+
+### 2026-08-02 14:37 EEST - PR #142 NITPICK TRUE EOF MIRROR
+
+- Strict zip cardinality and constant-derived oversize test are applied;
+  focused 136/4, Black, and diff checks pass.
+- **Status:** `All known review feedback fixed / Refreshed checks next`.

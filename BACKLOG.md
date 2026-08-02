@@ -5,6 +5,7 @@
 - Prometheus CI `30697333650`, Security Audit `30697333643`, and GitHub Pages `30697333307` are green for exact main. Current-Silverc CI validates the keyless Toccata-v1 operator, operator runbook, request/receipt/evidence pipeline, release-readiness audit, metrics-oracle handoff, exact-commit hardening gates, and the strict release performance gate.
 - GH-131/M-002, GH-132, GH-135/M-001, and GH-138/M-003 are merged and exact-main verified. GH-135 strictly parses separate model-provided integer basis points, replaces the indicator-count/YARA-shape heuristic, preserves the `0.85` policy, and fails closed on malformed output.
 - GH-138/M-003 provides deterministic, internally SHA-256-consistent synthetic confidence evaluation. Its co-versioned manifest is not an external tamper anchor and it does not establish live-model quality, production calibration, or authorization.
+- GH-141/M-004 is in progress: a literal-loopback, proxy-independent runner captures canonical local-model candidate predictions and an offline evaluator keeps them non-authorizing. No live result or independently verified model artifact is included.
 - Runtime stub gates added for Rust client; current-Silverc contract gates now cover H-001, ValidatorStaking, GuardianReputation, RuleStorage, CommunityDonations, DevIncentivePool, and GovernanceAutoTuning.
 - Local current-Silverc release-bundle smoke now compiles all 7 fixtures through pinned upstream `silverc` and writes a deterministic manifest plus optional archive with source/artifact/script hashes; deploy preflight validates the bundle/operator public inputs, emits a Markdown operator runbook, and confirms upstream `silverc` has no network deploy command.
 - Deployment receipt verifier validates public receipt records against the release bundle, rejects secret-like fields, and keeps synthetic `ci_fixture` receipts separate from real `operator_record` deployment evidence.
@@ -40,10 +41,11 @@
 3. **[P1] Sprint 10B: Guardian Decentralization** — GH-33/36/39 plus merged/exact-main-verified GH-42/GH-44/GH-48/GH-52/GH-55/GH-58/GH-63 are implemented; GH-74 tracks the bounded hash-only v1 analyzer adapter. Production proof artifacts, a privacy-preserving concrete-observable channel, real two-host operation, broad discovery, trusted membership/key assignment and rotation, Sybil resistance, and an explicit on-chain-attestation decision follow.
 4. **[P2] fp_rate Oracle** — Q-003 current-Silverc contract gate uses signed metrics input; public report/request/result verification is covered; production external transaction assembly/signing/broadcast/deploy operation remains
 5. **[P2] M-003 / GH-138** — **MERGED / EXACT-MAIN PASS:** deterministic synthetic confidence evaluation and calibration machinery; live evidence remains open
-6. **[P2] M-001 / GH-135** — **MERGED / EXACT-MAIN PASS:** strict closed-schema model confidence in integer basis points
-7. **[P2] M-002** — **MERGED / EXACT-MAIN PASS:** repeated-sample debug smoke gate plus strict `--release` one-millisecond CI gate
-8. **[P2] GH-132** — **MERGED / EXACT-MAIN PASS:** transitive `event-listener` is patched at 5.4.2
-9. **[P3] L-001/L-003** — DevIncentivePool ACL, CEI borderline
+6. **[P2] M-004 / GH-141** — local model candidate capture, prompt/model/corpus binding, atomic evidence, and offline verification; real model evidence and production authorization remain open
+7. **[P2] M-001 / GH-135** — **MERGED / EXACT-MAIN PASS:** strict closed-schema model confidence in integer basis points
+8. **[P2] M-002** — **MERGED / EXACT-MAIN PASS:** repeated-sample debug smoke gate plus strict `--release` one-millisecond CI gate
+9. **[P2] GH-132** — **MERGED / EXACT-MAIN PASS:** transitive `event-listener` is patched at 5.4.2
+10. **[P3] L-001/L-003** — DevIncentivePool ACL, CEI borderline
 
 ### Wartet auf externe Events:
 - External H-001 BIP340 signing approval and public chain evidence → Sprint 9

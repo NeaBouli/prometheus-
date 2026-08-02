@@ -84,6 +84,32 @@ production authorization remain separate rollout gates.
 The co-versioned manifest catches partial or accidental fixture drift during
 review and CI; it is not signed or anchored outside the editable repository.
 
+GH-141 adds a separate local-model candidate path. It accepts only the
+repository corpus, a relative public served-model identifier, a caller-supplied
+nonzero model-artifact SHA-256, a TCP port, and a new output path. Inference is
+fixed to literal `127.0.0.1`, ignores environment proxies, and accepts no URL.
+Predictions are written atomically as mode `0600` canonical JSONL, then can be
+re-evaluated offline:
+
+```bash
+PYTHONPATH=. python -m jaeger.model_evidence \
+  --corpus "$vector_dir/corpus.jsonl" \
+  --model meta-llama/Meta-Llama-3-8B-Instruct \
+  --model-sha256 <public-model-artifact-sha256> \
+  --port 8000 \
+  --output /owner-only/path/local-model-predictions.jsonl
+
+PYTHONPATH=. python -m jaeger.confidence_calibration --candidate \
+  --corpus "$vector_dir/corpus.jsonl" \
+  --predictions /owner-only/path/local-model-predictions.jsonl \
+  --policy "$vector_dir/policy.json"
+```
+
+The tool does not hash or approve the model artifact itself; the supplied
+digest must be established independently. No live result is committed, and
+schema/prompt binding does not establish semantic quality, adversarial
+robustness, calibration, or production authority.
+
 ## Local Ensemble Voting
 
 `EnsembleVoter` validates an already collected ballot from an immutable

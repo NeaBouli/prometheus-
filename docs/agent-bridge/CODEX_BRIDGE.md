@@ -2615,6 +2615,21 @@ No direct `main` push or production action occurred.
   signing, broadcast, deployment, chain, protocol, or token action occurred.
 - **Status:** `Local Done / Protected PR next`.
 
+### 2026-08-02 14:28 EEST - PR #142 review fixes PASS
+
+- Protected head `ed001c3` passed all eleven CI/Security contexts. After the PR
+  became ready, CodeRabbit's full content review found two valid issues.
+- Candidate evaluation now rejects any prediction header whose prompt digest is
+  not the repository-pinned YARA confidence prompt. Atomic output cleanup now
+  tracks raw-descriptor ownership explicitly and cannot double-close after
+  `fdopen()` transfers ownership.
+- Added mismatch, successful-transfer, and failed-transfer regression tests.
+  PASS after fixes: focused 136/4, complete Guardian 883/4, Black 56, full
+  Pylint 9.84, exact synthetic report, Memory/Autodidactic, and diff hygiene.
+- Rust/workflow/public-doc behavior was not changed by the review patch; the
+  full protected suite will rerun after push. Scope exclusions remain intact.
+- **Status:** `Review fixes local PASS / Push and refreshed checks next`.
+
 ### 2026-08-01 23:48 EEST - GH-138 protected PR opened
 
 - Local PASS commit `3ff382dc31c27dec84a0ff68aba00d7b26806fd6` is
@@ -2675,3 +2690,62 @@ No direct `main` push or production action occurred.
   v2, wallet, signing, broadcast, deployment, chain, protocol, or token action
   occurred.
 - **Status:** `Product Done / Documentation closeout PR next`.
+
+### 2026-08-02 13:10 EEST - GH-141 M-004 local model evidence started
+
+- Ticket `GIO-PROM-20260802-M004` and GitHub issue
+  [#141](https://github.com/NeaBouli/prometheus-/issues/141) own the next
+  repository-only Guardian evaluation block from exact green main
+  `04f350448a30398725fb649bb1faba342b8c91a8` on branch
+  `feat/GH-141-local-model-evidence`.
+- Scope is fail-closed prediction capture from an explicitly loopback-only
+  model service, exact corpus/model-artifact/prompt binding, canonical atomic
+  evidence, offline metric verification, adversarial tests, CI, independent
+  review, and factual public/status documentation.
+- Kimi K3 receives the larger secret-free implementation/review slice; Claude
+  Code receives only a small bounded helper check. Sol owns architecture,
+  security, integration, complete validation, and external GitHub actions.
+- Model download/training, real malware/private telemetry, remote inference,
+  production authorization, v2 actionability/transport, wallet, signing,
+  broadcast, deployment, chain, protocol formulas, KAS/PROM, reputation,
+  slash ACL, and emergency-stop behavior are excluded. GH-9 remains separately
+  externally gated.
+- **Status:** `In Progress / Delegated architecture and implementation next`.
+
+### 2026-08-02 14:02 EEST - GH-141 M-004 local completion PASS
+
+- Kimi K3 implemented the secret-free bounded capture/evaluation core and then
+  performed an independent read-only full-diff review. Result: PASS, no
+  P0/P1/P2; Sol fixed the public pre-merge status and Memory P3 findings.
+- Literal `127.0.0.1` inference with `trust_env=false`, a pinned prompt digest,
+  strict public model ID, canonical corpus/artifact/prompt binding, owner-only
+  atomic no-clobber evidence, redacted failures, and isolated offline candidate
+  evaluation are implemented. Synthetic CI remains byte-exact and separate.
+- PASS: focused Guardian 133/4, complete Guardian 880/4, Black 56, full Pylint
+  9.84, exact fixture, Rustfmt, locked all-target Clippy, complete workspace,
+  Memory/Autodidactic, YAML/Actionlint 1.7.12, HTML/status, Cargo Audit with zero
+  vulnerabilities/eight allowed warnings, Gitleaks 8.30.0, and diff hygiene.
+- Claude Code's two small bounded helper attempts exhausted provider budget
+  before producing output or a diff; no helper-written file exists.
+- No live candidate was run. The caller-supplied artifact digest is not
+  independently proven; semantic/adversarial quality, prompt-injection
+  robustness, calibration, production authority, and non-POSIX writer evidence
+  remain open. All v2/external/chain/token exclusions remain unchanged.
+- **Status:** `Local Done / Protected PR next`.
+
+### 2026-08-02 14:31 EEST - PR #142 REVIEW FIX TRUE EOF MIRROR
+
+- CodeRabbit's two valid findings are fixed: offline candidate evaluation now
+  requires the exact pinned prompt SHA-256, and the atomic writer explicitly
+  tracks raw-descriptor ownership across `fdopen()`.
+- Three regressions pass. Focused Guardian 136/4, complete Guardian 883/4,
+  Black, full Pylint 9.84, exact synthetic report, Memory/Autodidactic, and
+  diff hygiene pass. Refreshed protected checks remain after push.
+- **Status:** `Review fixes local PASS / Refreshed checks next`.
+
+### 2026-08-02 14:36 EEST - PR #142 review nitpicks complete
+
+- Applied the two non-inline test hardening notes: strict zip cardinality and
+  production-constant-derived oversize input. Focused Guardian remains 136/4;
+  Black and diff checks pass.
+- **Status:** `All known review feedback fixed / Refreshed checks next`.

@@ -2223,3 +2223,45 @@ review reproduced Cargo Audit and warning-free locked all-target Clippy,
 verified the exact baseline run IDs and ten branch-protection contexts, and
 confirmed the lockfile edge and documentation claims. Final review result:
 PASS with no P0/P1/P2/P3 finding.
+
+## 2026-08-02 - GH-141 local model candidate evidence audit
+
+**Result:** LOCAL PASS; protected publication and exact-main verification remain.
+
+- Candidate capture uses only a validated integer port on literal
+  `127.0.0.1`; arbitrary URLs, redirects through environment proxies, malformed
+  identifiers, noncanonical responses, incomplete evidence, and output
+  overwrite fail closed.
+- The canonical prediction header commits the corpus, public served-model ID,
+  caller-supplied artifact digest, and repository-pinned prompt digest. The
+  artifact digest is an assertion, not independently established provenance.
+- Offline evaluation rejects synthetic evidence in candidate mode and emits
+  only `local_model_candidate_only` with `production_authorized=false`. The
+  prior synthetic fixture and report remain byte-exact.
+- Owner-only same-directory temporary creation, fsync, atomic hard-link
+  no-clobber publication, symlink rejection, and generic CLI errors are covered
+  by adversarial tests. The writer is POSIX-only; trusted-parent and local
+  same-host race assumptions remain documented residual risks.
+- PASS: 133 focused tests/4 intentional live-model skips; complete Guardian
+  880/4; Black; full Pylint 9.84; exact fixture; Rustfmt; locked all-target
+  Clippy; complete workspace; Memory/Autodidactic; YAML/Actionlint 1.7.12;
+  HTML/status; Cargo Audit zero vulnerabilities/eight allowed warnings;
+  Gitleaks 8.30.0 no leaks; diff hygiene.
+- Kimi K3's independent read-only review found no P0/P1/P2. Sol corrected the
+  public pre-merge status and Memory P3 items. Its pre-existing `health_check`
+  exception-filter observation is unrelated to capture and remains out of scope.
+- Claude Code was invoked twice for a small read-only helper check; both bounded
+  attempts stopped on provider budget before reading or writing project files.
+
+No live model, model download, real malware/private telemetry, remote endpoint,
+production authorization, v2 operation, transport, publication, wallet/key/
+signature, broadcast, deployment, chain, protocol formula, KAS/PROM,
+reputation, slash ACL, commit-reveal, or emergency-stop behavior changed.
+
+### PR #142 review-fix audit EOF mirror
+
+The offline candidate path now requires the exact repository-pinned prompt
+digest, and atomic writer cleanup cannot raw-close a descriptor after ownership
+passes to `fdopen()`. Three regressions plus focused 136/4 and complete Guardian
+883/4 pass; Black, full Pylint 9.84, exact fixture, Memory, and diff pass.
+Refreshed protected checks remain.

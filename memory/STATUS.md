@@ -1172,3 +1172,38 @@ Remaining: independent production relation/key/ceremony approval and one
            final atomic verify-plus-consume boundary; external rollout gates
 Estimates: core 79-83%; complete vision 45-50%; 50-55% remains
 ```
+
+## GH-141 LOCAL MODEL CANDIDATE EVIDENCE (2026-08-02)
+
+```text
+Ticket: GIO-PROM-20260802-M004 / GH-141
+Baseline: 04f350448a30398725fb649bb1faba342b8c91a8
+Status: local implementation and complete gates PASS; protected PR next
+Capture: literal 127.0.0.1 only, environment proxies disabled, pinned prompt
+         specification, canonical corpus/public model ID/caller digest binding
+Output: canonical owner-only JSONL, atomic no-clobber creation, redacted failure
+Evaluation: local_model_candidate_only; production_authorized=false
+Evidence: focused 133 pass/4 intentional live-model skips; complete Guardian
+          880 pass/4 skips; Black 56 files; full Pylint 9.84; exact synthetic
+          report; Rustfmt/Clippy/workspace; Memory/Autodidactic; Actionlint;
+          HTML/status; Cargo Audit 0 vulnerabilities/8 allowed warnings;
+          Gitleaks 8.30.0 no leaks; diff checks
+Review: Kimi K3 PASS with no P0/P1/P2; status/Memory P3 items fixed by Sol.
+        Claude Code helper attempts exceeded their bounded budget and wrote no diff.
+Residual: supplied model-artifact digest is not independently proven; no live
+          candidate result, semantic/adversarial quality, prompt-injection,
+          production calibration, authority, or non-POSIX writer evidence
+Boundary: no model download, real malware/private telemetry, remote inference,
+          v2 operation, transport, wallet, signing, broadcast, deployment,
+          chain, protocol formula, KAS/PROM, reputation, slash ACL, or stop switch
+```
+
+## GH-141 PR #142 REVIEW FIX TRUE EOF MIRROR (2026-08-02)
+
+```text
+Status: review fixes local PASS; refreshed protected checks next
+Fixes: exact pinned prompt digest enforced; descriptor ownership transferred
+       once across fdopen with no raw double close
+Evidence: focused 136 pass/4 skips; Guardian 883/4; Black 56; Pylint 9.84;
+          exact synthetic report; Memory/Autodidactic; diff PASS
+```

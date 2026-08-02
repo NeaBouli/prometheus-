@@ -123,6 +123,20 @@ Protected PR #139 merged normally without bypass as exact main `52209cc`;
 Prometheus CI `30697333650`, Security Audit `30697333643`, and Pages
 `30697333307` pass on that SHA.
 
+**GH-141 local model candidate evidence (implementation candidate; not yet
+merged or exact-main verified):** the Guardian can run the same
+canonical benchmark through an explicitly literal-loopback vLLM service,
+capture one validated integer-bps prediction per case, and write canonical
+owner-only JSONL without overwrite or partial output. The evidence binds the
+exact corpus, a public served-model identifier, a caller-supplied model
+artifact SHA-256, and the repository-pinned prompt specification. A separate
+offline `--candidate` evaluator emits exact metrics as
+`local_model_candidate_only` with `production_authorized=false`. Environment
+proxies and arbitrary endpoint URLs are excluded. This is machinery for a
+future real run, not evidence that one occurred: artifact provenance,
+semantic/adversarial quality, prompt-injection robustness, production
+calibration, and authorization remain open.
+
 **GH-103 merged and exact-main verified — local ELF import extraction:** the Rust Threat Observable boundary can derive one checked `api_import` from exact caller-supplied Linux ELF bytes. It uses the pinned read-only `object` parser, accepts no path, import string, platform, format, or generic observable value, and derives `linux`/`elf` internally. Inputs are capped at 16 MiB and 4096 dynamic symbols; names must match the existing closed ASCII grammar, are byte-sorted and deduplicated, and one checked index is selected. Every result is local-only `review_required_v1`, with shared exact-byte vectors independently parsed by Python. This neither proves external artifact provenance nor authorizes disclosure, transport, proof acceptance, analysis, or publication.
 
 **GH-121 merged and exact-main verified — Windows PE import extraction:** the same isolated boundary derives one checked `api_import` from exact caller-supplied PE32 or PE32+ bytes. It fixes scope to `windows`/`pe`, caps input at 16 MiB, 4096 import descriptors, and 4096 thunk entries, rejects ordinal or grammar-invalid imports, and byte-sorts/deduplicates named functions before selection. Rust exercises both PE architectures and Python independently parses the synthetic shared PE32+ vector. Library names never become observables, every result remains local-only `review_required_v1`, and no path/string/generic, transport, proof, analyzer, wallet, chain, or promotion API is added. Protected PR #122 is merged as exact-main `2e3e1e1`; CI, Security, and Pages pass on that SHA.

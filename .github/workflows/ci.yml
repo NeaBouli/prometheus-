@@ -2450,6 +2450,13 @@ jobs:
         run: pylint modules/guardian-node/jaeger/ --fail-under=7.0 --disable=C0114,C0115,C0116
       - name: Tests
         run: cd modules/guardian-node && PYTHONPATH=. python -m pytest tests/ --tb=short
+      - name: Local Model Evidence Boundary
+        working-directory: modules/guardian-node
+        run: >-
+          PYTHONPATH=. python -m pytest
+          tests/test_model_evidence.py
+          tests/test_confidence_calibration.py
+          tests/test_llm_server.py --tb=short
       - name: Deterministic Confidence Calibration Evidence
         working-directory: modules/guardian-node
         run: |

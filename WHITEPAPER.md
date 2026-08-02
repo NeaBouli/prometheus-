@@ -316,6 +316,18 @@ transport, wallet, or chain component. It validates the evaluation machinery,
 not live 8B/70B semantic accuracy, real adversarial robustness, production
 calibration, P2P delivery, or authorization; those gates remain open.
 
+The GH-141 implementation candidate adds the next non-authorizing boundary: a
+local candidate runner sends
+the same cases only to a literal-loopback vLLM service with environment proxies
+disabled, records one closed-schema score per case, and atomically creates a
+canonical owner-only prediction set. Corpus bytes, public served-model ID,
+caller-supplied model-artifact digest, and a pinned repository prompt
+specification are bound into the evidence. A separate offline mode recomputes
+the exact metrics as `local_model_candidate_only` and always records
+`production_authorized=false`. No live model run or result is committed. The
+tool does not independently prove the supplied artifact digest, semantic
+accuracy, prompt-injection robustness, production calibration, or authority.
+
 ### 7.5 Local Guardian Ensemble Vote
 
 The Sprint 10B ensemble validator commits the protocol version, threat hash,
