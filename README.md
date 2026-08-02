@@ -123,9 +123,9 @@ Protected PR #139 merged normally without bypass as exact main `52209cc`;
 Prometheus CI `30697333650`, Security Audit `30697333643`, and Pages
 `30697333307` pass on that SHA.
 
-**GH-141 local model candidate evidence (implementation candidate; not yet
-merged or exact-main verified):** the Guardian can run the same
-canonical benchmark through an explicitly literal-loopback vLLM service,
+**GH-141 local model candidate evidence (merged and exact-main verified):** the
+Guardian can run the same canonical benchmark through an explicitly
+literal-loopback vLLM service,
 capture one validated integer-bps prediction per case, and write canonical
 owner-only JSONL without overwrite or partial output. The evidence binds the
 exact corpus, a public served-model identifier, a caller-supplied model
@@ -136,6 +136,10 @@ proxies and arbitrary endpoint URLs are excluded. This is machinery for a
 future real run, not evidence that one occurred: artifact provenance,
 semantic/adversarial quality, prompt-injection robustness, production
 calibration, and authorization remain open.
+
+Protected PR #142 squash-merged normally without bypass as exact main
+`bf3f74f`; Prometheus CI `30727224584`, Security Audit `30727224572`, and Pages
+`30727224235` pass on that SHA.
 
 **GH-103 merged and exact-main verified — local ELF import extraction:** the Rust Threat Observable boundary can derive one checked `api_import` from exact caller-supplied Linux ELF bytes. It uses the pinned read-only `object` parser, accepts no path, import string, platform, format, or generic observable value, and derives `linux`/`elf` internally. Inputs are capped at 16 MiB and 4096 dynamic symbols; names must match the existing closed ASCII grammar, are byte-sorted and deduplicated, and one checked index is selected. Every result is local-only `review_required_v1`, with shared exact-byte vectors independently parsed by Python. This neither proves external artifact provenance nor authorizes disclosure, transport, proof acceptance, analysis, or publication.
 

@@ -1207,3 +1207,16 @@ Fixes: exact pinned prompt digest enforced; descriptor ownership transferred
 Evidence: focused 136 pass/4 skips; Guardian 883/4; Black 56; Pylint 9.84;
           exact synthetic report; Memory/Autodidactic; diff PASS
 ```
+
+## GH-141 M-004 MERGED EXACT-MAIN (2026-08-02)
+
+```text
+Status: Done / merged / exact-main verified; documentation closeout pending
+PR/SHA: #142 / bf3f74f76eba83e7d689ffebd892a1fb19e4ddcc
+Runs: CI 30727224584; Security 30727224572; Pages 30727224235
+Review: all two actionable and two nitpick CodeRabbit findings fixed; both
+        inline threads resolved; final protected head had 11 green contexts
+Boundary: no live model/result/download, independently proven artifact,
+          semantic/adversarial quality, production calibration or authority;
+          no v2 operation, wallet, deployment, chain, protocol or token action
+```

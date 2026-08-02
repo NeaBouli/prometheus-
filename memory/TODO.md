@@ -75,7 +75,7 @@
 - [ ] [P1] Docker-Compose für Guardian-Node erstellen (8B + 70B Variante) | Claude Code | -
 - [ ] [P1] vLLM Server für LLaMA 3 8B einrichten (llm_server.py) | Claude Code | Docker
 - [ ] [P1] YARA-Regel-Generator implementieren (yara_generator.py) | Claude Code | llm_server.py
-- [~] [P2] GH-141 lokale Modellkandidaten-Evidence erfassen und offline verifizieren | Codex Sol + Kimi K3 | Lokale Implementierung und vollständige Gates PASS; geschützt veröffentlichen, PR-Prüfungen/Review abschließen, normal mergen und exact main/Pages verifizieren. Kein Live-Modelllauf oder Produktionsnachweis enthalten
+- [x] [P2] GH-141 lokale Modellkandidaten-Evidence erfassen und offline verifizieren | Codex Sol + Kimi K3 | PR #142 squash-merged und exact-main verifiziert als `bf3f74f`; CI `30727224584`, Security `30727224572`, Pages `30727224235`. Kein Live-Modelllauf oder Produktionsnachweis enthalten
 - [ ] [P1] Bedrohungsanalyse-Pipeline (analyzer.py) | Claude Code | yara_generator.py
 - [ ] [P2] Reputationsberechnung (reputation/scoring.py) | Claude Code | -
 - [ ] [P2] Guardian ↔ Validator Kommunikation (Proposal senden) | Claude Code | Contracts deployed

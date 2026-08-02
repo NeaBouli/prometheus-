@@ -821,3 +821,16 @@ Leistungsbasierte Emission. Guardians = "Miner" (KI statt GPU).
   three regressions. Focused Guardian passes 136/4; complete Guardian passes
   883/4; Black, Pylint 9.84, exact fixture, Memory and diff checks pass.
 - **Status:** `Review fixes local PASS / Refreshed protected checks next`.
+
+## Checkpoint 2026-08-02: GH-141 merged exact-main
+
+- PR #142 passed all eleven final protected contexts and squash-merged normally
+  without bypass as exact main `bf3f74f76eba83e7d689ffebd892a1fb19e4ddcc`;
+  GH-141 is closed.
+- Exact-main Prometheus CI `30727224584`, Security Audit `30727224572`, and
+  Pages `30727224235` pass. The live merged candidate markers were fetched.
+- Both actionable and both nitpick CodeRabbit findings are incorporated; both
+  inline threads are answered and resolved.
+- Real model evidence, independently verified artifact provenance, semantic/
+  adversarial quality, production calibration and authority remain open.
+- **Status:** `Product Done / Documentation closeout in progress`.
