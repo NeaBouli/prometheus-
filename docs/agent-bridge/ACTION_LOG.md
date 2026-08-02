@@ -2862,3 +2862,26 @@ Rules for all dev agents:
 - Strict zip cardinality and constant-derived oversize test are applied;
   focused 136/4, Black, and diff checks pass.
 - **Status:** `All known review feedback fixed / Refreshed checks next`.
+
+### 2026-08-02 14:46 EEST - GH-141 merged and exact-main verified
+
+- PR #142 squash-merged normally as exact main `bf3f74f`; GH-141 closed.
+- Exact-main CI `30727224584`, Security `30727224572`, and Pages `30727224235`
+  pass; live merged markers were fetched.
+- Started docs-only `docs/GH-141-closeout` for final public/status truth.
+- **Status:** `Product Done / Documentation closeout in progress`.
+
+### 2026-08-02 14:47 EEST - GH-141 docs closeout local PASS
+
+- Kimi K3 read-only review: PASS, no P0/P1/P2. PR/SHA/runs, eleven protected
+  contexts, closed issue, resolved threads, and live pre-closeout Pages state
+  were independently verified.
+- Claude Code's bounded read-only helper found the stale `BACKLOG.md` green
+  baseline; Sol fixed it and the two minor heading inconsistencies. Claude
+  changed no file.
+- PASS: Memory/Autodidactic, YAML/Actionlint, HTML/SEO/status, stale-marker and
+  identifier scans, Gitleaks, and diff hygiene.
+- Historical local-clock timestamps retain one documented P3 audit skew;
+  append-only history is preserved and GitHub UTC event data remains external
+  authority. No product or external operational scope was added.
+- **Status:** `Docs closeout local PASS / Protected PR next`.

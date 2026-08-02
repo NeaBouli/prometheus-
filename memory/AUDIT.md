@@ -2265,3 +2265,16 @@ digest, and atomic writer cleanup cannot raw-close a descriptor after ownership
 passes to `fdopen()`. Three regressions plus focused 136/4 and complete Guardian
 883/4 pass; Black, full Pylint 9.84, exact fixture, Memory, and diff pass.
 Refreshed protected checks remain.
+
+### GH-141 merge and exact-main verification
+
+PR #142 passed all eleven final protected contexts and squash-merged through
+the repository's permitted method without bypass as exact main
+`bf3f74f76eba83e7d689ffebd892a1fb19e4ddcc`. Prometheus CI `30727224584`,
+Security Audit `30727224572`, and Pages `30727224235` pass. Both actionable and
+both nitpick CodeRabbit findings are fixed; both inline threads are resolved.
+
+No live model/result/download, independently proven artifact provenance,
+semantic/adversarial quality certification, production calibration/authority,
+v2 operation, wallet, signing, broadcast, deployment, chain, protocol formula,
+KAS/PROM, reputation, slash ACL, commit-reveal, or emergency-stop change exists.
