@@ -2741,6 +2741,12 @@ Rules for all dev agents:
   alone. Refreshed protected CI will provide the complete authoritative rerun.
 - **Status:** `Review fixes local PASS / Refreshed checks next`.
 
+### 2026-08-02 14:36 EEST - PR #142 review nitpicks fixed
+
+- Added strict zip cardinality and removed the oversize-test magic number.
+  Focused 136/4, Black, and diff checks pass.
+- **Status:** `All known review feedback fixed / Refreshed checks next`.
+
 ### 2026-08-01 22:55 EEST - GH-135 complete
 
 - PR #136 merged normally as exact main `3ff3fa1`; GH-135 closed.
@@ -2850,3 +2856,9 @@ Rules for all dev agents:
 - PASS: focused 136/4, complete Guardian 883/4, Black, Pylint 9.84, exact
   fixture, Memory/Autodidactic, and diff hygiene.
 - **Status:** `Review fixes local PASS / Refreshed checks next`.
+
+### 2026-08-02 14:37 EEST - PR #142 NITPICK TRUE EOF MIRROR
+
+- Strict zip cardinality and constant-derived oversize test are applied;
+  focused 136/4, Black, and diff checks pass.
+- **Status:** `All known review feedback fixed / Refreshed checks next`.

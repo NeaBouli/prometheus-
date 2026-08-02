@@ -14,6 +14,7 @@ import pytest
 
 from jaeger.confidence_calibration import (
     LOCAL_MODEL_EVALUATION_MODE,
+    MAX_PREDICTIONS_BYTES,
     ConfidenceEvaluationError,
     evaluate_confidence,
     parse_corpus,
@@ -126,7 +127,7 @@ async def test_capture_header_and_row_shape_are_exact() -> None:
     assert values[0]["evaluation_mode"] == "local_model_candidate"
     assert values[0]["corpus_sha256"] == corpus.sha256
     assert len(values) == len(corpus.cases) + 1
-    for row, case in zip(values[1:], corpus.cases):
+    for row, case in zip(values[1:], corpus.cases, strict=True):
         assert list(row) == ["case_id", "confidence_bps"]
         assert row["case_id"] == case.case_id
 
@@ -159,7 +160,9 @@ async def test_capture_bytes_are_canonical_and_reproducible() -> None:
             },
             *[
                 {"case_id": case.case_id, "confidence_bps": confidence}
-                for case, confidence in zip(corpus.cases, CONFIDENCE_VALUES)
+                for case, confidence in zip(
+                    corpus.cases, CONFIDENCE_VALUES, strict=True
+                )
             ],
         ]
     )
@@ -416,7 +419,9 @@ def test_write_rejects_invalid_content_and_path_types(tmp_path: Path) -> None:
     with pytest.raises(ModelEvidenceError):
         write_predictions_atomically(tmp_path / "out.jsonl", b"")
     with pytest.raises(ModelEvidenceError):
-        write_predictions_atomically(tmp_path / "out.jsonl", b"x" * 131_073)
+        write_predictions_atomically(
+            tmp_path / "out.jsonl", b"x" * (MAX_PREDICTIONS_BYTES + 1)
+        )
     with pytest.raises(ModelEvidenceError):
         write_predictions_atomically(
             tmp_path / "out.jsonl", "{}\n"  # type: ignore[arg-type]

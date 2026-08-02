@@ -2742,3 +2742,10 @@ No direct `main` push or production action occurred.
   Black, full Pylint 9.84, exact synthetic report, Memory/Autodidactic, and
   diff hygiene pass. Refreshed protected checks remain after push.
 - **Status:** `Review fixes local PASS / Refreshed checks next`.
+
+### 2026-08-02 14:36 EEST - PR #142 review nitpicks complete
+
+- Applied the two non-inline test hardening notes: strict zip cardinality and
+  production-constant-derived oversize input. Focused Guardian remains 136/4;
+  Black and diff checks pass.
+- **Status:** `All known review feedback fixed / Refreshed checks next`.
