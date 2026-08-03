@@ -2724,6 +2724,15 @@ Rules for all dev agents:
 - Kimi K3 final review-fix verdict: PASS, no P0/P1/P2/P3.
 - **Status:** `Local PASS / Commit, push, refreshed protected checks`.
 
+### 2026-08-04 11:35 EEST - GH-144 exact-main closeout started
+
+- PR #145 merged normally as `95d05cc`; issue #144 is closed, all seven review
+  threads are resolved, and exact-main CI `30858991436`, Security
+  `30858991557`, and Pages `30858990507` pass.
+- Live FAQ, roadmap, whitepaper and economics markers are present. README,
+  public status, backlog and memory are being closed out without product code.
+- **Status:** `Product Done / Docs closeout local verification next`.
+
 ### 2026-08-04 11:15 EEST - PR #145 review fixes started
 
 - Accepted six concrete runtime/docs comments, including the removed vLLM
@@ -2965,3 +2974,11 @@ Rules for all dev agents:
 - Six accepted review findings are fixed; append-only clock clarification is
   recorded without rewriting history.
 - **Status:** `Local PASS / Commit, push, refreshed protected checks`.
+
+### 2026-08-04 11:40 EEST - GH-144 docs closeout local PASS authoritative EOF
+
+- Public status, README, Whitepaper, backlog, memory and Bridge consistently
+  record merged exact main `95d05cc` and green CI/Security/Pages run IDs.
+- PASS: Memory/Autodidactic, HTML/SEO/status/stale markers, diff hygiene and
+  Kimi K3 independent review with no P0/P1/P2/P3.
+- **Status:** `Docs closeout local PASS / Protected PR next`.

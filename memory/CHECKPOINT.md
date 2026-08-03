@@ -834,3 +834,18 @@ Leistungsbasierte Emission. Guardians = "Miner" (KI statt GPU).
 - Real model evidence, independently verified artifact provenance, semantic/
   adversarial quality, production calibration and authority remain open.
 - **Status:** `Product Done / Documentation closeout in progress`.
+
+## Checkpoint 2026-08-04: GH-144 merged exact-main
+
+- PR #145 passed all eleven final protected contexts and squash-merged normally
+  without bypass as exact main `95d05ccb246c75f89a79d3601180907452f6b4dc`;
+  GH-144 is closed and all seven review threads are resolved.
+- Exact-main Prometheus CI `30858991436`, Security Audit `30858991557`, and
+  Pages `30858990507` pass. Live FAQ, roadmap, whitepaper and economics markers
+  were fetched successfully from GitHub Pages.
+- The repository now has a pinned, loopback-only, offline-model, non-root and
+  bounded 8B/default plus 70B/opt-in Compose boundary with fail-closed CI.
+- Image/model pull, live inference, independently verified artifact provenance,
+  semantic/adversarial quality, calibration and production authority remain
+  open and are not implied by this closeout.
+- **Status:** `Product Done / Documentation closeout in progress`.
