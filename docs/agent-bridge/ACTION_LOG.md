@@ -2982,3 +2982,47 @@ Rules for all dev agents:
 - PASS: Memory/Autodidactic, HTML/SEO/status/stale markers, diff hygiene and
   Kimi K3 independent review with no P0/P1/P2/P3.
 - **Status:** `Docs closeout local PASS / Protected PR next`.
+
+### 2026-08-04 11:56 EEST - GH-147 started
+
+- GH-144 product merged and verified as `95d05cc`; its later documentation
+  closeout produced exact main `a2cbeb9` with final CI/Security/Pages green.
+- Opened issue #147 and branch `feat/GH-147-guardian-membership-source` for the
+  missing canonical membership source and public-key binding boundary.
+- Kimi owns the bounded module/vector/test slice; Sol owns integration and all
+  external actions. No secret, signing, chain, transport or production scope.
+- Delegated files: `jaeger/guardian_membership_source.py`, its focused test, and
+  one public exact-byte vector plus SHA-256 sidecar only. Acceptance required
+  strict schema/order/network/member/key validation, owner-only descriptor-safe
+  loading, unchanged snapshot/signer APIs, and focused test/Black/Pylint PASS.
+- Required return: changed files, exact checks/results, and residual risks. No
+  private keys, agents, docs/Bridge/Memory, CI, Rust, external or production work.
+- **Status:** `In Progress / Implementation`.
+
+### 2026-08-04 12:25 EEST - GH-147 local core verified
+
+- Kimi delivered the bounded module/vector/test slice; Sol reviewed it fully
+  and fixed one specification-order wording mismatch.
+- PASS: 198 focused tests; Guardian 1043/4; Black 30; changed Pylint 10.00;
+  full Pylint 9.84; exact vector digest and clean diff.
+- Public docs, GitHub Pages sources, Backlog and Memory now describe GH-147 as
+  a local non-authorizing candidate. Protected review and exact-main evidence
+  remain.
+- **Status:** `Local core PASS / Integration gates next`.
+
+### 2026-08-04 12:40 EEST - GH-147 independent review clean
+
+- Kimi found one P2 Memory fence placement and one P3 stale date; Sol fixed
+  both without product-code changes. Memory, six Autodidactic tests, fence
+  balance and diff checks pass.
+- Kimi's targeted re-review: PASS, no remaining P0/P1/P2/P3, protected PR ready.
+- Existing CI discovers the new test automatically; no workflow edit required.
+- **Status:** `Local PASS / Protected PR ready`.
+
+### 2026-08-04 12:50 EEST - PR #148 review fixes pass
+
+- Accepted six wording/test/delegation clarifications; preserved correct
+  Europe/Athens August 4 dates against three UTC-based false positives.
+- PASS: focused 198, Black, changed Pylint 10.00, Memory, six Autodidactic tests,
+  changed HTML, wording and diff hygiene.
+- **Status:** `Review fixes local PASS / Refreshed checks next`.

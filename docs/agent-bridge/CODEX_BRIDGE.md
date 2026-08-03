@@ -2939,3 +2939,72 @@ No direct `main` push or production action occurred.
 - Kimi K3 independently verified the complete documentation-only delta and all
   external identifiers: PASS, no P0/P1/P2/P3. No product/protocol file changed.
 - **Status:** `Docs closeout local PASS / Protected PR next`.
+
+### 2026-08-04 11:56 EEST - GH-147 membership-source boundary started
+
+- GH-144 product and docs closeout are merged as exact main `a2cbeb9`; final CI
+  `30859954668`, Security `30859954670`, and Pages `30859954028` pass.
+- Opened issue #147 and branch `feat/GH-147-guardian-membership-source` from that
+  exact main. The bounded repository-only task defines and validates the missing
+  canonical source behind `membership_source_sha256` and Guardian-ID-to-public-
+  BIP340-key bindings.
+- Kimi K3 receives the typed module/vector/test implementation. Sol owns scope,
+  architecture, security, integration, docs, full tests, review and publishing.
+- Explicit exclusions: private keys/signing, transport/discovery, key rotation,
+  Sybil-resistance claims, on-chain attestation, reputation, KAS/PROM, slash ACL,
+  commit-reveal, emergency stop, deployment and production authority.
+- **Status:** `In Progress / Kimi implementation and Sol integration`.
+
+### 2026-08-04 12:25 EEST - GH-147 core and full Guardian gate pass
+
+- Kimi K3 implemented only the bounded membership-source module, byte-exact
+  public vector/sidecar, and adversarial tests. Sol independently reviewed the
+  entire diff and corrected one documentation-only field-order mismatch.
+- The source binds one network/epoch and 5–1024 sorted unique Guardian IDs
+  one-to-one to structurally valid unique public BIP340 keys, fixed 8B tier and
+  model-artifact digests. Its exact-byte digest pins the existing snapshot;
+  validated member fields derive signer views. An owner-only, no-symlink,
+  descriptor-verified POSIX loader protects file access.
+- PASS: focused `198`; complete Guardian `1043 passed, 4 skipped`; Black `30`
+  files; changed Pylint `10.00/10`; full Pylint `9.84/10`; vector digest and
+  diff hygiene exact.
+- README, Whitepaper, public roadmap/pages, `llms.txt`, Backlog and Memory now
+  describe the candidate without claiming merge or production trust.
+- Remaining: independent final review, repository/document gates, protected PR,
+  review/merge and exact-main CI/Security/Pages. External source authority, key
+  ownership/rotation, Sybil resistance and L1 attestation stay out of scope.
+- **Status:** `Local core PASS / Integration gates and protected PR next`.
+
+### 2026-08-04 12:40 EEST - GH-147 final local review PASS
+
+- Kimi K3's independent full review found no product/security P0 or P1 and one
+  P2 malformed `memory/STATUS.md` fence plus one P3 stale date. Sol moved only
+  the uncommitted GH-147 block outside the Sprint fence and updated the date.
+- The fix passed whole-file fence balance, Memory Integrity, all six
+  Autodidactic tests and diff hygiene. Kimi re-reviewed the exact fix read-only:
+  PASS, no remaining P0/P1/P2/P3, protected PR ready.
+- Full local evidence remains: focused `198`; Guardian `1043 passed, 4 skipped`;
+  Black `30`; changed Pylint `10.00/10`; full Pylint `9.84/10`; exact vector,
+  Memory, HTML/SEO/status, workflow YAML/CI discovery and diff pass.
+- Local Actionlint and Gitleaks binaries are unavailable; protected CI/Security
+  remain authoritative. No workflow change is needed because CI already runs
+  the complete Guardian test discovery, Black and full Guardian Pylint.
+- **Status:** `Local PASS / Protected PR ready`.
+
+### 2026-08-04 12:50 EEST - PR #148 review fixes local PASS
+
+- All seven CodeRabbit threads were evaluated. Accepted: separate source digest
+  from signer derivation, scope owner-only to the loader, state the 5–1024 bound,
+  replace inert `/tmp` test literals, clarify GH-144 product/docs SHAs, and make
+  the Kimi delegation contract explicit.
+- Three date findings are invalid: the workstation and project use
+  Europe/Athens, where `date` returned `2026-08-04 12:50 EEST`; GitHub review
+  timestamps are UTC on August 3. Correct EEST records remain unchanged.
+- PASS after fixes: focused `198`; changed Black and Pylint `10.00/10`; Memory
+  Integrity; six Autodidactic tests; changed HTML; review wording; diff hygiene.
+  Product behavior and the exact public vector are unchanged.
+- The CodeRabbit docstring-coverage summary warning is non-authoritative and
+  inaccurate for the public API: all public source classes/functions already
+  have docstrings, while repository CI intentionally disables missing internal
+  helper docstrings and passed full Pylint.
+- **Status:** `Review fixes local PASS / Commit and refreshed protected checks`.
