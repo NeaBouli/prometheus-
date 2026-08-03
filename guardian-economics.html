@@ -284,12 +284,13 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
       <p>This is the most significant structural tension in Prometheus. We document it transparently because pretending it doesn't exist would undermine the trust the protocol depends on.</p>
 
       <div class="callout-danger">
-        <p><strong>The problem in one sentence:</strong> LLaMA 3 70B requires hardware that costs $60,000–120,000 to acquire and $8,000–12,000/year to operate. Globally, only 50–200 nodes at this level are realistic. This contradicts the decentralization promise.</p>
+        <p><strong>The problem in one sentence:</strong> Using the illustrative planning ranges below, LLaMA 3 70B requires institutional-grade hardware and operating cost. Globally, only a limited number of nodes at this level are realistic. This contradicts the decentralization promise.</p>
       </div>
 
       <div class="sec-sub" id="hardware-cost">Hardware cost reality</div>
+      <p>All cost figures below are illustrative planning ranges, not current quotes. Acquisition cost may mix new and used purchases; electricity varies materially with regional rates, utilization, cooling, and power limits; cloud pricing varies by provider, commitment, and availability.</p>
       <table class="wp-table">
-        <tr><th>Node Type</th><th>Hardware</th><th>Acquisition cost</th><th>Annual electricity</th><th>Accessibility</th></tr>
+        <tr><th>Node Type</th><th>Hardware</th><th>Illustrative acquisition</th><th>Illustrative annual electricity</th><th>Accessibility</th></tr>
         <tr>
           <td>Light Client</td>
           <td>Any device, 4 GB RAM</td>
@@ -299,14 +300,14 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
         </tr>
         <tr>
           <td>Guardian (8B)</td>
-          <td>RTX 4070 Ti+, 16 GB VRAM</td>
+          <td>24 GB NVIDIA GPU (RTX 3090/4090 class)</td>
           <td class="num warn">$800–1,500</td>
           <td class="num warn">~$1,000</td>
           <td class="warn">Enthusiasts</td>
         </tr>
         <tr>
           <td>Guardian (70B)</td>
-          <td>4× A100/H100, 128 GB RAM</td>
+          <td>4× A100/H100 80 GB, 256 GB RAM</td>
           <td class="num bad">$60,000–120,000</td>
           <td class="num bad">$8,000–12,000</td>
           <td class="bad">Data centers only</td>
@@ -327,7 +328,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
         </tr>
       </table>
 
-      <p>The 8B Guardian is accessible — RTX 4070 Ti hardware is within reach for enthusiasts, and the reputation system rewards quality output regardless of model size. The 70B Guardian is categorically different: it requires institutional-grade infrastructure.</p>
+      <p>The 8B Guardian remains accessible on a single 24 GB consumer GPU, including RTX 3090/4090-class hardware. The reputation system rewards quality output regardless of model size. The 70B Guardian is categorically different: it requires institutional-grade infrastructure.</p>
     </div>
 
     <!-- BREAK-EVEN -->

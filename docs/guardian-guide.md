@@ -10,7 +10,7 @@ Guardians run LLaMA 3 AI models to analyze threats reported by Light Clients and
 
 | Component | Minimum | Recommended |
 |-----------|---------|-------------|
-| GPU | NVIDIA RTX 4070 Ti (12 GB VRAM) | RTX 4090 (24 GB VRAM) |
+| GPU | NVIDIA GPU with 24 GB VRAM | 48 GB datacenter/workstation GPU |
 | RAM | 32 GB | 64 GB |
 | Storage | 20 GB (model weights) | 50 GB |
 | OS | Linux with NVIDIA drivers | Ubuntu 22.04+ |
@@ -21,39 +21,63 @@ Guardians run LLaMA 3 AI models to analyze threats reported by Light Clients and
 | Component | Requirement |
 |-----------|-------------|
 | GPU | 4x NVIDIA A100 or H100 (80 GB each) |
-| RAM | 128 GB+ |
+| RAM | 256 GB+ |
 | Storage | 150 GB (model weights) |
 
 ## Setup (8B)
 
 ### 1. Install Prerequisites
 
-```bash
-# NVIDIA drivers + CUDA
-sudo apt install nvidia-driver-535 nvidia-cuda-toolkit
+Install a supported NVIDIA driver, Docker Engine with Compose v2, and the
+NVIDIA Container Toolkit from their official distribution instructions. Do not
+pipe remote installation scripts directly into a privileged shell. Verify the
+local operator environment before continuing:
 
-# Docker with GPU support
-curl -fsSL https://get.docker.com | sh
-sudo apt install nvidia-container-toolkit
+```bash
+nvidia-smi
+docker version
+docker compose version
 ```
 
-### 2. Download Model Weights
+### 2. Provision Reviewed Local Artifacts
 
 ```bash
 cd modules/guardian-node
-mkdir -p models
-# Download Meta-Llama-3-8B-Instruct to ./models/
+mkdir -p models/Meta-Llama-3-8B-Instruct
+# Place independently reviewed model files in this local directory.
+# The directory is gitignored and mounted read-only; Compose has no HF token.
 ```
 
-### 3. Start the Guardian
+From the repository root, validate the source policy before any runtime action:
 
 ```bash
-docker compose up guardian-8b
+python3 -m venv .venv
+. .venv/bin/activate
+python -m pip install -r modules/guardian-node/requirements.txt
+python scripts/verify_guardian_vllm_compose.py
+```
+
+The pinned image and model artifacts are separate operator-controlled inputs.
+Review their provenance and digest before performing the explicit image pull
+documented in `modules/guardian-node/README.md`. This repository task neither
+pulls them nor records a live model result.
+
+The service listens on the container interface only so Docker forwarding can
+reach it. Host publication remains restricted to literal `127.0.0.1`, and the
+container network is internal.
+
+### 3. Start the Local Runtime
+
+```bash
+cd modules/guardian-node
+docker compose up -d guardian-8b
+# Optional 70B escalation runtime:
+# docker compose --profile 70b up -d guardian-70b
 ```
 
 Verify health:
 ```bash
-curl http://localhost:8000/health
+curl http://127.0.0.1:8000/health
 ```
 
 ### 4. Run the Analyzer
@@ -88,7 +112,8 @@ describe the target flow, not current production readiness.
 5. Rule is validated (must contain `rule`, `strings:`, `condition:`)
 6. If confidence >= 85%, the proposal is submitted to validators
 7. Validators vote via Commit-Reveal
-8. Accepted rules are stored on-chain as KRC-20 assets
+8. Accepted rule metadata and CIDv1 references target `RuleStorage`; this path
+   does not mint or represent rules as KRC-20 assets
 
 ## Reputation System
 

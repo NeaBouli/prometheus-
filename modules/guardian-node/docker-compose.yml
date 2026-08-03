@@ -1,32 +1,76 @@
-# Prometheus Guardian Node — LLaMA 3 Inference via vLLM
-# Architecture Decision #6: LLaMA 3 70B (primary)
-# Architecture Decision #7: LLaMA 3 8B (fallback, lower hardware barrier)
+# Prometheus Guardian Node — local vLLM inference boundary (GH-144 / M-005)
+# Architecture Decision #6: LLaMA 3 70B (escalation)
+# Architecture Decision #7: LLaMA 3 8B (default, lower hardware barrier)
+#
+# Fail-closed local runtime boundary:
+#   * Exact official image pinned by tag AND registry index digest.
+#   * pull_policy: never — Compose never silently downloads the image.
+#     The digest pull is a separate deliberate operator step (see README.md).
+#   * Host ports bind literal 127.0.0.1 only. vLLM listens on the container
+#     interface so Docker port forwarding works; the container network is
+#     internal, so the runtime has no outbound network path.
+#   * Models load only from caller-provisioned local ./models directories,
+#     mounted read-only. HF_HUB_OFFLINE/TRANSFORMERS_OFFLINE are forced.
+#     This file accepts and requires no HF_TOKEN or any other secret.
+#   * Non-root UID:GID 2000:0, all capabilities dropped, no-new-privileges,
+#     read-only root filesystem, bounded writable tmpfs only, bounded
+#     pids/memory/shm, no host IPC.
 #
 # Usage:
-#   8B only:  docker compose up guardian-8b
-#   70B:      Uncomment guardian-70b section, then: docker compose up guardian-70b
+#   8B (default):  docker compose up -d guardian-8b
+#   70B (opt-in):  docker compose --profile 70b up -d guardian-70b
+#
+# Operator preflight (deliberate separate steps, see README.md):
+#   docker pull vllm/vllm-openai:v0.26.0@sha256:ffb2d59b1c059a5bd8d781320c9f5189de8293693b7d95da54befddaa54abf52
+#   # provision ./models/<Model-Dir> with locally obtained weights
+#   docker compose --profile 70b config --quiet
+#   # install requirements in a local venv as documented in README.md
+#   python ../../scripts/verify_guardian_vllm_compose.py
 
-# Note: version key deprecated in Docker Compose v2.x but harmless
-version: "3.9"
+name: prometheus-guardian-vllm
 
 services:
   guardian-8b:
-    image: vllm/vllm-openai:latest
-    container_name: prometheus-guardian-8b
+    image: vllm/vllm-openai:v0.26.0@sha256:ffb2d59b1c059a5bd8d781320c9f5189de8293693b7d95da54befddaa54abf52
+    pull_policy: never
+    user: "2000:0"
+    init: true
+    read_only: true
+    restart: "no"
+    networks:
+      - guardian-internal
     ports:
-      - "8000:8000"
+      - "127.0.0.1:8000:8000"
     volumes:
-      - ./models:/models
+      - ./models:/models:ro
+    tmpfs:
+      - /tmp:rw,nosuid,nodev,size=4g
     environment:
-      - MODEL_NAME=meta-llama/Meta-Llama-3-8B-Instruct
-      - MAX_MODEL_LEN=8192
-      - GPU_MEMORY_UTILIZATION=0.90
-    command: >
-      --model /models/Meta-Llama-3-8B-Instruct
-      --port 8000
-      --max-model-len 8192
-      --gpu-memory-utilization 0.90
-      --trust-remote-code
+      HF_HUB_OFFLINE: "1"
+      TRANSFORMERS_OFFLINE: "1"
+      HF_HOME: /tmp/hf
+      VLLM_CACHE_ROOT: /tmp/vllm
+      HOME: /tmp
+    command:
+      - --model
+      - /models/Meta-Llama-3-8B-Instruct
+      - --served-model-name
+      - meta-llama/Meta-Llama-3-8B-Instruct
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8000"
+      - --max-model-len
+      - "8192"
+      - --gpu-memory-utilization
+      - "0.90"
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    pids_limit: 2048
+    mem_limit: 24g
+    shm_size: 4g
     deploy:
       resources:
         reservations:
@@ -34,43 +78,81 @@ services:
             - driver: nvidia
               count: 1
               capabilities: [gpu]
-    restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:8000/health"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 120s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
 
-  # guardian-70b:
-  #   image: vllm/vllm-openai:latest
-  #   container_name: prometheus-guardian-70b
-  #   ports:
-  #     - "8001:8001"
-  #   volumes:
-  #     - ./models:/models
-  #   environment:
-  #     - MODEL_NAME=meta-llama/Meta-Llama-3-70B-Instruct
-  #     - MAX_MODEL_LEN=8192
-  #     - TENSOR_PARALLEL_SIZE=4
-  #   command: >
-  #     --model /models/Meta-Llama-3-70B-Instruct
-  #     --port 8001
-  #     --max-model-len 8192
-  #     --tensor-parallel-size 4
-  #     --gpu-memory-utilization 0.95
-  #     --trust-remote-code
-  #   deploy:
-  #     resources:
-  #       reservations:
-  #         devices:
-  #           - driver: nvidia
-  #             count: 4
-  #             capabilities: [gpu]
-  #   restart: unless-stopped
-  #   healthcheck:
-  #     test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
-  #     interval: 30s
-  #     timeout: 10s
-  #     retries: 3
-  #     start_period: 300s
+  guardian-70b:
+    profiles: ["70b"]
+    image: vllm/vllm-openai:v0.26.0@sha256:ffb2d59b1c059a5bd8d781320c9f5189de8293693b7d95da54befddaa54abf52
+    pull_policy: never
+    user: "2000:0"
+    init: true
+    read_only: true
+    restart: "no"
+    networks:
+      - guardian-internal
+    ports:
+      - "127.0.0.1:8001:8000"
+    volumes:
+      - ./models:/models:ro
+    tmpfs:
+      - /tmp:rw,nosuid,nodev,size=8g
+    environment:
+      HF_HUB_OFFLINE: "1"
+      TRANSFORMERS_OFFLINE: "1"
+      HF_HOME: /tmp/hf
+      VLLM_CACHE_ROOT: /tmp/vllm
+      HOME: /tmp
+    command:
+      - --model
+      - /models/Meta-Llama-3-70B-Instruct
+      - --served-model-name
+      - meta-llama/Meta-Llama-3-70B-Instruct
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8000"
+      - --max-model-len
+      - "8192"
+      - --gpu-memory-utilization
+      - "0.95"
+      - --tensor-parallel-size
+      - "4"
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    pids_limit: 2048
+    mem_limit: 256g
+    shm_size: 16g
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 4
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 600s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  guardian-internal:
+    internal: true

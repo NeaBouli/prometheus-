@@ -332,6 +332,17 @@ Protected PR #142 squash-merged normally without bypass as exact main
 `bf3f74f`; Prometheus CI `30727224584`, Security Audit `30727224572`, and Pages
 `30727224235` pass on that SHA.
 
+The GH-144 implementation candidate hardens the local serving boundary without
+claiming a model run. Its official vLLM image is pinned by release and registry
+digest; 8B and opt-in 70B services publish only to literal host loopback, use
+caller-provisioned read-only weights in forced offline mode, and run non-root
+on an internal network with bounded processes, memory, shared memory, writable
+temporary space, and logs. A structured repository gate rejects mutable images,
+remote or writable model sources, unsafe ports, privileges, secrets, missing
+resource limits, and profile/GPU drift. No image or model is downloaded, no
+inference is executed, and no artifact provenance, semantic quality,
+calibration, or production authority is established.
+
 ### 7.5 Local Guardian Ensemble Vote
 
 The Sprint 10B ensemble validator commits the protocol version, threat hash,
@@ -592,7 +603,7 @@ access; the invariant is not an uninterrupted-availability guarantee.
 | Sprint 1: Contracts | March 2026 | ACCEPTED |
 | Sprint 2: Client | March 2026 | ACCEPTED |
 | Sprint 3: AI | March 2026 | ACCEPTED |
-| Sprint 4: Guardian | March 2026 | ACCEPTED |
+| Sprint 4: Guardian | March/August 2026 | CORE ACCEPTED / GH-144 RUNTIME IN REVIEW |
 | Sprint 5: Voting | March 2026 | ACCEPTED |
 | Sprint 6: E2E | March 2026 | ACCEPTED |
 | Sprint 7: Dashboard | March 2026 | ACCEPTED |

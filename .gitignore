@@ -20,6 +20,10 @@ __pycache__/
 .venv/
 venv/
 
+# Local model artifacts and runtime caches
+modules/guardian-node/models/
+modules/guardian-node/.cache/
+
 # Temp
 /tmp/
 *.tmp

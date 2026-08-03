@@ -22,8 +22,8 @@ Prometheus transforms every connected device into a sensor in a global threat de
 |-----------|----------|---------|
 | **Light Client** | Any device, 4 GB RAM | `cargo run -p prometheus-client` |
 | **Validator** | Kaspa node + 10,000 KAS stake | `cargo run -p prometheus-validator` |
-| **Guardian (8B)** | RTX 4070 Ti+, 16 GB VRAM | `cd modules/guardian-node && docker compose up guardian-8b` |
-| **Guardian (70B)** | 4x A100/H100, 128 GB RAM | Uncomment `guardian-70b` in docker-compose.yml |
+| **Guardian (8B)** | NVIDIA GPU with 24 GB VRAM (RTX 3090/4090 class) | See [Guardian runtime preflight](modules/guardian-node/README.md) |
+| **Guardian (70B)** | 4x A100/H100 80 GB, 256 GB system RAM | Opt-in Compose profile `70b`; same preflight required |
 
 ```bash
 git clone https://github.com/NeaBouli/prometheus-.git
@@ -82,7 +82,7 @@ Guardian reputation is a separate canonical Kaspa L1 state in `GuardianReputatio
 | 1 — Contracts | ACCEPTED | 6 Silverscript contracts, 54 tests |
 | 2 — Client | ACCEPTED | Kaspa RPC, KRC-20 reader, YARA scanner, ZK stub |
 | 3 — AI | ACCEPTED | Phi-3 wrapper, anomaly detection, Fed-DART |
-| 4 — Guardian | ACCEPTED | Docker, vLLM, YARA generator, analyzer |
+| 4 — Guardian | CORE ACCEPTED / RUNTIME IN REVIEW | YARA/analyzer foundation; GH-144 hardens reproducible local vLLM operation without live evidence |
 | 5 — Voting | ACCEPTED | Commit-Reveal, bond system, slashing engine |
 | 6 — E2E | ACCEPTED | Development-stub lifecycle fixture and security tests; test foundation, not production evidence |
 | 7 — Dashboard | ACCEPTED | Audit dashboard, documentation |
@@ -140,6 +140,16 @@ calibration, and authorization remain open.
 Protected PR #142 squash-merged normally without bypass as exact main
 `bf3f74f`; Prometheus CI `30727224584`, Security Audit `30727224572`, and Pages
 `30727224235` pass on that SHA.
+
+**GH-144 Guardian vLLM runtime hardening (implementation candidate; not yet
+merged or exact-main verified):** the Compose boundary pins the official vLLM
+release by tag and registry digest, publishes only literal-loopback ports,
+forces local offline model resolution, and separates the public served-model
+identifier from read-only caller-provisioned weights. The 8B default and opt-in
+70B profile run non-root with no added capabilities, no-new-privileges, an
+internal network, bounded resources, and a repository-owned structured gate.
+This work does not pull an image or model, run inference, prove model-artifact
+provenance or quality, calibrate a model, or grant production authority.
 
 **GH-103 merged and exact-main verified — local ELF import extraction:** the Rust Threat Observable boundary can derive one checked `api_import` from exact caller-supplied Linux ELF bytes. It uses the pinned read-only `object` parser, accepts no path, import string, platform, format, or generic observable value, and derives `linux`/`elf` internally. Inputs are capped at 16 MiB and 4096 dynamic symbols; names must match the existing closed ASCII grammar, are byte-sorted and deduplicated, and one checked index is selected. Every result is local-only `review_required_v1`, with shared exact-byte vectors independently parsed by Python. This neither proves external artifact provenance nor authorizes disclosure, transport, proof acceptance, analysis, or publication.
 

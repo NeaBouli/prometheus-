@@ -29,7 +29,7 @@ real network operation are tracked in the later phases below.
 | 1 | 6 Silverscript contracts, 54 tests | ACCEPTED |
 | 2 | Rust client: RPC, YARA, ZK stub, KRC-20 | ACCEPTED |
 | 3 | Phi-3 wrapper, anomaly detection, Fed-DART | ACCEPTED |
-| 4 | Docker vLLM, YARA generator, analyzer | ACCEPTED |
+| 4 | Guardian analyzer foundation plus local vLLM runtime | CORE ACCEPTED / GH-144 RUNTIME IN REVIEW |
 | 5 | Commit-Reveal voting, bond system, slashing | ACCEPTED |
 | 6 | Development-stub E2E lifecycle fixture <60s, Sybil + FP flood tests | ACCEPTED as test foundation; not production evidence |
 | 7 | Audit dashboard, README, WHITEPAPER.md | ACCEPTED |
@@ -192,6 +192,7 @@ public release-hardening evidence for the exact rollout commit.
 - Implemented: separate bounded model confidence assessment with an exact closed JSON schema and integer basis points; malformed output fails closed and the former indicator-count/YARA-shape heuristic is removed
 - Merged/exact-main verified GH-138: internally SHA-256-consistent deterministic 24-case synthetic confidence evaluation with the unchanged `8500`-bps threshold, confusion matrix, exact-ratio precision/recall, Brier score, and ten-bin expected calibration error; evidence is offline-only and non-authorizing, and the co-versioned manifest is not an external tamper anchor
 - Merged/exact-main verified GH-141: literal-loopback, proxy-independent local model capture binds the canonical corpus, public served-model ID, caller-supplied artifact digest, and pinned prompt specification; atomic owner-only predictions can be re-evaluated offline only as `local_model_candidate_only` with no production authority
+- GH-144 implementation candidate: the official vLLM image is pinned by version and registry digest; 8B and opt-in 70B services use loopback-only publication, local read-only model weights, forced offline resolution, non-root execution, an internal network, bounded resources, and structured CI validation. No image/model pull, live inference, independently verified artifact provenance, quality evidence, calibration, or production authority is included
 - Implemented: local 5+ Guardian complete-ballot validator with canonical candidate/snapshot commitments, strict majority, and conservative confidence
 - Implemented: transport-neutral BIP340 ballot intake with exact key/session/context binding, strict canonical envelopes, freshness checks, and owner-only SQLite replay/equivocation protection across restarts and concurrent submissions
 - Merged/exact-main verified: real Guardian ballot transport over direct QUIC/libp2p request/response with exact 8192-byte-bounded frames, static peers, resource caps, owner-only AF_UNIX collector integration, and cancellation-safe concurrent processing
@@ -359,8 +360,8 @@ This is the final architectural milestone described in the whitepaper.
 |------|-----------------|---------------------|
 | Light Client | Any device, 4 GB RAM, no GPU | $0 (your existing device) |
 | Validator | VPS 2 vCPU / 4 GB RAM + 10,000 KAS stake | ~$20/mo VPS |
-| Guardian (8B) | RTX 4070 Ti+, 16 GB VRAM | ~$0 (own hardware) |
-| Guardian (70B) | 4x A100/H100, 128 GB RAM | ~$500-2000/mo cloud |
+| Guardian (8B) | NVIDIA GPU with 24 GB VRAM | ~$0 (own hardware) |
+| Guardian (70B) | 4x A100/H100 80 GB, 256 GB system RAM | ~$500-2000/mo cloud |
 | Honeypot | Any internet-exposed server | ~$5-20/mo VPS |
 
 ---

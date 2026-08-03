@@ -2615,6 +2615,43 @@ No direct `main` push or production action occurred.
   signing, broadcast, deployment, chain, protocol, or token action occurred.
 - **Status:** `Local Done / Protected PR next`.
 
+### 2026-08-04 11:21 EEST - PR #145 review-fix gates PASS
+
+- Sol addressed all six accepted CodeRabbit findings: removed the obsolete
+  vLLM request-logging flag, added fail-closed regression coverage, made the
+  validator setup reproducible in a local venv, documented detached runtime
+  startup, aligned the 70B hardware row, qualified illustrative economics,
+  and removed the unsupported roadmap GFLOPS claim.
+- PASS: structured validator, focused `33 passed`, complete Guardian `916
+  passed / 4 skipped`, Black (29 files), focused Pylint 10.00/10, full Pylint
+  9.84/10, Memory Integrity, six Autodidactic tests, workflow YAML, Actionlint
+  1.7.12, HTML/SEO/public-status checks, Gitleaks 8.30.0, and diff hygiene.
+  Dependencies did not change; the prior clean pip-audit result remains valid.
+- Kimi K3 independently reviewed the complete uncommitted review-fix delta:
+  PASS, no P0/P1/P2/P3. Its local validator also passed; its optional pytest
+  rerun was unavailable in the isolated worker environment, while Sol's full
+  repository environment completed all 920 collected tests.
+- The seventh CodeRabbit comment concerns append-only local timestamps. No
+  history was rewritten: the workstation reports 2026-08-04 EEST, while the
+  GitHub event clock differs. This clarification is the audit disposition.
+- No image/model pull, GPU execution, live inference, secret, wallet, signing,
+  broadcast, chain, deployment, or production action occurred.
+- **Status:** `Local PASS / Commit, push, refreshed protected checks`.
+
+### 2026-08-04 11:15 EEST - PR #145 review fixes started
+
+- All eleven PR contexts passed, but CodeRabbit posted seven actionable
+  comments. Six are accepted: remove the vLLM 0.26-unsupported
+  `--disable-log-requests` argument, install validator dependencies in a local
+  venv, run documented services detached before health probes, align the 70B
+  FAQ row, qualify economics estimates, and remove an unsupported GFLOPS claim.
+- The timestamp comment is not accepted as a history rewrite. The workstation
+  reports `2026-08-04` EEST/UTC while GitHub event timestamps lag that clock by
+  about ten hours; the existing append-only records faithfully capture the
+  local clock used during each event. A clarification is appended instead of
+  mutating historical evidence.
+- **Status:** `In Progress / Review fixes and refreshed gates`.
+
 ### 2026-08-02 14:28 EEST - PR #142 review fixes PASS
 
 - Protected head `ed001c3` passed all eleven CI/Security contexts. After the PR
@@ -2785,3 +2822,96 @@ No direct `main` push or production action occurred.
   occurred. Real model evidence, independent artifact provenance, semantic and
   adversarial quality, calibration, and production authority remain open.
 - **Status:** `Docs closeout local PASS / Protected PR next`.
+
+### 2026-08-04 10:28 EEST - GH-144 M-005 Guardian vLLM runtime started
+
+- Ticket `GIO-PROM-20260804-M005` and GitHub issue
+  [#144](https://github.com/NeaBouli/prometheus-/issues/144) own the next
+  repository-only P1 block on branch `feat/GH-144-vllm-runtime` from exact
+  green main `8ef16b0fba0dc83e9f7d6f96029ae205216af672`.
+- Scope is a reproducible, loopback-only, offline-model Guardian Compose
+  boundary: official `vllm/vllm-openai:v0.26.0` pinned to registry index digest
+  `sha256:ffb2d59b1c059a5bd8d781320c9f5189de8293693b7d95da54befddaa54abf52`,
+  non-root execution, read-only models, bounded writable surfaces/resources,
+  an opt-in 70B profile, structured validation/tests, CI, and factual public
+  documentation.
+- Kimi K3 receives the larger secret-free implementation slice. Claude Code
+  receives one small bounded read-only consistency check. Sol owns architecture,
+  security, integration, complete validation, GitHub actions, and closure.
+- No image pull, model download, HF token, live inference, real malware/private
+  telemetry, production authorization, remote endpoint, v2 operation, wallet,
+  signing, broadcast, deployment, chain, protocol, KAS/PROM, reputation,
+  slash ACL, commit-reveal, or emergency-stop change is in scope.
+- **Status:** `In Progress / Delegated implementation next`.
+
+### 2026-08-04 10:43 EEST - GH-144 implementation integrated and corrected
+
+- Kimi K3 completed the bounded Compose, structured-validator, focused-test,
+  dependency, and operator-documentation implementation. Sol reviewed every
+  changed line before integration.
+- Sol found and fixed a P1 reachability defect: binding vLLM to the container's
+  `127.0.0.1` would make Docker's published port unreachable. vLLM now listens
+  on the isolated container interface while host publication remains exactly
+  `127.0.0.1`; the internal network still blocks external egress.
+- Global `container_name` values were removed and automatic restart was changed
+  to explicit `restart: "no"`. The fail-closed policy and regression suite now
+  enforce these decisions. CI has a named structural boundary gate plus strict
+  format and lint coverage for the new Python files.
+- PASS so far: structured validator, 29 focused tests, Black, Pylint 10.00/10,
+  and diff hygiene. No Docker/Compose executable is available locally, so
+  rendered configuration, image contents, healthcheck tooling, GPU startup,
+  and live inference remain unverified operational evidence.
+- Claude Code was invoked through its explicit local path for a small read-only
+  helper check, but its OAuth session had expired; it produced no output and
+  changed no file. Kimi receives the final independent read-only review while
+  Sol runs the complete repository-relevant gates.
+- **Status:** `In Progress / Full verification and independent review`.
+
+### 2026-08-04 10:59 EEST - GH-144 full local gates PASS
+
+- Sol incorporated Kimi's independent PASS review and closed every suggested
+  hardening item: exact nested `deploy`, healthcheck, network and project-name
+  policy checks; 32 focused adversarial regressions; and realistic public
+  hardware floors of 24 GB VRAM for unquantized 8B and 256 GB system RAM for
+  the 70B profile.
+- CI now performs a real `docker compose --profile 70b config --quiet` render
+  before the structured boundary validator. This render will execute on the
+  GitHub runner because Docker/Compose is unavailable on the workstation; it
+  does not pull an image or start a container.
+- PASS: structured validator, focused `32 passed`, complete Guardian `915
+  passed / 4 skipped`, Black (29 files), focused Pylint 10.00/10, full Pylint
+  9.84/10, Memory Integrity, six Autodidactic tests, workflow YAML, Actionlint
+  1.7.12, HTML/SEO/public-status checks, pip-audit with no known
+  vulnerabilities, Gitleaks 8.30.0, and diff hygiene.
+- The first complete-suite attempt used Kimi's intentionally minimal temporary
+  environment and stopped during collection on missing project dependencies;
+  a fresh Python 3.12 environment installed from the repository requirements
+  then passed the complete suite. CI remains authoritative for Python 3.11.
+- Kimi's final delta review is next. No Docker image/model pull, GPU runtime,
+  live inference, secret, wallet, signing, broadcast, chain, deployment, or
+  production action occurred.
+- **Status:** `Local PASS / Final delta review next`.
+
+### 2026-08-04 11:06 EEST - GH-144 independent final review PASS
+
+- Kimi K3 completed the final read-only delta review after Sol incorporated
+  every earlier recommendation. Verdict: PASS with no remaining P0/P1/P2/P3.
+- Independently rechecked: validator exit 0, all 32 focused tests, exact nested
+  policy coverage, workflow/Compose YAML, valid Compose CLI ordering, public
+  24 GB/256 GB hardware consistency, no secret, no product/protocol scope, and
+  the exact Docker Hub manifest-list digest for `v0.26.0`.
+- Non-blocking residuals remain explicit: no local Docker render/image/GPU/live
+  inference; historical append-only hardware wording and duplicate log mirrors
+  are preserved; runtime image contents are not proven by an image pull.
+- **Status:** `Local Done / Protected PR next`.
+
+### 2026-08-04 11:21 EEST - PR #145 review-fix PASS authoritative EOF
+
+- The complete review-fix delta passed Sol's local gates: validator, focused
+  `33 passed`, Guardian `916 passed / 4 skipped`, Black, Pylint,
+  Memory/Autodidactic, workflow YAML/Actionlint, Pages/status, Gitleaks, and
+  diff hygiene. No dependency changed.
+- Kimi K3 independently returned PASS with no P0/P1/P2/P3. Six accepted
+  CodeRabbit findings are fixed; the append-only timestamp comment is
+  dispositioned by documenting the workstation/GitHub clock difference.
+- **Status:** `Local PASS / Commit, push, refreshed protected checks`.
