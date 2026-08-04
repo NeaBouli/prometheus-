@@ -3073,3 +3073,32 @@ Rules for all dev agents:
 - No wallet, key, signature, signed transaction, broadcast, deployment or chain
   mutation occurred.
 - **Status:** `Local PASS / Protected PR next`.
+
+### 2026-08-04 - GH-9 readiness docs closeout started authoritative EOF
+
+- PR #150 is merged as exact main `9854c5e`; exact-main CI `30866401314`,
+  Security `30866401257`, and Pages `30866400606` pass.
+- Issue #9 remains open; external BIP340 signing, full operator verification,
+  one-shot broadcast, network confirmation, a public `operator_record` receipt,
+  and independent node/explorer evidence remain.
+- No signing, broadcast, deployment, chain mutation or production action.
+- **Status:** `Documentation closeout in progress`.
+
+### 2026-08-04 - GH-9 readiness docs closeout local PASS authoritative EOF
+
+- Public docs, Memory and Bridge now publish merged PR #150 / exact main
+  `9854c5e` with exact-main runs `30866401314` / `30866401257` / `30866400606`.
+- Memory, six Autodidactic tests, HTML/SEO/infrastructure/status and diff checks
+  pass. Kimi K3 review: PASS, no P0/P1/P2/P3.
+- Issue #9 remains open for external BIP340 signing, full operator verification,
+  one-shot broadcast, network confirmation, a public `operator_record` receipt,
+  and independent node/explorer evidence.
+- **Status:** `Documentation closeout local PASS / Protected PR next`.
+
+### 2026-08-04 - PR #151 canonical gate-list review fix authoritative EOF
+
+- Accepted the single CodeRabbit finding; public docs and current Bridge records
+  now name signature, operator verification, broadcast, network confirmation,
+  public `operator_record` receipt, and independent node/explorer evidence.
+- Memory, six Autodidactic tests, HTML/SEO/infrastructure and diff checks pass.
+- **Status:** `Review fix local PASS / Refreshed protected checks next`.

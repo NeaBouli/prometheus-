@@ -896,3 +896,15 @@ Leistungsbasierte Emission. Guardians = "Miner" (KI statt GPU).
   separately approved one-shot broadcast, confirmation, receipt and independent
   evidence remain.
 - **Status:** `Readiness refresh local PASS / Independent review next`.
+
+## Checkpoint 2026-08-04: GH-9 readiness refresh merged exact-main authoritative EOF
+
+- PR #150 passed all ten CI/Security contexts plus CodeRabbit and merged
+  normally without bypass as exact main `9854c5e0f13586a502c2a80bbb3ac0d3a17648ad`.
+- Exact-main Prometheus CI `30866401314`, Security Audit `30866401257`, and
+  Pages `30866400606` pass. Issue #9 remains intentionally open.
+- Live README, Roadmap and Whitepaper expose the refreshed GH-9/H-001 status;
+  no signature or broadcast occurred.
+- External BIP340 signing, full operator verification, separately approved
+  one-shot broadcast, confirmation, receipt and independent evidence remain.
+- **Status:** `Readiness refresh merged / External execution gates remain`.
