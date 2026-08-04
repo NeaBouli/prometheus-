@@ -3081,8 +3081,9 @@ No direct `main` push or production action occurred.
 
 - PR #150 merged normally without bypass as exact main
   `9854c5e0f13586a502c2a80bbb3ac0d3a17648ad`; issue #9 remains intentionally
-  open because signing, broadcast, confirmation and independent evidence have
-  not occurred.
+  open because external BIP340 signing, full operator verification, one-shot
+  broadcast, network confirmation, a public `operator_record` receipt and
+  independent node/explorer evidence have not occurred.
 - Exact-main Prometheus CI `30866401314`, Security Audit `30866401257`, and
   Pages `30866400606` pass. This documentation-only closeout will reconcile the
   public status pages, Memory and Bridge with those final results.
@@ -3094,7 +3095,9 @@ No direct `main` push or production action occurred.
 
 - README, Markdown/HTML Roadmap, Whitepaper, `llms.txt`, Memory and Bridge now
   consistently record PR #150, exact main `9854c5e`, and green exact-main CI,
-  Security and Pages while retaining every external H-001 execution gate.
+  Security and Pages. They retain the external BIP340 signature, full operator
+  verification, one-shot broadcast, network confirmation, public
+  `operator_record` receipt, and independent node/explorer evidence gates.
 - PASS: Memory Integrity, six Autodidactic tests, five HTML parses, required
   SEO/infrastructure files, public-status stale-marker scan, and diff hygiene.
 - Kimi K3 independently verified PR/issue/run metadata, all ten CI/Security
@@ -3103,3 +3106,15 @@ No direct `main` push or production action occurred.
 - No wallet, secret, private key, signature, signed transaction, broadcast,
   deployment, chain mutation or production promotion occurred.
 - **Status:** `Documentation closeout local PASS / Protected PR next`.
+
+### 2026-08-04 - PR #151 canonical H-001 gate wording review fix authoritative EOF
+
+- Accepted CodeRabbit's single consistency finding and synchronized the current
+  readiness records to the canonical external sequence: BIP340 signature, full
+  operator verification, one-shot broadcast, network confirmation, public
+  `operator_record` receipt, and independent node/explorer evidence.
+- Memory Integrity, six Autodidactic tests, HTML parsing, SEO/infrastructure,
+  canonical-gate marker checks, and diff hygiene pass after the fix.
+- No product, protocol, wallet, key, signature, transaction, broadcast,
+  deployment or chain action occurred.
+- **Status:** `Review fix local PASS / Refreshed protected checks next`.

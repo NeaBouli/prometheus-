@@ -106,8 +106,9 @@ UTXO remained unspent/non-coinbase and the archive, request, and two
 signing-request builds stayed byte-identical to the accepted `205e1ca`
 baseline. PR #150 published the refresh as exact main `9854c5e`; CI
 `30866401314`, Security `30866401257`, and Pages `30866400606` pass on that
-commit. External signature, verified broadcast, receipt, and
-independent testnet-10 evidence remain required.
+commit. External signature, operator verification, one-shot broadcast, network
+confirmation, a public `operator_record` receipt, and independent testnet-10
+node/explorer evidence remain required.
 A public release-hardening evidence verifier binds successful CI, Pages,
 branch-control, rollback, and release-note checks to the exact release commit
 without querying GitHub, accepting credentials, changing repository settings,
