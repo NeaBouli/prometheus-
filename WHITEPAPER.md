@@ -385,7 +385,7 @@ BIP340 verifier.
 
 The local GH-147 candidate defines the source behind that snapshot and signer
 mapping. One exact schema-v1, network-bound and epoch-labelled canonical JSON
-document binds at least five sorted unique Guardian IDs one-to-one to
+document binds 5–1024 sorted unique Guardian IDs one-to-one to
 structurally valid public BIP340 x-only keys, fixed `8b` model tier, and model
 artifact digests. The SHA-256 is computed over the exact source bytes. Parsing
 rejects malformed, duplicate, missing, extra, reordered, noncanonical,

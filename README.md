@@ -156,8 +156,8 @@ Protected PR #145 squash-merged normally without bypass as exact main
 GitHub Pages `30858990507` pass on that SHA.
 
 **GH-147 canonical Guardian membership source (local candidate):** one exact
-schema-v1, network-bound and epoch-labelled JSON document now binds at least
-five sorted unique Guardian IDs one-to-one to structurally valid public BIP340
+schema-v1, network-bound and epoch-labelled JSON document now binds 5–1024
+sorted unique Guardian IDs one-to-one to structurally valid public BIP340
 x-only keys, the fixed `8b` tier, and model-artifact digests. Its raw-byte
 SHA-256 derives the existing `MembershipSnapshot`, while the same validated
 members derive the existing `BallotSigner` bindings. Parsing rejects duplicate,

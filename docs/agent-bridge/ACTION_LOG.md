@@ -2985,11 +2985,18 @@ Rules for all dev agents:
 
 ### 2026-08-04 11:56 EEST - GH-147 started
 
-- GH-144 fully closed at exact main `a2cbeb9` with final CI/Security/Pages green.
+- GH-144 product merged and verified as `95d05cc`; its later documentation
+  closeout produced exact main `a2cbeb9` with final CI/Security/Pages green.
 - Opened issue #147 and branch `feat/GH-147-guardian-membership-source` for the
   missing canonical membership source and public-key binding boundary.
 - Kimi owns the bounded module/vector/test slice; Sol owns integration and all
   external actions. No secret, signing, chain, transport or production scope.
+- Delegated files: `jaeger/guardian_membership_source.py`, its focused test, and
+  one public exact-byte vector plus SHA-256 sidecar only. Acceptance required
+  strict schema/order/network/member/key validation, owner-only descriptor-safe
+  loading, unchanged snapshot/signer APIs, and focused test/Black/Pylint PASS.
+- Required return: changed files, exact checks/results, and residual risks. No
+  private keys, agents, docs/Bridge/Memory, CI, Rust, external or production work.
 - **Status:** `In Progress / Implementation`.
 
 ### 2026-08-04 12:25 EEST - GH-147 local core verified
@@ -3011,3 +3018,11 @@ Rules for all dev agents:
 - Kimi's targeted re-review: PASS, no remaining P0/P1/P2/P3, protected PR ready.
 - Existing CI discovers the new test automatically; no workflow edit required.
 - **Status:** `Local PASS / Protected PR ready`.
+
+### 2026-08-04 12:50 EEST - PR #148 review fixes pass
+
+- Accepted six wording/test/delegation clarifications; preserved correct
+  Europe/Athens August 4 dates against three UTC-based false positives.
+- PASS: focused 198, Black, changed Pylint 10.00, Memory, six Autodidactic tests,
+  changed HTML, wording and diff hygiene.
+- **Status:** `Review fixes local PASS / Refreshed checks next`.

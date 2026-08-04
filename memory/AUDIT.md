@@ -2303,7 +2303,8 @@ Guardian IDs one-to-one to structurally valid unique public BIP340 x-only keys,
 fixed 8B tier, and model-artifact digests. Duplicate keys, malformed or
 reordered schemas, noncanonical bytes, wrong networks, invalid/shared keys, and
 conflicting IDs fail closed behind one redacted error. The raw source digest
-derives the existing ensemble snapshot and signer mapping without API changes.
+pins the existing ensemble snapshot; validated member fields derive the signer
+mapping without API changes.
 
 The POSIX-only loader requires an exact absolute path, an owner-only resolved
 parent and regular file, `O_NOFOLLOW`, pre-open versus descriptor identity and

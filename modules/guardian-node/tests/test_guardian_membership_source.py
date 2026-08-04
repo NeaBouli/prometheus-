@@ -47,6 +47,7 @@ _STABLE_MESSAGE = "invalid guardian membership source"
 _VECTORS = Path(__file__).parent / "vectors" / "guardian-membership-source-v1"
 _VECTOR_PATH = _VECTORS / "valid-mainnet-5-members.json"
 _VECTOR_DIGEST_PATH = _VECTORS / "valid-mainnet-5-members.sha256"
+_INVALID_ABSOLUTE_PATH = "/var/empty/guardian-membership-source.json"
 
 
 class _BytesSubclass(bytes):
@@ -523,10 +524,10 @@ def test_expected_network_fails_before_source_read(
     "bad_path",
     (
         "guardian-membership-source.json",
-        b"/tmp/guardian-membership-source.json",
+        _INVALID_ABSOLUTE_PATH.encode("ascii"),
         7,
         None,
-        _PathSubclass("/tmp/guardian-membership-source.json"),
+        _PathSubclass(_INVALID_ABSOLUTE_PATH),
     ),
 )
 def test_exact_absolute_path_required(bad_path: object) -> None:

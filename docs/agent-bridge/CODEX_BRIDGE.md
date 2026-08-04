@@ -2962,8 +2962,9 @@ No direct `main` push or production action occurred.
   entire diff and corrected one documentation-only field-order mismatch.
 - The source binds one network/epoch and 5–1024 sorted unique Guardian IDs
   one-to-one to structurally valid unique public BIP340 keys, fixed 8B tier and
-  model-artifact digests. Exact bytes derive the existing snapshot and signer
-  views through an owner-only, no-symlink, descriptor-verified POSIX loader.
+  model-artifact digests. Its exact-byte digest pins the existing snapshot;
+  validated member fields derive signer views. An owner-only, no-symlink,
+  descriptor-verified POSIX loader protects file access.
 - PASS: focused `198`; complete Guardian `1043 passed, 4 skipped`; Black `30`
   files; changed Pylint `10.00/10`; full Pylint `9.84/10`; vector digest and
   diff hygiene exact.
@@ -2989,3 +2990,21 @@ No direct `main` push or production action occurred.
   remain authoritative. No workflow change is needed because CI already runs
   the complete Guardian test discovery, Black and full Guardian Pylint.
 - **Status:** `Local PASS / Protected PR ready`.
+
+### 2026-08-04 12:50 EEST - PR #148 review fixes local PASS
+
+- All seven CodeRabbit threads were evaluated. Accepted: separate source digest
+  from signer derivation, scope owner-only to the loader, state the 5–1024 bound,
+  replace inert `/tmp` test literals, clarify GH-144 product/docs SHAs, and make
+  the Kimi delegation contract explicit.
+- Three date findings are invalid: the workstation and project use
+  Europe/Athens, where `date` returned `2026-08-04 12:50 EEST`; GitHub review
+  timestamps are UTC on August 3. Correct EEST records remain unchanged.
+- PASS after fixes: focused `198`; changed Black and Pylint `10.00/10`; Memory
+  Integrity; six Autodidactic tests; changed HTML; review wording; diff hygiene.
+  Product behavior and the exact public vector are unchanged.
+- The CodeRabbit docstring-coverage summary warning is non-authoritative and
+  inaccurate for the public API: all public source classes/functions already
+  have docstrings, while repository CI intentionally disables missing internal
+  helper docstrings and passed full Pylint.
+- **Status:** `Review fixes local PASS / Commit and refreshed protected checks`.
