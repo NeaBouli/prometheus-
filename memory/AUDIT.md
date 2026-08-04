@@ -2333,3 +2333,23 @@ External source authority, key ownership/rotation, Sybil resistance, multi-host
 operation, Kaspa-L1 ensemble attestation and production authority remain open.
 No private key, signing, transport, wallet, chain, reputation, token, deployment
 or production behavior changed.
+
+## 2026-08-04 - GH-9 exact-main H-001 readiness refresh
+
+Exact green main `48b3b74d126aebf6e9e1abcd7af28b432c635c25` reproduced
+the accepted `205e1ca` seven-artifact archive and schema-v2 signing request
+byte-for-byte. The canary request retains canonical hashes
+`b9f4d7a5ee72148165e5479e67551197682f416eb91d3155c4abba9f4fe2f6ed`
+and `c0cad33f23acfee4114092e0211dd642cb97c44891cc8f8826f4656f406f42fa`.
+
+Live read-only resolver and funding preflight reached synced, UTXO-indexed
+`rusty-kaspa 2.0.1` above Toccata activation and reconfirmed the exact public
+funding output unspent/non-coinbase at virtual DAA `534442816`. Two signing
+request builds are byte-identical with request hash `6b8e6506...fa5323` and
+sighash `174ccbe8...e0bcd`. Owner-only modes pass and Gitleaks 8.30.0 found no
+leak in the 1.27-MB public handoff.
+
+No wallet, wallet hint, private key, signature, signed transaction, broadcast,
+deployment or chain mutation occurred. External BIP340 signing, full import and
+transaction verification, separately approved one-shot broadcast, confirmation,
+receipt and independent public evidence remain.
