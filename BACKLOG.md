@@ -1,12 +1,12 @@
 # prometheus — Backlog
 
 ## 🔴 Aktiv (diese Session)
-- Latest documented green baseline is exact main `8ef16b0fba0dc83e9f7d6f96029ae205216af672`; run `git log --oneline -1` for the current working HEAD.
-- Prometheus CI `30727878700`, Security Audit `30727878697`, and GitHub Pages `30727878479` are green for exact main. Current-Silverc CI validates the keyless Toccata-v1 operator, operator runbook, request/receipt/evidence pipeline, release-readiness audit, metrics-oracle handoff, exact-commit hardening gates, and the strict release performance gate.
+- Latest documented green baseline is exact main `95d05ccb246c75f89a79d3601180907452f6b4dc`; run `git log --oneline -1` for the current working HEAD.
+- Prometheus CI `30858991436`, Security Audit `30858991557`, and GitHub Pages `30858990507` are green for exact main. Current-Silverc CI validates the keyless Toccata-v1 operator, operator runbook, request/receipt/evidence pipeline, release-readiness audit, metrics-oracle handoff, exact-commit hardening gates, and the strict release performance gate.
 - GH-131/M-002, GH-132, GH-135/M-001, GH-138/M-003, and GH-141/M-004 are merged and exact-main verified. GH-135 strictly parses separate model-provided integer basis points, replaces the indicator-count/YARA-shape heuristic, preserves the `0.85` policy, and fails closed on malformed output.
 - GH-138/M-003 provides deterministic, internally SHA-256-consistent synthetic confidence evaluation. Its co-versioned manifest is not an external tamper anchor and it does not establish live-model quality, production calibration, or authorization.
 - GH-141/M-004 is merged and exact-main verified at `bf3f74f`: a literal-loopback, proxy-independent runner captures canonical local-model candidate predictions and an offline evaluator keeps them non-authorizing. No live result or independently verified model artifact is included.
-- GH-144/M-005 is in progress: the repository is replacing the mutable, broadly published Guardian vLLM Compose sketch with a pinned, loopback-only, offline-model, non-root and resource-bounded runtime plus structured CI validation. No image/model pull or live inference is included.
+- GH-144/M-005 is merged and exact-main verified at `95d05cc`: the mutable, broadly published Guardian vLLM Compose sketch is replaced by a pinned, loopback-only, offline-model, non-root and resource-bounded runtime plus structured CI validation. No image/model pull or live inference is included.
 - Runtime stub gates added for Rust client; current-Silverc contract gates now cover H-001, ValidatorStaking, GuardianReputation, RuleStorage, CommunityDonations, DevIncentivePool, and GovernanceAutoTuning.
 - Local current-Silverc release-bundle smoke now compiles all 7 fixtures through pinned upstream `silverc` and writes a deterministic manifest plus optional archive with source/artifact/script hashes; deploy preflight validates the bundle/operator public inputs, emits a Markdown operator runbook, and confirms upstream `silverc` has no network deploy command.
 - Deployment receipt verifier validates public receipt records against the release bundle, rejects secret-like fields, and keeps synthetic `ci_fixture` receipts separate from real `operator_record` deployment evidence.
@@ -42,7 +42,7 @@
 3. **[P1] Sprint 10B: Guardian Decentralization** — GH-33/36/39 plus merged/exact-main-verified GH-42/GH-44/GH-48/GH-52/GH-55/GH-58/GH-63 are implemented; GH-74 tracks the bounded hash-only v1 analyzer adapter. Production proof artifacts, a privacy-preserving concrete-observable channel, real two-host operation, broad discovery, trusted membership/key assignment and rotation, Sybil resistance, and an explicit on-chain-attestation decision follow.
 4. **[P2] fp_rate Oracle** — Q-003 current-Silverc contract gate uses signed metrics input; public report/request/result verification is covered; production external transaction assembly/signing/broadcast/deploy operation remains
 5. **[P2] M-003 / GH-138** — **MERGED / EXACT-MAIN PASS:** deterministic synthetic confidence evaluation and calibration machinery; live evidence remains open
-6. **[P1] M-005 / GH-144** — **IN PROGRESS:** reproducible, loopback-only and offline-model Guardian vLLM runtime hardening; no live evidence or production authority
+6. **[P1] M-005 / GH-144** — **MERGED / EXACT-MAIN PASS:** reproducible, loopback-only and offline-model Guardian vLLM runtime hardening at `95d05cc`; no live evidence or production authority
 7. **[P2] M-004 / GH-141** — **MERGED / EXACT-MAIN PASS:** local model candidate capture, prompt/model/corpus binding, atomic evidence, and offline verification; real model evidence and production authorization remain open
 8. **[P2] M-001 / GH-135** — **MERGED / EXACT-MAIN PASS:** strict closed-schema model confidence in integer basis points
 9. **[P2] M-002** — **MERGED / EXACT-MAIN PASS:** repeated-sample debug smoke gate plus strict `--release` one-millisecond CI gate

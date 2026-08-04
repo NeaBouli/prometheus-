@@ -1220,3 +1220,16 @@ Boundary: no live model/result/download, independently proven artifact,
           semantic/adversarial quality, production calibration or authority;
           no v2 operation, wallet, deployment, chain, protocol or token action
 ```
+
+## GH-144 M-005 MERGED EXACT-MAIN (2026-08-04)
+
+```text
+Status: Done / merged / exact-main verified; documentation closeout in progress
+PR/SHA: #145 / 95d05ccb246c75f89a79d3601180907452f6b4dc
+Runs: CI 30858991436; Security 30858991557; Pages 30858990507
+Review: all seven CodeRabbit threads answered/resolved; six accepted findings
+        fixed; timestamp finding dispositioned append-only; 11 green contexts
+Boundary: no image/model pull, live inference, independently proven artifact,
+          semantic/adversarial quality, calibration or production authority;
+          no wallet, signing, broadcast, deployment, chain or protocol action
+```

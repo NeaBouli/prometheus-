@@ -2278,3 +2278,17 @@ No live model/result/download, independently proven artifact provenance,
 semantic/adversarial quality certification, production calibration/authority,
 v2 operation, wallet, signing, broadcast, deployment, chain, protocol formula,
 KAS/PROM, reputation, slash ACL, commit-reveal, or emergency-stop change exists.
+
+## 2026-08-04 - GH-144 merge and exact-main verification
+
+PR #145 passed all eleven final protected contexts after six accepted review
+fixes and squash-merged normally without bypass as exact main
+`95d05ccb246c75f89a79d3601180907452f6b4dc`. Prometheus CI `30858991436`,
+Security Audit `30858991557`, and Pages `30858990507` pass. All seven review
+threads are answered and resolved. The live FAQ, roadmap, whitepaper and
+economics pages serve the merged hardware/runtime wording.
+
+No image/model pull, GPU execution, live inference, independently proven model
+artifact, semantic/adversarial quality certification, production calibration
+or authority, wallet, signing, broadcast, deployment, chain, protocol formula,
+KAS/PROM, reputation, slash ACL, commit-reveal, or emergency-stop change exists.
