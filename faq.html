@@ -420,7 +420,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
           <table class="faq-table">
             <tr><th>Model</th><th>Where</th><th>License</th><th>Role</th></tr>
             <tr><td>Phi-3-mini 3.8B</td><td>Light Client (your device)</td><td>MIT</td><td>Local anomaly detection</td></tr>
-            <tr><td>LLaMA 3 8B</td><td>Guardian Node (RTX 4070 Ti+)</td><td>Community</td><td>Threat analysis + YARA</td></tr>
+            <tr><td>LLaMA 3 8B</td><td>Guardian Node (24 GB NVIDIA GPU)</td><td>Community</td><td>Threat analysis + YARA</td></tr>
             <tr><td>LLaMA 3 70B</td><td>Guardian Node (4× A100)</td><td>Community</td><td>Deep analysis (primary)</td></tr>
           </table>
           <p>Proprietary models (GPT-4, Claude, Gemini) are black boxes — nobody can verify what they actually do with your data. For a security system whose core principle is transparency, they are structurally unsuitable. Open source models can be audited, self-hosted, and fine-tuned. Malware samples never leave the local environment.</p>
@@ -577,8 +577,8 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
             <tr><td>Light Client</td><td>Any device, 4 GB RAM, no GPU</td><td>$0 (existing device)</td></tr>
             <tr><td>Honeypot</td><td>Any internet-exposed server</td><td>~$5–20/mo VPS</td></tr>
             <tr><td>Validator</td><td>VPS 2 vCPU / 4 GB RAM + 10,000 KAS stake</td><td>~$20/mo VPS</td></tr>
-            <tr><td>Guardian (8B)</td><td>RTX 4070 Ti+, 16 GB VRAM</td><td>Own hardware</td></tr>
-            <tr><td>Guardian (70B)</td><td>4× A100/H100, 128 GB RAM</td><td>$500–2,000/mo cloud</td></tr>
+            <tr><td>Guardian (8B)</td><td>NVIDIA GPU, 24 GB VRAM</td><td>Own hardware</td></tr>
+            <tr><td>Guardian (70B)</td><td>4× A100/H100 80 GB, 256 GB RAM</td><td>$500–2,000/mo cloud</td></tr>
           </table>
           <p>The Guardian 8B option was specifically added to lower the barrier for smaller operators. The reputation system automatically filters out low-quality outputs — hardware alone does not guarantee influence.</p>
         </div></div>

@@ -291,7 +291,8 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
           <li class="done-item">Rust client: Kaspa RPC, YARA scanner, ZK stub</li>
           <li class="done-item">Phi-3 ONNX wrapper + anomaly detector</li>
           <li class="done-item">Fed-DART gradient client (stub)</li>
-          <li class="done-item">Docker vLLM + YARA generator + analyzer</li>
+          <li class="done-item">Guardian YARA generator + analyzer development foundation</li>
+          <li>GH-144 reproducible local vLLM runtime hardening under protected review; no live model evidence or production authority</li>
           <li class="done-item">Commit-Reveal voting + bond + slashing engine</li>
         </ul>
       </div>
@@ -393,6 +394,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
           <li class="done-item">Closed-schema model-provided YARA confidence in exact integer basis points; malformed output fails closed and the former indicator-count/text-shape heuristic is removed</li>
           <li class="done-item">Merged and exact-main-verified GH-138 deterministic, internally SHA-256-consistent 24-case synthetic confidence evaluation with the unchanged 8500-bps threshold, confusion matrix, exact-ratio precision/recall, Brier score, and ten-bin calibration error; offline-only and non-authorizing, with no external tamper anchor</li>
           <li class="done-item">Merged and exact-main-verified GH-141: literal-loopback, proxy-independent model scoring; canonical corpus, public served-model ID, caller-supplied artifact digest, and pinned prompt binding; atomic owner-only predictions and offline-only non-authorizing evaluation</li>
+          <li>GH-144 implementation candidate: version-and-digest-pinned vLLM, loopback-only host publication, local read-only offline weights, non-root execution, internal networking, bounded resources, 8B default and opt-in 70B profile, plus structured CI validation; no pull, live inference, provenance, calibration, or authority</li>
           <li class="done-item">Local 5+ Guardian complete-ballot validation with canonical commitments and strict majority</li>
           <li class="done-item">Transport-neutral BIP340 ballot intake with persistent replay and equivocation protection</li>
           <li class="done-item">Real Guardian ballot carrier with exact bounded frames and end-to-end QUIC-to-collector ACK tests</li>
@@ -688,13 +690,13 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
       </tr>
       <tr>
         <td>Guardian (8B)</td>
-        <td>RTX 4070 Ti+ · 16 GB VRAM</td>
+        <td>NVIDIA GPU · 24 GB VRAM</td>
         <td>LLaMA 3 8B. Consumer GPU viable. 500+ GFLOPS.</td>
         <td>Own hardware</td>
       </tr>
       <tr>
         <td>Guardian (70B)</td>
-        <td>4× A100/H100 · 128 GB RAM</td>
+        <td>4× A100/H100 80 GB · 256 GB RAM</td>
         <td>LLaMA 3 70B. Primary model. Highest reputation potential.</td>
         <td>$500–2,000 / mo cloud</td>
       </tr>

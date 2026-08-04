@@ -2444,10 +2444,27 @@ jobs:
           python-version: '3.11'
       - name: Install dependencies
         run: pip install -r modules/guardian-node/requirements.txt
+      - name: Render Guardian vLLM Compose
+        run: >-
+          docker compose --profile 70b
+          -f modules/guardian-node/docker-compose.yml
+          config --quiet
+      - name: Guardian vLLM Compose Boundary
+        run: python3 scripts/verify_guardian_vllm_compose.py
       - name: Format Check (black)
-        run: black --check modules/guardian-node/jaeger/
+        run: >-
+          black --check
+          modules/guardian-node/jaeger/
+          scripts/verify_guardian_vllm_compose.py
+          modules/guardian-node/tests/test_guardian_vllm_compose.py
       - name: Lint (pylint)
         run: pylint modules/guardian-node/jaeger/ --fail-under=7.0 --disable=C0114,C0115,C0116
+      - name: Lint Guardian vLLM Compose Boundary
+        run: >-
+          pylint
+          scripts/verify_guardian_vllm_compose.py
+          modules/guardian-node/tests/test_guardian_vllm_compose.py
+          --fail-under=10.0 --disable=C0114,C0115,C0116
       - name: Tests
         run: cd modules/guardian-node && PYTHONPATH=. python -m pytest tests/ --tb=short
       - name: Local Model Evidence Boundary

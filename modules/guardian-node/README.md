@@ -6,29 +6,71 @@ for the Prometheus decentralized threat intelligence network.
 ## Hardware Requirements
 
 ### LLaMA 3 8B (Default — Architecture Decision #16)
-- **GPU:** NVIDIA RTX 4070 Ti or better (12-16 GB VRAM minimum)
+- **GPU:** NVIDIA GPU with at least 24 GB VRAM (RTX 3090/4090 class or better)
 - **RAM:** 32 GB system RAM
 - **Storage:** 20 GB for model weights
 - **OS:** Linux with NVIDIA drivers + CUDA 12.x
 
 ### LLaMA 3 70B (Escalation — Architecture Decision #16)
 - **GPU:** 4x NVIDIA A100 or H100 (80 GB each)
-- **RAM:** 128 GB system RAM
+- **RAM:** 256 GB system RAM
 - **Storage:** 150 GB for model weights
 - **OS:** Linux with NVIDIA drivers + CUDA 12.x
 
-## Quick Start (8B)
+## Local vLLM Runtime (GH-144 / M-005)
+
+`docker-compose.yml` defines a fail-closed, loopback-only local inference
+boundary: the exact official image
+`vllm/vllm-openai:v0.26.0@sha256:ffb2d59b1c059a5bd8d781320c9f5189de8293693b7d95da54befddaa54abf52`,
+`pull_policy: never`, host ports bound to literal `127.0.0.1`, an internal
+Docker network with no outbound path, read-only local model mounts, forced
+`HF_HUB_OFFLINE`/`TRANSFORMERS_OFFLINE`, non-root UID:GID `2000:0`, all
+capabilities dropped, `no-new-privileges`, a read-only root filesystem,
+bounded tmpfs/pids/memory/shm, and no host IPC. The Compose file accepts and
+requires no `HF_TOKEN` or any other secret.
+
+vLLM listens on `0.0.0.0` only inside that isolated container network so
+Docker can forward the published port. The host-side binding remains literal
+`127.0.0.1`; the structural gate rejects wildcard host publication.
+
+This is non-authorizing runtime machinery. It performs and authorizes no
+model download, live evidence collection, calibration, network submission,
+or production rollout; those remain separate gates.
+
+### Operator preflight (deliberate, separate steps)
 
 ```bash
-# 1. Download model weights
+cd modules/guardian-node
+
+# 1. Provision model weights locally (no download happens at compose time).
+#    Only caller-provisioned local directories are used, mounted read-only:
 mkdir -p models
-# Download Meta-Llama-3-8B-Instruct to ./models/
+#    place weights at ./models/Meta-Llama-3-8B-Instruct/
+#    and, for the 70B profile, ./models/Meta-Llama-3-70B-Instruct/
 
-# 2. Start the guardian node
+# 2. Pull the exact pinned image by digest as a separate deliberate step.
+#    pull_policy is "never", so compose up will NOT fetch it for you:
+docker pull vllm/vllm-openai:v0.26.0@sha256:ffb2d59b1c059a5bd8d781320c9f5189de8293693b7d95da54befddaa54abf52
+
+# 3. Verify the rendered compose configuration:
+docker compose config
+
+# 4. Run the fail-closed structural validator (PyYAML 6.0.3):
+python3 ../../scripts/verify_guardian_vllm_compose.py
+```
+
+### Run the 8B service (default)
+
+```bash
 docker compose up guardian-8b
+curl http://127.0.0.1:8000/health
+```
 
-# 3. Verify health
-curl http://localhost:8000/health
+### Run the 70B service (opt-in profile)
+
+```bash
+docker compose --profile 70b up guardian-70b
+curl http://127.0.0.1:8001/health
 ```
 
 ## Running the Analyzer

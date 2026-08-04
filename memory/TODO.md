@@ -72,7 +72,7 @@
 
 ## ═══ SPRINT 4: GUARDIAN NODE (Woche 6-7) ═══
 
-- [ ] [P1] Docker-Compose für Guardian-Node erstellen (8B + 70B Variante) | Claude Code | -
+- [~] [P1] GH-144/M-005 Guardian-vLLM-Compose reproduzierbar und fail-closed härten (8B + opt-in 70B) | Codex Sol + Kimi K3 | Exact main `8ef16b0`; pinned image/loopback/offline/non-root/resource gate in progress; kein Pull, Download, Live-Modell oder Produktionsnachweis
 - [ ] [P1] vLLM Server für LLaMA 3 8B einrichten (llm_server.py) | Claude Code | Docker
 - [ ] [P1] YARA-Regel-Generator implementieren (yara_generator.py) | Claude Code | llm_server.py
 - [x] [P2] GH-141 lokale Modellkandidaten-Evidence erfassen und offline verifizieren | Codex Sol + Kimi K3 | PR #142 squash-merged und exact-main verifiziert als `bf3f74f`; CI `30727224584`, Security `30727224572`, Pages `30727224235`. Kein Live-Modelllauf oder Produktionsnachweis enthalten

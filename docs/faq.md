@@ -164,8 +164,8 @@ The highest per-report reward goes to Honeypot operators
 
 **Q: What hardware do I need?**
 Light Client: any device with 4 GB RAM, no GPU required.
-Guardian (8B model): RTX 4070 Ti or better, 16 GB VRAM.
-Guardian (70B model): 4x A100/H100, 128 GB RAM.
+Guardian (8B model): NVIDIA GPU with 24 GB VRAM (RTX 3090/4090 class).
+Guardian (70B model): 4x A100/H100 80 GB, 256 GB system RAM.
 Validator: standard VPS, 2 vCPU, 4 GB RAM + 10,000 KAS stake.
 Honeypot: any internet-exposed server.
 
@@ -190,8 +190,8 @@ Windows, macOS, Linux, and mobile. It handles local anomaly
 detection — the first line of defense on your device.
 
 LLaMA 3 (Meta, Community License) runs on Guardian Nodes.
-The 8B variant requires an RTX 4070 Ti or better. The 70B variant
-requires 4x A100/H100. It handles deep threat analysis and
+The unquantized 8B runtime requires a 24 GB NVIDIA GPU. The 70B variant
+requires 4x A100/H100 80 GB GPUs. It handles deep threat analysis and
 YARA rule generation.
 
 Proprietary models (GPT-4, Claude, Gemini) are black boxes —

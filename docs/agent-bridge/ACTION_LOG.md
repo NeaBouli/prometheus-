@@ -2835,6 +2835,30 @@ Rules for all dev agents:
   boundaries remain excluded.
 - **Status:** `In Progress / Delegation next`.
 
+### 2026-08-04 10:59 EEST - GH-144 full local verification PASS TRUE EOF
+
+- Integrated Kimi's PASS recommendations, raised public hardware floors to
+  operationally plausible values, closed nested validator drift, and added the
+  non-starting CI Compose render for both profiles.
+- PASS: validator, focused 32, complete Guardian 915/4, Black 29, focused
+  Pylint 10.00, full Pylint 9.84, Memory/Autodidactic, YAML/Actionlint 1.7.12,
+  Pages/status checks, pip-audit, Gitleaks 8.30.0, and diff hygiene.
+- Docker/Compose, image/model/GPU/live inference remain unperformed locally;
+  CI will provide the Compose render. Kimi final delta review is next.
+- **Status:** `Local PASS / Final delta review next`.
+
+### 2026-08-04 10:43 EEST - GH-144 integration checkpoint
+
+- Integrated Kimi's bounded implementation and corrected the container-listen
+  versus host-publication boundary found by Sol review.
+- Removed fixed container names, disabled automatic restart, added CI gate and
+  two regressions. Validator, 29 tests, Black, Pylint 10.00/10, and diff check
+  pass.
+- Claude helper unavailable because its local OAuth session expired; no output
+  or write occurred. Docker/render/GPU/live-model validation remains explicitly
+  unperformed on this machine.
+- **Status:** `In Progress / Full gates plus Kimi review`.
+
 ### 2026-08-02 14:02 EEST - GH-141 local gates and independent review PASS
 
 - Integrated Kimi K3's bounded implementation, added Sol security hardening,
@@ -2885,3 +2909,33 @@ Rules for all dev agents:
   append-only history is preserved and GitHub UTC event data remains external
   authority. No product or external operational scope was added.
 - **Status:** `Docs closeout local PASS / Protected PR next`.
+
+### 2026-08-04 10:28 EEST - GH-144 M-005 started
+
+- Opened issue #144 and branch `feat/GH-144-vllm-runtime` from exact green main
+  `8ef16b0` for the bounded local Guardian vLLM runtime hardening block.
+- Official release `v0.26.0` and registry index digest `sha256:ffb2d59b...abf52`
+  were checked read-only. Kimi owns the bounded implementation slice; Claude
+  receives a small helper check; Sol owns integration and external actions.
+- Model/image download, secrets, live inference, production, v2 operations,
+  wallet, deployment, chain, protocol, and token behavior remain excluded.
+- **Status:** `In Progress / Delegation next`.
+
+### 2026-08-04 10:59 EEST - GH-144 full local PASS final mirror
+
+- The earlier 10:59 block was appended at a historical duplicate insertion
+  point. This final mirror preserves the append-only log and records the true
+  current EOF state.
+- Kimi's PASS recommendations are integrated: exact nested policy checks,
+  realistic 24 GB/256 GB hardware documentation, and CI Compose rendering.
+- PASS: validator, focused 32, complete Guardian 915/4, Black 29, focused
+  Pylint 10.00, full Pylint 9.84, Memory/Autodidactic, YAML/Actionlint 1.7.12,
+  Pages/status, pip-audit, Gitleaks 8.30.0, and diff hygiene.
+- **Status:** `Local PASS / Final Kimi delta review next`.
+
+### 2026-08-04 11:06 EEST - GH-144 Kimi final delta review PASS
+
+- Independent read-only verdict PASS; no P0/P1/P2/P3 remains.
+- Kimi rechecked validator + all 32 focused tests, nested policy coverage,
+  YAML/CI command form, public hardware consistency, digest, secrets and scope.
+- **Status:** `Local Done / Protected PR next`.
