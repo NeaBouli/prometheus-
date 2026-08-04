@@ -867,3 +867,16 @@ Leistungsbasierte Emission. Guardians = "Miner" (KI statt GPU).
   semantic/adversarial quality, calibration and production authority remain
   open and are not implied by this closeout.
 - **Status:** `Product Done / Documentation closeout in progress`.
+
+## Checkpoint 2026-08-04: GH-147 merged exact-main
+
+- PR #148 passed all eleven final protected contexts; all six inline review
+  threads are answered/resolved. It merged normally as exact main `aeecffb` and
+  issue #147 is closed.
+- Exact-main Prometheus CI `30863940497`, Security Audit `30863940502`, and Pages
+  `30863940053` pass. Live Whitepaper, roadmap and README markers were fetched.
+- The repository now has a canonical local Guardian membership/key-assignment
+  source and owner-only loader boundary, but no external source authority, key
+  ownership/rotation, Sybil resistance, multi-host proof, L1 attestation or
+  production authority.
+- **Status:** `Product Done / Documentation closeout in progress`.

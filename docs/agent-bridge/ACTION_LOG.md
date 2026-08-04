@@ -3026,3 +3026,23 @@ Rules for all dev agents:
 - PASS: focused 198, Black, changed Pylint 10.00, Memory, six Autodidactic tests,
   changed HTML, wording and diff hygiene.
 - **Status:** `Review fixes local PASS / Refreshed checks next`.
+
+### 2026-08-04 12:59 EEST - GH-147 product merged
+
+- PR #148 merged normally as exact main `aeecffb`; issue #147 is closed.
+- Exact-main CI `30863940497`, Security `30863940502`, and Pages `30863940053`
+  pass; live GH-147 public markers were fetched.
+- Documentation-only closeout started; no product or external runtime action.
+- **Status:** `Product Done / Docs closeout in progress`.
+
+### 2026-08-04 13:07 EEST - GH-147 docs closeout local PASS
+
+- Public README, Whitepaper, Roadmap, Backlog, `llms.txt`, Memory and Bridge now
+  consistently record PR #148 merged as exact main `aeecffb` with green
+  CI/Security/Pages runs `30863940497`/`30863940502`/`30863940053`.
+- PASS: Memory Integrity, six Autodidactic tests, HTML parsing, SEO,
+  infrastructure/status wording, stale GH-147 marker scan and diff hygiene.
+- Kimi K3 independent read-only review: no P0/P1/P2; both P3 line-wrap nits
+  fixed. External trust, key rotation, Sybil, multi-host, L1 and production
+  authority blockers remain explicit.
+- **Status:** `Docs closeout local PASS / Protected PR next`.
