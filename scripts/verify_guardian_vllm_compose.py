@@ -119,7 +119,6 @@ class ServicePolicy:  # pylint: disable=too-many-instance-attributes
         ]
         if self.tensor_parallel_size is not None:
             command += ["--tensor-parallel-size", str(self.tensor_parallel_size)]
-        command.append("--disable-log-requests")
         return command
 
     def expected_port(self) -> str:

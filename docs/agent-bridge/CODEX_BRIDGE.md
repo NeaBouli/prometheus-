@@ -2615,6 +2615,43 @@ No direct `main` push or production action occurred.
   signing, broadcast, deployment, chain, protocol, or token action occurred.
 - **Status:** `Local Done / Protected PR next`.
 
+### 2026-08-04 11:21 EEST - PR #145 review-fix gates PASS
+
+- Sol addressed all six accepted CodeRabbit findings: removed the obsolete
+  vLLM request-logging flag, added fail-closed regression coverage, made the
+  validator setup reproducible in a local venv, documented detached runtime
+  startup, aligned the 70B hardware row, qualified illustrative economics,
+  and removed the unsupported roadmap GFLOPS claim.
+- PASS: structured validator, focused `33 passed`, complete Guardian `916
+  passed / 4 skipped`, Black (29 files), focused Pylint 10.00/10, full Pylint
+  9.84/10, Memory Integrity, six Autodidactic tests, workflow YAML, Actionlint
+  1.7.12, HTML/SEO/public-status checks, Gitleaks 8.30.0, and diff hygiene.
+  Dependencies did not change; the prior clean pip-audit result remains valid.
+- Kimi K3 independently reviewed the complete uncommitted review-fix delta:
+  PASS, no P0/P1/P2/P3. Its local validator also passed; its optional pytest
+  rerun was unavailable in the isolated worker environment, while Sol's full
+  repository environment completed all 920 collected tests.
+- The seventh CodeRabbit comment concerns append-only local timestamps. No
+  history was rewritten: the workstation reports 2026-08-04 EEST, while the
+  GitHub event clock differs. This clarification is the audit disposition.
+- No image/model pull, GPU execution, live inference, secret, wallet, signing,
+  broadcast, chain, deployment, or production action occurred.
+- **Status:** `Local PASS / Commit, push, refreshed protected checks`.
+
+### 2026-08-04 11:15 EEST - PR #145 review fixes started
+
+- All eleven PR contexts passed, but CodeRabbit posted seven actionable
+  comments. Six are accepted: remove the vLLM 0.26-unsupported
+  `--disable-log-requests` argument, install validator dependencies in a local
+  venv, run documented services detached before health probes, align the 70B
+  FAQ row, qualify economics estimates, and remove an unsupported GFLOPS claim.
+- The timestamp comment is not accepted as a history rewrite. The workstation
+  reports `2026-08-04` EEST/UTC while GitHub event timestamps lag that clock by
+  about ten hours; the existing append-only records faithfully capture the
+  local clock used during each event. A clarification is appended instead of
+  mutating historical evidence.
+- **Status:** `In Progress / Review fixes and refreshed gates`.
+
 ### 2026-08-02 14:28 EEST - PR #142 review fixes PASS
 
 - Protected head `ed001c3` passed all eleven CI/Security contexts. After the PR
@@ -2867,3 +2904,14 @@ No direct `main` push or production action occurred.
   inference; historical append-only hardware wording and duplicate log mirrors
   are preserved; runtime image contents are not proven by an image pull.
 - **Status:** `Local Done / Protected PR next`.
+
+### 2026-08-04 11:21 EEST - PR #145 review-fix PASS authoritative EOF
+
+- The complete review-fix delta passed Sol's local gates: validator, focused
+  `33 passed`, Guardian `916 passed / 4 skipped`, Black, Pylint,
+  Memory/Autodidactic, workflow YAML/Actionlint, Pages/status, Gitleaks, and
+  diff hygiene. No dependency changed.
+- Kimi K3 independently returned PASS with no P0/P1/P2/P3. Six accepted
+  CodeRabbit findings are fixed; the append-only timestamp comment is
+  dispositioned by documenting the workstation/GitHub clock difference.
+- **Status:** `Local PASS / Commit, push, refreshed protected checks`.

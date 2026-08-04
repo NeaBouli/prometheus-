@@ -51,7 +51,10 @@ mkdir -p models/Meta-Llama-3-8B-Instruct
 From the repository root, validate the source policy before any runtime action:
 
 ```bash
-python3 scripts/verify_guardian_vllm_compose.py
+python3 -m venv .venv
+. .venv/bin/activate
+python -m pip install -r modules/guardian-node/requirements.txt
+python scripts/verify_guardian_vllm_compose.py
 ```
 
 The pinned image and model artifacts are separate operator-controlled inputs.
@@ -67,9 +70,9 @@ container network is internal.
 
 ```bash
 cd modules/guardian-node
-docker compose up guardian-8b
+docker compose up -d guardian-8b
 # Optional 70B escalation runtime:
-# docker compose --profile 70b up guardian-70b
+# docker compose --profile 70b up -d guardian-70b
 ```
 
 Verify health:

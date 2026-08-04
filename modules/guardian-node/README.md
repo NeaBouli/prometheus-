@@ -55,21 +55,25 @@ docker pull vllm/vllm-openai:v0.26.0@sha256:ffb2d59b1c059a5bd8d781320c9f5189de82
 # 3. Verify the rendered compose configuration:
 docker compose config
 
-# 4. Run the fail-closed structural validator (PyYAML 6.0.3):
-python3 ../../scripts/verify_guardian_vllm_compose.py
+# 4. Install the pinned validator dependency in a local virtual environment,
+#    then run the fail-closed structural validator:
+python3 -m venv .venv
+. .venv/bin/activate
+python -m pip install -r requirements.txt
+python ../../scripts/verify_guardian_vllm_compose.py
 ```
 
 ### Run the 8B service (default)
 
 ```bash
-docker compose up guardian-8b
+docker compose up -d guardian-8b
 curl http://127.0.0.1:8000/health
 ```
 
 ### Run the 70B service (opt-in profile)
 
 ```bash
-docker compose --profile 70b up guardian-70b
+docker compose --profile 70b up -d guardian-70b
 curl http://127.0.0.1:8001/health
 ```
 

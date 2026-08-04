@@ -210,6 +210,17 @@ def test_trust_remote_code_rejected() -> None:
     )
 
 
+def test_removed_request_logging_flag_rejected() -> None:
+    _assert_rejected(
+        lambda doc: _service(doc)["command"].append("--disable-log-requests"),
+        "command",
+    )
+    _assert_rejected(
+        lambda doc: _service(doc)["command"].append("--enable-log-requests"),
+        "command",
+    )
+
+
 def test_root_user_rejected() -> None:
     _assert_rejected(lambda doc: _service(doc).update(user="0:0"), "user")
     _assert_rejected(lambda doc: _service(doc).pop("user"), "user")

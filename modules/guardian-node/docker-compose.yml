@@ -17,14 +17,15 @@
 #     pids/memory/shm, no host IPC.
 #
 # Usage:
-#   8B (default):  docker compose up guardian-8b
-#   70B (opt-in):  docker compose --profile 70b up guardian-70b
+#   8B (default):  docker compose up -d guardian-8b
+#   70B (opt-in):  docker compose --profile 70b up -d guardian-70b
 #
 # Operator preflight (deliberate separate steps, see README.md):
 #   docker pull vllm/vllm-openai:v0.26.0@sha256:ffb2d59b1c059a5bd8d781320c9f5189de8293693b7d95da54befddaa54abf52
 #   # provision ./models/<Model-Dir> with locally obtained weights
-#   docker compose config
-#   python3 scripts/verify_guardian_vllm_compose.py
+#   docker compose --profile 70b config --quiet
+#   # install requirements in a local venv as documented in README.md
+#   python ../../scripts/verify_guardian_vllm_compose.py
 
 name: prometheus-guardian-vllm
 
@@ -63,7 +64,6 @@ services:
       - "8192"
       - --gpu-memory-utilization
       - "0.90"
-      - --disable-log-requests
     security_opt:
       - no-new-privileges:true
     cap_drop:
@@ -127,7 +127,6 @@ services:
       - "0.95"
       - --tensor-parallel-size
       - "4"
-      - --disable-log-requests
     security_opt:
       - no-new-privileges:true
     cap_drop:

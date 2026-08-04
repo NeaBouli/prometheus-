@@ -2714,6 +2714,23 @@ Rules for all dev agents:
 - Terra final review: PASS, no P0/P1/P2/P3. Kimi quota-blocked, no write.
 - **Status:** `Local Done / Protected PR next`.
 
+### 2026-08-04 11:21 EEST - PR #145 review-fix gates PASS (authoritative EOF)
+
+- Six accepted review findings are fixed; the append-only timestamp finding
+  is dispositioned with a local/GitHub clock clarification.
+- PASS: validator, focused 33, complete Guardian 916/4, Black 29, focused
+  Pylint 10.00, full Pylint 9.84, Memory/Autodidactic, YAML/Actionlint 1.7.12,
+  Pages/status, Gitleaks 8.30.0, and diff hygiene. No dependency changed.
+- Kimi K3 final review-fix verdict: PASS, no P0/P1/P2/P3.
+- **Status:** `Local PASS / Commit, push, refreshed protected checks`.
+
+### 2026-08-04 11:15 EEST - PR #145 review fixes started
+
+- Accepted six concrete runtime/docs comments, including the removed vLLM
+  argument as a real startup blocker. Historical timestamps remain append-only;
+  conflicting local/GitHub clocks are documented rather than rewritten.
+- **Status:** `In Progress / Fix, test, push`.
+
 ### 2026-08-02 14:28 EEST - PR #142 CodeRabbit findings fixed
 
 - Fixed both valid review findings: pinned-prompt enforcement in offline
@@ -2939,3 +2956,12 @@ Rules for all dev agents:
 - Kimi rechecked validator + all 32 focused tests, nested policy coverage,
   YAML/CI command form, public hardware consistency, digest, secrets and scope.
 - **Status:** `Local Done / Protected PR next`.
+
+### 2026-08-04 11:21 EEST - PR #145 review-fix PASS authoritative EOF
+
+- PASS: validator, focused 33, Guardian 916/4, Black, Pylint,
+  Memory/Autodidactic, YAML/Actionlint, Pages/status, Gitleaks, diff hygiene,
+  and Kimi K3 independent review with no P0/P1/P2/P3.
+- Six accepted review findings are fixed; append-only clock clarification is
+  recorded without rewriting history.
+- **Status:** `Local PASS / Commit, push, refreshed protected checks`.
