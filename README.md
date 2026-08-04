@@ -82,7 +82,7 @@ Guardian reputation is a separate canonical Kaspa L1 state in `GuardianReputatio
 | 1 — Contracts | ACCEPTED | 6 Silverscript contracts, 54 tests |
 | 2 — Client | ACCEPTED | Kaspa RPC, KRC-20 reader, YARA scanner, ZK stub |
 | 3 — AI | ACCEPTED | Phi-3 wrapper, anomaly detection, Fed-DART |
-| 4 — Guardian | CORE ACCEPTED / RUNTIME MERGED | YARA/analyzer foundation; merged GH-144 hardens reproducible local vLLM operation without live evidence |
+| 4 — Guardian | CORE ACCEPTED / MEMBERSHIP SOURCE MERGED | YARA/analyzer foundation; GH-144 hardens local vLLM operation and GH-147 binds canonical local membership/key assignments without production trust |
 | 5 — Voting | ACCEPTED | Commit-Reveal, bond system, slashing engine |
 | 6 — E2E | ACCEPTED | Development-stub lifecycle fixture and security tests; test foundation, not production evidence |
 | 7 — Dashboard | ACCEPTED | Audit dashboard, documentation |
@@ -155,8 +155,9 @@ Protected PR #145 squash-merged normally without bypass as exact main
 `95d05cc`; Prometheus CI `30858991436`, Security Audit `30858991557`, and
 GitHub Pages `30858990507` pass on that SHA.
 
-**GH-147 canonical Guardian membership source (local candidate):** one exact
-schema-v1, network-bound and epoch-labelled JSON document now binds 5–1024
+**GH-147 canonical Guardian membership source (merged and exact-main
+verified):** one exact schema-v1, network-bound and epoch-labelled JSON
+document now binds 5–1024
 sorted unique Guardian IDs one-to-one to structurally valid public BIP340
 x-only keys, the fixed `8b` tier, and model-artifact digests. Its raw-byte
 SHA-256 derives the existing `MembershipSnapshot`, while the same validated
@@ -167,6 +168,11 @@ descriptor-verified file boundary. This proves local structural and assignment
 consistency only. It does not establish who may author the source, key ownership
 or rotation, Sybil resistance, multi-host operation, on-chain attestation,
 signing capability, or production authority.
+
+Protected PR #148 passed all eleven final contexts with all review threads
+resolved and squash-merged normally without bypass as exact main `aeecffb`.
+Prometheus CI `30863940497`, Security Audit `30863940502`, and GitHub Pages
+`30863940053` pass on that SHA.
 
 **GH-103 merged and exact-main verified — local ELF import extraction:** the Rust Threat Observable boundary can derive one checked `api_import` from exact caller-supplied Linux ELF bytes. It uses the pinned read-only `object` parser, accepts no path, import string, platform, format, or generic observable value, and derives `linux`/`elf` internally. Inputs are capped at 16 MiB and 4096 dynamic symbols; names must match the existing closed ASCII grammar, are byte-sorted and deduplicated, and one checked index is selected. Every result is local-only `review_required_v1`, with shared exact-byte vectors independently parsed by Python. This neither proves external artifact provenance nor authorizes disclosure, transport, proof acceptance, analysis, or publication.
 

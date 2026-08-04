@@ -383,8 +383,9 @@ exact ballot/ACK delivery and socket cleanup. A libp2p `PeerId`, static address,
 relay, or discovered route cannot assign a Guardian ID or bypass the existing
 BIP340 verifier.
 
-The local GH-147 candidate defines the source behind that snapshot and signer
-mapping. One exact schema-v1, network-bound and epoch-labelled canonical JSON
+Merged and exact-main-verified GH-147 defines the source behind that snapshot
+and signer mapping. One exact schema-v1, network-bound and epoch-labelled
+canonical JSON
 document binds 5–1024 sorted unique Guardian IDs one-to-one to
 structurally valid public BIP340 x-only keys, fixed `8b` model tier, and model
 artifact digests. The SHA-256 is computed over the exact source bytes. Parsing
@@ -399,6 +400,11 @@ prove real two-host relay/NAT operation or broad discovery, prevent Sybil
 identities, submit a proposal, or prove an ensemble on Kaspa L1. No production
 private-key or signing API is included. Those remain production protocol and
 deployment gates.
+
+Protected PR #148 passed all eleven final contexts with all review threads
+resolved and squash-merged normally without bypass as exact main `aeecffb`.
+Prometheus CI `30863940497`, Security Audit `30863940502`, and GitHub Pages
+`30863940053` pass on that SHA.
 
 ---
 

@@ -14,15 +14,16 @@ Start:    2026-07-08
 Goal:     Complete the non-promotable H-001 canary, then the full state-contract, oracle, ZK, P2P, and release-evidence path.
 ```
 
-## GH-147 LOCAL MEMBERSHIP-SOURCE CANDIDATE (2026-08-04)
+## GH-147 MEMBERSHIP SOURCE MERGED / EXACT-MAIN VERIFIED (2026-08-04)
 
 ```text
-Status: local implementation and Sol verification PASS; protected review next
-Baseline: a2cbeb97e4287a1fc1ad65f1a50d59460aab3fa9
+Status: Done; PR #148 merged normally and issue #147 closed
+Exact main: aeecffb10a4f2978579b0d211b1052d18758520c
 Scope: exact schema-v1 canonical membership source for one network/epoch;
        owner-only bounded load; derived existing snapshot/signer mappings
 Evidence: focused 198 pass; Guardian 1043 pass/4 skip; Black 30;
-          changed Pylint 10.00; full Pylint 9.84; vector digest exact
+          changed Pylint 10.00; full Pylint 9.84; vector digest exact;
+          CI 30863940497; Security 30863940502; Pages 30863940053
 Boundary: structural/public-key assignment consistency only; no source trust,
           key ownership/rotation, Sybil resistance, chain attestation, signing,
           transport, deployment, or production authority

@@ -2319,3 +2319,17 @@ specification-order wording issue. PASS: 198 focused tests; complete Guardian
 9.84/10; exact vector sidecar and clean diff. Source authorship/trust, key
 ownership/rotation, Sybil resistance, multi-host operation, L1 attestation,
 production authority, protected review, merge, and exact-main evidence remain.
+
+## 2026-08-04 - GH-147 merge and exact-main verification
+
+PR #148 passed all eleven final protected contexts with all six inline review
+threads answered and resolved. It squash-merged normally without bypass as
+exact main `aeecffb10a4f2978579b0d211b1052d18758520c`; issue #147 is closed.
+Prometheus CI `30863940497`, Security Audit `30863940502`, and Pages
+`30863940053` pass on that SHA. Live Whitepaper, roadmap and README GH-147
+markers were fetched successfully.
+
+External source authority, key ownership/rotation, Sybil resistance, multi-host
+operation, Kaspa-L1 ensemble attestation and production authority remain open.
+No private key, signing, transport, wallet, chain, reputation, token, deployment
+or production behavior changed.
