@@ -3046,3 +3046,30 @@ Rules for all dev agents:
   fixed. External trust, key rotation, Sybil, multi-host, L1 and production
   authority blockers remain explicit.
 - **Status:** `Docs closeout local PASS / Protected PR next`.
+
+### 2026-08-04 13:19 EEST - GH-9 exact-main refresh started authoritative EOF
+
+- Clean exact main `48b3b74` is green; branch
+  `chore/GH-9-readiness-refresh-48b3b74` owns the public, read-only rebuild.
+- Planned evidence: deterministic archive/request parity, live resolver/node and
+  public unspent-UTXO preflight, two byte-identical schema-v2 signing requests,
+  mode/leak checks and a repository evidence update.
+- No wallet, secret, private key, signature, signed transaction, broadcast,
+  deployment or production action.
+- **Status:** `In Progress / H-001 readiness refresh`.
+
+### 2026-08-04 13:36 EEST - GH-9 readiness refresh local PASS
+
+- Exact `48b3b74` release/archive/request/signing parity and live read-only
+  resolver/UTXO preflight pass; the funding output remains unspent/non-coinbase
+  at virtual DAA `534442816`.
+- Two schema-v2 requests are byte-identical to each other and accepted
+  `205e1ca`; owner-only modes pass and Gitleaks 8.30.0 reports zero leaks.
+- Public evidence, README, Pages sources, Roadmap, `llms.txt`, Memory and Bridge
+  are synchronized. Memory, six Autodidactic tests, JSON, HTML/SEO/status,
+  stale-marker and diff gates pass.
+- Kimi K3 final review: PASS. Sol fixed the ACTION_LOG EOF placement and clarified
+  ten CI/Security contexts plus the separate Pages deployment.
+- No wallet, key, signature, signed transaction, broadcast, deployment or chain
+  mutation occurred.
+- **Status:** `Local PASS / Protected PR next`.

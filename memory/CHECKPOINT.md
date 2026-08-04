@@ -880,3 +880,19 @@ Leistungsbasierte Emission. Guardians = "Miner" (KI statt GPU).
   ownership/rotation, Sybil resistance, multi-host proof, L1 attestation or
   production authority.
 - **Status:** `Product Done / Documentation closeout in progress`.
+
+## Checkpoint 2026-08-04: GH-9 exact-main readiness refresh authoritative EOF
+
+- Exact green main `48b3b74` reproduces the accepted `205e1ca` H-001 archive,
+  one-request canary and schema-v2 signing request byte-for-byte.
+- Live read-only preflight reconfirms a synced, UTXO-indexed post-Toccata
+  `rusty-kaspa 2.0.1` node and the public funding output unspent/non-coinbase at
+  virtual DAA `534442816`.
+- Two signing builds match; owner-only modes pass; Gitleaks 8.30.0 reports no
+  leak across the 1.27-MB handoff. Public evidence is versioned at
+  `docs/evidence/gh-9-h001-readiness-refresh-2026-08-04.json`.
+- No wallet, private key, signature, signed transaction, broadcast, deployment
+  or chain mutation occurred. External BIP340 signing, full verification,
+  separately approved one-shot broadcast, confirmation, receipt and independent
+  evidence remain.
+- **Status:** `Readiness refresh local PASS / Independent review next`.

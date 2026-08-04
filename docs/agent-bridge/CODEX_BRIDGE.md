@@ -3038,3 +3038,41 @@ No direct `main` push or production action occurred.
 - No product, protocol, secret, key, wallet, chain, token, deployment or
   production action occurred.
 - **Status:** `Documentation closeout local PASS / Protected PR next`.
+
+### 2026-08-04 13:19 EEST - GH-9 exact-main readiness refresh started
+
+- Started branch `chore/GH-9-readiness-refresh-48b3b74` from clean exact main
+  `48b3b74d126aebf6e9e1abcd7af28b432c635c25` after GH-147 documentation
+  closeout PR #149 and exact-main CI/Security/Pages passed.
+- Scope is read-only and public: rebuild the deterministic H-001 release and
+  canary request, reuse only the public funding specification, run live node and
+  unspent-UTXO preflight, and produce two byte-compared schema-v2 signing
+  requests plus refreshed public evidence.
+- No wallet file, wallet hint, seed, password, private key, signature, signed
+  transaction, broadcast, deploy, chain mutation or production promotion is
+  authorized or accessed. Any external BIP340 signature and one-shot broadcast
+  remain separate explicit gates.
+- `ssh sandbox` still fails with `Permission denied (publickey)`; this does not
+  block the public resolver-based GH-9 refresh but still blocks real two-host
+  Guardian evidence.
+- **Status:** `In Progress / Public exact-main rebuild and live preflight`.
+
+### 2026-08-04 13:36 EEST - GH-9 exact-main readiness refresh local PASS
+
+- Exact green main `48b3b74` reproduced the accepted `205e1ca` archive,
+  canonical canary request and schema-v2 signing request byte-for-byte.
+- Live read-only evidence confirms synced, UTXO-indexed `rusty-kaspa 2.0.1`,
+  active Toccata and the exact public funding outpoint unspent/non-coinbase at
+  virtual DAA `534442816` through the TLS public resolver.
+- Owner-only handoff modes and Gitleaks 8.30.0 pass with zero leaks. Public
+  evidence is versioned at
+  `docs/evidence/gh-9-h001-readiness-refresh-2026-08-04.json`.
+- PASS: Memory Integrity, six Autodidactic tests, evidence JSON, all five HTML
+  parses, SEO/infrastructure/status, stale current H-001 marker and diff hygiene.
+  Kimi K3 independently verified hashes, parity, safety, status and EOF appends;
+  final verdict PASS after the ACTION_LOG position and context-count wording
+  were corrected.
+- No wallet file/hint, secret, private key, signature, signed transaction,
+  broadcast, deployment or chain mutation occurred. External BIP340 signing and
+  separately approved one-shot execution remain the immediate blocker.
+- **Status:** `Local PASS / Protected PR next`.
