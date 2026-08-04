@@ -104,7 +104,9 @@ the mandatory funding-bound preflight. Public H-001 funding and the schema-v2
 request/digest were refreshed from exact main `48b3b74` on 2026-08-04; the live
 UTXO remained unspent/non-coinbase and the archive, request, and two
 signing-request builds stayed byte-identical to the accepted `205e1ca`
-baseline. External signature, verified broadcast, receipt, and
+baseline. PR #150 published the refresh as exact main `9854c5e`; CI
+`30866401314`, Security `30866401257`, and Pages `30866400606` pass on that
+commit. External signature, verified broadcast, receipt, and
 independent testnet-10 evidence remain required.
 A public release-hardening evidence verifier binds successful CI, Pages,
 branch-control, rollback, and release-note checks to the exact release commit

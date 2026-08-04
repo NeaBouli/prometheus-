@@ -3073,3 +3073,21 @@ Rules for all dev agents:
 - No wallet, key, signature, signed transaction, broadcast, deployment or chain
   mutation occurred.
 - **Status:** `Local PASS / Protected PR next`.
+
+### 2026-08-04 - GH-9 readiness docs closeout started authoritative EOF
+
+- PR #150 is merged as exact main `9854c5e`; exact-main CI `30866401314`,
+  Security `30866401257`, and Pages `30866400606` pass.
+- Issue #9 remains open; this scope only reconciles public docs, Memory and
+  Bridge with the verified merge.
+- No signing, broadcast, deployment, chain mutation or production action.
+- **Status:** `Documentation closeout in progress`.
+
+### 2026-08-04 - GH-9 readiness docs closeout local PASS authoritative EOF
+
+- Public docs, Memory and Bridge now publish merged PR #150 / exact main
+  `9854c5e` with exact-main runs `30866401314` / `30866401257` / `30866400606`.
+- Memory, six Autodidactic tests, HTML/SEO/infrastructure/status and diff checks
+  pass. Kimi K3 review: PASS, no P0/P1/P2/P3.
+- Issue #9 and all external signature/broadcast/evidence gates remain open.
+- **Status:** `Documentation closeout local PASS / Protected PR next`.

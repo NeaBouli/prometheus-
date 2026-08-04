@@ -3076,3 +3076,30 @@ No direct `main` push or production action occurred.
   broadcast, deployment or chain mutation occurred. External BIP340 signing and
   separately approved one-shot execution remain the immediate blocker.
 - **Status:** `Local PASS / Protected PR next`.
+
+### 2026-08-04 - GH-9 readiness documentation closeout started authoritative EOF
+
+- PR #150 merged normally without bypass as exact main
+  `9854c5e0f13586a502c2a80bbb3ac0d3a17648ad`; issue #9 remains intentionally
+  open because signing, broadcast, confirmation and independent evidence have
+  not occurred.
+- Exact-main Prometheus CI `30866401314`, Security Audit `30866401257`, and
+  Pages `30866400606` pass. This documentation-only closeout will reconcile the
+  public status pages, Memory and Bridge with those final results.
+- No wallet, secret, private key, signature, signed transaction, broadcast,
+  deployment, chain mutation or production promotion is in scope.
+- **Status:** `Documentation closeout in progress`.
+
+### 2026-08-04 - GH-9 readiness documentation closeout local PASS authoritative EOF
+
+- README, Markdown/HTML Roadmap, Whitepaper, `llms.txt`, Memory and Bridge now
+  consistently record PR #150, exact main `9854c5e`, and green exact-main CI,
+  Security and Pages while retaining every external H-001 execution gate.
+- PASS: Memory Integrity, six Autodidactic tests, five HTML parses, required
+  SEO/infrastructure files, public-status stale-marker scan, and diff hygiene.
+- Kimi K3 independently verified PR/issue/run metadata, all ten CI/Security
+  contexts plus CodeRabbit, append-only EOF order, referenced evidence, secret
+  safety and status consistency; verdict PASS with no P0/P1/P2/P3 findings.
+- No wallet, secret, private key, signature, signed transaction, broadcast,
+  deployment, chain mutation or production promotion occurred.
+- **Status:** `Documentation closeout local PASS / Protected PR next`.
