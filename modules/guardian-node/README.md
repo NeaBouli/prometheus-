@@ -171,6 +171,28 @@ input fails closed with no YARA output. This component does not discover or
 trust Guardians, submit proposals, or prove an ensemble on chain. Those are
 separate production gates.
 
+## Canonical Guardian Membership Source
+
+`jaeger.guardian_membership_source` defines the local schema-v1 source behind
+the snapshot digest and ballot signer mapping. One exact canonical JSON
+document is restricted to a separately trusted network and binds an epoch plus
+5–1024 sorted unique Guardian IDs one-to-one to structurally valid public
+BIP340 x-only keys, fixed model tier `8b`, and model-artifact SHA-256 values.
+The source digest is SHA-256 over the exact accepted bytes. The validated source
+derives the existing `MembershipSnapshot` and `BallotSigner` objects without
+changing either API.
+
+The parser rejects malformed JSON, duplicate keys, reordered/extra/missing
+fields, noncanonical bytes, invalid or shared public keys, unsorted/duplicate
+members, and network mismatch. The POSIX-only file loader requires an exact
+absolute path, owner-only parent and regular file, `O_NOFOLLOW`, descriptor
+identity checks, and a 300,000-byte bound. It performs no writes.
+
+This is local structural and assignment consistency, not identity authority.
+It includes no private keys or signing, key ownership/rotation, discovery,
+transport, Sybil resistance, on-chain attestation, reputation, or production
+authority.
+
 ## Authenticated Ballot Intake
 
 `BallotSession` binds one candidate, membership snapshot, network, validity

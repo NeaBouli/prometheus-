@@ -383,8 +383,19 @@ exact ballot/ACK delivery and socket cleanup. A libp2p `PeerId`, static address,
 relay, or discovered route cannot assign a Guardian ID or bypass the existing
 BIP340 verifier.
 
-This still does not establish that the membership source or key assignment is
-trustworthy, prove real two-host relay/NAT operation or broad discovery, prevent Sybil
+The local GH-147 candidate defines the source behind that snapshot and signer
+mapping. One exact schema-v1, network-bound and epoch-labelled canonical JSON
+document binds at least five sorted unique Guardian IDs one-to-one to
+structurally valid public BIP340 x-only keys, fixed `8b` model tier, and model
+artifact digests. The SHA-256 is computed over the exact source bytes. Parsing
+rejects malformed, duplicate, missing, extra, reordered, noncanonical,
+shared-key, and wrong-network input; a POSIX-only loader additionally requires
+an owner-only, no-symlink, bounded, descriptor-verified file. The validated
+source derives the existing snapshot and signer types without changing them.
+
+This proves local structural and key-assignment consistency only. It does not
+establish who may author or trust the source, prove key ownership or rotation,
+prove real two-host relay/NAT operation or broad discovery, prevent Sybil
 identities, submit a proposal, or prove an ensemble on Kaspa L1. No production
 private-key or signing API is included. Those remain production protocol and
 deployment gates.

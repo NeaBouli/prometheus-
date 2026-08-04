@@ -835,6 +835,24 @@ Leistungsbasierte Emission. Guardians = "Miner" (KI statt GPU).
   adversarial quality, production calibration and authority remain open.
 - **Status:** `Product Done / Documentation closeout in progress`.
 
+## Checkpoint 2026-08-04: GH-147 local membership-source candidate
+
+- From exact green main `a2cbeb9`, GH-147 defines one exact canonical local
+  schema-v1 source binding 5–1024 sorted unique Guardian IDs to unique public
+  BIP340 x-only keys, fixed 8B tier, model artifacts, network, and epoch.
+- Raw source SHA-256 derives the existing `MembershipSnapshot`; the same
+  validated source derives existing `BallotSigner` bindings without API drift.
+- Owner-only POSIX loading is absolute-path, no-symlink, bounded and
+  descriptor-verified; invalid schemas, identities, keys and file races fail
+  closed through one redacted error.
+- PASS: focused 198; complete Guardian 1043/4; Black 30; changed Pylint 10.00;
+  full Pylint 9.84; exact vector digest. Kimi implemented the bounded core;
+  Sol reviewed every line and corrected one specification wording mismatch.
+- This proves structural assignment consistency only. External source trust,
+  key ownership/rotation, Sybil resistance, multi-host evidence, L1 attestation,
+  protected review, exact-main verification and production operation remain.
+- **Status:** `Local PASS / Protected PR next`.
+
 ## Checkpoint 2026-08-04: GH-144 merged exact-main
 
 - PR #145 passed all eleven final protected contexts and squash-merged normally

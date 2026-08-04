@@ -2292,3 +2292,29 @@ No image/model pull, GPU execution, live inference, independently proven model
 artifact, semantic/adversarial quality certification, production calibration
 or authority, wallet, signing, broadcast, deployment, chain, protocol formula,
 KAS/PROM, reputation, slash ACL, commit-reveal, or emergency-stop change exists.
+
+## 2026-08-04 - GH-147 local membership-source audit
+
+**Result:** LOCAL PASS; protected review and exact-main verification remain.
+
+The candidate accepts only byte-exact canonical schema-v1 JSON for a separately
+trusted network and labelled epoch. It binds 5–1024 strictly sorted unique
+Guardian IDs one-to-one to structurally valid unique public BIP340 x-only keys,
+fixed 8B tier, and model-artifact digests. Duplicate keys, malformed or
+reordered schemas, noncanonical bytes, wrong networks, invalid/shared keys, and
+conflicting IDs fail closed behind one redacted error. The raw source digest
+derives the existing ensemble snapshot and signer mapping without API changes.
+
+The POSIX-only loader requires an exact absolute path, an owner-only resolved
+parent and regular file, `O_NOFOLLOW`, pre-open versus descriptor identity and
+size equality, bounded reads, and exact final length. Symlinked ancestors,
+owner/mode drift, descriptor swaps, short/growing reads, and unavailable POSIX
+controls fail closed. It performs no write, signing, network, database, wallet,
+chain, reputation, token, or deployment action.
+
+Sol independently reviewed the Kimi implementation and corrected one module
+specification-order wording issue. PASS: 198 focused tests; complete Guardian
+1043 passed/4 intentional skips; Black 30; changed Pylint 10.00/10; full Pylint
+9.84/10; exact vector sidecar and clean diff. Source authorship/trust, key
+ownership/rotation, Sybil resistance, multi-host operation, L1 attestation,
+production authority, protected review, merge, and exact-main evidence remain.
