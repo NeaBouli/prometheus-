@@ -3218,3 +3218,13 @@ Rules for all dev agents:
 - No production source, runtime, protocol, wallet, chain, contract, token, signing,
   deployment, secret, README, Whitepaper, or public Pages behavior changed.
 - **Status:** `GH-155 Local Done / Protected PR and exact-main evidence pending`.
+
+### 2026-08-09 13:31 EEST - GH-155 PR review correction EOF
+
+- PR #156 opened from commit `a70cbde`; protected CI and Security checks started.
+- CodeRabbit correctly found stale Backlog header metadata. The documented green
+  baseline, exact-main CI/Security/Pages run IDs, startflow baseline, and update
+  date now consistently describe the GH-152 closeout at exact main `d87d969`.
+- No code or product behavior changed in this correction. All protected checks
+  must rerun on the refreshed PR head before merge.
+- **Status:** `GH-155 PR #156 / Metadata correction pending push and checks`.

@@ -3218,3 +3218,13 @@ No direct `main` push or production action occurred.
   product behavior or public project claim. Bridge/Memory/Backlog carry the task
   state. No secret or external system action occurred.
 - **Status:** `GH-155 Local Done / Commit, protected PR, merge, exact-main pending`.
+
+### 2026-08-09 13:31 EEST - GH-155 PR review state authoritative EOF
+
+- PR #156 is the protected publication path. CodeRabbit's one valid finding was
+  stale `BACKLOG.md` header metadata, not product code.
+- The Backlog now names `d87d969` and exact-main runs CI `31307044838`, Security
+  `31307044850`, and Pages `31307044558`, with the matching 2026-08-09 update date.
+- Merge remains prohibited until the corrected exact PR head passes all required
+  CI/Security contexts and review.
+- **Status:** `GH-155 PR #156 / Corrected head not yet exact-main verified`.
