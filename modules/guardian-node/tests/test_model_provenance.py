@@ -87,8 +87,12 @@ def _make_tree(root: Path) -> dict[str, bytes]:
         "sub/deep/d.bin": b"deep",
     }
     (root / "sub" / "deep").mkdir(parents=True)
+    os.chmod(root, 0o700)
+    os.chmod(root / "sub", 0o700)
+    os.chmod(root / "sub" / "deep", 0o700)
     for relative, payload in contents.items():
         (root / relative).write_bytes(payload)
+        os.chmod(root / relative, 0o600)
     return contents
 
 
@@ -303,7 +307,10 @@ def test_parse_rejects_malformed_json_and_non_ascii() -> None:
     _expect_rejection(parse_model_provenance, b"{")
     _expect_rejection(parse_model_provenance, b"[1,2]\n")
     _expect_rejection(parse_model_provenance, b"\xc3\xb8\n")
-    _expect_rejection(parse_model_provenance, b'{"schema_version":1' + b"[" * 40000)
+    _expect_rejection(
+        parse_model_provenance,
+        b"[" * 40000 + b"0" + b"]" * 40000 + b"\n",
+    )
 
 
 def test_parse_rejects_missing_extra_reordered_and_duplicate_keys(
@@ -733,6 +740,24 @@ def test_write_failure_leaves_no_output(base: Path, monkeypatch) -> None:
         raise OSError("simulated write failure")
 
     proxy.write = failing_write
+    monkeypatch.setattr(provenance_module, "os", proxy)
+    _expect_rejection(write_model_provenance, manifest, output)
+    assert not output.exists()
+    leftovers = [p.name for p in base.iterdir() if p.name.startswith(".manifest")]
+    assert leftovers == []
+
+
+def test_write_fsync_failure_is_redacted_and_leaves_no_output(
+    base: Path, monkeypatch
+) -> None:
+    _, manifest = _build_tree(base)
+    output = base / "manifest.json"
+    proxy = _OsProxy(os)
+
+    def failing_fsync(_descriptor: int) -> None:
+        raise OSError("sensitive fsync failure")
+
+    proxy.fsync = failing_fsync
     monkeypatch.setattr(provenance_module, "os", proxy)
     _expect_rejection(write_model_provenance, manifest, output)
     assert not output.exists()

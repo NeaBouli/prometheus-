@@ -144,6 +144,7 @@ PYTHONPATH=. python -m jaeger.model_provenance \
   --model-dir /trusted/local/model \
   --output /owner-only/path/model-provenance.json
 
+vector_dir=tests/vectors/confidence-calibration-v1
 PYTHONPATH=. python -m jaeger.model_evidence \
   --corpus "$vector_dir/corpus.jsonl" \
   --model meta-llama/Meta-Llama-3-8B-Instruct \

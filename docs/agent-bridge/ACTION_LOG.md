@@ -3302,3 +3302,11 @@ Rules for all dev agents:
 - Docker Compose rendering is deferred to GitHub CI because Docker is absent
   locally. No live model, production, chain, wallet, secret, or deploy action.
 - **Status:** `GH-161 Implementation Complete / PR publication next`.
+
+### 2026-08-10 01:40 EEST - PR #162 review feedback resolved EOF
+
+- Addressed all five CodeRabbit comments: redacted `fsync` failure, clearer CLI
+  pairing, standalone docs command, umask-independent fixtures, recursive JSON
+  coverage, and exact-main-pending public status alignment.
+- Focused tests now pass `116/116`; Black and focused Pylint remain green.
+- **Status:** `GH-161 Implementation Complete / PR re-check next`.

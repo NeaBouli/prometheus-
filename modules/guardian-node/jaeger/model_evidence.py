@@ -266,9 +266,20 @@ def _main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--corpus", required=True, type=Path)
     parser.add_argument("--model", required=True)
     provenance = parser.add_mutually_exclusive_group(required=True)
-    provenance.add_argument("--model-sha256")
-    provenance.add_argument("--model-manifest", type=Path)
-    parser.add_argument("--model-dir", type=Path)
+    provenance.add_argument(
+        "--model-sha256",
+        help="legacy caller digest; cannot be combined with --model-dir",
+    )
+    provenance.add_argument(
+        "--model-manifest",
+        type=Path,
+        help="canonical provenance manifest; requires --model-dir",
+    )
+    parser.add_argument(
+        "--model-dir",
+        type=Path,
+        help="local directory verified against --model-manifest",
+    )
     parser.add_argument("--port", required=True, type=int)
     parser.add_argument("--output", required=True, type=Path)
     args = parser.parse_args(argv)

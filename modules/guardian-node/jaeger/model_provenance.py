@@ -212,7 +212,10 @@ def write_model_provenance(manifest: object, output_path: object) -> None:
     descriptor = _open_new_output(temporary)
     try:
         _write_descriptor(descriptor, manifest.canonical_bytes)
-        os.fsync(descriptor)
+        try:
+            os.fsync(descriptor)
+        except OSError:
+            raise ModelProvenanceError() from None
     except BaseException:
         os.close(descriptor)
         _best_effort_unlink(temporary)

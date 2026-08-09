@@ -3343,3 +3343,21 @@ No direct `main` push or production action occurred.
   explicit CI boundary coverage are synchronized with the exact local-byte
   claim and its upstream/live-served-model non-claims.
 - **Status:** `GH-161 Implementation Complete / Protected publication pending`.
+
+### 2026-08-10 01:40 EEST - PR #162 external review follow-up authoritative EOF
+
+- PR #162 passed all initial required GitHub checks and CodeRabbit completed
+  with five actionable minor comments plus one non-blocking repository-wide
+  docstring-coverage warning.
+- Sol resolved every actionable comment: manifest-file `fsync` now preserves
+  the stable redacted error contract; CLI pairing is explicit in help; the
+  README workflow defines its vector path; test fixtures are umask-independent;
+  deep JSON reaches the recursive parser path; and all public records now say
+  implementation complete but exact-main publication pending.
+- Added explicit `fsync` failure cleanup/redaction coverage. Post-review focused
+  provenance/evidence verification is `116 passed`; Black remains clean and
+  focused Pylint remains `9.98/10`.
+- Historical append-only `In Progress` entries remain historical. The latest
+  status and open TODO consistently require merge plus exact-main verification
+  before GH-161 is marked Done.
+- **Status:** `GH-161 Implementation Complete / Review feedback resolved / Re-check pending`.

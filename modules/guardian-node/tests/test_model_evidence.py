@@ -103,7 +103,10 @@ def _model_provenance_fixture(tmp_path: Path) -> tuple[Path, Path, str]:
     os.chmod(base, 0o700)
     model_dir = base / "model"
     model_dir.mkdir()
-    (model_dir / "weights.bin").write_bytes(b"candidate-weights")
+    os.chmod(model_dir, 0o700)
+    weights = model_dir / "weights.bin"
+    weights.write_bytes(b"candidate-weights")
+    os.chmod(weights, 0o600)
     manifest = build_model_provenance(model_dir)
     manifest_path = base / "model-provenance.json"
     write_model_provenance(manifest, manifest_path)
