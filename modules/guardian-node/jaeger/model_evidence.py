@@ -43,6 +43,12 @@ from jaeger.llm_server import (
     LlmServer,
     YaraConfidenceAssessment,
 )
+from jaeger.model_provenance import (
+    MAX_MODEL_MANIFEST_BYTES,
+    ModelProvenanceError,
+    parse_model_provenance,
+    verify_model_provenance,
+)
 
 MAX_MODEL_ID_LENGTH = 128
 MAX_TCP_PORT = 65_535
@@ -220,6 +226,28 @@ def _model_artifact_sha256(value: object) -> str:
     return value
 
 
+def _verified_model_artifact_sha256(
+    supplied_sha256: object,
+    manifest_path: object,
+    model_dir: object,
+) -> str:
+    """Resolve either legacy caller metadata or verified local provenance."""
+    if supplied_sha256 is not None:
+        if manifest_path is not None or model_dir is not None:
+            raise ModelEvidenceError()
+        return _model_artifact_sha256(supplied_sha256)
+    if not isinstance(manifest_path, Path) or not isinstance(model_dir, Path):
+        raise ModelEvidenceError()
+    try:
+        manifest = parse_model_provenance(
+            _read_bounded(manifest_path, MAX_MODEL_MANIFEST_BYTES)
+        )
+        verify_model_provenance(manifest, model_dir)
+    except (ConfidenceEvaluationError, ModelProvenanceError):
+        raise ModelEvidenceError() from None
+    return _model_artifact_sha256(manifest.artifact_sha256)
+
+
 def _tcp_port(value: object) -> int:
     """Require one literal integer TCP port in the valid range."""
     if type(value) is not int or not 1 <= value <= MAX_TCP_PORT:
@@ -237,13 +265,18 @@ def _main(argv: Sequence[str] | None = None) -> int:
     )
     parser.add_argument("--corpus", required=True, type=Path)
     parser.add_argument("--model", required=True)
-    parser.add_argument("--model-sha256", required=True)
+    provenance = parser.add_mutually_exclusive_group(required=True)
+    provenance.add_argument("--model-sha256")
+    provenance.add_argument("--model-manifest", type=Path)
+    parser.add_argument("--model-dir", type=Path)
     parser.add_argument("--port", required=True, type=int)
     parser.add_argument("--output", required=True, type=Path)
     args = parser.parse_args(argv)
     try:
         subject_id = _model_identifier(args.model)
-        subject_sha256 = _model_artifact_sha256(args.model_sha256)
+        subject_sha256 = _verified_model_artifact_sha256(
+            args.model_sha256, args.model_manifest, args.model_dir
+        )
         port = _tcp_port(args.port)
         _validate_output_target(args.output)
         corpus = parse_corpus(_read_bounded(args.corpus, MAX_CORPUS_BYTES))

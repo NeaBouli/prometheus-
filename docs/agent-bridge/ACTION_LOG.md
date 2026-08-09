@@ -3278,3 +3278,27 @@ Rules for all dev agents:
 - Readiness estimates remain unchanged and no production or secret-bearing
   action occurred.
 - **Status:** `GH-158 Done / Closeout publication next`.
+
+### 2026-08-10 00:50 EEST - GH-161 model provenance implementation started EOF
+
+- Created issue #161 and branch `feat/GH-161-model-artifact-provenance` from
+  clean exact main `fbd3733`.
+- Scope is exact local file hashing, canonical manifest production and
+  capture-time re-verification with adversarial filesystem tests.
+- No download, inference, external service, production approval, wallet,
+  signing, chain, deployment, token, or secret boundary is in scope.
+- **Status:** `GH-161 In Progress / Kimi design review complete`.
+
+### 2026-08-10 01:28 EEST - GH-161 implementation locally complete EOF
+
+- Kimi K3 delivered the isolated provenance module and 58 adversarial tests;
+  Sol reviewed, integrated, documented, and hardened it.
+- Preferred capture now derives and re-verifies an exact local model-directory
+  manifest digest before adapter construction; legacy caller digest remains
+  explicit compatibility only.
+- Focused `115 passed`; full Guardian `1116 passed, 4 skipped`; Python format
+  and lint, Memory/Autodidactic, Compose policy, Rust workspace, release
+  performance, Cargo Audit, docs/status, and diff checks pass.
+- Docker Compose rendering is deferred to GitHub CI because Docker is absent
+  locally. No live model, production, chain, wallet, secret, or deploy action.
+- **Status:** `GH-161 Implementation Complete / PR publication next`.

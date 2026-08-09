@@ -3294,3 +3294,52 @@ No direct `main` push or production action occurred.
   remains 50-55%. No wallet, key, signature, transaction, broadcast, chain,
   contract, token, production, deployment, or secret-bearing action occurred.
 - **Status:** `GH-158 Done / Public status current`.
+
+### 2026-08-10 00:50 EEST - GH-161 model artifact provenance started authoritative EOF
+
+- Issue #161 and branch `feat/GH-161-model-artifact-provenance` start from
+  clean exact main `fbd3733f27b672f8f50790b8eb38cfdd827a9a7f`.
+- Goal: add a bounded canonical owner-local model-directory manifest, derive
+  the candidate artifact digest from exact regular-file bytes, and re-verify
+  the manifest before local candidate prediction capture. Existing
+  `--model-sha256` behavior remains as explicit legacy compatibility.
+- Filesystem input must be absolute, read-only during hashing, trusted-owner
+  and non-group/world-writable, with no symlink, special-file, duplicate-inode,
+  path-escape, count/size overflow, or undetected mid-read mutation.
+- Kimi K3's read-only architecture review recommends this over operated
+  packaging of the deterministic non-actionable v2 test worker. Sol owns the
+  implementation diff, integration, security review, full tests, publication,
+  and exact-main verification.
+- This remains candidate evidence only. No upstream authenticity, served-model
+  identity, live inference, production artifact approval, semantic quality,
+  calibration, transport, wallet, signing, chain, deployment, or production
+  authority is claimed or changed.
+- **Status:** `GH-161 In Progress / Repository-only provenance`.
+
+### 2026-08-10 01:28 EEST - GH-161 implementation and pre-publication verification authoritative EOF
+
+- Added a strict canonical model-directory provenance builder/parser/verifier,
+  owner-only atomic manifest writer, CLI, and 58 focused adversarial tests.
+- Candidate capture now supports mutually exclusive legacy
+  `--model-sha256` or preferred `--model-manifest` plus `--model-dir` input.
+  Manifest parsing and full directory re-hashing complete before `LlmServer`
+  construction; mixed, missing, stale, or tampered provenance fails closed.
+- Kimi K3 implemented the isolated provenance core and independently reviewed
+  Sol's integration. Final review verdict is PASS with no P0-P2. All four P3
+  observations were resolved: generated manifests now respect the parser cap,
+  the parent directory receives a best-effort durability fsync, constants are
+  pinned in tests, and public symlink wording matches the implemented boundary.
+- Local verification passes: focused provenance/evidence `115 passed`; full
+  Guardian `1116 passed, 4 skipped`; Black clean; focused Pylint `9.98/10` and
+  full package `9.85/10`; Memory Integrity and all six Autodidactic tests;
+  repository Compose policy; Rustfmt, Clippy, full Rust workspace tests, and
+  release performance gate. Cargo Audit exits 0 with the eight already allowed
+  warnings. `git diff --check` passes.
+- Docker is not installed locally, so only the repository Compose policy ran;
+  GitHub CI remains the authority for actual Compose rendering. No model was
+  downloaded or run and no network, wallet, signing, chain, deployment,
+  production, token, secret, or authorization boundary changed.
+- Public README, Guardian README, backlog, roadmap, Whitepaper, `llms.txt`, and
+  explicit CI boundary coverage are synchronized with the exact local-byte
+  claim and its upstream/live-served-model non-claims.
+- **Status:** `GH-161 Implementation Complete / Protected publication pending`.
