@@ -102,10 +102,10 @@
 
 *Lokaler Handoff aktualisiert: 2026-07-29*
 
-## GH-152 local candidate - 2026-08-09
+## GH-152 merged and exact-main verified - 2026-08-09
 
 - [x] Governed schema v5 permanent 1:1:1 statement/approval/commitment pairing.
 - [x] V4 migration with empty outbox/results and preserved non-outbox state;
   nonempty-v4 fail-closed, retention, replay and rollback regressions.
 - [x] Full local gates and independent final review.
-- [ ] Protected PR, merge and exact-main evidence.
+- [x] Protected PR #153, merge `3d203aa`, exact-main CI/Security/Pages evidence.

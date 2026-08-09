@@ -3170,3 +3170,15 @@ No direct `main` push or production action occurred.
 - No implementation or security boundary changed; refreshed documentation gates
   and protected checks are required before merge.
 - **Status:** `Review fix local / Refreshed protected checks next`.
+
+### 2026-08-09 12:49 EEST - GH-152 canonical closeout authoritative EOF
+
+- PR #153 is merged; issue #152 is closed; canonical exact main is
+  `3d203aaf384f242c68ce8fcb418f2b8524fc995b`.
+- Exact-main runs pass: CI `31306353671`, Security `31306353670`, Pages
+  `31306353328`. Live public Whitepaper/Roadmap/FAQ markers pass.
+- Final public and internal records identify the feature as merged and
+  exact-main verified while retaining the non-production boundary.
+- No wallet, key, signature, transaction, broadcast, deployment, chain,
+  contract, token, production, or secret action occurred.
+- **Status:** `GH-152 Done / Next bounded candidate is sidecar CI stability`.

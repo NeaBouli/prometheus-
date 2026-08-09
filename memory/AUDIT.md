@@ -2396,3 +2396,10 @@ CodeRabbit's single actionable documentation finding was accepted. Migration
 requires only empty v4 outbox and result tables; authority, replay high-water,
 and approval-consumption state are preserved. Any retained outbox/result row
 fails closed unchanged. No implementation behavior changed.
+
+## 2026-08-09 - GH-152 merged exact-main audit closeout
+
+PR #153 merged as `3d203aa`; issue #152 closed. Exact-main CI `31306353671`,
+Security `31306353670`, and Pages `31306353328` pass. Live Whitepaper, Roadmap,
+and FAQ markers confirm schema v5 and exact migration wording. No production or
+external protocol authority changed.

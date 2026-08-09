@@ -1251,10 +1251,12 @@ Boundary: no image/model pull, live inference, independently proven artifact,
           no wallet, signing, broadcast, deployment, chain or protocol action
 ```
 
-## GH-152 GOVERNED V2 IDENTITY PAIRING LOCAL CANDIDATE (2026-08-09)
+## GH-152 GOVERNED V2 IDENTITY PAIRING MERGED / EXACT-MAIN VERIFIED (2026-08-09)
 
 ```text
-Status: In Progress / full local verification PASS / protected PR pending
+Status: Done / PR #153 merged / exact-main verified
+PR/SHA: #153 / 3d203aaf384f242c68ce8fcb418f2b8524fc995b
+Runs: CI 31306353671; Security 31306353670; Pages 31306353328
 Schema: governed v5; legacy remains v1
 Invariant: permanent per-ledger 1:1:1 statement digest / approval ID / observable commitment
 Migration: v4 outbox/results must be empty; authority/high-water/consumptions persist; any retained work/result fails closed unchanged

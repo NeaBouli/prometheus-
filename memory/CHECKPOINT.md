@@ -933,3 +933,9 @@ Leistungsbasierte Emission. Guardians = "Miner" (KI statt GPU).
 - Exact migration scope synchronized: empty v4 outbox/results only; persistent
   authority, high-water, and approval consumptions are retained.
 - **Status:** `Review fix local / Refreshed protected checks next`.
+
+## Checkpoint 2026-08-09: GH-152 exact-main complete
+
+- PR #153 / exact main `3d203aa`; CI `31306353671`, Security `31306353670`,
+  Pages `31306353328` all pass; live public markers verified.
+- **Status:** `Done / Next candidate: sidecar CI stability`.
