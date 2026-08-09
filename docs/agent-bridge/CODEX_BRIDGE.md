@@ -3160,3 +3160,13 @@ No direct `main` push or production action occurred.
 - No wallet, key, signature, proof authority, analyzer, transport, chain,
   contract, token, deployment, production, or secret action occurred.
 - **Status:** `GH-152 Full local PASS / Protected publication next`.
+
+### 2026-08-09 12:32 EEST - PR #153 exact migration-scope correction authoritative EOF
+
+- CodeRabbit correctly identified overly broad "empty v4 ledger/state" wording.
+- Canonical rule: only `approval_outbox` and `observable_analysis_results` must
+  be empty. Authority state, replay high-water, and approval consumptions are
+  preserved. Any retained row in either gated table fails closed unchanged.
+- No implementation or security boundary changed; refreshed documentation gates
+  and protected checks are required before merge.
+- **Status:** `Review fix local / Refreshed protected checks next`.

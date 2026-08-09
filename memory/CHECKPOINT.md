@@ -927,3 +927,9 @@ Leistungsbasierte Emission. Guardians = "Miner" (KI statt GPU).
   public-page, Rust workspace, performance, and dependency audit gates pass.
 - Docker-only Compose rendering and Gitleaks remain for protected CI.
 - **Status:** `Full local PASS / Protected PR next`.
+
+## Checkpoint 2026-08-09: PR #153 review wording fix
+
+- Exact migration scope synchronized: empty v4 outbox/results only; persistent
+  authority, high-water, and approval consumptions are retained.
+- **Status:** `Review fix local / Refreshed protected checks next`.

@@ -1257,7 +1257,7 @@ Boundary: no image/model pull, live inference, independently proven artifact,
 Status: In Progress / full local verification PASS / protected PR pending
 Schema: governed v5; legacy remains v1
 Invariant: permanent per-ledger 1:1:1 statement digest / approval ID / observable commitment
-Migration: empty exact v4 -> v5 lossless; nonempty v4 outbox/results fail closed unchanged
+Migration: v4 outbox/results must be empty; authority/high-water/consumptions persist; any retained work/result fails closed unchanged
 Tests: 63 focused; 1050 passed and 4 skipped full Guardian
 Review: Kimi PASS; no P0-P2 findings
 Boundary: no public API, proof authority, analyzer, transport, wallet, chain,

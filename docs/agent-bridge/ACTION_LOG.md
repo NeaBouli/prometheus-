@@ -3155,3 +3155,13 @@ Rules for all dev agents:
   notes are deliberate permanent table growth, forward-only v5 pairing coverage,
   and manual recovery for any nonempty v4 queue/result state.
 - **Status:** `GH-152 Full local PASS / Commit and protected PR next`.
+
+### 2026-08-09 12:32 EEST - PR #153 migration wording review fix authoritative EOF
+
+- Accepted CodeRabbit's single actionable finding: the migration gate concerns
+  only v4 outbox and result rows, not all v4 ledger state.
+- Public and current status records now state exactly that both tables must be
+  empty, while authority, replay high-water, and approval consumptions persist;
+  any retained outbox/result row remains unchanged and fails closed.
+- All initial protected technical and security checks passed on `def63a4`.
+- **Status:** `Review wording fixed locally / Refreshed protected checks next`.

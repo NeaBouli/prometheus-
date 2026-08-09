@@ -886,3 +886,8 @@ transaction as authority, high-water, approval consumption, and outbox enqueue.
 The table is permanent and is never subject to outbox/result retention.
 Empty exact v4 databases migrate to v5; nonempty v4 outbox or result state
 fails closed unchanged. Legacy schema v1 remains unchanged.
+
+**GH-152 migration clarification (2026-08-09):** "empty v4" applies only to
+`approval_outbox` and `observable_analysis_results`. Authority state, ledger
+high-water, and approval-consumption rows are preserved by migration. Any row in
+either gated table keeps the whole v4 database unchanged and fails closed.

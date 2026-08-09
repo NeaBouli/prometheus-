@@ -2389,3 +2389,10 @@ public-page checks; Rust fmt/Clippy/workspace tests/release performance; Cargo
 Audit with allowed warnings only; Pip Audit with no known vulnerabilities.
 Docker is unavailable locally, so protected CI remains authoritative for
 Compose rendering and Gitleaks.
+
+## 2026-08-09 - GH-152 migration wording correction
+
+CodeRabbit's single actionable documentation finding was accepted. Migration
+requires only empty v4 outbox and result tables; authority, replay high-water,
+and approval-consumption state are preserved. Any retained outbox/result row
+fails closed unchanged. No implementation behavior changed.
