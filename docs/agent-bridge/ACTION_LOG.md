@@ -3165,3 +3165,15 @@ Rules for all dev agents:
   any retained outbox/result row remains unchanged and fails closed.
 - All initial protected technical and security checks passed on `def63a4`.
 - **Status:** `Review wording fixed locally / Refreshed protected checks next`.
+
+### 2026-08-09 12:49 EEST - GH-152 merged exact-main verified authoritative EOF
+
+- PR #153 merged normally by squash as exact main
+  `3d203aaf384f242c68ce8fcb418f2b8524fc995b`; issue #152 closed.
+- CodeRabbit's one actionable wording finding was fixed in `9b14c9a`, answered,
+  and resolved before merge. The final PR head passed all ten protected checks.
+- Exact-main PASS: Prometheus CI `31306353671`, Security Audit `31306353670`,
+  and GitHub Pages `31306353328`.
+- Live Pages verification confirms schema-v5 and exact v4 outbox/result migration
+  wording in Whitepaper, Roadmap, and FAQ.
+- **Status:** `GH-152 Done / Merged and exact-main verified`.

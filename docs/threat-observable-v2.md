@@ -420,7 +420,8 @@ completion stores a canonical explicitly non-actionable result before deleting
 the queue row; `acknowledge` cannot bypass result durability. Expired records
 are removed at their inherited deadline.
 
-GH-152 advances governed durable-outbox ledgers to schema v5. The promotion
+Merged and exact-main-verified GH-152 advances governed durable-outbox ledgers
+to schema v5. The promotion
 transaction also inserts one permanent strict pairing row whose statement
 digest is the primary key and whose approval ID and observable commitment are
 independently unique. Outbox and result retention never removes this row, so a
