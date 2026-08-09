@@ -213,7 +213,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
     <p class="r d1" style="font-size:15px;font-weight:300;color:var(--silver-dim);max-width:560px;line-height:1.7;margin-top:16px">Decentralized AI-Powered Threat Intelligence on Kaspa. The complete technical specification.</p>
     <div class="page-meta r">
       <div class="page-meta-item">Version <span>4.0</span></div>
-      <div class="page-meta-item">Updated <span>July 2026</span></div>
+      <div class="page-meta-item">Updated <span>August 2026</span></div>
       <div class="page-meta-item">License <span>MIT</span></div>
       <div class="page-meta-item">Deploy <span>Operator built, evidence pending</span></div>
     </div>
@@ -340,6 +340,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
       <p>Merged and exact-main-verified GH-117, but not production-deployed, makes the authority and privacy policy enforceable across promotion, retention, proof precheck, and durable consumption. One exact owner policy fixes network, approver, recipient scope, authority epoch and window, same-Guardian local-analysis semantics, denied external disclosure, and one deny-or-risk-specific decision for every observable kind. All three policy kind sets must match. First valid use atomically pins all three exact policy-file digests and authority state; stale epochs, same-epoch changes, overlapping same-identity windows, replay, and failed inserts change no durable state. This is local enforcement only and grants no worker, transport, actionable analysis, publication, chain action, or production relation/key/ceremony approval.</p>
       <p>Merged and exact-main-verified GH-117, but not production-deployed, advances the governed queue to schema v4. The same <code>BEGIN IMMEDIATE</code> transaction stores the canonical statement and digest, trusted report nonce, full Observable Bundle, approval binding, authority state, replay high-water, and retention. Claims revalidate every binding and derive a lease-bound input identity. Atomic completion stores one canonical explicitly non-actionable result before deleting work and supports exact idempotent retry. Empty schema-v3 queues migrate; nonempty v3 queues fail closed unchanged. The bounded worker uses only a deterministic test analyzer and adds no confidence, <code>should_submit</code>, LLM, YARA/rule body, semantic finding, transport, disclosure, wallet, signature, transaction, chain, reward, deployment, or external effect.</p>
       <p>Merged and exact-main-verified GH-152, not production-deployed, advances governed ledgers to schema v5 with one permanent strict one-to-one-to-one binding of the exact statement digest, approval ID, and observable commitment in the same atomic promotion transaction. Fresh approvals cannot rebind accepted statements or commitments, and outbox/result retention cannot reopen replay. A v4 ledger migrates only when its outbox and result tables are empty; authority, replay high-water, and approval-consumption state are preserved. Any retained v4 outbox or result row fails closed unchanged. This adds no proof, privacy, analysis, transport, disclosure, wallet, chain, reward, deployment, or production authority.</p>
+      <p>Merged and exact-main-verified GH-155 hardens Guardian sidecar process integration tests by serializing shared cases, bounding diagnostics and waits, coordinating collector EOF/ACK shutdown, holding the relay-port reservation until spawn, and deterministically killing and reaping a real child on timeout. PR #156 published exact main <code>db33f56</code>; CI, Security, and Pages pass after 20 consecutive stress runs and complete review. This is test-infrastructure evidence only and changes no protocol, production behavior, H-001 readiness, core-rollout percentage, or roadmap percentage.</p>
       <div class="timeline">
         <div class="tl-time">t = 0s</div>
         <div class="tl-content"><strong>Light Client</strong> — Phi-3-mini detects anomaly. Artifact hash and privacy-filtered observable commitment computed. An approved, precisely scoped ZK-proof and data-minimal hint are sent to Guardian nodes.</div>
@@ -664,7 +665,7 @@ async def training_round(self):
 </div>
 
 <footer>
-  <div class="f-left">v4.0 · Updated July 2026</div>
+  <div class="f-left">v4.0 · Updated August 2026</div>
   <div class="f-center">PROMETHEUS</div>
   <ul class="f-links">
     <li><a href="faq.html">FAQ</a></li>

@@ -3243,3 +3243,40 @@ No direct `main` push or production action occurred.
 - README, Whitepaper, and public Pages need no content change for this test-only
   task. No production or secret-bearing boundary changed.
 - **Status:** `GH-155 Done / Next task may start from exact main db33f56`.
+
+### 2026-08-09 14:25 EEST - GH-158 public August status synchronization authoritative EOF
+
+- Issue #158 and branch `docs/GH-158-august-public-status` start from clean
+  exact main `14f07df5532f6c187d4ad47d2e88d6581a75ea9d`; no unrelated local diff or
+  open pull request exists.
+- Scope is public documentation consistency only: README, Pages status
+  surfaces, Whitepaper metadata, Roadmap, `llms.txt`, Memory and Bridge.
+- GH-155 may be recorded only as merged, exact-main-verified test
+  infrastructure hardening. It does not advance H-001 or rollout readiness.
+  H-001 remains 96% and core rollout remains 84-88%.
+- The H-001 artifact provenance remains bound to its 2026-08-04 refresh from
+  exact main `48b3b74` and published evidence at `9854c5e`; this task must not
+  rewrite that provenance as the newer repository HEAD.
+- No product code, wallet, key, signature, transaction, broadcast, chain,
+  contract, token, production deployment, or secret-bearing action is in scope.
+- **Status:** `GH-158 In Progress / Public docs only`.
+
+### 2026-08-09 14:36 EEST - GH-158 local public-status gate authoritative EOF
+
+- README, Markdown/HTML Roadmap, Whitepaper, `llms.txt`, and the homepage now
+  record GH-155 as test-only reliability evidence and retain H-001 at 96%, core
+  rollout at 84-88%, and the complete roadmap at 50-55%.
+- The homepage's stale 2026-07-31 / `143a8a0` H-001 marker now points to the
+  verified 2026-08-04 / `48b3b74` refresh. Published evidence remains correctly
+  attributed to PR #150 exact main `9854c5e`.
+- PASS: Memory Integrity, six Autodidactic tests, five HTML parses, homepage
+  JSON-LD parsing, SEO/infrastructure checks, public stale-marker checks, and
+  diff hygiene.
+- Kimi K3 independently verified live GH-155 run metadata, H-001 provenance,
+  percentage stability, Markdown/HTML consistency, append-only records, and
+  secret safety; verdict PASS with no P0-P2. Two non-blocking style notes were
+  accepted without change.
+- Gitleaks is unavailable locally; protected Security remains authoritative.
+  No product, wallet, signing, transaction, chain, deployment, token, or secret
+  action occurred.
+- **Status:** `GH-158 Local PASS / Protected PR next`.

@@ -3245,3 +3245,25 @@ Rules for all dev agents:
 - No wallet, key, secret, signature, transaction, chain, contract, token,
   production, or deployment action occurred.
 - **Status:** `GH-155 Done / Merged and exact-main verified`.
+
+### 2026-08-09 14:25 EEST - GH-158 public status synchronization started EOF
+
+- Created issue #158 and branch `docs/GH-158-august-public-status` from clean
+  exact main `14f07df` after all exact-main CI, Security, and Pages runs passed.
+- Public status will add the verified GH-155 test-reliability evidence and
+  refresh stale July metadata without changing H-001 96% or core rollout
+  84-88% readiness.
+- Product, protocol, wallet, signing, chain, deployment, token, and secret
+  boundaries are excluded.
+- **Status:** `GH-158 In Progress / Documentation consistency`.
+
+### 2026-08-09 14:36 EEST - GH-158 local documentation PASS EOF
+
+- Public README/Pages/Whitepaper/Roadmap/LLM status now records GH-155 test
+  reliability without changing rollout readiness and corrects the homepage to
+  the verified 2026-08-04 H-001 refresh provenance.
+- PASS: Memory Integrity, six Autodidactic tests, five HTML parses, index JSON-LD,
+  SEO/infrastructure/status markers, and diff hygiene.
+- Kimi read-only review PASS with no P0-P2 after live GitHub run and provenance
+  verification. Gitleaks is unavailable locally and remains a protected check.
+- **Status:** `GH-158 Local PASS / Commit and protected PR next`.
