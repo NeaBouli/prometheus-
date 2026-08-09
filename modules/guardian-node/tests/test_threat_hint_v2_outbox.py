@@ -47,6 +47,7 @@ from tests.test_threat_hint_v2_governed_promotion import (
     _authority_state,
     _governed_service,
     _schema_version,
+    _set_fresh_statement_identity,
     _write_governance_policy,
     _write_retention_policy,
 )
@@ -163,6 +164,16 @@ def _result_rows(ledger_path: Path) -> list[tuple]:
             """).fetchall()
 
 
+def _pairing_rows(ledger_path: Path) -> list[tuple]:
+    with sqlite3.connect(ledger_path) as connection:
+        return connection.execute("""
+            SELECT statement_digest, approval_id, observable_commitment,
+                   network_id, consumed_at
+            FROM threat_hint_v2_pairings
+            ORDER BY consumed_at ASC, statement_digest ASC
+            """).fetchall()
+
+
 def _table_names(ledger_path: Path) -> set[str]:
     with sqlite3.connect(ledger_path) as connection:
         return {
@@ -203,9 +214,12 @@ def _rotate_to_new_key(
     key: PrivateKey,
     *,
     epoch: int = 2,
+    report_nonce: bytes | None = None,
     **service_changes: object,
 ) -> ThreatHintV2PromotionService:
     key_hex = PublicKeyXOnly.from_secret(key.secret).format().hex()
+    if report_nonce is not None:
+        _set_fresh_statement_identity(scenario, key, report_nonce=report_nonce)
     _write_preflight_policy(
         scenario.directory,
         scenario.vector,
@@ -282,8 +296,11 @@ def test_governed_promotion_enqueues_full_bundle_in_one_atomic_commit(
     scenario = _Scenario(tmp_path)
     service = _governed_service(scenario)
     ledger = _ledger_path(scenario)
-    assert _schema_version(ledger) == 4
-    assert "approval_outbox" in _table_names(ledger)
+    assert _schema_version(ledger) == 5
+    assert {
+        "approval_outbox",
+        "threat_hint_v2_pairings",
+    }.issubset(_table_names(ledger))
     assert _outbox_rows(ledger) == []
 
     result = _promote(service, scenario)
@@ -315,6 +332,15 @@ def test_governed_promotion_enqueues_full_bundle_in_one_atomic_commit(
             scenario.statement_wire,
             statement.statement_digest(),
             scenario.report_nonce,
+        )
+    ]
+    assert _pairing_rows(ledger) == [
+        (
+            statement.statement_digest(),
+            result.approval_id,
+            result.observable_commitment,
+            scenario.vector["network_id"],
+            scenario.current_time,
         )
     ]
     assert _consumption_count(ledger) == 1
@@ -381,7 +407,7 @@ def test_governed_acceptance_without_promotion_creates_no_outbox(
     _accept(service, scenario)
 
     ledger = _ledger_path(scenario)
-    assert _schema_version(ledger) == 4
+    assert _schema_version(ledger) == 5
     assert "approval_outbox" in _table_names(ledger)
     assert _outbox_rows(ledger) == []
     assert _consumption_count(ledger) == 1
@@ -396,7 +422,10 @@ def test_full_outbox_rolls_back_all_states_and_approval_stays_usable(
     assert len(_outbox_rows(ledger)) == 1
 
     service = _rotate_to_new_key(
-        scenario, PrivateKey(), retention_max_pending_records=1
+        scenario,
+        PrivateKey(),
+        report_nonce=b"\xc1" * 32,
+        retention_max_pending_records=1,
     )
     with pytest.raises(ThreatHintV2PromotionUnavailableError):
         _promote(service, scenario)
@@ -448,6 +477,36 @@ def test_failed_outbox_insert_rolls_back_and_is_not_replay(tmp_path: Path) -> No
     assert _consumption_count(ledger) == 1
 
 
+def test_failed_pairing_insert_rolls_back_and_retry_succeeds(tmp_path: Path) -> None:
+    scenario = _Scenario(tmp_path)
+    service = _governed_service(scenario)
+    ledger = _ledger_path(scenario)
+    with sqlite3.connect(ledger) as connection:
+        connection.execute("""
+            CREATE TRIGGER reject_pairing
+            BEFORE INSERT ON threat_hint_v2_pairings
+            BEGIN
+                SELECT RAISE(ABORT, 'injected pairing failure');
+            END
+            """)
+
+    with pytest.raises(ThreatHintV2PromotionUnavailableError) as exc_info:
+        _promote(service, scenario)
+    assert "injected pairing failure" not in str(exc_info.value)
+    assert _authority_state(ledger) is None
+    assert _high_water(ledger) == 0
+    assert _consumption_count(ledger) == 0
+    assert _outbox_rows(ledger) == []
+    assert _pairing_rows(ledger) == []
+
+    with sqlite3.connect(ledger) as connection:
+        connection.execute("DROP TRIGGER reject_pairing")
+    _promote(service, scenario)
+    assert len(_outbox_rows(ledger)) == 1
+    assert len(_pairing_rows(ledger)) == 1
+    assert _consumption_count(ledger) == 1
+
+
 def test_replay_creates_exactly_one_outbox_record(tmp_path: Path) -> None:
     scenario = _Scenario(tmp_path)
     service = _governed_service(scenario)
@@ -458,6 +517,23 @@ def test_replay_creates_exactly_one_outbox_record(tmp_path: Path) -> None:
         _promote(service, scenario)
     with pytest.raises(ThreatHintV2PromotionReplayError):
         _promote(_governed_service(scenario), scenario)
+    assert len(_outbox_rows(ledger)) == 1
+    assert _consumption_count(ledger) == 1
+
+
+def test_fresh_approval_cannot_rebind_statement_or_commitment(tmp_path: Path) -> None:
+    scenario = _Scenario(tmp_path)
+    _promote(_governed_service(scenario), scenario)
+    ledger = _ledger_path(scenario)
+    service = _rotate_to_new_key(scenario, PrivateKey())
+
+    with pytest.raises(ThreatHintV2PromotionReplayError) as exc_info:
+        _promote(service, scenario)
+
+    rendered = str(exc_info.value)
+    assert rendered == "threat-hint v2 promotion replay"
+    assert scenario.vector["observable_commitment_hex"] not in rendered
+    assert len(_pairing_rows(ledger)) == 1
     assert len(_outbox_rows(ledger)) == 1
     assert _consumption_count(ledger) == 1
 
@@ -527,7 +603,10 @@ def test_claim_leases_oldest_records_in_deterministic_order(tmp_path: Path) -> N
     _promote(_governed_service(scenario), scenario)
     key = PrivateKey()
     scenario.current_time += 5
-    _promote(_rotate_to_new_key(scenario, key), scenario)
+    _promote(
+        _rotate_to_new_key(scenario, key, report_nonce=b"\xc2" * 32),
+        scenario,
+    )
     ledger = _ledger_path(scenario)
     rows = _outbox_rows(ledger)
     assert len(rows) == 2
@@ -600,7 +679,12 @@ def test_retention_cleanup_removes_deadline_passed_records_at_enqueue(
 
     scenario.current_time += 20
     _promote(
-        _rotate_to_new_key(scenario, PrivateKey(), retention_max_retention_seconds=10),
+        _rotate_to_new_key(
+            scenario,
+            PrivateKey(),
+            report_nonce=b"\xc5" * 32,
+            retention_max_retention_seconds=10,
+        ),
         scenario,
     )
 
@@ -625,6 +709,7 @@ def test_claim_atomically_purges_deadline_passed_records(tmp_path: Path) -> None
 
     assert claim is None
     assert _outbox_rows(ledger) == []
+    assert len(_pairing_rows(ledger)) == 1
 
 
 def test_schema_rejects_lease_past_retention_deadline(tmp_path: Path) -> None:
@@ -685,7 +770,7 @@ def test_v1_migration_preserves_consumption_and_enables_outbox(
     assert _schema_version(ledger) == 1
 
     service = _governed_service(scenario)
-    assert _schema_version(ledger) == 4
+    assert _schema_version(ledger) == 5
     assert "approval_outbox" in _table_names(ledger)
     with pytest.raises(ThreatHintV2PromotionReplayError):
         _promote(service, scenario)
@@ -694,7 +779,10 @@ def test_v1_migration_preserves_consumption_and_enables_outbox(
     assert _high_water(ledger) == scenario.current_time
 
     scenario.current_time += 5
-    _promote(_rotate_to_new_key(scenario, PrivateKey(), epoch=1), scenario)
+    _promote(
+        _rotate_to_new_key(scenario, PrivateKey(), epoch=1, report_nonce=b"\xc3" * 32),
+        scenario,
+    )
     assert _consumption_count(ledger) == 2
     assert len(_outbox_rows(ledger)) == 1
 
@@ -707,7 +795,7 @@ def test_v2_migration_preserves_consumption_high_water_and_authority(
     assert _schema_version(ledger) == 2
 
     service = _governed_service(scenario)
-    assert _schema_version(ledger) == 4
+    assert _schema_version(ledger) == 5
     assert "approval_outbox" in _table_names(ledger)
     with pytest.raises(ThreatHintV2PromotionReplayError):
         _promote(service, scenario)
@@ -717,12 +805,15 @@ def test_v2_migration_preserves_consumption_high_water_and_authority(
     assert _outbox_rows(ledger) == []
 
     scenario.current_time += 5
-    _promote(_rotate_to_new_key(scenario, PrivateKey(), epoch=1), scenario)
+    _promote(
+        _rotate_to_new_key(scenario, PrivateKey(), epoch=1, report_nonce=b"\xc4" * 32),
+        scenario,
+    )
     assert _consumption_count(ledger) == 2
     assert len(_outbox_rows(ledger)) == 1
 
 
-def test_empty_v3_outbox_migrates_to_v4_without_data_loss(tmp_path: Path) -> None:
+def test_empty_v3_outbox_migrates_to_v5_without_data_loss(tmp_path: Path) -> None:
     scenario = _Scenario(tmp_path)
     ledger = _create_v3_ledger(scenario, pending=False)
     assert _schema_version(ledger) == 3
@@ -730,7 +821,7 @@ def test_empty_v3_outbox_migrates_to_v4_without_data_loss(tmp_path: Path) -> Non
 
     _governed_service(scenario)
 
-    assert _schema_version(ledger) == 4
+    assert _schema_version(ledger) == 5
     assert _consumption_count(ledger) == 1
     assert _high_water(ledger) == scenario.current_time
     assert _outbox_rows(ledger) == []
@@ -738,7 +829,118 @@ def test_empty_v3_outbox_migrates_to_v4_without_data_loss(tmp_path: Path) -> Non
     assert {
         "approval_outbox",
         "observable_analysis_results",
+        "threat_hint_v2_pairings",
     }.issubset(_table_names(ledger))
+
+
+def test_empty_v4_migrates_to_v5_without_data_loss(tmp_path: Path) -> None:
+    scenario = _Scenario(tmp_path)
+    ledger = _create_v2_ledger(scenario)
+    _governed_service(scenario)
+    with sqlite3.connect(ledger) as connection:
+        connection.execute("DROP TABLE threat_hint_v2_pairings")
+        connection.execute("PRAGMA user_version = 4")
+    before_authority = _authority_state(ledger)
+    before_high_water = _high_water(ledger)
+    before_consumptions = _consumption_count(ledger)
+
+    _governed_service(scenario)
+
+    assert _schema_version(ledger) == 5
+    assert _authority_state(ledger) == before_authority
+    assert _high_water(ledger) == before_high_water
+    assert _consumption_count(ledger) == before_consumptions
+    assert _outbox_rows(ledger) == []
+    assert _result_rows(ledger) == []
+    assert _pairing_rows(ledger) == []
+
+
+def test_idle_used_v4_migrates_to_v5_with_authority_and_consumption(
+    tmp_path: Path,
+) -> None:
+    scenario = _Scenario(tmp_path)
+    _promote(_governed_service(scenario), scenario)
+    ledger = _ledger_path(scenario)
+    with sqlite3.connect(ledger) as connection:
+        connection.execute("DELETE FROM approval_outbox")
+        connection.execute("DROP TABLE threat_hint_v2_pairings")
+        connection.execute("PRAGMA user_version = 4")
+    before_authority = _authority_state(ledger)
+    before_high_water = _high_water(ledger)
+    before_consumptions = _consumption_count(ledger)
+    assert before_authority is not None
+    assert before_consumptions == 1
+
+    _governed_service(scenario)
+
+    assert _schema_version(ledger) == 5
+    assert _authority_state(ledger) == before_authority
+    assert _high_water(ledger) == before_high_water
+    assert _consumption_count(ledger) == before_consumptions
+    assert _outbox_rows(ledger) == []
+    assert _result_rows(ledger) == []
+    assert _pairing_rows(ledger) == []
+
+
+@pytest.mark.parametrize("retained_table", ["approval_outbox", "results"])
+def test_nonempty_v4_fails_closed_and_remains_unchanged(
+    tmp_path: Path,
+    retained_table: str,
+) -> None:
+    scenario = _Scenario(tmp_path)
+    _promote(_governed_service(scenario), scenario)
+    ledger = _ledger_path(scenario)
+    if retained_table == "results":
+        with sqlite3.connect(ledger) as connection:
+            approval_id = connection.execute(
+                "SELECT approval_id FROM approval_consumptions"
+            ).fetchone()[0]
+            connection.execute("DELETE FROM approval_outbox")
+            connection.execute(
+                """
+                INSERT INTO observable_analysis_results (
+                    approval_id, result_wire, result_digest, input_identity,
+                    completion_token_digest, completed_at, retention_deadline
+                ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    approval_id,
+                    b"{}",
+                    b"\x11" * 32,
+                    b"\x22" * 32,
+                    b"\x33" * 32,
+                    scenario.current_time,
+                    scenario.current_time + 60,
+                ),
+            )
+    with sqlite3.connect(ledger) as connection:
+        connection.execute("DROP TABLE threat_hint_v2_pairings")
+        connection.execute("PRAGMA user_version = 4")
+    before_outbox = _outbox_rows(ledger)
+    before_results = _result_rows(ledger)
+
+    with pytest.raises(ThreatHintV2PromotionUnavailableError):
+        _governed_service(scenario)
+
+    assert _schema_version(ledger) == 4
+    assert _outbox_rows(ledger) == before_outbox
+    assert _result_rows(ledger) == before_results
+    assert "threat_hint_v2_pairings" not in _table_names(ledger)
+
+
+def test_wrong_pairing_schema_fails_closed(tmp_path: Path) -> None:
+    scenario = _Scenario(tmp_path)
+    _governed_service(scenario)
+    ledger = _ledger_path(scenario)
+    with sqlite3.connect(ledger) as connection:
+        connection.execute("DROP TABLE threat_hint_v2_pairings")
+        connection.execute(
+            "CREATE TABLE threat_hint_v2_pairings (injected INTEGER) STRICT"
+        )
+
+    with pytest.raises(ThreatHintV2PromotionUnavailableError):
+        _governed_service(scenario)
+    assert _schema_version(ledger) == 5
 
 
 def test_nonempty_v3_outbox_fails_closed_and_leaves_database_unchanged(
@@ -803,10 +1005,10 @@ def test_v3_wrong_outbox_shape_fails_closed(tmp_path: Path) -> None:
     with pytest.raises(ThreatHintV2PromotionUnavailableError):
         _governed_service(scenario)
 
-    assert _schema_version(ledger) == 4
+    assert _schema_version(ledger) == 5
 
 
-def test_v4_downgrade_to_v2_with_outbox_fails_closed(tmp_path: Path) -> None:
+def test_v5_downgrade_to_v2_with_outbox_fails_closed(tmp_path: Path) -> None:
     scenario = _Scenario(tmp_path)
     _governed_service(scenario)
     ledger = _ledger_path(scenario)
@@ -819,7 +1021,7 @@ def test_v4_downgrade_to_v2_with_outbox_fails_closed(tmp_path: Path) -> None:
     assert _schema_version(ledger) == 2
 
 
-def test_v4_downgrade_to_v3_shape_confusion_fails_closed(tmp_path: Path) -> None:
+def test_v5_downgrade_to_v3_shape_confusion_fails_closed(tmp_path: Path) -> None:
     scenario = _Scenario(tmp_path)
     _governed_service(scenario)
     ledger = _ledger_path(scenario)

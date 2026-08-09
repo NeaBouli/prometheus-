@@ -1,7 +1,7 @@
 # PROMETHEUS – MODULE STATUS
 # Format: | Module | Status | Progress | Last Update | Audit | Testnet Address |
 # Status: PENDING | IN_PROGRESS | DONE | BLOCKED | PENDING_AUDIT | ACCEPTED | REJECTED
-# Last Updated: 2026-08-04
+# Last Updated: 2026-08-09
 
 ---
 
@@ -1249,4 +1249,17 @@ Review: all seven CodeRabbit threads answered/resolved; six accepted findings
 Boundary: no image/model pull, live inference, independently proven artifact,
           semantic/adversarial quality, calibration or production authority;
           no wallet, signing, broadcast, deployment, chain or protocol action
+```
+
+## GH-152 GOVERNED V2 IDENTITY PAIRING LOCAL CANDIDATE (2026-08-09)
+
+```text
+Status: In Progress / full local verification PASS / protected PR pending
+Schema: governed v5; legacy remains v1
+Invariant: permanent per-ledger 1:1:1 statement digest / approval ID / observable commitment
+Migration: empty exact v4 -> v5 lossless; nonempty v4 outbox/results fail closed unchanged
+Tests: 63 focused; 1050 passed and 4 skipped full Guardian
+Review: Kimi PASS; no P0-P2 findings
+Boundary: no public API, proof authority, analyzer, transport, wallet, chain,
+          contract, tokenomics, deployment or production change
 ```

@@ -912,3 +912,16 @@ This API validates syntax and range only. It does not prove semantic accuracy,
 model calibration, prompt-injection resistance, production authorization, or
 safe publication. It is not connected to the governed ThreatHint-v2 worker,
 which remains explicitly non-actionable.
+
+## Governed ThreatHint v2 Identity Pairing (GH-152)
+
+No public API is added. Successful governed promotion now records the verified
+statement digest, approval ID, and observable commitment in a permanent
+database-enforced one-to-one-to-one pairing. Reuse of any identity with a fresh
+counterpart maps to the existing stable replay outcome. Outbox/result retention
+cannot reopen the identity.
+
+This applies only to the existing durable-outbox governed promotion path.
+Legacy and governed non-outbox consumption retain their previous behavior. The
+pairing grants no proof, analysis, disclosure, transport, wallet, chain,
+contract, token, deployment, or production authority.

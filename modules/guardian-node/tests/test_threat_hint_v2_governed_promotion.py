@@ -26,7 +26,7 @@ from jaeger.threat_hint_v2_promotion import (
     ThreatHintV2PromotionService,
     ThreatHintV2PromotionUnavailableError,
 )
-from jaeger.threat_observable import MAX_OBSERVABLES
+from jaeger.threat_observable import MAX_OBSERVABLES, ObservableBundle
 from tests.test_threat_hint_v2_acceptance import (
     _consumption_count,
     _high_water,
@@ -35,7 +35,9 @@ from tests.test_threat_hint_v2_acceptance import (
 )
 from tests.test_threat_hint_v2_preflight import (
     _Scenario,
+    _envelope_wire,
     _signed_approval,
+    _statement_wire,
     _write_policy as _write_preflight_policy,
 )
 from tests.test_threat_hint_v2_promotion import (
@@ -195,6 +197,26 @@ def _schema_version(path: Path) -> int:
         return connection.execute("PRAGMA user_version").fetchone()[0]
 
 
+def _set_fresh_statement_identity(
+    scenario: _Scenario,
+    key: PrivateKey,
+    *,
+    report_nonce: bytes,
+) -> None:
+    vector = scenario.vector
+    commitment = ObservableBundle.parse_canonical(scenario.bundle_wire).commitment(
+        vector["network_id"], report_nonce.hex()
+    )
+    vector["report_nonce_hex"] = report_nonce.hex()
+    vector["observable_commitment_hex"] = commitment.hex()
+    scenario.report_nonce = report_nonce
+    scenario.statement_wire = _statement_wire(
+        commitment.hex(), report_nonce.hex(), vector["network_id"]
+    )
+    scenario.envelope_wire = _envelope_wire(scenario.statement_wire)
+    scenario.approval_wire = _signed_approval(scenario, key)
+
+
 def test_first_valid_governed_promotion_pins_every_state_atomically(
     tmp_path: Path,
 ) -> None:
@@ -202,7 +224,7 @@ def test_first_valid_governed_promotion_pins_every_state_atomically(
     service = _governed_service(scenario)
     ledger = _ledger_path(scenario)
 
-    assert _schema_version(ledger) == 4
+    assert _schema_version(ledger) == 5
     assert _authority_state(ledger) is None
 
     result = _promote(service, scenario)
@@ -396,6 +418,7 @@ def test_epoch_regression_fails_without_verifier_or_state_change(
     scenario = _Scenario(tmp_path)
     key = PrivateKey()
     key_hex = PublicKeyXOnly.from_secret(key.secret).format().hex()
+    _set_fresh_statement_identity(scenario, key, report_nonce=b"\xb1" * 32)
     _write_preflight_policy(
         scenario.directory,
         scenario.vector,
@@ -433,6 +456,7 @@ def test_higher_epoch_advances_only_with_success_and_preserves_replay_state(
 
     key = PrivateKey()
     key_hex = PublicKeyXOnly.from_secret(key.secret).format().hex()
+    _set_fresh_statement_identity(scenario, key, report_nonce=b"\xb4" * 32)
     _write_preflight_policy(
         scenario.directory,
         scenario.vector,
@@ -469,7 +493,7 @@ def test_nonoverlapping_same_identity_epoch_advance_succeeds(tmp_path: Path) -> 
     scenario.vector["expires_at"] = next_not_before + 300
     scenario.vector["approval_nonce_hex"] = "ab" * 32
     scenario.current_time = next_not_before + 1
-    scenario.approval_wire = _signed_approval(scenario, key)
+    _set_fresh_statement_identity(scenario, key, report_nonce=b"\xb2" * 32)
     service = _governed_service(
         scenario,
         epoch=2,
@@ -499,6 +523,7 @@ def test_failed_insert_rolls_back_epoch_digest_and_high_water(
 
     key = PrivateKey()
     key_hex = PublicKeyXOnly.from_secret(key.secret).format().hex()
+    _set_fresh_statement_identity(scenario, key, report_nonce=b"\xb3" * 32)
     _write_preflight_policy(
         scenario.directory,
         scenario.vector,
@@ -541,7 +566,7 @@ def test_v1_migration_preserves_existing_replay_and_does_not_pin_on_replay(
     assert _schema_version(ledger) == 1
 
     service = _governed_service(scenario)
-    assert _schema_version(ledger) == 4
+    assert _schema_version(ledger) == 5
     assert _authority_state(ledger) is None
     with pytest.raises(ThreatHintV2PromotionReplayError):
         _promote(service, scenario)

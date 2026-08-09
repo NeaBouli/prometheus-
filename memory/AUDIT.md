@@ -2353,3 +2353,39 @@ No wallet, wallet hint, private key, signature, signed transaction, broadcast,
 deployment or chain mutation occurred. External BIP340 signing, full import and
 transaction verification, separately approved one-shot broadcast, confirmation,
 receipt and independent public evidence remain.
+
+## 2026-08-09 - GH-152 permanent governed identity-pairing audit
+
+**Result:** focused local PASS; independent final review and full repository
+gates remain.
+
+Governed schema v5 adds a permanent STRICT pairing table with independent
+database uniqueness for statement digest, approval ID, and observable
+commitment. The insert follows exact statement/bundle/approval revalidation
+inside the existing `BEGIN IMMEDIATE` promotion transaction, so collision or
+injected failure rolls authority, high-water, consumption, outbox, and pairing
+back together. Retention never deletes pairing rows.
+
+Exact empty schema-v4 state migrates without data loss. Nonempty v4 outbox or
+result state remains at v4 and fails closed without partial migration. Legacy
+and governed non-outbox consumption are unchanged. Focused outbox/governance
+tests pass 62/62. No proof, analyzer, privacy authority, transport, wallet,
+chain, contract, token, deployment, or production behavior changed.
+
+## 2026-08-09 - GH-152 full local gate and independent review closeout
+
+**Result:** PASS locally; protected publication pending.
+
+Kimi's final independent review found no P0-P2 issue. A realistic idle-used v4
+migration regression now proves that pinned authority, replay high-water, and
+approval consumption survive while empty outbox/results permit v5 migration.
+Permanent growth, no reconstructable pre-v5 pairing backfill, and fail-closed
+manual handling of any nonempty v4 outbox/result state remain explicit
+operational constraints.
+
+Verification: 63 focused; full Guardian 1050 passed/4 skipped; Black; Pylint
+9.84/10 and 10.00/10; Memory and six Autodidactic tests; model evidence 136/4;
+public-page checks; Rust fmt/Clippy/workspace tests/release performance; Cargo
+Audit with allowed warnings only; Pip Audit with no known vulnerabilities.
+Docker is unavailable locally, so protected CI remains authoritative for
+Compose rendering and Gitleaks.

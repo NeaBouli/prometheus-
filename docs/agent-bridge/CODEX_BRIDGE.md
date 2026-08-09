@@ -3118,3 +3118,45 @@ No direct `main` push or production action occurred.
 - No product, protocol, wallet, key, signature, transaction, broadcast,
   deployment or chain action occurred.
 - **Status:** `Review fix local PASS / Refreshed protected checks next`.
+
+### 2026-08-09 12:15 EEST - GH-152 focused local implementation authoritative EOF
+
+- Issue GH-152 and branch `fix/GH-152-v2-pairing-uniqueness` start from clean
+  exact main `9e7760f`.
+- Governed schema v5 permanently enforces one-to-one-to-one statement-digest,
+  approval-ID, and observable-commitment pairing in the existing atomic
+  durable-outbox promotion transaction. Retention never deletes pairing rows.
+- Empty exact v4 ledgers migrate losslessly; nonempty v4 outbox/results remain
+  unchanged and fail closed. Legacy and governed non-outbox behavior are
+  unchanged.
+- Kimi K3 completed the read-only architecture/security review. Its attempted
+  implementation was stopped before any edit after excessive test-impact
+  analysis; Sol implemented and reviewed the current diff. Claude Code's
+  bounded docs helper was unavailable because its local usage budget was
+  exhausted and changed no file.
+- PASS: 62 focused outbox/governance tests. Full Guardian, lint, Memory,
+  Rust/CI/Security, independent final review, protected PR, merge, Pages, and
+  exact-main evidence remain.
+- No wallet, key, signature, proof authority, analyzer, transport, chain,
+  contract, token, deployment, production, or secret scope.
+- **Status:** `GH-152 Focused local PASS / Full gates next`.
+
+### 2026-08-09 12:17 EEST - GH-152 full local gate and review handoff authoritative EOF
+
+- Final implementation includes explicit coverage for an idle but previously
+  used v4 ledger with pinned authority and consumption state. Migration retains
+  those rows exactly and creates an empty permanent v5 pairing table.
+- PASS: 63 focused tests; full Guardian 1050 passed/4 skipped; Black; Pylint
+  9.84/10 and 10.00/10 boundary lint; Memory and six Autodidactic tests;
+  model-evidence 136/4; HTML/SEO/infrastructure/stale-status; diff hygiene.
+- PASS: Rust fmt, workspace Clippy with warnings denied, workspace tests,
+  locked release performance, Cargo Audit (allowed warnings only), and Pip Audit
+  (no known vulnerabilities).
+- Kimi independent final review PASS with no P0-P2. Permanent row growth,
+  forward-only v5 pairing coverage, and manual handling of nonempty v4 state are
+  explicit fail-closed operational notes, not hidden migration behavior.
+- Docker is unavailable locally, so Compose rendering and Gitleaks remain for
+  protected CI; the repository-owned Compose boundary verifier passes.
+- No wallet, key, signature, proof authority, analyzer, transport, chain,
+  contract, token, deployment, production, or secret action occurred.
+- **Status:** `GH-152 Full local PASS / Protected publication next`.

@@ -3102,3 +3102,56 @@ Rules for all dev agents:
   public `operator_record` receipt, and independent node/explorer evidence.
 - Memory, six Autodidactic tests, HTML/SEO/infrastructure and diff checks pass.
 - **Status:** `Review fix local PASS / Refreshed protected checks next`.
+
+### 2026-08-09 11:27 EEST - local candidate cleanup started authoritative EOF
+
+- Clean canonical `main` is `9e7760f`, synchronized with `origin/main`; no PR
+  is open and GH-9 remains the only open issue.
+- Read-only provenance audit classified the old PE producer, proof envelope,
+  and relation manifest as already merged and superseded. Their old copies and
+  stale documentation must not be integrated.
+- Two bounded candidates remain valuable: permanent database-level uniqueness
+  for the v2 statement/approval/observable-commitment triple, followed by the
+  test-only Guardian sidecar process-stability hardening.
+- User authorization covers completing both slices through protected PR,
+  merge, exact-main checks, and required public/Bridge synchronization.
+- No wallet, signing, chain, contract, token, deployment, production, secret,
+  or live runtime action is in scope. Local untracked coordination/image files
+  remain unpublished and untouched.
+- **Status:** `GIO-PROM-20260809-001 In Progress / Pairing slice first`.
+
+### 2026-08-09 12:15 EEST - GH-152 focused implementation PASS authoritative EOF
+
+- Governed schema v5 adds permanent database uniqueness for the exact
+  statement/approval/observable-commitment triple in the atomic durable-outbox
+  promotion transaction.
+- Empty exact v4 migration is lossless; nonempty v4 work/results fail closed
+  unchanged; retention cannot remove the permanent pairing.
+- Kimi architecture/security review completed. Kimi's implementation attempt
+  made no edit and was stopped after extended impact analysis; Sol implemented
+  the bounded diff. Claude Code's read-only docs helper exhausted its local
+  budget without output or file changes.
+- PASS: 62 focused outbox/governance tests. Full integration gates and protected
+  publication remain.
+- **Status:** `GH-152 Focused local PASS / Full gates next`.
+
+### 2026-08-09 12:17 EEST - GH-152 full local verification PASS authoritative EOF
+
+- Added the realistic idle-used v4 migration regression: pinned authority,
+  replay high-water, and approval consumption survive migration while empty
+  outbox/results permit creation of the v5 pairing table.
+- PASS: 63 focused tests; 1050 passed and 4 intentionally skipped in the full
+  Guardian suite; Black clean; Guardian Pylint 9.84/10; Compose-boundary Pylint
+  10.00/10; Memory Integrity; six Autodidactic tests; HTML/SEO/infrastructure;
+  public stale-status scan; diff hygiene; deterministic model evidence 136/4.
+- PASS: `cargo fmt --all --check`, `cargo clippy --workspace -- -D warnings`,
+  `cargo test --workspace`, isolated locked release performance, `cargo audit`
+  with only the repository-allowed warnings, and `pip-audit` with no known
+  vulnerabilities.
+- Docker Compose rendering was not run locally because Docker is unavailable;
+  the repository-owned Compose boundary verifier passes. Protected CI remains
+  authoritative for container rendering and Gitleaks.
+- Kimi final independent review: PASS, no P0-P2 findings. Residual operational
+  notes are deliberate permanent table growth, forward-only v5 pairing coverage,
+  and manual recovery for any nonempty v4 queue/result state.
+- **Status:** `GH-152 Full local PASS / Commit and protected PR next`.

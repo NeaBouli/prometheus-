@@ -101,3 +101,11 @@
   Pages-Update in diesem repository-only Scope.
 
 *Lokaler Handoff aktualisiert: 2026-07-29*
+
+## GH-152 local candidate - 2026-08-09
+
+- [x] Governed schema v5 permanent 1:1:1 statement/approval/commitment pairing.
+- [x] Empty v4 migration, nonempty-v4 fail-closed, retention, replay and
+  rollback regressions.
+- [x] Full local gates and independent final review.
+- [ ] Protected PR, merge and exact-main evidence.
