@@ -12,6 +12,7 @@ from pathlib import Path
 
 import pytest
 
+import jaeger.model_evidence as model_evidence_module
 from jaeger.confidence_calibration import (
     LOCAL_MODEL_EVALUATION_MODE,
     MAX_PREDICTIONS_BYTES,
@@ -27,8 +28,13 @@ from jaeger.llm_server import (
 )
 from jaeger.model_evidence import (
     ModelEvidenceError,
+    _verified_model_artifact_sha256,
     capture_local_model_predictions,
     write_predictions_atomically,
+)
+from jaeger.model_provenance import (
+    build_model_provenance,
+    write_model_provenance,
 )
 
 VECTOR_ROOT = Path(__file__).parent / "vectors" / "confidence-calibration-v1"
@@ -89,6 +95,110 @@ def _run_cli(arguments: list[str]) -> subprocess.CompletedProcess[bytes]:
         capture_output=True,
         check=False,
     )
+
+
+def _model_provenance_fixture(tmp_path: Path) -> tuple[Path, Path, str]:
+    """Create an exact local model tree and its canonical manifest."""
+    base = tmp_path.resolve()
+    os.chmod(base, 0o700)
+    model_dir = base / "model"
+    model_dir.mkdir()
+    os.chmod(model_dir, 0o700)
+    weights = model_dir / "weights.bin"
+    weights.write_bytes(b"candidate-weights")
+    os.chmod(weights, 0o600)
+    manifest = build_model_provenance(model_dir)
+    manifest_path = base / "model-provenance.json"
+    write_model_provenance(manifest, manifest_path)
+    return model_dir, manifest_path, manifest.artifact_sha256
+
+
+def test_verified_model_artifact_digest_binds_exact_manifest_and_tree(
+    tmp_path: Path,
+) -> None:
+    """The provenance mode derives its digest from exact verified bytes."""
+    model_dir, manifest_path, expected_digest = _model_provenance_fixture(tmp_path)
+
+    assert (
+        _verified_model_artifact_sha256(None, manifest_path, model_dir)
+        == expected_digest
+    )
+
+
+def test_verified_model_artifact_digest_rejects_tree_drift(tmp_path: Path) -> None:
+    """Any post-manifest model mutation fails before capture can start."""
+    model_dir, manifest_path, _ = _model_provenance_fixture(tmp_path)
+    (model_dir / "weights.bin").write_bytes(b"tampered-weights")
+
+    with pytest.raises(ModelEvidenceError):
+        _verified_model_artifact_sha256(None, manifest_path, model_dir)
+
+
+@pytest.mark.parametrize(
+    "supplied_sha256,with_manifest,with_model_dir",
+    [
+        (MODEL_SHA256, True, False),
+        (MODEL_SHA256, False, True),
+        (None, True, False),
+        (None, False, True),
+        (None, False, False),
+    ],
+)
+def test_verified_model_artifact_digest_rejects_mixed_or_incomplete_modes(
+    tmp_path: Path,
+    supplied_sha256: str | None,
+    with_manifest: bool,
+    with_model_dir: bool,
+) -> None:
+    """Legacy and manifest-bound inputs cannot be mixed or left incomplete."""
+    model_dir, manifest_path, _ = _model_provenance_fixture(tmp_path)
+
+    with pytest.raises(ModelEvidenceError):
+        _verified_model_artifact_sha256(
+            supplied_sha256,
+            manifest_path if with_manifest else None,
+            model_dir if with_model_dir else None,
+        )
+
+
+def test_cli_rejects_provenance_drift_before_model_construction(
+    tmp_path: Path, monkeypatch, capsys
+) -> None:
+    """A stale manifest fails before the local model adapter is constructed."""
+    model_dir, manifest_path, _ = _model_provenance_fixture(tmp_path)
+    (model_dir / "weights.bin").write_bytes(b"tampered-weights")
+    constructed = False
+
+    def reject_model_construction(*_args, **_kwargs):
+        nonlocal constructed
+        constructed = True
+        raise AssertionError("model adapter must not be constructed")
+
+    monkeypatch.setattr(model_evidence_module, "LlmServer", reject_model_construction)
+    output = tmp_path.resolve() / "predictions.jsonl"
+    result = model_evidence_module._main(
+        [
+            "--corpus",
+            str(VECTOR_ROOT / "corpus.jsonl"),
+            "--model",
+            MODEL_ID,
+            "--model-manifest",
+            str(manifest_path),
+            "--model-dir",
+            str(model_dir),
+            "--port",
+            "8000",
+            "--output",
+            str(output),
+        ]
+    )
+
+    captured = capsys.readouterr()
+    assert result == 2
+    assert captured.out == ""
+    assert captured.err == "model evidence capture failed\n"
+    assert not constructed
+    assert not output.exists()
 
 
 @pytest.mark.asyncio

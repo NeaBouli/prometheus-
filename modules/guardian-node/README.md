@@ -131,17 +131,25 @@ The co-versioned manifest catches partial or accidental fixture drift during
 review and CI; it is not signed or anchored outside the editable repository.
 
 GH-141 adds a separate local-model candidate path. It accepts only the
-repository corpus, a relative public served-model identifier, a caller-supplied
-nonzero model-artifact SHA-256, a TCP port, and a new output path. Inference is
-fixed to literal `127.0.0.1`, ignores environment proxies, and accepts no URL.
-Predictions are written atomically as mode `0600` canonical JSONL, then can be
-re-evaluated offline:
+repository corpus, a relative public served-model identifier, model-artifact
+metadata, a TCP port, and a new output path. Inference is fixed to literal
+`127.0.0.1`, ignores environment proxies, and accepts no URL. Predictions are
+written atomically as mode `0600` canonical JSONL, then can be re-evaluated
+offline. The preferred GH-161 path first creates a canonical manifest from an
+exact trusted local model directory and re-hashes that directory before model
+adapter construction:
 
 ```bash
+PYTHONPATH=. python -m jaeger.model_provenance \
+  --model-dir /trusted/local/model \
+  --output /owner-only/path/model-provenance.json
+
+vector_dir=tests/vectors/confidence-calibration-v1
 PYTHONPATH=. python -m jaeger.model_evidence \
   --corpus "$vector_dir/corpus.jsonl" \
   --model meta-llama/Meta-Llama-3-8B-Instruct \
-  --model-sha256 <public-model-artifact-sha256> \
+  --model-manifest /owner-only/path/model-provenance.json \
+  --model-dir /trusted/local/model \
   --port 8000 \
   --output /owner-only/path/local-model-predictions.jsonl
 
@@ -151,10 +159,13 @@ PYTHONPATH=. python -m jaeger.confidence_calibration --candidate \
   --policy "$vector_dir/policy.json"
 ```
 
-The tool does not hash or approve the model artifact itself; the supplied
-digest must be established independently. No live result is committed, and
-schema/prompt binding does not establish semantic quality, adversarial
-robustness, calibration, or production authority.
+The legacy `--model-sha256` input remains available as explicit caller-supplied
+compatibility metadata and cannot be combined with the manifest mode. The
+manifest digest binds sorted relative paths, sizes, and SHA-256 values derived
+from exact regular-file bytes. It does not establish upstream authenticity,
+approval, or that an already running vLLM process loaded those same bytes. No
+live result is committed, and schema/prompt binding does not establish semantic
+quality, adversarial robustness, calibration, or production authority.
 
 ## Local Ensemble Voting
 

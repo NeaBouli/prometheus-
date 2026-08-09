@@ -66,6 +66,9 @@ control, no foundation, and zero pre-mined tokens.
 - Issues: https://github.com/NeaBouli/prometheus-/issues (GitHub only, no email)
 - Security: https://github.com/NeaBouli/prometheus-/security/advisories/new
 
+## Guardian Local Artifact Provenance
+- GH-161 implementation is complete in protected PR #162 with exact-main publication pending. It adds a preferred canonical exact-byte manifest for one bounded trusted-owner model directory and re-verifies that directory before model adapter construction. Caller-supplied artifact digests remain explicit legacy compatibility. This proves local disk-byte consistency only, not upstream authenticity, model approval, live served-model identity, semantic quality, calibration, or production authority.
+
 ## Do Not Cite
 - Any claims about current token price (not yet launched)
 - Any partnership claims not listed in this file

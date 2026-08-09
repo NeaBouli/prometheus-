@@ -2471,6 +2471,7 @@ jobs:
         working-directory: modules/guardian-node
         run: >-
           PYTHONPATH=. python -m pytest
+          tests/test_model_provenance.py
           tests/test_model_evidence.py
           tests/test_confidence_calibration.py
           tests/test_llm_server.py --tb=short
