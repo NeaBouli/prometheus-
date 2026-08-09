@@ -6,6 +6,9 @@ statement and bundle bindings in the same transaction as the authority
 snapshot, replay high-water mark, and consumption row. Records are leased
 single-winner through ``ObservableApprovalOutbox`` and may be removed only by
 an atomic durable non-actionable completion.
+
+Governed durable-outbox consumptions also retain one permanent database-level
+statement/approval/commitment pairing after outbox and result retention.
 """
 
 # Exact built-in types are protocol requirements.
@@ -65,7 +68,8 @@ MAX_CONSUMPTION_POLICY_BYTES: Final[int] = 4_096
 _SQLITE_SCHEMA_VERSION_LEGACY: Final[int] = 1
 _SQLITE_SCHEMA_VERSION_GOVERNED_V2: Final[int] = 2
 _SQLITE_SCHEMA_VERSION_GOVERNED_V3: Final[int] = 3
-_SQLITE_SCHEMA_VERSION_GOVERNED: Final[int] = 4
+_SQLITE_SCHEMA_VERSION_GOVERNED_V4: Final[int] = 4
+_SQLITE_SCHEMA_VERSION_GOVERNED: Final[int] = 5
 MAX_OUTBOX_LEASE_SECONDS: Final[int] = 300
 ANALYSIS_RESULT_SCHEMA_VERSION: Final[int] = 1
 ANALYSIS_RESULT_KIND: Final[str] = "non_actionable_local_v1"
@@ -306,6 +310,7 @@ class _ObservableApprovalLedger:  # pylint: disable=too-few-public-methods
                 _SQLITE_SCHEMA_VERSION_LEGACY,
                 _SQLITE_SCHEMA_VERSION_GOVERNED_V2,
                 _SQLITE_SCHEMA_VERSION_GOVERNED_V3,
+                _SQLITE_SCHEMA_VERSION_GOVERNED_V4,
                 _SQLITE_SCHEMA_VERSION_GOVERNED,
             ):
                 raise ObservableApprovalConsumptionError()
@@ -322,6 +327,7 @@ class _ObservableApprovalLedger:  # pylint: disable=too-few-public-methods
             and version
             not in (
                 _SQLITE_SCHEMA_VERSION_GOVERNED_V3,
+                _SQLITE_SCHEMA_VERSION_GOVERNED_V4,
                 _SQLITE_SCHEMA_VERSION_GOVERNED,
             )
             and _table_shape(connection, "approval_outbox")
@@ -329,8 +335,16 @@ class _ObservableApprovalLedger:  # pylint: disable=too-few-public-methods
             raise ObservableApprovalConsumptionError()
         if (
             governed
-            and version != _SQLITE_SCHEMA_VERSION_GOVERNED
+            and version
+            not in (
+                _SQLITE_SCHEMA_VERSION_GOVERNED_V4,
+                _SQLITE_SCHEMA_VERSION_GOVERNED,
+            )
             and _table_shape(connection, "observable_analysis_results")
+        ):
+            raise ObservableApprovalConsumptionError()
+        if version != _SQLITE_SCHEMA_VERSION_GOVERNED and _table_shape(
+            connection, "threat_hint_v2_pairings"
         ):
             raise ObservableApprovalConsumptionError()
         if version == 0:
@@ -355,6 +369,27 @@ class _ObservableApprovalLedger:  # pylint: disable=too-few-public-methods
                 ):
                     raise ObservableApprovalConsumptionError()
                 connection.execute("DROP TABLE approval_outbox")
+            if version == _SQLITE_SCHEMA_VERSION_GOVERNED_V4:
+                self._validate_schema(
+                    connection,
+                    governed=True,
+                    governed_version=_SQLITE_SCHEMA_VERSION_GOVERNED_V4,
+                )
+                pending_outbox = connection.execute(
+                    "SELECT COUNT(*) FROM approval_outbox"
+                ).fetchone()
+                pending_results = connection.execute(
+                    "SELECT COUNT(*) FROM observable_analysis_results"
+                ).fetchone()
+                if (
+                    pending_outbox is None
+                    or pending_results is None
+                    or type(pending_outbox[0]) is not int
+                    or type(pending_results[0]) is not int
+                    or pending_outbox[0] != 0
+                    or pending_results[0] != 0
+                ):
+                    raise ObservableApprovalConsumptionError()
             connection.execute("""
                 CREATE TABLE IF NOT EXISTS authority_state (
                     singleton INTEGER PRIMARY KEY CHECK (singleton = 1),
@@ -420,6 +455,19 @@ class _ObservableApprovalLedger:  # pylint: disable=too-few-public-methods
                         CHECK(completed_at >= 1),
                     retention_deadline INTEGER NOT NULL
                         CHECK(retention_deadline >= completed_at)
+                ) STRICT
+                """)
+            connection.execute("""
+                CREATE TABLE IF NOT EXISTS threat_hint_v2_pairings (
+                    statement_digest BLOB PRIMARY KEY
+                        CHECK(length(statement_digest) = 32),
+                    approval_id BLOB NOT NULL UNIQUE
+                        CHECK(length(approval_id) = 32)
+                        REFERENCES approval_consumptions(approval_id),
+                    observable_commitment BLOB NOT NULL UNIQUE
+                        CHECK(length(observable_commitment) = 32),
+                    network_id TEXT NOT NULL,
+                    consumed_at INTEGER NOT NULL CHECK(consumed_at >= 1)
                 ) STRICT
                 """)
             connection.execute(
@@ -585,6 +633,22 @@ class _ObservableApprovalLedger:  # pylint: disable=too-few-public-methods
                             governance.retention,
                         )
         except sqlite3.IntegrityError:
+            statement_digest: bytes | None = None
+            if (
+                governance is not None
+                and self._outbox_enabled
+                and type(statement_wire) is bytes
+                and type(report_nonce) is bytes
+            ):
+                try:
+                    statement_digest = _validate_outbox_statement(
+                        statement_wire,
+                        verified.network_id,
+                        observable_commitment=verified.observable_commitment,
+                        report_nonce=report_nonce,
+                    )
+                except ObservableApprovalConsumptionError:
+                    statement_digest = None
             try:
                 with closing(self._connect()) as connection:
                     replay = connection.execute(
@@ -602,6 +666,20 @@ class _ObservableApprovalLedger:  # pylint: disable=too-few-public-methods
                             verified.approval_nonce,
                         ),
                     ).fetchone()
+                    if replay is None and statement_digest is not None:
+                        replay = connection.execute(
+                            """
+                            SELECT 1 FROM threat_hint_v2_pairings
+                            WHERE statement_digest = ?
+                               OR approval_id = ?
+                               OR observable_commitment = ?
+                            """,
+                            (
+                                statement_digest,
+                                verified.approval_id,
+                                verified.observable_commitment,
+                            ),
+                        ).fetchone()
             except sqlite3.OperationalError as exc:
                 _raise_operational_error(exc)
             except sqlite3.Error:
@@ -830,6 +908,21 @@ class _ObservableApprovalLedger:  # pylint: disable=too-few-public-methods
                 retention_deadline,
             ),
         )
+        connection.execute(
+            """
+            INSERT INTO threat_hint_v2_pairings (
+                statement_digest, approval_id, observable_commitment,
+                network_id, consumed_at
+            ) VALUES (?, ?, ?, ?, ?)
+            """,
+            (
+                statement_digest,
+                verified.approval_id,
+                verified.observable_commitment,
+                verified.network_id,
+                consumed_at,
+            ),
+        )
 
     def _connect(self) -> sqlite3.Connection:
         connection = sqlite3.connect(self.path, timeout=0.25, isolation_level=None)
@@ -903,8 +996,16 @@ class _ObservableApprovalLedger:  # pylint: disable=too-few-public-methods
             ("completed_at", "INTEGER", 1, 0),
             ("retention_deadline", "INTEGER", 1, 0),
         )
+        expected_pairings = (
+            ("statement_digest", "BLOB", 1, 1),
+            ("approval_id", "BLOB", 1, 0),
+            ("observable_commitment", "BLOB", 1, 0),
+            ("network_id", "TEXT", 1, 0),
+            ("consumed_at", "INTEGER", 1, 0),
+        )
         if governed and governed_version not in (
             _SQLITE_SCHEMA_VERSION_GOVERNED_V3,
+            _SQLITE_SCHEMA_VERSION_GOVERNED_V4,
             _SQLITE_SCHEMA_VERSION_GOVERNED,
         ):
             raise ObservableApprovalConsumptionError()
@@ -926,9 +1027,9 @@ class _ObservableApprovalLedger:  # pylint: disable=too-few-public-methods
         ):
             raise ObservableApprovalConsumptionError()
         expected_outbox = (
-            expected_outbox_v4
-            if governed_version == _SQLITE_SCHEMA_VERSION_GOVERNED
-            else expected_outbox_v3
+            expected_outbox_v3
+            if governed_version == _SQLITE_SCHEMA_VERSION_GOVERNED_V3
+            else expected_outbox_v4
         )
         if governed and (  # pylint: disable=too-many-boolean-expressions
             _table_shape(connection, "authority_state") != expected_authority
@@ -939,7 +1040,7 @@ class _ObservableApprovalLedger:  # pylint: disable=too-few-public-methods
             or not _is_strict_table(
                 connection,
                 "approval_outbox",
-                10 if governed_version == _SQLITE_SCHEMA_VERSION_GOVERNED else 7,
+                7 if governed_version == _SQLITE_SCHEMA_VERSION_GOVERNED_V3 else 10,
             )
             or _unique_index_columns(connection, "approval_outbox")
             != {("approval_id",)}
@@ -947,7 +1048,11 @@ class _ObservableApprovalLedger:  # pylint: disable=too-few-public-methods
             raise ObservableApprovalConsumptionError()
         if (
             governed
-            and governed_version == _SQLITE_SCHEMA_VERSION_GOVERNED
+            and governed_version
+            in (
+                _SQLITE_SCHEMA_VERSION_GOVERNED_V4,
+                _SQLITE_SCHEMA_VERSION_GOVERNED,
+            )
             and (
                 _table_shape(connection, "observable_analysis_results")
                 != expected_results
@@ -955,6 +1060,23 @@ class _ObservableApprovalLedger:  # pylint: disable=too-few-public-methods
                 or _unique_index_columns(connection, "observable_analysis_results")
                 != {("approval_id",)}
                 or _foreign_key_targets(connection, "observable_analysis_results")
+                != {("approval_consumptions", "approval_id", "approval_id")}
+            )
+        ):
+            raise ObservableApprovalConsumptionError()
+        if (
+            governed
+            and governed_version == _SQLITE_SCHEMA_VERSION_GOVERNED
+            and (
+                _table_shape(connection, "threat_hint_v2_pairings") != expected_pairings
+                or not _is_strict_table(connection, "threat_hint_v2_pairings", 5)
+                or _unique_index_columns(connection, "threat_hint_v2_pairings")
+                != {
+                    ("statement_digest",),
+                    ("approval_id",),
+                    ("observable_commitment",),
+                }
+                or _foreign_key_targets(connection, "threat_hint_v2_pairings")
                 != {("approval_consumptions", "approval_id", "approval_id")}
             )
         ):

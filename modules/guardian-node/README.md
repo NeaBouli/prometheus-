@@ -464,7 +464,7 @@ only by its own risk-specific local-analysis token.
 `ThreatHintV2PromotionService.from_governed_policies(...)` composes one
 immutable promotion, governance, and retention snapshot before ledger access.
 All three allowed-kind sets must be exactly equal. On the first valid governed
-promotion, governed schema v4 atomically pins the exact raw SHA-256 digest of every
+promotion, governed schema v5 atomically pins the exact raw SHA-256 digest of every
 policy plus network, key, scope, epoch, and authority window in the same
 `BEGIN IMMEDIATE` transaction as high-water and approval consumption.
 
@@ -484,7 +484,7 @@ unavailable consumption rather than being persisted.
 ### Governed recoverable ThreatHint v2 outbox
 
 Only `ThreatHintV2PromotionService.from_governed_policies(...)` enables durable
-enqueue. Governed schema v4 stores the approval ID, observable commitment,
+enqueue. Governed schema v5 stores the approval ID, observable commitment,
 canonical statement wire and digest, trusted report nonce, canonical bundle
 wire, enqueue time, and retention deadline in the exact `BEGIN IMMEDIATE`
 transaction that pins or advances authority state, moves ledger high-water,
@@ -492,9 +492,17 @@ and consumes the approval. The pending-record cap is checked in that
 transaction. Capacity, enqueue, schema, lock, integrity, or overflow failure
 rolls everything back and leaves the approval unconsumed.
 
-An empty schema-v3 outbox migrates transactionally to v4. A nonempty v3 outbox
+The same transaction permanently records a strict one-to-one-to-one pairing of
+the statement digest, approval ID, and observable commitment. Outbox and result
+retention never removes that pairing, so a fresh counterpart cannot rebind an
+accepted identity.
+
+An empty schema-v3 outbox migrates transactionally to v5. A nonempty v3 outbox
 cannot be upgraded because its report nonce and statement are unrecoverable;
 opening it fails closed without changing its version, schema, or rows.
+An exact schema-v4 ledger migrates only when both its outbox and result table
+are empty; nonempty v4 state remains unchanged and fails closed because its
+historical pairing cannot be reconstructed safely.
 
 `ObservableApprovalConsumptionService.outbox().claim(...)` opens one
 owner-local claim capability. It removes expired-retention rows, selects the
@@ -507,11 +515,11 @@ domain-separated input identity bound to approval, lease, and retention.
 Claim results cannot be constructed or serialized and reveal no token in
 `repr`.
 
-`complete(...)` is the only v4 terminal transition. It requires the exact
+`complete(...)` is the only v5 terminal transition. It requires the exact
 unexpired lease, input identity, canonical non-actionable result, and
 completion token; one transaction inserts the retained result and deletes the
 outbox row. Exact post-commit retry is idempotent, while changed tokens, leases,
-inputs, or results fail closed. `acknowledge(...)` cannot delete v4 work without
+inputs, or results fail closed. `acknowledge(...)` cannot delete v5 work without
 a durable result. Results inherit the original retention deadline and remain
 owner-local/readable until lazy cleanup at that deadline.
 
@@ -520,8 +528,8 @@ one deterministic test analyzer. The analyzer only validates and counts the
 canonical observables. It emits no confidence, `should_submit`, YARA/rule body,
 semantic finding, transport, publication, wallet, chain, reward, or external
 authority. Legacy consumption remains schema v1; governed acceptance uses
-schema v4 but enqueues only when promotion explicitly enables the durable
-outbox.
+schema v5 but enqueues and records permanent identity pairing only when
+promotion explicitly enables the durable outbox.
 
 ## Local Observable Approval Consumption
 

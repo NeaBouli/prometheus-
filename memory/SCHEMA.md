@@ -863,3 +863,31 @@ result and deletes the leased outbox row in the same transaction. The result
 references the persistent consumption row, so it survives outbox deletion.
 Its deadline is inherited from the original outbox record and bound into both
 the lease input identity and the result-record digest.
+
+### Governed approval ledger schema v5 (GH-152)
+
+Schema v5 preserves every v4 table and adds:
+
+```sql
+CREATE TABLE threat_hint_v2_pairings (
+    statement_digest BLOB PRIMARY KEY CHECK(length(statement_digest) = 32),
+    approval_id BLOB NOT NULL UNIQUE
+        CHECK(length(approval_id) = 32)
+        REFERENCES approval_consumptions(approval_id),
+    observable_commitment BLOB NOT NULL UNIQUE
+        CHECK(length(observable_commitment) = 32),
+    network_id TEXT NOT NULL,
+    consumed_at INTEGER NOT NULL CHECK(consumed_at >= 1)
+) STRICT;
+```
+
+Durable governed promotion inserts this row in the same `BEGIN IMMEDIATE`
+transaction as authority, high-water, approval consumption, and outbox enqueue.
+The table is permanent and is never subject to outbox/result retention.
+Empty exact v4 databases migrate to v5; nonempty v4 outbox or result state
+fails closed unchanged. Legacy schema v1 remains unchanged.
+
+**GH-152 migration clarification (2026-08-09):** "empty v4" applies only to
+`approval_outbox` and `observable_analysis_results`. Authority state, ledger
+high-water, and approval-consumption rows are preserved by migration. Any row in
+either gated table keeps the whole v4 database unchanged and fails closed.

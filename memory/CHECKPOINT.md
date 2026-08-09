@@ -908,3 +908,28 @@ Leistungsbasierte Emission. Guardians = "Miner" (KI statt GPU).
 - External BIP340 signing, full operator verification, separately approved
   one-shot broadcast, confirmation, receipt and independent evidence remain.
 - **Status:** `Readiness refresh merged / External execution gates remain`.
+
+## Checkpoint 2026-08-09: GH-152 focused local verification
+
+- Governed ledger schema v5 permanently binds each accepted durable-outbox
+  statement digest, approval ID, and observable commitment one-to-one-to-one.
+- Empty exact v4 state migrates losslessly; nonempty v4 outbox/results fail
+  closed unchanged. Pairing rows survive outbox retention.
+- Focused outbox/governance tests pass 62/62. Full Guardian, lint, security,
+  independent review, protected PR, merge, and exact-main evidence remain.
+- **Status:** `Focused local PASS / Full integration gates next`.
+
+## Checkpoint 2026-08-09: GH-152 full local verification
+
+- Kimi final review PASS with no P0-P2; realistic used-but-idle v4 migration
+  coverage added.
+- 63 focused and 1050 passed/4 skipped full Guardian tests; Python, Memory,
+  public-page, Rust workspace, performance, and dependency audit gates pass.
+- Docker-only Compose rendering and Gitleaks remain for protected CI.
+- **Status:** `Full local PASS / Protected PR next`.
+
+## Checkpoint 2026-08-09: PR #153 review wording fix
+
+- Exact migration scope synchronized: empty v4 outbox/results only; persistent
+  authority, high-water, and approval consumptions are retained.
+- **Status:** `Review fix local / Refreshed protected checks next`.
