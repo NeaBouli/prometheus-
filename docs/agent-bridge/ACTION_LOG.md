@@ -3310,3 +3310,12 @@ Rules for all dev agents:
   coverage, and exact-main-pending public status alignment.
 - Focused tests now pass `116/116`; Black and focused Pylint remain green.
 - **Status:** `GH-161 Implementation Complete / PR re-check next`.
+
+### 2026-08-10 01:48 EEST - GH-161 exact-main verification complete EOF
+
+- PR #162 merged as exact main `d468426`; issue #161 closed.
+- Exact-main CI `31340112225`, Security `31340112204`, and Pages `31340111625`
+  pass after all external review feedback was resolved.
+- Opened GH-163 for documentation-only exact-main closeout. No product,
+  production, model, chain, wallet, secret, or deployment action.
+- **Status:** `GH-161 Done / GH-163 closeout in progress`.

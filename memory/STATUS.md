@@ -1,7 +1,7 @@
 # PROMETHEUS – MODULE STATUS
 # Format: | Module | Status | Progress | Last Update | Audit | Testnet Address |
 # Status: PENDING | IN_PROGRESS | DONE | BLOCKED | PENDING_AUDIT | ACCEPTED | REJECTED
-# Last Updated: 2026-08-09
+# Last Updated: 2026-08-10
 
 ---
 
@@ -1265,3 +1265,16 @@ Review: Kimi PASS; no P0-P2 findings
 Boundary: no public API, proof authority, analyzer, transport, wallet, chain,
           contract, tokenomics, deployment or production change
 ```
+## 2026-08-10 - GH-161 exact local model artifact provenance
+
+Protected PR #162 merged as exact main `d4684260108d91cec81a5a98d86eda848dcab115`.
+Prometheus CI `31340112225`, Security Audit `31340112204`, and Pages
+`31340111625` pass. Guardian candidate capture can now derive its artifact
+digest from a strict canonical manifest of exact regular-file bytes in one
+bounded trusted-owner local model directory and re-verify the directory before
+model adapter construction. The caller-supplied digest remains explicit legacy
+compatibility. This establishes local disk-byte consistency only: upstream
+authenticity, the weights loaded by an already-running service, semantic
+quality, calibration, and production authority remain open. No model was run
+or downloaded. Rollout estimates remain H-001 96%, core 84-88%, and complete
+roadmap vision 50-55%.

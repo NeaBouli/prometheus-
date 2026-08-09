@@ -3361,3 +3361,24 @@ No direct `main` push or production action occurred.
   status and open TODO consistently require merge plus exact-main verification
   before GH-161 is marked Done.
 - **Status:** `GH-161 Implementation Complete / Review feedback resolved / Re-check pending`.
+
+### 2026-08-10 01:48 EEST - GH-161 merged and exact-main verified authoritative EOF
+
+- Protected PR #162 squash-merged normally as exact main
+  `d4684260108d91cec81a5a98d86eda848dcab115`; issue #161 closed.
+- PR-head review feedback was fully resolved before merge. The final PR checks
+  passed, including Python Guardian with real Docker Compose rendering,
+  Current Silverc, Rust workspace/performance, Memory, HTML, Dependency Audit,
+  Secret Detection, Security Summary, and CodeRabbit status.
+- Exact-main Prometheus CI `31340112225`, Security Audit `31340112204`, and
+  Pages `31340111625` all completed successfully on `d468426`.
+- Public README, Guardian README, roadmap, Whitepaper, backlog, `llms.txt`,
+  Memory, Bridge, and CI now expose the canonical local-byte provenance path
+  and retain its non-claims: no upstream authenticity, live served-model
+  identity, semantic quality, calibration, or production authority.
+- No model download/inference, wallet, key, signature, transaction, chain,
+  deployment, production, token, secret, or permission change occurred.
+- H-001 remains 96%, rollout-capable core remains 84-88%, and the complete
+  roadmap vision remains 50-55%; GH-161 closes one local evidence-integrity
+  gap but does not change those rollout estimates.
+- **Status:** `GH-161 Done / Exact-main verified / GH-163 closeout publication`.

@@ -2,7 +2,7 @@
 # Every completed module is audited by Claude (Architect) before proceeding to the next sprint.
 # Format: | Module | Version | Date | Auditor | Result | Notes |
 # Result: ACCEPTED | REJECTED | NEEDS_CHANGES
-# Last Updated: 2026-07-27
+# Last Updated: 2026-08-10
 
 ---
 
@@ -2403,3 +2403,18 @@ PR #153 merged as `3d203aa`; issue #152 closed. Exact-main CI `31306353671`,
 Security `31306353670`, and Pages `31306353328` pass. Live Whitepaper, Roadmap,
 and FAQ markers confirm schema v5 and exact migration wording. No production or
 external protocol authority changed.
+## 2026-08-10 - GH-161 model artifact provenance audit
+
+PR #162 merged and exact-main verified as `d468426`. The new POSIX-only
+provenance boundary rejects unsafe modes, symlink/special tree entries,
+duplicate inodes, hard links, count/size/depth/path overflow, noncanonical
+manifests, and detected file or directory mutation. Capture verifies the exact
+manifest before model adapter construction and keeps legacy caller metadata
+mutually exclusive. Focused verification reached 116 tests; full Guardian
+verification reached 1116 passed and 4 intentional live-model skips before the
+final review patch, with the final focused patch rechecked locally and by PR
+CI. Kimi review found no P0-P2, all P3 observations were resolved, and all five
+CodeRabbit comments were addressed before merge. Exact-main CI `31340112225`,
+Security `31340112204`, and Pages `31340111625` pass. Remaining model risks are
+upstream authenticity, binding to already-loaded service memory, semantic and
+adversarial quality, calibration, and production authorization.
