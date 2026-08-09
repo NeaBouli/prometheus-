@@ -3267,3 +3267,14 @@ Rules for all dev agents:
 - Kimi read-only review PASS with no P0-P2 after live GitHub run and provenance
   verification. Gitleaks is unavailable locally and remains a protected check.
 - **Status:** `GH-158 Local PASS / Commit and protected PR next`.
+
+### 2026-08-09 14:44 EEST - GH-158 merged exact-main and live Pages verified EOF
+
+- PR #159 merged normally as exact main `ed75b58291584a2a5ab71c677879674bf8288201`;
+  issue #158 closed. All eleven PR contexts passed and CodeRabbit produced no
+  actionable comment.
+- Exact-main PASS: Prometheus CI `31311389618`, Security Audit `31311389613`,
+  and Pages `31311389052`. Live homepage, Whitepaper, and Roadmap markers pass.
+- Readiness estimates remain unchanged and no production or secret-bearing
+  action occurred.
+- **Status:** `GH-158 Done / Closeout publication next`.
