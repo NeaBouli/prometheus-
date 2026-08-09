@@ -137,8 +137,8 @@ future real run, not evidence that one occurred: artifact provenance,
 semantic/adversarial quality, prompt-injection robustness, production
 calibration, and authorization remain open.
 
-**GH-161 local model artifact provenance (implementation complete in protected
-PR #162; exact-main publication pending):** the preferred candidate-capture
+**GH-161 local model artifact provenance (merged and exact-main verified):**
+the preferred candidate-capture
 mode now derives its artifact digest from a canonical manifest of exact bytes
 in one bounded trusted-owner local model directory. Descriptor-relative
 traversal rejects a symlink root plus symlink, writable, special, linked,
@@ -148,6 +148,10 @@ digest remains only as explicit
 legacy compatibility. This proves local disk-byte consistency, not upstream
 authenticity, model approval, live served-model identity, semantic quality,
 calibration, or production authority.
+
+Protected PR #162 squash-merged normally as exact main `d468426`; Prometheus
+CI `31340112225`, Security Audit `31340112204`, and Pages `31340111625` pass on
+that SHA.
 
 Protected PR #142 squash-merged normally without bypass as exact main
 `bf3f74f`; Prometheus CI `30727224584`, Security Audit `30727224572`, and Pages

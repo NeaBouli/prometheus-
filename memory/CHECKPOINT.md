@@ -1,5 +1,5 @@
 # PROMETHEUS — SESSION CHECKPOINT
-# Last updated: 2026-07-31
+# Last updated: 2026-08-10
 # Purpose: Full recovery document. If Claude (Architect) or Claude Code
 # loses context, read this file first. It contains the complete project state.
 
@@ -13,10 +13,10 @@
 | Repo | https://github.com/NeaBouli/prometheus- |
 | Branch | Canonical target `main`; product/public/status changes remain PR-only |
 | Lokaler Pfad | `$REPO_ROOT` |
-| Letzter grün verifizierter Produkt-/Public-Baseline | Exact product/public main `2d03f739b309ed40b7944b3109521a989bb7de67`; Prometheus CI `30598044239`, Security `30598044233`, and Pages `30598043838` pass |
-| Aktueller Entwicklungs-Slice | GH-129 documentation-only merge closeout on `docs/GH-129-gh9-merge-closeout`; no product/protocol, signing, broadcast, deployment, wallet, or chain mutation |
-| Aktuelle Tooling-Baseline | Exact main `2d03f739` includes the `ruint 1.20.0` security remediation and the public record of the byte-identical H-001 refresh reproduced from `143a8a0`. Production proof artifacts/ceremony, independent cryptographic/privacy review, real semantic/actionable analysis, v2 transport, H-001 external signing/broadcast/evidence, and operated rollout remain open. |
-| Aktueller HEAD | Exact verified product/public baseline is `2d03f739b309ed40b7944b3109521a989bb7de67`; the current GH-129 branch contains Bridge/Memory closeout only |
+| Letzter grün verifizierter Produkt-/Public-Baseline | Exact product/public main `d4684260108d91cec81a5a98d86eda848dcab115`; Prometheus CI `31340112225`, Security `31340112204`, and Pages `31340111625` pass |
+| Aktueller Entwicklungs-Slice | GH-163 documentation-only GH-161 exact-main closeout on `docs/GH-163-close-gh-161-exact-main`; no product/protocol, model run, signing, broadcast, deployment, wallet, or chain mutation |
+| Aktuelle Tooling-Baseline | Exact main `d468426` includes canonical exact-byte owner-local model-directory provenance and pre-adapter capture-time re-verification. Upstream authenticity, live served-model identity, production proof artifacts/ceremony, independent cryptographic/privacy review, real semantic/actionable analysis, v2 transport, H-001 external signing/broadcast/evidence, and operated rollout remain open. |
+| Aktueller HEAD | Exact verified product/public baseline is `d4684260108d91cec81a5a98d86eda848dcab115`; the current GH-163 branch contains public/Bridge/Memory closeout only |
 | Rollback-Tag | `pre-session-20260413` → `6347b85` |
 | Whitepaper | WHITEPAPER.md (root) + whitepaper.html (styled); miner companion, reward boundaries, GH-36/GH-39 trust boundaries, GH-48/GH-52/GH-55/GH-58/GH-63/GH-74/GH-94/GH-107/GH-111/GH-114, and merged GH-117 binding/verifier/preflight/acceptance/governance/outbox/non-actionable-worker boundaries remain synchronized |
 | Status | Rollout-capable core is estimated at 84-88%. GH-117 is merged and exact-main verified but not production-deployed. Production relation/key/ceremony approval and independent cryptographic/privacy review, post-Toccata canary execution, v2 transport, real semantic/actionable analysis, crash-safe external side effects, and full rollout evidence remain gated. |
@@ -939,3 +939,15 @@ Leistungsbasierte Emission. Guardians = "Miner" (KI statt GPU).
 - PR #153 / exact main `3d203aa`; CI `31306353671`, Security `31306353670`,
   Pages `31306353328` all pass; live public markers verified.
 - **Status:** `Done / Next candidate: sidecar CI stability`.
+## GH-161 checkpoint - 2026-08-10
+
+- Exact main: `d4684260108d91cec81a5a98d86eda848dcab115` via protected PR #162.
+- Green evidence: Prometheus CI `31340112225`, Security Audit `31340112204`,
+  Pages `31340111625`.
+- Delivered: canonical exact-byte owner-local model-directory manifests,
+  capture-time re-verification before adapter construction, explicit legacy
+  compatibility, adversarial tests, CI coverage, and public documentation.
+- Non-claims: no live model result, upstream authenticity, served-memory
+  identity, semantic quality, calibration, production authority, wallet,
+  signing, chain, or deployment evidence.
+- Rollout estimates unchanged: H-001 96%, core 84-88%, full vision 50-55%.
