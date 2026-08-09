@@ -3182,3 +3182,49 @@ No direct `main` push or production action occurred.
 - No wallet, key, signature, transaction, broadcast, deployment, chain,
   contract, token, production, or secret action occurred.
 - **Status:** `GH-152 Done / Next bounded candidate is sidecar CI stability`.
+
+### 2026-08-09 13:01 EEST - GH-155 active implementation handoff authoritative EOF
+
+- Canonical base: `d87d969`; issue #155; branch
+  `test/GH-155-sidecar-ci-stability`.
+- Test-only goal: serialize process tests, reserve relay port, centralize bounded
+  waits, retain bounded stderr, enforce collector EOF/ACK shutdown, and provide
+  useful timeout diagnostics.
+- Submit subprocess timeout must guarantee kill and reap on every path. The old
+  candidate's outer timeout around `Command::output()` is insufficient by itself.
+- Kimi may edit only the sidecar process test. Sol owns diff review, stress,
+  full integration, publication, Bridge, and exact-main verification.
+- **Status:** `GH-155 In Progress / No production behavior`.
+
+### 2026-08-09 13:25 EEST - GH-155 local gate handoff authoritative EOF
+
+- The only code diff is the Guardian sidecar process integration test. It now
+  serializes process cases, holds the relay UDP reservation until spawn, separates
+  timeout from channel-disconnect diagnostics, bounds stderr/output retention while
+  continuing to drain pipes, and bounds service/collector/submit waits.
+- Collector fixtures require request EOF and explicitly close the acknowledgement
+  write side. The submit helper retains child ownership; completed timeout handling
+  explicitly sends kill and awaits child exit/reap. A real long-running child
+  regression executes this path. `kill_on_drop` is the cancellation fallback.
+- Sol evidence: focused 4/4; 20 consecutive stress runs at 4/4; Rustfmt; workspace
+  all-target/all-feature Clippy with `-D warnings`; complete all-feature Rust
+  workspace; locked release performance; Cargo Audit with zero vulnerabilities and
+  eight unchanged allowed warnings; Guardian 1050 passed/4 skipped; Black 30 files;
+  Pylint 9.84 and 10.00; Memory Integrity; six autodidactic tests; Pip Audit zero
+  known vulnerabilities; Guardian compose boundary verifier PASS.
+- Local Docker is unavailable, so the unchanged Docker Compose render remains a
+  protected GitHub CI check. Kimi final review: PASS, no P0-P2.
+- README, Whitepaper, and public Pages require no update because GH-155 changes no
+  product behavior or public project claim. Bridge/Memory/Backlog carry the task
+  state. No secret or external system action occurred.
+- **Status:** `GH-155 Local Done / Commit, protected PR, merge, exact-main pending`.
+
+### 2026-08-09 13:31 EEST - GH-155 PR review state authoritative EOF
+
+- PR #156 is the protected publication path. CodeRabbit's one valid finding was
+  stale `BACKLOG.md` header metadata, not product code.
+- The Backlog now names `d87d969` and exact-main runs CI `31307044838`, Security
+  `31307044850`, and Pages `31307044558`, with the matching 2026-08-09 update date.
+- Merge remains prohibited until the corrected exact PR head passes all required
+  CI/Security contexts and review.
+- **Status:** `GH-155 PR #156 / Corrected head not yet exact-main verified`.
