@@ -2,12 +2,12 @@
 
 use std::{
     fs,
-    io::{BufRead, BufReader},
+    io::{BufRead, BufReader, Read},
     net::{Ipv4Addr, UdpSocket},
     os::unix::fs::PermissionsExt,
     path::{Path, PathBuf},
-    process::{Child, Command, ExitStatus, Stdio},
-    sync::mpsc::{self, Receiver},
+    process::{Child, Command, ExitStatus, Output, Stdio},
+    sync::mpsc::{self, Receiver, RecvTimeoutError},
     thread,
     time::{Duration, Instant},
 };
@@ -18,14 +18,24 @@ use serde_json::Value;
 use sha2::{Digest, Sha256};
 use tempfile::TempDir;
 use tokio::{
-    io::{AsyncReadExt, AsyncWriteExt},
+    io::{AsyncRead, AsyncReadExt, AsyncWriteExt},
     net::UnixListener,
-    sync::oneshot,
+    sync::{oneshot, Mutex, MutexGuard},
+    task::JoinHandle,
 };
 
 use prometheus_guardian_p2p::MAX_BALLOT_BYTES;
 
 const BINARY: &str = env!("CARGO_BIN_EXE_prometheus-guardian-p2p");
+const SERVICE_EVENT_TIMEOUT: Duration = Duration::from_secs(10);
+const SERVICE_EXIT_TIMEOUT: Duration = Duration::from_secs(10);
+const RELAY_RESERVATION_TIMEOUT: Duration = Duration::from_secs(15);
+const SUBMIT_PROCESS_TIMEOUT: Duration = Duration::from_secs(15);
+const SUBMIT_REQUEST_TIMEOUT_SECS: &str = "10";
+const CHILD_POLL_INTERVAL: Duration = Duration::from_millis(20);
+const MAX_STDERR_DIAGNOSTIC_BYTES: usize = 64 * 1024;
+const MAX_SUBMIT_OUTPUT_BYTES: usize = 64 * 1024;
+static PROCESS_TEST_LOCK: Mutex<()> = Mutex::const_new(());
 
 struct ServiceProcess {
     child: Child,
@@ -62,10 +72,15 @@ impl ServiceProcess {
             let remaining = deadline
                 .checked_duration_since(Instant::now())
                 .unwrap_or_else(|| panic!("service event timed out after observing {observed:?}"));
-            let event = self
-                .events
-                .recv_timeout(remaining)
-                .unwrap_or_else(|_| panic!("service event timed out after observing {observed:?}"));
+            let event = match self.events.recv_timeout(remaining) {
+                Ok(event) => event,
+                Err(RecvTimeoutError::Timeout) => {
+                    panic!("service event timed out after observing {observed:?}")
+                }
+                Err(RecvTimeoutError::Disconnected) => {
+                    panic!("service event channel disconnected after observing {observed:?}")
+                }
+            };
             if predicate(&event) {
                 return event;
             }
@@ -76,17 +91,23 @@ impl ServiceProcess {
     fn terminate(&mut self, timeout: Duration) -> ExitStatus {
         let pid = Pid::from_raw(self.child.id() as i32).expect("non-zero child process id");
         kill_process(pid, Signal::TERM).expect("send SIGTERM");
-        let deadline = Instant::now() + timeout;
+        let started = Instant::now();
+        let deadline = started + timeout;
         loop {
             if let Some(status) = self.child.try_wait().expect("poll service exit") {
                 return status;
             }
             assert!(
                 Instant::now() < deadline,
-                "service did not stop after SIGTERM"
+                "service did not stop after SIGTERM within {timeout:?}; elapsed: {:?}",
+                started.elapsed()
             );
-            thread::sleep(Duration::from_millis(20));
+            thread::sleep(CHILD_POLL_INTERVAL);
         }
+    }
+
+    fn drain_events(&self) -> Vec<Value> {
+        self.events.try_iter().collect()
     }
 }
 
@@ -120,12 +141,8 @@ fn write_owner_only(path: &Path, contents: impl AsRef<[u8]>) {
         .expect("set owner-only fixture permissions");
 }
 
-fn available_udp_port() -> u16 {
-    UdpSocket::bind((Ipv4Addr::LOCALHOST, 0))
-        .expect("reserve local UDP port")
-        .local_addr()
-        .expect("read local UDP address")
-        .port()
+fn reserve_udp_port() -> UdpSocket {
+    UdpSocket::bind((Ipv4Addr::UNSPECIFIED, 0)).expect("reserve local UDP port")
 }
 
 fn preflight(config: &Path) -> Value {
@@ -161,6 +178,12 @@ async fn collect_once(listener: UnixListener, received_tx: oneshot::Sender<Vec<u
         .read_exact(&mut ballot)
         .await
         .expect("read exact ballot bytes");
+    let mut trailing = [0_u8; 1];
+    assert_eq!(
+        stream.read(&mut trailing).await.expect("read ballot EOF"),
+        0,
+        "collector ballot contained trailing bytes"
+    );
     let ack = serde_json::to_vec(&CollectorAck {
         payload_digest: format!("{:x}", Sha256::digest(&ballot)),
         protocol_version: 1,
@@ -173,11 +196,144 @@ async fn collect_once(listener: UnixListener, received_tx: oneshot::Sender<Vec<u
         .await
         .expect("write acknowledgement length");
     stream.write_all(&ack).await.expect("write acknowledgement");
+    stream
+        .shutdown()
+        .await
+        .expect("shutdown acknowledgement stream");
     received_tx.send(ballot).expect("record received ballot");
+}
+
+fn capture_child_stderr(child: &mut Child) -> thread::JoinHandle<String> {
+    let mut stderr = child.stderr.take().expect("capture child stderr");
+    thread::spawn(move || {
+        let mut contents = Vec::new();
+        let mut truncated = false;
+        let mut chunk = [0_u8; 8 * 1024];
+        loop {
+            let count = stderr.read(&mut chunk).expect("read child stderr");
+            if count == 0 {
+                break;
+            }
+            let retained = count.min(MAX_STDERR_DIAGNOSTIC_BYTES.saturating_sub(contents.len()));
+            contents.extend_from_slice(&chunk[..retained]);
+            truncated |= retained < count;
+        }
+        let mut rendered = String::from_utf8_lossy(&contents).into_owned();
+        if truncated {
+            rendered.push_str("<stderr truncated>");
+        }
+        rendered
+    })
+}
+
+fn wait_for_child_exit(
+    child: &mut Child,
+    timeout: Duration,
+    context: &str,
+) -> (ExitStatus, String) {
+    let stderr_capture = capture_child_stderr(child);
+    let started = Instant::now();
+    let deadline = started + timeout;
+    loop {
+        if let Some(status) = child.try_wait().expect("poll child exit") {
+            let stderr = stderr_capture.join().expect("join child stderr capture");
+            return (status, stderr);
+        }
+        if Instant::now() >= deadline {
+            child.kill().expect("kill timed-out child");
+            let forced_status = child.wait().expect("reap timed-out child");
+            let stderr = stderr_capture.join().expect("join child stderr capture");
+            panic!(
+                "{context} within {timeout:?}; elapsed: {:?}; forced status: {forced_status}; stderr: {stderr:?}",
+                started.elapsed()
+            );
+        }
+        thread::sleep(CHILD_POLL_INTERVAL);
+    }
+}
+
+async fn serialize_process_test() -> MutexGuard<'static, ()> {
+    PROCESS_TEST_LOCK.lock().await
+}
+
+async fn capture_bounded<R>(mut reader: R, limit: usize) -> Vec<u8>
+where
+    R: AsyncRead + Unpin,
+{
+    let mut contents = Vec::new();
+    let mut truncated = false;
+    let mut chunk = [0_u8; 8 * 1024];
+    loop {
+        let count = reader.read(&mut chunk).await.expect("read submit output");
+        if count == 0 {
+            break;
+        }
+        let retained = count.min(limit.saturating_sub(contents.len()));
+        contents.extend_from_slice(&chunk[..retained]);
+        truncated |= retained < count;
+    }
+    if truncated {
+        contents.extend_from_slice(b"<output truncated>");
+    }
+    contents
+}
+
+async fn join_capture(task: JoinHandle<Vec<u8>>) -> Vec<u8> {
+    task.await.expect("join submit output capture")
+}
+
+async fn wait_for_submit_output(
+    mut child: tokio::process::Child,
+    timeout: Duration,
+) -> Result<Output, String> {
+    let stdout = child.stdout.take().expect("capture submit stdout");
+    let stderr = child.stderr.take().expect("capture submit stderr");
+    let stdout_capture = tokio::spawn(capture_bounded(stdout, MAX_SUBMIT_OUTPUT_BYTES));
+    let stderr_capture = tokio::spawn(capture_bounded(stderr, MAX_SUBMIT_OUTPUT_BYTES));
+
+    match tokio::time::timeout(timeout, child.wait()).await {
+        Ok(status) => {
+            let status = status.expect("wait for local submit client");
+            Ok(Output {
+                status,
+                stdout: join_capture(stdout_capture).await,
+                stderr: join_capture(stderr_capture).await,
+            })
+        }
+        Err(_) => {
+            let kill_result = child.start_kill();
+            let forced_status = child.wait().await;
+            let stdout = join_capture(stdout_capture).await;
+            let stderr = join_capture(stderr_capture).await;
+            Err(format!(
+                "timed out after {timeout:?}; kill_result={kill_result:?}; forced_status={forced_status:?}; stdout={:?}; stderr={:?}",
+                String::from_utf8_lossy(&stdout),
+                String::from_utf8_lossy(&stderr),
+            ))
+        }
+    }
+}
+
+#[tokio::test]
+async fn submit_timeout_kills_and_reaps_child() {
+    let _process_test_guard = serialize_process_test().await;
+    let child = tokio::process::Command::new("/bin/sleep")
+        .arg("60")
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .kill_on_drop(true)
+        .spawn()
+        .expect("spawn timeout fixture");
+
+    let error = wait_for_submit_output(child, Duration::from_millis(50))
+        .await
+        .expect_err("sleep fixture must time out");
+    assert!(error.contains("forced_status=Ok"), "{error}");
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn sigterm_during_collector_wait_stops_cleanly() {
+    let _process_test_guard = serialize_process_test().await;
     let directory = secure_directory();
     let collector = directory.path().join("missing-collector.sock");
     let submission = directory.path().join("waiting-submit.sock");
@@ -190,18 +346,19 @@ async fn sigterm_during_collector_wait_stops_cleanly() {
         None,
     );
     let mut service = ServiceProcess::spawn(&config);
-    service.wait_for(Duration::from_secs(5), |event| {
+    service.wait_for(SERVICE_EVENT_TIMEOUT, |event| {
         event["event"] == "waiting-for-collector"
     });
 
-    assert!(service.terminate(Duration::from_secs(5)).success());
-    let stopped = service.wait_for(Duration::from_secs(5), |event| event["event"] == "stopped");
+    assert!(service.terminate(SERVICE_EXIT_TIMEOUT).success());
+    let stopped = service.wait_for(SERVICE_EVENT_TIMEOUT, |event| event["event"] == "stopped");
     assert_eq!(stopped["ready"], false);
     assert!(!submission.exists());
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn broken_stdout_fails_without_blocking_the_service() {
+    let _process_test_guard = serialize_process_test().await;
     let directory = secure_directory();
     let collector_path = directory.path().join("collector.sock");
     let _collector = bind_collector(&collector_path).await;
@@ -218,23 +375,20 @@ async fn broken_stdout_fails_without_blocking_the_service() {
         .args(["run", "--config"])
         .arg(&config)
         .stdout(Stdio::piped())
-        .stderr(Stdio::null())
+        .stderr(Stdio::piped())
         .spawn()
         .expect("spawn service with breakable stdout");
     drop(child.stdout.take().expect("capture service stdout"));
 
-    let deadline = Instant::now() + Duration::from_secs(5);
-    loop {
-        if let Some(status) = child.try_wait().expect("poll service exit") {
-            assert!(!status.success(), "broken stdout must fail closed");
-            break;
-        }
-        assert!(
-            Instant::now() < deadline,
-            "service remained blocked after stdout closed"
-        );
-        thread::sleep(Duration::from_millis(20));
-    }
+    let (status, stderr) = wait_for_child_exit(
+        &mut child,
+        SERVICE_EXIT_TIMEOUT,
+        "service remained blocked after stdout closed",
+    );
+    assert!(
+        !status.success(),
+        "broken stdout must fail closed; status: {status}; stderr: {stderr:?}"
+    );
 }
 
 fn guardian_config(
@@ -270,9 +424,14 @@ fn guardian_config(
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn separate_processes_relay_exact_ballot_and_shutdown_cleanly() {
+    let _process_test_guard = serialize_process_test().await;
     let directory = secure_directory();
     let relay_config = directory.path().join("relay.toml");
-    let relay_port = available_udp_port();
+    let relay_port_reservation = reserve_udp_port();
+    let relay_port = relay_port_reservation
+        .local_addr()
+        .expect("read reserved local UDP address")
+        .port();
     let relay_dial_address = format!("/ip4/127.0.0.1/udp/{relay_port}/quic-v1");
     write_owner_only(
         &relay_config,
@@ -288,8 +447,9 @@ async fn separate_processes_relay_exact_ballot_and_shutdown_cleanly() {
         .as_str()
         .expect("relay peer id")
         .to_owned();
+    drop(relay_port_reservation);
     let mut relay = ServiceProcess::spawn(&relay_config);
-    let bootstrap = relay.wait_for(Duration::from_secs(10), |event| {
+    let bootstrap = relay.wait_for(SERVICE_EVENT_TIMEOUT, |event| {
         event["event"] == "bootstrap-route"
     });
     assert_eq!(
@@ -298,7 +458,7 @@ async fn separate_processes_relay_exact_ballot_and_shutdown_cleanly() {
     );
     assert_eq!(bootstrap["schema_version"], 2);
     assert_eq!(bootstrap["ready"], false);
-    let relay_listening = relay.wait_for(Duration::from_secs(10), |event| {
+    let relay_listening = relay.wait_for(SERVICE_EVENT_TIMEOUT, |event| {
         event["event"] == "listening" && event["ready"] == true
     });
     assert!(relay_listening["address"]
@@ -328,10 +488,10 @@ async fn separate_processes_relay_exact_ballot_and_shutdown_cleanly() {
         .expect("receiver peer id")
         .to_owned();
     let mut receiver = ServiceProcess::spawn(&receiver_config);
-    receiver.wait_for(Duration::from_secs(15), |event| {
+    receiver.wait_for(RELAY_RESERVATION_TIMEOUT, |event| {
         event["event"] == "relay-reservation-accepted"
     });
-    receiver.wait_for(Duration::from_secs(10), |event| event["ready"] == true);
+    receiver.wait_for(SERVICE_EVENT_TIMEOUT, |event| event["ready"] == true);
 
     let receiver_route = format!("{reservation_address}/p2p/{receiver_peer}");
     let sender_listener = "/ip4/127.0.0.1/udp/0/quic-v1".to_owned();
@@ -349,24 +509,46 @@ async fn separate_processes_relay_exact_ballot_and_shutdown_cleanly() {
         .expect("sender peer id")
         .to_owned();
     let mut sender = ServiceProcess::spawn(&sender_config);
-    sender.wait_for(Duration::from_secs(10), |event| {
+    sender.wait_for(SERVICE_EVENT_TIMEOUT, |event| {
         event["event"] == "listening" && event["ready"] == true
     });
 
     let ballot = b"separate-process exact Guardian ballot".to_vec();
     let ballot_path = directory.path().join("ballot.bin");
     write_owner_only(&ballot_path, &ballot);
-    let (received_tx, received_rx) = oneshot::channel();
-    let collector_task = tokio::spawn(collect_once(receiver_collector, received_tx));
-    let submit_output = tokio::process::Command::new(BINARY)
+    let (received_tx, mut received_rx) = oneshot::channel();
+    let mut collector_task = tokio::spawn(collect_once(receiver_collector, received_tx));
+    // Output is drained concurrently to avoid pipe backpressure. The timeout
+    // path explicitly kills and waits for the child; kill_on_drop remains the
+    // cancellation safeguard if the surrounding test future is dropped.
+    let submit_child = tokio::process::Command::new(BINARY)
         .args(["submit", "--socket"])
         .arg(&sender_submit)
         .args(["--peer", &receiver_peer, "--ballot"])
         .arg(&ballot_path)
-        .args(["--timeout-secs", "10"])
-        .output()
+        .args(["--timeout-secs", SUBMIT_REQUEST_TIMEOUT_SECS])
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .kill_on_drop(true)
+        .spawn()
+        .expect("spawn local submit client");
+    let submit_output: Output = match wait_for_submit_output(submit_child, SUBMIT_PROCESS_TIMEOUT)
         .await
-        .expect("run local submit client");
+    {
+        Ok(output) => output,
+        Err(submit_error) => {
+            tokio::time::sleep(Duration::from_millis(100)).await;
+            let collector_result =
+                tokio::time::timeout(Duration::from_secs(1), &mut collector_task).await;
+            let received_result = received_rx.try_recv();
+            panic!(
+                "local submit client failed: {submit_error}; collector_result={collector_result:?}; received_result={received_result:?}; relay_events={:?}; receiver_events={:?}; sender_events={:?}",
+                relay.drain_events(),
+                receiver.drain_events(),
+                sender.drain_events(),
+            );
+        }
+    };
     assert!(
         submit_output.status.success(),
         "local submit failed: {}",
@@ -374,27 +556,43 @@ async fn separate_processes_relay_exact_ballot_and_shutdown_cleanly() {
     );
     let submit_report: Value =
         serde_json::from_slice(&submit_output.stdout).expect("parse submit report");
-    assert_eq!(submit_report["status"], "accepted");
+    if submit_report["status"] != "accepted" {
+        tokio::time::sleep(Duration::from_millis(100)).await;
+        let collector_result =
+            tokio::time::timeout(Duration::from_secs(1), &mut collector_task).await;
+        let received_result = received_rx.try_recv();
+        panic!(
+            "local submit was not accepted: report={submit_report}; stderr={:?}; collector_result={collector_result:?}; received_result={received_result:?}; relay_events={:?}; receiver_events={:?}; sender_events={:?}",
+            String::from_utf8_lossy(&submit_output.stderr),
+            relay.drain_events(),
+            receiver.drain_events(),
+            sender.drain_events(),
+        );
+    }
     assert_eq!(submit_report["peer_id"], receiver_peer);
-    assert_eq!(
-        received_rx.await.expect("receive collector evidence"),
-        ballot
-    );
-    collector_task.await.expect("collector task");
+    let received_ballot = tokio::time::timeout(SERVICE_EVENT_TIMEOUT, &mut received_rx)
+        .await
+        .expect("collector evidence timed out")
+        .expect("receive collector evidence");
+    assert_eq!(received_ballot, ballot);
+    tokio::time::timeout(SERVICE_EVENT_TIMEOUT, &mut collector_task)
+        .await
+        .expect("collector task timed out")
+        .expect("collector task");
 
-    relay.wait_for(Duration::from_secs(10), |event| {
+    relay.wait_for(SERVICE_EVENT_TIMEOUT, |event| {
         event["event"] == "circuit-accepted"
     });
-    receiver.wait_for(Duration::from_secs(10), |event| {
+    receiver.wait_for(SERVICE_EVENT_TIMEOUT, |event| {
         event["event"] == "inbound-processed" && event["status"] == "accepted"
     });
-    sender.wait_for(Duration::from_secs(10), |event| {
+    sender.wait_for(SERVICE_EVENT_TIMEOUT, |event| {
         event["event"] == "outbound-ack" && event["status"] == "accepted"
     });
 
-    assert!(sender.terminate(Duration::from_secs(10)).success());
-    assert!(receiver.terminate(Duration::from_secs(10)).success());
-    assert!(relay.terminate(Duration::from_secs(10)).success());
+    assert!(sender.terminate(SERVICE_EXIT_TIMEOUT).success());
+    assert!(receiver.terminate(SERVICE_EXIT_TIMEOUT).success());
+    assert!(relay.terminate(SERVICE_EXIT_TIMEOUT).success());
     assert!(!sender_submit.exists());
     assert!(!receiver_submit.exists());
     assert_eq!(preflight(&relay_config)["peer_id"], relay_peer);

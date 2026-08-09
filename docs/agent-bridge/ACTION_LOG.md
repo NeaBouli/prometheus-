@@ -3177,3 +3177,44 @@ Rules for all dev agents:
 - Live Pages verification confirms schema-v5 and exact v4 outbox/result migration
   wording in Whitepaper, Roadmap, and FAQ.
 - **Status:** `GH-152 Done / Merged and exact-main verified`.
+
+### 2026-08-09 13:01 EEST - GH-155 sidecar CI stability started authoritative EOF
+
+- Issue #155 and branch `test/GH-155-sidecar-ci-stability` start from clean
+  exact main `d87d969` after GH-152 and its closeout.
+- The superseded old sidecar worktree is read-only source material. Only its
+  still-relevant test hardening may be ported; its old Bridge/Memory edits remain
+  excluded.
+- Required correction beyond the old candidate: timeout cancellation must own,
+  kill, and reap the submit subprocess rather than dropping `output()` future
+  state ambiguously.
+- Scope is `modules/guardian-p2p/tests/sidecar_process.rs` plus tests/status docs;
+  no production runtime, protocol, wallet, chain, contract, token, or deploy.
+- **Status:** `GH-155 In Progress / Kimi implementation then Sol integration`.
+
+### 2026-08-09 13:25 EEST - GH-155 local implementation and verification EOF
+
+- Kimi ported the bounded process-test hardening into
+  `modules/guardian-p2p/tests/sidecar_process.rs`; Sol retained the child handle,
+  added concurrent bounded stdout/stderr draining, and made the completed timeout
+  path call `start_kill()` plus `wait()` before reporting failure.
+- A deterministic `/bin/sleep` regression executes that kill-and-reap path.
+  `kill_on_drop(true)` remains the cancellation fallback; completed success and
+  timeout paths explicitly reap.
+- Focused sidecar tests pass 4/4, followed by 20 consecutive 4/4 stress passes.
+  Rustfmt, warning-free workspace all-target/all-feature Clippy, the complete
+  all-feature Rust workspace, and the locked release performance gate pass.
+- Guardian passes 1050 tests with four intentional live-model skips; Black leaves
+  30 files unchanged; Pylint passes at 9.84/10 and 10.00/10. Memory Integrity and
+  all six autodidactic tests pass.
+- Cargo Audit reports no vulnerabilities and the eight unchanged allowed warnings;
+  Pip Audit reports no known vulnerabilities. The Guardian compose boundary
+  verifier passes. Docker is unavailable locally, so GitHub CI owns the unchanged
+  compose render check.
+- Kimi's independent final review is PASS with no P0-P2. Non-blocking residuals:
+  the minimal UDP release-to-bind race against external processes, cancellation
+  relying on Tokio's drop fallback rather than synchronous reap, a deliberately
+  simple timeout-status assertion, and `/bin/sleep` portability within `cfg(unix)`.
+- No production source, runtime, protocol, wallet, chain, contract, token, signing,
+  deployment, secret, README, Whitepaper, or public Pages behavior changed.
+- **Status:** `GH-155 Local Done / Protected PR and exact-main evidence pending`.

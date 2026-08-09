@@ -109,3 +109,13 @@
   nonempty-v4 fail-closed, retention, replay and rollback regressions.
 - [x] Full local gates and independent final review.
 - [x] Protected PR #153, merge `3d203aa`, exact-main CI/Security/Pages evidence.
+
+## GH-155 Guardian sidecar CI stability - 2026-08-09
+
+- [x] Port only the still-relevant process-test hardening from the superseded
+  old worktree onto fresh exact main `d87d969`.
+- [x] Prove the completed timeout path explicitly kills and reaps submit children;
+  retain `kill_on_drop` as the cancellation fallback.
+- [x] Run 20 consecutive stress passes, full local Rust/Python/security gates,
+  and independent review with no P0-P2 finding.
+- [ ] Complete protected PR, merge, and exact-main CI/Security/Pages evidence.
