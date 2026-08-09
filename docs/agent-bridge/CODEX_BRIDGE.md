@@ -3280,3 +3280,17 @@ No direct `main` push or production action occurred.
   No product, wallet, signing, transaction, chain, deployment, token, or secret
   action occurred.
 - **Status:** `GH-158 Local PASS / Protected PR next`.
+
+### 2026-08-09 14:44 EEST - GH-158 merged public closeout authoritative EOF
+
+- PR #159 passed all eleven protected contexts with no actionable CodeRabbit
+  finding and squash-merged normally without admin bypass as exact main
+  `ed75b58291584a2a5ab71c677879674bf8288201`; issue #158 is closed.
+- Exact-main Prometheus CI `31311389618`, Security Audit `31311389613`, and
+  GitHub Pages `31311389052` pass on that SHA. Live homepage, Whitepaper, and
+  Roadmap markers confirm the August status, GH-155 test-only evidence, and the
+  corrected 2026-08-04 / `48b3b74` H-001 provenance.
+- H-001 remains 96%, core rollout remains 84-88%, and complete roadmap vision
+  remains 50-55%. No wallet, key, signature, transaction, broadcast, chain,
+  contract, token, production, deployment, or secret-bearing action occurred.
+- **Status:** `GH-158 Done / Public status current`.
