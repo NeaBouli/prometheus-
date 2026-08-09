@@ -3228,3 +3228,18 @@ No direct `main` push or production action occurred.
 - Merge remains prohibited until the corrected exact PR head passes all required
   CI/Security contexts and review.
 - **Status:** `GH-155 PR #156 / Corrected head not yet exact-main verified`.
+
+### 2026-08-09 13:41 EEST - GH-155 final closeout authoritative EOF
+
+- PR #156 merged as exact main `db33f566caed4f3acb3807c1dbafe0342ca8a7da`;
+  issue #155 is closed.
+- Exact-main evidence is fully green: Prometheus CI `31308756777`, Security Audit
+  `31308756786`, and Pages `31308756387`.
+- The delivered test-only lifecycle hardening has deterministic explicit timeout
+  kill/reap coverage, 20 consecutive local stress passes, complete local gates,
+  Kimi PASS with no P0-P2, protected PR checks, and exact-main checks.
+- CodeRabbit's one valid stale-Backlog-metadata finding was corrected, answered,
+  resolved, and rechecked before merge.
+- README, Whitepaper, and public Pages need no content change for this test-only
+  task. No production or secret-bearing boundary changed.
+- **Status:** `GH-155 Done / Next task may start from exact main db33f56`.

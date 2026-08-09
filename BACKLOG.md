@@ -1,8 +1,8 @@
 # prometheus — Backlog
 
 ## 🔴 Aktiv (diese Session)
-- Latest documented green baseline is exact main `d87d969b6c40ad83fa58c48eb0c567ab50570889`; run `git log --oneline -1` for the current working HEAD.
-- Prometheus CI `31307044838`, Security Audit `31307044850`, and GitHub Pages `31307044558` are green for exact main. Current-Silverc CI validates the keyless Toccata-v1 operator, operator runbook, request/receipt/evidence pipeline, release-readiness audit, metrics-oracle handoff, exact-commit hardening gates, and the strict release performance gate.
+- Latest documented green baseline is exact main `db33f566caed4f3acb3807c1dbafe0342ca8a7da`; run `git log --oneline -1` for the current working HEAD.
+- Prometheus CI `31308756777`, Security Audit `31308756786`, and GitHub Pages `31308756387` are green for exact main. Current-Silverc CI validates the keyless Toccata-v1 operator, operator runbook, request/receipt/evidence pipeline, release-readiness audit, metrics-oracle handoff, exact-commit hardening gates, and the strict release performance gate.
 - GH-131/M-002, GH-132, GH-135/M-001, GH-138/M-003, and GH-141/M-004 are merged and exact-main verified. GH-135 strictly parses separate model-provided integer basis points, replaces the indicator-count/YARA-shape heuristic, preserves the `0.85` policy, and fails closed on malformed output.
 - GH-138/M-003 provides deterministic, internally SHA-256-consistent synthetic confidence evaluation. Its co-versioned manifest is not an external tamper anchor and it does not establish live-model quality, production calibration, or authorization.
 - GH-141/M-004 is merged and exact-main verified at `bf3f74f`: a literal-loopback, proxy-independent runner captures canonical local-model candidate predictions and an offline evaluator keeps them non-authorizing. No live result or independently verified model artifact is included.
@@ -27,7 +27,7 @@
 
 ### Pflicht VOR neuem Code:
 1. `cd /Users/gio/Desktop/repos/prometheus`
-2. `git log --oneline -5` — aktuellen HEAD prüfen; letzter dokumentierter grüner Baseline-Commit ist `d87d969`
+2. `git log --oneline -5` — aktuellen HEAD prüfen; letzter dokumentierter grüner Baseline-Commit ist `db33f56`
 3. Lies `memory/CHECKPOINT.md` — vollständiger Projektstatus
 4. Lies `memory/AUDIT.md` ab Zeile 337 — Pre-Hardfork-Audit-Ergebnisse
 5. Lies `memory/ERRORS.md` — 12 bekannte Patterns
@@ -118,4 +118,5 @@
   retain `kill_on_drop` as the cancellation fallback.
 - [x] Run 20 consecutive stress passes, full local Rust/Python/security gates,
   and independent review with no P0-P2 finding.
-- [ ] Complete protected PR, merge, and exact-main CI/Security/Pages evidence.
+- [x] Protected PR #156 merged as `db33f56`; exact-main CI `31308756777`,
+  Security `31308756786`, and Pages `31308756387` pass.

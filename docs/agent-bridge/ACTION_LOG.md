@@ -3228,3 +3228,20 @@ Rules for all dev agents:
 - No code or product behavior changed in this correction. All protected checks
   must rerun on the refreshed PR head before merge.
 - **Status:** `GH-155 PR #156 / Metadata correction pending push and checks`.
+
+### 2026-08-09 13:41 EEST - GH-155 merged and exact-main verified EOF
+
+- CodeRabbit's single valid Backlog-metadata finding was fixed in `d8f59e3`,
+  answered, and resolved. All required contexts passed on that exact PR head.
+- PR #156 merged normally by the repository-allowed squash method without admin
+  bypass as exact main `db33f566caed4f3acb3807c1dbafe0342ca8a7da`; issue #155
+  closed automatically.
+- Exact-main Prometheus CI `31308756777`, Security Audit `31308756786`, and Pages
+  `31308756387` pass. Main CI includes the real Docker Compose render, Guardian,
+  Rust workspace, strict release performance, Silverc, Memory, and HTML gates;
+  Security includes Gitleaks, Cargo Audit, and Pip Audit.
+- README, Whitepaper, and public Pages content remain unchanged because GH-155 is
+  test-only. Their integrity/build/deployment gates passed on exact main.
+- No wallet, key, secret, signature, transaction, chain, contract, token,
+  production, or deployment action occurred.
+- **Status:** `GH-155 Done / Merged and exact-main verified`.
