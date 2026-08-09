@@ -1,6 +1,6 @@
 # Prometheus — Full Deployment Roadmap
 *Readiness-gated roadmap; no fixed public-release date is claimed.*
-*Last status reconciliation: 2026-07-31 (Europe/Athens project time).*
+*Last status reconciliation: 2026-08-09 (Europe/Athens project time).*
 
 ## Progress Snapshot
 
@@ -184,6 +184,7 @@ public release-hardening evidence for the exact rollout commit.
 - Merged and exact-main-verified GH-117, not production-deployed: enforceable authority/privacy governance binds network, key, scope, epoch/window, same-Guardian recipient semantics, denied external disclosure, and explicit per-kind risk decisions; all three policy digests and authority state pin or advance atomically with valid consumption
 - Merged and exact-main-verified GH-117, not production-deployed: governed schema v4 binds canonical statement/digest, trusted nonce, canonical bundle, approval, lease and retention; atomic completion stores one canonical non-actionable result before deleting work. The bounded worker uses only a deterministic test analyzer and has no LLM/YARA, actionable rule, transport, publication, chain, reward, deployment, or external effect
 - Merged and exact-main-verified GH-152, not production-deployed: governed schema v5 permanently enforces one-to-one-to-one statement-digest, approval-ID and observable-commitment pairing across outbox/result retention; v4 migration requires empty outbox and result tables, preserves authority/high-water/consumption state, and fails closed unchanged for any retained work or result
+- Merged and exact-main-verified GH-155: Guardian sidecar process integration tests serialize shared cases, bound diagnostics and waits, coordinate EOF/ACK shutdown, and deterministically kill and reap a child on timeout; this is test reliability only and changes no rollout percentage or production behavior
 - Pending: production authority/key/recipient attestation, independent approval of the v2 relation/production proof artifacts and cryptographic review, real privacy-reviewed semantic/actionable analysis, and v2 transport
 - Proven on an isolated three-node harness: relay reservation/delivery, AutoNAT state, DCUtR relay fallback, and disconnect handling; real two-host operation remains pending
 - Pending: public operated relay/NAT infrastructure and broad discovery; mDNS remains excluded while its compatible dependency path has unresolved RustSec advisories
