@@ -2,7 +2,7 @@
 # Format: - [ ] [PRIO] Beschreibung | Verantwortlich | Dependencies
 # PRIO: P0=Kritisch, P1=Hoch, P2=Mittel, P3=Niedrig
 # Status: [ ]=offen, [~]=in Arbeit, [x]=erledigt, [!]=blockiert
-# Last Updated: 2026-08-02
+# Last Updated: 2026-08-13
 
 ---
 
@@ -261,3 +261,4 @@
 - [x] [P2] GH-155 Guardian sidecar process-test CI stability | Codex Sol + Kimi K3 | PR #156 merged as exact main `db33f56`; CI `31308756777`, Security `31308756786`, and Pages `31308756387` pass after deterministic kill/reap coverage, 20-pass stress, full local gates, and Kimi review PASS with no P0-P2; test-only, no production behavior
 - [x] [P2] GH-158 synchronize August public status and GH-155 reliability evidence | Codex Sol + Kimi K3 | PR #159 merged as exact main `ed75b58`; CI `31311389618`, Security `31311389613`, and Pages `31311389052` pass; live Pages verified, H-001 remains 96% and core rollout remains 84-88%
 - [x] [P1] GH-161 derive Guardian candidate model digest from exact owner-local artifacts | Codex Sol + Kimi K3 | PR #162 merged as exact main `d468426`; CI `31340112225`, Security `31340112204`, and Pages `31340111625` pass; canonical manifest and capture-time re-verification only, no upstream authenticity or production model authority
+- [~] [P1] GH-167 bounded ThreatHint-v2 repository transport substrate | Codex Sol + Kimi K3 | Exact Rust/Python framing, independent libp2p v2 channel, owner-only local ingress, trusted network/session/time revalidation, bounded acknowledgements/budgets, adversarial corpus, and separate-process same-host evidence are implemented locally; complete gates, independent final review, protected PR, merge, exact-main CI/Security/Pages, and live verification remain

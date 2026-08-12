@@ -49,6 +49,17 @@ It opens no SQLite database and returns only data hashes and identifiers.
 Success is not Groth16 verification, privacy approval, disclosure authority,
 replay consumption, transport admission, analyzer promotion, or rollout state.
 
+GH-167 adds only the bounded repository transport substrate. One exact
+Rust/Python frame carries the original proof envelope, Observable Bundle,
+approval wire, and an untrusted report-nonce lookup key over the independent
+`/prometheus/threat-hint/2.0.0` protocol into owner-only local IPC. Rust parses
+against an explicitly trusted local network before IPC. Python reparses the
+same bytes, resolves the nonce only through trusted active-session state,
+obtains time from a trusted local clock, and then calls the existing governed
+promotion boundary. This same-host substrate does not approve production
+relation/key/ceremony artifacts, semantic or actionable analysis, disclosure,
+public multi-host operation, models/YARA, wallet, chain, rewards, or deployment.
+
 A separate merged local Rust `verify-v2` boundary closes the mechanical proof
 verification step. It owner-loads retained canonical manifest bytes plus fixed
 `relation-source.bin` and `verifying-key.bin` siblings, binds their exact

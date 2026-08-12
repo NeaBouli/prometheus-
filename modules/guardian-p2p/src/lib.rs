@@ -13,6 +13,7 @@ pub mod local_submit;
 pub mod relay_service;
 pub mod service;
 pub mod threat_hint_ingress;
+pub mod threat_hint_v2_ingress;
 #[path = "identity.rs"]
 pub mod transport_identity;
 
@@ -43,20 +44,27 @@ use libp2p_ping as ping;
 use libp2p_relay as relay;
 use libp2p_request_response as request_response;
 use libp2p_swarm::{NetworkBehaviour, StreamProtocol, Swarm, SwarmEvent};
-pub use prometheus_threat_hint::{ThreatHintEnvelope, ThreatIndicatorType, ThreatProofSystem};
+pub use prometheus_threat_hint::{
+    ThreatHintEnvelope, ThreatHintV2TransportPayload, ThreatIndicatorType, ThreatProofSystem,
+};
 use thiserror::Error;
 
 use crate::ingress::{IngressError, UnixBallotIngress};
 use crate::threat_hint_ingress::{ThreatHintIngressError, UnixThreatHintIngress};
+use crate::threat_hint_v2_ingress::{ThreatHintV2IngressError, UnixThreatHintV2Ingress};
 
 /// Direct request-response protocol for opaque Guardian ballot envelopes.
 pub const BALLOT_PROTOCOL: &str = "/prometheus/guardian-ballot/1.0.0";
 /// Direct request-response protocol for canonical Light Client threat hints.
 pub const THREAT_HINT_PROTOCOL: &str = "/prometheus/threat-hint/1.0.0";
+/// Independent request-response protocol for canonical ThreatHint-v2 payloads.
+pub const THREAT_HINT_V2_PROTOCOL: &str = "/prometheus/threat-hint/2.0.0";
 /// Maximum permitted ballot envelope size, matching the canonical verifier.
 pub const MAX_BALLOT_BYTES: usize = 8_192;
 /// Maximum permitted canonical threat-hint envelope size.
 pub const MAX_THREAT_HINT_BYTES: usize = prometheus_threat_hint::MAX_CANONICAL_BYTES;
+/// Maximum permitted canonical ThreatHint-v2 transport payload size.
+pub const MAX_THREAT_HINT_V2_BYTES: usize = prometheus_threat_hint::MAX_TRANSPORT_PAYLOAD_BYTES;
 /// Maximum configured static transport routes.
 pub const MAX_STATIC_PEERS: usize = 64;
 /// Maximum configured direct or relay listeners.
@@ -70,7 +78,7 @@ pub const MAX_CONCURRENT_REQUESTS: usize = 1_024;
 /// Maximum concurrent streams accepted per connection.
 pub const MAX_STREAMS_PER_CONNECTION: usize = 64;
 /// Minimum global stream budget needed to reserve one stream per protocol.
-pub const MIN_STREAMS_PER_CONNECTION: usize = 2;
+pub const MIN_STREAMS_PER_CONNECTION: usize = 3;
 /// Maximum value for any individual configured connection limit.
 pub const MAX_CONNECTION_LIMIT: u32 = 4_096;
 /// Maximum operator-configured transport duration.
@@ -208,6 +216,51 @@ impl ThreatHintAckStatus {
     }
 }
 
+/// Data-minimal response for the independent ThreatHint-v2 channel.
+///
+/// Duplicate suppression belongs to the downstream promotion boundary, so the
+/// wire carries accepted/rejected/busy only and fails closed on anything else.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[repr(u8)]
+pub enum ThreatHintV2AckStatus {
+    Accepted = 0,
+    Rejected = 1,
+    Busy = 2,
+}
+
+impl ThreatHintV2AckStatus {
+    fn from_wire(value: u8) -> io::Result<Self> {
+        match value {
+            0 => Ok(Self::Accepted),
+            1 => Ok(Self::Rejected),
+            2 => Ok(Self::Busy),
+            _ => Err(io::Error::new(
+                io::ErrorKind::InvalidData,
+                "unknown ThreatHint-v2 acknowledgement",
+            )),
+        }
+    }
+
+    /// Stable machine-readable acknowledgement name.
+    pub const fn as_str(self) -> &'static str {
+        match self {
+            Self::Accepted => "accepted",
+            Self::Rejected => "rejected",
+            Self::Busy => "busy",
+        }
+    }
+}
+
+impl From<crate::threat_hint_v2_ingress::ThreatHintV2AckStatus> for ThreatHintV2AckStatus {
+    fn from(status: crate::threat_hint_v2_ingress::ThreatHintV2AckStatus) -> Self {
+        match status {
+            crate::threat_hint_v2_ingress::ThreatHintV2AckStatus::Accepted => Self::Accepted,
+            crate::threat_hint_v2_ingress::ThreatHintV2AckStatus::Rejected => Self::Rejected,
+            crate::threat_hint_v2_ingress::ThreatHintV2AckStatus::Busy => Self::Busy,
+        }
+    }
+}
+
 /// A configured transport peer. It intentionally has no Guardian identity fields.
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub struct StaticPeer {
@@ -235,6 +288,10 @@ pub struct GuardianP2pConfig {
     pub max_established_incoming_connections: u32,
     pub max_established_outgoing_connections: u32,
     pub max_established_connections_per_peer: u32,
+    /// Separately trusted network id used to validate inbound ThreatHint-v2
+    /// payloads. An empty value disables inbound v2 parsing fail-closed; trust
+    /// is never derived from payload bytes.
+    pub threat_hint_v2_trusted_network_id: String,
 }
 
 impl Default for GuardianP2pConfig {
@@ -257,6 +314,7 @@ impl Default for GuardianP2pConfig {
             max_established_incoming_connections: 16,
             max_established_outgoing_connections: 16,
             max_established_connections_per_peer: 2,
+            threat_hint_v2_trusted_network_id: String::new(),
         }
     }
 }
@@ -293,6 +351,15 @@ impl GuardianP2pConfig {
         {
             return Err(TransportError::InvalidConfig(
                 "request and connection limits are out of bounds",
+            ));
+        }
+
+        if !self.threat_hint_v2_trusted_network_id.is_empty()
+            && prometheus_threat_hint::validate_network_id(&self.threat_hint_v2_trusted_network_id)
+                .is_err()
+        {
+            return Err(TransportError::InvalidConfig(
+                "ThreatHint-v2 trusted network id is invalid",
             ));
         }
 
@@ -488,6 +555,25 @@ pub enum TransportEvent {
         request_id: request_response::OutboundRequestId,
         failure: RequestFailure,
     },
+    InboundThreatHintV2 {
+        peer: PeerId,
+        request_id: request_response::InboundRequestId,
+        payload: Box<ThreatHintV2TransportPayload>,
+    },
+    InboundThreatHintV2Processed {
+        peer: PeerId,
+        status: ThreatHintV2AckStatus,
+    },
+    OutboundThreatHintV2Ack {
+        peer: PeerId,
+        request_id: request_response::OutboundRequestId,
+        status: ThreatHintV2AckStatus,
+    },
+    OutboundThreatHintV2Failure {
+        peer: PeerId,
+        request_id: request_response::OutboundRequestId,
+        failure: RequestFailure,
+    },
     ConnectionEstablished {
         peer: PeerId,
         path: ConnectionPath,
@@ -596,6 +682,8 @@ pub enum TransportError {
     UnknownInboundRequest,
     #[error("the inbound ThreatHint is no longer awaiting an acknowledgement")]
     UnknownInboundThreatHint,
+    #[error("the inbound ThreatHint-v2 is no longer awaiting an acknowledgement")]
+    UnknownInboundThreatHintV2,
     #[error("the inbound response channel closed before the acknowledgement was sent")]
     ResponseChannelClosed,
 }
@@ -721,6 +809,74 @@ impl request_response::Codec for ThreatHintCodec {
     }
 }
 
+/// Independent ThreatHint-v2 codec bound to a separately trusted network id.
+///
+/// Inbound frames are parsed as canonical v2 payloads against the configured
+/// trusted network before they can reach any local IPC boundary; the payload
+/// bytes themselves never supply trust.
+#[derive(Clone, Debug)]
+struct ThreatHintV2Codec {
+    trusted_network_id: String,
+}
+
+#[async_trait]
+impl request_response::Codec for ThreatHintV2Codec {
+    type Protocol = StreamProtocol;
+    type Request = ThreatHintV2TransportPayload;
+    type Response = ThreatHintV2AckStatus;
+
+    async fn read_request<T>(&mut self, _: &Self::Protocol, io: &mut T) -> io::Result<Self::Request>
+    where
+        T: AsyncRead + Unpin + Send,
+    {
+        let bytes = read_threat_hint_v2_frame(io).await?;
+        let payload =
+            ThreatHintV2TransportPayload::parse_canonical(&bytes, &self.trusted_network_id)
+                .map_err(|error| io::Error::new(io::ErrorKind::InvalidData, error))?;
+        require_stream_end(io, "ThreatHint-v2 frame contains trailing bytes").await?;
+        Ok(payload)
+    }
+
+    async fn read_response<T>(
+        &mut self,
+        _: &Self::Protocol,
+        io: &mut T,
+    ) -> io::Result<Self::Response>
+    where
+        T: AsyncRead + Unpin + Send,
+    {
+        let mut encoded = [0_u8; ACK_BYTES];
+        io.read_exact(&mut encoded).await?;
+        require_stream_end(io, "ThreatHint-v2 acknowledgement contains trailing bytes").await?;
+        ThreatHintV2AckStatus::from_wire(encoded[0])
+    }
+
+    async fn write_request<T>(
+        &mut self,
+        _: &Self::Protocol,
+        io: &mut T,
+        request: Self::Request,
+    ) -> io::Result<()>
+    where
+        T: AsyncWrite + Unpin + Send,
+    {
+        write_threat_hint_v2_frame(io, &request.to_canonical_bytes()).await
+    }
+
+    async fn write_response<T>(
+        &mut self,
+        _: &Self::Protocol,
+        io: &mut T,
+        response: Self::Response,
+    ) -> io::Result<()>
+    where
+        T: AsyncWrite + Unpin + Send,
+    {
+        io.write_all(&[response as u8]).await?;
+        io.close().await
+    }
+}
+
 async fn require_stream_end<T>(io: &mut T, message: &'static str) -> io::Result<()>
 where
     T: AsyncRead + Unpin,
@@ -770,6 +926,47 @@ where
     })?;
     io.write_all(&length.to_be_bytes()).await?;
     io.write_all(hint).await?;
+    io.close().await
+}
+
+async fn read_threat_hint_v2_frame<T>(io: &mut T) -> io::Result<Vec<u8>>
+where
+    T: AsyncRead + Unpin,
+{
+    let mut length = [0_u8; BALLOT_LENGTH_BYTES];
+    io.read_exact(&mut length).await?;
+    let length = usize::from(u16::from_be_bytes(length));
+    if length == 0 || length > MAX_THREAT_HINT_V2_BYTES {
+        return Err(io::Error::new(
+            io::ErrorKind::InvalidData,
+            "ThreatHint-v2 exceeds transport limit",
+        ));
+    }
+
+    let mut payload = vec![0_u8; length];
+    io.read_exact(&mut payload).await?;
+    Ok(payload)
+}
+
+async fn write_threat_hint_v2_frame<T>(io: &mut T, payload: &[u8]) -> io::Result<()>
+where
+    T: AsyncWrite + Unpin,
+{
+    if payload.is_empty() || payload.len() > MAX_THREAT_HINT_V2_BYTES {
+        return Err(io::Error::new(
+            io::ErrorKind::InvalidInput,
+            "ThreatHint-v2 exceeds transport limit",
+        ));
+    }
+
+    let length = u16::try_from(payload.len()).map_err(|_| {
+        io::Error::new(
+            io::ErrorKind::InvalidInput,
+            "ThreatHint-v2 length does not fit transport frame",
+        )
+    })?;
+    io.write_all(&length.to_be_bytes()).await?;
+    io.write_all(payload).await?;
     io.close().await
 }
 
@@ -823,6 +1020,7 @@ fn to_invalid_data(error: TransportError) -> io::Error {
 struct GuardianBehaviour {
     ballots: request_response::Behaviour<BallotCodec>,
     threat_hints: request_response::Behaviour<ThreatHintCodec>,
+    threat_hints_v2: request_response::Behaviour<ThreatHintV2Codec>,
     identify: identify::Behaviour,
     ping: ping::Behaviour,
     autonat: autonat::Behaviour,
@@ -838,7 +1036,7 @@ impl GuardianBehaviour {
         config: &GuardianP2pConfig,
     ) -> Result<Self, Box<dyn std::error::Error + Send + Sync>> {
         let local_peer_id = keypair.public().to_peer_id();
-        let (ballot_streams, threat_hint_streams) =
+        let (ballot_streams, threat_hint_streams, threat_hint_v2_streams) =
             protocol_stream_limits(config.max_concurrent_streams_per_connection);
         let ballots = request_response::Behaviour::with_codec(
             BallotCodec,
@@ -860,10 +1058,23 @@ impl GuardianBehaviour {
                 .with_request_timeout(config.request_timeout)
                 .with_max_concurrent_streams(threat_hint_streams),
         );
+        let threat_hints_v2 = request_response::Behaviour::with_codec(
+            ThreatHintV2Codec {
+                trusted_network_id: config.threat_hint_v2_trusted_network_id.clone(),
+            },
+            [(
+                StreamProtocol::new(THREAT_HINT_V2_PROTOCOL),
+                request_response::ProtocolSupport::Full,
+            )],
+            request_response::Config::default()
+                .with_request_timeout(config.request_timeout)
+                .with_max_concurrent_streams(threat_hint_v2_streams),
+        );
 
         Ok(Self {
             ballots,
             threat_hints,
+            threat_hints_v2,
             identify: identify::Behaviour::new(identify::Config::new(
                 "/prometheus/guardian/1.0.0".to_owned(),
                 keypair.public(),
@@ -877,15 +1088,23 @@ impl GuardianBehaviour {
     }
 }
 
-fn protocol_stream_limits(total: usize) -> (usize, usize) {
-    let threat_hints = total / 2;
-    (total - threat_hints, threat_hints)
+fn protocol_stream_limits(total: usize) -> (usize, usize, usize) {
+    let threat_hints = total / 3;
+    let threat_hints_v2 = total / 3;
+    (
+        total - threat_hints - threat_hints_v2,
+        threat_hints,
+        threat_hints_v2,
+    )
 }
 
 #[derive(Debug)]
 enum BehaviourEvent {
     Ballots(request_response::Event<BallotBytes, AckStatus>),
     ThreatHints(request_response::Event<ThreatHintBytes, ThreatHintAckStatus>),
+    ThreatHintsV2(
+        Box<request_response::Event<ThreatHintV2TransportPayload, ThreatHintV2AckStatus>>,
+    ),
     Identify(Box<identify::Event>),
     Ping(ping::Event),
     Autonat(autonat::Event),
@@ -908,6 +1127,16 @@ impl From<request_response::Event<BallotBytes, AckStatus>> for BehaviourEvent {
 impl From<request_response::Event<ThreatHintBytes, ThreatHintAckStatus>> for BehaviourEvent {
     fn from(event: request_response::Event<ThreatHintBytes, ThreatHintAckStatus>) -> Self {
         Self::ThreatHints(event)
+    }
+}
+
+impl From<request_response::Event<ThreatHintV2TransportPayload, ThreatHintV2AckStatus>>
+    for BehaviourEvent
+{
+    fn from(
+        event: request_response::Event<ThreatHintV2TransportPayload, ThreatHintV2AckStatus>,
+    ) -> Self {
+        Self::ThreatHintsV2(Box::new(event))
     }
 }
 
@@ -950,14 +1179,22 @@ pub struct GuardianP2p {
         request_response::InboundRequestId,
         request_response::ResponseChannel<ThreatHintAckStatus>,
     >,
+    inbound_threat_hint_v2_responses: HashMap<
+        request_response::InboundRequestId,
+        request_response::ResponseChannel<ThreatHintV2AckStatus>,
+    >,
     inbound_work: HashSet<request_response::InboundRequestId>,
     inbound_threat_hint_work: HashSet<request_response::InboundRequestId>,
+    inbound_threat_hint_v2_work: HashSet<request_response::InboundRequestId>,
     ingress_request_ids: HashSet<request_response::InboundRequestId>,
     ingress_tasks: FuturesUnordered<IngressFuture>,
     threat_hint_ingress_request_ids: HashSet<request_response::InboundRequestId>,
     threat_hint_ingress_tasks: FuturesUnordered<ThreatHintIngressFuture>,
+    threat_hint_v2_ingress_request_ids: HashSet<request_response::InboundRequestId>,
+    threat_hint_v2_ingress_tasks: FuturesUnordered<ThreatHintV2IngressFuture>,
     outbound_requests: HashSet<request_response::OutboundRequestId>,
     outbound_threat_hint_requests: HashSet<request_response::OutboundRequestId>,
+    outbound_threat_hint_v2_requests: HashSet<request_response::OutboundRequestId>,
     max_outbound_requests: usize,
     max_inbound_requests: usize,
     configured_static_peers: HashSet<StaticPeer>,
@@ -979,6 +1216,15 @@ struct ThreatHintIngressCompletion {
     peer: PeerId,
     request_id: request_response::InboundRequestId,
     status: ThreatHintAckStatus,
+}
+
+type ThreatHintV2IngressFuture =
+    Pin<Box<dyn Future<Output = ThreatHintV2IngressCompletion> + Send>>;
+
+struct ThreatHintV2IngressCompletion {
+    peer: PeerId,
+    request_id: request_response::InboundRequestId,
+    status: ThreatHintV2AckStatus,
 }
 
 impl GuardianP2p {
@@ -1040,14 +1286,19 @@ impl GuardianP2p {
             swarm,
             inbound_responses: HashMap::new(),
             inbound_threat_hint_responses: HashMap::new(),
+            inbound_threat_hint_v2_responses: HashMap::new(),
             inbound_work: HashSet::new(),
             inbound_threat_hint_work: HashSet::new(),
+            inbound_threat_hint_v2_work: HashSet::new(),
             ingress_request_ids: HashSet::new(),
             ingress_tasks: FuturesUnordered::new(),
             threat_hint_ingress_request_ids: HashSet::new(),
             threat_hint_ingress_tasks: FuturesUnordered::new(),
+            threat_hint_v2_ingress_request_ids: HashSet::new(),
+            threat_hint_v2_ingress_tasks: FuturesUnordered::new(),
             outbound_requests: HashSet::new(),
             outbound_threat_hint_requests: HashSet::new(),
+            outbound_threat_hint_v2_requests: HashSet::new(),
             max_outbound_requests,
             max_inbound_requests,
             configured_static_peers: static_peers.into_iter().collect(),
@@ -1109,12 +1360,22 @@ impl GuardianP2p {
     pub fn pending_work(&self) -> (usize, usize) {
         (
             self.inbound_request_count(),
-            self.outbound_requests.len() + self.outbound_threat_hint_requests.len(),
+            self.outbound_requests.len()
+                + self.outbound_threat_hint_requests.len()
+                + self.outbound_threat_hint_v2_requests.len(),
         )
     }
 
     fn inbound_request_count(&self) -> usize {
-        self.inbound_work.len() + self.inbound_threat_hint_work.len()
+        self.inbound_work.len()
+            + self.inbound_threat_hint_work.len()
+            + self.inbound_threat_hint_v2_work.len()
+    }
+
+    fn outbound_request_count(&self) -> usize {
+        self.outbound_requests.len()
+            + self.outbound_threat_hint_requests.len()
+            + self.outbound_threat_hint_v2_requests.len()
     }
 
     /// Stops accepting new network traffic while retained work is drained by the owner loop.
@@ -1135,9 +1396,7 @@ impl GuardianP2p {
         peer: PeerId,
         ballot: BallotBytes,
     ) -> Result<request_response::OutboundRequestId, TransportError> {
-        if self.outbound_requests.len() + self.outbound_threat_hint_requests.len()
-            >= self.max_outbound_requests
-        {
+        if self.outbound_request_count() >= self.max_outbound_requests {
             return Err(TransportError::OutboundBusy {
                 max: self.max_outbound_requests,
             });
@@ -1159,9 +1418,7 @@ impl GuardianP2p {
         peer: PeerId,
         hint: ThreatHintBytes,
     ) -> Result<request_response::OutboundRequestId, TransportError> {
-        if self.outbound_requests.len() + self.outbound_threat_hint_requests.len()
-            >= self.max_outbound_requests
-        {
+        if self.outbound_request_count() >= self.max_outbound_requests {
             return Err(TransportError::OutboundBusy {
                 max: self.max_outbound_requests,
             });
@@ -1173,6 +1430,28 @@ impl GuardianP2p {
             .threat_hints
             .send_request(&peer, hint);
         let inserted = self.outbound_threat_hint_requests.insert(request_id);
+        debug_assert!(inserted, "libp2p request IDs must be unique per behaviour");
+        Ok(request_id)
+    }
+
+    /// Sends one validated ThreatHint-v2 payload as exact canonical bytes.
+    pub fn send_threat_hint_v2(
+        &mut self,
+        peer: PeerId,
+        payload: ThreatHintV2TransportPayload,
+    ) -> Result<request_response::OutboundRequestId, TransportError> {
+        if self.outbound_request_count() >= self.max_outbound_requests {
+            return Err(TransportError::OutboundBusy {
+                max: self.max_outbound_requests,
+            });
+        }
+
+        let request_id = self
+            .swarm
+            .behaviour_mut()
+            .threat_hints_v2
+            .send_request(&peer, payload);
+        let inserted = self.outbound_threat_hint_v2_requests.insert(request_id);
         debug_assert!(inserted, "libp2p request IDs must be unique per behaviour");
         Ok(request_id)
     }
@@ -1213,6 +1492,24 @@ impl GuardianP2p {
             .map_err(|_| TransportError::ResponseChannelClosed)
     }
 
+    /// Sends one bounded response for a pending inbound ThreatHint-v2 payload.
+    pub fn respond_threat_hint_v2(
+        &mut self,
+        request_id: request_response::InboundRequestId,
+        status: ThreatHintV2AckStatus,
+    ) -> Result<(), TransportError> {
+        let channel = self
+            .inbound_threat_hint_v2_responses
+            .remove(&request_id)
+            .ok_or(TransportError::UnknownInboundThreatHintV2)?;
+        self.inbound_threat_hint_v2_work.remove(&request_id);
+        self.swarm
+            .behaviour_mut()
+            .threat_hints_v2
+            .send_response(channel, status)
+            .map_err(|_| TransportError::ResponseChannelClosed)
+    }
+
     /// Waits for the next application-relevant transport event.
     pub async fn next_event(&mut self) -> TransportEvent {
         loop {
@@ -1228,39 +1525,49 @@ impl GuardianP2p {
         &mut self,
         ingress: &UnixBallotIngress,
     ) -> Result<TransportEvent, TransportError> {
-        self.next_sidecar_event_inner(ingress, None).await
+        self.next_sidecar_event_inner(ingress, None, None).await
     }
 
-    /// Drives one event through separate ballot and verified-ThreatHint boundaries.
+    /// Drives one event through separate ballot, verified-ThreatHint, and
+    /// verified-ThreatHint-v2 boundaries.
     pub async fn next_verified_sidecar_event(
         &mut self,
         ingress: &UnixBallotIngress,
         threat_hint_ingress: &UnixThreatHintIngress,
+        threat_hint_v2_ingress: &UnixThreatHintV2Ingress,
     ) -> Result<TransportEvent, TransportError> {
-        self.next_sidecar_event_inner(ingress, Some(threat_hint_ingress))
-            .await
+        self.next_sidecar_event_inner(
+            ingress,
+            Some(threat_hint_ingress),
+            Some(threat_hint_v2_ingress),
+        )
+        .await
     }
 
     async fn next_sidecar_event_inner(
         &mut self,
         ingress: &UnixBallotIngress,
         threat_hint_ingress: Option<&UnixThreatHintIngress>,
+        threat_hint_v2_ingress: Option<&UnixThreatHintV2Ingress>,
     ) -> Result<TransportEvent, TransportError> {
         loop {
             enum Progress {
                 Swarm(SwarmEvent<BehaviourEvent>),
                 Ingress(IngressCompletion),
                 ThreatHintIngress(ThreatHintIngressCompletion),
+                ThreatHintV2Ingress(ThreatHintV2IngressCompletion),
             }
 
             let progress = if self.ingress_tasks.is_empty()
                 && self.threat_hint_ingress_tasks.is_empty()
+                && self.threat_hint_v2_ingress_tasks.is_empty()
             {
                 Progress::Swarm(self.swarm.select_next_some().await)
             } else {
                 let swarm = &mut self.swarm;
                 let ingress_tasks = &mut self.ingress_tasks;
                 let threat_hint_ingress_tasks = &mut self.threat_hint_ingress_tasks;
+                let threat_hint_v2_ingress_tasks = &mut self.threat_hint_v2_ingress_tasks;
                 tokio::select! {
                     event = swarm.select_next_some() => Progress::Swarm(event),
                     completion = ingress_tasks.select_next_some(), if !ingress_tasks.is_empty() => {
@@ -1269,6 +1576,10 @@ impl GuardianP2p {
                     completion = threat_hint_ingress_tasks.select_next_some(),
                         if !threat_hint_ingress_tasks.is_empty() => {
                             Progress::ThreatHintIngress(completion)
+                    }
+                    completion = threat_hint_v2_ingress_tasks.select_next_some(),
+                        if !threat_hint_v2_ingress_tasks.is_empty() => {
+                            Progress::ThreatHintV2Ingress(completion)
                     }
                 }
             };
@@ -1346,6 +1657,50 @@ impl GuardianP2p {
                                 }
                             }));
                         }
+                        TransportEvent::InboundThreatHintV2 {
+                            peer,
+                            request_id,
+                            payload,
+                        } => {
+                            let Some(threat_hint_v2_ingress) = threat_hint_v2_ingress else {
+                                match self.respond_threat_hint_v2(
+                                    request_id,
+                                    ThreatHintV2AckStatus::Rejected,
+                                ) {
+                                    Ok(()) => {
+                                        return Ok(TransportEvent::InboundThreatHintV2Processed {
+                                            peer,
+                                            status: ThreatHintV2AckStatus::Rejected,
+                                        });
+                                    }
+                                    Err(TransportError::ResponseChannelClosed) => continue,
+                                    Err(error) => return Err(error),
+                                }
+                            };
+                            let ingress = threat_hint_v2_ingress.clone();
+                            let inserted =
+                                self.threat_hint_v2_ingress_request_ids.insert(request_id);
+                            debug_assert!(
+                                inserted,
+                                "inbound ThreatHint-v2 cannot start ingress twice"
+                            );
+                            self.threat_hint_v2_ingress_tasks.push(Box::pin(async move {
+                                let status = match ingress.forward(&payload).await {
+                                    Ok(status) => ThreatHintV2AckStatus::from(status),
+                                    Err(
+                                        ThreatHintV2IngressError::Io(_)
+                                        | ThreatHintV2IngressError::Timeout
+                                        | ThreatHintV2IngressError::Unavailable,
+                                    ) => ThreatHintV2AckStatus::Busy,
+                                    Err(_) => ThreatHintV2AckStatus::Rejected,
+                                };
+                                ThreatHintV2IngressCompletion {
+                                    peer,
+                                    request_id,
+                                    status,
+                                }
+                            }));
+                        }
                         event => return Ok(event),
                     }
                 }
@@ -1359,7 +1714,37 @@ impl GuardianP2p {
                         return Ok(event);
                     }
                 }
+                Progress::ThreatHintV2Ingress(completion) => {
+                    if let Some(event) = self.complete_threat_hint_v2_ingress(completion)? {
+                        return Ok(event);
+                    }
+                }
             }
+        }
+    }
+
+    fn complete_threat_hint_v2_ingress(
+        &mut self,
+        completion: ThreatHintV2IngressCompletion,
+    ) -> Result<Option<TransportEvent>, TransportError> {
+        self.threat_hint_v2_ingress_request_ids
+            .remove(&completion.request_id);
+        if !self
+            .inbound_threat_hint_v2_responses
+            .contains_key(&completion.request_id)
+        {
+            self.inbound_threat_hint_v2_work
+                .remove(&completion.request_id);
+            return Ok(None);
+        }
+
+        match self.respond_threat_hint_v2(completion.request_id, completion.status) {
+            Ok(()) => Ok(Some(TransportEvent::InboundThreatHintV2Processed {
+                peer: completion.peer,
+                status: completion.status,
+            })),
+            Err(TransportError::ResponseChannelClosed) => Ok(None),
+            Err(error) => Err(error),
         }
     }
 
@@ -1456,6 +1841,9 @@ impl GuardianP2p {
             }
             SwarmEvent::Behaviour(BehaviourEvent::ThreatHints(event)) => {
                 self.handle_threat_hint_event(event)
+            }
+            SwarmEvent::Behaviour(BehaviourEvent::ThreatHintsV2(event)) => {
+                self.handle_threat_hint_v2_event(*event)
             }
             SwarmEvent::Behaviour(BehaviourEvent::Identify(event)) => {
                 let _ = event;
@@ -1690,6 +2078,91 @@ impl GuardianP2p {
             }
         }
     }
+
+    fn handle_threat_hint_v2_event(
+        &mut self,
+        event: request_response::Event<ThreatHintV2TransportPayload, ThreatHintV2AckStatus>,
+    ) -> Option<TransportEvent> {
+        match event {
+            request_response::Event::Message {
+                peer,
+                message:
+                    request_response::Message::Request {
+                        request_id,
+                        request: payload,
+                        channel,
+                    },
+                ..
+            } => {
+                if self.inbound_request_count() >= self.max_inbound_requests {
+                    let _ = self
+                        .swarm
+                        .behaviour_mut()
+                        .threat_hints_v2
+                        .send_response(channel, ThreatHintV2AckStatus::Busy);
+                    return None;
+                }
+                let admitted = self.inbound_threat_hint_v2_work.insert(request_id);
+                debug_assert!(admitted, "libp2p request IDs must be unique per behaviour");
+                let previous = self
+                    .inbound_threat_hint_v2_responses
+                    .insert(request_id, channel);
+                debug_assert!(
+                    previous.is_none(),
+                    "request IDs must be unique per behaviour"
+                );
+                Some(TransportEvent::InboundThreatHintV2 {
+                    peer,
+                    request_id,
+                    payload: Box::new(payload),
+                })
+            }
+            request_response::Event::Message {
+                peer,
+                message:
+                    request_response::Message::Response {
+                        request_id,
+                        response: status,
+                    },
+                ..
+            } => {
+                self.outbound_threat_hint_v2_requests.remove(&request_id);
+                Some(TransportEvent::OutboundThreatHintV2Ack {
+                    peer,
+                    request_id,
+                    status,
+                })
+            }
+            request_response::Event::OutboundFailure {
+                peer,
+                request_id,
+                error,
+                ..
+            } => {
+                self.outbound_threat_hint_v2_requests.remove(&request_id);
+                Some(TransportEvent::OutboundThreatHintV2Failure {
+                    peer,
+                    request_id,
+                    failure: RequestFailure::from(&error),
+                })
+            }
+            request_response::Event::InboundFailure { request_id, .. } => {
+                self.inbound_threat_hint_v2_responses.remove(&request_id);
+                if !self
+                    .threat_hint_v2_ingress_request_ids
+                    .contains(&request_id)
+                {
+                    self.inbound_threat_hint_v2_work.remove(&request_id);
+                }
+                None
+            }
+            request_response::Event::ResponseSent { request_id, .. } => {
+                self.inbound_threat_hint_v2_responses.remove(&request_id);
+                self.inbound_threat_hint_v2_work.remove(&request_id);
+                None
+            }
+        }
+    }
 }
 
 fn connection_path(relayed: bool) -> ConnectionPath {
@@ -1716,6 +2189,7 @@ mod tests {
         GuardianP2pConfig {
             request_timeout: Duration::from_secs(3),
             idle_connection_timeout: Duration::from_secs(3),
+            threat_hint_v2_trusted_network_id: "testnet-10".to_owned(),
             ..GuardianP2pConfig::default()
         }
     }
@@ -1802,6 +2276,65 @@ mod tests {
         let digest = format!("{:x}", Sha256::digest(&received));
         let ack = format!(
             "{{\"payload_digest\":\"{digest}\",\"protocol_version\":1,\"status\":\"{status}\"}}"
+        );
+        stream
+            .write_u32(u32::try_from(ack.len()).expect("bounded ack"))
+            .await
+            .expect("write ack length");
+        stream.write_all(ack.as_bytes()).await.expect("write ack");
+        stream.shutdown().await.expect("close acknowledgement");
+    }
+
+    fn hex_decode(encoded: &str) -> Vec<u8> {
+        assert!(encoded.len().is_multiple_of(2), "even-length hex");
+        (0..encoded.len())
+            .step_by(2)
+            .map(|offset| u8::from_str_radix(&encoded[offset..offset + 2], 16).expect("hex pair"))
+            .collect()
+    }
+
+    fn threat_hint_v2_vector_wire(case: &str) -> (Vec<u8>, String) {
+        let corpus: serde_json::Value = serde_json::from_str(include_str!(
+            "../../threat-hint/tests/vectors/threat-hint-v2-transport-v1.json"
+        ))
+        .expect("transport vector corpus");
+        let vector = corpus["valid_cases"]
+            .as_array()
+            .expect("valid cases")
+            .iter()
+            .find(|entry| entry["name"] == case)
+            .expect("named vector case");
+        (
+            hex_decode(vector["wire_hex"].as_str().expect("wire hex")),
+            vector["trusted_network_id"]
+                .as_str()
+                .expect("trusted network id")
+                .to_owned(),
+        )
+    }
+
+    fn test_threat_hint_v2_payload() -> ThreatHintV2TransportPayload {
+        let (wire, network) = threat_hint_v2_vector_wire("base_review_required");
+        ThreatHintV2TransportPayload::parse_canonical(&wire, &network).expect("valid v2 payload")
+    }
+
+    async fn serve_threat_hint_v2_ingress_once(path: PathBuf, expected: Vec<u8>, status: &str) {
+        let listener = UnixListener::bind(&path).expect("bind ThreatHint-v2 ingress");
+        fs::set_permissions(&path, fs::Permissions::from_mode(0o600))
+            .expect("owner-only ThreatHint-v2 socket");
+        let (mut stream, _) = listener
+            .accept()
+            .await
+            .expect("accept ThreatHint-v2 carrier");
+        let received = read_ingress_ballot(&mut stream).await;
+        assert_eq!(received, expected);
+        let digest = if status == "busy" {
+            String::new()
+        } else {
+            format!("{:x}", Sha256::digest(&received))
+        };
+        let ack = format!(
+            "{{\"payload_digest\":\"{digest}\",\"protocol_version\":2,\"status\":\"{status}\"}}"
         );
         stream
             .write_u32(u32::try_from(ack.len()).expect("bounded ack"))
@@ -1962,16 +2495,49 @@ mod tests {
 
     #[test]
     fn stream_budget_is_split_without_multiplying_per_connection_capacity() {
-        assert_eq!(protocol_stream_limits(2), (1, 1));
-        assert_eq!(protocol_stream_limits(3), (2, 1));
-        assert_eq!(protocol_stream_limits(MAX_STREAMS_PER_CONNECTION), (32, 32));
+        assert_eq!(protocol_stream_limits(3), (1, 1, 1));
+        assert_eq!(protocol_stream_limits(4), (2, 1, 1));
+        assert_eq!(protocol_stream_limits(5), (3, 1, 1));
+        assert_eq!(
+            protocol_stream_limits(MAX_STREAMS_PER_CONNECTION),
+            (22, 21, 21)
+        );
 
         let mut config = test_config();
-        config.max_concurrent_streams_per_connection = 1;
+        config.max_concurrent_streams_per_connection = MIN_STREAMS_PER_CONNECTION - 1;
         assert!(matches!(
             config.validate(),
             Err(TransportError::InvalidConfig(_))
         ));
+    }
+
+    #[test]
+    fn threat_hint_v2_trusted_network_id_is_validated() {
+        let disabled = GuardianP2pConfig::default();
+        disabled
+            .validate()
+            .expect("empty default disables inbound ThreatHint-v2 fail-closed");
+
+        for network_id in [
+            "a",
+            "MAINNET",
+            "testnet_10",
+            "-testnet-10",
+            "testnet-10-",
+            &"a".repeat(65),
+        ] {
+            let mut config = test_config();
+            config.threat_hint_v2_trusted_network_id = network_id.to_owned();
+            assert!(
+                matches!(
+                    config.validate(),
+                    Err(TransportError::InvalidConfig(
+                        "ThreatHint-v2 trusted network id is invalid"
+                    ))
+                ),
+                "invalid trusted network id must fail closed: {network_id:?}"
+            );
+        }
     }
 
     #[tokio::test]
@@ -2358,6 +2924,11 @@ mod tests {
         let threat_hint_ingress =
             UnixThreatHintIngress::new(threat_hint_path, Duration::from_secs(2))
                 .expect("owner-only ThreatHint ingress");
+        let threat_hint_v2_ingress = UnixThreatHintV2Ingress::configured(
+            directory.path().join("unused-threat-hint-v2.sock"),
+            Duration::from_secs(2),
+        )
+        .expect("safe configured ThreatHint-v2 ingress");
 
         let receiver_identity = identity::Keypair::generate_ed25519();
         let receiver_peer = receiver_identity.public().to_peer_id();
@@ -2391,6 +2962,7 @@ mod tests {
                     event = receiver.next_verified_sidecar_event(
                         &ballot_ingress,
                         &threat_hint_ingress,
+                        &threat_hint_v2_ingress,
                     ) => {
                         if let TransportEvent::InboundThreatHintProcessed { status, .. } =
                             event.expect("sidecar event")
@@ -2936,5 +3508,623 @@ mod tests {
             node.send_threat_hint(peer, test_threat_hint()),
             Err(TransportError::OutboundBusy { max: 1 })
         ));
+        assert!(matches!(
+            node.send_threat_hint_v2(peer, test_threat_hint_v2_payload()),
+            Err(TransportError::OutboundBusy { max: 1 })
+        ));
+    }
+
+    #[tokio::test]
+    async fn threat_hint_v2_codec_accepts_only_canonical_payloads_for_trusted_network() {
+        let payload = test_threat_hint_v2_payload();
+        let (wire, _) = threat_hint_v2_vector_wire("base_review_required");
+        assert_eq!(payload.to_canonical_bytes(), wire);
+
+        let protocol = StreamProtocol::new(THREAT_HINT_V2_PROTOCOL);
+        let mut codec = ThreatHintV2Codec {
+            trusted_network_id: "testnet-10".to_owned(),
+        };
+
+        let length = u16::try_from(wire.len()).expect("bounded payload length");
+        let mut valid = length.to_be_bytes().to_vec();
+        valid.extend_from_slice(&wire);
+        let mut cursor = futures::io::Cursor::new(&mut valid);
+        let parsed = request_response::Codec::read_request(&mut codec, &protocol, &mut cursor)
+            .await
+            .expect("canonical payload is admitted");
+        assert_eq!(parsed, payload);
+
+        let mut empty = vec![0, 0];
+        let mut cursor = futures::io::Cursor::new(&mut empty);
+        assert_eq!(
+            request_response::Codec::read_request(&mut codec, &protocol, &mut cursor)
+                .await
+                .expect_err("empty frame must fail closed")
+                .kind(),
+            io::ErrorKind::InvalidData
+        );
+
+        let oversized = u16::try_from(MAX_THREAT_HINT_V2_BYTES + 1).expect("bounded test value");
+        let mut too_large = oversized.to_be_bytes().to_vec();
+        too_large.extend_from_slice(&[0_u8; 16]);
+        let mut cursor = futures::io::Cursor::new(&mut too_large);
+        assert_eq!(
+            request_response::Codec::read_request(&mut codec, &protocol, &mut cursor)
+                .await
+                .expect_err("oversized frame must fail closed")
+                .kind(),
+            io::ErrorKind::InvalidData
+        );
+
+        let mut truncated = length.to_be_bytes().to_vec();
+        truncated.extend_from_slice(&wire[..wire.len() - 2]);
+        let mut cursor = futures::io::Cursor::new(&mut truncated);
+        assert!(
+            request_response::Codec::read_request(&mut codec, &protocol, &mut cursor)
+                .await
+                .is_err()
+        );
+
+        let mut trailing = length.to_be_bytes().to_vec();
+        trailing.extend_from_slice(&wire);
+        trailing.push(0);
+        let mut cursor = futures::io::Cursor::new(&mut trailing);
+        assert_eq!(
+            request_response::Codec::read_request(&mut codec, &protocol, &mut cursor)
+                .await
+                .expect_err("trailing bytes must fail closed")
+                .kind(),
+            io::ErrorKind::InvalidData
+        );
+    }
+
+    #[tokio::test]
+    async fn threat_hint_v2_codec_rejects_noncanonical_and_wrong_network_before_ipc() {
+        let protocol = StreamProtocol::new(THREAT_HINT_V2_PROTOCOL);
+        let mut codec = ThreatHintV2Codec {
+            trusted_network_id: "testnet-10".to_owned(),
+        };
+
+        let corpus: serde_json::Value = serde_json::from_str(include_str!(
+            "../../threat-hint/tests/vectors/threat-hint-v2-transport-v1.json"
+        ))
+        .expect("transport vector corpus");
+        for case in corpus["invalid_cases"]
+            .as_array()
+            .expect("invalid cases")
+            .iter()
+            .filter(|case| case["name"].as_str() != Some("untrusted_network_mismatch"))
+        {
+            let wire = hex_decode(case["wire_hex"].as_str().expect("wire hex"));
+            let Ok(length) = u16::try_from(wire.len()) else {
+                continue;
+            };
+            let mut frame = length.to_be_bytes().to_vec();
+            frame.extend_from_slice(&wire);
+            let mut cursor = futures::io::Cursor::new(&mut frame);
+            assert!(
+                request_response::Codec::read_request(&mut codec, &protocol, &mut cursor)
+                    .await
+                    .is_err(),
+                "invalid vector must fail closed: {}",
+                case["name"].as_str().expect("case name")
+            );
+        }
+
+        let (wire, _) = threat_hint_v2_vector_wire("base_review_required");
+        let length = u16::try_from(wire.len()).expect("bounded payload length");
+        let mut frame = length.to_be_bytes().to_vec();
+        frame.extend_from_slice(&wire);
+        let mut wrong_network = ThreatHintV2Codec {
+            trusted_network_id: "mainnet".to_owned(),
+        };
+        let mut cursor = futures::io::Cursor::new(&mut frame);
+        assert_eq!(
+            request_response::Codec::read_request(&mut wrong_network, &protocol, &mut cursor)
+                .await
+                .expect_err("payload for another network must fail closed")
+                .kind(),
+            io::ErrorKind::InvalidData
+        );
+    }
+
+    #[test]
+    fn threat_hint_v2_ack_wire_is_stable_and_fails_closed() {
+        assert_eq!(
+            ThreatHintV2AckStatus::from_wire(0).expect("accepted"),
+            ThreatHintV2AckStatus::Accepted
+        );
+        assert_eq!(
+            ThreatHintV2AckStatus::from_wire(1).expect("rejected"),
+            ThreatHintV2AckStatus::Rejected
+        );
+        assert_eq!(
+            ThreatHintV2AckStatus::from_wire(2).expect("busy"),
+            ThreatHintV2AckStatus::Busy
+        );
+        for value in 3..=u8::MAX {
+            assert!(ThreatHintV2AckStatus::from_wire(value).is_err());
+        }
+        assert_eq!(ThreatHintV2AckStatus::Accepted.as_str(), "accepted");
+        assert_eq!(ThreatHintV2AckStatus::Rejected.as_str(), "rejected");
+        assert_eq!(ThreatHintV2AckStatus::Busy.as_str(), "busy");
+    }
+
+    #[tokio::test]
+    async fn two_nodes_exchange_canonical_threat_hint_v2_on_independent_protocol() {
+        let receiver_identity = identity::Keypair::generate_ed25519();
+        let receiver_peer = receiver_identity.public().to_peer_id();
+        let mut receiver_config = test_config();
+        receiver_config.listen_addresses.push(
+            "/ip4/127.0.0.1/udp/0/quic-v1"
+                .parse()
+                .expect("valid test address"),
+        );
+        let mut receiver = GuardianP2p::new(receiver_identity, receiver_config)
+            .expect("ephemeral receiver should initialize");
+        let receiver_address = match next_event_with_timeout(&mut receiver).await {
+            TransportEvent::Listening { address } => address,
+            event => panic!("expected listener address, got {event:?}"),
+        };
+
+        let sender_identity = identity::Keypair::generate_ed25519();
+        let sender_peer = sender_identity.public().to_peer_id();
+        let mut sender_config = test_config();
+        sender_config.static_peers.push(StaticPeer {
+            peer_id: receiver_peer,
+            address: receiver_address,
+        });
+        let mut sender = GuardianP2p::new(sender_identity, sender_config)
+            .expect("ephemeral sender should initialize");
+        let payload = test_threat_hint_v2_payload();
+        let expected_wire = payload.to_canonical_bytes();
+        let request_id = sender
+            .send_threat_hint_v2(receiver_peer, payload)
+            .expect("ThreatHint-v2 request capacity available");
+
+        let inbound_request = tokio::time::timeout(Duration::from_secs(10), async {
+            loop {
+                tokio::select! {
+                    event = receiver.next_event() => if let TransportEvent::InboundThreatHintV2 {
+                            peer,
+                            request_id,
+                            payload: received,
+                        } = event {
+                        assert_eq!(peer, sender_peer);
+                        assert_eq!(received.to_canonical_bytes(), expected_wire);
+                        break request_id;
+                    },
+                    event = sender.next_event() => {
+                        if let TransportEvent::OutboundThreatHintV2Failure { failure, .. } = event {
+                            panic!("ThreatHint-v2 request failed before delivery: {failure:?}");
+                        }
+                    }
+                }
+            }
+        })
+        .await
+        .expect("two-node ThreatHint-v2 delivery timed out");
+        receiver
+            .respond_threat_hint_v2(inbound_request, ThreatHintV2AckStatus::Accepted)
+            .expect("ThreatHint-v2 acknowledgement channel remains open");
+
+        tokio::time::timeout(Duration::from_secs(10), async {
+            loop {
+                tokio::select! {
+                    event = sender.next_event() => match event {
+                        TransportEvent::OutboundThreatHintV2Ack {
+                            peer,
+                            request_id: received_request_id,
+                            status,
+                        } => {
+                            assert_eq!(peer, receiver_peer);
+                            assert_eq!(received_request_id, request_id);
+                            assert_eq!(status, ThreatHintV2AckStatus::Accepted);
+                            break;
+                        }
+                        TransportEvent::OutboundThreatHintV2Failure { failure, .. } => {
+                            panic!("ThreatHint-v2 acknowledgement failed: {failure:?}");
+                        }
+                        _ => {}
+                    },
+                    _ = receiver.next_event() => {}
+                }
+            }
+        })
+        .await
+        .expect("two-node ThreatHint-v2 acknowledgement timed out");
+        assert_eq!(receiver.pending_work(), (0, 0));
+        assert_eq!(sender.pending_work(), (0, 0));
+    }
+
+    #[tokio::test]
+    async fn wrong_trusted_network_fails_before_event_and_ipc() {
+        let directory = tempfile::tempdir().expect("temporary ingress directory");
+        fs::set_permissions(directory.path(), fs::Permissions::from_mode(0o700))
+            .expect("owner-only ingress directory");
+        let ballot_ingress = UnixBallotIngress::configured(
+            directory.path().join("unused-ballot.sock"),
+            Duration::from_secs(2),
+        )
+        .expect("safe configured ballot ingress");
+        let threat_hint_ingress = UnixThreatHintIngress::configured(
+            directory.path().join("unused-threat-hint.sock"),
+            Duration::from_secs(2),
+        )
+        .expect("safe configured ThreatHint ingress");
+        let v2_path = directory.path().join("threat-hint-v2.sock");
+        let accepts = Arc::new(std::sync::atomic::AtomicUsize::new(0));
+        let observed = Arc::clone(&accepts);
+        let mock_path = v2_path.clone();
+        let mock_server = tokio::spawn(async move {
+            let listener = UnixListener::bind(&mock_path).expect("bind ThreatHint-v2 ingress");
+            fs::set_permissions(&mock_path, fs::Permissions::from_mode(0o600))
+                .expect("owner-only ThreatHint-v2 socket");
+            let _ = listener.accept().await;
+            observed.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
+        });
+        tokio::task::yield_now().await;
+        let threat_hint_v2_ingress =
+            UnixThreatHintV2Ingress::configured(v2_path, Duration::from_secs(2))
+                .expect("safe configured ThreatHint-v2 ingress");
+
+        let receiver_identity = identity::Keypair::generate_ed25519();
+        let receiver_peer = receiver_identity.public().to_peer_id();
+        let mut receiver_config = test_config();
+        receiver_config.threat_hint_v2_trusted_network_id = "mainnet".to_owned();
+        receiver_config.listen_addresses.push(
+            "/ip4/127.0.0.1/udp/0/quic-v1"
+                .parse()
+                .expect("valid test address"),
+        );
+        let mut receiver =
+            GuardianP2p::new(receiver_identity, receiver_config).expect("receiver initializes");
+        let receiver_address = match next_event_with_timeout(&mut receiver).await {
+            TransportEvent::Listening { address } => address,
+            event => panic!("expected listener address, got {event:?}"),
+        };
+
+        let mut sender_config = test_config();
+        sender_config.static_peers.push(StaticPeer {
+            peer_id: receiver_peer,
+            address: receiver_address,
+        });
+        let mut sender = GuardianP2p::new(identity::Keypair::generate_ed25519(), sender_config)
+            .expect("sender initializes");
+        sender
+            .send_threat_hint_v2(receiver_peer, test_threat_hint_v2_payload())
+            .expect("send canonical ThreatHint-v2");
+
+        tokio::time::timeout(Duration::from_secs(10), async {
+            loop {
+                tokio::select! {
+                    event = receiver.next_verified_sidecar_event(
+                        &ballot_ingress,
+                        &threat_hint_ingress,
+                        &threat_hint_v2_ingress,
+                    ) => {
+                        match event.expect("sidecar event") {
+                            TransportEvent::InboundThreatHintV2 { .. }
+                            | TransportEvent::InboundThreatHintV2Processed { .. } => {
+                                panic!("wrong-network payload reached the event loop");
+                            }
+                            _ => {}
+                        }
+                    },
+                    event = sender.next_event() => {
+                        if let TransportEvent::OutboundThreatHintV2Failure { failure, .. } = event {
+                            assert!(matches!(
+                                failure,
+                                RequestFailure::Io
+                                    | RequestFailure::ConnectionClosed
+                                    | RequestFailure::Timeout
+                            ));
+                            break;
+                        }
+                    }
+                }
+            }
+        })
+        .await
+        .expect("wrong-network rejection timed out");
+
+        assert_eq!(
+            accepts.load(std::sync::atomic::Ordering::SeqCst),
+            0,
+            "wrong-network payload must never reach local IPC"
+        );
+        assert_eq!(receiver.pending_work(), (0, 0));
+        mock_server.abort();
+    }
+
+    #[tokio::test]
+    async fn operated_sidecar_forwards_threat_hint_v2_and_maps_status() {
+        for (ack_status, expected) in [
+            ("accepted", ThreatHintV2AckStatus::Accepted),
+            ("rejected", ThreatHintV2AckStatus::Rejected),
+            ("busy", ThreatHintV2AckStatus::Busy),
+        ] {
+            let directory = tempfile::tempdir().expect("temporary ingress directory");
+            fs::set_permissions(directory.path(), fs::Permissions::from_mode(0o700))
+                .expect("owner-only ingress directory");
+            let ballot_ingress = UnixBallotIngress::configured(
+                directory.path().join("unused-ballot.sock"),
+                Duration::from_secs(2),
+            )
+            .expect("safe configured ballot ingress");
+            let threat_hint_ingress = UnixThreatHintIngress::configured(
+                directory.path().join("unused-threat-hint.sock"),
+                Duration::from_secs(2),
+            )
+            .expect("safe configured ThreatHint ingress");
+            let payload = test_threat_hint_v2_payload();
+            let v2_path = directory.path().join("threat-hint-v2.sock");
+            let verifier_task = tokio::spawn(serve_threat_hint_v2_ingress_once(
+                v2_path.clone(),
+                payload.to_canonical_bytes(),
+                ack_status,
+            ));
+            tokio::task::yield_now().await;
+            let threat_hint_v2_ingress =
+                UnixThreatHintV2Ingress::new(v2_path, Duration::from_secs(2))
+                    .expect("owner-only ThreatHint-v2 ingress");
+
+            let receiver_identity = identity::Keypair::generate_ed25519();
+            let receiver_peer = receiver_identity.public().to_peer_id();
+            let mut receiver_config = test_config();
+            receiver_config.listen_addresses.push(
+                "/ip4/127.0.0.1/udp/0/quic-v1"
+                    .parse()
+                    .expect("valid test address"),
+            );
+            let mut receiver =
+                GuardianP2p::new(receiver_identity, receiver_config).expect("receiver initializes");
+            let receiver_address = match next_event_with_timeout(&mut receiver).await {
+                TransportEvent::Listening { address } => address,
+                event => panic!("expected listener address, got {event:?}"),
+            };
+
+            let mut sender_config = test_config();
+            sender_config.static_peers.push(StaticPeer {
+                peer_id: receiver_peer,
+                address: receiver_address,
+            });
+            let mut sender = GuardianP2p::new(identity::Keypair::generate_ed25519(), sender_config)
+                .expect("sender initializes");
+            let request_id = sender
+                .send_threat_hint_v2(receiver_peer, payload)
+                .expect("send canonical ThreatHint-v2");
+
+            tokio::time::timeout(Duration::from_secs(10), async {
+                loop {
+                    tokio::select! {
+                        event = receiver.next_verified_sidecar_event(
+                            &ballot_ingress,
+                            &threat_hint_ingress,
+                            &threat_hint_v2_ingress,
+                        ) => {
+                            if let TransportEvent::InboundThreatHintV2Processed { status, .. } =
+                                event.expect("sidecar event")
+                            {
+                                assert_eq!(status, expected);
+                                break;
+                            }
+                        },
+                        event = sender.next_event() => {
+                            if let TransportEvent::OutboundThreatHintV2Failure { failure, .. } = event {
+                                panic!("ThreatHint-v2 request failed: {failure:?}");
+                            }
+                        }
+                    }
+                }
+            })
+            .await
+            .expect("ThreatHint-v2 sidecar processing timed out");
+            verifier_task.await.expect("verifier task");
+
+            match next_event_with_timeout(&mut sender).await {
+                TransportEvent::OutboundThreatHintV2Ack {
+                    request_id: received,
+                    status,
+                    ..
+                } => {
+                    assert_eq!(received, request_id);
+                    assert_eq!(status, expected);
+                }
+                event => panic!("expected ThreatHint-v2 acknowledgement, got {event:?}"),
+            }
+            assert_eq!(receiver.pending_work(), (0, 0));
+        }
+    }
+
+    #[tokio::test]
+    async fn v2_inbound_saturation_returns_busy_and_releases_slot() {
+        let receiver_identity = identity::Keypair::generate_ed25519();
+        let receiver_peer = receiver_identity.public().to_peer_id();
+        let mut receiver_config = test_config();
+        receiver_config.max_concurrent_requests = 1;
+        receiver_config.listen_addresses.push(
+            "/ip4/127.0.0.1/udp/0/quic-v1"
+                .parse()
+                .expect("valid test address"),
+        );
+        let mut receiver = GuardianP2p::new(receiver_identity, receiver_config)
+            .expect("ephemeral receiver should initialize");
+        let receiver_address = match next_event_with_timeout(&mut receiver).await {
+            TransportEvent::Listening { address } => address,
+            event => panic!("expected listener address, got {event:?}"),
+        };
+
+        let mut sender_config = test_config();
+        sender_config.static_peers.push(StaticPeer {
+            peer_id: receiver_peer,
+            address: receiver_address.clone(),
+        });
+        let mut sender = GuardianP2p::new(identity::Keypair::generate_ed25519(), sender_config)
+            .expect("ephemeral sender should initialize");
+        sender
+            .send_threat_hint_v2(receiver_peer, test_threat_hint_v2_payload())
+            .expect("ThreatHint-v2 request capacity available");
+
+        let held_request = tokio::time::timeout(Duration::from_secs(10), async {
+            loop {
+                tokio::select! {
+                    event = receiver.next_event() => {
+                        if let TransportEvent::InboundThreatHintV2 { request_id, .. } = event {
+                            break request_id;
+                        }
+                    },
+                    event = sender.next_event() => {
+                        if let TransportEvent::OutboundThreatHintV2Failure { failure, .. } = event {
+                            panic!("ThreatHint-v2 failed before admission: {failure:?}");
+                        }
+                    }
+                }
+            }
+        })
+        .await
+        .expect("ThreatHint-v2 did not occupy the shared inbound slot");
+        assert_eq!(receiver.pending_work(), (1, 0));
+
+        // A second connection has its own per-protocol stream budget, so the
+        // overflow request reaches admission and must be answered busy.
+        let mut overflow_config = test_config();
+        overflow_config.static_peers.push(StaticPeer {
+            peer_id: receiver_peer,
+            address: receiver_address,
+        });
+        let mut overflow_sender =
+            GuardianP2p::new(identity::Keypair::generate_ed25519(), overflow_config)
+                .expect("overflow sender should initialize");
+        let overflow_request = overflow_sender
+            .send_threat_hint_v2(receiver_peer, test_threat_hint_v2_payload())
+            .expect("overflow request capacity available");
+        tokio::time::timeout(Duration::from_secs(10), async {
+            loop {
+                tokio::select! {
+                    event = receiver.next_event() => {
+                        if matches!(event, TransportEvent::InboundThreatHintV2 { .. }) {
+                            panic!("overflow ThreatHint-v2 bypassed the shared admission cap");
+                        }
+                    },
+                    event = overflow_sender.next_event() => match event {
+                        TransportEvent::OutboundThreatHintV2Ack { request_id, status, .. }
+                            if request_id == overflow_request =>
+                        {
+                            assert_eq!(status, ThreatHintV2AckStatus::Busy);
+                            break;
+                        }
+                        TransportEvent::OutboundThreatHintV2Failure { request_id, failure, .. }
+                            if request_id == overflow_request =>
+                        {
+                            panic!("overflow ThreatHint-v2 failed before busy ACK: {failure:?}");
+                        }
+                        _ => {}
+                    },
+                    _ = sender.next_event() => {}
+                }
+            }
+        })
+        .await
+        .expect("ThreatHint-v2 busy acknowledgement timed out");
+
+        assert_eq!(receiver.pending_work(), (1, 0));
+        receiver
+            .respond_threat_hint_v2(held_request, ThreatHintV2AckStatus::Rejected)
+            .expect("held ThreatHint-v2 response channel remains open");
+        assert_eq!(receiver.pending_work(), (0, 0));
+    }
+
+    #[tokio::test]
+    async fn canceled_threat_hint_v2_releases_its_independent_work_slot() {
+        let receiver_identity = identity::Keypair::generate_ed25519();
+        let receiver_peer = receiver_identity.public().to_peer_id();
+        let mut receiver_config = test_config();
+        receiver_config.request_timeout = Duration::from_millis(150);
+        receiver_config.listen_addresses.push(
+            "/ip4/127.0.0.1/udp/0/quic-v1"
+                .parse()
+                .expect("valid test address"),
+        );
+        let mut receiver =
+            GuardianP2p::new(receiver_identity, receiver_config).expect("receiver initializes");
+        let receiver_address = match next_event_with_timeout(&mut receiver).await {
+            TransportEvent::Listening { address } => address,
+            event => panic!("expected listener address, got {event:?}"),
+        };
+
+        let mut sender_config = test_config();
+        sender_config.request_timeout = Duration::from_millis(150);
+        sender_config.static_peers.push(StaticPeer {
+            peer_id: receiver_peer,
+            address: receiver_address,
+        });
+        let mut sender = GuardianP2p::new(identity::Keypair::generate_ed25519(), sender_config)
+            .expect("sender initializes");
+        sender
+            .send_threat_hint_v2(receiver_peer, test_threat_hint_v2_payload())
+            .expect("send canonical ThreatHint-v2");
+
+        let inbound_request = tokio::time::timeout(Duration::from_secs(10), async {
+            loop {
+                tokio::select! {
+                    event = receiver.next_event() => {
+                        if let TransportEvent::InboundThreatHintV2 { request_id, .. } = event {
+                            break request_id;
+                        }
+                    },
+                    event = sender.next_event() => {
+                        if let TransportEvent::OutboundThreatHintV2Failure { failure, .. } = event {
+                            panic!("ThreatHint-v2 failed before inbound delivery: {failure:?}");
+                        }
+                    }
+                }
+            }
+        })
+        .await
+        .expect("ThreatHint-v2 did not reach receiver");
+        assert!(receiver
+            .inbound_threat_hint_v2_responses
+            .contains_key(&inbound_request));
+        assert!(receiver
+            .inbound_threat_hint_v2_work
+            .contains(&inbound_request));
+
+        tokio::time::timeout(Duration::from_secs(10), async {
+            loop {
+                tokio::select! {
+                    event = sender.next_event() => {
+                        if let TransportEvent::OutboundThreatHintV2Failure { failure, .. } = event {
+                            assert!(matches!(
+                                failure,
+                                RequestFailure::Timeout
+                                    | RequestFailure::ConnectionClosed
+                                    | RequestFailure::Io
+                            ));
+                            break;
+                        }
+                    },
+                    _ = receiver.next_event() => {}
+                }
+            }
+        })
+        .await
+        .expect("ThreatHint-v2 request did not time out");
+
+        let cleanup_deadline = tokio::time::Instant::now() + Duration::from_secs(2);
+        while receiver
+            .inbound_threat_hint_v2_responses
+            .contains_key(&inbound_request)
+            && tokio::time::Instant::now() < cleanup_deadline
+        {
+            let _ = tokio::time::timeout_at(cleanup_deadline, receiver.next_event()).await;
+        }
+        assert!(!receiver
+            .inbound_threat_hint_v2_responses
+            .contains_key(&inbound_request));
+        assert!(!receiver
+            .inbound_threat_hint_v2_work
+            .contains(&inbound_request));
+        assert_eq!(receiver.pending_work(), (0, 0));
     }
 }

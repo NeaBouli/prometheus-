@@ -2,7 +2,7 @@
 # Every completed module is audited by Claude (Architect) before proceeding to the next sprint.
 # Format: | Module | Version | Date | Auditor | Result | Notes |
 # Result: ACCEPTED | REJECTED | NEEDS_CHANGES
-# Last Updated: 2026-08-10
+# Last Updated: 2026-08-13
 
 ---
 
@@ -2418,3 +2418,39 @@ CodeRabbit comments were addressed before merge. Exact-main CI `31340112225`,
 Security `31340112204`, and Pages `31340111625` pass. Remaining model risks are
 upstream authenticity, binding to already-loaded service memory, semantic and
 adversarial quality, calibration, and production authorization.
+
+## 2026-08-13 - GH-167 bounded ThreatHint-v2 transport local audit
+
+**Result:** NEEDS_CHANGES until complete gates and independent final review pass.
+
+The candidate uses one exact bounded frame and shared cross-language corpus.
+Rust validates the explicit trusted network before owner-only IPC; Python
+reparses the original wires and resolves the untrusted nonce only through
+trusted active-session state with a trusted local clock. Peer identity remains
+transport metadata. Global admission budgets and strict accepted/rejected/busy
+responses fail closed, and a separate-process test covers the real Guardian
+boundary. The operated service rejects an absent trusted-network setting; the
+library default grants no implicit network trust.
+
+Production artifacts and authority, privacy-reviewed semantic/actionable
+analysis, disclosure, public multi-host operation, models/YARA, wallet, chain,
+rewards, and deployment are unchanged. Final full repository gates and Kimi's
+independent read-only review remain mandatory before acceptance.
+
+## 2026-08-13 - GH-167 local audit closeout
+
+**Result:** ACCEPTED locally; protected publication and exact-main evidence pending.
+
+Kimi's independent read-only review found no P0-P2 issue. The missing normative
+v2 protocol-document update was added. Sol identified and fixed a cancellation
+edge in which Python cannot kill already-running thread work: the ingress now
+uses a dedicated bounded executor and waits for started promotion work before
+close returns. A blocking regression proves that shutdown does not report
+completion while durable promotion work can still run.
+
+Verification passes: 30 focused transport/ingress tests; Guardian 1147 passed
+and 4 intentional live-model skips; Black; Pylint 9.85/10 and 10.00/10; Rust
+workspace fmt/clippy/tests; Guardian-P2P 76 library plus 5 process cases twice;
+release binaries, package contents and performance; Memory, Autodidactic,
+vLLM/public-evidence/HTML checks; Cargo Audit with allowed warnings only; Pip
+Audit with no known vulnerabilities; diff and secret-marker hygiene.
