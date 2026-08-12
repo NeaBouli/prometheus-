@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "kind": "prometheus.silverc.h001_confirmed_canary_evidence",
+  "status": "PUBLIC_CANARY_DEPLOY_EVIDENCE_VERIFIED",
+  "generated_at": "2026-08-12T17:18:29Z",
+  "network": "testnet",
+  "network_id": "testnet-10",
+  "deployment_profile": "testnet-10-validator-staking-h001",
+  "contract_name": "ValidatorStakingH001",
+  "request": {
+    "request_sha256": "c0cad33f23acfee4114092e0211dd642cb97c44891cc8f8826f4656f406f42fa",
+    "signing_request_sha256": "6b8e65065ca5ae2ca561ddd3fcb9659c384496fd31db32c137fcc9d811fa5323",
+    "artifact_sha256": "bc2af7e54d464384eaebe3ba0b93e005af4a9aaab2a2dbab637d2ba2529cfdfe",
+    "script_sha256": "e5d99d8662e529a56a7d04acf66ea087ddb84d3c385f043e79d632b62596ba23"
+  },
+  "transaction": {
+    "transaction_id": "c85fd1e79607370ff63faabbc3158e011158d2bde1af40d4eecd642189d8c22f",
+    "version": 1,
+    "block_hash": "faaa49eb38b3a58b5b5834cc2d91c78dba8bf1dd6ceeaee9401bc195013454e0",
+    "block_daa_score": 541960711,
+    "accepted": true,
+    "deployed_at": "2026-08-12T17:17:02Z",
+    "explorer_url": "https://explorer-tn10.kaspa.org/txs/c85fd1e79607370ff63faabbc3158e011158d2bde1af40d4eecd642189d8c22f"
+  },
+  "contract_output": {
+    "deployed_instance_id": "c85fd1e79607370ff63faabbc3158e011158d2bde1af40d4eecd642189d8c22f:0",
+    "output_index": 0,
+    "amount_sompi": 1000000000,
+    "contract_address": "kaspatest:pzvl3cs0k35zxnfgj9z6d322mf0552xskz2f8jqrjp74mkdvh2x2jl4nn643n",
+    "covenant_id": "8cdb49adc2511ed5fa11f71317b66f203f37ce376a2603cd9b118236c1f8219f"
+  },
+  "verification": {
+    "signature_validation": "bip340_schnorr_passed",
+    "transaction_validation": "kaspa_consensus_sign_verify_passed",
+    "node_observation_status": "confirmed_utxo_observed",
+    "node_observation_daa_depth": 209,
+    "operator_receipt_status": "CANARY_RECEIPTS_VERIFIED",
+    "public_evidence_status": "PUBLIC_CANARY_DEPLOY_EVIDENCE_VERIFIED",
+    "operator_receipts_sha256": "4eb10f5a704eae7679bc648094aa36febc9f256e7d308a68ade08565938f63bc",
+    "public_evidence_sha256": "f751988aba5e01e43890f0e5b8bc9d7f18a1475af7d75e762a2abc77652fb38a"
+  },
+  "hash_binding": {
+    "canonicalization": "UTF-8 JSON with sorted keys and compact separators (comma and colon), without trailing newline",
+    "operator_receipts_sha256_target": "gh-9-h001-operator-receipts-2026-08-12.json",
+    "public_evidence_sha256_target": "gh-9-h001-public-evidence-2026-08-12.json",
+    "summary_self_hash": false,
+    "consumer": "scripts/verify_h001_canary_closeout_evidence.py"
+  },
+  "independent_observation": {
+    "source": "api-tn10.kaspa.org",
+    "url": "https://api-tn10.kaspa.org/transactions/c85fd1e79607370ff63faabbc3158e011158d2bde1af40d4eecd642189d8c22f",
+    "http_status": 200,
+    "transaction_id_match": true,
+    "accepted": true,
+    "block_hash_match": true,
+    "contract_output_match": true,
+    "covenant_id_match": true
+  },
+  "safety": {
+    "mainnet_action": false,
+    "additional_contract_deployment": false,
+    "metrics_oracle_action": false,
+    "raw_transaction_published": false,
+    "signature_published": false,
+    "private_key_accessed_by_repository_operator": false,
+    "wallet_secret_recorded": false
+  },
+  "scope": {
+    "canary_complete": true,
+    "promotes_full_rollout": false,
+    "remaining_state_contract_deployments": 6,
+    "remaining_gates_complete": true,
+    "remaining_gates": [
+      "six state-contract deployments",
+      "real metrics-oracle state and sponsor inputs plus signatures and confirmed successor evidence",
+      "production proof relation/key/ceremony approval and independent cryptographic review",
+      "privacy-reviewed production semantic/actionable analysis",
+      "production v2 transport and multi-host Guardian/P2P operation",
+      "exact-commit release-hardening evidence"
+    ]
+  }
+}

@@ -3319,3 +3319,133 @@ Rules for all dev agents:
 - Opened GH-163 for documentation-only exact-main closeout. No product,
   production, model, chain, wallet, secret, or deployment action.
 - **Status:** `GH-161 Done / GH-163 closeout in progress`.
+
+## 2026-08-12 - GH-9 owner-local signer preparation complete
+
+- Hardened the existing local Kaspa wallet directory/file modes to owner-only
+  without reading wallet contents.
+- Built an unpublished owner-local signer from official `rusty-kaspa v2.0.1`
+  commit `cfafeb4c` and preserved the exact patch as local-only commit `9fe9ad5`.
+- Added raw 32-byte BIP340 signing with address/x-only-key binding, official
+  hidden encrypted-wallet access without mnemonic/private-key export, complete
+  intermediate-key erasure, self-verification, and collision-safe `0600` output.
+- Added an owner-only launcher with `umask 077`, core dumps disabled, and a
+  macOS `deny network*` process sandbox. DNS and direct-IP live negatives pass.
+- PASS: six synthetic signer tests, all-target warning-free Clippy, optimized
+  release build, launcher shell syntax, diff hygiene, interactive registration,
+  and a disposable encrypted-wallet end-to-end signing ceremony. Synthetic
+  wallet/signature artifacts were deleted after verification.
+- Kimi final review: PASS, no P0-P2. No real wallet was opened/read, no real
+  password/key/mnemonic or H-001 signature was used, no signature was imported,
+  and no transaction, broadcast, deployment, or chain mutation occurred.
+- H-001 remains 96%. Real signing and the later one-shot broadcast remain two
+  separate exact approval gates.
+
+## 2026-08-12 - GH-9 one-time local H-001 signing ceremony authorized
+
+- Gio authorized one local signature of the already verified Testnet-10 H-001
+  schema-v2 digest with the dedicated Prometheus Testnet-10 wallet.
+- Rechecked the reviewed signer commit and binary/launcher hashes, owner-only
+  wallet modes, canonical signing-request evidence, and unused owner-only output
+  path before opening the ceremony.
+- Password entry is restricted to the hidden local terminal prompt. Signature
+  import, broadcast, deployment, publication, and every chain-state mutation
+  remain outside this authorization.
+- **Status:** `Authorized / Awaiting local owner interaction / No broadcast`.
+
+## 2026-08-12 - GH-9 local H-001 signing ceremony completed and verified
+
+- The network-denied owner-local signer created exactly one owner-only canonical
+  signature file after hidden local password entry. The wallet process was
+  terminated immediately afterward.
+- PASS: `0600`; 129 bytes; one 128-lowercase-hex signature line; file SHA-256
+  `59170472bdb5ccabe25962c828f40aca627d35e6ecb4f81f1012514292e582c0`.
+- A separate minimal `secp256k1 0.29.1` verifier confirmed the BIP340 signature
+  against the exact schema-v2 sighash and expected x-only public key. Original
+  and rebuilt signing requests remain byte-identical.
+- No secret was logged or delegated. No import, transaction mutation, network
+  connection, broadcast, deployment, publication, or chain mutation occurred.
+- **Status:** `Signing PASS / Independent BIP340 verification PASS / Import and broadcast separately gated`.
+
+## 2026-08-12 - GH-9 local import and full transaction verification authorized
+
+- Gio authorized the canonical repository `import-signature` flow against the
+  accepted Testnet-10 request/artifact/funding inputs and verified signature.
+- Scope is local response binding, deterministic transaction rebuild, BIP340
+  verification, and complete Kaspa transaction verification under OS-level
+  network denial with owner-only outputs.
+- RPC, broadcast, deployment, publication, and every chain mutation remain
+  forbidden.
+- **Status:** `Authorized / Local verification in progress / No broadcast`.
+
+## 2026-08-12 - GH-9 local import and full transaction verification complete
+
+- Rebuilt the release deployer offline and ran canonical `import-signature`
+  under OS-level network denial with owner-only outputs.
+- PASS: `EXTERNAL_SIGNATURE_AND_TRANSACTION_VERIFIED`, BIP340 verification,
+  complete Kaspa consensus transaction signature verification, and exact
+  request/signing-request/transaction/covenant binding.
+- A separate `verify-signature` run rebuilt the transaction and produced a
+  byte-identical verification artifact. Response SHA-256 is
+  `baabc1bcb04a7c8f9c1f9ebb7f8232bb434876b248edd9493592509d2e80ef12`;
+  verification SHA-256 is
+  `332d30922ba3fc6301d134cc29e4da2cb73e06d96946aea47e97c484064c57e3`.
+- PASS: 10 focused tests, all 49 deployer tests, Rustfmt, warning-free all-target
+  Clippy, release build, owner-only modes, and no broadcast artifacts/processes.
+- No raw signed transaction entered Git. No RPC, network-client import,
+  broadcast, deployment, publication, or chain mutation occurred.
+- **Status:** `Done / Full local transaction verification PASS / Broadcast separately gated`.
+
+## 2026-08-12 - GH-9 one-shot Testnet-10 broadcast authorized
+
+- Gio authorized exactly one journaled broadcast of the fully verified H-001
+  transaction, acknowledging signing-request hash
+  `6b8e65065ca5ae2ca561ddd3fcb9659c384496fd31db32c137fcc9d811fa5323`.
+- Scope includes immediate live preflight, one submission, confirmation
+  observation, receipt, and independent evidence only. All other deployments,
+  transactions, wallet actions, publication, and mainnet work remain excluded.
+- **Status:** `Authorized / Live preflight next / One-shot only`.
+
+## 2026-08-12 - GH-9 pre-submission RPC compatibility blocker
+
+- Live preflight PASS: Testnet-10, synced indexed v2.0.1 node, Toccata active,
+  exact funding UTXO unspent and non-coinbase.
+- Broadcast command stopped before submission because remote v2.0.1 wraps the
+  expected transaction-not-found result in `RpcSubsystem`; the operator matched
+  only the typed variant.
+- Journal remains `verified_pending_submission` with no submission timestamp or
+  result, proving no transaction was sent and the one-shot authorization is
+  unused.
+- **Status:** `No submission / Minimal compatibility fix in progress`.
+
+## 2026-08-12 20:37 EEST - GH-9 H-001 canary confirmed; local closeout PASS
+
+- Added the exact-ID fail-closed v2.0.1 RPC transaction-absence compatibility
+  path and regression coverage shared by genesis and oracle reconciliation.
+- Exactly one authorized Testnet-10 submission confirmed transaction
+  `c85fd1e79607370ff63faabbc3158e011158d2bde1af40d4eecd642189d8c22f`;
+  node observation, canonical receipts, and independent official REST evidence
+  agree on the accepted block and covenant output.
+- Published only sanitized public evidence. Signature bytes, wallet data, and
+  the raw signed transaction remain owner-local and outside Git.
+- PASS: Rustfmt, 50 deployer tests, strict all-target Clippy, locked release
+  build, Memory Integrity, six Autodidactic tests, HTML/public-status checks,
+  evidence JSON parse, and diff hygiene.
+- Kimi read-only review found one stale current-status row and one useful display
+  pinning improvement; Sol fixed both and reran the complete relevant gate.
+- H-001 is 100% complete as a non-promotable canary. Six state deployments,
+  metrics-oracle successor evidence, production proof/privacy review,
+  production protocol operation, and exact-commit release evidence remain.
+- **Status:** `Local PASS / Protected GitHub PR and CI next / No further deployment authorized`.
+
+## 2026-08-12 20:54 EEST - PR #165 CodeRabbit findings resolved
+
+- Resolved five findings: public Bridge path redaction, current blocker
+  reconciliation, Markdown fence language, complete remaining-gate inventory,
+  and reproducible evidence-hash validation.
+- Added the secret-free canonical operator receipt/public evidence sources, one
+  fail-closed verifier, four tamper/status/privacy regression tests, and a Pages
+  CI gate. No signature or raw signed transaction was published.
+- PASS: verifier, four tests, Python compile, Memory/Autodidactic, CI YAML parse,
+  Rustfmt, 50 deployer tests, strict Clippy, path sweep, and diff hygiene.
+- **Status:** `Review fixes local PASS / Push and complete protected recheck next`.

@@ -2524,6 +2524,10 @@ jobs:
           for f in robots.txt sitemap.xml llms.txt manifest.json sw.js; do
             test -f "$f" && echo "OK: $f" || (echo "MISSING: $f" && exit 1)
           done
+      - name: Verify H-001 public closeout evidence
+        run: |
+          python3 scripts/verify_h001_canary_closeout_evidence.py
+          python3 -m unittest scripts/test_h001_canary_closeout_evidence.py
       - name: Verify public launch status is not stale
         run: |
           files=(index.html faq.html roadmap.html whitepaper.html guardian-economics.html README.md WHITEPAPER.md docs/roadmap.md llms.txt)
