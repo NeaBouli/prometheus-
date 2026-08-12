@@ -3437,3 +3437,15 @@ Rules for all dev agents:
   metrics-oracle successor evidence, production proof/privacy review,
   production protocol operation, and exact-commit release evidence remain.
 - **Status:** `Local PASS / Protected GitHub PR and CI next / No further deployment authorized`.
+
+## 2026-08-12 20:54 EEST - PR #165 CodeRabbit findings resolved
+
+- Resolved five findings: public Bridge path redaction, current blocker
+  reconciliation, Markdown fence language, complete remaining-gate inventory,
+  and reproducible evidence-hash validation.
+- Added the secret-free canonical operator receipt/public evidence sources, one
+  fail-closed verifier, four tamper/status/privacy regression tests, and a Pages
+  CI gate. No signature or raw signed transaction was published.
+- PASS: verifier, four tests, Python compile, Memory/Autodidactic, CI YAML parse,
+  Rustfmt, 50 deployer tests, strict Clippy, path sweep, and diff hygiene.
+- **Status:** `Review fixes local PASS / Push and complete protected recheck next`.

@@ -1,0 +1,45 @@
+{
+  "deployment_profile": {
+    "full_bundle_fixture_count": 7,
+    "full_bundle_manifest_sha256": "e6cec2aa5d740c47c972fe92d4607ffd8a7a3c3f26b353475451d50b2670aefd",
+    "kind": "canary",
+    "name": "testnet-10-validator-staking-h001",
+    "network_id": "testnet-10",
+    "selected_contracts": [
+      "ValidatorStakingH001"
+    ]
+  },
+  "network": "testnet",
+  "provenance": {
+    "description": "Generated from public external deploy-orchestrator results after request-set verification.",
+    "orchestrator": "prometheus-silverc-deployer",
+    "recorded_at": "2026-08-12T17:18:29Z",
+    "request_set_sha256": "b9f4d7a5ee72148165e5479e67551197682f416eb91d3155c4abba9f4fe2f6ed",
+    "source_result_sha256": "2d2b2df71c4a10231d8b394e59b9fd41cbd36f6978395b92a3a8af636955051c",
+    "type": "operator_record"
+  },
+  "receipts": [
+    {
+      "artifact_sha256": "bc2af7e54d464384eaebe3ba0b93e005af4a9aaab2a2dbab637d2ba2529cfdfe",
+      "block_daa_score": 541960711,
+      "block_hash": "faaa49eb38b3a58b5b5834cc2d91c78dba8bf1dd6ceeaee9401bc195013454e0",
+      "confirmations": 1,
+      "constructor_args_sha256": "473580f1bb813c368a9d35714bcb980a8a3c41f99865c791f24715911bd4890f",
+      "contract_name": "ValidatorStakingH001",
+      "deploy_tx_id": "c85fd1e79607370ff63faabbc3158e011158d2bde1af40d4eecd642189d8c22f",
+      "deployed_at": "2026-08-12T17:17:02Z",
+      "deployed_instance_id": "c85fd1e79607370ff63faabbc3158e011158d2bde1af40d4eecd642189d8c22f:0",
+      "deployer_address": "kaspatest:qrj68xczazadtklg67f5yh39jzcq3fz3w6tvw4kv7xxl48ckc8cu7rwdr0jrt",
+      "script_len": 58,
+      "script_sha256": "e5d99d8662e529a56a7d04acf66ea087ddb84d3c385f043e79d632b62596ba23",
+      "source_sha256": "ebf17c5291934c90ea0df118791094b35bac12ea58ee4e65fc69bcebae6908d6",
+      "status": "confirmed"
+    }
+  ],
+  "release_bundle": {
+    "fixture_count": 7,
+    "silverscript_commit": "d25bd3427a093c17327ca3d6b9e1aa5f7688c863",
+    "silverscript_ref": "d25bd3427a093c17327ca3d6b9e1aa5f7688c863"
+  },
+  "schema_version": 1
+}

@@ -7,7 +7,7 @@
 
 ## CURRENT SPRINT
 
-```
+```text
 Sprint 9: Post-Toccata deployment and production-protocol gates
 Status:   H-001 CANARY COMPLETE; BLOCKED on remaining full-rollout gates
 Start:    2026-07-08
@@ -120,6 +120,10 @@ deployer tests, warning-free Clippy, and an end-to-end Python canary regression.
 Main Prometheus CI `29412667386`, Security Audit `29412667410`, and Pages
 `29412666483` pass for the exact merge commit, and the live whitepaper exposes
 the profile and non-promotable boundary.
+The following paragraphs retain the historical readiness trail through the
+2026-08-04 refresh; their pre-execution blocker statements are superseded by
+the completed-canary record above.
+
 The public testnet-10 P2PK outpoint and matching deployer identity are now
 confirmed at transaction `24e81339f3656689643ca86e3c53c4c5336e4273bb127d25bdaf328e5da241c7`,
 output `0`, for `100100000000` sompi. The official TN10 API reports it accepted,
@@ -130,8 +134,8 @@ funding spec, and both signing-request builds byte-for-byte. Live preflight
 reconfirmed the output unspent/non-coinbase at virtual DAA `534442816` through
 a synced, UTXO-indexed `rusty-kaspa 2.0.1` node above Toccata activation. The
 refresh merged through PR #150 as exact main `9854c5e`; Prometheus CI
-`30866401314`, Security Audit `30866401257`, and Pages `30866400606` pass. The
-real canary still needs an explicitly approved external
+`30866401314`, Security Audit `30866401257`, and Pages `30866400606` pass. At
+that historical snapshot, the real canary still needed an explicitly approved external
 BIP340 signature, full operator verification, one-shot broadcast, confirmation,
 receipt, and independent chain evidence. Canary success cannot mark the full
 seven-fixture rollout, six production-state contracts, or metrics oracle ready.
@@ -369,7 +373,12 @@ Rollback tag: pre-session-20260413 → 6347b85
 
 ## BLOCKED
 
-Sprint 9 remains blocked until the already funded H-001 request receives its explicitly approved external Schnorr signature, passes canonical import/full transaction verification, and is separately authorized for one-shot broadcast; confirmation, a public `operator_record` receipt, and independent node/explorer evidence must follow. Full rollout additionally requires the remaining contract deployments, a confirmed externally signed keyless metrics transition with successor evidence, and public release-hardening evidence for the exact rollout commit. GH-25 software/merge verification is complete; real execution/evidence gates remain.
+Sprint 9 remains blocked on full rollout, not on the completed H-001 canary. The
+remaining gates are six state-contract deployments, a confirmed externally
+signed keyless metrics transition with successor evidence, approved production
+proof artifacts and independent cryptographic/privacy review, production
+semantic/actionable analysis and transport, multi-host operation, and public
+release-hardening evidence for the exact rollout commit.
 
 ## NEXT ACTIONS (for Claude Code)
 

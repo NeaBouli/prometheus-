@@ -106,26 +106,26 @@ UTXO remained unspent/non-coinbase and the archive, request, and two
 signing-request builds stayed byte-identical to the accepted `205e1ca`
 baseline. PR #150 published the refresh as exact main `9854c5e`; CI
 `30866401314`, Security `30866401257`, and Pages `30866400606` pass on that
-commit. External signature, operator verification, one-shot broadcast, network
-confirmation, a public `operator_record` receipt, and independent testnet-10
-node/explorer evidence remain required.
+commit. The H-001 Testnet-10 canary subsequently completed external signature,
+operator verification, exactly one journaled broadcast, confirmation, a public
+`operator_record` receipt, and independent node/REST evidence on 2026-08-12.
 A public release-hardening evidence verifier binds successful CI, Pages,
 branch-control, rollback, and release-note checks to the exact release commit
 without querying GitHub, accepting credentials, changing repository settings,
 or touching chain material.
 A release-readiness auditor now checks the generated handoff package, required
 files, component summaries, safety flags, and JSON secret/raw-transaction
-hygiene before any rollout claim. The remaining deployment blockers are the
-real funded testnet-10 run through the repository Toccata-v1 genesis operator,
-external Schnorr signatures, confirmed public deploy receipts plus independent
-node/explorer evidence, the externally signed keyless metrics-oracle transition, and
-public release-hardening evidence for the exact rollout commit.
+hygiene before any rollout claim. The remaining deployment blockers are the six
+state-contract deployments, the externally signed keyless metrics-oracle
+transition with confirmed successor evidence, production proof and privacy
+review, production semantic/actionable analysis and transport, multi-host
+operation, and public release-hardening evidence for the exact rollout commit.
 
 **Sprint 9 — Contracts Live + Real ZK-Proof**
 - Keep current-Silverscript runtime and release-bundle manifest gates green
 - Keep both closed deployment profiles manifest-bound and fail-closed
-- Execute the non-promotable `ValidatorStakingH001` testnet-10 canary first
-- Require a funded public P2PK outpoint, matching public deployer identity, external BIP340 signature, confirmation, and independent public evidence for that canary
+- Keep the completed non-promotable `ValidatorStakingH001` Testnet-10 canary evidence reproducible
+- Preserve the confirmed public P2PK funding, deployer identity, BIP340 verification, receipt, and independent evidence bindings without publishing signing material
 - Preserve all seven-fixture, metrics-oracle, and release-hardening gates after the canary; canary success is not rollout readiness
 - Keep release-bundle deploy preflight green
 - Keep the generated deploy operator runbook green and free of signing material

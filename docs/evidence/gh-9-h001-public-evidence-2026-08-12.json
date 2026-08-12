@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "evidence_type": "prometheus_silverc_deploy_receipt_public_evidence",
+  "network": "testnet",
+  "provenance": {
+    "type": "public_explorer_snapshot",
+    "observer": "api-tn10.kaspa.org",
+    "observed_at": "2026-08-12T17:18:29Z"
+  },
+  "release_bundle": {
+    "silverscript_ref": "d25bd3427a093c17327ca3d6b9e1aa5f7688c863",
+    "silverscript_commit": "d25bd3427a093c17327ca3d6b9e1aa5f7688c863",
+    "fixture_count": 7
+  },
+  "deployment_profile": {
+    "full_bundle_fixture_count": 7,
+    "full_bundle_manifest_sha256": "e6cec2aa5d740c47c972fe92d4607ffd8a7a3c3f26b353475451d50b2670aefd",
+    "kind": "canary",
+    "name": "testnet-10-validator-staking-h001",
+    "network_id": "testnet-10",
+    "selected_contracts": [
+      "ValidatorStakingH001"
+    ]
+  },
+  "receipts_sha256": "4eb10f5a704eae7679bc648094aa36febc9f256e7d308a68ade08565938f63bc",
+  "receipt_count": 1,
+  "observations": [
+    {
+      "status": "confirmed",
+      "contract_name": "ValidatorStakingH001",
+      "deployed_instance_id": "c85fd1e79607370ff63faabbc3158e011158d2bde1af40d4eecd642189d8c22f:0",
+      "deploy_tx_id": "c85fd1e79607370ff63faabbc3158e011158d2bde1af40d4eecd642189d8c22f",
+      "block_hash": "faaa49eb38b3a58b5b5834cc2d91c78dba8bf1dd6ceeaee9401bc195013454e0",
+      "block_daa_score": 541960711,
+      "confirmations": 1,
+      "explorer_url": "https://explorer-tn10.kaspa.org/txs/c85fd1e79607370ff63faabbc3158e011158d2bde1af40d4eecd642189d8c22f"
+    }
+  ]
+}

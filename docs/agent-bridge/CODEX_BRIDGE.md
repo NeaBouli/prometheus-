@@ -3385,7 +3385,7 @@ No direct `main` push or production action occurred.
 
 ### 2026-08-12 - GH-9 owner-local offline signer preparation authoritative EOF
 
-- Gio confirmed that `/Users/gio/.kaspa/prometheus-testnet.wallet` is dedicated
+- Gio confirmed that the owner-local Testnet-10 wallet is dedicated
   exclusively to Kaspa Testnet-10. This confirmation authorizes only a bounded
   preparation block for an owner-local signer outside the repository.
 - Current scope is limited to read-only handoff/wallet-client inspection and a
@@ -3400,8 +3400,8 @@ No direct `main` push or production action occurred.
 
 ### 2026-08-12 - GH-9 owner-local offline signer preparation complete authoritative EOF
 
-- The owner-local signer preparation is complete outside this repository under
-  `/Users/gio/Desktop/repos/prometheus-handoffs/gh-9-offline-signer`. It is based
+- The owner-local signer preparation is complete outside this repository in the
+  owner-local GH-9 signer workspace. It is based
   on official `rusty-kaspa v2.0.1` commit `cfafeb4c` and preserved as local-only
   commit `9fe9ad5`; no signer source or binary was pushed or published.
 - The added wallet command accepts one interactive canonical 32-byte digest,
@@ -3583,3 +3583,23 @@ No direct `main` push or production action occurred.
   and exact-commit release evidence. No further deployment or transaction is
   authorized.
 - **Status:** `GH-9 Local Closeout PASS / Protected PR, CI, merge, and live Pages verification next`.
+
+### 2026-08-12 20:54 EEST - PR #165 review findings resolved
+
+- Addressed all five CodeRabbit findings without changing chain state: removed
+  owner-local absolute paths from the public Bridge; synchronized stale current
+  blocker text; added the missing Markdown fence language; and made the public
+  remaining-gates list complete.
+- Published the exact secret-free canonical `operator_record` receipts and
+  public explorer evidence that underlie the closeout hashes. Added a repository
+  verifier that recomputes both canonical SHA-256 values, checks cross-document
+  transaction/block/profile bindings, rejects secret/raw-transaction fields,
+  and accepts the verified status only after every check passes.
+- Added four regression tests covering the committed evidence, receipt tamper,
+  unverified status, and nonpublic payload rejection. The Pages CI job now runs
+  the verifier and tests on every change.
+- Local recheck PASS: evidence verifier, four evidence tests, Python compile,
+  Memory Integrity, six Autodidactic tests, CI YAML parse, Rustfmt, all 50
+  deployer tests, warning-free all-target Clippy, path-redaction sweep, and diff
+  hygiene.
+- **Status:** `PR #165 Review Fixes Local PASS / Updated protected CI next`.
