@@ -102,6 +102,13 @@ preserved through ensemble commitments without a float round trip.
 This is a local orchestration component. A closed response schema provides
 format validation, not semantic trust or production calibration.
 
+GH-170 adds a separate compile-only validation boundary for generated candidate
+source. It uses the exact-pinned official `yara-x==1.4.0` binding, accepts one
+bounded ASCII rule, disables includes, rejects imports, multiple rules, compiler
+errors, and compiler warnings, and discards the compiled object without calling
+any scan API. It performs no file, process, or data scan and grants no semantic,
+submission, publication, or production authority.
+
 ## Offline Confidence Evaluation
 
 GH-138 adds a standalone development gate over a canonical 24-case synthetic

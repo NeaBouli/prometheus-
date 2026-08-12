@@ -230,6 +230,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
         <li><a href="#rules-auto">Are rules confirmed automatically?</a></li>
         <li><a href="#false-positive">False positives</a></li>
         <li><a href="#privacy">Privacy protection</a></li>
+        <li><a href="#yara-validation">YARA validation</a></li>
         <li><a href="#commit-reveal">Commit-Reveal voting</a></li>
       </ul>
     </div>
@@ -342,6 +343,17 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
             4. Challenge period ······ 24 hours · auto-tuning responds to FP rate
           </div>
           <p>No single step is fully automatic without verification. The automation lies in the <em>execution</em> of the rules — the decision itself has multiple independent checkpoints. This makes it structurally difficult to push a false rule through: an attacker would need to simultaneously overcome AI confidence thresholds, gather 5 fake reports, win a validator vote, and survive the challenge period.</p>
+        </div></div>
+      </div>
+
+      <div class="faq-item" id="yara-validation">
+        <button class="faq-q" onclick="toggle(this)">
+          <span class="faq-q-text">Does Prometheus validate generated YARA rules with a real engine?</span>
+          <span class="faq-icon"></span>
+        </button>
+        <div class="faq-a"><div class="faq-a-inner">
+          <p>GH-170 is a local, not-yet-merged candidate that replaces substring shape checks with exact-pinned, compile-only <code>yara-x==1.4.0</code> validation. It accepts one bounded ASCII rule, disables includes, rejects imports, multiple rules, compiler errors, and warnings, and performs no scan.</p>
+          <p>This validates syntax and structure only. Semantic quality, model approval, actionable analysis, submission, publication, protected merge, and production operation remain separate gates.</p>
         </div></div>
       </div>
 

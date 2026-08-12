@@ -3510,3 +3510,49 @@ Rules for all dev agents:
   GH-167 boundary. README, homepage, whitepaper, roadmap, FAQ, Memory, and Bridge
   closeout records are synchronized without changing product behavior.
 - Status: `Done / Exact-main verified / Documentation closeout in review`.
+
+## 2026-08-13 01:31 EEST - GH-170 real YARA validation started
+
+- Opened issue #170 and branch `feat/GH-170-yara-x-validation` from clean exact
+  final main `e8a13cae679a4d1a5d213e0d56b9e958dfa20733`.
+- Bounded scope is compile-only in-memory candidate validation with official
+  pinned YARA-X, strict source/feature budgets, adversarial tests, and no scan or
+  external effect. Existing v2 non-actionable worker and durable schema remain
+  unchanged.
+- Kimi supplied read-only architecture analysis; Sol owns implementation review,
+  dependency/security decisions, full gates, publication, and closeout.
+- Status: `In Progress / Implementation and dependency verification next`.
+
+## 2026-08-13 01:52 EEST - GH-170 local implementation/review milestone
+
+- Exact-pinned compile-only YARA-X validation and adversarial coverage are
+  integrated; no scan or external authority was added.
+- PASS: 76 focused tests; 1205 Guardian tests with 4 intentional skips; Black;
+  Guardian Pylint 9.85/10; Pip Audit with no known vulnerability.
+- Kimi implementation contribution was fully reviewed and simplified by Sol;
+  Kimi's independent read-only security review reports no P0/P1/P2 finding.
+- Public and internal documentation now records GH-170 strictly as a local
+  candidate. Full repository gates, protected PR, merge, exact-main checks, and
+  cache-busted live verification remain.
+- Status: `Local PASS / Full gates next`.
+
+## 2026-08-13 01:56 EEST - GH-170 complete local gates
+
+- PASS: Guardian 1207/4 skip; Black; changed Pylint 10.00/10 and full 9.85/10;
+  Pip Audit; Rust workspace fmt/clippy/tests; locked release binaries;
+  33/15/15-file packages; isolated release performance; Memory/Autodidactic;
+  H-001 public evidence; HTML/JSON-LD/YAML/stale-status; Cargo Audit with no
+  vulnerability and eight existing allowed warnings; diff hygiene.
+- The pinned YARA-X Linux stable-ABI wheel resolves for protected CI. Docker is
+  absent locally, so Compose rendering remains for protected CI; the structural
+  vLLM policy verifier passes.
+- Status: `Local PASS / Protected publication next`.
+
+## 2026-08-13 02:12 EEST - PR #171 review triage
+
+- Ten protected CI/Security contexts pass at head `333ba2e`.
+- Accepted two review improvements: historical labeling for the retained GH-167
+  pre-merge checkpoint and one valid stringless YARA-X regression case.
+- The timestamp finding is invalid: GitHub's August 12 UTC review time maps to
+  August 13 EEST, the required audit timezone.
+- Status: `Review fixes local / Recheck next`.

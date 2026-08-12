@@ -54,6 +54,14 @@ No — four independent checkpoints exist:
 4. 24-hour challenge period: anyone can contest, auto-tuning responds
 No single step is fully automatic without verification.
 
+**Q: Does Prometheus already validate generated YARA rules with a real engine?**
+GH-170 is a local, not-yet-merged candidate that replaces substring shape
+checks with exact-pinned, compile-only YARA-X validation. It accepts one
+bounded ASCII rule, disables includes, rejects imports, multiple rules,
+compiler errors, and warnings, and performs no scan. This validates syntax and
+structure only; semantic quality, model approval, submission, publication, and
+production operation remain separate gates.
+
 **Q: What happens with a false positive?**
 Affected users report the false detection. The signed metrics-oracle
 pipeline reports the bounded false positive rate on-chain.

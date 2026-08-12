@@ -3718,3 +3718,84 @@ No direct `main` push or production action occurred.
 - No wallet, signing, transaction, chain, deployment, production, reward,
   slash, commit-reveal, reputation, or emergency-stop action occurred.
 - **Status:** `Done / Product exact-main PASS / Documentation closeout review`.
+
+### 2026-08-13 01:31 EEST - GH-170 bounded YARA-X validation started
+
+- Created issue #170 and branch `feat/GH-170-yara-x-validation` from exact
+  final main `e8a13cae679a4d1a5d213e0d56b9e958dfa20733`.
+- Scope: replace the Guardian's substring-only candidate-rule check with one
+  pinned, real, compile-only YARA-X boundary. Source remains in memory; includes,
+  imports/modules, warnings, malformed metadata, multiple rules, NUL/non-ASCII,
+  and oversized inputs must fail closed under explicit budgets.
+- Kimi K3 independently mapped the semantic-analysis boundary and recommended
+  real YARA compilation as the largest bounded repository-owned prerequisite.
+  Sol owns dependency review, API/security invariants, integration, complete
+  tests, documentation, external writes, and closure.
+- Non-goals: no file/process/data scan; no v2 worker semantic result; no LLM or
+  model invocation; no disclosure, publication, committee, IPFS, wallet,
+  signing, chain, reward, deployment, production authority, slash,
+  commit-reveal, reputation, or emergency-stop change.
+- Risk: medium because this is a security validation boundary and adds one
+  native official dependency. Exact pinning, dependency audit, adversarial
+  tests, independent final review, and all protected gates are mandatory.
+- **Status:** `GH-170 In Progress / Bridge recorded / Implementation next`.
+
+### 2026-08-13 01:52 EEST - GH-170 implementation and independent review local PASS
+
+- Replaced the Guardian substring-only candidate-rule check with an in-memory,
+  compile-only boundary using exact-pinned official `yara-x==1.4.0`. Exactly one
+  ASCII rule up to 65,536 bytes and a 128-character name is allowed; imports,
+  includes, multiple rules, NUL/non-ASCII, compiler errors, and every warning
+  fail closed. The compiled object is discarded and no scan API is called.
+- Added adversarial parser/compiler tests, including comments, escaped strings,
+  regex and hex regions, duplicate rules, directives, warning cases, budget
+  edges, and control-character line comments. Generator integration delegates
+  only rule-content validation; confidence and submission thresholds remain
+  unchanged.
+- Real checks so far: focused Guardian tests `76 passed`; full Guardian tests
+  `1205 passed, 4 skipped`; Black clean across 67 files; full Guardian Pylint
+  `9.85/10`; Pip Audit reports no known vulnerabilities.
+- Kimi K3 supplied the initial bounded implementation slice and then completed
+  an independent read-only security review. Sol reviewed and simplified every
+  write, probed parser/compiler synchronization, added regression coverage, and
+  owns final integration. Kimi found no P0/P1/P2 issue; residual native
+  compile-time cost under the 64 KiB cap and native-wheel supply-chain exposure
+  are documented non-blocking risks.
+- README, Whitepaper, Roadmap, FAQ, homepage, `llms.txt`, protocol draft,
+  Guardian README, Memory, Bridge, and action log are synchronized as a local
+  candidate. They do not claim merge, exact-main, live, semantic, actionable,
+  submission, publication, or production completion.
+- No model invocation, file/process/data scan, v2 actionable result, wallet,
+  signing, transaction, chain, reward, deployment, production, slash,
+  commit-reveal, reputation, or emergency-stop action occurred.
+- **Status:** `GH-170 Local PASS / Full repository gates and protected PR next`.
+
+### 2026-08-13 01:56 EEST - GH-170 complete local repository gates PASS
+
+- Sol's final local regression after review fixes passes: Guardian `1207
+  passed, 4 skipped`; changed-source Pylint `10.00/10`; full Guardian Pylint
+  `9.85/10`; Black clean; Pip Audit no known vulnerabilities.
+- Rust workspace fmt, warning-free Clippy, complete tests, locked optimized
+  Guardian/ThreatProof builds, verified 33-file ThreatHint package, 33/15/15
+  package set, and isolated release performance gate pass.
+- Memory Integrity, six Autodidactic tests, H-001 public evidence verifier plus
+  four tamper/privacy tests, five HTML parses, four JSON-LD parses, both workflow
+  YAML parses, stale-public-status scan, and diff hygiene pass. Cargo Audit has
+  no vulnerability and the same eight repository-allowed warnings.
+- YARA-X 1.4.0's CPython stable-ABI manylinux_2_28 x86_64 wheel was resolved
+  independently for the protected Ubuntu/Python 3.11 environment. Docker is not
+  installed locally, so only `docker compose ... config --quiet` could not run;
+  the repository structural vLLM policy verifier passes and protected Linux CI
+  remains authoritative for Compose rendering.
+- **Status:** `Local PASS / Commit, protected PR, merge, exact-main and live Pages next`.
+
+### 2026-08-13 02:12 EEST - PR #171 review findings triaged
+
+- All ten CI/Security contexts pass at exact PR head `333ba2e`; CodeRabbit
+  completed with three threads.
+- Accepted: mark the retained GH-167 pre-merge checkpoint explicitly historical
+  and add a valid stringless YARA-X rule regression.
+- Rejected with evidence: GH-170 Bridge timestamps are not future-dated. GitHub
+  review events on 2026-08-12 UTC correspond to 2026-08-13 EEST in the required
+  Europe/Athens audit timezone; local `date` independently reported EEST.
+- **Status:** `Review fixes in progress / Focused and complete recheck next`.

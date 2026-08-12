@@ -6,6 +6,8 @@
 
 ---
 
+- [~] [P1] GH-170 substring-only Guardian YARA check durch bounded compile-only YARA-X ersetzen | Codex Sol | Local code/tests/docs PASS; protected PR, merge, exact-main CI/Security/Pages and live readback pending
+
 ## ═══ SPRINT 0: SETUP & TESTNET (Woche 1) ═══
 
 - [x] [P0] Repo-Struktur auf GitHub anlegen (memory/, modules/, scripts/, .gitignore) | Claude Code | 2026-03-21

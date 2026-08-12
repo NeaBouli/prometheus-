@@ -155,3 +155,41 @@ class TestYaraRuleGenerator:
         with pytest.raises(ValueError, match="invalid"):
             await gen.generate_rule("hash", ["indicator"])
         assert gen._rule_counter == 0
+
+
+class TestYaraRuleGeneratorValidationBoundary:
+    """validate_rule delegates to the GH-170 compile-only YARA-X boundary."""
+
+    def _make_generator(self) -> YaraRuleGenerator:
+        mock_llm = MagicMock()
+        mock_llm.generate_yara_rule = AsyncMock(return_value=VALID_YARA)
+        mock_llm.assess_yara_rule = AsyncMock(
+            return_value=YaraConfidenceAssessment(9_000)
+        )
+        return YaraRuleGenerator(mock_llm)
+
+    def test_validate_rule_accepts_compilable_rule(self) -> None:
+        gen = self._make_generator()
+        assert gen.validate_rule(make_rule(VALID_YARA)) is True
+
+    def test_validate_rule_rejects_import_directive(self) -> None:
+        gen = self._make_generator()
+        rule = make_rule('import "pe"\n' + VALID_YARA)
+        assert gen.validate_rule(rule) is False
+
+    def test_validate_rule_rejects_multiple_rules(self) -> None:
+        gen = self._make_generator()
+        rule = make_rule(VALID_YARA + "\n" + VALID_YARA.replace("TestMalware", "Other"))
+        assert gen.validate_rule(rule) is False
+
+    def test_validate_rule_rejects_compiler_warning(self) -> None:
+        gen = self._make_generator()
+        rule = make_rule("rule Broken {\n    condition:\n        true\n}")
+        assert gen.validate_rule(rule) is False
+
+    def test_validate_rule_rejects_non_ascii_content(self) -> None:
+        gen = self._make_generator()
+        rule = make_rule(
+            'rule Caf\u00e9 {\n    strings:\n        $a = "x"\n    condition:\n        $a\n}'
+        )
+        assert gen.validate_rule(rule) is False

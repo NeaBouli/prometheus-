@@ -14,6 +14,22 @@ Start:    2026-07-08
 Goal:     Complete the non-promotable H-001 canary, then the full state-contract, oracle, ZK, P2P, and release-evidence path.
 ```
 
+## GH-170 BOUNDED YARA-X VALIDATION LOCAL PASS (2026-08-13)
+
+```text
+Status: Local PASS; protected PR/merge/exact-main evidence pending
+Scope: exact-pinned yara-x 1.4.0 compile-only validation for one bounded ASCII
+       candidate rule; imports/includes, multiple rules, errors and warnings
+       fail closed; compiled rules are discarded without scan
+Evidence: 76 focused pass; Guardian 1205 pass/4 skip; Black clean; Pylint
+          9.85/10; Pip Audit no known vulnerabilities; independent Kimi review
+          found no P0/P1/P2 issue
+Boundary: structural syntax validation only; no model invocation, semantic
+          quality claim, actionable v2 result, scan, submission, publication,
+          wallet, chain, reward, deployment, or production authority
+Readiness: estimates unchanged at core 84-88%, complete roadmap 50-55%
+```
+
 ## GH-167 THREATHINT-V2 TRANSPORT MERGED / EXACT-MAIN VERIFIED (2026-08-13)
 
 ```text
