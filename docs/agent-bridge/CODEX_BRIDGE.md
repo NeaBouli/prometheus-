@@ -3696,3 +3696,25 @@ No direct `main` push or production action occurred.
   transaction, chain, deployment, production, reward, slash, commit-reveal, or
   emergency-stop action occurred.
 - **Status:** `Local PASS / Protected PR, CI, merge, exact-main and Pages next`.
+
+### 2026-08-13 01:12 EEST - GH-167 merged and exact-main verified
+
+- PR #168 squash-merged normally through protected main as
+  `7c6260855193cce1ae2790670fcf25371ac08412`; issue #167 closed and the remote
+  feature branch was deleted.
+- All ten required PR contexts passed with no review thread. The optional
+  CodeRabbit status remained in progress and was not a branch-protection
+  requirement; two independent Kimi reviews and Sol's complete review/gates
+  had already found no unresolved P0-P2 issue.
+- Exact-main Prometheus CI `31645624623`, Security Audit `31645624601`, and
+  Pages `31645623547` pass. Cache-busted live Pages reads confirmed the GH-167
+  boundary in roadmap, whitepaper, FAQ, and `llms.txt`.
+- README, root/styled whitepaper, roadmap, FAQ, homepage, `llms.txt`, Memory,
+  Bridge, and action log are synchronized in the documentation-only closeout.
+- Remaining rollout gates are unchanged: production relation/key/ceremony
+  approval, independent cryptographic/privacy review, semantic/actionable
+  analysis, operated public multi-host evidence, six state deployments,
+  metrics-oracle execution/evidence, and final release gates.
+- No wallet, signing, transaction, chain, deployment, production, reward,
+  slash, commit-reveal, reputation, or emergency-stop action occurred.
+- **Status:** `Done / Product exact-main PASS / Documentation closeout review`.

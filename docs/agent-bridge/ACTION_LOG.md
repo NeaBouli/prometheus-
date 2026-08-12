@@ -3499,3 +3499,14 @@ Rules for all dev agents:
 - Sol added and verified bounded executor draining so synchronous promotion work
   cannot outlive a reported Python-ingress shutdown; 30 focused tests pass.
 - Status is `Local PASS`; protected publication and exact-main evidence remain.
+
+## 2026-08-13 01:12 EEST - GH-167 protected merge and exact-main closeout
+
+- PR #168 merged normally as exact main `7c6260855193cce1ae2790670fcf25371ac08412`;
+  issue #167 closed and the remote feature branch was removed.
+- All ten required PR checks passed with no review thread. Exact-main Prometheus
+  CI `31645624623`, Security Audit `31645624601`, and Pages `31645623547` pass.
+- Cache-busted public roadmap, whitepaper, FAQ, and `llms.txt` reads contain the
+  GH-167 boundary. README, homepage, whitepaper, roadmap, FAQ, Memory, and Bridge
+  closeout records are synchronized without changing product behavior.
+- Status: `Done / Exact-main verified / Documentation closeout in review`.

@@ -14,15 +14,18 @@ Start:    2026-07-08
 Goal:     Complete the non-promotable H-001 canary, then the full state-contract, oracle, ZK, P2P, and release-evidence path.
 ```
 
-## GH-167 THREATHINT-V2 TRANSPORT LOCAL CANDIDATE (2026-08-13)
+## GH-167 THREATHINT-V2 TRANSPORT MERGED / EXACT-MAIN VERIFIED (2026-08-13)
 
 ```text
-Status: In Progress; repository implementation complete, final gates pending
+Status: Done; PR #168 merged normally and issue #167 closed
+Exact main: 7c6260855193cce1ae2790670fcf25371ac08412
 Scope: exact bounded Rust/Python transport frame; independent libp2p v2 path;
        owner-only local IPC; trusted network/session/time revalidation;
        accepted/rejected/busy acknowledgements and shared admission budgets
 Evidence: shared 2-valid/19-invalid corpus; adversarial unit tests; real
-          separate-process same-host Guardian forwarding test
+          separate-process same-host Guardian forwarding test; Prometheus CI
+          31645624623, Security Audit 31645624601, Pages 31645623547 pass;
+          live public roadmap, whitepaper, FAQ and llms markers verified
 Trust: report nonce and peer identity are untrusted transport metadata; the
        operated service requires an explicit trusted network and Python resolves
        the active session and time from trusted local sources
