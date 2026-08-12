@@ -3788,3 +3788,14 @@ No direct `main` push or production action occurred.
   the repository structural vLLM policy verifier passes and protected Linux CI
   remains authoritative for Compose rendering.
 - **Status:** `Local PASS / Commit, protected PR, merge, exact-main and live Pages next`.
+
+### 2026-08-13 02:12 EEST - PR #171 review findings triaged
+
+- All ten CI/Security contexts pass at exact PR head `333ba2e`; CodeRabbit
+  completed with three threads.
+- Accepted: mark the retained GH-167 pre-merge checkpoint explicitly historical
+  and add a valid stringless YARA-X rule regression.
+- Rejected with evidence: GH-170 Bridge timestamps are not future-dated. GitHub
+  review events on 2026-08-12 UTC correspond to 2026-08-13 EEST in the required
+  Europe/Athens audit timezone; local `date` independently reported EEST.
+- **Status:** `Review fixes in progress / Focused and complete recheck next`.

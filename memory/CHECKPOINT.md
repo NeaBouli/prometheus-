@@ -977,7 +977,7 @@ Leistungsbasierte Emission. Guardians = "Miner" (KI statt GPU).
   non-promotable H-001 canary and preserve all full-rollout blockers.
 - **Status:** `GH-9 Done / Exact-main and live Pages verified`.
 
-## Checkpoint 2026-08-13: GH-167 bounded ThreatHint-v2 transport local
+## Historical checkpoint 2026-08-13: GH-167 bounded ThreatHint-v2 transport local
 
 - Shared Rust/Python canonical framing carries the exact proof envelope,
   Observable Bundle, approval wire, and an untrusted report-nonce lookup key.
@@ -989,4 +989,4 @@ Leistungsbasierte Emission. Guardians = "Miner" (KI statt GPU).
 - Production relation/key/ceremony approval, semantic/actionable analysis,
   disclosure, public multi-host operation, models/YARA, wallet, chain, rewards,
   and deployment remain outside the boundary.
-- **Status:** `GH-167 In Progress / Complete gates and independent review next`.
+- **Historical status at capture:** `GH-167 In Progress / Complete gates and independent review next`.

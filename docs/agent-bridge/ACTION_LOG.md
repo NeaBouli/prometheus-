@@ -3547,3 +3547,12 @@ Rules for all dev agents:
   absent locally, so Compose rendering remains for protected CI; the structural
   vLLM policy verifier passes.
 - Status: `Local PASS / Protected publication next`.
+
+## 2026-08-13 02:12 EEST - PR #171 review triage
+
+- Ten protected CI/Security contexts pass at head `333ba2e`.
+- Accepted two review improvements: historical labeling for the retained GH-167
+  pre-merge checkpoint and one valid stringless YARA-X regression case.
+- The timestamp finding is invalid: GitHub's August 12 UTC review time maps to
+  August 13 EEST, the required audit timezone.
+- Status: `Review fixes local / Recheck next`.
