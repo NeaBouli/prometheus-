@@ -3449,3 +3449,14 @@ Rules for all dev agents:
 - PASS: verifier, four tests, Python compile, Memory/Autodidactic, CI YAML parse,
   Rustfmt, 50 deployer tests, strict Clippy, path sweep, and diff hygiene.
 - **Status:** `Review fixes local PASS / Push and complete protected recheck next`.
+
+## 2026-08-12 21:00 EEST - GH-9 exact-main closeout verified
+
+- PR #165 exact reviewed head `eb6e435` passed all required contexts with all
+  five review threads resolved, then squash-merged as exact main `6b43f5d`;
+  issue #9 closed and the feature branch was deleted.
+- Exact-main CI `31625028961`, Security `31625028915`, and Pages `31625028100`
+  pass. Live Roadmap, Whitepaper, and public evidence readback pass.
+- H-001 is Done as a non-promotable Testnet-10 canary. No additional deployment
+  or chain action occurred.
+- **Status:** `GH-9 Done / Exact-main and live Pages verified`.
