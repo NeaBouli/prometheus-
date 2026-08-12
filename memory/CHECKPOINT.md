@@ -1,5 +1,5 @@
 # PROMETHEUS — SESSION CHECKPOINT
-# Last updated: 2026-08-10
+# Last updated: 2026-08-12
 # Purpose: Full recovery document. If Claude (Architect) or Claude Code
 # loses context, read this file first. It contains the complete project state.
 
@@ -14,12 +14,12 @@
 | Branch | Canonical target `main`; product/public/status changes remain PR-only |
 | Lokaler Pfad | `$REPO_ROOT` |
 | Letzter grün verifizierter Produkt-/Public-Baseline | Exact product/public main `d4684260108d91cec81a5a98d86eda848dcab115`; Prometheus CI `31340112225`, Security `31340112204`, and Pages `31340111625` pass |
-| Aktueller Entwicklungs-Slice | GH-163 documentation-only GH-161 exact-main closeout on `docs/GH-163-close-gh-161-exact-main`; no product/protocol, model run, signing, broadcast, deployment, wallet, or chain mutation |
-| Aktuelle Tooling-Baseline | Exact main `d468426` includes canonical exact-byte owner-local model-directory provenance and pre-adapter capture-time re-verification. Upstream authenticity, live served-model identity, production proof artifacts/ceremony, independent cryptographic/privacy review, real semantic/actionable analysis, v2 transport, H-001 external signing/broadcast/evidence, and operated rollout remain open. |
-| Aktueller HEAD | Exact verified product/public baseline is `d4684260108d91cec81a5a98d86eda848dcab115`; the current GH-163 branch contains public/Bridge/Memory closeout only |
+| Aktueller Entwicklungs-Slice | GH-9 H-001 Testnet-10 canary confirmed and independently evidenced; exact-main publication/CI closeout in progress |
+| Aktuelle Tooling-Baseline | H-001 Testnet-10 signature/import/full verification/one-shot broadcast/confirmation/receipt/independent evidence pass locally; exact-main publication remains. Production proof artifacts/ceremony, independent cryptographic/privacy review, real semantic/actionable analysis, v2 transport, six state deployments, metrics-oracle evidence, multi-host operation, and operated rollout remain open. |
+| Aktueller HEAD | Exact verified product/public baseline is `d4684260108d91cec81a5a98d86eda848dcab115`; branch `fix/GH-9-confirm-h001-canary` contains the bounded RPC compatibility fix, public canary evidence, and status closeout pending protected CI |
 | Rollback-Tag | `pre-session-20260413` → `6347b85` |
 | Whitepaper | WHITEPAPER.md (root) + whitepaper.html (styled); miner companion, reward boundaries, GH-36/GH-39 trust boundaries, GH-48/GH-52/GH-55/GH-58/GH-63/GH-74/GH-94/GH-107/GH-111/GH-114, and merged GH-117 binding/verifier/preflight/acceptance/governance/outbox/non-actionable-worker boundaries remain synchronized |
-| Status | Rollout-capable core is estimated at 84-88%. GH-117 is merged and exact-main verified but not production-deployed. Production relation/key/ceremony approval and independent cryptographic/privacy review, post-Toccata canary execution, v2 transport, real semantic/actionable analysis, crash-safe external side effects, and full rollout evidence remain gated. |
+| Status | H-001 Testnet-10 canary is confirmed and independently evidenced. Rollout-capable core is estimated at 84-88%. Production relation/key/ceremony approval and independent cryptographic/privacy review, v2 transport, real semantic/actionable analysis, six state deployments, metrics-oracle evidence, multi-host operation, crash-safe external side effects, and full rollout evidence remain gated. |
 | GitHub Pages | https://neabouli.github.io/prometheus-/ |
 | Google Search Console | Verified: googleaa2902079481c7a8 |
 
@@ -951,3 +951,16 @@ Leistungsbasierte Emission. Guardians = "Miner" (KI statt GPU).
   identity, semantic quality, calibration, production authority, wallet,
   signing, chain, or deployment evidence.
 - Rollout estimates unchanged: H-001 96%, core 84-88%, full vision 50-55%.
+
+## Checkpoint 2026-08-12: GH-9 H-001 Testnet-10 canary confirmed
+
+- Exactly one authorized journaled submission produced transaction
+  `c85fd1e79607370ff63faabbc3158e011158d2bde1af40d4eecd642189d8c22f`.
+- The covenant output was observed and independently confirmed as accepted in
+  block `faaa49eb38b3a58b5b5834cc2d91c78dba8bf1dd6ceeaee9401bc195013454e0`.
+- Canonical operator receipts and sanitized public evidence verify. No private
+  signature or raw signed transaction entered Git.
+- H-001 is 100% complete but remains a non-promotable isolated canary. Six state
+  deployments, metrics-oracle evidence, production proof review, multi-host
+  operation, and exact-commit rollout evidence remain open.
+- **Status:** `GH-9 Canary confirmed / Repository closeout and protected CI next`.

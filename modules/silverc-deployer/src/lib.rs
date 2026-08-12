@@ -1398,6 +1398,14 @@ fn rpc_timeout(operation: &str) -> anyhow::Error {
     )
 }
 
+fn is_expected_transaction_not_found(error: &RpcError, expected: TransactionId) -> bool {
+    match error {
+        RpcError::TransactionNotFound(actual) => *actual == expected,
+        RpcError::RpcSubsystem(message) => message == &format!("Transaction {expected} not found"),
+        _ => false,
+    }
+}
+
 async fn connect_rpc(
     rpc_url: &str,
     network_id: NetworkId,
@@ -1892,7 +1900,7 @@ pub async fn broadcast_verified_transaction(
                     .unwrap_or(journal.created_at_unix_seconds),
             ));
         }
-        Err(RpcError::TransactionNotFound(_)) => {}
+        Err(error) if is_expected_transaction_not_found(&error, expected_tx_id) => {}
         Err(error) => {
             let _ = client.disconnect().await;
             return Err(error).context("failed to reconcile expected transaction in mempool");
@@ -2078,6 +2086,37 @@ pub fn write_public_json<T: Serialize>(path: &Path, value: &T) -> Result<()> {
 mod tests {
     use super::*;
     use kaspa_bip32::secp256k1::{rand::thread_rng, Keypair};
+
+    #[test]
+    fn recognizes_only_expected_typed_or_remote_transaction_not_found() {
+        let expected = TransactionId::from_str(&"11".repeat(32)).unwrap();
+        let different = TransactionId::from_str(&"22".repeat(32)).unwrap();
+
+        assert!(is_expected_transaction_not_found(
+            &RpcError::TransactionNotFound(expected),
+            expected,
+        ));
+        assert_eq!(
+            RpcError::TransactionNotFound(expected).to_string(),
+            format!("Transaction {expected} not found"),
+        );
+        assert!(!is_expected_transaction_not_found(
+            &RpcError::TransactionNotFound(different),
+            expected,
+        ));
+        assert!(is_expected_transaction_not_found(
+            &RpcError::RpcSubsystem(format!("Transaction {expected} not found")),
+            expected,
+        ));
+        assert!(!is_expected_transaction_not_found(
+            &RpcError::RpcSubsystem(format!("Transaction {different} not found")),
+            expected,
+        ));
+        assert!(!is_expected_transaction_not_found(
+            &RpcError::General(format!("Transaction {expected} not found")),
+            expected,
+        ));
+    }
 
     fn full_deployment_profile() -> DeploymentProfile {
         DeploymentProfile {

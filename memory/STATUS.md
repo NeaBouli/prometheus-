@@ -1,7 +1,7 @@
 # PROMETHEUS – MODULE STATUS
 # Format: | Module | Status | Progress | Last Update | Audit | Testnet Address |
 # Status: PENDING | IN_PROGRESS | DONE | BLOCKED | PENDING_AUDIT | ACCEPTED | REJECTED
-# Last Updated: 2026-08-10
+# Last Updated: 2026-08-12
 
 ---
 
@@ -9,7 +9,7 @@
 
 ```
 Sprint 9: Post-Toccata deployment and production-protocol gates
-Status:   BLOCKED on external H-001 signing/execution evidence
+Status:   H-001 CANARY COMPLETE; BLOCKED on remaining full-rollout gates
 Start:    2026-07-08
 Goal:     Complete the non-promotable H-001 canary, then the full state-contract, oracle, ZK, P2P, and release-evidence path.
 ```
@@ -94,7 +94,20 @@ above activation. PR #8 merged normally as `288ea18`; main Prometheus CI
 GH-7 software/CI is complete. Real funding/signing/evidence gates continue in
 issue #9.
 
-## GH-9 H-001 CANARY STATUS
+## GH-9 H-001 CANARY STATUS — COMPLETE 2026-08-12
+
+The manifest-bound, non-promotable `ValidatorStakingH001` Testnet-10 canary is
+complete. External BIP340 signing, canonical signature import, full Kaspa
+transaction verification, exact-hash acknowledged one-shot broadcast,
+confirmed covenant output, `operator_record` receipt, and independent public
+REST evidence all pass. Confirmed transaction:
+`c85fd1e79607370ff63faabbc3158e011158d2bde1af40d4eecd642189d8c22f`;
+instance `:0`; covenant ID
+`8cdb49adc2511ed5fa11f71317b66f203f37ce376a2603cd9b118236c1f8219f`.
+This canary cannot promote full rollout or metrics readiness. Six state
+deployments, real metrics-oracle execution/evidence, production proof approval
+and independent cryptographic review, multi-host operation, and release
+hardening remain.
 
 PR #11 merged closed deployment profiles as `6213c559508d3322b8660aed308df1a696ac5576`,
 bound to the exact release-manifest SHA-256. `full` keeps all seven release
@@ -268,10 +281,10 @@ Whitepaper verification pass. GH-13 is accepted as development-only foundation.
 | claude-code-start.sh         | DONE            | 100%     | 2026-03-21  | -            | -               |
 | **SPRINT 0 – SETUP**         |                 |          |             |              |                 |
 | Testnet-10-Node              | DONE            | 100%     | 2026-03-21  | -            | wrpc://127.0.0.1:17210 |
-| Silverscript tooling (silverc/ssc) | IN_PROGRESS | 99%      | 2026-07-16  | -            | Upstream `silverc` builds/tests in CI; all seven current-Silverc compile/ABI/runtime gates, deterministic release/handoff/evidence tooling, and the repository keyless genesis plus value-preserving reportMetrics operators pass exact-main CI; upstream `silverc` remains compile-only while the Rust operator supplies the network path; real signatures/receipts/evidence remain |
-| prometheus-silverc-deployer | ACCEPTED | 100% | 2026-07-16 | REMOTE PASS | PR #26 merged as `072f04a`; canonical public-signature import, keyless genesis and reportMetrics assembly/verification/guarded broadcast paths, 49 tests, exact-main CI/Security/Pages, and live Whitepaper pass |
+| Silverscript tooling (silverc/ssc) | IN_PROGRESS | 99%      | 2026-08-12  | -            | Upstream `silverc` builds/tests in CI; all seven current-Silverc compile/ABI/runtime gates, deterministic release/handoff/evidence tooling, and the repository keyless genesis plus value-preserving reportMetrics operators pass; upstream `silverc` remains compile-only while the Rust operator supplies the network path; H-001 canary evidence passes, while six state deployments and metrics-oracle successor evidence remain |
+| prometheus-silverc-deployer | ACCEPTED | 100% | 2026-08-12 | LOCAL PASS / PROTECTED CI PENDING | Canonical public-signature import, keyless genesis and reportMetrics assembly/verification/guarded broadcast paths, 50 tests, strict Clippy, and release build pass; the exact-ID v2.0.1 remote transaction-absence compatibility fix awaits protected CI |
 | GovernanceAutoTuning reportMetrics operator | ACCEPTED | 100% | 2026-07-16 | REMOTE PASS | GH-25 software/docs merged as `072f04a`: two-input value-preserving transition, external oracle+sponsor BIP340 signatures, full input execution, live UTXO checks, journaled acknowledged broadcast, successor observation, 11 focused tests, exact-main CI/Security/Pages, and live Whitepaper pass; real operation/evidence remains separately gated |
-| ValidatorStakingH001 Canary | IN_PROGRESS | 96% | 2026-08-04 | SIGNING HANDOFF READY | Exact main `48b3b74` reproduced the accepted archive/request/signing request and live-revalidated the public unspent/non-coinbase UTXO; PR #150 published the evidence as exact main `9854c5e`; external BIP340 signature, operator verification, one-shot broadcast, confirmation, receipt, and independent evidence remain; non-promotable by design |
+| ValidatorStakingH001 Canary | DONE | 100% | 2026-08-12 | CONFIRMED / INDEPENDENT EVIDENCE PASS | Exactly one authorized Testnet-10 broadcast produced confirmed transaction `c85fd1e7...c22f`; covenant output, `operator_record`, and independent REST evidence pass; non-promotable by design and no further deployment authorized |
 | GitHub Actions CI/CD         | ACCEPTED        | 100%     | 2026-08-04  | ACCEPTED     | Prometheus CI `30866401314`, Security Audit `30866401257`, and Pages `30866400606` pass on exact main `9854c5e`; current-Silverc runtime, Rust/Python, Memory, HTML, Gitleaks, cargo/pip audit, security summary, and public deployment pass |
 | Sprint-1 Pre-Check           | ACCEPTED        | 100%     | 2026-03-21  | ACCEPTED     | V-001, V-002, V-003 alle genehmigt |
 | **SPRINT 1 – CONTRACTS**     |                 |          |             |              |                 |

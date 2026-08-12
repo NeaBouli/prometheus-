@@ -24,7 +24,7 @@ use kaspa_consensus_core::tx::{
     TransactionInput, TransactionOutput, UtxoEntry, VerifiableTransaction,
 };
 use kaspa_consensus_core::Hash;
-use kaspa_rpc_core::{api::rpc::RpcApi, RpcError, RpcUtxosByAddressesEntry};
+use kaspa_rpc_core::{api::rpc::RpcApi, RpcUtxosByAddressesEntry};
 use kaspa_txscript::caches::Cache;
 use kaspa_txscript::covenants::CovenantsContext;
 use kaspa_txscript::script_builder::ScriptBuilder;
@@ -44,10 +44,11 @@ use tokio::time::timeout;
 use super::{
     canonical_json, connect_rpc, consensus_params, deployer_address_and_funding_script,
     expected_storage_mass, external_signer_contract_map, fee_mass_profile, inspect_node,
-    read_public_json, reject_import_output_collisions, reject_secret_fields, rpc_timeout,
-    sha256_hex, unix_seconds, validate_lower_hex, validate_resolver_network, validate_rpc_url,
-    write_public_json, NodePreflight, OutpointSpec, ScriptSpec, PINNED_FEE_RATE_SOMPI_PER_KG,
-    PUBLIC_TESTNET_RESOLVER, RPC_REQUEST_TIMEOUT, TRANSACTION_VERSION,
+    is_expected_transaction_not_found, read_public_json, reject_import_output_collisions,
+    reject_secret_fields, rpc_timeout, sha256_hex, unix_seconds, validate_lower_hex,
+    validate_resolver_network, validate_rpc_url, write_public_json, NodePreflight, OutpointSpec,
+    ScriptSpec, PINNED_FEE_RATE_SOMPI_PER_KG, PUBLIC_TESTNET_RESOLVER, RPC_REQUEST_TIMEOUT,
+    TRANSACTION_VERSION,
 };
 
 pub const ORACLE_CONTRACT_NAME: &str = "GovernanceAutoTuningState";
@@ -1617,7 +1618,7 @@ pub async fn broadcast_verified_oracle_transition(
                     .unwrap_or(journal.created_at_unix_seconds),
             ));
         }
-        Err(RpcError::TransactionNotFound(_)) => {}
+        Err(error) if is_expected_transaction_not_found(&error, expected_tx_id) => {}
         Err(error) => {
             let _ = client.disconnect().await;
             return Err(error)

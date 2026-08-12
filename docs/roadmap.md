@@ -1,12 +1,12 @@
 # Prometheus — Full Deployment Roadmap
 *Readiness-gated roadmap; no fixed public-release date is claimed.*
-*Last status reconciliation: 2026-08-09 (Europe/Athens project time).*
+*Last status reconciliation: 2026-08-12 (Europe/Athens project time).*
 
 ## Progress Snapshot
 
 | Scope | Estimated complete | Estimated remaining | Current gate |
 |-------|-------------------:|--------------------:|--------------|
-| H-001 testnet-10 canary preparation | 96% | 4% | External BIP340 signature, verification, one-shot broadcast, confirmation, receipt, independent evidence |
+| H-001 testnet-10 canary | 100% | 0% | Confirmed and independently evidenced; non-promotable canary complete |
 | Rollout-capable core network | 84–88% | 12–16% | Production v2 relation/key/ceremony approval and independent cryptographic review, real privacy-reviewed semantic/actionable analysis, v2 transport, six state deployments, PROM emission, real metrics-oracle execution/evidence, public multi-host P2P/rule distribution, production node evidence |
 | Complete roadmap vision | 50–55% | 45–50% | Production AI, desktop/mobile clients, installers, operated network, vProgs, plus all core-network gates |
 
@@ -146,7 +146,7 @@ public release-hardening evidence for the exact rollout commit.
 - Keep public oracle status staging guarded against blocked requests, secrets, and raw transactions
 - Keep public release-hardening evidence verification green and bound to the exact release commit
 - Keep the keyless Toccata-v1 genesis operator tests, deterministic public vectors, public-file handoff, CLI secret-boundary checks, contextual storage-mass commitment, exact live funding-UTXO checks, fee caps, and broadcast acknowledgement gates green
-- Complete explicitly approved external signing, operator verification, one-shot broadcast, deployment receipt, and independent chain-observation evidence for the funded H-001 testnet-10 canary
+- Preserve the confirmed H-001 Testnet-10 canary receipt/evidence and keep it non-promotable for full rollout or metrics readiness
 - Compile and deploy all six state contracts to Kaspa Mainnet only after the full seven-fixture verification path passes; H-001 remains a proof/canary fixture
 - Merged and exact-main-verified in GH-63: manifest-pinned active-KIP-16 BN254/Arkworks Groth16 engine plus bounded owner-aware adapter/service; production relation/VK/vector approval and installation remain
 - Implement PROM emission contract (minting logic)
@@ -337,8 +337,8 @@ This is the final architectural milestone described in the whitepaper.
 | Date | Milestone |
 |------|-----------|
 | March 2026 | All sprints 0-8 accepted. Foundation complete. |
-| August 2026 | Toccata runtime/release gates, public H-001 funding, exact-main `48b3b74` schema-v2 handoff refresh, live UTXO revalidation, and byte-identical `205e1ca` parity verified; external canary execution remains. |
-| After H-001 evidence | Deploy the remaining state contracts, execute the metrics-oracle transaction, and complete exact-commit release hardening. |
+| August 2026 | Toccata runtime/release gates plus the non-promotable H-001 Testnet-10 canary are complete: external signature, full verification, one-shot broadcast, confirmation, operator receipt, and independent evidence pass. |
+| After H-001 evidence | Deploy the remaining six state contracts only through separately approved operations, execute the metrics-oracle transaction, and complete exact-commit release hardening. |
 | After core-network rollout | Approved production Groth16 artifacts, PROM emission, P2P rule distribution, production Phi-3, and operated Guardian/Validator network. |
 | After production AI/P2P | Desktop client beta and signed installers for Windows, macOS, and Linux. |
 | After desktop beta | Mobile clients for iOS and Android, subject to platform security review and store approval. |
