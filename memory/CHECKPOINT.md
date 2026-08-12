@@ -13,10 +13,10 @@
 | Repo | https://github.com/NeaBouli/prometheus- |
 | Branch | Canonical target `main`; product/public/status changes remain PR-only |
 | Lokaler Pfad | `$REPO_ROOT` |
-| Letzter grün verifizierter Produkt-/Public-Baseline | Exact product/public main `d4684260108d91cec81a5a98d86eda848dcab115`; Prometheus CI `31340112225`, Security `31340112204`, and Pages `31340111625` pass |
-| Aktueller Entwicklungs-Slice | GH-9 H-001 Testnet-10 canary confirmed and independently evidenced; exact-main publication/CI closeout in progress |
-| Aktuelle Tooling-Baseline | H-001 Testnet-10 signature/import/full verification/one-shot broadcast/confirmation/receipt/independent evidence pass locally; exact-main publication remains. Production proof artifacts/ceremony, independent cryptographic/privacy review, real semantic/actionable analysis, v2 transport, six state deployments, metrics-oracle evidence, multi-host operation, and operated rollout remain open. |
-| Aktueller HEAD | Exact verified product/public baseline is `d4684260108d91cec81a5a98d86eda848dcab115`; branch `fix/GH-9-confirm-h001-canary` contains the bounded RPC compatibility fix, public canary evidence, and status closeout pending protected CI |
+| Letzter grün verifizierter Produkt-/Public-Baseline | Exact product/public main `6b43f5d9d5a901f27b78215612f4aad13a007e0a`; Prometheus CI `31625028961`, Security `31625028915`, and Pages `31625028100` pass |
+| Aktueller Entwicklungs-Slice | GH-9 H-001 Testnet-10 canary is confirmed, independently evidenced, merged, exact-main verified, and live on Pages; documentation closeout only |
+| Aktuelle Tooling-Baseline | H-001 Testnet-10 signature/import/full verification/one-shot broadcast/confirmation/receipt/independent evidence and repository-public hash revalidation pass on exact main. Production proof artifacts/ceremony, independent cryptographic/privacy review, real semantic/actionable analysis, v2 transport, six state deployments, metrics-oracle evidence, multi-host operation, and operated rollout remain open. |
+| Aktueller HEAD | Exact verified product/public main is `6b43f5d9d5a901f27b78215612f4aad13a007e0a`; GH-9 is closed and the public Pages/readme/whitepaper/roadmap evidence is current |
 | Rollback-Tag | `pre-session-20260413` → `6347b85` |
 | Whitepaper | WHITEPAPER.md (root) + whitepaper.html (styled); miner companion, reward boundaries, GH-36/GH-39 trust boundaries, GH-48/GH-52/GH-55/GH-58/GH-63/GH-74/GH-94/GH-107/GH-111/GH-114, and merged GH-117 binding/verifier/preflight/acceptance/governance/outbox/non-actionable-worker boundaries remain synchronized |
 | Status | H-001 Testnet-10 canary is confirmed and independently evidenced. Rollout-capable core is estimated at 84-88%. Production relation/key/ceremony approval and independent cryptographic/privacy review, v2 transport, real semantic/actionable analysis, six state deployments, metrics-oracle evidence, multi-host operation, crash-safe external side effects, and full rollout evidence remain gated. |
@@ -964,3 +964,15 @@ Leistungsbasierte Emission. Guardians = "Miner" (KI statt GPU).
   deployments, metrics-oracle evidence, production proof review, multi-host
   operation, and exact-commit rollout evidence remain open.
 - **Status:** `GH-9 Canary confirmed / Repository closeout and protected CI next`.
+
+## Checkpoint 2026-08-12: GH-9 merged and exact-main verified
+
+- PR #165 merged normally as exact main
+  `6b43f5d9d5a901f27b78215612f4aad13a007e0a`; GH-9 closed.
+- Exact-main Prometheus CI `31625028961`, Security Audit `31625028915`, and
+  Pages `31625028100` pass. Gitleaks, dependency audits, Current Silverc, Rust
+  workspace/performance, Guardian, Memory, HTML, and the new public evidence
+  verifier are green.
+- Live Roadmap, Whitepaper, and public evidence expose the completed 100%
+  non-promotable H-001 canary and preserve all full-rollout blockers.
+- **Status:** `GH-9 Done / Exact-main and live Pages verified`.

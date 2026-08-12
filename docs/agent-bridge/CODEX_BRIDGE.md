@@ -3603,3 +3603,22 @@ No direct `main` push or production action occurred.
   deployer tests, warning-free all-target Clippy, path-redaction sweep, and diff
   hygiene.
 - **Status:** `PR #165 Review Fixes Local PASS / Updated protected CI next`.
+
+### 2026-08-12 21:00 EEST - GH-9 merged, exact-main and live Pages verified
+
+- Protected PR #165 passed all ten required CI/Security contexts at exact head
+  `eb6e435`, including the new public-evidence verifier and four tamper/privacy
+  tests. All five CodeRabbit threads were answered and resolved.
+- PR #165 squash-merged normally as exact main
+  `6b43f5d9d5a901f27b78215612f4aad13a007e0a`; issue #9 closed and the remote
+  feature branch was deleted.
+- Exact-main Prometheus CI `31625028961`, Security Audit `31625028915`, and
+  Pages `31625028100` pass. Secret Detection/Gitleaks and both dependency audits
+  are green.
+- Live GitHub Pages readback PASS on the first cache-busted request: Roadmap
+  reports H-001 Testnet-10 at 100%, Whitepaper records the completed
+  non-promotable canary, and the public closeout evidence reports
+  `PUBLIC_CANARY_DEPLOY_EVIDENCE_VERIFIED`.
+- No further transaction, deployment, wallet, signing, Mainnet, metrics-oracle,
+  or production action occurred or is authorized by this closeout.
+- **Status:** `GH-9 Done / Exact-main verified / Live Pages current`.
