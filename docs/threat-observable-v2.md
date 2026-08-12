@@ -60,6 +60,14 @@ promotion boundary. This same-host substrate does not approve production
 relation/key/ceremony artifacts, semantic or actionable analysis, disclosure,
 public multi-host operation, models/YARA, wallet, chain, rewards, or deployment.
 
+GH-170 is a separate local candidate-rule prerequisite. It replaces the
+Guardian's substring-only YARA shape check with exact-pinned, bounded,
+compile-only YARA-X validation, while disabling includes and rejecting imports,
+multiple rules, compiler errors, and warnings. It does not connect the v2
+non-actionable worker to a model or YARA generator, scan any data, establish
+semantic quality, or authorize an actionable result, disclosure, submission,
+publication, or production operation.
+
 A separate merged local Rust `verify-v2` boundary closes the mechanical proof
 verification step. It owner-loads retained canonical manifest bytes plus fixed
 `relation-source.bin` and `verifying-key.bin` siblings, binds their exact

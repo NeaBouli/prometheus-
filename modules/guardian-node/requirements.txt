@@ -5,3 +5,4 @@ black>=23.0
 pylint>=3.0
 coincurve==21.0.0
 PyYAML==6.0.3
+yara-x==1.4.0

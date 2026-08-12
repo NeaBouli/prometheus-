@@ -8,11 +8,15 @@ MIN_CONFIDENCE = 0.85 (from MEMO.md AUTO-TUNING PARAMETER).
 
 from __future__ import annotations
 
+# Confidence must be an exact integer; bool is not accepted as basis points.
+# pylint: disable=unidiomatic-typecheck
+
 import json
 import time
 from dataclasses import dataclass
 
 from .llm_server import LlmServer
+from .yara_validation import validate_candidate_rule_source
 
 MIN_CONFIDENCE_BPS: int = 8_500
 MIN_CONFIDENCE: float = MIN_CONFIDENCE_BPS / 10_000
@@ -89,16 +93,19 @@ class YaraRuleGenerator:
         )
 
     def validate_rule(self, rule: YaraRule) -> bool:
-        """Validate a YARA rule for basic syntactic correctness.
+        """Validate a YARA rule against the bounded YARA-X compile boundary.
 
-        Checks that rule_content contains the required YARA sections:
-        "rule ", "strings:", and "condition:".
+        Delegates rule_content to the GH-170 compile-only boundary in
+        ``jaeger.yara_validation``: one ASCII, NUL-free, size-bounded rule
+        with a bounded name, no import/include directives, and a clean
+        pinned YARA-X compile with zero errors and zero warnings. Anything
+        else fails closed.
 
         Args:
             rule: The YaraRule to validate.
 
         Returns:
-            True if the rule passes basic syntax validation.
+            True if the rule passes the bounded compile-only validation.
         """
         if (
             not isinstance(rule, YaraRule)
@@ -106,11 +113,7 @@ class YaraRuleGenerator:
             or not 0 <= rule.confidence_bps <= 10_000
         ):
             return False
-        content = rule.rule_content
-        has_rule_keyword = "rule " in content
-        has_strings = "strings:" in content
-        has_condition = "condition:" in content
-        return has_rule_keyword and has_strings and has_condition
+        return validate_candidate_rule_source(rule.rule_content)
 
     def is_submittable(self, rule: YaraRule) -> bool:
         """Check if a rule meets the minimum confidence for submission.

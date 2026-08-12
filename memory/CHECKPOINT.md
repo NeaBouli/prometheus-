@@ -14,11 +14,11 @@
 | Branch | Canonical target `main`; product/public/status changes remain PR-only |
 | Lokaler Pfad | `$REPO_ROOT` |
 | Letzter grün verifizierter Produkt-/Public-Baseline | Exact product/public main `7c6260855193cce1ae2790670fcf25371ac08412`; Prometheus CI `31645624623`, Security `31645624601`, and Pages `31645623547` pass |
-| Aktueller Entwicklungs-Slice | GH-167 bounded ThreatHint-v2 repository transport is merged, exact-main green, and live; the next repository-owned rollout task must be selected from the remaining production-artifact, semantic-analysis, multi-host, deployment, oracle, and release gates |
+| Aktueller Entwicklungs-Slice | GH-170 bounded compile-only YARA-X validation is local PASS; protected PR, merge, exact-main CI/Security/Pages, and live readback remain |
 | Aktuelle Tooling-Baseline | H-001 Testnet-10 signature/import/full verification/one-shot broadcast/confirmation/receipt/independent evidence and repository-public hash revalidation pass on exact main. The bounded GH-167 ThreatHint-v2 repository transport substrate is merged and exact-main verified. Production proof artifacts/ceremony, independent cryptographic/privacy review, real semantic/actionable analysis, six state deployments, metrics-oracle evidence, operated multi-host transport, and rollout remain open. |
-| Aktueller HEAD | Canonical product/public main is `7c6260855193cce1ae2790670fcf25371ac08412`; the documentation-only GH-167 closeout branch records that exact-main evidence |
+| Aktueller HEAD | Branch `feat/GH-170-yara-x-validation` is based on exact final main `e8a13cae679a4d1a5d213e0d56b9e958dfa20733`; GH-170 is local-only until protected merge |
 | Rollback-Tag | `pre-session-20260413` → `6347b85` |
-| Whitepaper | WHITEPAPER.md (root) + whitepaper.html (styled); miner companion, reward boundaries, GH-36/GH-39 trust boundaries, GH-48/GH-52/GH-55/GH-58/GH-63/GH-74/GH-94/GH-107/GH-111/GH-114, merged GH-117 binding/verifier/preflight/acceptance/governance/outbox/non-actionable-worker, and GH-167 bounded transport boundaries remain synchronized |
+| Whitepaper | WHITEPAPER.md (root) + whitepaper.html (styled); GH-167 merged transport and GH-170 local compile-only YARA-X boundaries are synchronized without claiming semantic or production authority |
 | Status | H-001 Testnet-10 canary is confirmed and independently evidenced. Rollout-capable core is estimated at 84-88%. GH-167 closes only the bounded repository v2 transport substrate. Production relation/key/ceremony approval and independent cryptographic/privacy review, real semantic/actionable analysis, six state deployments, metrics-oracle evidence, operated multi-host transport, crash-safe external side effects, and full rollout evidence remain gated. |
 | GitHub Pages | https://neabouli.github.io/prometheus-/ |
 | Google Search Console | Verified: googleaa2902079481c7a8 |
