@@ -43,7 +43,7 @@ If criterion 1, 2, or 3 is NOT met: automatic REJECTED (no NEEDS_CHANGES).
 | Sprint-6 E2E          | 1.0     | 2026-03-22 | Claude  | ACCEPTED        | 4 test suites, 18 tests, no fixes                    |
 | Sprint-7 Dashboard    | 1.0     | 2026-03-22 | Claude  | ACCEPTED        | Dashboard, README, WHITEPAPER.md                     |
 | scripts/autodidactic.py | 1.1   | 2026-07-12 | Codex   | ACCEPTED        | Regression suite added for memory loading, padded dependency/status table handling, task completion, and blocker detection |
-| GH-170 bounded YARA-X candidate | local | 2026-08-13 | Codex + Kimi | PENDING_AUDIT | Local 76 focused + 1205 Guardian pass/4 skip; no P0-P2; protected merge and exact-main evidence pending |
+| GH-170 bounded YARA-X validation | 8d8e29c | 2026-08-13 | Codex + Kimi | ACCEPTED | 77 focused + 1207 Guardian pass/4 skip; no P0-P2; PR #171, exact-main CI/Security/Pages and live readback pass |
 | Miner Companion Foundation | 0.1 | 2026-07-16 | Codex + Terra + Spark | ACCEPTED | Safe Phase-1 boundary and all review findings resolved; PR #14 plus exact-merge CI/Security/Pages and live Whitepaper verification pass |
 | Keyless reportMetrics Operator | 0.1 | 2026-07-16 | Codex + Terra | ACCEPTED | Exact state/value binding, separate P2PK fee sponsor, dual external BIP340 verification, full input execution, UTXO revalidation, collision guards, journal recovery, 49 deployer tests, independent review, PR #26, exact-main CI/Security/Pages, and live Whitepaper pass at `072f04a`; real chain operation/evidence remains gated |
 

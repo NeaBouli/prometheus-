@@ -60,7 +60,7 @@ promotion boundary. This same-host substrate does not approve production
 relation/key/ceremony artifacts, semantic or actionable analysis, disclosure,
 public multi-host operation, models/YARA, wallet, chain, rewards, or deployment.
 
-GH-170 is a separate local candidate-rule prerequisite. It replaces the
+Merged and exact-main-verified GH-170 is a separate candidate-rule prerequisite. It replaces the
 Guardian's substring-only YARA shape check with exact-pinned, bounded,
 compile-only YARA-X validation, while disabling includes and rejecting imports,
 multiple rules, compiler errors, and warnings. It does not connect the v2

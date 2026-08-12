@@ -14,16 +14,18 @@ Start:    2026-07-08
 Goal:     Complete the non-promotable H-001 canary, then the full state-contract, oracle, ZK, P2P, and release-evidence path.
 ```
 
-## GH-170 BOUNDED YARA-X VALIDATION LOCAL PASS (2026-08-13)
+## GH-170 BOUNDED YARA-X VALIDATION MERGED / EXACT-MAIN VERIFIED (2026-08-13)
 
 ```text
-Status: Local PASS; protected PR/merge/exact-main evidence pending
+Status: Done; PR #171 merged normally and issue #170 closed
+Exact main: 8d8e29c236bdb4839a049a1d4f5b51ce6abbc3e7
 Scope: exact-pinned yara-x 1.4.0 compile-only validation for one bounded ASCII
        candidate rule; imports/includes, multiple rules, errors and warnings
        fail closed; compiled rules are discarded without scan
 Evidence: 76 focused pass; Guardian 1205 pass/4 skip; Black clean; Pylint
           9.85/10; Pip Audit no known vulnerabilities; independent Kimi review
-          found no P0/P1/P2 issue
+          found no P0/P1/P2 issue; exact-main CI 31650123073, Security
+          31650123055, and Pages 31650122593 pass
 Boundary: structural syntax validation only; no model invocation, semantic
           quality claim, actionable v2 result, scan, submission, publication,
           wallet, chain, reward, deployment, or production authority

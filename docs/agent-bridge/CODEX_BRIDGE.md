@@ -3799,3 +3799,34 @@ No direct `main` push or production action occurred.
   review events on 2026-08-12 UTC correspond to 2026-08-13 EEST in the required
   Europe/Athens audit timezone; local `date` independently reported EEST.
 - **Status:** `Review fixes in progress / Focused and complete recheck next`.
+
+### 2026-08-13 02:16 EEST - GH-170 merged and exact-main verified
+
+- PR #171 passed all ten protected checks at exact reviewed head `e114410`.
+  Two valid review improvements were merged, the EEST/UTC false positive was
+  answered with evidence, and all three review threads are resolved.
+- PR #171 squash-merged normally as exact main
+  `8d8e29c236bdb4839a049a1d4f5b51ce6abbc3e7`; issue #170 closed and the remote
+  feature branch was deleted.
+- Exact-main Prometheus CI `31650123073`, Security Audit `31650123055`, and
+  Pages `31650122593` pass. Protected Linux CI also confirms YARA-X dependency
+  installation and Docker Compose rendering.
+- Cache-busted live homepage, Whitepaper, Roadmap, FAQ, and `llms.txt` markers
+  plus exact-commit raw README all pass. Six public/exact-raw surfaces were
+  verified.
+- A documentation-only closeout branch now updates local-candidate wording to
+  merged/exact-main evidence. Product behavior is unchanged.
+- **Status:** `GH-170 Done / Exact-main and live Pages verified / Docs closeout in progress`.
+
+### 2026-08-13 02:20 EEST - GH-170 documentation closeout local PASS
+
+- README, Markdown/styled Whitepaper, Markdown/styled Roadmap, Markdown/styled
+  FAQ, homepage, `llms.txt`, v2 protocol draft, Memory, Bridge, and action log
+  now record the merged exact-main evidence instead of local-candidate wording.
+- Memory Integrity, six Autodidactic tests, five HTML parses, four JSON-LD
+  parses, stale-public-status scan, exact evidence-marker scan, and diff hygiene
+  pass. No product source, dependency, workflow, wallet, chain, deployment, or
+  production behavior changed in this closeout.
+- Rollout estimates remain core 84-88% and complete roadmap 50-55%; GH-170
+  closes structural candidate-rule compilation, not semantic/actionable quality.
+- **Status:** `Docs closeout local PASS / Protected documentation PR next`.
