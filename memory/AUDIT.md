@@ -2454,3 +2454,20 @@ workspace fmt/clippy/tests; Guardian-P2P 76 library plus 5 process cases twice;
 release binaries, package contents and performance; Memory, Autodidactic,
 vLLM/public-evidence/HTML checks; Cargo Audit with allowed warnings only; Pip
 Audit with no known vulnerabilities; diff and secret-marker hygiene.
+
+## 2026-08-13 - GH-167 protected publication closeout
+
+**Result:** ACCEPTED and exact-main verified.
+
+PR #168 squash-merged normally to protected main as
+`7c6260855193cce1ae2790670fcf25371ac08412`; issue #167 closed and the remote
+feature branch was removed. All ten required PR contexts passed with no review
+thread. Exact-main Prometheus CI `31645624623`, Security Audit `31645624601`,
+and Pages `31645623547` pass. Cache-busted live reads confirm GH-167 on the
+public roadmap, whitepaper, FAQ, and `llms.txt`. The public and repository
+claims remain limited to same-host transport substrate evidence.
+
+No production proof/relation/key approval, privacy authority, semantic or
+actionable analysis, public multi-host evidence, model/YARA execution, wallet,
+signing, chain, reward, deployment, slash, commit-reveal, reputation, or
+emergency-stop behavior changed.

@@ -104,7 +104,9 @@ only structural consistency: no approved relation, proof, privacy review,
 approval pairing, replay authority, transport, analyzer, wallet, or chain path
 uses it, and it does not prove that the artifact or report is genuine.
 
-GH-167 adds the bounded repository ThreatHint-v2 transport substrate. Exact
+Merged and exact-main-verified GH-167 adds the bounded repository ThreatHint-v2
+transport substrate. PR #168 published exact main `7c62608`; Prometheus CI
+`31645624623`, Security Audit `31645624601`, and Pages `31645623547` pass. Exact
 canonical v2 wires cross an independent libp2p protocol into owner-only local
 IPC, where they are reparsed against separately trusted network, active-session,
 and time context before the existing governed promotion boundary is called.
