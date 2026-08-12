@@ -6,7 +6,7 @@
 
 ---
 
-- [~] [P1] GH-170 substring-only Guardian YARA check durch bounded compile-only YARA-X ersetzen | Codex Sol | Local code/tests/docs PASS; protected PR, merge, exact-main CI/Security/Pages and live readback pending
+- [x] [P1] GH-170 substring-only Guardian YARA check durch bounded compile-only YARA-X ersetzen | Codex Sol | PR #171 merged as exact main `8d8e29c`; CI `31650123073`, Security `31650123055`, Pages `31650122593`, review and live readback pass
 
 ## ═══ SPRINT 0: SETUP & TESTNET (Woche 1) ═══
 

@@ -3556,3 +3556,23 @@ Rules for all dev agents:
 - The timestamp finding is invalid: GitHub's August 12 UTC review time maps to
   August 13 EEST, the required audit timezone.
 - Status: `Review fixes local / Recheck next`.
+
+## 2026-08-13 02:16 EEST - GH-170 protected merge and exact-main verification
+
+- PR #171 exact head `e114410` passed all ten protected contexts; all three
+  review threads are resolved.
+- Normal squash merge produced exact main `8d8e29c236bdb4839a049a1d4f5b51ce6abbc3e7`;
+  issue #170 closed and the feature branch was deleted.
+- Exact-main CI `31650123073`, Security `31650123055`, and Pages `31650122593`
+  pass. Cache-busted homepage/Whitepaper/Roadmap/FAQ/llms and exact raw README
+  markers pass.
+- Status: `Done / Exact-main verified / Documentation closeout in progress`.
+
+## 2026-08-13 02:20 EEST - GH-170 documentation closeout local PASS
+
+- Reconciled all current public/internal status surfaces to PR #171 exact main
+  `8d8e29c` and final CI/Security/Pages run IDs without overstating semantic or
+  production readiness.
+- PASS: Memory Integrity, six Autodidactic tests, five HTML, four JSON-LD,
+  stale-status scan, evidence markers, and diff hygiene.
+- Status: `Docs closeout local PASS / Protected PR next`.
