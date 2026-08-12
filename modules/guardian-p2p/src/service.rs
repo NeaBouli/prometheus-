@@ -36,6 +36,7 @@ use crate::{
     },
     relay_service::{RelayService, RelayServiceConfig, RelayServiceEvent},
     threat_hint_ingress::{ThreatHintIngressError, UnixThreatHintIngress},
+    threat_hint_v2_ingress::{ThreatHintV2IngressError, UnixThreatHintV2Ingress},
     transport_identity::{load_or_create_transport_identity, IdentityError},
     AckStatus, ConnectionPath, GuardianP2p, GuardianP2pConfig, HolePunchOutcome, NatReachability,
     RequestFailure, StaticPeer, TransportError, TransportEvent,
@@ -72,6 +73,8 @@ pub struct GuardianServiceConfig {
     identity_path: PathBuf,
     collector_socket: PathBuf,
     threat_hint_socket: PathBuf,
+    threat_hint_v2_socket: PathBuf,
+    threat_hint_v2_trusted_network_id: String,
     submission_socket: PathBuf,
     listen_addresses: Vec<String>,
     #[serde(default)]
@@ -124,6 +127,7 @@ pub struct PreparedGuardian {
     keypair: Keypair,
     collector_socket: PathBuf,
     threat_hint_socket: PathBuf,
+    threat_hint_v2_socket: PathBuf,
     submission_socket: PathBuf,
     transport: GuardianP2pConfig,
     health_interval: Duration,
@@ -155,6 +159,7 @@ pub struct PreflightReport {
     identity_storage: &'static str,
     collector_boundary: &'static str,
     threat_hint_boundary: &'static str,
+    threat_hint_v2_boundary: &'static str,
     submission_boundary: &'static str,
     public_multi_host_evidence: &'static str,
 }
@@ -303,21 +308,33 @@ impl GuardianServiceConfig {
         validate_absolute_file_path(&self.identity_path)?;
         validate_absolute_file_path(&self.collector_socket)?;
         validate_absolute_file_path(&self.threat_hint_socket)?;
+        validate_absolute_file_path(&self.threat_hint_v2_socket)?;
         validate_absolute_file_path(&self.submission_socket)?;
-        if self.identity_path == self.collector_socket
-            || self.identity_path == self.threat_hint_socket
-            || self.identity_path == self.submission_socket
-            || self.collector_socket == self.threat_hint_socket
-            || self.collector_socket == self.submission_socket
-            || self.threat_hint_socket == self.submission_socket
+        let boundary_paths = [
+            &self.identity_path,
+            &self.collector_socket,
+            &self.threat_hint_socket,
+            &self.threat_hint_v2_socket,
+            &self.submission_socket,
+        ];
+        if boundary_paths
+            .iter()
+            .collect::<std::collections::HashSet<_>>()
+            .len()
+            != boundary_paths.len()
         {
             return Err(ServiceError::InvalidConfig(
-                "identity, collector, ThreatHint and submission paths must be distinct",
+                "identity, collector, ThreatHint, ThreatHint-v2 and submission paths must be distinct",
             ));
         }
         if self.listen_addresses.is_empty() {
             return Err(ServiceError::InvalidConfig(
                 "guardian service requires at least one listener",
+            ));
+        }
+        if self.threat_hint_v2_trusted_network_id.is_empty() {
+            return Err(ServiceError::InvalidConfig(
+                "guardian service requires a ThreatHint-v2 trusted network id",
             ));
         }
         validate_submission_path(&self.submission_socket)?;
@@ -328,6 +345,7 @@ impl GuardianServiceConfig {
         )?;
         UnixBallotIngress::configured(&self.collector_socket, ingress_timeout)?;
         UnixThreatHintIngress::configured(&self.threat_hint_socket, ingress_timeout)?;
+        UnixThreatHintV2Ingress::configured(&self.threat_hint_v2_socket, ingress_timeout)?;
         let collector_startup_timeout = bounded_seconds(
             self.collector_startup_timeout_secs,
             MAX_COLLECTOR_STARTUP_SECS,
@@ -359,6 +377,7 @@ impl GuardianServiceConfig {
             static_peers: parse_routes(&self.static_peers)?,
             autonat_servers: parse_routes(&self.autonat_servers)?,
             autonat_allow_private_addresses: self.allow_private_autonat_addresses,
+            threat_hint_v2_trusted_network_id: self.threat_hint_v2_trusted_network_id,
             ..GuardianP2pConfig::default()
         };
         transport.request_timeout = ingress_timeout;
@@ -369,6 +388,7 @@ impl GuardianServiceConfig {
             keypair,
             collector_socket: self.collector_socket,
             threat_hint_socket: self.threat_hint_socket,
+            threat_hint_v2_socket: self.threat_hint_v2_socket,
             submission_socket: self.submission_socket,
             transport,
             health_interval,
@@ -432,6 +452,7 @@ impl PreparedService {
                 identity_storage: "owner-only-persistent-ed25519",
                 collector_boundary: "owner-only-af-unix",
                 threat_hint_boundary: "owner-only-af-unix-fail-closed",
+                threat_hint_v2_boundary: "owner-only-af-unix-fail-closed",
                 submission_boundary: "owner-only-af-unix",
                 public_multi_host_evidence: "not-proven",
             },
@@ -448,6 +469,7 @@ impl PreparedService {
                 identity_storage: "owner-only-persistent-ed25519",
                 collector_boundary: "not-applicable",
                 threat_hint_boundary: "not-applicable",
+                threat_hint_v2_boundary: "not-applicable",
                 submission_boundary: "not-applicable",
                 public_multi_host_evidence: "not-proven",
             },
@@ -485,6 +507,10 @@ async fn run_guardian(
         UnixBallotIngress::configured(&service.collector_socket, service.ingress_timeout)?;
     let threat_hint_ingress =
         UnixThreatHintIngress::configured(&service.threat_hint_socket, service.ingress_timeout)?;
+    let threat_hint_v2_ingress = UnixThreatHintV2Ingress::configured(
+        &service.threat_hint_v2_socket,
+        service.ingress_timeout,
+    )?;
     output.emit(OperatorRecord::basic(
         ServiceRole::Guardian,
         "waiting-for-collector",
@@ -558,7 +584,11 @@ async fn run_guardian(
                 };
                 admit_submission(&mut node, &mut pending_submissions, submission);
             }
-            event = node.next_verified_sidecar_event(&ingress, &threat_hint_ingress) => {
+            event = node.next_verified_sidecar_event(
+                &ingress,
+                &threat_hint_ingress,
+                &threat_hint_v2_ingress,
+            ) => {
                 let event = event?;
                 update_connection_count(&event, &mut connections);
                 complete_local_submission(&event, &mut pending_submissions);
@@ -577,7 +607,11 @@ async fn run_guardian(
     while node.pending_work() != (0, 0) && time::Instant::now() < deadline {
         match time::timeout_at(
             deadline,
-            node.next_verified_sidecar_event(&ingress, &threat_hint_ingress),
+            node.next_verified_sidecar_event(
+                &ingress,
+                &threat_hint_ingress,
+                &threat_hint_v2_ingress,
+            ),
         )
         .await
         {
@@ -762,6 +796,10 @@ fn guardian_event_record(
         | TransportEvent::OutboundFailure { peer, .. }
         | TransportEvent::OutboundThreatHintAck { peer, .. }
         | TransportEvent::OutboundThreatHintFailure { peer, .. }
+        | TransportEvent::InboundThreatHintV2 { peer, .. }
+        | TransportEvent::InboundThreatHintV2Processed { peer, .. }
+        | TransportEvent::OutboundThreatHintV2Ack { peer, .. }
+        | TransportEvent::OutboundThreatHintV2Failure { peer, .. }
         | TransportEvent::ConnectionEstablished { peer, .. }
         | TransportEvent::ConnectionClosed { peer, .. }
         | TransportEvent::HolePunchFinished { peer, .. } => {
@@ -783,10 +821,17 @@ fn guardian_event_record(
         | TransportEvent::OutboundThreatHintAck { status, .. } => {
             record.status = Some(status.as_str())
         }
+        TransportEvent::InboundThreatHintV2Processed { status, .. }
+        | TransportEvent::OutboundThreatHintV2Ack { status, .. } => {
+            record.status = Some(status.as_str())
+        }
         TransportEvent::OutboundFailure { failure, .. } => {
             record.status = Some(request_failure_name(*failure))
         }
         TransportEvent::OutboundThreatHintFailure { failure, .. } => {
+            record.status = Some(request_failure_name(*failure))
+        }
+        TransportEvent::OutboundThreatHintV2Failure { failure, .. } => {
             record.status = Some(request_failure_name(*failure))
         }
         TransportEvent::NatStatusChanged { new, .. } => record.status = Some(nat_name(*new)),
@@ -862,6 +907,10 @@ fn guardian_event_name(event: &TransportEvent) -> &'static str {
         TransportEvent::OutboundFailure { .. } => "outbound-failure",
         TransportEvent::OutboundThreatHintAck { .. } => "outbound-threat-hint-ack",
         TransportEvent::OutboundThreatHintFailure { .. } => "outbound-threat-hint-failure",
+        TransportEvent::InboundThreatHintV2 { .. } => "inbound-threat-hint-v2",
+        TransportEvent::InboundThreatHintV2Processed { .. } => "inbound-threat-hint-v2-processed",
+        TransportEvent::OutboundThreatHintV2Ack { .. } => "outbound-threat-hint-v2-ack",
+        TransportEvent::OutboundThreatHintV2Failure { .. } => "outbound-threat-hint-v2-failure",
         TransportEvent::ConnectionEstablished { .. } => "connection-established",
         TransportEvent::ConnectionClosed { .. } => "connection-closed",
         TransportEvent::RelayReservationAccepted { .. } => "relay-reservation-accepted",
@@ -1138,6 +1187,8 @@ pub enum ServiceError {
     Ingress(#[from] IngressError),
     #[error("Guardian ThreatHint ingress is unavailable")]
     ThreatHintIngress(#[from] ThreatHintIngressError),
+    #[error("Guardian ThreatHint-v2 ingress is unavailable")]
+    ThreatHintV2Ingress(#[from] ThreatHintV2IngressError),
     #[error("Guardian local submission service failed")]
     Submission(#[from] LocalSubmissionError),
     #[error("Guardian P2P transport failed")]
@@ -1192,12 +1243,15 @@ mod tests {
 identity_path = "{}"
 collector_socket = "{}"
 threat_hint_socket = "{}"
+threat_hint_v2_socket = "{}"
+threat_hint_v2_trusted_network_id = "testnet-10"
 submission_socket = "{}"
 listen_addresses = ["/ip4/127.0.0.1/udp/0/quic-v1"]
 "#,
                 directory.path().join("identity").display(),
                 directory.path().join("collector.sock").display(),
                 directory.path().join("threat-hint.sock").display(),
+                directory.path().join("threat-hint-v2.sock").display(),
                 directory.path().join("submit.sock").display(),
             ),
         );
@@ -1207,6 +1261,7 @@ listen_addresses = ["/ip4/127.0.0.1/udp/0/quic-v1"]
             .expect("prepare config");
         let report = serde_json::to_string(&prepared.preflight_report()).expect("report");
         assert!(report.contains("ready-for-operated-sidecar"));
+        assert!(report.contains("owner-only-af-unix-fail-closed"));
         assert!(!report.contains(directory.path().to_str().expect("UTF-8 temp path")));
         assert!(!report.contains("collector.sock"));
     }
@@ -1222,11 +1277,14 @@ listen_addresses = ["/ip4/127.0.0.1/udp/0/quic-v1"]
 identity_path = "{}"
 collector_socket = "{}"
 threat_hint_socket = "{}"
+threat_hint_v2_socket = "{}"
+threat_hint_v2_trusted_network_id = "testnet-10"
 submission_socket = "{}"
 listen_addresses = ["/ip4/127.0.0.1/udp/0/quic-v1"]
 "#,
                 directory.path().join("identity").display(),
                 shared_socket.display(),
+                directory.path().join("threat-hint.sock").display(),
                 shared_socket.display(),
                 directory.path().join("submit.sock").display(),
             ),
@@ -1236,9 +1294,95 @@ listen_addresses = ["/ip4/127.0.0.1/udp/0/quic-v1"]
                 .expect("parse config")
                 .prepare(),
             Err(ServiceError::InvalidConfig(
-                "identity, collector, ThreatHint and submission paths must be distinct"
+                "identity, collector, ThreatHint, ThreatHint-v2 and submission paths must be distinct"
             ))
         ));
+    }
+
+    #[test]
+    fn guardian_v2_boundary_requires_absolute_path_and_valid_network() {
+        let directory = secure_directory();
+        let base = |v2_socket: String, network_id: &str| {
+            write_config(
+                &directory,
+                &format!(
+                    r#"role = "guardian"
+identity_path = "{}"
+collector_socket = "{}"
+threat_hint_socket = "{}"
+threat_hint_v2_socket = "{v2_socket}"
+threat_hint_v2_trusted_network_id = "{network_id}"
+submission_socket = "{}"
+listen_addresses = ["/ip4/127.0.0.1/udp/0/quic-v1"]
+"#,
+                    directory.path().join("identity").display(),
+                    directory.path().join("collector.sock").display(),
+                    directory.path().join("threat-hint.sock").display(),
+                    directory.path().join("submit.sock").display(),
+                ),
+            )
+        };
+
+        let relative = base("relative-v2.sock".to_owned(), "testnet-10");
+        assert!(matches!(
+            ServiceConfig::from_toml_file(&relative)
+                .expect("parse config")
+                .prepare(),
+            Err(ServiceError::InvalidConfig(_))
+        ));
+
+        let invalid_network = base(
+            directory
+                .path()
+                .join("threat-hint-v2.sock")
+                .display()
+                .to_string(),
+            "MAINNET",
+        );
+        assert!(matches!(
+            ServiceConfig::from_toml_file(&invalid_network)
+                .expect("parse config")
+                .prepare(),
+            Err(ServiceError::Transport(TransportError::InvalidConfig(_)))
+        ));
+
+        let empty_network = base(
+            directory
+                .path()
+                .join("empty-network-v2.sock")
+                .display()
+                .to_string(),
+            "",
+        );
+        assert!(matches!(
+            ServiceConfig::from_toml_file(&empty_network)
+                .expect("parse config")
+                .prepare(),
+            Err(ServiceError::InvalidConfig(
+                "guardian service requires a ThreatHint-v2 trusted network id"
+            ))
+        ));
+
+        let missing_fields = write_config(
+            &directory,
+            &format!(
+                r#"role = "guardian"
+identity_path = "{}"
+collector_socket = "{}"
+threat_hint_socket = "{}"
+submission_socket = "{}"
+listen_addresses = ["/ip4/127.0.0.1/udp/0/quic-v1"]
+"#,
+                directory.path().join("identity").display(),
+                directory.path().join("collector.sock").display(),
+                directory.path().join("threat-hint.sock").display(),
+                directory.path().join("submit.sock").display(),
+            ),
+        );
+        assert!(
+            ServiceConfig::from_toml_file(&missing_fields).is_err(),
+            "v2 socket path and trusted network id are required fields"
+        );
     }
 
     #[test]
@@ -1289,6 +1433,8 @@ health_interval_secs = 3601
 identity_path = "{}"
 collector_socket = "{}"
 threat_hint_socket = "{}"
+threat_hint_v2_socket = "{}"
+threat_hint_v2_trusted_network_id = "testnet-10"
 submission_socket = "{}"
 listen_addresses = ["/ip4/127.0.0.1/udp/4101/quic-v1"]
 advertise_addresses = ["/ip4/198.51.100.10/udp/4101/quic-v1"]
@@ -1296,6 +1442,7 @@ advertise_addresses = ["/ip4/198.51.100.10/udp/4101/quic-v1"]
                 directory.path().join("guardian.identity").display(),
                 directory.path().join("collector.sock").display(),
                 directory.path().join("threat-hint.sock").display(),
+                directory.path().join("threat-hint-v2.sock").display(),
                 directory.path().join("submit.sock").display(),
             ),
         );

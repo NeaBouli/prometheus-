@@ -11,6 +11,7 @@ pub mod observable_bundle;
 mod pe_api_import_producer;
 mod threat_hint_v2_proof_envelope;
 mod threat_hint_v2_statement;
+mod threat_hint_v2_transport;
 
 pub use api_import_producer::{
     produce_elf_api_import_bundle, ElfApiImportProducerError, MAX_ELF_API_IMPORT_ARTIFACT_BYTES,
@@ -23,8 +24,8 @@ pub use observable_approval::{
     VerifiedObservableApproval, MAX_APPROVAL_LIFETIME_SECONDS, MAX_CANONICAL_APPROVAL_BYTES,
 };
 pub use observable_bundle::{
-    DisclosurePolicy, ObservableBundle, ObservableBundleError, ObservableKind, ObservableScope,
-    ScopeFormat, ScopePlatform,
+    validate_network_id, DisclosurePolicy, ObservableBundle, ObservableBundleError, ObservableKind,
+    ObservableScope, ScopeFormat, ScopePlatform, MAX_CANONICAL_OBSERVABLE_BUNDLE_BYTES,
 };
 pub use pe_api_import_producer::{
     produce_pe_api_import_bundle, PeApiImportProducerError, MAX_PE_API_IMPORT_ARTIFACT_BYTES,
@@ -37,6 +38,11 @@ pub use threat_hint_v2_proof_envelope::{
 pub use threat_hint_v2_statement::{
     ThreatHintV2DisclosureClass, ThreatHintV2Statement, ThreatHintV2StatementError,
     MAX_CANONICAL_V2_STATEMENT_BYTES,
+};
+pub use threat_hint_v2_transport::{
+    ThreatHintV2TransportError, ThreatHintV2TransportPayload, MAX_TRANSPORT_APPROVAL_BYTES,
+    MAX_TRANSPORT_BUNDLE_BYTES, MAX_TRANSPORT_ENVELOPE_BYTES, MAX_TRANSPORT_PAYLOAD_BYTES,
+    REPORT_NONCE_BYTES, THREAT_HINT_V2_TRANSPORT_MAGIC, THREAT_HINT_V2_TRANSPORT_VERSION,
 };
 
 pub const MAX_CANONICAL_BYTES: usize = 2048;

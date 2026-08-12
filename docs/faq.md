@@ -104,6 +104,15 @@ only structural consistency: no approved relation, proof, privacy review,
 approval pairing, replay authority, transport, analyzer, wallet, or chain path
 uses it, and it does not prove that the artifact or report is genuine.
 
+GH-167 adds the bounded repository ThreatHint-v2 transport substrate. Exact
+canonical v2 wires cross an independent libp2p protocol into owner-only local
+IPC, where they are reparsed against separately trusted network, active-session,
+and time context before the existing governed promotion boundary is called.
+This is same-host engineering evidence only. Production proof artifacts,
+privacy-reviewed semantic/actionable analysis, public multi-host operation,
+disclosure, model/YARA execution, wallet, chain, rewards, and deployment remain
+separate blocked gates.
+
 **Q: What is Commit-Reveal voting?**
 A cryptographic protocol that prevents validators from copying each
 other's votes. In the commit phase, each validator submits

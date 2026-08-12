@@ -128,6 +128,13 @@ struct CollectorAck {
     status: &'static str,
 }
 
+#[derive(Serialize)]
+struct ThreatHintV2Ack {
+    payload_digest: String,
+    protocol_version: u8,
+    status: &'static str,
+}
+
 fn secure_directory() -> TempDir {
     let directory = tempfile::tempdir().expect("temporary sidecar directory");
     fs::set_permissions(directory.path(), fs::Permissions::from_mode(0o700))
@@ -201,6 +208,80 @@ async fn collect_once(listener: UnixListener, received_tx: oneshot::Sender<Vec<u
         .await
         .expect("shutdown acknowledgement stream");
     received_tx.send(ballot).expect("record received ballot");
+}
+
+async fn collect_v2_once(
+    listener: UnixListener,
+    expected: Vec<u8>,
+    received_tx: oneshot::Sender<Vec<u8>>,
+) {
+    let (mut stream, _) = listener.accept().await.expect("accept v2 ingress");
+    let length = stream.read_u32().await.expect("read v2 payload length") as usize;
+    assert!(
+        (1..=prometheus_guardian_p2p::MAX_THREAT_HINT_V2_BYTES).contains(&length),
+        "v2 payload length is out of bounds"
+    );
+    let mut payload = vec![0_u8; length];
+    stream
+        .read_exact(&mut payload)
+        .await
+        .expect("read exact v2 payload bytes");
+    let mut trailing = [0_u8; 1];
+    assert_eq!(
+        stream.read(&mut trailing).await.expect("read v2 EOF"),
+        0,
+        "v2 payload contained trailing bytes"
+    );
+    assert_eq!(
+        payload, expected,
+        "v2 ingress received exact canonical bytes"
+    );
+    let ack = serde_json::to_vec(&ThreatHintV2Ack {
+        payload_digest: format!("{:x}", Sha256::digest(&payload)),
+        protocol_version: 2,
+        status: "accepted",
+    })
+    .expect("serialize v2 acknowledgement");
+    stream
+        .write_u32(u32::try_from(ack.len()).expect("bounded acknowledgement"))
+        .await
+        .expect("write acknowledgement length");
+    stream.write_all(&ack).await.expect("write acknowledgement");
+    stream
+        .shutdown()
+        .await
+        .expect("shutdown acknowledgement stream");
+    received_tx
+        .send(payload)
+        .expect("record received v2 payload");
+}
+
+fn hex_decode(encoded: &str) -> Vec<u8> {
+    assert!(encoded.len().is_multiple_of(2), "even-length hex");
+    (0..encoded.len())
+        .step_by(2)
+        .map(|offset| u8::from_str_radix(&encoded[offset..offset + 2], 16).expect("hex pair"))
+        .collect()
+}
+
+fn threat_hint_v2_vector_wire(case: &str) -> (Vec<u8>, String) {
+    let corpus: Value = serde_json::from_str(include_str!(
+        "../../threat-hint/tests/vectors/threat-hint-v2-transport-v1.json"
+    ))
+    .expect("transport vector corpus");
+    let vector = corpus["valid_cases"]
+        .as_array()
+        .expect("valid cases")
+        .iter()
+        .find(|entry| entry["name"] == case)
+        .expect("named vector case");
+    (
+        hex_decode(vector["wire_hex"].as_str().expect("wire hex")),
+        vector["trusted_network_id"]
+            .as_str()
+            .expect("trusted network id")
+            .to_owned(),
+    )
 }
 
 fn capture_child_stderr(child: &mut Child) -> thread::JoinHandle<String> {
@@ -411,10 +492,11 @@ fn guardian_config(
         .collect::<Vec<_>>()
         .join(", ");
     let config = format!(
-        "role = \"guardian\"\nidentity_path = \"{}\"\ncollector_socket = \"{}\"\nthreat_hint_socket = \"{}\"\nsubmission_socket = \"{}\"\nlisten_addresses = [{listeners}]\nhealth_interval_secs = 1\ningress_timeout_secs = 5\ncollector_startup_timeout_secs = 5\nshutdown_drain_timeout_secs = 5\n{static_peers}",
+        "role = \"guardian\"\nidentity_path = \"{}\"\ncollector_socket = \"{}\"\nthreat_hint_socket = \"{}\"\nthreat_hint_v2_socket = \"{}\"\nthreat_hint_v2_trusted_network_id = \"testnet-10\"\nsubmission_socket = \"{}\"\nlisten_addresses = [{listeners}]\nhealth_interval_secs = 1\ningress_timeout_secs = 5\ncollector_startup_timeout_secs = 5\nshutdown_drain_timeout_secs = 5\n{static_peers}",
         directory.join(format!("{name}.identity")).display(),
         collector_socket.display(),
         directory.join(format!("{name}-threat-hint.sock")).display(),
+        directory.join(format!("{name}-threat-hint-v2.sock")).display(),
         submission_socket.display(),
     );
     let path = directory.join(format!("{name}.toml"));
@@ -598,4 +680,103 @@ async fn separate_processes_relay_exact_ballot_and_shutdown_cleanly() {
     assert_eq!(preflight(&relay_config)["peer_id"], relay_peer);
     assert_eq!(preflight(&receiver_config)["peer_id"], receiver_peer);
     assert_eq!(preflight(&sender_config)["peer_id"], sender_peer);
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn separate_process_delivers_canonical_threat_hint_v2() {
+    let _process_test_guard = serialize_process_test().await;
+    let directory = secure_directory();
+    let collector_path = directory.path().join("v2-receiver-collector.sock");
+    let _collector = bind_collector(&collector_path).await;
+    let v2_path = directory.path().join("v2-receiver-threat-hint-v2.sock");
+    let v2_listener = bind_collector(&v2_path).await;
+    let submission = directory.path().join("v2-receiver-submit.sock");
+    let config = guardian_config(
+        directory.path(),
+        "v2-receiver",
+        &collector_path,
+        &submission,
+        &["/ip4/127.0.0.1/udp/0/quic-v1".to_owned()],
+        None,
+    );
+    let receiver_preflight = preflight(&config);
+    let receiver_peer = receiver_preflight["peer_id"]
+        .as_str()
+        .expect("receiver peer id")
+        .to_owned();
+    let mut receiver = ServiceProcess::spawn(&config);
+    let listening = receiver.wait_for(SERVICE_EVENT_TIMEOUT, |event| {
+        event["event"] == "listening" && event["ready"] == true
+    });
+    let receiver_address = listening["address"]
+        .as_str()
+        .expect("receiver listen address")
+        .to_owned();
+
+    let (wire, network) = threat_hint_v2_vector_wire("base_review_required");
+    assert_eq!(network, "testnet-10");
+    let payload =
+        prometheus_guardian_p2p::ThreatHintV2TransportPayload::parse_canonical(&wire, &network)
+            .expect("valid vector payload");
+    let (received_tx, received_rx) = oneshot::channel();
+    let collector_task = tokio::spawn(collect_v2_once(v2_listener, wire.clone(), received_tx));
+
+    let sender_config = prometheus_guardian_p2p::GuardianP2pConfig {
+        request_timeout: Duration::from_secs(5),
+        idle_connection_timeout: Duration::from_secs(5),
+        static_peers: vec![prometheus_guardian_p2p::StaticPeer {
+            peer_id: receiver_peer.parse().expect("receiver peer id parses"),
+            address: receiver_address.parse().expect("receiver address parses"),
+        }],
+        threat_hint_v2_trusted_network_id: network,
+        ..prometheus_guardian_p2p::GuardianP2pConfig::default()
+    };
+    let mut sender = prometheus_guardian_p2p::GuardianP2p::new(
+        libp2p_identity::Keypair::generate_ed25519(),
+        sender_config,
+    )
+    .expect("in-process sender initializes");
+    sender
+        .send_threat_hint_v2(
+            receiver_peer.parse().expect("receiver peer id parses"),
+            payload,
+        )
+        .expect("send canonical ThreatHint-v2");
+
+    tokio::time::timeout(SERVICE_EVENT_TIMEOUT, async {
+        loop {
+            match sender.next_event().await {
+                prometheus_guardian_p2p::TransportEvent::OutboundThreatHintV2Ack {
+                    status, ..
+                } => {
+                    assert_eq!(
+                        status,
+                        prometheus_guardian_p2p::ThreatHintV2AckStatus::Accepted
+                    );
+                    break;
+                }
+                prometheus_guardian_p2p::TransportEvent::OutboundThreatHintV2Failure {
+                    failure,
+                    ..
+                } => panic!("ThreatHint-v2 delivery failed: {failure:?}"),
+                _ => {}
+            }
+        }
+    })
+    .await
+    .expect("separate-process ThreatHint-v2 acknowledgement timed out");
+
+    let received = tokio::time::timeout(SERVICE_EVENT_TIMEOUT, received_rx)
+        .await
+        .expect("v2 ingress evidence timed out")
+        .expect("receive v2 ingress evidence");
+    assert_eq!(received, wire);
+    collector_task.await.expect("v2 ingress task");
+    receiver.wait_for(SERVICE_EVENT_TIMEOUT, |event| {
+        event["event"] == "inbound-threat-hint-v2-processed" && event["status"] == "accepted"
+    });
+
+    assert!(receiver.terminate(SERVICE_EXIT_TIMEOUT).success());
+    assert!(!submission.exists());
+    assert_eq!(preflight(&config)["peer_id"], receiver_peer);
 }

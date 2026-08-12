@@ -542,6 +542,27 @@ authority. Legacy consumption remains schema v1; governed acceptance uses
 schema v5 but enqueues and records permanent identity pairing only when
 promotion explicitly enables the durable outbox.
 
+### ThreatHint-v2 transport ingress substrate
+
+`jaeger.threat_hint_v2_transport` parses the shared canonical transport frame
+against a separately trusted network. It preserves the exact proof-envelope,
+Observable Bundle, and approval wires, while treating the report nonce only as
+an untrusted session lookup key. Rust and Python consume one shared exact-byte
+valid/invalid corpus.
+
+`jaeger.threat_hint_v2_ingress` provides a bounded owner-only AF_UNIX server.
+It reparses transport first, resolves the nonce through injected trusted active
+session state, obtains time only from an injected trusted clock, and then passes
+the three original wires to `ThreatHintV2PromotionService`. Rejected transport
+or session mismatches never call promotion; local unavailability maps to
+`busy`. Acknowledgements contain only protocol version, status, and an exact
+payload digest where applicable.
+
+This is a repository transport substrate, not a production promotion service.
+It constructs no authority, policy, proof artifacts, session store, or model;
+it performs no semantic/actionable analysis, disclosure, publication, wallet,
+chain, reward, deployment, or external effect.
+
 ## Local Observable Approval Consumption
 
 `jaeger.observable_approval_consumption` is a local-only policy and persistence

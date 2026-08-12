@@ -1,5 +1,5 @@
 # PROMETHEUS — SESSION CHECKPOINT
-# Last updated: 2026-08-12
+# Last updated: 2026-08-13
 # Purpose: Full recovery document. If Claude (Architect) or Claude Code
 # loses context, read this file first. It contains the complete project state.
 
@@ -14,12 +14,12 @@
 | Branch | Canonical target `main`; product/public/status changes remain PR-only |
 | Lokaler Pfad | `$REPO_ROOT` |
 | Letzter grün verifizierter Produkt-/Public-Baseline | Exact product/public main `6b43f5d9d5a901f27b78215612f4aad13a007e0a`; Prometheus CI `31625028961`, Security `31625028915`, and Pages `31625028100` pass |
-| Aktueller Entwicklungs-Slice | GH-9 H-001 Testnet-10 canary is confirmed, independently evidenced, merged, exact-main verified, and live on Pages; documentation closeout only |
-| Aktuelle Tooling-Baseline | H-001 Testnet-10 signature/import/full verification/one-shot broadcast/confirmation/receipt/independent evidence and repository-public hash revalidation pass on exact main. Production proof artifacts/ceremony, independent cryptographic/privacy review, real semantic/actionable analysis, v2 transport, six state deployments, metrics-oracle evidence, multi-host operation, and operated rollout remain open. |
-| Aktueller HEAD | Exact verified product/public main is `6b43f5d9d5a901f27b78215612f4aad13a007e0a`; GH-9 is closed and the public Pages/readme/whitepaper/roadmap evidence is current |
+| Aktueller Entwicklungs-Slice | GH-167 bounded ThreatHint-v2 repository transport is locally implemented and under protected review; GH-9 remains confirmed/exact-main/live |
+| Aktuelle Tooling-Baseline | H-001 Testnet-10 signature/import/full verification/one-shot broadcast/confirmation/receipt/independent evidence and repository-public hash revalidation pass on exact main. The bounded GH-167 ThreatHint-v2 repository transport substrate is locally implemented. Production proof artifacts/ceremony, independent cryptographic/privacy review, real semantic/actionable analysis, six state deployments, metrics-oracle evidence, operated multi-host transport, and rollout remain open. |
+| Aktueller HEAD | GH-167 branch base and current remote main are `f88901d14194fa1d86c63ed58f74d9ad591359c7`; last independently recorded product/public verification is the GH-9 exact-main evidence below |
 | Rollback-Tag | `pre-session-20260413` → `6347b85` |
 | Whitepaper | WHITEPAPER.md (root) + whitepaper.html (styled); miner companion, reward boundaries, GH-36/GH-39 trust boundaries, GH-48/GH-52/GH-55/GH-58/GH-63/GH-74/GH-94/GH-107/GH-111/GH-114, and merged GH-117 binding/verifier/preflight/acceptance/governance/outbox/non-actionable-worker boundaries remain synchronized |
-| Status | H-001 Testnet-10 canary is confirmed and independently evidenced. Rollout-capable core is estimated at 84-88%. Production relation/key/ceremony approval and independent cryptographic/privacy review, v2 transport, real semantic/actionable analysis, six state deployments, metrics-oracle evidence, multi-host operation, crash-safe external side effects, and full rollout evidence remain gated. |
+| Status | H-001 Testnet-10 canary is confirmed and independently evidenced. Rollout-capable core is estimated at 84-88%. GH-167 closes only the bounded repository v2 transport substrate. Production relation/key/ceremony approval and independent cryptographic/privacy review, real semantic/actionable analysis, six state deployments, metrics-oracle evidence, operated multi-host transport, crash-safe external side effects, and full rollout evidence remain gated. |
 | GitHub Pages | https://neabouli.github.io/prometheus-/ |
 | Google Search Console | Verified: googleaa2902079481c7a8 |
 
@@ -976,3 +976,17 @@ Leistungsbasierte Emission. Guardians = "Miner" (KI statt GPU).
 - Live Roadmap, Whitepaper, and public evidence expose the completed 100%
   non-promotable H-001 canary and preserve all full-rollout blockers.
 - **Status:** `GH-9 Done / Exact-main and live Pages verified`.
+
+## Checkpoint 2026-08-13: GH-167 bounded ThreatHint-v2 transport local
+
+- Shared Rust/Python canonical framing carries the exact proof envelope,
+  Observable Bundle, approval wire, and an untrusted report-nonce lookup key.
+- The independent libp2p v2 path validates the explicitly configured trusted
+  network before owner-only local IPC. Python reparses and resolves network,
+  session, and time from trusted local state before governed promotion.
+- Admission budgets, accepted/rejected/busy acknowledgements, adversarial
+  vectors, and real separate-process same-host forwarding are covered.
+- Production relation/key/ceremony approval, semantic/actionable analysis,
+  disclosure, public multi-host operation, models/YARA, wallet, chain, rewards,
+  and deployment remain outside the boundary.
+- **Status:** `GH-167 In Progress / Complete gates and independent review next`.

@@ -8,7 +8,8 @@ use subtle::ConstantTimeEq;
 use thiserror::Error;
 
 const OBSERVABLE_BUNDLE_SCHEMA_VERSION: u16 = 1;
-const MAX_CANONICAL_BYTES: usize = 4096;
+/// Maximum accepted canonical observable-bundle wire size.
+pub const MAX_CANONICAL_OBSERVABLE_BUNDLE_BYTES: usize = 4096;
 const MIN_OBSERVABLES: usize = 1;
 const MAX_OBSERVABLES: usize = 16;
 const MIN_NETWORK_LEN: usize = 2;
@@ -272,7 +273,7 @@ impl ObservableBundle {
             return Err(ObservableBundleError::InvalidPayload);
         }
 
-        if bytes.len() > MAX_CANONICAL_BYTES {
+        if bytes.len() > MAX_CANONICAL_OBSERVABLE_BUNDLE_BYTES {
             return Err(ObservableBundleError::BundleTooLarge);
         }
 
@@ -308,7 +309,7 @@ impl ObservableBundle {
     pub fn to_canonical_bytes(&self) -> Result<Vec<u8>, ObservableBundleError> {
         self.validate()?;
         let bytes = serde_json::to_vec(self).map_err(|_| ObservableBundleError::InvalidPayload)?;
-        if bytes.is_empty() || bytes.len() > MAX_CANONICAL_BYTES {
+        if bytes.is_empty() || bytes.len() > MAX_CANONICAL_OBSERVABLE_BUNDLE_BYTES {
             return Err(ObservableBundleError::BundleTooLarge);
         }
         Ok(bytes)
@@ -533,7 +534,8 @@ fn validate_byte_pattern(value: &str) -> Result<(), ObservableBundleError> {
     Ok(())
 }
 
-pub(crate) fn validate_network_id(network_id: &str) -> Result<(), ObservableBundleError> {
+/// Validates the canonical network identifier grammar shared by trusted boundaries.
+pub fn validate_network_id(network_id: &str) -> Result<(), ObservableBundleError> {
     if network_id.len() < MIN_NETWORK_LEN || network_id.len() > MAX_NETWORK_LEN {
         return Err(ObservableBundleError::InvalidNetworkId);
     }

@@ -1,7 +1,7 @@
 # PROMETHEUS – MODULE STATUS
 # Format: | Module | Status | Progress | Last Update | Audit | Testnet Address |
 # Status: PENDING | IN_PROGRESS | DONE | BLOCKED | PENDING_AUDIT | ACCEPTED | REJECTED
-# Last Updated: 2026-08-12
+# Last Updated: 2026-08-13
 
 ---
 
@@ -12,6 +12,24 @@ Sprint 9: Post-Toccata deployment and production-protocol gates
 Status:   H-001 CANARY COMPLETE; BLOCKED on remaining full-rollout gates
 Start:    2026-07-08
 Goal:     Complete the non-promotable H-001 canary, then the full state-contract, oracle, ZK, P2P, and release-evidence path.
+```
+
+## GH-167 THREATHINT-V2 TRANSPORT LOCAL CANDIDATE (2026-08-13)
+
+```text
+Status: In Progress; repository implementation complete, final gates pending
+Scope: exact bounded Rust/Python transport frame; independent libp2p v2 path;
+       owner-only local IPC; trusted network/session/time revalidation;
+       accepted/rejected/busy acknowledgements and shared admission budgets
+Evidence: shared 2-valid/19-invalid corpus; adversarial unit tests; real
+          separate-process same-host Guardian forwarding test
+Trust: report nonce and peer identity are untrusted transport metadata; the
+       operated service requires an explicit trusted network and Python resolves
+       the active session and time from trusted local sources
+Boundary: no production proof approval, semantic/actionable analysis,
+          disclosure, public multi-host claim, model/YARA, wallet, chain,
+          rewards, deployment, or external side effect
+Readiness: core 84-88%; complete roadmap 50-55%; 45-50% remains
 ```
 
 ## GH-147 MEMBERSHIP SOURCE MERGED / EXACT-MAIN VERIFIED (2026-08-04)

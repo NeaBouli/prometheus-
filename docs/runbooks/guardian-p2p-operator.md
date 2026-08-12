@@ -10,7 +10,9 @@ Supported target: Unix-like systems with AF_UNIX peer credentials. Protected CI 
 
 - Transport identity is persisted locally and reused.
 - `PeerId` is metadata only, never a Guardian trust decision.
-- Transport remains opaque ballot request/ACK exchange (`/prometheus/guardian-ballot/1.0.0`) with a Python collector behind an owner-only Unix socket.
+- Transport carries independent bounded ballot, ThreatHint-v1, and
+  ThreatHint-v2 request/ACK protocols. The v2 codec requires an explicit trusted
+  network before forwarding exact canonical bytes to its owner-only Unix socket.
 - No wallet, chain, signature, reputation, tokenomics, or committee-auth assignment.
 - `PeerId` and all emitted addresses are transport metadata only.
 
@@ -33,9 +35,9 @@ mkdir -p /var/lib/prometheus/guardian-p2p /run/prometheus/guardian-p2p
 chmod 700 /var/lib/prometheus/guardian-p2p /run/prometheus/guardian-p2p
 ```
 
-- The collector and ThreatHint verifier must create their independent Unix sockets with mode `0600` in the owner-only runtime directory.
+- The collector and both ThreatHint verifier boundaries must create independent Unix sockets with mode `0600` in the owner-only runtime directory.
 - The sidecar creates its submission socket with mode `0600` and removes it after graceful shutdown.
-- Identity, collector, ThreatHint, and submission paths must be distinct absolute file paths.
+- Identity, collector, ThreatHint-v1, ThreatHint-v2, and submission paths must be distinct absolute file paths.
 
 3) Write an owner-only Guardian config
 
@@ -44,6 +46,8 @@ role = "guardian"
 identity_path = "/var/lib/prometheus/guardian-p2p/identity"
 collector_socket = "/run/prometheus/guardian-p2p/collector.sock"
 threat_hint_socket = "/run/prometheus/guardian-p2p/threat-hint.sock"
+threat_hint_v2_socket = "/run/prometheus/guardian-p2p/threat-hint-v2.sock"
+threat_hint_v2_trusted_network_id = "testnet-10"
 submission_socket = "/run/prometheus/guardian-p2p/submit.sock"
 listen_addresses = ["/ip4/0.0.0.0/udp/4101/quic-v1"]
 health_interval_secs = 30
@@ -123,6 +127,11 @@ prometheus-guardian-p2p run --config /var/lib/prometheus/guardian-p2p/service.to
 - Monitor JSON-line `health`, listener, connection, reservation, circuit, inbound, outbound, and terminal events.
 - Drain stdout continuously. JSON-line output uses a bounded dedicated writer; output backpressure or writer failure makes the service fail closed instead of blocking signal handling indefinitely.
 - A collector outage returns `busy`; unsafe IPC ownership, framing, or ACK data fails closed.
+- A v2 ingress outage returns `busy`; invalid canonical framing, wrong trusted
+  network, unsafe IPC ownership, or malformed acknowledgements fail closed. The
+  configured network is local trust and must match the governed Python policy.
+- This procedure does not approve production proof artifacts or authorize
+  semantic/actionable analysis, publication, chain activity, or rewards.
 - A missing, unavailable, or verifier-disabled ThreatHint boundary returns `busy`.
   Invalid canonical data, development proof stubs, stale/replayed conflicting
   data, and invalid proof results return `rejected`. `accepted` means the

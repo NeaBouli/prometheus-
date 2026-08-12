@@ -3460,3 +3460,42 @@ Rules for all dev agents:
 - H-001 is Done as a non-promotable Testnet-10 canary. No additional deployment
   or chain action occurred.
 - **Status:** `GH-9 Done / Exact-main and live Pages verified`.
+
+## 2026-08-12 21:18 EEST - GH-167 ThreatHint-v2 transport started
+
+- Opened issue #167 and branch `feat/GH-167-threat-hint-v2-transport` from
+  clean exact main `f88901d`.
+- Kimi K3 completed a secret-free read-only architecture comparison and
+  recommended bounded v2 transport as the largest non-blocked repository-owned
+  rollout task. No files were changed by Kimi.
+- Scope and non-authority boundaries are recorded in the issue and project
+  Bridge before product edits.
+- **Status:** `In Progress / Existing transport and v2 boundaries mapping`.
+
+## 2026-08-13 00:24 EEST - GH-167 implementation milestone
+
+- Rust/Python canonical transport, owner-only governed ingress, independent
+  libp2p v2 channel, operated service wiring, adversarial tests, and real
+  separate-process same-host evidence are implemented locally.
+- Kimi K3 supplied the bounded guardian-p2p/service implementation; Codex Sol
+  completed line-by-line security/integration review and corrected BSD
+  peer-credential tuple handling, overload bounds, implicit network trust
+  default, and duplicated network-id validation.
+- Current real checks: Guardian Python 1146 passed/4 skipped; ThreatHint Rust
+  complete crate pass; guardian-p2p delegated 76 library/5 process pass and
+  clean fmt/clippy; Sol observed one relay `Dial` flake then 5/5 isolated passes.
+- Status remains `In Progress`; public docs, complete fresh gates, independent
+  final review, protected PR/CI/merge, exact-main and live Pages verification
+  are still open.
+
+## 2026-08-13 01:18 EEST - GH-167 local verification closeout
+
+- Complete Rust workspace fmt/clippy/tests, release binaries, package contents,
+  release performance, Guardian Black/Pylint, Guardian 1147 pass/4 skip,
+  Memory/Autodidactic, vLLM policy, public evidence, HTML, dependency audits,
+  secret-marker scan and diff hygiene pass locally.
+- Kimi's independent read-only review found no P0-P2 issue. Added the missing
+  GH-167 transport boundary to `docs/threat-observable-v2.md`.
+- Sol added and verified bounded executor draining so synchronous promotion work
+  cannot outlive a reported Python-ingress shutdown; 30 focused tests pass.
+- Status is `Local PASS`; protected publication and exact-main evidence remain.

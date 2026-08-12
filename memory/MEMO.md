@@ -1,6 +1,6 @@
 # PROMETHEUS – PERSISTENT MEMORY (MEMO)
 # Version: 4.0
-# Last Updated: 2026-03-21
+# Last Updated: 2026-08-13
 # Maintainer: Claude Code (auto-update) + Claude (audit)
 #
 # WICHTIG: Diese Datei ist das Langzeitgedächtnis des Projekts.
@@ -215,6 +215,7 @@ Core Dev benötigt: Apple Developer Account + Google Play Account (vor Sprint 13
 | 2026-07-29 | v2 Completion speichert Ergebnis vor Work-Delete | Codex Sol + Kimi Review | Governed Schema v4 bindet Statement, Nonce, Bundle, Approval, Lease und Retention; eine atomare Completion speichert exakt ein kanonisches nicht-actionable Ergebnis und loescht erst danach den Outbox-Datensatz |
 | 2026-07-29 | Reale v2 Analyse bleibt separates High-Risk-Ticket | Codex Sol + Kimi Review | Der Ticket-014-Worker nutzt nur einen deterministischen Test-Analyzer ohne LLM, YARA, Confidence oder should_submit; semantische/actionable Analyse braucht eigene Privacy-/Security-Freigabe |
 | 2026-07-31 | H-001 exact-main Readiness-Refresh | Codex Audit | Exact main `143a8a0` reproduziert den akzeptierten `205e1ca` Handoff nach dem Dependency-Security-Fix bytegleich und revalidiert den öffentlichen UTXO; Signatur, Broadcast und Chain-Evidenz bleiben gesondert freizugeben |
+| 2026-08-13 | ThreatHint-v2 Transport vertraut keinem impliziten Netzwerk | Codex Sol + Kimi Review | Der Library-Default bleibt leer und fail-closed; der betriebene Service verlangt ein explizites trusted network. Rust validiert vor owner-only IPC, Python validiert erneut und bezieht Session sowie Zeit aus separatem trusted local state. Peer-ID und Report-Nonce bleiben reine untrusted Transportmetadaten |
 
 ## 2026-07-29 — Windows-PE-Producer exact-main Reintegration
 

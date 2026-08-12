@@ -21,6 +21,28 @@ work.
 Transport `PeerId` remains routing metadata only. It is not a reporter identity,
 Guardian membership record, proof of reachability, authorization, or reward key.
 
+## GH-167 ThreatHint-v2 transport substrate
+
+GH-167 adds `/prometheus/threat-hint/2.0.0` as a third independent bounded
+request-response protocol. The Rust codec accepts only the shared canonical
+transport payload against an explicitly trusted local network id before an
+inbound request can reach IPC. The payload carries the exact v2 proof-envelope,
+Observable Bundle, approval wire, and an untrusted report-nonce lookup key; it
+does not carry trusted time, policy, relation artifacts, authority, or signer
+keys. Accepted, rejected, and busy are the only wire acknowledgements.
+
+The operated Guardian forwards validated payloads to a distinct owner-only
+`threat_hint_v2_socket`. The Python boundary reparses the exact bytes, resolves
+the untrusted nonce against separately trusted active-session state, obtains
+time only from its trusted clock, and only then calls the existing governed
+promotion service. Invalid input reaches neither session resolution nor durable
+promotion. Separate-process tests prove exact same-host QUIC-to-AF_UNIX
+delivery; they are not public multi-host or production evidence.
+
+No production relation/key/ceremony approval, semantic or actionable analysis,
+LLM/YARA execution, disclosure, publication, wallet, chain, reward, or rollout
+authority is added.
+
 ## GH-52 explicit relay bootstrap routes
 
 GH-52 adds a controlled, transport-only bootstrap surface for relay operators:
@@ -51,7 +73,7 @@ This workspace crate is the transport-only Guardian ballot carrier. GH-42 and GH
 Supported operated target: Unix-like systems with AF_UNIX peer credentials. Protected CI verifies Linux; public Windows or macOS packaging is not claimed.
 
 - Explicit `prometheus-guardian-p2p` binary with `preflight`, `run`, and `submit` commands.
-- Strict role-tagged TOML with unknown-field rejection and owner-only config, identity, collector, and submission paths.
+- Strict role-tagged TOML with unknown-field rejection and owner-only config, identity, collector, ThreatHint, ThreatHint-v2, and submission paths.
 - `guardian` and `relay` roles expose conservative bounded settings rather than arbitrary transport internals.
 - The Guardian role waits for its existing authenticated collector, owns a local submission socket, continuously drives libp2p, and correlates local requests with network ACKs.
 - JSON-line lifecycle, readiness, connection, transport, ACK, and health records contain no ballot or collector bytes and no local filesystem paths.
@@ -59,6 +81,7 @@ Supported operated target: Unix-like systems with AF_UNIX peer credentials. Prot
 - Missing or refused collector ingress is temporary `busy`; unsafe ownership, modes, symlinks, framing, or acknowledgements still fail closed.
 - Listener readiness is live state and is cleared on expired or closed listeners.
 - The separate-process test starts a relay, receiver, sender, local submit client, and owner-only collector boundary; it proves exact-byte relay delivery, canonical ACK, graceful shutdown, socket cleanup, and stable transport identities on one host.
+- A separate v2 process test drives the real Guardian binary over QUIC and verifies exact canonical delivery to the owner-only v2 ingress with a digest-bound ACK.
 
 Example owner-only Guardian config:
 
@@ -67,6 +90,8 @@ role = "guardian"
 identity_path = "/var/lib/prometheus/guardian-p2p/identity"
 collector_socket = "/run/user/1000/prometheus/collector.sock"
 threat_hint_socket = "/run/user/1000/prometheus/threat-hint.sock"
+threat_hint_v2_socket = "/run/user/1000/prometheus/threat-hint-v2.sock"
+threat_hint_v2_trusted_network_id = "testnet-10"
 submission_socket = "/run/user/1000/prometheus/submit.sock"
 listen_addresses = ["/ip4/127.0.0.1/udp/0/quic-v1"]
 health_interval_secs = 30

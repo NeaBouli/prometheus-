@@ -3622,3 +3622,77 @@ No direct `main` push or production action occurred.
 - No further transaction, deployment, wallet, signing, Mainnet, metrics-oracle,
   or production action occurred or is authorized by this closeout.
 - **Status:** `GH-9 Done / Exact-main verified / Live Pages current`.
+
+### 2026-08-12 21:18 EEST - GH-167 bounded ThreatHint-v2 transport started
+
+- Created issue #167 and branch `feat/GH-167-threat-hint-v2-transport` from
+  clean exact main `f88901d14194fa1d86c63ed58f74d9ad591359c7` after the final GH-9
+  documentation closeout CI, Security, and Pages runs passed.
+- Scope is repository-only: carry exact bounded raw v2 wires through a new
+  protocol path and owner-only local IPC into the existing governed Python
+  raw-input promotion boundary, with cross-language vectors and adversarial
+  process evidence.
+- Peer identity remains transport metadata. Production proof artifacts,
+  semantic disclosure authority, actionable analysis, LLM/YARA invocation,
+  ledger mutation on rejected input, wallet/signing, chain, deployment,
+  KAS/PROM, reputation, slash ACL, commit-reveal, and emergency-stop changes
+  are excluded.
+- Kimi K3 read-only architecture review selected this block over multi-host
+  evidence, which needs external infrastructure, and exact-commit rollout
+  evidence, which would be stale before the final rollout commit exists.
+- **Status:** `GH-167 In Progress / Architecture mapping and bounded design next`.
+
+### 2026-08-13 00:24 EEST - GH-167 transport and local ingress integrated
+
+- Added one shared exact-byte ThreatHint-v2 transport payload in Rust/Python,
+  strict canonical framing and a 2-valid/19-invalid cross-language corpus.
+- Added a fail-closed owner-only Python AF_UNIX ingress that resolves the
+  untrusted report nonce against separately trusted active-session state before
+  calling the existing governed promotion boundary. Sol fixed the macOS
+  `getpeereid()` uid comparison and bounded overload workers/I/O.
+- Added an independent `/prometheus/threat-hint/2.0.0` Rust request-response
+  channel, trusted-network parsing before IPC, accepted/rejected/busy
+  acknowledgements, shared global admission budgets, owner-only v2 IPC, strict
+  operated-service configuration, path-free events, and a real separate-process
+  same-host delivery test.
+- Kimi K3 implemented the bounded guardian-p2p/service slice and reported 76
+  library plus 5 process tests passing with clean fmt/clippy. Sol reviewed every
+  write, replaced the implicit `testnet-10` library trust default with an empty
+  fail-closed default plus explicit operated-service/test configuration, and
+  reused the canonical ThreatHint network-id validator instead of duplicating
+  its grammar.
+- Sol verification so far: Guardian Python focused transport/ingress 29 passed;
+  full Guardian Python 1146 passed, 4 skipped; full ThreatHint Rust crate passed;
+  one full guardian-p2p run saw the known relay harness `Dial` flake while all 75
+  other cases passed, followed by 5/5 isolated relay passes. A complete fresh
+  guardian-p2p rerun and all repository gates remain required.
+- No production relation/key/ceremony approval, semantic/actionable analysis,
+  model/YARA invocation, public multi-host evidence, wallet, signing,
+  transaction, chain, deployment, KAS/PROM, reputation, slash, commit-reveal,
+  or emergency-stop behavior changed.
+- **Status:** `In Progress / Implementation reviewed / Docs and complete gates next`.
+
+### 2026-08-13 01:18 EEST - GH-167 complete local gates and review fixes pass
+
+- Complete local verification now passes: Rust workspace fmt/clippy/tests,
+  ThreatHint packaging with the new transport implementation/tests/corpus,
+  Guardian-P2P 76 library plus 5 process tests on two complete clean runs,
+  release security binaries, release performance, Guardian Black/Pylint, and
+  Guardian Python 1147 passed with 4 intentional live-model skips.
+- Memory Integrity, six Autodidactic tests, vLLM policy, public H-001 evidence,
+  HTML parsing, diff hygiene, Cargo Audit with the eight repository-allowed
+  warnings only, and Pip Audit with no known vulnerability pass.
+- Kimi K3 independently reviewed the complete diff and surfaced no P0-P2
+  issue. Its concrete P3 documentation gap was fixed by adding GH-167 to the
+  normative v2 protocol draft. Residual same-host credential fallback,
+  pre-admission bounded parsing, and intentional service-config migration are
+  documented non-blocking risks.
+- Sol additionally fixed cancellation semantics for synchronous Python
+  promotion work: a dedicated bounded executor is now drained before server
+  close returns, preventing accepted durable work from continuing after the
+  local ingress is reported closed. The new shutdown regression and all 30
+  focused transport/ingress tests pass.
+- No secret marker was found in any new source/vector file. No wallet, signing,
+  transaction, chain, deployment, production, reward, slash, commit-reveal, or
+  emergency-stop action occurred.
+- **Status:** `Local PASS / Protected PR, CI, merge, exact-main and Pages next`.
