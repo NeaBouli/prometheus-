@@ -990,3 +990,23 @@ Leistungsbasierte Emission. Guardians = "Miner" (KI statt GPU).
   disclosure, public multi-host operation, models/YARA, wallet, chain, rewards,
   and deployment remain outside the boundary.
 - **Historical status at capture:** `GH-167 In Progress / Complete gates and independent review next`.
+
+## Checkpoint 2026-08-13: GH-173 deterministic semantic draft integration
+
+- Issue #173 and branch `feat/GH-173-semantic-draft` start from exact clean main
+  `76b55af`. Kimi K3 implemented the pure deterministic derivation slice; Sol
+  reviewed it and integrated the closed v2 result wire and governed worker.
+- Already approved local API-import and byte-pattern observables derive one
+  bounded memory-only candidate. GH-170 performs the only compile action; no
+  scan occurs. Durable output contains only exact input bindings, kind counts,
+  nonce-bound candidate-binding SHA-256 and compile status; existing v1 results
+  remain readable.
+- Focused derivation/result tests pass 61/61; the complete Guardian suite passes
+  1269 tests with 4 intentional live-model skips; changed-source Black and
+  Pylint 10.00/10 pass. Complete local repository gates pass except locally
+  unavailable Docker Compose rendering and Actionlint, which remain mandatory
+  protected-CI checks; independent final review is in progress.
+- No model, confidence, `should_submit`, disclosure, publication, wallet, chain,
+  reward, deployment, semantic-quality claim, actionable rule, or production
+  authority is added.
+- **Status:** `GH-173 Complete local PASS / Independent review and protected CI next`.

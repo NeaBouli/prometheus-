@@ -2472,3 +2472,26 @@ No production proof/relation/key approval, privacy authority, semantic or
 actionable analysis, public multi-host evidence, model/YARA execution, wallet,
 signing, chain, reward, deployment, slash, commit-reveal, reputation, or
 emergency-stop behavior changed.
+
+## 2026-08-13 - GH-173 deterministic semantic draft local audit
+
+**Result:** complete local integration PASS; protected CI and merge pending.
+
+The optional governed-worker analyzer revalidates the exact canonical bundle and
+statement digest, derives one deterministic bounded memory-only YARA candidate,
+and delegates compile-only validation to the pinned GH-170 boundary. The closed
+schema-v2 result binds approval, lease-derived input identity, statement,
+observable commitment, exact per-kind counts, nonce-bound candidate-binding
+SHA-256, and an exact boolean compile verdict. Existing schema-v1 results remain
+readable; no SQLite
+DDL or migration is required because the result wire remains an opaque bounded
+BLOB under ledger schema v5.
+
+The candidate source, transient raw candidate digest, and observable values are
+never persisted in the result. File hashes are never embedded. No model,
+confidence, `should_submit`, scan, disclosure, publication, wallet, chain,
+reward, deployment, semantic-quality claim, actionable rule, or production
+authority is added. Current evidence is 61 focused tests and 1269 full Guardian
+tests with 4 intentional live-model skips, Black clean, changed-source Pylint
+10.00/10, and complete local repository gates except locally unavailable Docker
+Compose rendering and Actionlint; protected CI remains authoritative for both.

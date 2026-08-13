@@ -3830,3 +3830,67 @@ No direct `main` push or production action occurred.
 - Rollout estimates remain core 84-88% and complete roadmap 50-55%; GH-170
   closes structural candidate-rule compilation, not semantic/actionable quality.
 - **Status:** `Docs closeout local PASS / Protected documentation PR next`.
+
+### 2026-08-13 - GH-173 deterministic semantic draft started
+
+- Created issue #173 and branch `feat/GH-173-semantic-draft` from clean exact
+  final main `76b55af97bca3d961840ff6c5b4653338a636a7f`.
+- Scope: deterministically derive one bounded ASCII YARA draft from an already
+  governed ThreatHint-v2 observable bundle, validate it only through the pinned
+  compile-only YARA-X boundary, and atomically persist a canonical explicitly
+  non-actionable v2 result with exact input bindings, per-kind counts, candidate
+  digest, and compile status. Existing v1 results remain readable.
+- Candidate source remains memory-only. No model/network invocation, file or
+  process scan, submission, publication, disclosure, transport, wallet,
+  signing, transaction, chain, reward, deployment, or production authority is
+  added. Legacy `should_submit` behavior is not wired into this path.
+- Kimi K3 completed a secret-free read-only architecture review and found no
+  inherent P0 blocker. Its recommended invariants are digest-only persistence,
+  exact dual-version wire validation, hostile-observable escaping tests, and
+  zero downstream authority for the compile verdict.
+- **Status:** `GH-173 In Progress / Bridge recorded / Implementation next`.
+
+### 2026-08-13 03:11 EEST - GH-173 complete local verification PASS
+
+- The optional governed-worker analyzer now derives one bounded memory-only
+  YARA draft from canonical `api_import` and `byte_pattern` observables and
+  compile-checks it only through the pinned GH-170 YARA-X boundary. File hashes
+  remain count-only and no scan occurs.
+- The closed canonical v2 result preserves exact v1 input bindings, exact
+  per-kind counts and compile verdict, but persists only a domain-separated
+  report-nonce-bound candidate binding. The raw candidate source and raw
+  candidate digest remain transient; existing v1 result reads and exact retries
+  remain valid.
+- Kimi K3 authored the bounded pure-derivation slice. Sol reviewed every write,
+  integrated the worker/result wire, corrected the initial dictionary-oracle
+  risk in raw digest persistence, and added nested duplicate/missing/extra-key,
+  exact-retry and nonce-binding regressions. Kimi's independent final review
+  reports no P0/P1/P2 finding; its stale-test-count P3 was fixed before commit.
+- PASS: 61 focused tests; 119 focused-plus-adjacent tests; full Guardian 1269
+  passed/4 intentional live-model skips; Black; changed-source Pylint 10.00/10;
+  full Guardian Pylint 9.86/10; Pip Audit; Rustfmt, warning-free Clippy and full
+  workspace tests; locked release binaries; 33/15/15-file packages; isolated
+  release performance; Cargo Audit with no vulnerability and eight repository-
+  allowed warnings; Memory Integrity; six Autodidactic tests; vLLM policy;
+  H-001 evidence; HTML/JSON/YAML parsing; diff and secret-marker hygiene.
+- Docker Compose rendering, Actionlint and Gitleaks are unavailable locally and
+  remain mandatory protected-CI checks. No model, network, scan, submission,
+  disclosure, wallet, signing, chain, reward, deployment or production action
+  occurred.
+- **Status:** `GH-173 Complete local PASS / Protected PR next`.
+
+### 2026-08-13 03:20 EEST - PR #174 review triage
+
+- All ten protected CI/Security contexts pass at exact head `907bf11`, including
+  Docker Compose rendering, Actionlint, Gitleaks, dependency audit, Guardian and
+  Rust performance.
+- Accepted the restart-coverage finding by recreating the governed outbox from
+  the same database before reading the completed result. Accepted the test nit
+  by proving both binding inputs affect the digest and pinning one exact vector.
+  The refreshed adjacent suite passes 71/71; Black and test-file Pylint 10.00/10
+  pass.
+- The kickoff wording about candidate-digest persistence is intentionally
+  retained as append-only historical state from before the privacy hardening.
+  The later local-PASS entry supersedes it and records the final nonce-bound
+  candidate-binding contract; the review thread will be answered accordingly.
+- **Status:** `Review fixes local / Commit, resolve threads and protected recheck next`.
