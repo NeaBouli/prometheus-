@@ -9,7 +9,7 @@
   change. Do not copy finding details or raw evidence into this public Bridge.
   Live trading and production operations remain separately gated.
 
-Last updated: 2026-07-29 EEST
+Last updated: 2026-08-13 EEST
 Repo: Prometheus working-tree root
 Operational product/public baseline: exact product main `cb3d076d0e698361ce410e993de3edb869c0770e` merges GH-117 through protected PR #118. Prometheus CI `30423663562`, Security Audit `30423663566`, and Pages `30423663016` pass on that exact commit. All product, public-site, and status changes remain PR-only, and foreign untracked `Prometheus-1.png` remains untouched.
 Current handoff: GH-117 is merged and exact-main verified. This documentation-only closeout branch synchronizes Bridge, Memory, README, Whitepaper, Roadmap, FAQ, protocol/Guardian docs, and `llms.txt`; it changes no product code or architectural boundary. Production relation/key/ceremony approval, independent cryptographic/privacy review, real semantic/actionable analysis, v2 transport, and operated rollout evidence remain later gates.
