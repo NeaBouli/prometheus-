@@ -3910,3 +3910,17 @@ No direct `main` push or production action occurred.
 - No product behavior, rollout estimate, model, scan, submission, disclosure,
   wallet, signing, chain, reward, deployment or production authority changed.
 - **Status:** `GH-173 Done / Exact-main verified / Docs closeout local candidate`.
+
+### 2026-08-13 03:39 EEST - GH-173 public documentation closeout verified
+
+- Documentation-only PR #175 merged normally as exact main
+  `619374e311ae3a047af025b954d9b3eb52e5a077`; its remote branch is deleted.
+- Final-closeout Prometheus CI `31654905321`, Security Audit `31654905397`,
+  and Pages `31654904489` all completed successfully on that exact commit.
+- Cache-busted live readback confirms the GH-173 status and feature commit
+  `1107b11` on the homepage, Whitepaper, Roadmap, FAQ and `llms.txt`; the raw
+  commit-pinned README confirms the same merged and exact-main-verified status.
+- The repository was clean and synchronized with `origin/main` before this
+  append-only audit record. No product behavior, readiness estimate, wallet,
+  signing, chain, deployment or production authority changed.
+- **Status:** `GH-173 Done / Public docs and exact-main closeout verified`.

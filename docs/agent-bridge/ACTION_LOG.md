@@ -3629,3 +3629,16 @@ Rules for all dev agents:
   pass. Current public/internal status surfaces now record that evidence without
   changing readiness percentages or production authority.
 - Status: `Done / Exact-main verified / Docs closeout local PASS next`.
+
+## 2026-08-13 03:39 EEST - GH-173 public documentation closeout
+
+- Documentation PR #175 merged as exact main `619374e`; its remote branch was
+  deleted.
+- Final-closeout CI `31654905321`, Security `31654905397`, and Pages
+  `31654904489` pass on the exact merge commit.
+- Cache-busted live Pages and commit-pinned raw README readback confirm the
+  merged GH-173 status and feature commit `1107b11` across all public status
+  surfaces.
+- This append-only record changes documentation only. No external runtime,
+  wallet, chain, deployment or production action occurred.
+- Status: `Done / Public docs and exact-main closeout verified`.
