@@ -2503,3 +2503,31 @@ closed and the remote feature branch was deleted. All review threads are
 resolved. Exact-main Prometheus CI `31654308969`, Security Audit `31654308964`,
 and Pages `31654308875` pass. No rollout estimate or production authority
 changed.
+
+## 2026-08-13 - GH-177 synthetic YARA semantic-quality local audit
+
+**Result:** complete local candidate PASS; protected CI and merge pending.
+
+The standalone evaluator imports only stdlib plus exact-pinned YARA-X. It
+compiles one fixed GH-173-shaped rule and scans only 20 bounded byte buffers
+reconstructed in memory from a closed deterministic synthetic recipe. Exact
+canonical parsing rejects duplicate keys, noncanonical bytes, wrong types,
+oversize inputs, executable magic at offset zero, policy weakening, engine
+drift and any corpus/policy/evaluator/report hash mismatch with one stable
+redacted error.
+
+Sol review found and fixed two P1 direct-object integrity gaps before commit:
+payload bytes now rederive exactly from fully revalidated segments, and corpus
+and policy objects reconstruct to the exact claimed canonical hashes before
+evaluation. Independent Kimi final review reports no remaining P0/P1/P2.
+
+PASS: 26 focused tests; Guardian 1295 passed/4 intentional live-model skips;
+Black; changed-source Pylint 10.00/10 and full Guardian Pylint 9.85/10; Pip
+Audit; Rustfmt, warning-free Clippy and full workspace tests; Cargo Audit with
+no known vulnerability and eight allowed existing warnings; Memory Integrity;
+six Autodidactic tests; structured-data and diff hygiene. The committed
+synthetic baseline is 10 TP/0 FP/10 TN/0 FN at exact 10000-bps thresholds.
+
+No real sample, file/process scan, governed worker/outbox/result wiring, model,
+transport, disclosure, submission, wallet, signing, chain, reward, deployment,
+production-quality certification, or production authority is added.

@@ -947,3 +947,22 @@ digest path.
 The result grants no confidence, `should_submit`, scan, disclosure, submission,
 publication, wallet, chain, reward, deployment, semantic-quality, actionable, or
 production authority.
+
+## Offline Synthetic YARA Semantic-Quality Evidence (GH-177)
+
+`jaeger.yara_semantic_quality` is a standalone CLI and Python evidence module,
+not a governed analyzer API. It accepts only exact canonical bounded fixture
+bytes for a closed synthetic recipe corpus, strict policy, expected report, and
+integrity manifest. It compiles one fixed GH-173-shaped rule with pinned
+`yara-x==1.4.0` and scans only derived in-memory bytes.
+
+The canonical report binds exact corpus, policy, evaluator-module bytes,
+engine version and rule digest, then records confusion counts plus exact
+precision, recall, and specificity basis points. Authority is `none` and
+`production_authorized` is false. The CLI returns `0` for a verified passing
+fixture set, `1` for a verified failing gate, and `2` for invalid evidence.
+
+No scan path or process, real sample, worker/outbox/result integration, model,
+transport, disclosure, submission, wallet, chain, reward, deployment, or
+production authority is exposed. The synthetic gate is regression evidence,
+not real-world semantic-quality certification or actionable-rule approval.

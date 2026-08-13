@@ -3588,6 +3588,20 @@ Rules for all dev agents:
   production action is in scope.
 - Status: `In Progress / Implementation next`.
 
+## 2026-08-13 - GH-177 complete local PASS
+
+- Integrated the isolated synthetic YARA-X evaluator, 20-case deterministic
+  recipe corpus, strict authority-none policy, canonical expected report and
+  exact integrity manifest.
+- Sol fixed direct payload/segment and corpus/policy digest forgery paths before
+  commit. Kimi final review reports no remaining P0/P1/P2.
+- PASS: focused 26; Guardian 1295/4 skip; Black; Pylint changed 10.00/full 9.85;
+  Pip Audit; Rust workspace fmt/clippy/tests; Cargo Audit with the eight existing
+  allowed warnings only; Memory/Autodidactic/structured-data/diff checks.
+- Public and internal docs label this as unmerged synthetic evidence; readiness
+  estimates and production authority are unchanged.
+- Status: `Complete local PASS / Protected PR next`.
+
 ## 2026-08-13 03:11 EEST - GH-173 complete local PASS
 
 - Integrated the deterministic memory-only semantic draft, compile-only GH-170
@@ -3642,3 +3656,17 @@ Rules for all dev agents:
 - This append-only record changes documentation only. No external runtime,
   wallet, chain, deployment or production action occurred.
 - Status: `Done / Public docs and exact-main closeout verified`.
+
+## 2026-08-13 - GH-177 synthetic YARA quality gate kickoff
+
+- Opened issue #177 and branch `feat/GH-177-synthetic-yara-quality` from exact
+  clean main `a508339`.
+- Selected a standalone synthetic offline YARA-X match evaluator as the next
+  repository-owned rollout-risk reduction after GH-173. It is evidence-only,
+  canonical, bounded, in-memory and carries authority `none`.
+- Kimi K3's read-only architecture review found no blocker and required strict
+  synthetic-only corpus construction plus import isolation from every governed
+  worker/outbox/result and external-effect path.
+- No real sample, model, network, wallet, chain, deployment or production action
+  is in scope.
+- Status: `In Progress / Implementation next`.

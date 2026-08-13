@@ -13,12 +13,12 @@
 | Repo | https://github.com/NeaBouli/prometheus- |
 | Branch | Canonical target `main`; product/public/status changes remain PR-only |
 | Lokaler Pfad | `$REPO_ROOT` |
-| Letzter grün verifizierter Produkt-/Public-Baseline | Exact product/public main `7c6260855193cce1ae2790670fcf25371ac08412`; Prometheus CI `31645624623`, Security `31645624601`, and Pages `31645623547` pass |
-| Aktueller Entwicklungs-Slice | GH-170 bounded compile-only YARA-X validation is merged, exact-main green, and live; the next repository-owned rollout block must be selected |
+| Letzter grün verifizierter Produkt-/Public-Baseline | Exact product/public main `a508339cb40815b262923b1dab8ee313da609cce`; Prometheus CI `31655438351`, Security `31655438409`, and Pages `31655437651` pass |
+| Aktueller Entwicklungs-Slice | GH-177 isolated synthetic YARA semantic-quality gate is complete local PASS; protected PR, CI, merge, and public closeout remain |
 | Aktuelle Tooling-Baseline | H-001 Testnet-10 signature/import/full verification/one-shot broadcast/confirmation/receipt/independent evidence and repository-public hash revalidation pass on exact main. The bounded GH-167 ThreatHint-v2 repository transport substrate is merged and exact-main verified. Production proof artifacts/ceremony, independent cryptographic/privacy review, real semantic/actionable analysis, six state deployments, metrics-oracle evidence, operated multi-host transport, and rollout remain open. |
-| Aktueller HEAD | Exact product main `8d8e29c236bdb4839a049a1d4f5b51ce6abbc3e7`; Prometheus CI `31650123073`, Security `31650123055`, and Pages `31650122593` pass |
+| Aktueller HEAD | Feature branch `feat/GH-177-synthetic-yara-quality` from exact main `a508339cb40815b262923b1dab8ee313da609cce`; local candidate passes complete gates |
 | Rollback-Tag | `pre-session-20260413` → `6347b85` |
-| Whitepaper | WHITEPAPER.md (root) + whitepaper.html (styled); GH-167 transport and GH-170 compile-only YARA-X are merged/exact-main synchronized without claiming semantic or production authority |
+| Whitepaper | WHITEPAPER.md (root) + whitepaper.html (styled); GH-173 is merged/exact-main synchronized and GH-177 is labeled local candidate without semantic or production authority |
 | Status | H-001 Testnet-10 canary is confirmed and independently evidenced. Rollout-capable core is estimated at 84-88%. GH-167 closes only the bounded repository v2 transport substrate. Production relation/key/ceremony approval and independent cryptographic/privacy review, real semantic/actionable analysis, six state deployments, metrics-oracle evidence, operated multi-host transport, crash-safe external side effects, and full rollout evidence remain gated. |
 | GitHub Pages | https://neabouli.github.io/prometheus-/ |
 | Google Search Console | Verified: googleaa2902079481c7a8 |
