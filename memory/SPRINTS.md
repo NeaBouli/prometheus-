@@ -1,6 +1,6 @@
 # PROMETHEUS – SPRINT PLANUNG
 # Detaillierter Sprint-Plan mit Tagesaufgaben für Claude Code
-# Last Updated: 2026-03-21
+# Last Updated: 2026-08-14
 
 ---
 
@@ -19,7 +19,10 @@
 | 8      | Community & Förderung     | Parallel| PENDING | Whitepaper v4         |
 
 **Gesamt: ~10-12 Wochen ab Sprint 1** (realistisch mit 2 Entwicklern)
-**Ziel: Testnet-Launch Mai 2026, Mainnet 5. Mai 2026**
+**Historischer Plan ersetzt:** Es gibt kein festes Launch-Datum. Der
+vollstaendige Rollout und Mainnet bleiben an die aktuellen Nachweis-, Audit-,
+Deployment- und Betriebs-Gates in `memory/STATUS.md` und `docs/roadmap.md`
+gebunden.
 
 ---
 

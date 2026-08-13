@@ -1,9 +1,39 @@
 # PROMETHEUS – MODULE STATUS
 # Format: | Module | Status | Progress | Last Update | Audit | Testnet Address |
 # Status: PENDING | IN_PROGRESS | DONE | BLOCKED | PENDING_AUDIT | ACCEPTED | REJECTED
-# Last Updated: 2026-08-13
+# Last Updated: 2026-08-14
 
 ---
+
+## PUBLIC CLAIM RECONCILIATION (2026-08-14)
+
+```text
+Baseline: exact main 5cd13bf6f9c170711e26364263bd0dcd8aad8c09
+Evidence: CI 31747553871; Security 31747553891; Pages 31747553216
+Canonical table: docs/claim-audit-2026-08-14.md
+Machine status: docs/evidence/public-claim-status-2026-08-14.json
+
+Implemented/tested: development Light Client and contract/validator state
+machines; bounded Guardian transport and analysis machinery; compile-only
+YARA-X validation; non-actionable draft; synthetic regression gate.
+Testnet-demonstrated: exactly one confirmed, non-promotable H-001 Testnet-10
+canary.
+Production-deployed: no Prometheus protocol component is proven deployed.
+Target/planned: real Phi-3/ONNX and 8B/70B analysis, actionable rule flow,
+public multi-host operation, IPFS distribution, PROM issuance/liquidity and
+decentralized membership/attestation.
+Blocked/unproven: production proof approval/review, real-model quality,
+privacy-reviewed semantic authority, six state deployments, metrics successor
+evidence, key rotation, Sybil resistance, availability/replication and private
+operator audit closure.
+
+Invariants: validators stake KAS, never PROM. PROM minting, emission,
+liquidity and trading are not implemented, deployed or active. The <60-second
+lifecycle is a target supported only by a same-host development-stub fixture.
+```
+
+All percentages below are internal, scope-weighted engineering estimates or
+component-completion records. They are not production-readiness evidence.
 
 ## CURRENT SPRINT
 

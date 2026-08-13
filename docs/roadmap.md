@@ -1,6 +1,11 @@
 # Prometheus — Full Deployment Roadmap
 *Readiness-gated roadmap; no fixed public-release date is claimed.*
-*Last status reconciliation: 2026-08-12 (Europe/Athens project time).*
+*Last status reconciliation: 2026-08-14 (Europe/Athens project time), exact main `5cd13bf`; CI `31747553871`, Security `31747553891`, Pages `31747553216`.*
+
+Evidence classes are intentionally separate: implemented/tested development
+foundations, the single demonstrated non-promotable Testnet-10 canary, no proven
+production protocol deployment, planned target architecture, and explicit
+blocked/unproven gates. See the [public claim audit](claim-audit-2026-08-14.md).
 
 ## Progress Snapshot
 
@@ -15,10 +20,10 @@ financial forecasts, or evidence that any contract is live.
 
 ---
 
-## Phase 0 — Foundation (COMPLETE)
-**March 2026 · All sprints accepted**
+## Phase 0 — Development Foundation (COMPLETE AS TEST FOUNDATION)
+**March–August 2026 · Repository foundations accepted, not production operation**
 
-The architecture and tested foundation are complete. Six contract state machines,
+The scoped development foundation is complete. Six contract state machines,
 the Rust light-client foundation, Python guardian foundation, voting mechanism,
 E2E fixtures, documentation, and landing page are in GitHub. Production stubs and
 real network operation are tracked in the later phases below.
@@ -27,10 +32,10 @@ real network operation are tracked in the later phases below.
 |--------|-------------|--------|
 | 0 | Kaspa Testnet-10, repo structure, CI/CD | ACCEPTED |
 | 1 | 6 Silverscript contracts, 54 tests | ACCEPTED |
-| 2 | Rust client: RPC, YARA, ZK stub, KRC-20 | ACCEPTED |
-| 3 | Phi-3 wrapper, anomaly detection, Fed-DART | ACCEPTED |
-| 4 | Guardian analyzer, local vLLM runtime, and canonical membership source | CORE ACCEPTED / GH-147 MEMBERSHIP MERGED |
-| 5 | Commit-Reveal voting, bond system, slashing | ACCEPTED |
+| 2 | Rust client: RPC foundation, custom YARA-style matcher, ZK stub, cache-only rule reader | DEVELOPMENT FOUNDATION |
+| 3 | Phi-3 heuristic/stub and Fed-DART placeholder | DEVELOPMENT FOUNDATION; NO ONNX INFERENCE |
+| 4 | Guardian interfaces, hardened local vLLM scaffold, and canonical owner-loaded membership source | TESTED FOUNDATION; NO EVALUATED REAL MODEL OR PRODUCTION TRUST |
+| 5 | Commit-Reveal voting, bond system, slashing | TESTED STATE MACHINES; NO OPERATED VALIDATOR NETWORK |
 | 6 | Development-stub E2E lifecycle fixture <60s, Sybil + FP flood tests | ACCEPTED as test foundation; not production evidence |
 | 7 | Audit dashboard, README, WHITEPAPER.md | ACCEPTED |
 | 8 | CONTRIBUTING.md, 5 wiki guides, landing page | DONE |
@@ -151,7 +156,7 @@ operation, and public release-hardening evidence for the exact rollout commit.
 - Merged and exact-main-verified in GH-63: manifest-pinned active-KIP-16 BN254/Arkworks Groth16 engine plus bounded owner-aware adapter/service; production relation/VK/vector approval and installation remain
 - Implement PROM emission contract (minting logic)
 - Deploy first KAS/PROM liquidity pool on Kasplex DEX
-- Start 10 team-operated Guardian + Validator nodes
+- Operate and evidence an initial Guardian/Validator set only after membership, key lifecycle, Sybil, model, proof, privacy, and deployment gates pass
 
 **Sprint 10 — Real KRC-20 Reader + P2P Network**
 - KRC-20 UTXO queries for "PROM-RULES" tick (real on-chain reads)
@@ -341,7 +346,7 @@ This is the final architectural milestone described in the whitepaper.
 
 | Date | Milestone |
 |------|-----------|
-| March 2026 | All sprints 0-8 accepted. Foundation complete. |
+| March–August 2026 | Sprints 0-8 accepted as repository/test foundations; this is not production deployment. |
 | August 2026 | Toccata runtime/release gates plus the non-promotable H-001 Testnet-10 canary are complete: external signature, full verification, one-shot broadcast, confirmation, operator receipt, and independent evidence pass. |
 | After H-001 evidence | Deploy the remaining six state contracts only through separately approved operations, execute the metrics-oracle transaction, and complete exact-commit release hardening. |
 | After core-network rollout | Approved production Groth16 artifacts, PROM emission, P2P rule distribution, production Phi-3, and operated Guardian/Validator network. |

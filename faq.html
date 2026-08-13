@@ -31,7 +31,7 @@
 <meta name="ai-status" content="post-toccata-verification, active-development, audited">
 <!-- Schema.org -->
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"FAQPage","name":"Prometheus FAQ","description":"Frequently asked questions about Prometheus decentralized AI threat intelligence protocol.","url":"https://neabouli.github.io/prometheus-/faq.html","mainEntity":[{"@type":"Question","name":"What is the difference between KAS and PROM?","acceptedAnswer":{"@type":"Answer","text":"KAS is Kaspa's native token used as economic collateral by validators. PROM is an earned-only reward and governance token for verified contributions. Canonical Guardian reputation is separate Kaspa L1 state. KAS = economic security; PROM = contribution rewards and governance."}},{"@type":"Question","name":"How does PROM enter the market?","acceptedAnswer":{"@type":"Answer","text":"Zero PROM exist at launch. First PROM minted when first threat rule passes consensus. KAS/PROM liquidity pool opens on Kasplex DEX. No ICO, no presale."}},{"@type":"Question","name":"Can Prometheus be shut down?","acceptedAnswer":{"@type":"Answer","text":"The contract design has no repository-controlled emergency-stop entrypoint or central protocol server. Availability still depends on Kaspa, nodes, clients, and network access; this is not an uninterrupted-availability guarantee."}}]}
+{"@context":"https://schema.org","@type":"FAQPage","name":"Prometheus FAQ","description":"Frequently asked questions about the Prometheus development-stage threat intelligence protocol.","url":"https://neabouli.github.io/prometheus-/faq.html","mainEntity":[{"@type":"Question","name":"What is the difference between KAS and PROM?","acceptedAnswer":{"@type":"Answer","text":"Validators stake KAS, never PROM. PROM is a planned reward and governance token; minting, emission, liquidity and trading are not active. Canonical Guardian reputation is separate Kaspa L1 state."}},{"@type":"Question","name":"How does PROM enter the market?","acceptedAnswer":{"@type":"Answer","text":"The specification starts with zero PROM and no pre-mine, ICO, presale, founder or foundation allocation. Contribution issuance and a later KAS/PROM secondary market are planned, not deployed."}},{"@type":"Question","name":"Can Prometheus be shut down?","acceptedAnswer":{"@type":"Answer","text":"The contract design has no repository-controlled emergency-stop entrypoint. No public multi-host Prometheus network is operating; current evidence relies on owner-controlled policies and local trust anchors. Availability is not guaranteed."}}]}
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -277,7 +277,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
         </button>
         <div class="faq-a"><div class="faq-a-inner">
           <p><strong>KAS</strong> is the native Kaspa token that already exists. Validators stake KAS as economic collateral. If a validator misbehaves, they lose KAS — real money with real consequences. The alignment of incentives is economic, not ideological.</p>
-          <p><strong>PROM</strong> is the Prometheus reward and governance token. It cannot be purchased at launch. It is minted exclusively through consensus-accepted security contribution paths. Canonical Guardian reputation remains separate Kaspa L1 state.</p>
+          <p><strong>PROM</strong> is the planned Prometheus reward and governance token. Primary issuance is specified for verified contributions; a planned KAS/PROM pool would permit secondary-market purchases after issuance. Minting, emission, liquidity, and trading are not implemented, deployed, or active. Canonical Guardian reputation remains separate Kaspa L1 state.</p>
           <div class="callout"><p><strong>The key distinction:</strong> KAS = economic security deposit. PROM = proof of contribution. Keeping them separate ensures that capital alone cannot buy influence over the protocol.</p></div>
         </div></div>
       </div>
@@ -288,9 +288,8 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
           <span class="faq-icon"></span>
         </button>
         <div class="faq-a"><div class="faq-a-inner">
-          <p>On launch day, <strong>zero PROM exist</strong>. No presale, no airdrop, no team allocation. The first PROM are minted when the first threat rule passes consensus.</p>
-          <p>Simultaneously with the mainnet launch, a <strong>KAS/PROM liquidity pool</strong> opens on Kasplex DEX (funded from the 5% community pool). From this moment, PROM has a market price formed entirely by supply and demand — no ICO, no listing price, no market-making.</p>
-          <p>The deflationary emission schedule (−10% per year) combined with growing network demand creates natural upward price pressure over time. The more threats Prometheus detects, the more PROM is earned by participants — and the more PROM is needed to vote on governance and access the AI assistant.</p>
+          <p>The specification starts with <strong>zero PROM</strong>: no pre-mine, ICO, presale, founder allocation, or foundation allocation.</p>
+          <p>Primary contribution issuance and a later <strong>KAS/PROM secondary market</strong> funded from the Community allocation are targets. Neither is deployed, active, or a price promise.</p>
         </div></div>
       </div>
 
@@ -300,9 +299,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
           <span class="faq-icon"></span>
         </button>
         <div class="faq-a"><div class="faq-a-inner">
-          <p>Not in the traditional sense. PROM is minted when a threat rule is accepted by consensus — this is <strong>performance-based emission</strong>.</p>
-          <p>Guardian Nodes are the closest equivalent to "miners": instead of GPU hashrate, they contribute AI compute and threat intelligence. They run LLaMA 3 to analyze threats, generate YARA rules, and earn PROM for accepted proposals.</p>
-          <p>The analogy holds deeper: just as Bitcoin miners must spend real electricity to earn Bitcoin, Guardian operators must spend real compute and produce real security value to earn PROM.</p>
+          <p>No PROM is currently minted. The target uses <strong>performance-based emission</strong> for verified contributions after consensus, anti-abuse, and deployment gates pass.</p>
         </div></div>
       </div>
 
@@ -313,13 +310,13 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
         </button>
         <div class="faq-a"><div class="faq-a-inner">
           <table class="faq-table">
-            <tr><th>Year</th><th>Total Emission</th><th>Validators 40%</th><th>Guardians 30%</th><th>Reporters 20%</th><th>Dev Pool 5%</th></tr>
-            <tr><td>Year 1</td><td>20,000,000</td><td>8,000,000</td><td>6,000,000</td><td>4,000,000</td><td>1,000,000</td></tr>
-            <tr><td>Year 2</td><td>18,000,000</td><td>7,200,000</td><td>5,400,000</td><td>3,600,000</td><td>900,000</td></tr>
-            <tr><td>Year 3</td><td>16,000,000</td><td>6,400,000</td><td>4,800,000</td><td>3,200,000</td><td>800,000</td></tr>
-            <tr><td>Year 5</td><td>12,000,000</td><td>4,800,000</td><td>3,600,000</td><td>2,400,000</td><td>600,000</td></tr>
+            <tr><th>Year</th><th>Total target</th><th>Validators 40%</th><th>Guardians 30%</th><th>Reporters 20%</th><th>Dev Pool 5%</th><th>Community 5%</th></tr>
+            <tr><td>Year 1</td><td>20,000,000</td><td>8,000,000</td><td>6,000,000</td><td>4,000,000</td><td>1,000,000</td><td>1,000,000</td></tr>
+            <tr><td>Year 2</td><td>18,000,000</td><td>7,200,000</td><td>5,400,000</td><td>3,600,000</td><td>900,000</td><td>900,000</td></tr>
+            <tr><td>Year 3</td><td>16,000,000</td><td>6,400,000</td><td>4,800,000</td><td>3,200,000</td><td>800,000</td><td>800,000</td></tr>
+            <tr><td>Year 5</td><td>12,000,000</td><td>4,800,000</td><td>3,600,000</td><td>2,400,000</td><td>600,000</td><td>600,000</td></tr>
           </table>
-          <p>Reporters (20%) split: 75% to Light Clients for validated threat reports, 25% to Honeypot operators for zero-day discoveries. Dev Pool (5%) is only released via DAO vote — no automatic flow to any team member.</p>
+          <p>This is planned tokenomics, not active emission. Reporters split 15% Light Clients and 5% Honeypots. Dev Pool and Community are predefined 5% protocol pools, not founder/foundation allocations.</p>
         </div></div>
       </div>
     </div>
@@ -423,7 +420,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
         </button>
         <div class="faq-a"><div class="faq-a-inner">
           <p>No — and that would be the wrong approach. Training foundation models from scratch costs hundreds of millions of dollars and years of research time. That is not Prometheus.</p>
-          <p>Prometheus takes existing state-of-the-art open-source models and <strong>specializes them for security work</strong> using LoRA fine-tuning. This is the Prometheus metaphor in practice: we take the fire that already exists and give it to humanity in a new, more powerful form.</p>
+          <p>Prometheus targets existing locally operated models and planned <strong>LoRA specialization</strong>. No completed fine-tuning or independently evaluated real 8B/70B run is currently evidenced.</p>
           <div class="callout"><p><strong>We are not reinventing the wheel. We are building the vehicle.</strong></p></div>
         </div></div>
       </div>
@@ -436,11 +433,11 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
         <div class="faq-a"><div class="faq-a-inner">
           <table class="faq-table">
             <tr><th>Model</th><th>Where</th><th>License</th><th>Role</th></tr>
-            <tr><td>Phi-3-mini 3.8B</td><td>Light Client (your device)</td><td>MIT</td><td>Local anomaly detection</td></tr>
-            <tr><td>LLaMA 3 8B</td><td>Guardian Node (24 GB NVIDIA GPU)</td><td>Community</td><td>Threat analysis + YARA</td></tr>
-            <tr><td>LLaMA 3 70B</td><td>Guardian Node (4× A100/H100 80 GB)</td><td>Community</td><td>Deep analysis (primary)</td></tr>
+            <tr><td>Phi-3-mini 3.8B</td><td>Light Client target</td><td>MIT</td><td>Planned ONNX inference; current code is a heuristic/stub</td></tr>
+            <tr><td>LLaMA 3 8B</td><td>Guardian target</td><td>Community</td><td>Planned first analysis tier</td></tr>
+            <tr><td>LLaMA 3 70B</td><td>Guardian target</td><td>Community</td><td>Planned confidence escalation tier</td></tr>
           </table>
-          <p>Proprietary models (GPT-4, Claude, Gemini) are black boxes — nobody can verify what they actually do with your data. For a security system whose core principle is transparency, they are structurally unsuitable. Open source models can be audited, self-hosted, and fine-tuned. Malware samples never leave the local environment.</p>
+          <p>Proprietary hosted models do not expose all weights or service internals for independent inspection. The target therefore favors locally operated, inspectable models. Open weights alone do not prove quality, privacy, provenance, or safe operation. No production malware-sample workflow is deployed, so no absolute data-locality claim is made.</p>
         </div></div>
       </div>
 
@@ -450,7 +447,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
           <span class="faq-icon"></span>
         </button>
         <div class="faq-a"><div class="faq-a-inner">
-          <p>Through <strong>LoRA (Low-Rank Adaptation)</strong> — a technique that fine-tunes only 1-5% of the model's parameters. A single A100 GPU is sufficient. No supercomputer needed.</p>
+          <p><strong>LoRA (Low-Rank Adaptation)</strong> and the listed datasets are roadmap inputs. Fine-tuning, provenance review, real-sample evaluation, calibration, and production authorization remain unproven.</p>
           <p>Training datasets:</p>
           <table class="faq-table">
             <tr><th>Dataset</th><th>Content</th></tr>
@@ -459,7 +456,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
             <tr><td>Exploit-DB</td><td>Complete CVE and exploit correlation database</td></tr>
             <tr><td>CuckooSandbox</td><td>Behavioral analysis reports of malware in sandboxes</td></tr>
           </table>
-          <p>The result is a security-specialized model that understands malware behavior, CVE correlations, and can generate syntactically valid YARA rules with high confidence.</p>
+          <p>No resulting model-quality claim is currently enabled. Compile-valid YARA syntax and synthetic regression data do not establish real-world detection quality.</p>
         </div></div>
       </div>
 
@@ -479,8 +476,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
             ·············································· ↓<br>
             Improved global model → IPFS → on-chain hash → all nodes
           </div>
-          <p><strong>After 1 month:</strong> 50 nodes × 1,000 threats = 50,000 new patterns learned network-wide.</p>
-          <p><strong>After 6 months:</strong> the model outperforms commercial solutions because it trains on real threats from the entire world in real time.</p>
+          <p>No node-count, learning-rate, quality-improvement, or commercial-outperformance claim has been demonstrated.</p>
         </div></div>
       </div>
 
@@ -490,14 +486,14 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
           <span class="faq-icon"></span>
         </button>
         <div class="faq-a"><div class="faq-a-inner">
-          <p>No. Every model update follows this integrity chain:</p>
+          <p>The target model-distribution integrity chain is:</p>
           <div class="flow">
-            1. Model uploaded to IPFS (content-addressed, immutable)<br>
+            1. Target: model bytes published to IPFS (content-addressed; availability and authorization remain separate)<br>
             2. CIDv1 hash stored on Kaspa L1 (tamper-proof)<br>
             3. Every node verifies: IPFS hash == on-chain hash<br>
             4. Mismatch = automatic rejection, no installation
           </div>
-          <p>A manipulated model would produce a different hash and be rejected by every node automatically. Compromising the model distribution would require compromising the Kaspa blockchain itself — which has approximately 50% Byzantine fault tolerance under DAGKnight consensus.</p>
+          <p>Hash matching can provide tamper evidence for exact bytes. It does not prove upstream authenticity, model quality, authorization, IPFS availability, replication, or censorship resistance. This distribution path is not deployed.</p>
         </div></div>
       </div>
     </div>
@@ -531,8 +527,8 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
           <span class="faq-icon"></span>
         </button>
         <div class="faq-a"><div class="faq-a-inner">
-          <p>ClamAV and Wazuh are <strong>signature-based</strong> — they only detect what is already known and catalogued. A zero-day exploit that appeared 10 minutes ago is invisible to them.</p>
-          <p>Prometheus detects <strong>unknown threats</strong> through behavioral AI analysis and swarm intelligence. It also stores rules permanently on a public blockchain that no organization can modify, censor, or selectively enforce.</p>
+          <p>ClamAV is primarily signature-driven, while Wazuh combines multiple monitoring and detection approaches. Neither comparison proves Prometheus detection quality, and real-world performance depends on configuration, rules, telemetry and evaluation.</p>
+          <p>Prometheus targets <strong>behavioral analysis</strong> and shared rule state but does not currently provide production unknown-threat detection. Canonical state and a CID are targeted for Kaspa while content lives on IPFS; authorized deactivation exists, and anchoring does not guarantee availability, replication, or universal censorship resistance.</p>
           <p>Prometheus is designed to <strong>complement</strong> existing tools, not replace them. A device running ClamAV, Wazuh, and the Prometheus Light Client has layered defense — signatures for the known, AI for the unknown.</p>
         </div></div>
       </div>
@@ -543,8 +539,8 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
           <span class="faq-icon"></span>
         </button>
         <div class="faq-a"><div class="faq-a-inner">
-          <p>Prometheus has no repository-controlled emergency stop, foundation server, or central protocol operator. Once deployed, covenant state transitions follow their scripts rather than a developer kill switch.</p>
-          <p>Availability still depends on Kaspa, participating nodes, clients, and network access; infrastructure can be disrupted or blocked. The absence of an emergency-stop path is a deliberate architectural decision, not an availability guarantee.</p>
+          <p>Prometheus has no repository-controlled emergency-stop entrypoint. That invariant is not proof of decentralized operation. Current evidence relies on owner-controlled policies, membership files, and local trust anchors; no public multi-host Prometheus network is operating.</p>
+          <p>Availability also depends on Kaspa, IPFS replication, participating nodes, clients, and network access.</p>
           <div class="callout"><p><strong>No central kill switch.</strong> This invariant does not justify absolute claims about uninterrupted access or network operation.</p></div>
         </div></div>
       </div>
@@ -568,36 +564,36 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
 
       <div class="faq-item" id="earn-prom">
         <button class="faq-q" onclick="toggle(this)">
-          <span class="faq-q-text">How do I earn PROM?</span>
+          <span class="faq-q-text">Can I earn PROM today?</span>
           <span class="faq-icon"></span>
         </button>
         <div class="faq-a"><div class="faq-a-inner">
           <table class="faq-table">
-            <tr><th>Role</th><th>How to earn</th><th>PROM share</th></tr>
-            <tr><td>Light Client</td><td>Run the app — validated threat reports</td><td>15% of total</td></tr>
-            <tr><td>Guardian Node</td><td>Run LLaMA 3 — accepted rule proposals</td><td>30% of total</td></tr>
-            <tr><td>Validator Node</td><td>Stake KAS — honest voting</td><td>40% of total</td></tr>
-            <tr><td>Honeypot Node</td><td>Expose server — zero-day discoveries</td><td>5% of total</td></tr>
+            <tr><th>Target role</th><th>Future verified contribution</th><th>Planned PROM share</th></tr>
+            <tr><td>Light Client</td><td>Validated threat reports</td><td>15%</td></tr>
+            <tr><td>Guardian Node</td><td>Accepted rule proposals</td><td>30%</td></tr>
+            <tr><td>Validator Node</td><td>KAS-backed honest voting</td><td>40%</td></tr>
+            <tr><td>Honeypot Node</td><td>Validated discoveries</td><td>5%</td></tr>
           </table>
-          <p>Honeypot operators receive the highest reward <em>per discovery</em> because zero-day threats are rare and extremely valuable. A single validated zero-day can earn significantly more than thousands of ordinary threat reports.</p>
+          <p>No PROM minting or reward path is active. Running development software earns nothing; all shares require future implementation, audit, deployment, and consensus-verified contributions.</p>
         </div></div>
       </div>
 
       <div class="faq-item" id="hardware">
         <button class="faq-q" onclick="toggle(this)">
-          <span class="faq-q-text">What hardware do I need?</span>
+          <span class="faq-q-text">What hardware is targeted?</span>
           <span class="faq-icon"></span>
         </button>
         <div class="faq-a"><div class="faq-a-inner">
           <table class="faq-table">
-            <tr><th>Role</th><th>Minimum hardware</th><th>Cost estimate</th></tr>
-            <tr><td>Light Client</td><td>Any device, 4 GB RAM, no GPU</td><td>$0 (existing device)</td></tr>
-            <tr><td>Honeypot</td><td>Any internet-exposed server</td><td>~$5–20/mo VPS</td></tr>
-            <tr><td>Validator</td><td>VPS 2 vCPU / 4 GB RAM + 10,000 KAS stake</td><td>~$20/mo VPS</td></tr>
-            <tr><td>Guardian (8B)</td><td>NVIDIA GPU, 24 GB VRAM</td><td>Own hardware</td></tr>
-            <tr><td>Guardian (70B)</td><td>4× A100/H100 80 GB, 256 GB RAM</td><td>$500–2,000/mo cloud</td></tr>
+            <tr><th>Target role</th><th>Planning profile</th><th>Status</th></tr>
+            <tr><td>Light Client</td><td>4 GB RAM, no GPU target</td><td>Real ONNX inference open</td></tr>
+            <tr><td>Honeypot</td><td>Isolated server target</td><td>Not implemented</td></tr>
+            <tr><td>Validator</td><td>2 vCPU / 4 GB RAM + 10,000 KAS target</td><td>No operated network</td></tr>
+            <tr><td>Guardian (8B)</td><td>NVIDIA GPU, 24 GB VRAM target</td><td>No evaluated real-model run</td></tr>
+            <tr><td>Guardian (70B)</td><td>4x A100/H100 80 GB target</td><td>No evaluated real-model run</td></tr>
           </table>
-          <p>The Guardian 8B option was specifically added to lower the barrier for smaller operators. The reputation system automatically filters out low-quality outputs — hardware alone does not guarantee influence.</p>
+          <p>These are planning profiles, not certified production requirements. Hardware alone grants no membership, authority, reputation, or influence.</p>
         </div></div>
       </div>
 
@@ -606,7 +602,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
 </div>
 
 <footer>
-  <div class="f-left">v4.0 · March 2026</div>
+  <div class="f-left">Status reconciled 2026-08-14 · base <a href="https://github.com/NeaBouli/prometheus-/commit/5cd13bf6f9c170711e26364263bd0dcd8aad8c09">5cd13bf</a> · <a href="docs/claim-audit-2026-08-14.md">claim audit</a></div>
   <div class="f-center">PROMETHEUS</div>
   <ul class="f-links">
     <li><a href="faq.html">FAQ</a></li>

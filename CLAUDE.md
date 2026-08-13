@@ -881,7 +881,7 @@ OVERALL:         [0-100]
 # prometheus — Claude Context
 
 ## Was ist das?
-Dezentrales AI-gestütztes Threat-Intelligence-Protokoll auf der Kaspa-Blockchain. Jedes Gerät wird zu einem Sensor in einem globalen Bedrohungserkennungs-Schwarm — ohne zentrale Kontrolle, ohne Foundation, 0% Pre-Mine. Kombiniert On-Device-AI (Phi-3-mini), Guardian-Nodes (LLaMA 3) und Kaspa L1 Consensus (DAGKnight, 100 BPS).
+Entwicklungsprojekt fuer ein dezentrales, AI-gestuetztes Threat-Intelligence-Protokoll auf Kaspa. Die Zielarchitektur kombiniert On-Device-AI (Phi-3-mini), Guardian-Nodes (LLaMA 3) und Kaspa L1. Der aktuelle Stand beweist Entwicklungsgrundlagen und einen nicht promotbaren Testnet-10-Canary, aber noch keinen produktiven oder voll dezentral betriebenen Schwarm.
 
 ## Stack
 - **Rust** (Edition 2021) — Workspace mit `modules/client` und `modules/validator-node`
@@ -899,7 +899,7 @@ Dezentrales AI-gestütztes Threat-Intelligence-Protokoll auf der Kaspa-Blockchai
 blockchain / security / AI
 
 ## Aktuelle Phase
-Sprint 7 — Dashboard & Audit. Sprints 0-6 abgeschlossen (Setup, Contracts, Client, AI, Guardian, Voting, E2E). Mainnet-Ziel: 5. Mai 2026 (Kaspa Covenant-Hardfork).
+Post-Toccata Integrations- und Rollout-Gates. Das fruehere Mainnet-Zieldatum ist abgelaufen und ersetzt; `memory/STATUS.md` und `docs/roadmap.md` sind fuer den aktuellen, readiness-gesteuerten Stand massgeblich.
 
 ## Wichtige Dateipfade
 - **Workspace Config:** `Cargo.toml`

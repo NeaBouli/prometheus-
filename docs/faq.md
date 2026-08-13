@@ -6,25 +6,24 @@
 
 **Q: What is the difference between KAS and PROM?**
 KAS is the Kaspa native token used as economic collateral by validators.
-If a validator misbehaves, they lose KAS — real money. PROM is the
-Prometheus reputation and governance token. It cannot be purchased.
-It is minted exclusively when a threat rule is accepted by consensus.
-KAS = economic security. PROM = proof of contribution.
+If a validator misbehaves under the target protocol, they lose KAS. PROM is the
+planned reward and governance token, while Guardian reputation is separate
+canonical Kaspa L1 state. Validators stake KAS and never PROM. Planned primary
+PROM issuance is contribution-based; a planned KAS/PROM pool would permit
+secondary-market purchases after issuance. No PROM minting, emission, pool, or
+trading is implemented, deployed, or active.
 
 **Q: How does PROM enter the market?**
-On launch day, zero PROM exist. The first PROM are minted when the
-first threat rule passes consensus. Simultaneously, a KAS/PROM
-liquidity pool opens on Kasplex DEX (funded from the community pool).
-The price forms organically — no ICO, no presale, no listing price.
-The deflationary curve (-10%/year) combined with growing demand
-creates natural upward price pressure over time.
+The specification starts with zero PROM: no pre-mine, ICO, presale, founder, or
+foundation allocation. Primary issuance is planned for verified contributions.
+A later KAS/PROM liquidity pool funded from the Community allocation is a
+secondary-market target, not a deployed feature or price promise.
 
 **Q: Is there mining for PROM?**
-Not in the traditional sense. PROM is minted when a threat rule is
-accepted — this is performance-based emission. Guardians are the
-closest equivalent to "miners": they run LLaMA 3 AI to analyze
-threats and generate rules. Instead of GPU hashrate, they contribute
-AI compute and threat intelligence.
+No PROM is currently minted. The target tokenomics use performance-based
+emission for verified protocol contributions, including validators, Guardians,
+reporters, the Dev Pool, and the Community pool. Real model operation and every
+reward path remain undeployed.
 
 **Q: Does running Prometheus beside a Kaspa miner automatically earn PROM?**
 No. The current miner companion is a development-only local Testnet-10
@@ -35,24 +34,25 @@ companion is eligible for neither allocation and cannot claim the full 20%.
 Kaspa mining uses Stratum in most ASIC/pool setups; Prometheus wRPC observation
 is separate.
 
-**Q: What is the PROM emission schedule?**
-Year 1: 20,000,000 PROM. Each subsequent year: -10%.
+**Q: What is the planned PROM emission schedule?**
+The specification targets Year 1: 20,000,000 PROM, then -10% annually.
 Year 2: 18M. Year 3: 16M. Year 4: 14M. Year 5: 12M.
 Total over 5 years: 80,000,000 PROM.
 Distribution: 40% Validators. 30% Guardians. 20% Reporters.
-5% Dev Pool. 5% Community.
+5% Dev Pool. 5% Community. These are predefined protocol pools, not founder or
+foundation allocations, and none is emitting today.
 
 ---
 
 ## Security Protocol
 
 **Q: Are threat rules confirmed automatically?**
-No — four independent checkpoints exist:
+No production rule-confirmation path is operating. The target architecture has four checkpoints:
 1. AI pre-filter: minimum 85% confidence required (automatic)
 2. Collection: minimum 5 independent reports of the same threat
 3. Validator vote: 67% majority via Commit-Reveal (bond at risk)
 4. 24-hour challenge period: anyone can contest, auto-tuning responds
-No single step is fully automatic without verification.
+Their state-machine and fixture coverage does not prove an operated end-to-end network.
 
 **Q: Does Prometheus already validate generated YARA rules with a real engine?**
 Merged and exact-main-verified GH-170 replaces substring shape
@@ -155,12 +155,12 @@ disclosure, model/YARA execution, wallet, chain, rewards, and deployment remain
 separate blocked gates.
 
 **Q: What is Commit-Reveal voting?**
-A cryptographic protocol that prevents validators from copying each
-other's votes. In the commit phase, each validator submits
+A cryptographic state machine designed to reduce vote copying. In the commit phase, each validator submits
 sha256(vote || salt || block_height) — a sealed envelope. After all
 validators have committed, the reveal phase begins and everyone
 opens their envelope simultaneously. A 10% bond is locked during
-voting. Invalid reveals result in immediate bond slashing.
+voting. Invalid reveals result in bond slashing in the tested state machines.
+No operated validator network or production quorum is proven.
 
 ---
 
@@ -173,26 +173,25 @@ complete report pipeline are not production implementations yet. Runtime
 guards reject those placeholders in beta and mainnet profiles.
 
 **Q: Why Kaspa and not Ethereum?**
-Kaspa's DAGKnight consensus achieves 100 blocks per second with
-sub-second finality. Ethereum finality is 12 seconds — too slow for
-real-time threat response. Kaspa also shares the 0% pre-mine
-philosophy of Prometheus. Silverscript (native L1 contracts)
-eliminates reentrancy attacks by design.
+Prometheus targets Kaspa because its high-throughput BlockDAG and current
+SilverScript path can anchor compact protocol state. The repository verifies
+against pinned Kaspa/SilverScript versions; it does not turn network performance
+or security assumptions into Prometheus production evidence.
 
 **Q: What is the difference between Prometheus and ClamAV or Wazuh?**
-ClamAV and Wazuh are signature-based — they only detect what is
-already known. Prometheus detects unknown threats through behavioral
-AI analysis and swarm intelligence. It also stores rules permanently
-on a public blockchain that no organization can modify or censor.
-Prometheus complements existing tools — it does not replace them.
+Prometheus targets complementary behavioral analysis and shared rule state.
+Today it does not provide production malware or unknown-threat detection. The
+target stores canonical rule state and a CID on Kaspa while content lives on
+IPFS; `deactivateRule` is an explicit state transition. Anchoring is tamper
+evidence, not proof of content availability, replication, or universal
+censorship resistance. Prometheus is intended to complement existing tools.
 
 **Q: Can Prometheus be shut down?**
-Prometheus has no repository-controlled emergency stop, foundation server, or
-central protocol operator. Once deployed, covenant state transitions follow
-their scripts rather than a developer kill switch. Availability still depends
-on Kaspa, participating nodes, clients, and network access; infrastructure can
-be disrupted or blocked. The absence of an emergency-stop path is a deliberate
-architectural decision, not an availability guarantee.
+Prometheus has no repository-controlled emergency-stop entrypoint. That
+contract invariant is not proof of decentralized operation. Current evidence
+depends on owner-operated policy/membership files and local trust anchors; no
+public multi-host protocol network is operating. Availability still depends on
+Kaspa, IPFS replication, participating nodes, clients, and network access.
 
 **Q: When will the mobile app be available?**
 Desktop and mobile releases are readiness-gated rather than date-gated.
@@ -204,20 +203,17 @@ mobile implementation target.
 
 ## Participation
 
-**Q: How do I earn PROM?**
-Four ways: (1) Run a Light Client and report validated threats.
-(2) Run a Guardian Node with LLaMA 3 and submit accepted rules.
-(3) Run a Validator Node, stake KAS, and vote honestly.
-(4) Run a Honeypot Node and capture zero-day attacks.
-The highest per-report reward goes to Honeypot operators
-(zero-days are rare and extremely valuable).
+**Q: Can I earn PROM today?**
+No active PROM reward or emission path exists. The target allocation rewards
+verified validator, Guardian, Light Client, and Honeypot contributions after
+minting, consensus, anti-abuse, and deployment gates pass. Running development
+software or a miner companion earns nothing.
 
-**Q: What hardware do I need?**
-Light Client: any device with 4 GB RAM, no GPU required.
-Guardian (8B model): NVIDIA GPU with 24 GB VRAM (RTX 3090/4090 class).
-Guardian (70B model): 4x A100/H100 80 GB, 256 GB system RAM.
-Validator: standard VPS, 2 vCPU, 4 GB RAM + 10,000 KAS stake.
-Honeypot: any internet-exposed server.
+**Q: What hardware is targeted?**
+The architecture targets a 4 GB Light Client, a 24 GB VRAM Guardian 8B path,
+an opt-in multi-GPU 70B escalation path, and a standard validator host with
+10,000 KAS stake. These are planning requirements, not certified production
+profiles. The current miner companion is only a local Testnet-10 RPC observer.
 
 ---
 
@@ -231,30 +227,28 @@ open-source models and specialize them for security work.
 This is the Prometheus metaphor in practice — we take the fire
 that already exists and give it to humanity in a new form.
 
-**Q: Which AI models does Prometheus use and why open source?**
-Two models, both fully open source:
+**Q: Which AI models does Prometheus target?**
+The target architecture names two locally operated model families:
 
-Phi-3-mini 3.8B (Microsoft, MIT License) runs locally on every
-Light Client. It requires only 4 GB RAM, no GPU, and runs on
-Windows, macOS, Linux, and mobile. It handles local anomaly
-detection — the first line of defense on your device.
+Phi-3-mini 3.8B is the Light Client target. Current Rust code has no ONNX
+Runtime session and uses only a development heuristic/stub, so no real-model or
+real-sample detection claim is made.
 
-LLaMA 3 (Meta, Community License) runs on Guardian Nodes.
-The unquantized 8B runtime requires a 24 GB NVIDIA GPU. The 70B variant
-requires 4x A100/H100 80 GB GPUs. It handles deep threat analysis and
-YARA rule generation.
+LLaMA 3 8B-first with 70B escalation is the Guardian target. Hardened local
+runtime configuration and evidence-capture machinery exist, but no real 8B/70B
+run has been independently evaluated. Current YARA results are compile-valid
+non-actionable drafts or synthetic regression evidence.
 
-Proprietary models (GPT-4, Claude, Gemini) are black boxes —
-nobody can verify what they actually do. For a security system
-whose core principle is transparency, they are structurally
-unsuitable. Open source models can be audited, self-hosted,
-and fine-tuned. Malware samples never leave the local environment.
+Proprietary hosted models do not expose all weights or service internals for
+independent inspection. The target therefore favors locally operated,
+inspectable models. Open weights alone do not prove quality, privacy,
+provenance, or safe operation. No production model, malware-sample workflow,
+or privacy proof is currently deployed.
 
-**Q: How is LLaMA 3 trained for security tasks?**
-We use LoRA (Low-Rank Adaptation) — a technique that fine-tunes
-only 1-5% of the model's parameters on security-specific datasets.
-This means no supercomputer is needed. A single A100 GPU is
-sufficient for training.
+**Q: How is LLaMA 3 planned to be specialized?**
+LoRA fine-tuning and security-specific datasets are roadmap targets. No
+repository evidence proves that an 8B or 70B model has been fine-tuned,
+executed on real samples, independently evaluated, calibrated, or authorized.
 
 Training datasets:
 - VirusShare: the largest public malware database, millions of samples
@@ -262,13 +256,12 @@ Training datasets:
 - Exploit-DB: complete CVE and exploit database
 - CuckooSandbox reports: behavioral analysis of malware in sandboxes
 
-The result is a specialized security model built on LLaMA 3 —
-trained to recognize threat patterns, correlate CVEs, and generate
-valid YARA rules with high confidence.
+Dataset licensing, provenance, handling, evaluation, and privacy review remain
+required before this plan can produce a release claim.
 
 **Q: How does the network get smarter over time?**
-Through federated learning via the Fed-DART protocol
-(Fraunhofer Institute, open source). Here is how it works:
+The target uses federated learning via a Fed-DART-inspired protocol. The current
+client implementation is a development placeholder. A future flow would be:
 
 Guardian Node A sees malware X in Germany.
 Guardian Node B sees malware X in Japan.
@@ -278,26 +271,19 @@ In the target architecture, none sends the malware itself. Each sends a bounded
 model update. Such updates can still leak information, so production requires
 clipping, secure aggregation, privacy accounting, authentication, and
 validation.
-A rotating coordinator (chosen by reputation) aggregates all
-gradients and distributes an improved global model to all nodes.
-Every Guardian Node becomes smarter simultaneously.
+A rotating coordinator selected by governed reputation would aggregate bounded
+updates and distribute a candidate model.
 This reduces direct record sharing; it is not an anonymity or
 non-reconstruction guarantee.
 
-After 1 month: 50 nodes x 1,000 threats = 50,000 new patterns learned.
-After 6 months: the model outperforms commercial solutions because
-it trains on real threats from the entire world, not lab data.
-After 1 year: the model understands regional threat landscapes,
-new exploit categories, and attack patterns that did not exist in 2025.
+No node-count, learning-rate, quality-improvement, or commercial-outperformance
+claim has been demonstrated.
 
-**Q: Can a compromised model be pushed to the network?**
-No. Every model update is distributed via IPFS. The SHA-256 hash
-of the new model is stored on the Kaspa blockchain before
-distribution. Every Guardian Node and Light Client verifies
-the IPFS content hash against the on-chain hash before installing
-any update. A manipulated model would have a different hash —
-it would be automatically rejected. The blockchain is the
-tamper-proof source of truth for model integrity.
+**Q: How is model integrity planned?**
+The target anchors a model CID/hash on Kaspa and verifies downloaded IPFS bytes
+before use. This can provide tamper evidence for exact content, but does not
+prove model quality, upstream authenticity, authorization, availability,
+replication, or censorship resistance. The distribution path is not deployed.
 
 **Q: What exactly does Prometheus develop vs. what does it reuse?**
 
@@ -308,14 +294,11 @@ Reused (existing open source):
 - Kaspa blockchain infrastructure (kaspanet)
 - YARA rule engine (VirusTotal)
 
-Developed by Prometheus:
-- Security fine-tuning pipeline (LoRA on malware datasets)
-- YARA generation prompts and validation logic
-- Fed-DART integration and coordinator rotation
-- Model distribution via IPFS with on-chain hash verification
-- The complete protocol connecting all components
-- 6 Silverscript smart contracts
-- Rust light client, Python guardian node, Rust validator node
+Implemented/tested foundations include contract state machines, Rust Light
+Client and validator components, Python Guardian boundaries, compile-only YARA-X
+validation, and bounded transport/integration tests. Fine-tuning, real model
+execution, Fed-DART operation, IPFS model distribution, actionable rules, and a
+complete production protocol remain planned or blocked.
 
 This is software engineering and ML engineering — not AI research.
 The distinction matters: we are not reinventing the wheel.
