@@ -4150,3 +4150,34 @@ No direct `main` push or production action occurred.
   deployment, product code, contract, source fixture, production system or
   audit-PR mutation occurred.
 - **Status:** `SEC-DOC-1 Complete local PASS / Protected PR next`.
+### 2026-08-13 14:36 EEST - Python dependency audit fail-closed fix started
+
+- A secret-free static review and an independent Kimi K3 review confirmed that
+  the current multi-manifest `pip-audit` shell command does not propagate a
+  failing child audit to the workflow exit status.
+- Scope is limited to the Security Audit workflow: discover tracked Python
+  requirement/constraint manifests deterministically, audit every discovered
+  file, and return nonzero if any audit fails. No dependency version, product
+  code, public finding detail, production system or external PR is changed.
+- Sol owns the patch and complete validation. Kimi's contribution is read-only;
+  it changed no files and reported generic CI/documentation hardening only.
+- **Status:** `SEC-CI-1 In Progress / Local workflow fix next`.
+
+### 2026-08-13 15:08 EEST - SEC-CI-1 local verification PASS
+
+- Replaced the non-propagating multi-file `find -exec` audit with one
+  deterministic tracked-manifest list in `RUNNER_TEMP`. A failed discovery now
+  fails under the Actions shell, an empty list exits cleanly, every listed
+  manifest is audited, and any failed audit produces final exit status 1.
+- PASS: mixed root/nested fixture audited 2/2 and returned 1 after one simulated
+  failure; current repository success fixture audited 1/1 and returned 0;
+  empty-repository fixture returned the expected no-manifest path; workflow
+  YAML parsed; `git diff --check`; all eight Memory Integrity checks.
+- Kimi K3's independent read-only diff review found no P0/P1/P2 and approved
+  the fail-closed semantics under GitHub Actions bash. Sol accepted its
+  theoretical process-substitution P3 by materializing the list before the
+  loop; the exact real `pip-audit==2.10.1` run remains for protected CI because
+  the tool is not installed in the local environment.
+- No dependency versions, product code, public finding details, infrastructure,
+  production systems or external GitHub state changed.
+- **Status:** `SEC-CI-1 Complete local PASS / Commit and protected PR pending`.
