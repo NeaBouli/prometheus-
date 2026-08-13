@@ -2531,3 +2531,17 @@ synthetic baseline is 10 TP/0 FP/10 TN/0 FN at exact 10000-bps thresholds.
 No real sample, file/process scan, governed worker/outbox/result wiring, model,
 transport, disclosure, submission, wallet, signing, chain, reward, deployment,
 production-quality certification, or production authority is added.
+
+## 2026-08-13 - GH-177 protected merge and exact-main audit
+
+**Result:** PASS. Feature PR #178 passed every protected context at reviewed
+head `c20340c1253f9d732e84334006ae0ed91cd3f441` with no review threads and
+squash-merged normally as exact main
+`396d34793414add284d450f9b53d40ae287aaa4f`. Issue #177 closed and the remote
+feature branch was deleted.
+
+Exact-main Prometheus CI `31658560850`, Security Audit `31658560811`, and Pages
+`31658560331` pass. Cache-busted live readback confirms that GitHub Pages serves
+the GH-177 feature content. This documentation-only closeout reconciles the
+public and internal status surfaces; it changes no product behavior, rollout
+estimate, external effect, or production authority.

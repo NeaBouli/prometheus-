@@ -3588,6 +3588,33 @@ Rules for all dev agents:
   production action is in scope.
 - Status: `In Progress / Implementation next`.
 
+## 2026-08-13 04:46 EEST - GH-177 protected merge and docs closeout
+
+- PR #178 passed all protected contexts at exact reviewed head `c20340c` with
+  no review threads and squash-merged normally as exact main `396d347`; issue
+  #177 closed and the remote feature branch was deleted.
+- Exact-main CI `31658560850`, Security `31658560811`, and Pages `31658560331`
+  pass. Cache-busted live Pages readback confirms the feature content is
+  deployed.
+- README, Whitepaper, Roadmap, FAQ, homepage, `llms.txt`, Guardian docs, Memory,
+  Bridge and this Action Log are being reconciled in a documentation-only
+  protected closeout. Rollout estimates stay core 84-88% and complete vision
+  50-55%.
+- No product behavior, real sample, model, network, wallet, chain, deployment,
+  actionable authority or production certification changes.
+- Status: `Done / Exact-main verified / Docs closeout local verification next`.
+
+## 2026-08-13 04:58 EEST - GH-177 docs closeout local PASS
+
+- Synchronized public/internal status to PR #178 exact main `396d347` and its
+  successful CI/Security/Pages evidence without changing readiness estimates.
+- Kimi K3 review found no P0/P1/P2. Its two P3 consistency notes were fixed:
+  completed Roadmap styling and explicit non-production-deployment wording.
+- PASS: Memory Integrity, six Autodidactic tests, H-001 evidence verifier plus
+  four tests, HTML/JSON-LD parsing, exact HTML workflow checks, GH-177 markers,
+  documentation-only scope, and diff hygiene.
+- Status: `Docs closeout local PASS / Protected PR next`.
+
 ## 2026-08-13 - GH-177 complete local PASS
 
 - Integrated the isolated synthetic YARA-X evaluator, 20-case deterministic
