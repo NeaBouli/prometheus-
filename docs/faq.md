@@ -74,6 +74,14 @@ authority. PR #174 published exact main `1107b11`; CI `31654308969`, Security
 `31654308964`, and Pages `31654308875` pass. Real privacy-reviewed
 semantic/actionable quality remains open.
 
+GH-177 is currently a locally verified, unmerged evidence candidate. It scans
+only 20 deterministically generated synthetic in-memory buffers with one fixed
+rule and records an authority-`none` canonical report with exact false-positive
+and false-negative metrics. It is structurally isolated from every governed
+worker, result, submission, wallet, chain, and deployment path. Passing this
+synthetic gate is regression evidence only, not real-world detection quality,
+actionable-rule approval, calibration, certification, or production authority.
+
 **Q: What happens with a false positive?**
 Affected users report the false detection. The signed metrics-oracle
 pipeline reports the bounded false positive rate on-chain.

@@ -3924,3 +3924,54 @@ No direct `main` push or production action occurred.
   append-only audit record. No product behavior, readiness estimate, wallet,
   signing, chain, deployment or production authority changed.
 - **Status:** `GH-173 Done / Public docs and exact-main closeout verified`.
+
+### 2026-08-13 - GH-177 synthetic YARA semantic-quality gate started
+
+- Created issue #177 and branch `feat/GH-177-synthetic-yara-quality` from clean
+  exact main `a508339cb40815b262923b1dab8ee313da609cce`.
+- Scope is one standalone offline evaluator over bounded, deterministically
+  generated synthetic in-memory byte buffers and exact expected match labels.
+  It may use the pinned YARA-X scan API only inside that isolated evidence
+  module and must emit a closed canonical report bound to corpus, policy,
+  implementation and engine version with exact false-positive/false-negative
+  metrics.
+- Existing GH-170/GH-173 modules stay unchanged. The evaluator accepts no path,
+  file, process, network or private input and is not imported by worker, outbox,
+  result, model, transport, submission, wallet, chain, reward or deployment
+  paths. Authority remains `none`; synthetic evidence is not production
+  detection-quality certification.
+- Kimi K3 completed the initial secret-free read-only architecture review and
+  recommends proceeding with structural import isolation, synthetic-only corpus
+  construction, bounded resources, canonical byte-identical reports and stable
+  redacted failure behavior. Sol owns schema/security decisions, every accepted
+  write, integration, full verification, GitHub and closure.
+- **Status:** `GH-177 In Progress / Bridge recorded / Implementation next`.
+
+### 2026-08-13 - GH-177 complete local verification PASS
+
+- Added one standalone stdlib-plus-YARA-X evaluator, a 20-case closed synthetic
+  recipe corpus, strict authority-`none` policy, canonical expected report and
+  integrity manifest. It compiles one fixed GH-173-shaped rule and scans only
+  transient derived in-memory bytes; no path/process scan or governed/external
+  effect path imports the module.
+- The exact baseline is TP 10, FP 0, TN 10, FN 0 with precision, recall and
+  specificity at 10000 bps. Report bytes bind the exact corpus, policy,
+  evaluator implementation, YARA-X 1.4.0 engine version, rule digest and
+  metrics. It is synthetic regression evidence only, never real-world quality
+  certification or actionable/production authority.
+- Kimi K3 implemented the bounded core after a secret-free read-only design
+  review. Sol reviewed every write and fixed two P1 pre-commit integrity gaps:
+  directly constructed payloads now rederive from fully revalidated segments,
+  and direct corpus/policy objects reconstruct to their exact canonical hashes.
+  Kimi's independent final review reports no remaining P0/P1/P2 finding.
+- PASS: 26 focused tests; Guardian 1295 passed/4 intentional live-model skips;
+  Black; changed-source Pylint 10.00/10; full Guardian Pylint 9.85/10; Pip
+  Audit; Rustfmt, warning-free Clippy and full workspace tests; Cargo Audit with
+  no known vulnerability and eight allowed existing warnings; Memory Integrity;
+  six Autodidactic tests; structured-data, diff and public-status hygiene.
+- README, Whitepaper, Roadmap, FAQ, homepage, `llms.txt`, Guardian docs and
+  Memory now label GH-177 as a local candidate. Rollout estimates remain core
+  84-88% and complete vision 50-55%.
+- No real sample, model, network, disclosure, submission, wallet, signing,
+  chain, reward, deployment or production action occurred.
+- **Status:** `GH-177 Complete local PASS / Protected PR next`.

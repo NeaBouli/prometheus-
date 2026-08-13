@@ -1360,3 +1360,23 @@ authenticity, the weights loaded by an already-running service, semantic
 quality, calibration, and production authority remain open. No model was run
 or downloaded. Rollout estimates remain H-001 96%, core 84-88%, and complete
 roadmap vision 50-55%.
+
+## GH-177 SYNTHETIC YARA SEMANTIC-QUALITY LOCAL PASS (2026-08-13)
+
+```text
+Status: complete local candidate PASS; protected PR/CI/merge pending
+Baseline: a508339cb40815b262923b1dab8ee313da609cce
+Scope: standalone authority-none offline evaluator; one fixed GH-173-shaped
+       rule; 20 deterministic synthetic in-memory payloads; no governed wiring
+Evidence: exact corpus/policy/evaluator/engine/rule/report bindings; baseline
+          TP=10 FP=0 TN=10 FN=0; precision/recall/specificity=10000 bps
+Tests: 26 focused; Guardian 1295 pass/4 skip; Black; Pylint 10.00/9.85;
+       Pip Audit; Rust fmt/clippy/workspace; Cargo Audit allowed warnings only;
+       Memory/Autodidactic/structured-data/diff checks
+Review: Sol fixed direct-payload/segment and corpus/policy-hash forgery gaps;
+        Kimi final review reports no remaining P0/P1/P2
+Boundary: synthetic regression evidence only; no real sample, file/process scan,
+          worker/outbox/result/model/transport/submission/wallet/chain/reward/
+          deployment path, actionable authority, or production certification
+Estimates: unchanged; core 84-88%; complete vision 50-55%
+```

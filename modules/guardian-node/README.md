@@ -563,6 +563,22 @@ remain readable; governed acceptance uses schema v5 but enqueues and records
 permanent identity pairing only when promotion explicitly enables the durable
 outbox.
 
+### Synthetic YARA semantic-quality evidence
+
+`jaeger.yara_semantic_quality` is a standalone GH-177 offline evaluator. It
+compiles one fixed synthetic GH-173-shaped rule with exact-pinned YARA-X and
+scans only bounded bytes reconstructed in memory from a closed deterministic
+recipe corpus. The canonical report binds the exact corpus, policy, evaluator
+module bytes, engine version, rule digest, confusion counts, and
+precision/recall/specificity. Authority is fixed to `none`.
+
+The module is not imported by the governed worker, outbox, result schema,
+model, transport, submission, wallet, chain, reward, or deployment paths. It
+accepts no scan path or process and persists neither rule source nor payload
+bytes. Its synthetic baseline is regression evidence only; it does not prove
+real-world semantic quality, privacy safety, actionable-rule approval,
+calibration, certification, or production readiness.
+
 ### ThreatHint-v2 transport ingress substrate
 
 `jaeger.threat_hint_v2_transport` parses the shared canonical transport frame

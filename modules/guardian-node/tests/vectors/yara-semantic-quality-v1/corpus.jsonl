@@ -1,0 +1,21 @@
+{"schema_version":1,"evidence_kind":"synthetic_offline","authority":"none","disclaimer":"Synthetic offline evaluation only; not production detection quality, adversarial robustness, certification, or authorization.","corpus_id":"yara-semantic-quality-corpus-v1"}
+{"case_id":"case-001","expected_match":true,"segments":[{"kind":"fill","value":32,"count":64},{"kind":"ascii","text":"PROM-SYNTH-177-ALPHA"},{"kind":"fill","value":32,"count":32}]}
+{"case_id":"case-002","expected_match":false,"segments":[{"kind":"ascii","text":"PROM-SYNTH-177-ALPHB"},{"kind":"fill","value":32,"count":16}]}
+{"case_id":"case-003","expected_match":true,"segments":[{"kind":"hex","value":"50524f4d2d3137372d42455441001f"},{"kind":"fill","value":0,"count":16}]}
+{"case_id":"case-004","expected_match":false,"segments":[{"kind":"ascii","text":"prom-synth-177-alpha"},{"kind":"fill","value":65,"count":8}]}
+{"case_id":"case-005","expected_match":true,"segments":[{"kind":"digest_walk","seed":7,"count":128},{"kind":"ascii","text":"PROM-SYNTH-177-ALPHA"},{"kind":"digest_walk","seed":8,"count":32}]}
+{"case_id":"case-006","expected_match":false,"segments":[{"kind":"ascii","text":"PROM-SYNTH-177-ALPH"},{"kind":"fill","value":32,"count":4}]}
+{"case_id":"case-007","expected_match":true,"segments":[{"kind":"hex","value":"50524f4d2d3137372d42455441001f"}]}
+{"case_id":"case-008","expected_match":false,"segments":[{"kind":"digest_walk","seed":1,"count":1024}]}
+{"case_id":"case-009","expected_match":true,"segments":[{"kind":"ascii","text":"PROM-SYNTH-177-ALPHA"},{"kind":"fill","value":32,"count":24}]}
+{"case_id":"case-010","expected_match":false,"segments":[{"kind":"ascii","text":"PROM-SYNTH-177-AL"},{"kind":"fill","value":88,"count":1},{"kind":"ascii","text":"PHA"}]}
+{"case_id":"case-011","expected_match":true,"segments":[{"kind":"ascii","text":"hdr"},{"kind":"ascii","text":"PROM-SYNTH-177-ALPHA"},{"kind":"hex","value":"50524f4d2d3137372d42455441001f"}]}
+{"case_id":"case-012","expected_match":false,"segments":[{"kind":"hex","value":"50524f4d2d3137372d42455441001e"},{"kind":"fill","value":0,"count":8}]}
+{"case_id":"case-013","expected_match":true,"segments":[{"kind":"fill","value":127,"count":2000},{"kind":"ascii","text":"PROM-SYNTH-177-ALPHA"},{"kind":"fill","value":127,"count":2000}]}
+{"case_id":"case-014","expected_match":false,"segments":[{"kind":"fill","value":0,"count":512}]}
+{"case_id":"case-015","expected_match":true,"segments":[{"kind":"digest_walk","seed":42,"count":256},{"kind":"hex","value":"50524f4d2d3137372d42455441001f"},{"kind":"digest_walk","seed":43,"count":64}]}
+{"case_id":"case-016","expected_match":false,"segments":[{"kind":"hex","value":"51524f4d2d3137372d42455441001f"},{"kind":"ascii","text":"tail"}]}
+{"case_id":"case-017","expected_match":true,"segments":[{"kind":"fill","value":65,"count":100},{"kind":"hex","value":"50524f4d2d3137372d42455441001f"},{"kind":"ascii","text":"tail"}]}
+{"case_id":"case-018","expected_match":false,"segments":[{"kind":"ascii","text":"PROM SYNTH 177 ALPHA"}]}
+{"case_id":"case-019","expected_match":true,"segments":[{"kind":"digest_walk","seed":99,"count":512},{"kind":"ascii","text":"PROM-SYNTH-177-ALPHA"},{"kind":"digest_walk","seed":100,"count":512}]}
+{"case_id":"case-020","expected_match":false,"segments":[{"kind":"digest_walk","seed":2,"count":2048},{"kind":"ascii","text":"PROM-SYNTH-177"}]}
