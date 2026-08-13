@@ -2495,3 +2495,11 @@ authority is added. Current evidence is 61 focused tests and 1269 full Guardian
 tests with 4 intentional live-model skips, Black clean, changed-source Pylint
 10.00/10, and complete local repository gates except locally unavailable Docker
 Compose rendering and Actionlint; protected CI remains authoritative for both.
+
+## 2026-08-13 - GH-173 protected merge and exact-main audit
+
+**Result:** PASS. PR #174 merged normally as exact main `1107b11`; issue #173
+closed and the remote feature branch was deleted. All review threads are
+resolved. Exact-main Prometheus CI `31654308969`, Security Audit `31654308964`,
+and Pages `31654308875` pass. No rollout estimate or production authority
+changed.

@@ -3894,3 +3894,19 @@ No direct `main` push or production action occurred.
   The later local-PASS entry supersedes it and records the final nonce-bound
   candidate-binding contract; the review thread will be answered accordingly.
 - **Status:** `Review fixes local / Commit, resolve threads and protected recheck next`.
+
+### 2026-08-13 03:28 EEST - GH-173 merged and exact-main verified
+
+- PR #174 passed all ten protected contexts at exact reviewed head `0478550`;
+  both inline threads are answered and resolved. It squash-merged normally as
+  exact main `1107b11831dfd9a3a9205d4edc4bb4404e42b343`; issue #173 closed and
+  the remote feature branch was deleted.
+- Exact-main Prometheus CI `31654308969`, Security Audit `31654308964`, and
+  Pages `31654308875` pass. The deterministic draft remains owner-local,
+  compile-only and explicitly non-actionable.
+- README, Whitepaper, Roadmap, FAQ, homepage, `llms.txt`, protocol docs, Memory,
+  Bridge and Action Log are being reconciled from local-candidate wording to
+  exact-main evidence in this documentation-only closeout.
+- No product behavior, rollout estimate, model, scan, submission, disclosure,
+  wallet, signing, chain, reward, deployment or production authority changed.
+- **Status:** `GH-173 Done / Exact-main verified / Docs closeout local candidate`.

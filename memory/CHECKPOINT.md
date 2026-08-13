@@ -1010,3 +1010,11 @@ Leistungsbasierte Emission. Guardians = "Miner" (KI statt GPU).
   reward, deployment, semantic-quality claim, actionable rule, or production
   authority is added.
 - **Status:** `GH-173 Complete local PASS / Independent review and protected CI next`.
+
+## Checkpoint 2026-08-13: GH-173 exact-main closeout
+
+- PR #174 passed all ten protected contexts after review fixes and merged as
+  exact main `1107b11831dfd9a3a9205d4edc4bb4404e42b343`; issue #173 closed.
+- Exact-main CI `31654308969`, Security `31654308964`, and Pages `31654308875`
+  pass. The public status closeout changes documentation only.
+- **Status:** `GH-173 Done / Exact-main verified / Docs closeout in progress`.

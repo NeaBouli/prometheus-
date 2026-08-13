@@ -109,13 +109,16 @@ errors, and compiler warnings, and discards the compiled object without calling
 any scan API. It performs no file, process, or data scan and grants no semantic,
 submission, publication, or production authority.
 
-GH-173 adds an optional deterministic governed-worker analyzer as a local review
-candidate. It maps already approved `api_import` and `byte_pattern` observables
+Merged and exact-main-verified GH-173 adds an optional deterministic governed-
+worker analyzer. It maps already approved `api_import` and `byte_pattern` observables
 to one bounded memory-only YARA draft, validates it only through the GH-170
 compile boundary, and returns only per-kind counts, a nonce-bound candidate
 binding SHA-256, and the compile verdict. File hashes are counted but never
 embedded. No source, model, confidence, scan, or downstream authority is
 exposed.
+
+PR #174 published exact main `1107b11`; Prometheus CI `31654308969`, Security
+Audit `31654308964`, and Pages `31654308875` pass.
 
 ## Offline Confidence Evaluation
 
