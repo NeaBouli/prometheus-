@@ -73,20 +73,28 @@ jobs:
         run: cargo audit
         timeout-minutes: 10
 
-      - name: Check for requirements.txt
-        id: check-pip
+      - name: pip audit
         run: |
-          if [ -f requirements.txt ] || find . -maxdepth 3 -name "requirements.txt" -print -quit | grep -q .; then
-            echo "has_pip=true" >> $GITHUB_OUTPUT
-          else
-            echo "has_pip=false" >> $GITHUB_OUTPUT
+          manifest_list="${RUNNER_TEMP}/prometheus-python-dependency-manifests"
+          git ls-files -z -- \
+            ':(glob)requirements*.txt' \
+            ':(glob)**/requirements*.txt' \
+            ':(glob)constraints*.txt' \
+            ':(glob)**/constraints*.txt' > "${manifest_list}"
+          if [ ! -s "${manifest_list}" ]; then
+            echo "No tracked Python dependency manifests found."
+            exit 0
           fi
 
-      - name: pip audit
-        if: steps.check-pip.outputs.has_pip == 'true'
-        run: |
           python -m pip install pip-audit==2.10.1
-          find . -maxdepth 3 -name "requirements.txt" -exec pip-audit -r {} \;
+          status=0
+          while IFS= read -r -d '' manifest; do
+            echo "Auditing ${manifest}"
+            if ! python -m pip_audit -r "${manifest}"; then
+              status=1
+            fi
+          done < "${manifest_list}"
+          exit "${status}"
         timeout-minutes: 10
 
   security-summary:
