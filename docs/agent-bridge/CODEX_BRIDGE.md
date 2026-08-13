@@ -4258,3 +4258,24 @@ No direct `main` push or production action occurred.
   remain required. No direct-main push, production action, audit-detail
   disclosure, wallet/chain action, or security-policy change occurred.
 - **Status:** `PROMETHEUS-DOC-CLAIMS-20260814 Local PASS / Commit and protected PR next`.
+
+## 2026-08-14 - Public claim reconciliation merged and exact-main verified
+
+- PR #188 passed all eleven attached protected contexts at exact reviewed head
+  `66bdac0d56e7c891235c4b88884be015cd706e0a`; CodeRabbit was rate-limited but
+  its required context passed, and the PR had zero review threads.
+- PR #188 squash-merged normally without admin bypass as exact main
+  `5416b493ad24c2733f50add5bd76825e2e83a433`; issue #187 is closed and the
+  remote feature branch was deleted.
+- Exact-main Prometheus CI `31751277505`, Security Audit `31751277513`, and
+  Pages `31751277037` pass. The HTML Pages job exercised the new synchronized
+  public-claims gate; hosted `index`, Whitepaper, FAQ, Roadmap and Guardian
+  economics pages plus the commit-pinned README expose the reconciled markers.
+- Public status now distinguishes development/test evidence, the one
+  non-promotable Testnet-10 canary, no proven production protocol deployment,
+  planned target architecture, and blocked/unproven gates. The private-operator
+  audit release gate and every production rollout gate remain active.
+- No product code, contract behavior, tokenomics, security policy, wallet,
+  chain, deployment, infrastructure, secret, private audit detail, direct-main
+  push, admin bypass, or destructive Git action occurred.
+- **Status:** `PROMETHEUS-DOC-CLAIMS-20260814 Done / Exact-main and live Pages verified`.
