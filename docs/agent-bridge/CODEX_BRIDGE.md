@@ -4093,3 +4093,27 @@ No direct `main` push or production action occurred.
   remains valid because the review hardening changed only test imports and
   append-only documentation; no product source changed.
 - **Status:** `GH-180 Complete local + independent review PASS / Protected PR next`.
+
+### 2026-08-13 06:00 EEST - PR #181 review fixes in progress
+
+- PR #181 exact initial head `902ac95` passed all eleven reported protected
+  contexts. CodeRabbit then opened two minor documentation threads and supplied
+  three non-blocking test-quality nits; no security or product finding exists.
+- Sol accepted all five: public evidence uses one explicit Guardian pass/skip
+  phrase, the in-progress TODO moved out of the completed section, SQLite test
+  handles close deterministically, the injected trigger uses the single marker
+  constant, and worker-thread failures propagate to the main test thread.
+- Local post-fix verification and a refreshed exact-head protected run are
+  required before resolving the two threads and merging.
+- **Status:** `GH-180 Review fixes local / Verification next`.
+
+### 2026-08-13 06:04 EEST - PR #181 review fixes local PASS
+
+- All five accepted CodeRabbit improvements are implemented. Post-fix results:
+  8/8 new tests, exact adjacent 171/171, full Guardian 1303 passed/4 intentional
+  live-model skips, Black and test-file Pylint 10.00/10.
+- Memory Integrity, six Autodidactic tests, HTML/JSON-LD parsing, canonical
+  public pass/skip wording, TODO placement and `git diff --check` pass.
+- No product source or runtime authority changed. The fix commit, refreshed
+  protected checks and thread resolution are next.
+- **Status:** `GH-180 Review fixes PASS / Push and protected recheck next`.

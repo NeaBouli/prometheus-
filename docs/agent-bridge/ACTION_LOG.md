@@ -3635,6 +3635,23 @@ Rules for all dev agents:
   hygiene pass. No product source changed.
 - Status: `Complete local + review PASS / Protected PR next`.
 
+## 2026-08-13 06:00 EEST - PR #181 review fixes
+
+- Initial exact head `902ac95` passed eleven protected contexts. CodeRabbit
+  found two minor docs inconsistencies and three test-quality nits.
+- Accepted all five: canonical pass/skip wording, active TODO placement,
+  explicit SQLite close/commit, one failure-marker source, and propagated
+  thread exceptions. No product or security defect was found.
+- Status: `Review fixes local / Verification next`.
+
+## 2026-08-13 06:04 EEST - PR #181 review fixes PASS
+
+- All five accepted review improvements pass 8 new, 171 adjacent and full
+  Guardian 1303 passed/4 intentional skips, Black and Pylint 10.00/10.
+- Memory, Autodidactic, HTML/JSON-LD, wording/TODO and diff checks pass. No
+  product source changed.
+- Status: `Review fixes PASS / Protected recheck next`.
+
 ## 2026-08-13 04:46 EEST - GH-177 protected merge and docs closeout
 
 - PR #178 passed all protected contexts at exact reviewed head `c20340c` with

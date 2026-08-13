@@ -25,6 +25,7 @@ error messages.
 
 from __future__ import annotations
 
+from contextlib import closing
 import hashlib
 import json
 import os
@@ -420,18 +421,22 @@ async def test_concurrent_duplicate_submissions_have_exactly_one_durable_winner(
     ledger = _ledger_path(scenario)
     barrier = threading.Barrier(2)
     outcomes: List[str] = []
+    failures: List[Exception] = []
 
     def attempt() -> None:
-        barrier.wait(timeout=5)
-        deadline = time.monotonic() + 15
-        while True:
-            ack = ingress.process(wire)
-            if ack.status != "busy":
-                outcomes.append(ack.status)
-                return
-            if time.monotonic() > deadline:
-                raise AssertionError("duplicate submission stayed busy")
-            time.sleep(0.02)
+        try:
+            barrier.wait(timeout=5)
+            deadline = time.monotonic() + 15
+            while True:
+                ack = ingress.process(wire)
+                if ack.status != "busy":
+                    outcomes.append(ack.status)
+                    return
+                if time.monotonic() > deadline:
+                    raise AssertionError("duplicate submission stayed busy")
+                time.sleep(0.02)
+        except Exception as error:  # pylint: disable=broad-exception-caught
+            failures.append(error)
 
     threads = [threading.Thread(target=attempt) for _ in range(2)]
     for thread in threads:
@@ -440,6 +445,8 @@ async def test_concurrent_duplicate_submissions_have_exactly_one_durable_winner(
         thread.join(timeout=30)
 
     assert all(not thread.is_alive() for thread in threads)
+    if failures:
+        raise failures[0]
     assert sorted(outcomes) == ["accepted", "rejected"]
     assert _consumption_count(ledger) == 1
     assert len(_outbox_rows(ledger)) == 1
@@ -523,14 +530,15 @@ async def test_injected_completion_failure_rolls_back_and_recovers(
     ingress, _resolver = _make_ingress(scenario)
     assert ingress.process(_transport_wire(scenario)).status == "accepted"
     ledger = _ledger_path(scenario)
-    with sqlite3.connect(ledger) as connection:
-        connection.execute("""
+    with closing(sqlite3.connect(ledger)) as connection:
+        connection.execute(f"""
             CREATE TRIGGER reject_result_insert
             BEFORE INSERT ON observable_analysis_results
             BEGIN
-                SELECT RAISE(ABORT, 'synthetic-completion-failure-marker');
+                SELECT RAISE(ABORT, '{_COMPLETION_FAILURE_MARKER}');
             END
             """)
+        connection.commit()
 
     failing_worker = _make_worker(scenario, lease_seconds=10)
     with pytest.raises(ObservableApprovalOutboxError) as exc_info:
@@ -543,8 +551,9 @@ async def test_injected_completion_failure_rolls_back_and_recovers(
     assert _consumption_count(ledger) == 1
     assert len(_pairing_rows(ledger)) == 1
 
-    with sqlite3.connect(ledger) as connection:
+    with closing(sqlite3.connect(ledger)) as connection:
         connection.execute("DROP TRIGGER reject_result_insert")
+        connection.commit()
     recovered = _make_worker(scenario)
     completion = await recovered.process_next(current_time=scenario.current_time + 10)
     assert completion is not None

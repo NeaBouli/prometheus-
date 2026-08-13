@@ -173,6 +173,7 @@
 - [ ] [P2] Sybil resistance final design: KAS/PROM stake per Guardian identity OR hardware ZK-fingerprint | Architect decision needed
 - [ ] [P3] Evaluate PLONK vs Groth16 for Light Client ZK-proofs | Claude Code | Post hardfork
 - [ ] [P3] YARA-specialized 8B fine-tuning on CVE/YARA datasets only | Claude Code | Sprint 12
+- [~] [P1] GH-180 deterministic offline ThreatHint-v2 pipeline integration gate | Codex Sol + Kimi K3 | Local candidate composes canonical synthetic transport through real ingress, governed promotion, schema-v5 atomic outbox, bounded worker, and durable non-actionable result; 8 new and 171 adjacent tests pass; 1303 Guardian tests passed and 4 intentional live-model tests skipped; protected PR/CI/merge/exact-main verification pending
 
 ---
 
@@ -266,4 +267,3 @@
 - [x] [P1] GH-161 derive Guardian candidate model digest from exact owner-local artifacts | Codex Sol + Kimi K3 | PR #162 merged as exact main `d468426`; CI `31340112225`, Security `31340112204`, and Pages `31340111625` pass; canonical manifest and capture-time re-verification only, no upstream authenticity or production model authority
 - [x] [P1] GH-167 bounded ThreatHint-v2 repository transport substrate | Codex Sol + Kimi K3 | PR #168 merged normally as exact main `7c62608`; CI `31645624623`, Security `31645624601`, and Pages `31645623547` pass. Exact Rust/Python framing, independent libp2p v2 channel, owner-only ingress, trusted network/session/time revalidation, bounded acknowledgements/budgets, adversarial corpus, and separate-process same-host evidence are merged and live. Production proof approval, semantic/actionable analysis, disclosure, operated public multi-host evidence, model/YARA, wallet, chain, reward, and deployment remain separate gates
 - [x] [P1] GH-177 isolated synthetic YARA semantic-quality gate | Codex Sol + Kimi K3 | PR #178 merged as exact main `396d347`; CI `31658560850`, Security `31658560811`, and Pages `31658560331` pass after a 20-case deterministic in-memory corpus, exact corpus/policy/evaluator/engine binding, strict authority-none report, 26 focused and 1295/4 full Guardian tests, complete gates and no-finding final review
-- [~] [P1] GH-180 deterministic offline ThreatHint-v2 pipeline integration gate | Codex Sol + Kimi K3 | Local candidate composes canonical synthetic transport through real ingress, governed promotion, schema-v5 atomic outbox, bounded worker, and durable non-actionable result; 8 new, 171 adjacent, and 1303/4 full Guardian cases pass; protected PR/CI/merge/exact-main verification pending

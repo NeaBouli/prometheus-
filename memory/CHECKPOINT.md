@@ -1029,7 +1029,8 @@ Leistungsbasierte Emission. Guardians = "Miner" (KI statt GPU).
 - Exact identity bindings, malformed/oversized rejection, replay/restart,
   duplicate concurrency, lease recovery, redacted analyzer failure, and
   transactional completion rollback are proven.
-- PASS: 171 adjacent; Guardian 1303/4; Black; Pylint 10.00/9.85; Pip Audit;
+- PASS: 171 adjacent tests; 1303 Guardian tests passed and 4 intentional
+  live-model tests skipped; Black; Pylint 10.00/9.85; Pip Audit;
   Rust fmt/Clippy/workspace; Cargo Audit allowed warnings only; Memory and six
   Autodidactic tests.
 - No product runtime, GH-177 pipeline import, real sample, network, model, scan,
