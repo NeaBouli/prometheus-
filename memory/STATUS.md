@@ -14,10 +14,11 @@ Start:    2026-07-08
 Goal:     Complete the non-promotable H-001 canary, then the full state-contract, oracle, ZK, P2P, and release-evidence path.
 ```
 
-## GH-173 DETERMINISTIC NON-ACTIONABLE SEMANTIC DRAFT LOCAL CANDIDATE (2026-08-13)
+## GH-173 DETERMINISTIC NON-ACTIONABLE SEMANTIC DRAFT MERGED / EXACT-MAIN VERIFIED (2026-08-13)
 
 ```text
-Status: In progress; issue #173 and protected feature branch open
+Status: Done; PR #174 merged normally and issue #173 closed
+Exact main: 1107b11831dfd9a3a9205d4edc4bb4404e42b343
 Scope: optional governed-worker analyzer derives one bounded memory-only YARA
        draft from already approved api_import/byte_pattern observables; GH-170
        compile-only validation; atomic v2 result stores exact bindings, kind
@@ -26,7 +27,8 @@ Scope: optional governed-worker analyzer derives one bounded memory-only YARA
 Evidence: 61 focused derivation/result tests and 1269 full Guardian tests with
           4 intentional live-model skips pass; changed-source Black clean and
           Pylint 10.00/10; Kimi authored the pure derivation slice and its
-          independent final review is in progress; protected CI remains
+          independent final review passed with no P0-P2; CI 31654308969,
+          Security 31654308964 and Pages 31654308875 pass
 Boundary: file hashes are count-only; no source/model/confidence/should_submit,
           scan, disclosure, publication, wallet, chain, reward, deployment,
           semantic-quality claim, actionable rule, or production authority

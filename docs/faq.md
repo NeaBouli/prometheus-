@@ -64,14 +64,15 @@ production operation remain separate gates. PR #171 published exact main
 `8d8e29c`; CI `31650123073`, Security `31650123055`, and Pages `31650122593`
 pass.
 
-GH-173 is a local review candidate that composes this boundary with the governed
-v2 worker. It deterministically derives one memory-only draft from already
+Merged and exact-main-verified GH-173 composes this boundary with the governed v2
+worker. It deterministically derives one memory-only draft from already
 approved local API-import and byte-pattern observables, then stores only exact
 bindings, per-kind counts, a nonce-bound candidate-binding digest, and compile
 status in an explicitly non-actionable result. It invokes no model, persists no
 rule source, scans nothing, and grants no submission, publication, or production
-authority. Protected merge and real privacy-reviewed semantic/actionable quality
-remain open.
+authority. PR #174 published exact main `1107b11`; CI `31654308969`, Security
+`31654308964`, and Pages `31654308875` pass. Real privacy-reviewed
+semantic/actionable quality remains open.
 
 **Q: What happens with a false positive?**
 Affected users report the false detection. The signed metrics-oracle

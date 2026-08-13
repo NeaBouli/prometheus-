@@ -68,8 +68,8 @@ non-actionable worker to a model or YARA generator, scan any data, establish
 semantic quality, or authorize an actionable result, disclosure, submission,
 publication, or production operation.
 
-GH-173 is a separate local candidate pending protected merge. It adds one
-deterministic governed-worker analyzer that turns already approved local
+Merged and exact-main-verified GH-173 adds one deterministic governed-worker
+analyzer that turns already approved local
 `api_import` and `byte_pattern` values into a bounded memory-only draft, reuses
 the GH-170 compile-only boundary, and atomically records only exact input
 bindings, per-kind counts, a nonce-bound candidate-binding SHA-256, and compile
@@ -77,6 +77,9 @@ status. File hashes are count-only, the source is never persisted, schema-v1
 results remain readable, and the result has no model, confidence,
 `should_submit`, scan, disclosure, publication, chain, reward, deployment, or
 production authority.
+
+PR #174 published exact main `1107b11`; Prometheus CI `31654308969`, Security
+Audit `31654308964`, and Pages `31654308875` pass.
 
 A separate merged local Rust `verify-v2` boundary closes the mechanical proof
 verification step. It owner-loads retained canonical manifest bytes plus fixed

@@ -3619,3 +3619,13 @@ Rules for all dev agents:
 - Retained the pre-hardening kickoff statement as append-only audit history; the
   later authoritative block already records the final nonce-bound binding.
 - Status: `Review fixes local / Protected recheck next`.
+
+## 2026-08-13 03:28 EEST - GH-173 protected merge and docs closeout
+
+- PR #174 exact head `0478550` passed all ten protected contexts with both
+  review threads resolved and squash-merged as exact main `1107b11`; issue #173
+  closed and its remote feature branch was deleted.
+- Exact-main CI `31654308969`, Security `31654308964`, and Pages `31654308875`
+  pass. Current public/internal status surfaces now record that evidence without
+  changing readiness percentages or production authority.
+- Status: `Done / Exact-main verified / Docs closeout local PASS next`.
