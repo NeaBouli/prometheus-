@@ -400,7 +400,7 @@ All sprints 0-7 ACCEPTED. Feature-complete.
 Pre-Hardfork Audit completed 2026-04-02: 0 CRITICAL, 2 HIGH, 2 MEDIUM, 3 LOW.
 H-002 (PATTERN-010) FIXED in 6347b85 (Arc<Phi3Model>).
 Kaspa Toccata status researched 2026-07-07; Rusty-Kaspa v2.0.0 scheduled mainnet activation at DAA 474,165,565 (~2026-06-30 16:15 UTC).
-Sandbox access check: direct `ssh sandbox` currently fails public-key authentication, while `ssh hub-sandbox` succeeds through the existing Hetzner ProxyJump as user `deploy`. The reachable deploy account currently exposes Docker but not `kaspad`, `silverc`, `ssc`, `kaspa-cli`, Node.js, or Cargo in PATH.
+Private operator access check recorded different availability states for direct and compatibility paths. Topology, account and host-tool inventory are intentionally omitted; this is not deployment evidence.
 Local upstream Silverscript check: `/tmp/prom-silverscript` `cargo test -p silverscript-lang` passed; `silverc --help` works.
 Repo H-001 fixture: `modules/contracts/silverc/ValidatorStakingH001.sil` plus `scripts/verify_silverc_h001.py` verifies explicit `vote_byte || byte[8](salt) || byte[8](block_height)` against Rust vectors at pinned Silverscript ref `d25bd3427a093c17327ca3d6b9e1aa5f7688c863`.
 Repo ValidatorStaking current-silverc state fixture: `modules/contracts/silverc/ValidatorStakingState.sil` compiles against the same pinned upstream `silverc`; the verifier builds covenant sigscripts for `commitVote`, `revealVote`, `slashInvalidReveal`, `requestWithdraw`, and `completeWithdraw`.
@@ -612,8 +612,8 @@ Local evidence: 38 Guardian P2P unit tests and three process tests; 211
 Boundary: advertised routes are operator metadata, not reachability proof or
           Guardian authorization; no wallet, signing, chain, reputation,
           KAS/PROM, slash ACL, or commit-reveal behavior changed
-External evidence: ssh sandbox reaches the host but public-key authentication
-                   is rejected, so real two-host evidence is not claimed
+External evidence: private operator access remained unavailable, so real
+                   two-host evidence is not claimed
 Remote evidence: Prometheus CI 29644233106, Security Audit 29644233098, and
                  Pages 29644232771 passed for exact main f2e52be
 ```
