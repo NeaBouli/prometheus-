@@ -3975,3 +3975,39 @@ No direct `main` push or production action occurred.
 - No real sample, model, network, disclosure, submission, wallet, signing,
   chain, reward, deployment or production action occurred.
 - **Status:** `GH-177 Complete local PASS / Protected PR next`.
+
+### 2026-08-13 04:46 EEST - GH-177 merged and exact-main verified
+
+- Feature PR #178 passed every protected context at exact reviewed head
+  `c20340c1253f9d732e84334006ae0ed91cd3f441` with no review threads, then
+  squash-merged normally as exact main
+  `396d34793414add284d450f9b53d40ae287aaa4f`; issue #177 closed and the
+  remote feature branch was deleted.
+- Exact-main Prometheus CI `31658560850`, Security Audit `31658560811`, and
+  Pages `31658560331` all completed successfully. Cache-busted live readback
+  confirms the GH-177 content is deployed, while its pre-merge candidate labels
+  correctly remain until this documentation-only closeout is published.
+- README, Whitepaper, Roadmap, FAQ, homepage, `llms.txt`, Guardian docs, Memory,
+  Bridge and Action Log are being reconciled to the verified merge evidence.
+  Rollout estimates remain core 84-88% and complete vision 50-55%.
+- No product behavior, real sample, file/process scan, model, network,
+  disclosure, submission, wallet, signing, chain, reward, deployment or
+  production authority changes in this closeout.
+- **Status:** `GH-177 Done / Exact-main verified / Docs closeout in progress`.
+
+### 2026-08-13 04:58 EEST - GH-177 documentation closeout local PASS
+
+- Reconciled all current public and internal status surfaces to feature PR #178,
+  exact main `396d347`, and its successful CI/Security/Pages evidence. Historical
+  candidate entries remain unchanged as append-only audit history.
+- Kimi K3 independently reviewed the secret-free documentation diff and found
+  no P0/P1/P2 issue. Sol accepted both P3 consistency notes: GH-177 now has the
+  completed Roadmap styling, and the principal public surfaces explicitly state
+  that the merged evaluator is not production-deployed.
+- PASS: Memory Integrity; six Autodidactic tests; H-001 public closeout verifier
+  and four tests; five-page HTML parsing; JSON-LD parsing; exact HTML workflow
+  checks; GH-177 merge/boundary markers; documentation-only file scope; and
+  `git diff --check`.
+- No product behavior, rollout estimate, external runtime, wallet, signing,
+  chain, deployment, actionable authority or production certification changed.
+- **Status:** `GH-177 Docs closeout local PASS / Protected PR next`.

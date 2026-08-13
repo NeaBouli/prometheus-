@@ -1380,3 +1380,18 @@ Boundary: synthetic regression evidence only; no real sample, file/process scan,
           deployment path, actionable authority, or production certification
 Estimates: unchanged; core 84-88%; complete vision 50-55%
 ```
+
+## GH-177 MERGED / EXACT-MAIN VERIFIED (2026-08-13)
+
+```text
+Status: Done / PR #178 merged / exact-main verified
+PR/SHA: #178 / 396d34793414add284d450f9b53d40ae287aaa4f
+Runs: CI 31658560850; Security 31658560811; Pages 31658560331
+Review: all protected contexts pass; no review threads
+Evidence: live Pages serves the GH-177 feature content; documentation-only
+          status reconciliation is in progress
+Boundary: no real sample, file/process scan, governed integration, model,
+          network, submission, wallet, chain, reward, deployment, actionable
+          authority, or production certification
+Estimates: unchanged; core 84-88%; complete vision 50-55%
+```
