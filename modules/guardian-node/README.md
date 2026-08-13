@@ -592,8 +592,8 @@ failure, and transactional completion rollback.
 The gate adds no product runtime or authority path and asserts that GH-177 is
 not imported by the pipeline modules. It uses no real sample, external network,
 model, scan, disclosure, submission, wallet, chain, reward, deployment, or
-production authority. Protected PR, CI, merge, and exact-main verification are
-still pending.
+production authority. PR #181 merged as exact main `a28ad00`; Prometheus CI
+`31662874366`, Security Audit `31662874399`, and Pages `31662873670` pass.
 
 ### ThreatHint-v2 transport ingress substrate
 

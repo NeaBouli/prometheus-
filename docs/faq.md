@@ -82,7 +82,7 @@ worker, result, submission, wallet, chain, and deployment path. Passing this
 synthetic gate is regression evidence only, not real-world detection quality,
 actionable-rule approval, calibration, certification, or production authority.
 
-GH-180 is currently a local, unmerged integration-test candidate. Eight
+GH-180 is merged and exact-main verified through PR #181 at `a28ad00`. Eight
 POSIX-only cases drive canonical synthetic transport bytes through the real
 Python ingress, governed promotion, schema-v5 atomic outbox, bounded worker,
 and durable non-actionable semantic-draft result. They cover exact bindings,
@@ -90,6 +90,8 @@ malformed and oversized input, replay/restart, duplicate concurrency, lease
 recovery, redacted analyzer failure, and transactional rollback. This adds no
 runtime path or authority, keeps GH-177 isolated, and is not production
 deployment or real-world detection evidence.
+Prometheus CI `31662874366`, Security Audit `31662874399`, and Pages
+`31662873670` pass on the exact merge commit.
 
 **Q: What happens with a false positive?**
 Affected users report the false detection. The signed metrics-oracle

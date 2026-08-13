@@ -1037,3 +1037,15 @@ Leistungsbasierte Emission. Guardians = "Miner" (KI statt GPU).
   submission, wallet, chain, reward, deployment, actionable or production
   authority is added.
 - **Status:** `GH-180 Complete local PASS / Protected PR next`.
+
+## Checkpoint 2026-08-13: GH-180 merged and exact-main verified
+
+- PR #181 passed all protected contexts at reviewed head `5119445` after both
+  CodeRabbit threads were fixed, answered and resolved, then squash-merged as
+  exact main `a28ad00c1f4cb564c1c3ee7dfe49cdfd88bb7bd9`.
+- Exact-main Prometheus CI `31662874366`, Security Audit `31662874399`, and
+  Pages `31662873670` pass. Issue #180 is closed and the feature branch deleted.
+- The integration gate changes no product runtime or authority and remains not
+  production-deployed. Rollout estimates remain core 84-88% and complete
+  vision 50-55%.
+- **Status:** `GH-180 Done / Exact-main verified / Docs closeout in progress`.

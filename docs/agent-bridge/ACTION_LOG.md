@@ -3652,6 +3652,27 @@ Rules for all dev agents:
   product source changed.
 - Status: `Review fixes PASS / Protected recheck next`.
 
+## 2026-08-13 06:10 EEST - GH-180 merged and exact-main verified
+
+- PR #181 exact head `5119445` passed eleven protected contexts with both
+  CodeRabbit threads resolved and merged as exact main `a28ad00`; issue #180
+  closed and the feature branch was deleted.
+- Exact-main CI `31662874366`, Security `31662874399`, and Pages `31662873670`
+  pass. Public/internal status is being reconciled in a docs-only closeout.
+- No product behavior, rollout estimate, external effect or production
+  authority changed.
+- Status: `Done / Exact-main verified / Docs closeout local candidate`.
+
+## 2026-08-13 06:18 EEST - GH-180 docs closeout local PASS
+
+- Public/internal status now records PR #181 exact main `a28ad00` and successful
+  CI `31662874366`, Security `31662874399`, and Pages `31662873670`.
+- Kimi docs review PASS, no P0/P1/P2. Sol confirmed remote feature-branch
+  deletion. Memory/Autodidactic, H-001, HTML/JSON-LD, marker, scope and diff
+  checks pass.
+- Historical records remain append-only and are superseded by this EOF status.
+- Status: `Docs closeout local PASS / Protected docs PR next`.
+
 ## 2026-08-13 04:46 EEST - GH-177 protected merge and docs closeout
 
 - PR #178 passed all protected contexts at exact reviewed head `c20340c` with

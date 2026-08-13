@@ -4117,3 +4117,41 @@ No direct `main` push or production action occurred.
 - No product source or runtime authority changed. The fix commit, refreshed
   protected checks and thread resolution are next.
 - **Status:** `GH-180 Review fixes PASS / Push and protected recheck next`.
+
+### 2026-08-13 06:10 EEST - GH-180 merged and exact-main verified
+
+- PR #181 exact reviewed head `5119445a2d7b1c6140c81055e963a5d1ce7f5945`
+  passed all eleven reported protected contexts. Both CodeRabbit threads were
+  answered and resolved; its five accepted documentation/test improvements and
+  Kimi's no-P0/P1/P2 independent review are integrated.
+- PR #181 squash-merged normally as exact main
+  `a28ad00c1f4cb564c1c3ee7dfe49cdfd88bb7bd9`; issue #180 closed and the remote
+  feature branch was deleted.
+- Exact-main Prometheus CI `31662874366`, Security Audit `31662874399`, and
+  Pages `31662873670` all completed successfully. README, Whitepaper, Roadmap,
+  FAQ, homepage, `llms.txt`, Guardian docs, Memory, Bridge and Action Log are
+  being reconciled to that evidence in a documentation-only closeout.
+- Rollout estimates remain core 84-88% and complete vision 50-55%. No product
+  runtime, real/private/malware sample, model, scan, network service,
+  disclosure, submission, wallet, signing, chain, reward, deployment,
+  actionable authority, production artifact approval or production operation
+  changed or occurred.
+- **Status:** `GH-180 Done / Exact-main verified / Docs closeout local candidate`.
+
+### 2026-08-13 06:18 EEST - GH-180 documentation closeout local PASS
+
+- Reconciled README, Whitepaper, Roadmap, FAQ, homepage, `llms.txt`, Guardian
+  docs, Memory, Bridge and Action Log to PR #181 exact main `a28ad00`, CI
+  `31662874366`, Security Audit `31662874399`, and Pages `31662873670`.
+- Kimi K3 independently reviewed the documentation-only diff and reports PASS
+  with no P0/P1/P2. Sol verified the exact local main commit and confirmed by
+  direct remote-head read that `feat/GH-180-v2-pipeline-integration` is deleted.
+- PASS: Memory Integrity; six Autodidactic tests; H-001 closeout verifier plus
+  four tests; four-page HTML and JSON-LD parsing; exact GH-180 public markers;
+  documentation-only scope; `git diff --check`.
+- Historical pre-merge candidate records and the legacy GH-117 header are
+  retained under the append-only rule. This EOF entry supersedes them as the
+  current authoritative handoff: GH-180 is merged, exact-main verified, not
+  production-deployed, and rollout estimates remain core 84-88% / complete
+  vision 50-55%.
+- **Status:** `GH-180 Docs closeout local PASS / Protected docs PR next`.
