@@ -3615,6 +3615,19 @@ Rules for all dev agents:
   product code, contract, production system or audit-PR mutation occurred.
 - Status: `SEC-DOC-1 Complete local PASS / Protected PR next`.
 
+## 2026-08-13 17:23 EEST - Security hardening exact-main closeout
+
+- PR #184 merged SEC-CI-1 as `bd257af`; PR #185 merged SEC-DOC-1 as exact main
+  `7a9c11e` after all protected contexts and review gates passed normally.
+- Exact-main Prometheus CI `31708149848`, Security Audit `31708149910`, and
+  Pages `31708148888` pass. The merged Security run includes both the
+  fail-closed Python dependency audit and public-document hygiene plus 11 tests.
+- Public operational values remain omitted. Audit-handoff PR #183 remains open
+  under its normal review gate, and production rollout readiness stays blocked.
+- No secret/key action, access test, infrastructure write, deployment, product
+  code, contract, production action or protection bypass occurred.
+- Status: `SEC-CI-1 + SEC-DOC-1 Done / Exact-main verified`.
+
 ## 2026-08-13 05:35 EEST - GH-180 complete local PASS
 
 - Added eight deterministic POSIX integration tests from canonical synthetic

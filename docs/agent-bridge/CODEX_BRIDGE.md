@@ -4181,3 +4181,26 @@ No direct `main` push or production action occurred.
 - No dependency versions, product code, public finding details, infrastructure,
   production systems or external GitHub state changed.
 - **Status:** `SEC-CI-1 Complete local PASS / Commit and protected PR pending`.
+
+### 2026-08-13 17:23 EEST - SEC-CI-1 and SEC-DOC-1 merged / exact-main verified
+
+- SEC-CI-1 PR #184 passed all eleven reported protected contexts after its
+  out-of-scope review request was answered and normally resolved, then
+  squash-merged as `bd257afd8b6e809142b9b07d82b84d00cb0725c6`.
+- SEC-DOC-1 PR #185 passed all ten required CI/Security contexts plus
+  CodeRabbit at reviewed head `52e1a278ab4848f006a93868a01f8401c1f5ba75`
+  with zero open review threads, then squash-merged normally as exact main
+  `7a9c11e316b1c2f26b1d111266e6f1e182f140be`.
+- Exact-main Prometheus CI `31708149848`, Security Audit `31708149910`, and
+  Pages `31708148888` completed successfully. The Security Audit run exercised
+  the merged fail-closed Python dependency audit and the new redacted-output
+  public-documentation hygiene gate with all 11 focused tests.
+- Public operational-access material is replaced by a private boundary and
+  historical references preserve only abstract availability semantics. No
+  operational values were copied into another tracked file.
+- Audit-handoff PR #183 remains separately open and blocked by its normal review
+  state. Its release gate and all existing production rollout gates remain
+  active; these generic hardening merges do not establish release readiness.
+- No secret/key action, access test, infrastructure write, deployment, product
+  code, contract, production action or branch-protection bypass occurred.
+- **Status:** `SEC-CI-1 + SEC-DOC-1 Done / Exact-main verified / Audit gate remains BLOCKED`.
