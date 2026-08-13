@@ -1,4 +1,4 @@
-"""Adversarial tests for the digest-only semantic-draft result wire."""
+"""Adversarial tests for the binding-only semantic-draft result wire."""
 
 # Test names describe the invariant under test.
 # pylint: disable=missing-function-docstring,protected-access
@@ -56,7 +56,8 @@ def test_semantic_draft_completes_atomically_and_survives_restart(
         current_time=scenario.current_time,
     )
 
-    stored = outbox.result(
+    restarted = _claim_service(scenario).outbox()
+    stored = restarted.result(
         approval_id=claim.approval_id,
         current_time=scenario.current_time + 1,
     )
@@ -227,9 +228,15 @@ def test_candidate_binding_is_nonce_bound_and_deterministic() -> None:
     first = _semantic_draft_binding(b"\x59" * 32, candidate_digest)
     repeated = _semantic_draft_binding(b"\x59" * 32, candidate_digest)
     changed_nonce = _semantic_draft_binding(b"\x5a" * 32, candidate_digest)
+    changed_candidate = _semantic_draft_binding(b"\x59" * 32, b"\x5b" * 32)
 
     assert first == repeated
     assert first != changed_nonce
+    assert first != changed_candidate
+    assert (
+        first.hex()
+        == "97d3da1c5e1cc165851e7279c5307c64c12ef93e2187911f41c20d218a45de6d"
+    )
     assert len(first) == 32
 
 

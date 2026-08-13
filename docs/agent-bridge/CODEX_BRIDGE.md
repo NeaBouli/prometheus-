@@ -3878,3 +3878,19 @@ No direct `main` push or production action occurred.
   disclosure, wallet, signing, chain, reward, deployment or production action
   occurred.
 - **Status:** `GH-173 Complete local PASS / Protected PR next`.
+
+### 2026-08-13 03:20 EEST - PR #174 review triage
+
+- All ten protected CI/Security contexts pass at exact head `907bf11`, including
+  Docker Compose rendering, Actionlint, Gitleaks, dependency audit, Guardian and
+  Rust performance.
+- Accepted the restart-coverage finding by recreating the governed outbox from
+  the same database before reading the completed result. Accepted the test nit
+  by proving both binding inputs affect the digest and pinning one exact vector.
+  The refreshed adjacent suite passes 71/71; Black and test-file Pylint 10.00/10
+  pass.
+- The kickoff wording about candidate-digest persistence is intentionally
+  retained as append-only historical state from before the privacy hardening.
+  The later local-PASS entry supersedes it and records the final nonce-bound
+  candidate-binding contract; the review thread will be answered accordingly.
+- **Status:** `Review fixes local / Commit, resolve threads and protected recheck next`.

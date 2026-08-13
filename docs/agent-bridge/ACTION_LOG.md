@@ -3609,3 +3609,13 @@ Rules for all dev agents:
 - Local Docker, Actionlint and Gitleaks are absent; their protected CI contexts
   remain required. No external runtime or production authority was exercised.
 - Status: `Complete local PASS / Protected PR next`.
+
+## 2026-08-13 03:20 EEST - PR #174 review triage
+
+- Ten initial protected contexts passed at exact head `907bf11`.
+- Added a real service/outbox reconstruction before result read, plus changed-
+  candidate and fixed-vector binding assertions. PASS: 71 adjacent tests, Black
+  clean, test-file Pylint 10.00/10.
+- Retained the pre-hardening kickoff statement as append-only audit history; the
+  later authoritative block already records the final nonce-bound binding.
+- Status: `Review fixes local / Protected recheck next`.
