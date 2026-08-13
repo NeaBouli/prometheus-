@@ -984,4 +984,6 @@ redacted analyzer errors, and atomic rollback on result-insert failure.
 
 This test composition adds no runtime endpoint, authority, schema migration, or
 external effect. GH-177 remains absent from worker, consumption, draft,
-ingress, and promotion modules. Protected publication is pending.
+ingress, promotion, acceptance, governance, preflight, verified-preflight, and
+transport modules. PR #181 merged as exact main `a28ad00`; CI, Security Audit,
+and Pages pass on that SHA. This remains a development test gate only.

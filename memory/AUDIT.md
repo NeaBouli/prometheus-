@@ -2572,3 +2572,16 @@ Independent final diff review and protected publication remain pending.
 No real sample, network service, model, scan, disclosure, submission, wallet,
 signing, chain, reward, deployment, actionable result, production artifact
 approval, or production authority is exercised or added.
+
+## 2026-08-13 - GH-180 protected merge and exact-main audit
+
+**Result:** PASS. PR #181 exact reviewed head `5119445` passed all eleven
+reported protected contexts after five accepted review improvements. Both
+CodeRabbit threads were answered and resolved; Kimi's independent review found
+no P0/P1/P2. The PR squash-merged normally as exact main
+`a28ad00c1f4cb564c1c3ee7dfe49cdfd88bb7bd9`, closing issue #180 and deleting
+the remote feature branch.
+
+Exact-main Prometheus CI `31662874366`, Security Audit `31662874399`, and Pages
+`31662873670` pass. This documentation closeout changes no product behavior,
+rollout estimate, external effect, or production authority.

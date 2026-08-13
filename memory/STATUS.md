@@ -1415,3 +1415,19 @@ Boundary: test composition only; no product runtime, GH-177 pipeline import,
           chain, reward, deployment, actionable or production authority
 Estimates: unchanged; core 84-88%; complete vision 50-55%
 ```
+
+## GH-180 MERGED / EXACT-MAIN VERIFIED (2026-08-13)
+
+```text
+Status: Done / PR #181 merged / exact-main verified / not production-deployed
+PR/SHA: #181 / a28ad00c1f4cb564c1c3ee7dfe49cdfd88bb7bd9
+Runs: CI 31662874366; Security 31662874399; Pages 31662873670
+Review: Kimi no P0/P1/P2; two CodeRabbit threads fixed and resolved; exact
+        reviewed head 5119445 passed all eleven reported protected contexts
+Evidence: 8 new and 171 adjacent tests; 1303 Guardian tests passed and 4
+          intentional live-model tests skipped; no product-source change
+Boundary: deterministic synthetic POSIX test composition only; no runtime,
+          model, scan, network, submission, wallet, chain, deployment,
+          actionable result, production artifact approval or authority
+Estimates: unchanged; core 84-88%; complete vision 50-55%
+```
