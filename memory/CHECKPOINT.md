@@ -1018,3 +1018,21 @@ Leistungsbasierte Emission. Guardians = "Miner" (KI statt GPU).
 - Exact-main CI `31654308969`, Security `31654308964`, and Pages `31654308875`
   pass. The public status closeout changes documentation only.
 - **Status:** `GH-173 Done / Exact-main verified / Docs closeout in progress`.
+
+## Checkpoint 2026-08-13: GH-180 offline v2 pipeline local PASS
+
+- Issue #180 and branch `feat/GH-180-v2-pipeline-integration` start from exact
+  clean main `440a5c1`.
+- Eight POSIX-only tests compose canonical synthetic transport through real
+  ingress, governed promotion, schema-v5 atomic acceptance/outbox, bounded
+  worker, and durable GH-173 non-actionable completion.
+- Exact identity bindings, malformed/oversized rejection, replay/restart,
+  duplicate concurrency, lease recovery, redacted analyzer failure, and
+  transactional completion rollback are proven.
+- PASS: 171 adjacent; Guardian 1303/4; Black; Pylint 10.00/9.85; Pip Audit;
+  Rust fmt/Clippy/workspace; Cargo Audit allowed warnings only; Memory and six
+  Autodidactic tests.
+- No product runtime, GH-177 pipeline import, real sample, network, model, scan,
+  submission, wallet, chain, reward, deployment, actionable or production
+  authority is added.
+- **Status:** `GH-180 Complete local PASS / Protected PR next`.

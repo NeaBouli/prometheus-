@@ -4011,3 +4011,85 @@ No direct `main` push or production action occurred.
 - No product behavior, rollout estimate, external runtime, wallet, signing,
   chain, deployment, actionable authority or production certification changed.
 - **Status:** `GH-177 Docs closeout local PASS / Protected PR next`.
+
+### 2026-08-13 05:08 EEST - GH-180 offline v2 pipeline integration gate started
+
+- Created issue #180 and branch `feat/GH-180-v2-pipeline-integration` from
+  clean exact main `440a5c12d2787f45eae9485ad0434952802f86ac` after GH-177 fully
+  closed with public documentation and exact-main verification.
+- Kimi K3's secret-free read-only architecture review confirmed the missing
+  composition gate: ingress tests stop at a promotion stub, while worker tests
+  begin from an already-populated outbox. The adjacent six-file baseline passes
+  165 tests with cache and bytecode writes disabled.
+- Scope is a deterministic development-only integration gate from canonical
+  transport bytes through real ingress, governed promotion, atomic acceptance,
+  schema-v5 outbox, bounded worker, and durable non-actionable semantic-draft
+  result. It uses synthetic fixtures only and may add minimal composition glue
+  only where existing public boundaries cannot be wired directly.
+- GH-177 stays structurally isolated. No real/private/malware sample, model,
+  external network, disclosure, submission, actionable rule, wallet, signing,
+  chain, reward, deployment, production authority, KAS/PROM, L1 reputation,
+  slash ACL, commit-reveal formula or emergency-stop change is in scope.
+- Sol owns architecture, security, accepted writes, integration, complete
+  verification, GitHub and closure. Kimi owns one bounded implementation block
+  and a later independent review; it may not invoke other agents.
+- **Status:** `GH-180 In Progress / Bridge recorded / Implementation next`.
+
+### 2026-08-13 05:35 EEST - GH-180 complete local verification PASS
+
+- Added one development-only POSIX integration module with eight tests. It
+  composes canonical synthetic ThreatHint-v2 transport bytes through the real
+  Python ingress, governed promotion, schema-v5 atomic acceptance/outbox,
+  bounded worker, and durable GH-173 non-actionable semantic-draft result.
+- Exact statement, approval, observable, report-nonce, candidate-binding,
+  input-identity and result-wire relationships pass. Malformed/oversized input
+  rejects before trusted state; replay/restart, exactly-one concurrent winner,
+  lease recovery, redacted analyzer failure, and transactional completion
+  rollback are covered. GH-177 remains absent from every pipeline module.
+- Kimi K3 supplied the bounded implementation after its secret-free read-only
+  architecture review. Sol reviewed every test and all public/internal status
+  edits, confirmed there is no product-source diff, and reran the complete
+  relevant verification chain. Independent final Kimi diff review is next.
+- PASS: 8 new tests; 171 adjacent; full Guardian 1303 passed/4 intentional
+  live-model skips; Black; changed-file Pylint 10.00/10; full Guardian Pylint
+  9.85/10; Pip Audit with no known vulnerability; Rustfmt, warning-free Clippy
+  and full workspace tests; Cargo Audit with no vulnerability and eight
+  repository-allowed existing warnings; Memory Integrity; six Autodidactic
+  tests; `git diff --check`.
+- README, Whitepaper, Roadmap, FAQ, homepage, `llms.txt`, Guardian docs and
+  Memory label GH-180 accurately as a local unmerged candidate. Estimates stay
+  core 84-88% and complete vision 50-55%.
+- No real/private/malware sample, model, scan, network service, disclosure,
+  submission, wallet, signing, chain, reward, deployment, actionable authority,
+  production artifact approval or production operation occurred.
+- **Status:** `GH-180 Complete local PASS / Independent review next`.
+
+### 2026-08-13 05:49 EEST - GH-180 independent review PASS
+
+- Kimi K3 independently reviewed the complete secret-free diff and reproduced
+  8/8 new tests, the exact 171-case adjacent set, full Guardian 1303 passed/4
+  skipped, Black and test-file lint. It reports no P0/P1/P2 and recommends the
+  candidate for protected PR.
+- The reproducible adjacent set is the six v2 pipeline suites used by the final
+  Sol command plus `test_observable_analysis_worker.py` and
+  `test_observable_approval.py`; all 171 pass. The earlier append-only kickoff
+  count remains historical and is not the final test-set definition.
+- Sol accepted one P3 hardening note by expanding the GH-177 source tripwire
+  from five modules to the complete adjacent acceptance, governance, preflight,
+  verified-preflight and transport path. A bounded 15-second concurrency retry
+  remains an explicit low-risk host-load residual and fails loudly.
+- No product source changed. Focused rerun and complete post-review hygiene are
+  next before commit and protected publication.
+- **Status:** `GH-180 Review PASS / Final rerun next`.
+
+### 2026-08-13 05:54 EEST - GH-180 post-review rerun PASS
+
+- The expanded GH-177 isolation tripwire passes across all adjacent v2
+  pipeline modules. Post-review reruns pass: 8/8 new tests, exact adjacent
+  171/171, and full Guardian 1303 passed/4 intentional live-model skips.
+- Black and test-file Pylint 10.00/10 pass. Memory Integrity, six Autodidactic
+  tests, four-page HTML parsing, JSON-LD parsing and `git diff --check` pass.
+- Earlier complete local Rust, dependency and full Guardian lint evidence
+  remains valid because the review hardening changed only test imports and
+  append-only documentation; no product source changed.
+- **Status:** `GH-180 Complete local + independent review PASS / Protected PR next`.

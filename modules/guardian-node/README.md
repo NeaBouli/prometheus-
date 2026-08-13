@@ -579,6 +579,22 @@ bytes. Its synthetic baseline is regression evidence only; it does not prove
 real-world semantic quality, privacy safety, actionable-rule approval,
 calibration, certification, or production readiness.
 
+### Deterministic v2 pipeline integration gate
+
+`tests/test_threat_hint_v2_pipeline_integration.py` is the GH-180 local
+development gate. It composes canonical synthetic transport bytes with the real
+Python ingress, governed promotion, schema-v5 atomic acceptance/outbox, bounded
+worker, and durable GH-173 non-actionable semantic-draft result. Eight POSIX
+cases cover exact binding relationships, malformed and oversized frames,
+replay and restart, concurrent duplicates, lease recovery, redacted analyzer
+failure, and transactional completion rollback.
+
+The gate adds no product runtime or authority path and asserts that GH-177 is
+not imported by the pipeline modules. It uses no real sample, external network,
+model, scan, disclosure, submission, wallet, chain, reward, deployment, or
+production authority. Protected PR, CI, merge, and exact-main verification are
+still pending.
+
 ### ThreatHint-v2 transport ingress substrate
 
 `jaeger.threat_hint_v2_transport` parses the shared canonical transport frame

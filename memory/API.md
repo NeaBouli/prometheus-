@@ -966,3 +966,22 @@ No scan path or process, real sample, worker/outbox/result integration, model,
 transport, disclosure, submission, wallet, chain, reward, deployment, or
 production authority is exposed. The synthetic gate is regression evidence,
 not real-world semantic-quality certification or actionable-rule approval.
+
+## Offline ThreatHint-v2 Pipeline Integration Gate (GH-180)
+
+No public or production API is added. The development-only POSIX test harness
+constructs the existing `ThreatHintV2Ingress` with the real governed promotion,
+schema-v5 acceptance/outbox, `ObservableAnalysisWorker`, and
+`DeterministicSemanticDraftAnalyzer`. Canonical synthetic transport bytes enter
+through `ThreatHintV2Ingress.process(...)`; completion is read through the
+existing durable result API.
+
+The gate verifies exact statement digest, approval ID, observable commitment,
+report nonce, candidate binding, input identity, and canonical result-wire
+relationships. It also covers malformed/oversized input before trusted state,
+durable replay/restart, concurrent duplicate submission, lease expiry,
+redacted analyzer errors, and atomic rollback on result-insert failure.
+
+This test composition adds no runtime endpoint, authority, schema migration, or
+external effect. GH-177 remains absent from worker, consumption, draft,
+ingress, and promotion modules. Protected publication is pending.
