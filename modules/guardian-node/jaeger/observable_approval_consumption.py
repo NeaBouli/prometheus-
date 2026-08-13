@@ -73,6 +73,8 @@ _SQLITE_SCHEMA_VERSION_GOVERNED: Final[int] = 5
 MAX_OUTBOX_LEASE_SECONDS: Final[int] = 300
 ANALYSIS_RESULT_SCHEMA_VERSION: Final[int] = 1
 ANALYSIS_RESULT_KIND: Final[str] = "non_actionable_local_v1"
+SEMANTIC_DRAFT_RESULT_SCHEMA_VERSION: Final[int] = 2
+SEMANTIC_DRAFT_RESULT_KIND: Final[str] = "semantic_draft_non_actionable_local_v2"
 MAX_CANONICAL_ANALYSIS_RESULT_BYTES: Final[int] = 1_024
 ANALYSIS_INPUT_IDENTITY_DOMAIN: Final[bytes] = (
     b"prometheus-observable-analysis-input-v1\x00"
@@ -84,7 +86,7 @@ COMPLETION_TOKEN_DIGEST_DOMAIN: Final[bytes] = (
     b"prometheus-observable-analysis-completion-v1\x00"
 )
 _ANALYZER_ID_RE = re.compile(r"[a-z0-9][a-z0-9_]{0,63}")
-_ANALYSIS_RESULT_FIELDS = (
+_ANALYSIS_RESULT_V1_FIELDS = (
     "schema_version",
     "result_kind",
     "analyzer_id",
@@ -93,6 +95,17 @@ _ANALYSIS_RESULT_FIELDS = (
     "statement_digest",
     "observable_commitment",
     "observable_count",
+)
+_ANALYSIS_RESULT_V2_FIELDS = (
+    *_ANALYSIS_RESULT_V1_FIELDS,
+    "observable_kind_counts",
+    "candidate_binding_sha256",
+    "rule_compile_ok",
+)
+_OBSERVABLE_KIND_COUNT_FIELDS = (
+    "file_sha256",
+    "api_import",
+    "byte_pattern",
 )
 _POLICY_FIELDS = {
     "schema_version",
@@ -1920,6 +1933,64 @@ def build_analysis_result_wire(  # pylint: disable=too-many-arguments
     return wire
 
 
+def build_semantic_draft_result_wire(  # pylint: disable=too-many-arguments
+    *,
+    analyzer_id: str,
+    approval_id: bytes,
+    input_identity: bytes,
+    statement_digest: bytes,
+    observable_commitment: bytes,
+    file_sha256_count: int,
+    api_import_count: int,
+    byte_pattern_count: int,
+    candidate_binding_sha256: bytes,
+    rule_compile_ok: bool,
+) -> bytes:
+    """Build one canonical nonce-bound draft result with no downstream authority."""
+    counts = (file_sha256_count, api_import_count, byte_pattern_count)
+    observable_count = sum(counts) if all(type(value) is int for value in counts) else 0
+    if (
+        not _is_analyzer_id(analyzer_id)
+        or not _is_fixed_bytes(approval_id)
+        or not _is_fixed_bytes(input_identity)
+        or not _is_fixed_bytes(statement_digest)
+        or not _is_fixed_bytes(observable_commitment)
+        or any(
+            type(value) is not int or not 0 <= value <= MAX_OBSERVABLES
+            for value in counts
+        )
+        or not 1 <= observable_count <= MAX_OBSERVABLES
+        or not _is_fixed_bytes(candidate_binding_sha256)
+        or not any(candidate_binding_sha256)
+        or type(rule_compile_ok) is not bool
+    ):
+        raise ObservableApprovalOutboxError()
+    wire = json.dumps(
+        {
+            "schema_version": SEMANTIC_DRAFT_RESULT_SCHEMA_VERSION,
+            "result_kind": SEMANTIC_DRAFT_RESULT_KIND,
+            "analyzer_id": analyzer_id,
+            "approval_id": approval_id.hex(),
+            "input_identity": input_identity.hex(),
+            "statement_digest": statement_digest.hex(),
+            "observable_commitment": observable_commitment.hex(),
+            "observable_count": observable_count,
+            "observable_kind_counts": {
+                "file_sha256": file_sha256_count,
+                "api_import": api_import_count,
+                "byte_pattern": byte_pattern_count,
+            },
+            "candidate_binding_sha256": candidate_binding_sha256.hex(),
+            "rule_compile_ok": rule_compile_ok,
+        },
+        separators=(",", ":"),
+        ensure_ascii=True,
+    ).encode("ascii")
+    if not 1 <= len(wire) <= MAX_CANONICAL_ANALYSIS_RESULT_BYTES:
+        raise ObservableApprovalOutboxError()
+    return wire
+
+
 def _validate_analysis_result_wire(
     result_wire: bytes,
     *,
@@ -1950,21 +2021,22 @@ def _validate_analysis_result_wire(
         )
     except (UnicodeError, ValueError, RecursionError):
         raise ObservableApprovalOutboxError() from None
-    if (
-        type(decoded) is not dict
-        or tuple(decoded) != _ANALYSIS_RESULT_FIELDS
-        or type(decoded["schema_version"]) is not int  # pylint: disable=C0123
-        or decoded["schema_version"] != ANALYSIS_RESULT_SCHEMA_VERSION
-        or type(decoded["result_kind"]) is not str  # pylint: disable=C0123
-        or decoded["result_kind"] != ANALYSIS_RESULT_KIND
-        or not _is_analyzer_id(decoded["analyzer_id"])
-        or not _is_fixed_lower_hex(decoded["approval_id"])
-        or not _is_fixed_lower_hex(decoded["input_identity"])
-        or not _is_fixed_lower_hex(decoded["statement_digest"])
-        or not _is_fixed_lower_hex(decoded["observable_commitment"])
-        or type(decoded["observable_count"]) is not int  # pylint: disable=C0123
-        or not 1 <= decoded["observable_count"] <= MAX_OBSERVABLES
-    ):
+    if type(decoded) is not dict or not _is_common_analysis_result(decoded):
+        raise ObservableApprovalOutboxError()
+    if decoded["schema_version"] == ANALYSIS_RESULT_SCHEMA_VERSION:
+        valid_version = (
+            tuple(decoded) == _ANALYSIS_RESULT_V1_FIELDS
+            and decoded["result_kind"] == ANALYSIS_RESULT_KIND
+        )
+    elif decoded["schema_version"] == SEMANTIC_DRAFT_RESULT_SCHEMA_VERSION:
+        valid_version = (
+            tuple(decoded) == _ANALYSIS_RESULT_V2_FIELDS
+            and decoded["result_kind"] == SEMANTIC_DRAFT_RESULT_KIND
+            and _is_semantic_draft_fields(decoded)
+        )
+    else:
+        valid_version = False
+    if not valid_version:
         raise ObservableApprovalOutboxError()
     canonical = json.dumps(decoded, separators=(",", ":"), ensure_ascii=False).encode(
         "utf-8"
@@ -1983,6 +2055,40 @@ def _validate_analysis_result_wire(
         )
     ):
         raise ObservableApprovalOutboxError()
+
+
+def _is_common_analysis_result(decoded: dict[str, object]) -> bool:
+    """Validate fields shared by every durable local analysis result."""
+    return (
+        type(decoded.get("schema_version")) is int
+        and type(decoded.get("result_kind")) is str
+        and _is_analyzer_id(decoded.get("analyzer_id"))
+        and _is_fixed_lower_hex(decoded.get("approval_id"))
+        and _is_fixed_lower_hex(decoded.get("input_identity"))
+        and _is_fixed_lower_hex(decoded.get("statement_digest"))
+        and _is_fixed_lower_hex(decoded.get("observable_commitment"))
+        and type(decoded.get("observable_count")) is int
+        and 1 <= decoded["observable_count"] <= MAX_OBSERVABLES
+    )
+
+
+def _is_semantic_draft_fields(decoded: dict[str, object]) -> bool:
+    """Validate the closed binding-only semantic-draft extension."""
+    counts = decoded.get("observable_kind_counts")
+    if (
+        type(counts) is not dict
+        or tuple(counts) != _OBSERVABLE_KIND_COUNT_FIELDS
+        or any(
+            type(counts[field]) is not int or not 0 <= counts[field] <= MAX_OBSERVABLES
+            for field in _OBSERVABLE_KIND_COUNT_FIELDS
+        )
+        or sum(counts.values()) != decoded["observable_count"]
+        or not _is_fixed_lower_hex(decoded.get("candidate_binding_sha256"))
+        or decoded["candidate_binding_sha256"] == "0" * (FIXED_HASH_BYTES * 2)
+        or type(decoded.get("rule_compile_ok")) is not bool
+    ):
+        return False
+    return True
 
 
 def _analysis_result_record_digest(

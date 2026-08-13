@@ -7,6 +7,7 @@
 ---
 
 - [x] [P1] GH-170 substring-only Guardian YARA check durch bounded compile-only YARA-X ersetzen | Codex Sol | PR #171 merged as exact main `8d8e29c`; CI `31650123073`, Security `31650123055`, Pages `31650122593`, review and live readback pass
+- [~] [P1] GH-173 deterministic non-actionable semantic draft in governed v2 worker | Codex Sol + Kimi K3 | Local candidate: memory-only bounded YARA derivation, compile-only GH-170 reuse, nonce-bound binding/count/verdict-only v2 persistence, v1 read compatibility; protected PR/exact-main pending
 
 ## ═══ SPRINT 0: SETUP & TESTNET (Woche 1) ═══
 

@@ -354,6 +354,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
         <div class="faq-a"><div class="faq-a-inner">
           <p>Merged and exact-main-verified GH-170 replaces substring shape checks with exact-pinned, compile-only <code>yara-x==1.4.0</code> validation. It accepts one bounded ASCII rule, disables includes, rejects imports, multiple rules, compiler errors, and warnings, and performs no scan.</p>
           <p>PR #171 published exact main <code>8d8e29c</code>; CI <code>31650123073</code>, Security <code>31650123055</code>, and Pages <code>31650122593</code> pass. This validates syntax and structure only. Semantic quality, model approval, actionable analysis, submission, publication, and production operation remain separate gates.</p>
+          <p>GH-173 is a local review candidate that composes this boundary with the governed v2 worker. It derives one memory-only draft from already approved local API-import and byte-pattern observables and stores only exact bindings, kind counts, a nonce-bound candidate-binding digest, and compile status. It invokes no model, persists no rule source, scans nothing, and grants no submission, publication, or production authority. Protected merge and real semantic/actionable quality remain open.</p>
         </div></div>
       </div>
 

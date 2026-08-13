@@ -1,10 +1,12 @@
 """Bounded owner-local processing for durable ThreatHint-v2 observables.
 
 The worker accepts only claims produced by the governed v4 outbox and stores
-only the exact non-actionable result contract enforced by that outbox. It has
-no transport, publication, rule-generation, reward, wallet, or chain authority.
-The included analyzer is deterministic test infrastructure; it does not call an
-LLM, load YARA, inspect the host, or emit semantic findings.
+only exact non-actionable result contracts enforced by that outbox. It has no
+transport, publication, reward, wallet, or chain authority. The legacy analyzer
+only counts observables. The semantic-draft analyzer deterministically derives
+one memory-only candidate, compile-checks it without scanning, and persists only
+its nonce-bound binding, verdict, and kind counts. Neither analyzer calls a
+model or grants semantic-quality, submission, disclosure, or production authority.
 """
 
 # Exact built-in types are protocol requirements.
@@ -29,6 +31,11 @@ from jaeger.observable_approval_consumption import (
     ObservableApprovalOutboxClaim,
     ObservableApprovalOutboxError,
     build_analysis_result_wire,
+    build_semantic_draft_result_wire,
+)
+from jaeger.observable_semantic_draft import (
+    ObservableSemanticDraftError,
+    derive_semantic_draft,
 )
 from jaeger.threat_hint_v2_statement import (
     MAX_CANONICAL_V2_STATEMENT_BYTES,
@@ -40,6 +47,10 @@ MAX_WORKER_CONCURRENCY: Final[int] = 8
 MAX_ANALYZER_TIMEOUT_SECONDS: Final[float] = 300.0
 MAX_WORKER_BATCH: Final[int] = 64
 DETERMINISTIC_ANALYZER_ID: Final[str] = "deterministic_test_v1"
+SEMANTIC_DRAFT_ANALYZER_ID: Final[str] = "deterministic_semantic_draft_v2"
+SEMANTIC_DRAFT_BINDING_DOMAIN: Final[bytes] = (
+    b"prometheus-observable-semantic-draft-binding-v1\x00"
+)
 
 
 class ObservableAnalysisWorkerError(ValueError):
@@ -123,6 +134,43 @@ class DeterministicNonActionableAnalyzer:
                 observable_count=len(bundle.observables),
             )
         except ObservableApprovalOutboxError:
+            raise ObservableAnalysisWorkerError() from None
+
+
+class DeterministicSemanticDraftAnalyzer:
+    """Derive one binding-only compile-checked draft without external effects."""
+
+    async def analyze(self, analysis_input: ObservableAnalysisInput) -> bytes:
+        """Build a canonical v2 semantic draft result from governed input."""
+        if type(analysis_input) is not ObservableAnalysisInput:
+            raise ObservableAnalysisWorkerError()
+        try:
+            bundle = ObservableBundle.parse_canonical(analysis_input.bundle_wire)
+        except ValueError:
+            raise ObservableAnalysisWorkerError() from None
+        if not hmac.compare_digest(
+            _statement_digest(analysis_input.statement_wire),
+            analysis_input.statement_digest,
+        ):
+            raise ObservableAnalysisWorkerError()
+        try:
+            draft = derive_semantic_draft(bundle)
+            return build_semantic_draft_result_wire(
+                analyzer_id=SEMANTIC_DRAFT_ANALYZER_ID,
+                approval_id=analysis_input.approval_id,
+                input_identity=analysis_input.input_identity,
+                statement_digest=analysis_input.statement_digest,
+                observable_commitment=analysis_input.observable_commitment,
+                file_sha256_count=draft.file_sha256_count,
+                api_import_count=draft.api_import_count,
+                byte_pattern_count=draft.byte_pattern_count,
+                candidate_binding_sha256=_semantic_draft_binding(
+                    analysis_input.report_nonce,
+                    draft.candidate_rule_sha256,
+                ),
+                rule_compile_ok=draft.rule_compile_ok,
+            )
+        except (ObservableSemanticDraftError, ObservableApprovalOutboxError):
             raise ObservableAnalysisWorkerError() from None
 
 
@@ -235,4 +283,20 @@ def _statement_digest(statement_wire: bytes) -> bytes:
     digest.update(STATEMENT_DIGEST_DOMAIN)
     digest.update(len(statement_wire).to_bytes(4, byteorder="big", signed=False))
     digest.update(statement_wire)
+    return digest.digest()
+
+
+def _semantic_draft_binding(report_nonce: bytes, candidate_rule_sha256: bytes) -> bytes:
+    """Bind one transient candidate digest to its approved report nonce."""
+    if (
+        type(report_nonce) is not bytes
+        or len(report_nonce) != FIXED_HASH_BYTES
+        or type(candidate_rule_sha256) is not bytes
+        or len(candidate_rule_sha256) != FIXED_HASH_BYTES
+    ):
+        raise ObservableAnalysisWorkerError()
+    digest = hashlib.sha256()
+    digest.update(SEMANTIC_DRAFT_BINDING_DOMAIN)
+    digest.update(report_nonce)
+    digest.update(candidate_rule_sha256)
     return digest.digest()

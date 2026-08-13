@@ -3576,3 +3576,36 @@ Rules for all dev agents:
 - PASS: Memory Integrity, six Autodidactic tests, five HTML, four JSON-LD,
   stale-status scan, evidence markers, and diff hygiene.
 - Status: `Docs closeout local PASS / Protected PR next`.
+
+## 2026-08-13 - GH-173 deterministic semantic draft kickoff
+
+- Opened issue #173 and branch `feat/GH-173-semantic-draft` from exact clean
+  main `76b55af` after central ticket registration.
+- Kimi K3 read-only review selected a deterministic non-actionable semantic
+  draft as the largest repository-only next block: memory-only bounded YARA
+  derivation and compile, with only bindings/counts/digest/verdict persisted.
+- No external, model, scan, submission, wallet, chain, deployment, or
+  production action is in scope.
+- Status: `In Progress / Implementation next`.
+
+## 2026-08-13 03:11 EEST - GH-173 complete local PASS
+
+- Integrated the deterministic memory-only semantic draft, compile-only GH-170
+  validation, closed canonical result-wire v2, v1 compatibility and atomic
+  governed-worker completion.
+- Replaced raw candidate-digest persistence with a domain-separated,
+  report-nonce-bound candidate binding after Kimi review; the raw source and
+  raw digest remain transient. Added exact nested-schema, retry and nonce-
+  separation regressions.
+- Kimi K3 supplied the pure derivation implementation and two independent
+  secret-free reviews. Sol reviewed all writes, completed integration and docs,
+  and reran every relevant gate. Final Kimi verdict: no P0/P1/P2; its one P3
+  stale test-count note was fixed.
+- PASS: focused 61 and focused-plus-adjacent 119; Guardian 1269/4 skip; Black;
+  Pylint changed 10.00/full 9.86; Pip Audit; Rust workspace fmt/clippy/tests;
+  locked release builds and packages; release performance; Cargo Audit with the
+  eight existing allowed warnings only; Memory/Autodidactic; vLLM/H-001/docs/
+  structured-data/diff/secret-marker checks.
+- Local Docker, Actionlint and Gitleaks are absent; their protected CI contexts
+  remain required. No external runtime or production authority was exercised.
+- Status: `Complete local PASS / Protected PR next`.

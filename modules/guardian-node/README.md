@@ -109,6 +109,14 @@ errors, and compiler warnings, and discards the compiled object without calling
 any scan API. It performs no file, process, or data scan and grants no semantic,
 submission, publication, or production authority.
 
+GH-173 adds an optional deterministic governed-worker analyzer as a local review
+candidate. It maps already approved `api_import` and `byte_pattern` observables
+to one bounded memory-only YARA draft, validates it only through the GH-170
+compile boundary, and returns only per-kind counts, a nonce-bound candidate
+binding SHA-256, and the compile verdict. File hashes are counted but never
+embedded. No source, model, confidence, scan, or downstream authority is
+exposed.
+
 ## Offline Confidence Evaluation
 
 GH-138 adds a standalone development gate over a canonical 24-case synthetic
@@ -541,13 +549,16 @@ inputs, or results fail closed. `acknowledge(...)` cannot delete v5 work without
 a durable result. Results inherit the original retention deadline and remain
 owner-local/readable until lazy cleanup at that deadline.
 
-`jaeger.observable_analysis_worker` provides a bounded async worker protocol and
-one deterministic test analyzer. The analyzer only validates and counts the
-canonical observables. It emits no confidence, `should_submit`, YARA/rule body,
-semantic finding, transport, publication, wallet, chain, reward, or external
-authority. Legacy consumption remains schema v1; governed acceptance uses
-schema v5 but enqueues and records permanent identity pairing only when
-promotion explicitly enables the durable outbox.
+`jaeger.observable_analysis_worker` provides a bounded async worker protocol,
+the original deterministic count-only test analyzer, and the optional GH-173
+semantic-draft analyzer. The latter derives and compile-checks one candidate in
+memory, then persists only a closed non-actionable v2 result with exact bindings,
+kind counts, a nonce-bound candidate-binding digest, and verdict. It emits no
+source, confidence, `should_submit`, semantic-quality claim, transport,
+publication, wallet, chain, reward, or external authority. Existing v1 results
+remain readable; governed acceptance uses schema v5 but enqueues and records
+permanent identity pairing only when promotion explicitly enables the durable
+outbox.
 
 ### ThreatHint-v2 transport ingress substrate
 

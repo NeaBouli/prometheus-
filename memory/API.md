@@ -925,3 +925,25 @@ This applies only to the existing durable-outbox governed promotion path.
 Legacy and governed non-outbox consumption retain their previous behavior. The
 pairing grants no proof, analysis, disclosure, transport, wallet, chain,
 contract, token, deployment, or production authority.
+
+## Governed ThreatHint v2 Semantic Draft Result (GH-173)
+
+`DeterministicSemanticDraftAnalyzer` is an optional injected implementation of
+the existing owner-local worker protocol. It reparses the canonical bundle,
+revalidates the statement digest, derives one bounded in-memory YARA candidate,
+and calls only the pinned compile-only GH-170 validator. The candidate source is
+not returned or stored.
+
+Its canonical result wire uses `schema_version: 2` and
+`result_kind: semantic_draft_non_actionable_local_v2`. In addition to the exact
+v1 approval/input/statement/commitment bindings and total observable count, it
+contains the exact ordered `file_sha256`, `api_import`, and `byte_pattern`
+counts, one nonzero nonce-bound 32-byte candidate-binding SHA-256, and an exact
+boolean compile verdict. Counts must sum to the total. Duplicate, reordered,
+extra, malformed, cross-version, zero-binding, or cross-bound fields fail
+closed. Existing v1 rows remain readable and use the unchanged result-record
+digest path.
+
+The result grants no confidence, `should_submit`, scan, disclosure, submission,
+publication, wallet, chain, reward, deployment, semantic-quality, actionable, or
+production authority.

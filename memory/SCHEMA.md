@@ -891,3 +891,18 @@ fails closed unchanged. Legacy schema v1 remains unchanged.
 `approval_outbox` and `observable_analysis_results`. Authority state, ledger
 high-water, and approval-consumption rows are preserved by migration. Any row in
 either gated table keeps the whole v4 database unchanged and fails closed.
+
+### Semantic draft result wire v2 (GH-173)
+
+Ledger schema v5 and the seven-column `observable_analysis_results` table remain
+unchanged. `result_wire` is an opaque bounded BLOB, so GH-173 is a wire-version
+extension rather than a SQLite migration.
+
+Canonical v2 fields, in exact order, are the eight v1 binding/count fields plus
+`observable_kind_counts`, `candidate_binding_sha256`, and `rule_compile_ok`.
+`observable_kind_counts` itself has exactly ordered `file_sha256`, `api_import`,
+and `byte_pattern` integer fields whose sum equals `observable_count`. The
+candidate binding is one nonzero lowercase 32-byte SHA-256 over a fixed domain,
+the approved report nonce, and the transient raw candidate digest. Compile status
+is an exact boolean. Existing canonical v1 wires remain accepted on read and
+completion retry. No rule source or observable value is stored in this result.
