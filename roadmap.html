@@ -222,8 +222,8 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
   <div class="timeline-overview r d1">
     <div class="to-item done">
       <div class="to-date">Mar 2026</div>
-      <div class="to-label">Foundation complete</div>
-      <div class="to-status">✓ done</div>
+      <div class="to-label">Development/test foundation complete</div>
+      <div class="to-status">not production</div>
     </div>
     <div class="to-item done">
       <div class="to-date">Jul 2026</div>
@@ -266,10 +266,10 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
     <div class="phase-header">
       <div class="phase-letter">0</div>
       <div class="phase-meta">
-        <span class="phase-tag">Phase 0 · Foundation</span>
-        <div><span class="phase-title">All sprints accepted.</span>
-        <span class="phase-date">March 2026</span>
-        <span class="phase-status s-done">Complete</span></div>
+        <span class="phase-tag">Phase 0 · Development foundation</span>
+        <div><span class="phase-title">Repository foundations accepted, not production operation.</span>
+        <span class="phase-date">March–August 2026</span>
+        <span class="phase-status s-done">Test foundation</span></div>
       </div>
     </div>
     <div class="sprints-grid">
@@ -277,7 +277,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
         <div class="sprint-num">Sprint 0–1</div>
         <div class="sprint-title">Setup, Testnet &amp; Contracts</div>
         <ul class="sprint-items">
-          <li class="done-item">Kaspa Testnet-10 node running</li>
+          <li class="done-item">Testnet-10 development baseline and one later non-promotable H-001 canary</li>
           <li class="done-item">Repository structure + CI/CD</li>
           <li class="done-item">6 Silverscript contracts, 54 tests</li>
           <li class="done-item">ValidatorStaking, GuardianReputation, RuleStorage</li>
@@ -289,11 +289,11 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
         <div class="sprint-title">Client, AI &amp; Voting</div>
         <ul class="sprint-items">
           <li class="done-item">Rust client: Kaspa RPC, YARA scanner, ZK stub</li>
-          <li class="done-item">Phi-3 ONNX wrapper + anomaly detector</li>
+          <li class="done-item">Phi-3 interface uses a development heuristic/stub; no ONNX session or real-sample evidence</li>
           <li class="done-item">Fed-DART gradient client (stub)</li>
           <li class="done-item">Guardian YARA generator + analyzer development foundation</li>
           <li>GH-144 reproducible local vLLM runtime hardening merged and exact-main verified as <code>95d05cc</code>; no live model evidence or production authority</li>
-          <li class="done-item">Commit-Reveal voting + bond + slashing engine</li>
+          <li class="done-item">Commit-Reveal, bond, quorum, and slashing state machines; no operated validator network</li>
         </ul>
       </div>
       <div class="sprint">
@@ -301,8 +301,8 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
         <div class="sprint-title">E2E + Documentation</div>
         <ul class="sprint-items">
           <li class="done-item">Development-stub lifecycle fixture &lt;60s; accepted as test foundation, not production evidence</li>
-          <li class="done-item">Mathematical Sybil resistance proof</li>
-          <li class="done-item">FP-flood attack resistance verified</li>
+          <li class="done-item">Quadratic-weighting arithmetic fixture; not proof of Sybil resistance</li>
+          <li class="done-item">Synthetic FP-flood policy fixture; not real-model quality evidence</li>
           <li class="done-item">Audit dashboard, README, whitepaper.html</li>
           <li class="done-item">Landing page live on GitHub Pages</li>
         </ul>
@@ -342,8 +342,8 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
           <li>Deploy all 6 state contracts only after canary evidence passes</li>
           <li class="done-item">Implement manifest-pinned active-KIP-16 BN254/Arkworks Groth16 verification engine and owner-only bounded service adapter</li>
           <li>PROM emission contract: minting logic</li>
-          <li>First KAS/PROM liquidity pool on Kasplex DEX</li>
-          <li>10 team-operated Guardian + Validator nodes</li>
+          <li>Planned KAS/PROM secondary-market pool after token and deployment gates</li>
+          <li>Initial operator-controlled Guardian + Validator scenario; not decentralized operation</li>
         </ul>
       </div>
       <div class="sprint">
@@ -466,7 +466,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
         <ul class="sprint-items">
           <li>All AI stubs replaced with production implementations</li>
           <li>Network learns from real threats without sharing raw data</li>
-          <li>Model integrity guaranteed by on-chain hashes</li>
+          <li>Target model tamper evidence from an on-chain hash; availability, provenance, quality and authorization remain separate</li>
           <li>Auto-tuning responds to real network conditions</li>
         </ul>
       </div>
@@ -598,7 +598,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
         <ul class="sprint-items">
           <li>Every AI decision verifiable on-chain</li>
           <li>Every model update tamper-proof and auditable</li>
-          <li>Federated learning fully decentralized</li>
+          <li>Target: federated learning with decentralized operation after privacy, membership, Sybil and multi-host gates</li>
           <li>Protocol self-governing, self-improving, unstoppable</li>
         </ul>
       </div>
@@ -667,54 +667,54 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
 
 <!-- HARDWARE -->
 <div class="hw-section">
-  <span class="section-lbl r">Hardware requirements</span>
-  <h2 class="section-hdg r">From any laptop to a server rack.</h2>
+  <span class="section-lbl r">Target hardware profiles</span>
+  <h2 class="section-hdg r">Planning values, not certified production requirements.</h2>
   <table class="hw-table r d1">
     <thead>
       <tr>
         <th>Role</th>
-        <th>Minimum hardware</th>
-        <th>Details</th>
-        <th>Est. monthly cost</th>
+        <th>Target hardware</th>
+        <th>Evidence boundary</th>
+        <th>Status</th>
       </tr>
     </thead>
     <tbody>
       <tr>
         <td>Light Client</td>
         <td>Any device, 4 GB RAM</td>
-        <td>No GPU required. Windows, macOS, Linux, iOS, Android.</td>
-        <td>$0 (existing device)</td>
+        <td>Production ONNX and platform validation open.</td>
+        <td>Development stub</td>
       </tr>
       <tr>
         <td>Honeypot</td>
         <td>Any internet-exposed server</td>
-        <td>Emulates vulnerable services. Higher reward per zero-day.</td>
-        <td>~$5–20 / mo VPS</td>
+        <td>Requires isolated implementation and threat-model review.</td>
+        <td>Planned</td>
       </tr>
       <tr>
         <td>Validator</td>
         <td>2 vCPU · 4 GB RAM + 10,000 KAS</td>
-        <td>No GPU needed. Standard VPS. 7-day exit cooldown.</td>
-        <td>~$20 / mo VPS</td>
+        <td>KAS-only state machines tested; no operated network.</td>
+        <td>Target</td>
       </tr>
       <tr>
         <td>Guardian (8B)</td>
         <td>NVIDIA GPU · 24 GB VRAM</td>
-        <td>LLaMA 3 8B. Consumer GPU viable with the documented 24 GB VRAM floor.</td>
-        <td>Own hardware</td>
+        <td>8B-first runtime scaffold; no independently evaluated run.</td>
+        <td>Target</td>
       </tr>
       <tr>
         <td>Guardian (70B)</td>
         <td>4× A100/H100 80 GB · 256 GB RAM</td>
-        <td>LLaMA 3 70B. Primary model. Highest reputation potential.</td>
-        <td>$500–2,000 / mo cloud</td>
+        <td>Optional escalation tier; no independently evaluated run or reputation authority.</td>
+        <td>Target</td>
       </tr>
     </tbody>
   </table>
 </div>
 
 <footer>
-  <div class="f-left">v4.0 · March 2026</div>
+  <div class="f-left">Status reconciled 2026-08-14 · base <a href="https://github.com/NeaBouli/prometheus-/commit/5cd13bf6f9c170711e26364263bd0dcd8aad8c09">5cd13bf</a> · <a href="docs/claim-audit-2026-08-14.md">claim audit</a></div>
   <div class="f-center">PROMETHEUS</div>
   <ul class="f-links">
     <li><a href="faq.html">FAQ</a></li>

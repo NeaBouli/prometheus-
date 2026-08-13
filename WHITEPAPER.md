@@ -6,7 +6,7 @@
 
 The July status paragraph below is retained as a historical snapshot; its H-001 signing and broadcast statements are superseded by the current reconciliation above.
 
-**Status update — July 2026:** Kaspa Toccata is treated as a post-fork deployment environment for Prometheus. Current Silverc compile/runtime, release-bundle, request/receipt/evidence, metrics-oracle, and exact-commit gates cover the seven contract fixtures without holding signing material. Closed profiles separate the full path from the non-promotable `testnet-10-validator-staking-h001` canary. Public funding and the deterministic schema-v2 H-001 request/digest remain verified and byte-identical; no signature or broadcast has occurred. Sprint 10B includes fail-closed 8B-first/70B escalation, complete 5+ Guardian strict-majority voting, per-session BIP340 authenticated replay-safe intake, and GH-42/GH-44/GH-48/GH-52 ballot transport, persistent identity, relay/AutoNAT operation, packaged sidecars, and explicit bootstrap routes. Merged and exact-main-verified GH-55/GH-58/GH-63/GH-74 provide the canonical bounded ThreatHint channel, owner-only durable ingress, a real manifest-pinned BN254/Arkworks Groth16 verifier aligned with active KIP-16, and the bounded analyzer-domain adapter. Merged and exact-main-verified GH-77 isolates per-job drain failures: failed jobs remain pending, later safe jobs progress, and the structurally immutable report contains only a bounded index, fixed failure category, and validated digest or `None`. Merged and exact-main-verified GH-86 adds local-only Rust/Python canonical Observable Bundle validators and one shared byte-exact corpus without wiring them into v1, proof, transport, analysis, or publication. Merged and exact-main-verified GH-114 adds isolated local canonical v2 statement parsing and digest parity while leaving relation, proof, pairing, transport, and analysis disconnected. The adapter revalidates queued canonical bytes, digest, trusted network, proof mode, and admission time, but hash-only v1 has no concrete IOC strings and therefore produces only a zero-confidence, no-rule, non-submittable result without invoking LLM or YARA generation. No approved production relation or production relation vectors, verifying key, or proving key ships yet, so unavailable verification remains fail-closed as `busy` and actionable analysis is not claimed. Real two-host relay operation, broad discovery, trusted membership/key assignment, Sybil protection, reviewed extractors/privacy gates, the reviewed v2 relation/proof/pairing/transport path and real actionable ThreatHint analysis, on-chain ensemble attestation, live model evidence, and production operation remain open. Mainnet remains gated by the explicitly approved external canary signature and evidence, remaining deployments, real oracle/sponsor signatures and successor evidence, and exact-commit rollout evidence.
+**Status update — July 2026:** Kaspa Toccata is treated as a post-fork deployment environment for Prometheus. Current Silverc compile/runtime, release-bundle, request/receipt/evidence, metrics-oracle, and exact-commit gates cover the seven contract fixtures without holding signing material. Closed profiles separate the full path from the non-promotable `testnet-10-validator-staking-h001` canary. The deterministic schema-v2 H-001 request/digest later completed exactly one externally signed, fully verified, non-promotable Testnet-10 canary broadcast with confirmed public evidence; this does not authorize further deployments or Mainnet. Sprint 10B includes fail-closed 8B-first/70B escalation, complete 5+ Guardian strict-majority voting, per-session BIP340 authenticated replay-safe intake, and GH-42/GH-44/GH-48/GH-52 ballot transport, persistent identity, relay/AutoNAT operation, packaged sidecars, and explicit bootstrap routes. Merged and exact-main-verified GH-55/GH-58/GH-63/GH-74 provide the canonical bounded ThreatHint channel, owner-only durable ingress, a real manifest-pinned BN254/Arkworks Groth16 verifier aligned with active KIP-16, and the bounded analyzer-domain adapter. Merged and exact-main-verified GH-77 isolates per-job drain failures: failed jobs remain pending, later safe jobs progress, and the structurally immutable report contains only a bounded index, fixed failure category, and validated digest or `None`. Merged and exact-main-verified GH-86 adds local-only Rust/Python canonical Observable Bundle validators and one shared byte-exact corpus without wiring them into v1, proof, transport, analysis, or publication. Merged and exact-main-verified GH-114 adds isolated local canonical v2 statement parsing and digest parity while leaving relation, proof, pairing, transport, and analysis disconnected. The adapter revalidates queued canonical bytes, digest, trusted network, proof mode, and admission time, but hash-only v1 has no concrete IOC strings and therefore produces only a zero-confidence, no-rule, non-submittable result without invoking LLM or YARA generation. No approved production relation or production relation vectors, verifying key, or proving key ships yet, so unavailable verification remains fail-closed as `busy` and actionable analysis is not claimed. Real two-host relay operation, broad discovery, trusted membership/key assignment, Sybil protection, reviewed extractors/privacy gates, the reviewed v2 relation/proof/pairing/transport path and real actionable ThreatHint analysis, on-chain ensemble attestation, live model evidence, and production operation remain open. Mainnet remains gated by the explicitly approved external canary signature and evidence, remaining deployments, real oracle/sponsor signatures and successor evidence, and exact-commit rollout evidence.
 
 **GH-90 merged and exact-main verified — July 2026:** One local Rust producer computes a single `file_sha256` observable from exact caller-supplied bytes and typed scope; Python independently validates the shared producer vectors. The API accepts no path, caller-supplied digest, or generic observable value and performs no transport. It proves deterministic function-boundary derivation only, not external file provenance, maliciousness, privacy approval, or proof binding.
 
@@ -83,12 +83,12 @@ The deploy capability gate and repository operator both bind the official Silver
 
 ## 1. Abstract
 
-Prometheus is a fully decentralized, AI-powered threat intelligence protocol built on the Kaspa blockchain. It transforms every connected device into a node in a global threat detection swarm — without central control, without a foundation, and with zero pre-mined tokens.
+Prometheus is an open protocol project building toward decentralized, AI-assisted threat intelligence on Kaspa. The repository proves development foundations and one non-promotable Testnet-10 canary, not a production or fully decentralized network. Current operation relies on owner-controlled policy and membership files, local trust anchors, and same-host evidence; public multi-host operation, trusted key rotation, Sybil resistance, on-chain attestation, and decentralized rule distribution remain unproven target properties.
 
 The protocol combines three layers:
-- **On-device AI** (Phi-3-mini 3.8B, 4-bit quantized) for local anomaly detection
-- **Guardian nodes** (LLaMA 3 70B/8B) for advanced threat analysis and YARA rule generation
-- **Kaspa L1 consensus** (high-throughput BlockDAG / DAGKnight path) for immutable rule storage and governance
+- **On-device AI target** (Phi-3-mini 3.8B, 4-bit quantized) for local anomaly detection; current code is a development heuristic/stub with no ONNX session
+- **Guardian target** (LLaMA 3 8B-first with 70B escalation) for advanced threat analysis; no real 8B/70B run has been independently evaluated
+- **Kaspa L1 target** for canonical rule state, CID anchoring, and governance; content availability and replication remain separate IPFS responsibilities
 
 Key properties: 0% pre-mine, no emergency stop, automated governance target,
 and data-minimal on-chain state. Applicable privacy obligations depend on the
@@ -105,7 +105,7 @@ Current cybersecurity infrastructure suffers from three fundamental flaws:
 2. **Latency**: New threats take hours to days to propagate through signature databases. Zero-day exploits like Pegasus and Predator operate undetected during this window.
 3. **Misaligned Incentives**: Security vendors profit from fear, not from prevention. There is no economic incentive for collaborative, open threat intelligence.
 
-Prometheus eliminates all three by creating a permissionless, self-governing threat intelligence network where contributors are rewarded for accuracy and speed.
+Prometheus is designed to address these problems through a permissionless, self-governing threat-intelligence network. Permissionless operation, decentralized control, and active rewards remain rollout targets rather than current production facts.
 
 ---
 
@@ -202,8 +202,8 @@ privacy governance, and network/analyzer promotion remain blocked.
 
 ### 4.3 Off-Chain Layer
 
-- **Light Client AI**: Phi-3-mini 3.8B (4-bit quantized, 4GB RAM, no GPU)
-- **Guardian AI**: LLaMA 3 8B (default) / LLaMA 3 70B (confidence escalation)
+- **Light Client AI target**: Phi-3-mini 3.8B (4-bit quantized, 4GB RAM, no GPU); current implementation is a development-only heuristic/stub
+- **Guardian AI target**: LLaMA 3 8B (default) / LLaMA 3 70B (confidence escalation); no independently evaluated real-model run is published
 - **Federated Learning target**: Fed-DART with local training records and bounded model updates; gradients still require privacy controls
 
 ---
@@ -215,9 +215,9 @@ privacy governance, and network/analyzer promotion remain blocked.
 | Token | Purpose | Mechanism |
 |-------|---------|-----------|
 | **KAS** | Validator staking | Native Kaspa token. Validators stake KAS (min 10,000). Slashed on misbehavior. |
-| **PROM** | Rewards & Governance | Earned through accepted proposals. Never staked by validators. 0% pre-mine. |
+| **PROM** | Planned Rewards & Governance | Primary issuance is specified for verified contributions. Validators never stake PROM. Minting, emission, liquidity, and trading are not implemented, deployed, or active. |
 
-**Critical rule**: Validators stake KAS, never PROM. PROM is exclusively earned through contribution.
+**Critical rule**: Validators stake KAS, never PROM. Planned primary PROM issuance is contribution-based; a planned KAS/PROM pool would allow secondary-market purchases after issuance.
 
 ### 5.2 Tokenomics (Annual Emission)
 
@@ -231,15 +231,15 @@ privacy governance, and network/analyzer promotion remain blocked.
 | Community | 5% | 1,000,000 PROM |
 | **Total** | **100%** | **20,000,000 PROM** |
 
-Reporter percentages are protocol allocation targets, not passive uptime rewards. A miner-side companion receives no PROM merely for running; rewards require a future implementation and consensus-verified contribution path.
+These are predefined protocol allocation targets, including the 5% Dev Pool and 5% Community pool; they are not active emissions or passive uptime rewards. A miner-side companion receives no PROM merely for running. Minting logic, verified reward paths, the KAS/PROM pool, deployment, and activation remain open.
 
-No foundation allocation. No founder tokens. No pre-mine. Identical to Kaspa's launch philosophy.
+The specification assigns 0% to a pre-mine, ICO, presale, founders, or a foundation. That does not mean there are no predefined allocations: the five participant/community pools above total 100% of planned annual emission.
 
 ---
 
 ## 6. Validator System
 
-Validators secure the network by staking KAS and voting on threat proposals.
+The validator design uses KAS staking and Commit-Reveal voting. Rust and Silverc state machines are implemented and tested, but no operated validator network, trusted decentralized membership authority, or production quorum is proven.
 
 ### 6.1 Registration
 
@@ -273,7 +273,7 @@ if remaining_stake < MIN_STAKE_KAS: deactivate validator
 
 ## 7. Guardian System
 
-Guardians run LLaMA 3 models to analyze threats and generate YARA rules.
+Guardian interfaces and routing are implemented for an 8B-first/70B-escalation target. The published evidence does not show a real 8B or 70B model run or independent quality evaluation. Current YARA evidence covers compile-valid syntax, a deterministic non-actionable draft, and isolated synthetic regression data only.
 
 ### 7.1 Registration
 
@@ -297,7 +297,7 @@ It is separate from PROM balances and is not a badge or NFT.
 power = (reputation / 100)^2 * compute_power / 1000
 ```
 
-Quadratic voting (Architecture Decision #14) provides mathematical Sybil resistance: 1 real guardian with reputation 1.0 and 500 GFLOPS has power 5000, while 100 fake guardians with reputation 0.1 and 100 GFLOPS have total power 1000. The attacker needs 500+ accounts to match 1 legitimate guardian.
+Quadratic weighting changes the cost distribution in the documented example: one guardian with reputation 1.0 and 500 GFLOPS has power 5000, while 100 identities with reputation 0.1 and 100 GFLOPS have total power 1000. This arithmetic is not proof of Sybil resistance because identity admission, membership authority, compute attestation, key ownership/rotation, collusion, and on-chain attestation remain unproven.
 
 ### 7.4 Hybrid Analysis Routing
 
@@ -467,7 +467,7 @@ Running the companion does not automatically earn PROM. The reporter allocation 
 
 ### 9.1 Commit-Reveal Protocol
 
-Prevents vote-copying and frontrunning (Architecture Decision #13):
+The tested state machine is designed to reduce vote-copying and frontrunning (Architecture Decision #13); no operated validator network evidence is claimed:
 
 1. **Commit Phase**: Validator submits `sha256(vote_byte || salt_LE || block_height_LE)`
 2. **Bond**: 10% of current stake locked as collateral
@@ -487,7 +487,7 @@ Prevents vote-copying and frontrunning (Architecture Decision #13):
 
 ### 10.1 Rule State and Asset Representation
 
-Each accepted rule is anchored as canonical rule state on Kaspa L1. The public product target is a unique PROM-RULES asset representation, but current Silverc verification intentionally covers the rule state machine first:
+In the target architecture, each accepted rule has canonical state and a content CID anchored on Kaspa L1, while the rule content is stored and replicated through IPFS. The public product target is a unique PROM-RULES asset representation, but current Silverc verification covers the state machine first:
 - Target tick: `PROM-RULES`
 - Target supply: 1 per accepted rule
 - Target ID format: `PROM-RULE-2026-XXXX`
@@ -495,10 +495,11 @@ Each accepted rule is anchored as canonical rule state on Kaspa L1. The public p
 
 ### 10.2 IPFS Content Storage
 
-- Rule content stored on IPFS
+- Target rule content storage and replication: IPFS; no operated availability or replication evidence is published
 - On-chain reference: `bytes(36)` CIDv1 binary with SHA-256 multihash
 - **Not** bytes(46) — corrected from CIDv0 base58 assumption (Audit V-002)
 - Always CIDv1 (base32), never CIDv0 (Pattern-005)
+- `deactivateRule` is an explicit authorized state transition. L1 anchoring provides tamper evidence for canonical state/CID; it does not guarantee that IPFS content remains available, sufficiently replicated, or impossible to suppress at every access point
 
 ### 10.3 Contracts
 
@@ -588,7 +589,7 @@ Tuning interval: weekly (604,800 blocks). Parameter bounds enforced to prevent e
 
 ### 13.1 Sybil Resistance
 
-Quadratic voting mathematically prevents Sybil attacks:
+The following weighting example is implemented arithmetic, not proof that Sybil attacks are prevented:
 - 1 real guardian (rep 1.0, 500 GFLOPS): power = 5,000
 - 100 fake guardians (rep 0.1, 100 GFLOPS each): total power = 1,000
 - Ratio: 5:1 in favor of the legitimate participant
@@ -596,7 +597,7 @@ Quadratic voting mathematically prevents Sybil attacks:
 
 ### 13.2 False Positive Flood
 
-MIN_CONFIDENCE_KI = 0.85 threshold prevents low-quality proposals:
+The development policy rejects below-threshold confidence values; it does not prove real-world model quality:
 - 500 proposals with confidence 0.50: ALL blocked
 - 1 proposal with confidence 0.90: passes immediately
 - Threshold is dynamically adjusted by GovernanceAutoTuning
@@ -621,7 +622,7 @@ access; the invariant is not an uninterrupted-availability guarantee.
 
 ## 14. Developer Incentive Pool
 
-5% of annual PROM emission (1,000,000 PROM/year) allocated to developer grants:
+The planned tokenomics reserve 5% of annual PROM emission (1,000,000 PROM in Year 1) for developer grants. No PROM emission is active:
 
 - Anyone can propose a grant
 - Formula: `lines * 10 * (100 + complexity * 10) / 100`
@@ -629,7 +630,7 @@ access; the invariant is not an uninterrupted-availability guarantee.
 - Voting period: 7 days
 - Quorum: 10 validator votes minimum
 - Approval: 2/3 majority (VALIDATOR_QUORUM)
-- No foundation — disbursement only by DAO vote
+- No founder/foundation allocation; planned disbursement requires DAO vote
 
 ---
 

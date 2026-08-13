@@ -26,12 +26,12 @@
 <meta name="twitter:description" content="Full technical specification for the decentralized AI cybersecurity protocol on Kaspa.">
 <meta name="twitter:image" content="https://neabouli.github.io/prometheus-/logo/Prometheus.png">
 <!-- GEO: AI-readable -->
-<meta name="ai-summary" content="Prometheus Whitepaper v4.0: decentralized AI threat intelligence on Kaspa. Current-Silverc runtime/release gates and keyless Toccata-v1 genesis plus reportMetrics operators are implemented. The non-promotable H-001 Testnet-10 canary is externally signed, fully verified, confirmed, receipted, and independently evidenced. Six state deployments, real oracle evidence, production proof approval, multi-host operation, and exact-commit release evidence still gate rollout. KAS is staked; PROM is earned-only; Guardian reputation remains canonical on Kaspa L1.">
+<meta name="ai-summary" content="Prometheus Whitepaper v4.0 documents a development-stage target architecture. One non-promotable H-001 Testnet-10 canary is confirmed; no production protocol network is deployed. Validators are designed to stake KAS, never PROM. PROM minting, emission, liquidity and trading are inactive. Guardian reputation remains canonical on Kaspa L1.">
 <meta name="ai-category" content="whitepaper, cybersecurity, blockchain, technical-specification">
 <meta name="ai-status" content="v4.0, audited, deployment-gated">
 <!-- Schema.org -->
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"TechArticle","name":"Prometheus Whitepaper v4.0","headline":"Decentralized AI-Powered Threat Intelligence on Kaspa","description":"Full technical specification covering architecture, tokenomics, AI models, smart contracts, security analysis, and audit findings.","url":"https://neabouli.github.io/prometheus-/whitepaper.html","datePublished":"2026-03-22","dateModified":"2026-07-23","version":"4.0","author":{"@type":"Organization","name":"Prometheus Protocol Community"},"publisher":{"@type":"Organization","name":"Prometheus Protocol"},"license":"https://opensource.org/licenses/MIT"}
+{"@context":"https://schema.org","@type":"TechArticle","name":"Prometheus Whitepaper v4.0","headline":"Prometheus Threat Intelligence Target Architecture on Kaspa","description":"Technical specification and evidence-classified development status for Prometheus.","url":"https://neabouli.github.io/prometheus-/whitepaper.html","datePublished":"2026-03-22","dateModified":"2026-08-14","version":"4.0","author":{"@type":"Organization","name":"Prometheus Protocol Community"},"publisher":{"@type":"Organization","name":"Prometheus Protocol"},"license":"https://opensource.org/licenses/MIT"}
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -264,8 +264,8 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
     <div class="wp-section r" id="abstract">
       <span class="sec-label">01 / Abstract</span>
       <h2 class="sec-title">The fire belongs to humanity,<br>not to corporations.</h2>
-      <p>Prometheus is a fully decentralized, AI-powered threat intelligence protocol built on the Kaspa blockchain. It transforms every connected device into a node in a global threat detection swarm — without central control, without a foundation, and with zero pre-mined tokens.</p>
-      <p>The protocol combines three layers: <strong>on-device AI</strong> (Phi-3-mini 3.8B, 4-bit quantized) for local anomaly detection, <strong>Guardian nodes</strong> (LLaMA 3 70B/8B) for advanced threat analysis and YARA rule generation, and <strong>Kaspa L1 consensus</strong> (high-throughput BlockDAG / DAGKnight path) for immutable rule storage and governance.</p>
+      <p>Prometheus is an open protocol project building toward decentralized, AI-assisted threat intelligence on Kaspa. The repository proves development foundations and one non-promotable Testnet-10 canary, not a production or fully decentralized network. Current evidence relies on owner-controlled policies, membership files, local trust anchors, and same-host tests.</p>
+      <p>The target combines <strong>on-device Phi-3/ONNX inference</strong>, <strong>8B-first/70B-escalation Guardian analysis</strong>, and <strong>Kaspa L1 canonical state/CID anchoring</strong>. Real Phi-3 inference, independently evaluated real Guardian models, public multi-host operation, decentralized membership/key rotation, Sybil resistance, on-chain attestation, and IPFS availability remain unproven.</p>
       <div class="callout"><p><strong>Key properties:</strong> 0% pre-mine · No repository-controlled emergency-stop entrypoint · Automated governance target · Data-minimal on-chain state. Applicable privacy obligations depend on deployed data flows and jurisdiction; this whitepaper is not a legal determination.</p></div>
       <table class="wp-table">
         <tr><th>Parameter</th><th>Value</th></tr>
@@ -273,12 +273,11 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
         <tr><td>Smart Contracts</td><td>Silverscript — H-001 plus ValidatorStaking, GuardianReputation, RuleStorage, CommunityDonations, DevIncentivePool, and GovernanceAutoTuning current-Silverc gates verified</td></tr>
         <tr><td>Genesis Operator</td><td>Keyless Toccata-v1 assembly with exact contextual storage mass, final 66-byte Schnorr-script mass modeling, signed-request schema-v2 relay/operator fee floors, exact live funding-UTXO validation before preparation and broadcast, external BIP340 digest signing, canonical public signature import with path-collision guards, full verification before output, crash-consistent acknowledged broadcast, transaction-ID retry reconciliation, source-bound covenant UTXO observation, and per-request wRPC deadlines; 38 unit/security tests; testnet-10/mainnet supported by pinned v2.0.1 while resolver mode is testnet-10-only</td></tr>
         <tr><td>Deployment Profiles</td><td><code>full</code> binds all seven release fixtures and the public metrics-oracle key. <code>testnet-10-validator-staking-h001</code> binds only ValidatorStakingH001 to the TLS-only official resolver, omits the oracle key, and cannot promote full or metrics readiness.</td></tr>
-        <tr><td>Guardian AI (default)</td><td>LLaMA 3 8B (24 GB NVIDIA GPU)</td></tr>
-        <tr><td>Guardian AI (escalation)</td><td>LLaMA 3 70B (Meta, open source)</td></tr>
-        <tr><td>Client AI</td><td>Phi-3-mini 3.8B, 4-bit quantized (4 GB RAM, no GPU)</td></tr>
+        <tr><td>Guardian AI target</td><td>8B-first/70B escalation; runtime scaffold exists, no independently evaluated real-model run</td></tr>
+        <tr><td>Client AI target</td><td>Phi-3-mini ONNX; current code is a development heuristic/stub with no ONNX session</td></tr>
         <tr><td>Federated Learning</td><td>Fed-DART (Fraunhofer Institute)</td></tr>
         <tr><td>Staking Token</td><td>KAS (Kaspa native, 0% pre-mine)</td></tr>
-        <tr><td>Governance Token</td><td>PROM (Prometheus Token, 0% pre-mine)</td></tr>
+        <tr><td>Governance Token target</td><td>PROM tokenomics specify 0% pre-mine; minting, emission, liquidity, and trading are inactive</td></tr>
         <tr><td>Total Emission (5 years)</td><td>80,000,000 PROM</td></tr>
         <tr><td>Mainnet Launch</td><td>The non-promotable H-001 Testnet-10 canary completed external signing, full verification, one-shot broadcast, confirmation, operator receipt, and independent evidence on 2026-08-12. Canary success cannot authorize Mainnet; the remaining six state deployments, real oracle/sponsor signatures plus successor evidence, production proof approval, multi-host operation, and exact-commit release hardening remain required.</td></tr>
         <tr><td>License</td><td>MIT</td></tr>
@@ -319,13 +318,13 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
     <!-- SOLUTION -->
     <div class="wp-section r" id="solution">
       <span class="sec-label">03 / Solution Overview</span>
-      <h2 class="sec-title">Swarm intelligence. Blockchain immutability. AI analysis.</h2>
+      <h2 class="sec-title">Target swarm intelligence. Tamper-evident state. AI analysis.</h2>
       <p>Prometheus solves the three core failures of the current security industry simultaneously:</p>
       <table class="wp-table">
         <tr><th>Failure</th><th>Prometheus Solution</th></tr>
         <tr><td>Centralization</td><td>Target: no foundation or central protocol server. Contract design has no repository-controlled emergency-stop entrypoint; availability still depends on Kaspa, nodes, clients, and network access.</td></tr>
         <tr><td>Latency</td><td>Target: threat to on-chain rule in under 60 seconds after proof, observable, consensus, and rollout gates pass.</td></tr>
-        <tr><td>Misaligned incentives</td><td>0% pre-mine. PROM earned only through verified security work. No commercial relationship with governments.</td></tr>
+        <tr><td>Misaligned incentives</td><td>Specification target: 0% pre-mine and primary issuance for verified contributions. A later KAS/PROM pool would allow secondary trading; no minting, emission, liquidity or trading is active.</td></tr>
       </table>
 
       <div class="sec-sub">Target threat lifecycle — under 60 seconds after rollout gates pass</div>
@@ -348,25 +347,25 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
       <p>Merged and exact-main-verified GH-155 hardens Guardian sidecar process integration tests by serializing shared cases, bounding diagnostics and waits, coordinating collector EOF/ACK shutdown, holding the relay-port reservation until spawn, and deterministically killing and reaping a real child on timeout. PR #156 published exact main <code>db33f56</code>; CI, Security, and Pages pass after 20 consecutive stress runs and complete review. This is test-infrastructure evidence only and changes no protocol, production behavior, H-001 readiness, core-rollout percentage, or roadmap percentage.</p>
       <div class="timeline">
         <div class="tl-time">t = 0s</div>
-        <div class="tl-content"><strong>Light Client</strong> — Phi-3-mini detects anomaly. Artifact hash and privacy-filtered observable commitment computed. An approved, precisely scoped ZK-proof and data-minimal hint are sent to Guardian nodes.</div>
+        <div class="tl-content"><strong>Light Client target</strong> — Phi-3-mini detects an anomaly, then an approved proof binds a privacy-filtered observable commitment. Current Phi-3 and proof generation are development stubs.</div>
         <div class="tl-time">t = 2s</div>
-        <div class="tl-content"><strong>Guardian Node</strong> — LLaMA 3 aggregates 5+ similar reports. Analyzes entropy, API patterns, CVE correlations. Generates YARA rule proposal (min. 85% confidence).</div>
+        <div class="tl-content"><strong>Guardian target</strong> — 8B-first analysis with optional 70B escalation would aggregate approved reports and propose a rule. No independently evaluated real-model run or actionable authority is proven.</div>
         <div class="tl-time">t = 15s</div>
-        <div class="tl-content"><strong>Validator Network</strong> — Commit-Reveal voting. commitment = sha256(vote ‖ salt ‖ block_height). 67% consensus required. 10% bond locked per validator.</div>
+        <div class="tl-content"><strong>Validator target</strong> — tested Commit-Reveal, quorum and KAS-bond state machines. No operated validator network or decentralized membership is proven.</div>
         <div class="tl-time">t = 35s</div>
         <div class="tl-content"><strong>Kaspa Layer 1</strong> — Final rule state anchored on L1. PROM-RULES asset representation remains deployment orchestration after the verified RuleStorage state gate.</div>
         <div class="tl-time">t = 36s</div>
-        <div class="tl-content"><strong>All Clients</strong> — P2P broadcast or Kaspa polling. New rule automatically loaded. Local scanner immediately active. Protection established.</div>
+        <div class="tl-content"><strong>Client distribution target</strong> — verified P2P distribution or Kaspa polling would load active rule content. The current client uses a development cache; availability and automatic loading are not deployed.</div>
       </div>
     </div>
 
     <!-- ARCHITECTURE -->
     <div class="wp-section r" id="architecture">
       <span class="sec-label">04 / Architecture</span>
-      <h2 class="sec-title">Three layers. No center.</h2>
+      <h2 class="sec-title">Three target layers. Trust assumptions explicit.</h2>
 
-      <div class="sec-sub">Layer 1 — Kaspa (Immutable Truth)</div>
-      <p>Layer 1 is the core of the security system. Validated threat rules are anchored here as canonical rule state. The current RuleStorage gate verifies CIDv1 storage, quorum, and state transitions; PROM-RULES asset orchestration remains deployment work. The anchored data can be deleted or manipulated by nobody — not governments, not companies, not the developers themselves.</p>
+      <div class="sec-sub">Layer 1 target — canonical state and tamper evidence</div>
+      <p>The target anchors canonical rule state and a CID on Kaspa L1 while rule content lives on IPFS. The current RuleStorage gate verifies CIDv1, quorum, and submit/vote/finalize/deactivate transitions; PROM-RULES orchestration remains deployment work. Anchoring can expose state/CID tampering, but does not guarantee IPFS availability, replication, or universal censorship resistance.</p>
       <ul class="wp-list">
         <li><strong>DAGKnight consensus:</strong> Adaptive, parameterless consensus with theoretically optimal Byzantine fault tolerance (~50%). Converges under attack orders of magnitude faster than classical systems.</li>
         <li><strong>BlockDAG architecture:</strong> Parallel block production eliminates the bottleneck of linear chains. Prometheus treats high throughput as a deployment requirement and verifies contract/tooling compatibility before launch.</li>
@@ -391,7 +390,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
     <!-- NODES -->
     <div class="wp-section r" id="nodes">
       <span class="sec-label">05 / Node Types</span>
-      <h2 class="sec-title">Four roles. Every device contributes.</h2>
+      <h2 class="sec-title">Four target roles. Operation remains gated.</h2>
 
       <table class="wp-table">
         <tr><th>Node Type</th><th>Hardware</th><th>Role</th><th>PROM Share</th></tr>
@@ -428,7 +427,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
       <p>Target architecture: Microsoft's Phi-3-mini 3.8B runs locally on the end user's device for inference. Reporting and model-update paths remain separate, bounded data flows. The planned model is 4-bit quantized and targets ONNX Runtime on 4 GB RAM without GPU on Windows, macOS, Linux, and mobile; production inference is not yet wired.</p>
 
       <div class="sec-sub">Jäger-KI — LLaMA 3 (Guardian Nodes)</div>
-      <p>Meta's LLaMA 3 in the 70B or 8B variant is the centerpiece of the Guardian AI. It runs self-hosted on Guardian nodes and analyzes incoming threat hints from Light Clients across the network. Both variants are fine-tuned with LoRA (Low-Rank Adaptation) on security-specific datasets:</p>
+      <p>The Guardian target uses LLaMA 3 8B first with optional 70B escalation. Hardened local runtime configuration and evidence-capture machinery exist, but no completed fine-tuning, real 8B/70B inference run, real-sample evaluation, calibration, or production authorization is proven. Planned inputs include:</p>
       <ul class="wp-list">
         <li><strong>VirusShare:</strong> Largest public malware database, millions of samples</li>
         <li><strong>MalwareBazaar:</strong> Current malware samples, daily updated</li>
@@ -482,7 +481,7 @@ lora_config = LoraConfig(
         <tr><td>PROM</td><td>Rewards + governance</td><td>Earned through accepted security work (0% pre-mine)</td><td>Utility in Prometheus ecosystem</td></tr>
       </table>
 
-      <div class="sec-sub">PROM emission — first 5 years</div>
+      <div class="sec-sub">Planned PROM emission — first 5 years</div>
       <table class="wp-table">
         <tr><th>Year</th><th>Emission</th><th>Validators 40%</th><th>Guardians 30%</th><th>Reporters 20%</th><th>Dev Pool 5%</th><th>Community 5%</th></tr>
         <tr><td>Year 1</td><td>20,000,000</td><td>8,000,000</td><td>6,000,000</td><td>4,000,000</td><td>1,000,000</td><td>1,000,000</td></tr>
@@ -491,15 +490,15 @@ lora_config = LoraConfig(
         <tr><td>Year 5</td><td>12,000,000</td><td>4,800,000</td><td>3,600,000</td><td>2,400,000</td><td>600,000</td><td>600,000</td></tr>
         <tr><td><strong>Total</strong></td><td><strong>80,000,000</strong></td><td>32,000,000</td><td>24,000,000</td><td>16,000,000</td><td>4,000,000</td><td>4,000,000</td></tr>
       </table>
-      <p>Reporter percentages are protocol allocation targets, not passive uptime rewards. A miner-side companion earns no PROM merely by running; rewards require a future implemented and consensus-verified security contribution path.</p>
-      <div class="callout"><p><strong>0% Pre-mine — absolute and unchangeable.</strong> Not a single PROM token is issued before mainnet launch. No founder allocation. No investor tranche. No team reserve. Developers are compensated exclusively through DAO grants from the 5% Dev Pool — only for work performed.</p></div>
+      <p>These are predefined allocation targets, including Dev Pool 5% and Community 5%, not active emissions. Primary contribution issuance and a later KAS/PROM secondary market are planned; minting, deployment, liquidity, and trading are inactive.</p>
+      <div class="callout"><p><strong>Specified launch allocation:</strong> 0% pre-mine, ICO, presale, founder, or foundation allocation. This does not mean no allocation exists; the participant, Dev, and Community pools above total 100% of planned emission.</p></div>
     </div>
 
     <!-- VALIDATORS -->
     <div class="wp-section r" id="validators">
       <span class="sec-label">09 / Validator System</span>
       <h2 class="sec-title">Economic security through KAS staking.</h2>
-      <p>Validator nodes are the economic backbone of the network. By staking KAS they put economic capital on the line as a guarantee for honest behavior. Misbehavior is punished by slashing — a direct financial loss.</p>
+      <p>Validator state machines use KAS staking, never PROM, with tested quorum, bond, Commit-Reveal, and slashing transitions. No operated validator network, trusted decentralized membership authority, or production quorum is proven.</p>
       <table class="wp-table">
         <tr><th>Property</th><th>Value</th></tr>
         <tr><td>MIN_STAKE_KAS</td><td>10,000 KAS (dynamic via auto-tuning)</td></tr>
@@ -517,7 +516,7 @@ lora_config = LoraConfig(
     <div class="wp-section r" id="guardians">
       <span class="sec-label">10 / Guardian System</span>
       <h2 class="sec-title">Reputation capital through AI contribution.</h2>
-      <p>Guardian nodes are the intelligence of the network. They operate the Jäger-KI, analyze threat patterns, and create rule proposals. Their "stake" is not financial but reputational — a form of social capital earned through good work.</p>
+      <p>Guardian interfaces target model-assisted analysis and rule proposals. Current evidence covers runtime scaffolding, compile-valid syntax, a non-actionable draft, and synthetic regression only. Real-model quality and actionable authority remain blocked.</p>
       <table class="wp-table">
         <tr><th>Property</th><th>Value</th></tr>
         <tr><td>REPUTATION_START</td><td>1,000 (= 0.1 at 10,000× scale)</td></tr>
@@ -535,7 +534,7 @@ lora_config = LoraConfig(
     <div class="wp-section r" id="voting">
       <span class="sec-label">11 / Voting Mechanism</span>
       <h2 class="sec-title">Commit-Reveal. Bond system. 67% quorum.</h2>
-      <p>Commit-Reveal is the core protection mechanism against collusion among validators. No validator knows how the others will vote before they themselves have committed.</p>
+      <p>The tested Commit-Reveal state machine is designed to reduce vote copying. It does not by itself prove collusion resistance or operation by a decentralized validator network.</p>
       <pre>
 # Phase 1: COMMIT — validator sends only a hash
 # commitment = sha256(vote_byte || salt_LE || block_height_LE)
@@ -562,7 +561,7 @@ lora_config = LoraConfig(
         <li><strong>Minimum confidence:</strong> 0.85 (stored as 8,500 at 10,000× scale)</li>
         <li><strong>Current gate:</strong> RuleStorageState verifies submit/vote/finalize/deactivate covenant sigscripts and Guardian reputation outcome events</li>
       </ul>
-      <p>Rule content is stored on IPFS. The CIDv1 hash is stored on-chain. Every client verifies the IPFS content hash against the on-chain hash before loading a rule — manipulation is structurally impossible.</p>
+      <p>The target stores rule content on IPFS and anchors its CIDv1 on-chain. <code>deactivateRule</code> is an explicit authorized transition. Hash verification provides tamper evidence for exact bytes; the client loading path, IPFS availability, replication, and censorship resistance are not operated or proven.</p>
     </div>
 
     <!-- FEDERATED -->
@@ -610,10 +609,10 @@ async def training_round(self):
       <h2 class="sec-title">Sybil resistance. FP flood. 51% attack. Collusion.</h2>
       <table class="wp-table">
         <tr><th>Attack</th><th>Countermeasure</th></tr>
-        <tr><td>Sybil attack</td><td>Quadratic voting (power = rep²). 1 real guardian outweighs 500+ fakes mathematically.</td></tr>
-        <tr><td>Collusion</td><td>Commit-Reveal: nobody knows others' votes before committing. Bond loss makes false voting irrational.</td></tr>
+        <tr><td>Sybil attack</td><td>Quadratic weighting is implemented arithmetic, not proof of Sybil resistance; membership authority, key lifecycle, compute attestation, and on-chain attestation remain open.</td></tr>
+        <tr><td>Collusion</td><td>Commit-Reveal and bonds are tested state-machine mitigations; operated-network resistance is unproven.</td></tr>
         <tr><td>False positive flood</td><td>Min. 85% confidence threshold. Only 5+ independent reports trigger Guardian analysis.</td></tr>
-        <tr><td>Model poisoning</td><td>On-chain model hash. Any manipulation produces a different hash → rejected by all nodes.</td></tr>
+        <tr><td>Model poisoning</td><td>On-chain hash verification is a target tamper check; provenance, authorization, quality, availability, and deployment remain open.</td></tr>
         <tr><td>51% attack</td><td>DAGKnight: ~50% Byzantine fault tolerance. Prometheus inherits Kaspa security.</td></tr>
         <tr><td>Long-range attack</td><td>Weak subjectivity: new validators can only vote from their entry timestamp.</td></tr>
         <tr><td>Emergency stop</td><td>No repository-controlled emergency-stop entrypoint is introduced. This removes a developer kill switch, not every availability dependency.</td></tr>
@@ -623,8 +622,8 @@ async def training_round(self):
     <!-- DEV POOL -->
     <div class="wp-section r" id="devpool">
       <span class="sec-label">16 / Developer Incentives</span>
-      <h2 class="sec-title">5% Dev Pool. DAO vote only. No foundation.</h2>
-      <p>5% of annual PROM emission (1,000,000 PROM/year) is allocated to developer grants. Every single payment requires a DAO vote — full transparency, no hidden payments, no founder allocation.</p>
+      <h2 class="sec-title">Planned 5% Dev Pool. DAO vote required.</h2>
+      <p>The specification reserves 5% of planned emission for developer grants and 5% for Community use. No PROM emission is active; no founder or foundation allocation is specified.</p>
       <p>Recommended reward formula: <code>lines × 10 × (100 + complexity × 10) / 100</code> — capped at 100,000 PROM per grant. Complexity scale: 1–10.</p>
       <div class="sec-sub">Bootstrap financing (before mainnet)</div>
       <p>Before mainnet launch, no tokens are issued. Development is financed through external funding — Gitcoin Grants (quadratic funding, community-decided), Octant (matching pools for open-source infrastructure), and community donations in KAS.</p>
@@ -671,7 +670,7 @@ async def training_round(self):
 </div>
 
 <footer>
-  <div class="f-left">v4.0 · Updated August 2026</div>
+  <div class="f-left">Status reconciled 2026-08-14 · base <a href="https://github.com/NeaBouli/prometheus-/commit/5cd13bf6f9c170711e26364263bd0dcd8aad8c09">5cd13bf</a> · <a href="docs/claim-audit-2026-08-14.md">claim audit</a></div>
   <div class="f-center">PROMETHEUS</div>
   <ul class="f-links">
     <li><a href="faq.html">FAQ</a></li>

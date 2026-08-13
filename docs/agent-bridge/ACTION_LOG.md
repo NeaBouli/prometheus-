@@ -3810,3 +3810,31 @@ Rules for all dev agents:
 - No real sample, model, network, wallet, chain, deployment or production action
   is in scope.
 - Status: `In Progress / Implementation next`.
+## 2026-08-14 - Public claim reconciliation local implementation
+
+- Opened issue #187 and branch `docs/public-claim-reconciliation-20260814`
+  from exact clean main `5cd13bf`; no direct-main write is planned.
+- Added the evidence-classified public claim audit, canonical JSON status,
+  Light Client boundary README and CI drift guard; reconciled core Markdown,
+  public HTML, machine-readable, Memory and Guardian documentation surfaces.
+- Added `guardian-economics.html` after the audit found unqualified model,
+  break-even and node-count scenarios outside the initial minimum file list.
+  Those values are now explicitly illustrative and non-production.
+- Terra supplied a secret-free read-only depth review after Kimi's provider
+  rejected the request at its usage limit. Sol reviewed and integrated the
+  findings; neither delegated review received secrets or external authority.
+- Current focused status: 13-surface consistency PASS, 6 unit tests PASS,
+  documentation hygiene and 11 tests PASS, HTML/JSON-LD parse PASS, workflow
+  YAML parse PASS, and diff check PASS. Full test/build/CI/PR evidence pending.
+
+## 2026-08-14 - Public claim reconciliation full local PASS
+
+- Full Rust workspace all-target tests, Rustfmt and warning-free all-target
+  Clippy pass. Complete Guardian result: 1303 passed, 4 intentional live-model
+  skips. Memory, Autodidactic, H-001 public-evidence, documentation hygiene,
+  claim consistency, Python format/lint, workflow YAML, HTML/JSON-LD, Pages
+  file/meta and diff checks all pass.
+- The exact command/result matrix is recorded in
+  `docs/claim-audit-2026-08-14.md`. Local Actionlint and Gitleaks are absent and
+  remain mandatory protected contexts before merge.
+- Status: `Local PASS / Commit and protected PR next`.

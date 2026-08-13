@@ -4213,3 +4213,48 @@ No direct `main` push or production action occurred.
 - No secret/key action, access test, infrastructure write, deployment, product
   code, contract, production action or branch-protection bypass occurred.
 - **Status:** `SEC-CI-1 + SEC-DOC-1 Done / Exact-main verified / Audit gate remains BLOCKED`.
+## 2026-08-14 - Public claim reconciliation in progress
+
+- Branch `docs/public-claim-reconciliation-20260814` audits public claims at
+  exact baseline `5cd13bf6f9c170711e26364263bd0dcd8aad8c09`; baseline CI
+  `31747553871`, Security `31747553891`, and Pages `31747553216` pass.
+- GitHub issue #187 tracks a documentation-only reconciliation. No product
+  code, contract behavior, tokenomics, security policy, wallet, chain,
+  deployment, infrastructure, secret, or private audit detail is changed.
+- Added a claim table and machine-readable status, corrected Markdown, HTML,
+  Memory and relevant module surfaces, and added a read-only CI consistency
+  gate. The public classes remain: tested development foundation; one
+  non-promotable Testnet-10 canary; no proven production protocol deployment;
+  target architecture; and explicit blocked/unproven gates.
+- Invariants remain unchanged: validators stake KAS, never PROM; Guardian
+  reputation is canonical on Kaspa L1; PROM minting/emission/liquidity/trading
+  are inactive; the under-60-second lifecycle remains a target.
+- Generic public security hardening from PRs #184/#185 is complete. The
+  separate private-operator audit release gate from PR #183 remains blocked
+  pending a bounded, secret-free assignment; no private findings are inferred
+  or published.
+- Kimi review could not start because its configured provider returned a usage
+  limit before analysis and changed no files. A secret-free Terra read-only
+  fallback review identified stale homepage, Guardian, economics, rule and
+  validator wording; those findings are being integrated under Sol review.
+- Current local checks: public claim consistency 13 surfaces PASS; 6 focused
+  unit tests PASS; public documentation hygiene PASS; 11 hygiene tests PASS;
+  five public HTML pages and JSON-LD parse; workflow YAML parses; diff check
+  passes. Full repository test and protected-PR verification remain pending.
+- **Status:** `PROMETHEUS-DOC-CLAIMS-20260814 In Progress / Full verification next`.
+
+## 2026-08-14 - Public claim reconciliation full local verification
+
+- PASS: 13 synchronized public/status surfaces and 6 focused drift-gate tests;
+  documentation hygiene plus 11 tests; existing H-001 public evidence plus 4
+  tests; all 8 Memory files plus 6 Autodidactic tests; Black; Ruff; Rustfmt;
+  warning-free workspace all-target Clippy; complete Rust workspace all-target
+  tests; 1303 Guardian tests with 4 intentional live-model skips; five HTML
+  pages, every JSON-LD block, Pages files/meta, workflow YAML and diff hygiene.
+- The Guardian economics page is now within the canonical check. Its hardware,
+  node-count, reward, PROM-price, quality and break-even values are explicitly
+  illustrative planning inputs, not operating evidence or financial guidance.
+- Local Actionlint and Gitleaks are unavailable; the protected GitHub contexts
+  remain required. No direct-main push, production action, audit-detail
+  disclosure, wallet/chain action, or security-policy change occurred.
+- **Status:** `PROMETHEUS-DOC-CLAIMS-20260814 Local PASS / Commit and protected PR next`.

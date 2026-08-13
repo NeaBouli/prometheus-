@@ -1,9 +1,13 @@
 # Prometheus Guardian Node
 
-Guardian nodes run LLaMA 3 models to analyze threats and generate YARA rules
-for the Prometheus decentralized threat intelligence network.
+This module implements and tests non-production Guardian analysis boundaries.
+The target architecture runs LLaMA 3 8B first with optional 70B escalation,
+but the repository does not prove a completed real-model run, independent
+quality evaluation, calibration, or production authority. Current YARA
+evidence is limited to compile-valid syntax, a deterministic non-actionable
+draft, and synthetic regression fixtures. No actionable rule is authorized.
 
-## Hardware Requirements
+## Target Hardware Requirements
 
 ### LLaMA 3 8B (Default — Architecture Decision #16)
 - **GPU:** NVIDIA GPU with at least 24 GB VRAM (RTX 3090/4090 class or better)

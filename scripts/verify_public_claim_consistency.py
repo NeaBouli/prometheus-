@@ -1,0 +1,203 @@
+#!/usr/bin/env python3
+"""Fail closed when public Prometheus status claims drift from evidence."""
+
+from __future__ import annotations
+
+import json
+import re
+import sys
+from pathlib import Path
+from typing import Any
+
+STATUS_PATH = Path("docs/evidence/public-claim-status-2026-08-14.json")
+PUBLIC_FILES = (
+    Path("README.md"),
+    Path("WHITEPAPER.md"),
+    Path("docs/roadmap.md"),
+    Path("docs/faq.md"),
+    Path("memory/STATUS.md"),
+    Path("index.html"),
+    Path("roadmap.html"),
+    Path("whitepaper.html"),
+    Path("faq.html"),
+    Path("guardian-economics.html"),
+    Path("llms.txt"),
+    Path("modules/client/README.md"),
+    Path("modules/guardian-node/README.md"),
+)
+
+REQUIRED_FRAGMENTS = {
+    Path("README.md"): ("no production Prometheus network", "stake KAS, never PROM"),
+    Path("WHITEPAPER.md"): ("no ONNX session", "rule content is stored"),
+    Path("docs/roadmap.md"): (
+        "scope-weighted engineering estimates",
+        "NO OPERATED VALIDATOR NETWORK",
+    ),
+    Path("docs/faq.md"): (
+        "No PROM minting, emission, pool, or",
+        "development placeholder",
+    ),
+    Path("memory/STATUS.md"): (
+        "Production-deployed: no Prometheus protocol component",
+        "stake KAS, never PROM",
+    ),
+    Path("index.html"): (
+        "No production protocol network or PROM emission is active",
+        "Target: on-chain in under 60 seconds",
+    ),
+    Path("roadmap.html"): ("not production evidence", "no ONNX session"),
+    Path("whitepaper.html"): (
+        "Current Phi-3 and proof generation are development stubs",
+        "content on IPFS",
+    ),
+    Path("faq.html"): (
+        "not implemented, deployed, or active",
+        "No completed fine-tuning",
+    ),
+    Path("guardian-economics.html"): (
+        "not active network economics",
+        "PROM minting, emission, liquidity and trading are not implemented, deployed or active",
+    ),
+    Path("llms.txt"): (
+        "Production protocol status: none proven deployed",
+        "validators stake KAS, never PROM",
+    ),
+    Path("modules/client/README.md"): (
+        "development foundation",
+        "creates no ONNX Runtime session",
+    ),
+    Path("modules/guardian-node/README.md"): (
+        "No actionable rule is authorized",
+        "completed real-model run",
+    ),
+}
+
+BANNED_CLAIMS = {
+    "prom-cannot-be-purchased": re.compile(
+        r"PROM (?:can never|cannot|can not) be purchased", re.I
+    ),
+    "rules-never-removed": re.compile(
+        r"rules? can never be (?:removed|deleted|suppressed)", re.I
+    ),
+    "absolute-censorship": re.compile(
+        r"no (?:organization|corporation) can (?:modify|censor|suppress)", re.I
+    ),
+    "commercial-outperformance": re.compile(
+        r"(?:outperforms?|better than) commercial (?:models|systems)", re.I
+    ),
+    "stale-launch-date": re.compile(
+        r"(?:Mainnet|Testnet)(?: target| launch| Launch| Ziel)?:? (?:May|Mai) (?:5, )?2026",
+        re.I,
+    ),
+}
+
+
+def validate_status(data: dict[str, Any]) -> list[str]:
+    """Return invariant errors for the canonical machine-readable status."""
+    errors: list[str] = []
+    classes = data.get("classifications", {})
+    validators = classes.get("validators", {})
+    prom = classes.get("prom", {})
+    deployment = classes.get("deployment", {})
+    performance = classes.get("performance", {})
+    light = classes.get("light_client", {})
+    economics = classes.get("guardian_economics", {})
+
+    if (
+        validators.get("stake_asset") != "KAS"
+        or validators.get("prom_staking") is not False
+    ):
+        errors.append("validators must stake KAS and PROM staking must be false")
+    if any(
+        prom.get(field) is not False
+        for field in ("minting_implemented", "deployed", "active")
+    ):
+        errors.append("PROM minting, deployment, and activity must remain false")
+    shares = prom.get("year_one_allocation_percent", {})
+    if set(shares) != {"validators", "guardians", "reporters", "dev_pool", "community"}:
+        errors.append("PROM allocation categories are incomplete")
+    elif sum(shares.values()) != 100:
+        errors.append("PROM allocation must total 100 percent")
+    if deployment.get("production_protocol_components") != "none_proven":
+        errors.append("production protocol deployment must remain none proven")
+    if deployment.get("mainnet_ready") is not False:
+        errors.append("Mainnet readiness must remain false")
+    if deployment.get("testnet_10_h001_canary") != "confirmed_non_promotable":
+        errors.append("H-001 must remain confirmed and non-promotable")
+    if performance.get("under_60_seconds") != "target_only":
+        errors.append("under-60-second lifecycle must remain target-only")
+    if light.get("phi3_onnx_inference") != "not_implemented":
+        errors.append("Phi-3 ONNX inference must remain not implemented")
+    if economics.get("status") != "illustrative_planning_only":
+        errors.append("Guardian economics must remain illustrative planning only")
+    if economics.get("active_rewards_or_market_price") is not False:
+        errors.append("Guardian rewards and market price must remain inactive")
+    return errors
+
+
+def find_banned_claims(text: str) -> list[str]:
+    """Return category names only, avoiding matched-value disclosure."""
+    return [name for name, pattern in BANNED_CLAIMS.items() if pattern.search(text)]
+
+
+def validate_json_ld(text: str) -> list[str]:
+    """Validate every JSON-LD script body in an HTML document."""
+    bodies = re.findall(
+        r'<script[^>]+type=["\']application/ld\+json["\'][^>]*>(.*?)</script>',
+        text,
+        flags=re.I | re.S,
+    )
+    errors: list[str] = []
+    if not bodies:
+        return ["missing JSON-LD"]
+    for index, body in enumerate(bodies, start=1):
+        try:
+            json.loads(body)
+        except json.JSONDecodeError:
+            errors.append(f"invalid JSON-LD block {index}")
+    return errors
+
+
+def verify(root: Path) -> list[str]:
+    """Verify canonical status and synchronized public surfaces."""
+    errors: list[str] = []
+    status_file = root / STATUS_PATH
+    try:
+        status = json.loads(status_file.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return [f"{STATUS_PATH}: missing or invalid canonical status"]
+    errors.extend(f"{STATUS_PATH}: {item}" for item in validate_status(status))
+
+    for relative in PUBLIC_FILES:
+        path = root / relative
+        try:
+            text = path.read_text(encoding="utf-8")
+        except OSError:
+            errors.append(f"{relative}: missing public status surface")
+            continue
+        for fragment in REQUIRED_FRAGMENTS.get(relative, ()):
+            if fragment.casefold() not in text.casefold():
+                errors.append(f"{relative}: required status boundary missing")
+        if relative.suffix == ".html" and "5cd13bf" not in text:
+            errors.append(f"{relative}: exact reconciliation baseline missing")
+        for category in find_banned_claims(text):
+            errors.append(f"{relative}: prohibited claim category {category}")
+        if relative.suffix == ".html":
+            errors.extend(f"{relative}: {item}" for item in validate_json_ld(text))
+    return errors
+
+
+def main() -> int:
+    """Run the repository check and print data-minimal diagnostics."""
+    root = Path(__file__).resolve().parents[1]
+    errors = verify(root)
+    if errors:
+        for error in errors:
+            print(f"ERROR: {error}")
+        return 1
+    print(f"Public claim consistency PASS ({len(PUBLIC_FILES)} synchronized surfaces).")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

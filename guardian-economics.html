@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Prometheus — Guardian Economics & Open Problems</title>
 <!-- SEO Meta -->
-<meta name="description" content="Prometheus Guardian node economics: hardware costs, break-even calculations, centralization risk, and 5 solution approaches. Transparent analysis of the core challenge.">
+<meta name="description" content="Illustrative, non-production Prometheus Guardian economics scenarios, centralization risks, and open research assumptions.">
 <meta name="keywords" content="Guardian node economics, LLaMA 3 hardware costs, PROM break-even, decentralized AI security, Kaspa blockchain, 8B 70B Guardian, ensemble voting, hybrid routing">
 <meta name="author" content="Prometheus Protocol">
 <meta name="robots" content="index, follow">
@@ -16,7 +16,7 @@
 <!-- Open Graph -->
 <meta property="og:type" content="article">
 <meta property="og:title" content="Prometheus Guardian Economics — Costs, Break-Even & Solutions">
-<meta property="og:description" content="Radical transparency: hardware costs, break-even calculations for 8B and 70B Guardian nodes, and 5 concrete solutions to the centralization problem.">
+<meta property="og:description" content="Illustrative, non-production Guardian cost scenarios and unresolved decentralization assumptions. No active PROM economics or operated Guardian network.">
 <meta property="og:url" content="https://neabouli.github.io/prometheus-/guardian-economics.html">
 <meta property="og:image" content="https://neabouli.github.io/prometheus-/logo/prom_coin.png">
 <meta property="og:site_name" content="Prometheus Protocol">
@@ -26,11 +26,11 @@
 <meta name="twitter:description" content="70B Guardian costs $60k-120k. We document the problem and 5 solution paths. Radical transparency.">
 <meta name="twitter:image" content="https://neabouli.github.io/prometheus-/logo/Prometheus.png">
 <!-- GEO: AI-readable -->
-<meta name="ai-summary" content="Prometheus Guardian node economics: 8B costs $800-1500 hardware, breaks even at $0.10 PROM. 70B costs $60k-120k, breaks even at $0.28 PROM. Core problem: 70B too expensive for true decentralization. Solutions: hybrid routing, ensemble voting, guardian pooling, specialization. KAS as economic bridge solves bootstrapping chicken-egg problem.">
+<meta name="ai-summary" content="Non-production planning scenarios for Prometheus Guardian economics. Hardware costs, PROM prices, rewards, node counts, model quality and break-even values are illustrative and unproven. PROM minting, emission, liquidity and trading are inactive; no Guardian network or real 8B/70B evaluation is proven.">
 <meta name="ai-category" content="cybersecurity, blockchain, economics, decentralization, AI-infrastructure">
 <!-- Schema.org -->
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"TechArticle","name":"Prometheus Guardian Economics & Open Problems","description":"Transparent analysis of Guardian node hardware costs, break-even calculations, centralization risks, and solution approaches.","url":"https://neabouli.github.io/prometheus-/guardian-economics.html","datePublished":"2026-03-22","author":{"@type":"Organization","name":"Prometheus Protocol Community","url":"https://github.com/NeaBouli/prometheus-"},"mainEntity":{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"How much does a Prometheus Guardian node cost?","acceptedAnswer":{"@type":"Answer","text":"Guardian 8B: $800-1,500 hardware + ~$1,000/year electricity. Guardian 70B: $60,000-120,000 hardware + $8,000-12,000/year electricity."}},{"@type":"Question","name":"What is the break-even price for PROM?","acceptedAnswer":{"@type":"Answer","text":"Guardian 8B breaks even at ~$0.10 PROM. Guardian 70B (owned) at ~$0.28 PROM. Guardian 70B (cloud) at ~$0.144 PROM."}},{"@type":"Question","name":"How does Prometheus solve Guardian centralization?","acceptedAnswer":{"@type":"Answer","text":"Five approaches: hybrid routing (8B default, 70B escalation), ensemble voting (5+ 8B majority), guardian pooling (shared 70B), specialization sharding, and DAO grants for bootstrapping."}}]}}
+{"@context":"https://schema.org","@type":"TechArticle","name":"Prometheus Guardian Economics & Open Problems","description":"Illustrative planning scenarios and unresolved Guardian economics and decentralization assumptions; not active network economics.","url":"https://neabouli.github.io/prometheus-/guardian-economics.html","datePublished":"2026-03-22","dateModified":"2026-08-14","author":{"@type":"Organization","name":"Prometheus Protocol Community","url":"https://github.com/NeaBouli/prometheus-"},"mainEntity":{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Are the Guardian cost and break-even values current facts?","acceptedAnswer":{"@type":"Answer","text":"No. They are illustrative planning scenarios, not quotes, predictions or operating evidence. PROM has no active minting, emission, liquidity or market price."}},{"@type":"Question","name":"Has a real Guardian model or network been evaluated?","acceptedAnswer":{"@type":"Answer","text":"No independently evaluated real 8B or 70B model run and no operated Guardian network are proven. Current evidence covers hardened scaffolding, state machines, non-actionable drafts and synthetic fixtures."}},{"@type":"Question","name":"Is Guardian decentralization solved?","acceptedAnswer":{"@type":"Answer","text":"No. Membership authority, key rotation, Sybil resistance, public multi-host operation and on-chain attestation remain open gates."}}]}}
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -235,7 +235,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
     <div class="breadcrumb r"><a href="index.html">Prometheus</a><span>/</span>Guardian Economics &amp; Open Problems</div>
     <div class="honesty-banner r">⚠ Radical transparency — known problems documented here</div>
     <h1 class="page-title r">Guardian economics,<br>open problems,<br>and honest answers.</h1>
-    <p class="page-desc r d1">Prometheus is built on the principle that code is truth. That same principle applies to our documentation. This page covers the real challenges the protocol faces — including problems not yet fully solved — alongside concrete approaches to solving them.</p>
+    <p class="page-desc r d1">This page records planning scenarios and open questions, not active network economics. Hardware costs are illustrative, PROM has no active minting, emission, liquidity or market price, and no operated Guardian network or independently evaluated real 8B/70B run is proven.</p>
   </div>
 </div>
 
@@ -335,17 +335,17 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
     <div class="wp-section r" id="breakeven">
       <span class="sec-label">Economics</span>
       <h2 class="sec-title">Break-even calculations.</h2>
-      <p>For a Guardian operator to run a node economically, PROM earnings must cover hardware and operating costs. The following calculations use conservative assumptions and are based on Year 1 emission.</p>
+      <p>A future Guardian operator would need rewards to cover hardware and operating costs. The following calculations are hypothetical sensitivity scenarios based on planned Year 1 tokenomics, not forecasts or active rewards.</p>
 
       <div class="callout-warn">
-        <p><strong>Important caveat:</strong> PROM has no market price before Prometheus contract deployment. These calculations use target price scenarios — not predictions. Actual economics depend entirely on market adoption.</p>
+        <p><strong>Important caveat:</strong> PROM minting, emission, liquidity and trading are not implemented, deployed or active. These values are planning inputs, not current quotes, expected earnings, investment guidance or predictions.</p>
       </div>
 
       <div class="sec-sub">Assumptions (Year 1)</div>
       <table class="wp-table">
         <tr><th>Variable</th><th>Value</th><th>Source</th></tr>
         <tr><td>Guardian emission Y1</td><td class="num">6,000,000 PROM</td><td>Whitepaper tokenomics</td></tr>
-        <tr><td>Active Guardians (realistic Y1)</td><td class="num">50–150 nodes</td><td>Conservative estimate</td></tr>
+        <tr><td>Guardian scenario</td><td class="num">50–150 nodes</td><td>Unproven planning assumption</td></tr>
         <tr><td>PROM per Guardian (avg, 100 nodes)</td><td class="num">60,000 PROM/year</td><td>6M ÷ 100</td></tr>
         <tr><td>Reputation weighting</td><td class="num">70B earns ~3–5× more than 8B</td><td>Quadratic voting power formula</td></tr>
       </table>
@@ -354,47 +354,47 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
       <div class="calc-grid">
         <div class="calc-card">
           <div class="calc-title">Guardian 8B</div>
-          <div class="calc-big warn">$0.017</div>
-          <div class="calc-sub">PROM/token to break even in Year 1</div>
+          <div class="calc-big warn">Scenario</div>
+          <div class="calc-sub">Illustrative inputs; no active PROM market</div>
           <div class="calc-rows">
             <div class="calc-row"><span>Annual hardware cost</span><span>~$1,000</span></div>
             <div class="calc-row"><span>Electricity</span><span>~$1,000</span></div>
             <div class="calc-row"><span>Total annual cost</span><span>~$2,000</span></div>
             <div class="calc-row"><span>Avg PROM earned</span><span>~20,000</span></div>
             <div class="calc-row"><span>Break-even price</span><span>$0.10</span></div>
-            <div class="calc-row"><span>Profitable above</span><span class="good">$0.10/PROM</span></div>
+            <div class="calc-row"><span>Modeled threshold</span><span class="good">$0.10/PROM</span></div>
           </div>
         </div>
         <div class="calc-card">
           <div class="calc-title">Guardian 70B (owned)</div>
-          <div class="calc-big danger">$1.83</div>
-          <div class="calc-sub">PROM/token to break even in Year 1</div>
+          <div class="calc-big danger">Scenario</div>
+          <div class="calc-sub">Illustrative inputs; no active PROM market</div>
           <div class="calc-rows">
             <div class="calc-row"><span>Hardware (amortized 5yr)</span><span>~$18,000</span></div>
             <div class="calc-row"><span>Electricity</span><span>~$10,000</span></div>
             <div class="calc-row"><span>Total annual cost</span><span>~$28,000</span></div>
             <div class="calc-row"><span>Avg PROM earned (5× weight)</span><span>~100,000</span></div>
             <div class="calc-row"><span>Break-even price</span><span>$0.28</span></div>
-            <div class="calc-row"><span>Profitable above</span><span class="warn">$0.28/PROM</span></div>
+            <div class="calc-row"><span>Modeled threshold</span><span class="warn">$0.28/PROM</span></div>
           </div>
         </div>
         <div class="calc-card">
           <div class="calc-title">Guardian 70B (cloud)</div>
-          <div class="calc-big danger">$3.50+</div>
-          <div class="calc-sub">PROM/token to break even in Year 1</div>
+          <div class="calc-big danger">Scenario</div>
+          <div class="calc-sub">Illustrative inputs; no active PROM market</div>
           <div class="calc-rows">
             <div class="calc-row"><span>Cloud GPU (4× A100)</span><span>~$1,200/mo</span></div>
             <div class="calc-row"><span>Annual cloud cost</span><span>~$14,400</span></div>
             <div class="calc-row"><span>Total annual cost</span><span>~$14,400</span></div>
             <div class="calc-row"><span>Avg PROM earned</span><span>~100,000</span></div>
             <div class="calc-row"><span>Break-even price</span><span>$0.144</span></div>
-            <div class="calc-row"><span>Profitable above</span><span class="warn">$0.144/PROM</span></div>
+            <div class="calc-row"><span>Modeled threshold</span><span class="warn">$0.144/PROM</span></div>
           </div>
         </div>
       </div>
 
       <div class="callout">
-        <p><strong>Key insight:</strong> The 8B Guardian is economically the most attractive entry point. Break-even at $0.10/PROM is achievable if the network gains meaningful adoption. Cloud-hosted 70B is actually more capital-efficient than owning hardware — but depends entirely on PROM market price.</p>
+        <p><strong>Scenario result:</strong> Under these selected inputs, 8B has a lower modeled cost threshold than 70B. This does not establish achievable profitability, future PROM value, cloud availability, real model quality or an operating reward path.</p>
       </div>
 
       <div class="sec-sub">Early-mover advantage in numbers</div>
@@ -404,29 +404,29 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
         <tr><td>Year 2</td><td class="num">5,400,000 PROM</td><td class="num">54,000/node</td><td class="num">10,800/node</td><td class="num">2,700/node</td></tr>
         <tr><td>Year 3</td><td class="num">4,800,000 PROM</td><td class="num">48,000/node</td><td class="num">9,600/node</td><td class="num">2,400/node</td></tr>
       </table>
-      <p>Early operators earn significantly more PROM per node — both because emission is higher in Year 1 and because fewer nodes compete for rewards. This is the strongest economic argument for early participation despite the uncertain PROM price.</p>
+      <p>The table illustrates how a fixed planned pool would divide across assumed node counts. It does not promise earnings, encourage early participation, or account for eligibility, quality, uptime, abuse controls, market value, taxes or operating-network rules.</p>
     </div>
 
     <!-- SOLUTIONS -->
     <div class="wp-section r" id="hybrid-routing">
       <span class="sec-label">Solution Approaches</span>
-      <h2 class="sec-title">Five paths to solving Guardian centralization.</h2>
-      <p>None of these solutions is implemented yet. They represent the current best thinking on how to address the problem. Community input is explicitly invited — this is an open design question.</p>
+      <h2 class="sec-title">Six candidate paths for Guardian centralization.</h2>
+      <p>Repository state machines and an 8B-first routing scaffold exist, but none of these approaches is proven as an operated decentralization solution. Model quality, membership authority, public multi-host behavior and economics remain open.</p>
 
       <div class="solutions-grid">
 
         <div class="sol-card" id="hybrid-routing">
           <span class="sol-tag now">Immediate · High impact</span>
           <div class="sol-title">1. Hybrid Routing (8B/70B escalation)</div>
-          <div class="sol-desc">8B Guardians handle standard cases. 70B escalation only triggers when confidence score falls below threshold (e.g. &lt;0.70). Most threats are known variants — 8B handles them well. True zero-days escalate automatically to 70B.</div>
-          <div class="sol-impact">Impact: 70–80% of work stays at 8B level. 70B needed only for edge cases. Decentralization dramatically improved.</div>
+          <div class="sol-desc">The tested router selects an injected 8B path first and an independent 70B path below confidence 0.70. No real model quality, workload mix, zero-day behavior or automatic production routing has been evaluated.</div>
+          <div class="sol-impact">Target impact: reduce dependence on 70B hardware; the actual routing rate and decentralization effect are unproven.</div>
         </div>
 
         <div class="sol-card" id="ensemble">
           <span class="sol-tag now">Immediate · Proven pattern</span>
           <div class="sol-title">2. Ensemble Voting (multiple 8B nodes)</div>
-          <div class="sol-desc">Instead of one 70B node, 5–10 independent 8B Guardians analyze the same threat and vote on the YARA rule via majority consensus. Disagreement triggers 70B escalation. Ensemble accuracy approaches 70B quality for common threats.</div>
-          <div class="sol-impact">Impact: Zero new hardware requirements. Same quality via consensus. Strongly increases Guardian count and geographic distribution.</div>
+          <div class="sol-desc">The tested local ensemble state machine requires at least five configured Guardian identities and strict-majority ballots. It does not prove independent operators, model accuracy, 70B-equivalent quality or public-network consensus.</div>
+          <div class="sol-impact">Target impact: distribute analysis; membership, Sybil, quality and geographic claims remain unproven.</div>
         </div>
 
         <div class="sol-card" id="pooling">
@@ -460,7 +460,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
       </div>
 
       <div class="callout">
-        <p><strong>Current recommendation:</strong> Solutions 1 (Hybrid Routing) and 2 (Ensemble Voting) can be implemented immediately with existing architecture. They are the highest-impact, lowest-risk interventions. Solutions 3–6 require additional protocol design and will be addressed in Sprints 9–14.</p>
+        <p><strong>Current engineering direction:</strong> Continue testing the existing hybrid-routing and ensemble state-machine foundations before evaluating them with real models and independent operators. No candidate is approved as a production decentralization solution; pooling, specialization, grants and alternate proof systems require separate design and review.</p>
       </div>
     </div>
 
@@ -471,34 +471,33 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
       <p>Every decentralized network faces the same fundamental challenge: without nodes, there is no protection. Without protection, there are no users. Without users, there is no incentive for nodes. Prometheus has a structural answer to this that most protocols lack.</p>
 
       <div class="sec-sub" id="kas-bridge">KAS as the economic bridge</div>
-      <p>The critical insight: <strong>KAS already has economic value.</strong> On day one of mainnet, Validators stake KAS — an asset worth over $1 billion in market capitalization that has been established since 2021. This means Prometheus inherits real economic security immediately, without waiting for PROM to develop a price.</p>
+      <p>The design uses <strong>KAS, never PROM, for validator stake</strong>. KAS is an external network asset, but this does not automatically give Prometheus economic security. That requires deployed contracts, correct membership and stake operation, adequate value at risk, monitoring and a live validator network.</p>
 
       <div class="callout">
-        <p><strong>Why this matters:</strong> Most new protocols bootstrap security with their own token that has zero initial value. Prometheus bootstraps with KAS — a proven asset. Security comes from established value on day one. PROM can develop a price organically, under no pressure to be the primary security mechanism.</p>
+        <p><strong>Design intent:</strong> separating KAS collateral from PROM rewards avoids PROM self-staking. It is an incentive assumption, not proof of day-one security or future PROM value.</p>
       </div>
 
       <div class="sec-sub" id="early-mover">Early-mover dynamics</div>
-      <p>The deflationary emission schedule creates a natural bootstrapping incentive. Year 1 emits 20M PROM across fewer nodes than Year 3. An operator who joins in Month 1 earns dramatically more PROM per node than one who joins in Year 2 — at lower competition and higher token scarcity.</p>
-      <p>This is not artificial scarcity. It is a direct consequence of the network growing while emission decreases. The economic rational actor calculation strongly favors early participation even under price uncertainty.</p>
+      <p>The specification plans 20M PROM in Year 1 and a declining schedule. Actual per-node issuance would depend on implementation, verified contributions, eligibility, abuse controls and active operation. No early-operator return is promised.</p>
 
       <div class="sec-sub" id="phases">Realistic bootstrap phases</div>
       <div class="phases-track">
         <div class="phase-row">
           <div class="phase-label">Phase 1<br>Mo 1–3</div>
           <div class="phase-content">
-            <strong>Team-operated nodes.</strong> 10 Validators (team) + 10–20 Guardian 8B (team) + 2–5 Guardian 70B (team/partners). Security level: known threats covered. First PROM minted. DEX pool opens. Price discovery begins.
+            <strong>Planning scenario only.</strong> A small operator-controlled validator/Guardian set, initial PROM issuance and a later pool would each require separate implementation, governance, security and deployment evidence. None is active.
           </div>
         </div>
         <div class="phase-row">
           <div class="phase-label">Phase 2<br>Mo 4–12</div>
           <div class="phase-content">
-            <strong>Community expansion.</strong> +500 Light Clients. +50 Guardian 8B (community). +10 Guardian 70B (institutions/data centers). Dev Pool grants cover early 70B operators. Security level: good coverage of common threats + zero-day capability.
+            <strong>Target expansion scenario.</strong> Public clients, independent Guardians and Dev Pool grants remain contingent on real-model quality, privacy, membership, Sybil, token and operational gates.
           </div>
         </div>
         <div class="phase-row">
           <div class="phase-label">Phase 3<br>Year 2+</div>
           <div class="phase-content">
-            <strong>Self-sustaining network.</strong> 10,000+ Light Clients. 500+ Guardian 8B. 30–50 Guardian 70B. PROM market price established. Full security coverage. Guardian Pooling Protocol active. Specialization emerges organically.
+            <strong>Long-term target scenario.</strong> Node counts, market liquidity, coverage, pooling and specialization are aspirations, not forecasts or demonstrated outcomes.
           </div>
         </div>
       </div>
@@ -510,7 +509,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
       <h2 class="sec-title">Sybil resistance for Guardians.<span class="pill pill-partial">Partial</span></h2>
       <p>An attacker who operates 10 A100 GPUs could theoretically create 5 independent 70B Guardian identities and dominate the pre-analysis stage — injecting malicious YARA rules.</p>
 
-      <div class="sec-sub">Current countermeasures (implemented)</div>
+      <div class="sec-sub">Specified or locally tested mechanisms; no Sybil-resistance proof</div>
       <ul class="wp-list">
         <li><strong>Quadratic voting power:</strong> power = (reputation / 100)² × compute. Linear expansion of nodes does not linearly expand power.</li>
         <li><strong>PoW registration:</strong> Difficulty scales with current Guardian count. 100 fake nodes cost 100× the registration effort.</li>
@@ -533,7 +532,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
     <div class="wp-section r" id="sla">
       <span class="sec-label warn">Open Problem</span>
       <h2 class="sec-title">60-second SLA under real-world load.<span class="pill pill-partial">Partial</span></h2>
-      <p>The 60-second end-to-end guarantee has been proven in E2E tests — but under controlled conditions with no network latency, no load, and stub implementations for ZK-proof and AI inference.</p>
+      <p>The repository has a same-host development-stub fixture below 60 seconds. It is not a guarantee or production performance evidence because it has no real model, approved proof, public network load, IPFS availability or operated consensus.</p>
 
       <table class="wp-table">
         <tr><th>Step</th><th>Target time</th><th>Risk factor</th><th>Status</th></tr>
@@ -554,13 +553,13 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
       <h2 class="sec-title">8B vs 70B YARA rule quality.<span class="pill pill-partial">Acknowledged</span></h2>
       <table class="wp-table">
         <tr><th>Task</th><th>LLaMA 3 8B</th><th>LLaMA 3 70B</th></tr>
-        <tr><td>Known malware families</td><td class="good">Adequate (with fine-tuning)</td><td class="good">Reliable</td></tr>
-        <tr><td>YARA for common CVEs</td><td class="warn">Possible with fine-tuning</td><td class="good">Reliable</td></tr>
-        <tr><td>Zero-day analysis</td><td class="bad">Insufficient alone</td><td class="good">Required</td></tr>
-        <tr><td>Multi-stage threats (&gt;128k context)</td><td class="bad">Context window too small</td><td class="good">128k token context</td></tr>
-        <tr><td>YARA syntax correctness</td><td class="warn">Improvable via YARA-specific fine-tuning</td><td class="good">High quality</td></tr>
+        <tr><td>Known malware families</td><td class="warn">Not evaluated</td><td class="warn">Not evaluated</td></tr>
+        <tr><td>YARA for common CVEs</td><td class="warn">Not evaluated</td><td class="warn">Not evaluated</td></tr>
+        <tr><td>Zero-day analysis</td><td class="warn">Not evaluated</td><td class="warn">Not evaluated</td></tr>
+        <tr><td>Multi-stage threats</td><td class="warn">Not evaluated</td><td class="warn">Not evaluated</td></tr>
+        <tr><td>YARA syntax correctness</td><td class="warn">Compile-only fixture exists</td><td class="warn">No real-model output evaluated</td></tr>
       </table>
-      <p>The 85% confidence threshold combined with the reputation system provides a natural quality filter — 8B Guardians that produce poor rules lose reputation and influence over time. However, for genuine zero-day threats, 70B remains necessary. This is why maintaining at least a small number of 70B Guardians in the network is critical even if 8B dominates in count.</p>
+      <p>No independently evaluated real 8B/70B run, calibration, real-sample quality result or actionable authority is published. The 85% threshold and reputation transitions are policy/state-machine inputs, not proof of detection quality or a requirement that 70B solves zero-day analysis.</p>
     </div>
 
     <!-- RESEARCH -->
@@ -599,7 +598,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
 </div>
 
 <footer>
-  <div class="f-left">v4.0 · March 2026</div>
+  <div class="f-left">Status reconciled 2026-08-14 · base <a href="https://github.com/NeaBouli/prometheus-/commit/5cd13bf6f9c170711e26364263bd0dcd8aad8c09">5cd13bf</a> · <a href="docs/claim-audit-2026-08-14.md">claim audit</a></div>
   <div class="f-center">PROMETHEUS</div>
   <ul class="f-links">
     <li><a href="faq.html">FAQ</a></li>

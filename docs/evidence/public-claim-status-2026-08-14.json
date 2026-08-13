@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "as_of": "2026-08-14",
+  "repository_commit": "5cd13bf6f9c170711e26364263bd0dcd8aad8c09",
+  "evidence": {
+    "prometheus_ci_run": 31747553871,
+    "security_audit_run": 31747553891,
+    "pages_run": 31747553216,
+    "h001_canary": "docs/evidence/gh-9-h001-canary-confirmed-2026-08-12.json"
+  },
+  "classifications": {
+    "light_client": {
+      "status": "implemented_and_tested_development_foundation",
+      "phi3_onnx_inference": "not_implemented",
+      "scanner": "custom_yara_style_pattern_matcher",
+      "canonical_rule_loading": "development_cache_only",
+      "p2p_reporting": "not_operated",
+      "proof_generation": "development_stub_only"
+    },
+    "guardian_analysis": {
+      "status": "implemented_and_tested_non_production_foundation",
+      "yara_syntax_validation": "implemented_compile_only",
+      "semantic_draft": "implemented_non_actionable",
+      "actionable_rule_authority": "not_implemented_or_authorized",
+      "real_8b_or_70b_evaluation": "not_proven",
+      "synthetic_quality_gate": "implemented_regression_only"
+    },
+    "guardian_economics": {
+      "status": "illustrative_planning_only",
+      "active_rewards_or_market_price": false,
+      "costs_node_counts_quality_and_break_even": "unproven_scenario_inputs"
+    },
+    "validators": {
+      "stake_asset": "KAS",
+      "prom_staking": false,
+      "commit_reveal": "implemented_and_tested_state_machines",
+      "operated_validator_network": "not_proven",
+      "trusted_membership_and_sybil_resistance": "not_proven"
+    },
+    "rules": {
+      "canonical_state_and_cid": "targeted_for_kaspa_l1",
+      "content_location": "targeted_for_ipfs",
+      "deactivation_transition": "implemented_and_tested",
+      "availability_and_replication": "not_proven",
+      "censorship_resistance": "target_property_not_proven"
+    },
+    "performance": {
+      "under_60_seconds": "target_only",
+      "current_evidence": "same_host_development_stub_fixture"
+    },
+    "prom": {
+      "tokenomics": "specified",
+      "minting_implemented": false,
+      "deployed": false,
+      "active": false,
+      "primary_issuance": "planned_for_verified_contributions",
+      "secondary_market": "planned_kas_prom_pool",
+      "year_one_allocation_percent": {
+        "validators": 40,
+        "guardians": 30,
+        "reporters": 20,
+        "dev_pool": 5,
+        "community": 5
+      },
+      "premine_ico_presale_founder_foundation_allocation_percent": 0
+    },
+    "decentralization": {
+      "status": "target_property_not_proven",
+      "current_assumption": "owner_operated_policy_membership_and_local_trust_anchors"
+    },
+    "deployment": {
+      "testnet_10_h001_canary": "confirmed_non_promotable",
+      "production_protocol_components": "none_proven",
+      "mainnet_ready": false,
+      "full_rollout": "blocked"
+    },
+    "security_audit": {
+      "generic_public_hardening": "completed_in_prs_184_and_185",
+      "private_operator_release_gate": "blocked_pending_bounded_secret_free_assignment"
+    }
+  }
+}

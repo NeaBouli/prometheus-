@@ -2528,6 +2528,10 @@ jobs:
         run: |
           python3 scripts/verify_h001_canary_closeout_evidence.py
           python3 -m unittest scripts/test_h001_canary_closeout_evidence.py
+      - name: Verify synchronized public claims
+        run: |
+          python3 scripts/verify_public_claim_consistency.py
+          python3 -m unittest scripts/test_public_claim_consistency.py
       - name: Verify public launch status is not stale
         run: |
           files=(index.html faq.html roadmap.html whitepaper.html guardian-economics.html README.md WHITEPAPER.md docs/roadmap.md llms.txt)

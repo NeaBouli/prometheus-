@@ -2,7 +2,7 @@
 
 # Prometheus
 
-**Decentralized AI-powered threat intelligence on Kaspa.**
+**Building decentralized, AI-assisted threat intelligence on Kaspa.**
 
 [![CI](https://github.com/NeaBouli/prometheus-/actions/workflows/ci.yml/badge.svg)](https://github.com/NeaBouli/prometheus-/actions)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
@@ -12,18 +12,20 @@
 
 ## What is Prometheus?
 
-Prometheus transforms every connected device into a sensor in a global threat detection swarm — without central control, without a foundation, without hidden interests. It combines on-device AI (Phi-3-mini) with LLaMA 3 guardian nodes and Kaspa L1 consensus to create an incorruptible, zero-pre-mine security protocol.
+Prometheus is an open protocol project targeting a decentralized threat-intelligence network on Kaspa. The repository contains tested development foundations, but no production Prometheus network is operating today. Current execution depends on owner-operated policies, membership files, local trust anchors, and same-host evidence. Real Phi-3/ONNX inference, independently evaluated 8B/70B Guardian models, public multi-host operation, decentralized membership and key rotation, Sybil resistance, and on-chain attestation remain rollout gates.
+
+See the [2026-08-14 public claim audit](docs/claim-audit-2026-08-14.md) and its [machine-readable status](docs/evidence/public-claim-status-2026-08-14.json). The audit baseline is exact main `5cd13bf`; Prometheus CI `31747553871`, Security Audit `31747553891`, and Pages `31747553216` pass on that commit.
 
 ---
 
-## Quick Start
+## Development Build
 
-| Node Type | Hardware | Command |
+| Development component | Target hardware | Command |
 |-----------|----------|---------|
-| **Light Client** | Any device, 4 GB RAM | `cargo run -p prometheus-client` |
-| **Validator** | Kaspa node + 10,000 KAS stake | `cargo run -p prometheus-validator` |
-| **Guardian (8B)** | NVIDIA GPU with 24 GB VRAM (RTX 3090/4090 class) | See [Guardian runtime preflight](modules/guardian-node/README.md) |
-| **Guardian (70B)** | 4x A100/H100 80 GB, 256 GB system RAM | Opt-in Compose profile `70b`; same preflight required |
+| **Light Client foundation** | Development host | `cargo run -p prometheus-client` |
+| **Validator state-machine foundation** | Development host; target stake is 10,000 KAS | `cargo run -p prometheus-validator` |
+| **Guardian 8B runtime scaffold** | Target: NVIDIA GPU with 24 GB VRAM | See [Guardian runtime preflight](modules/guardian-node/README.md) |
+| **Guardian 70B runtime scaffold** | Target: 4x A100/H100 80 GB, 256 GB system RAM | Opt-in Compose profile `70b`; no completed real-model evaluation is claimed |
 
 ```bash
 git clone https://github.com/NeaBouli/prometheus-.git
@@ -50,14 +52,14 @@ The companion currently validates a strict credential-free, loopback-only config
 ## Architecture
 
 ```
-Layer 1 (Kaspa L1):  ValidatorStaking | GuardianReputation | RuleStorage | GovernanceAutoTuning
-                     Silverscript contracts on Kaspa with DAGKnight consensus
+Layer 1 target:       ValidatorStaking | GuardianReputation | RuleStorage | GovernanceAutoTuning
+                     Tested state machines; only the non-promotable H-001 canary is on Testnet-10
 
 Layer 2 (P2P):       Guardian ballot request/response over QUIC (implemented core)
                      Rule distribution and client/validator carriers remain rollout work
 
-Off-Chain:           Phi-3-mini (local AI) | LLaMA 3 8B-first/70B-escalation | Fed-DART
-                     Data-minimal by design; current v1 sends bounded claim metadata, not raw files
+Off-Chain target:    Phi-3-mini | LLaMA 3 8B-first/70B-escalation | Fed-DART
+                     Current Phi-3 and Fed-DART paths are development stubs; no real model quality is proven
 ```
 
 ---
@@ -67,9 +69,9 @@ Off-Chain:           Phi-3-mini (local AI) | LLaMA 3 8B-first/70B-escalation | F
 | Token | Role | Details |
 |-------|------|---------|
 | **KAS** | Validator Staking | Kaspa native token. Validators stake KAS (min 10,000). Slashed on misbehavior. |
-| **PROM** | Rewards & Governance | 0% pre-mine. Earned by guardians for accepted proposals. 20M annual emission. |
+| **PROM** | Planned Rewards & Governance | Tokenomics specify 0% pre-mine and 20M Year-1 emission; minting, emission, liquidity, and trading are not implemented, deployed, or active. |
 
-**Important:** Validators stake KAS, never PROM. PROM is earned through contribution, never purchased or staked.
+**Important:** Validators stake KAS, never PROM. Planned primary PROM issuance rewards verified contributions; a planned KAS/PROM pool would permit secondary-market purchases after issuance. No ICO, presale, founder allocation, foundation allocation, or pre-mine exists in the specification. The predefined Year-1 split is Validators 40%, Guardians 30%, Reporters 20%, Dev Pool 5%, and Community 5%.
 Guardian reputation is a separate canonical Kaspa L1 state in `GuardianReputationState`; it is not a PROM balance, badge, or NFT.
 
 ---
@@ -80,10 +82,10 @@ Guardian reputation is a separate canonical Kaspa L1 state in `GuardianReputatio
 |--------|--------|-------------|
 | 0 — Setup | DONE | Kaspa testnet-10 node, repo structure, CI/CD |
 | 1 — Contracts | ACCEPTED | 6 Silverscript contracts, 54 tests |
-| 2 — Client | ACCEPTED | Kaspa RPC, KRC-20 reader, YARA scanner, ZK stub |
-| 3 — AI | ACCEPTED | Phi-3 wrapper, anomaly detection, Fed-DART |
+| 2 — Client | DEVELOPMENT FOUNDATION | Kaspa RPC foundation, cache-only rule reader, custom YARA-style pattern matcher, and ZK stub; canonical L1/IPFS rule loading and operated P2P reporting are open |
+| 3 — AI | DEVELOPMENT FOUNDATION | Phi-3 wrapper uses a development heuristic/stub and no ONNX Runtime session; Fed-DART is also a stub |
 | 4 — Guardian | CORE ACCEPTED / MEMBERSHIP SOURCE MERGED | YARA/analyzer foundation; GH-144 hardens local vLLM operation and GH-147 binds canonical local membership/key assignments without production trust |
-| 5 — Voting | ACCEPTED | Commit-Reveal, bond system, slashing engine |
+| 5 — Voting | TESTED STATE MACHINES | Commit-Reveal, quorum, bond, and slashing logic pass local Rust/Silverc gates; no operated validator network or trusted decentralized membership is proven |
 | 6 — E2E | ACCEPTED | Development-stub lifecycle fixture and security tests; test foundation, not production evidence |
 | 7 — Dashboard | ACCEPTED | Audit dashboard, documentation |
 | 8 — Public Site | ACCEPTED | Website, SEO, whitepaper, GitHub Pages |
@@ -232,11 +234,11 @@ Prometheus CI `30863940497`, Security Audit `30863940502`, and GitHub Pages
 
 **GH-155 merged and exact-main verified - Guardian sidecar test reliability:** process integration tests now serialize shared process cases, retain bounded diagnostics, coordinate collector EOF/ACK shutdown, reserve the relay port until spawn, and deterministically kill and reap a real child on timeout. PR #156 published exact main `db33f56`; Prometheus CI `31308756777`, Security Audit `31308756786`, and Pages `31308756387` pass after focused tests, 20 consecutive stress runs, full local gates, and independent review. This changes test infrastructure only and does not advance H-001, core-rollout, protocol, or production readiness.
 
-**Status reconciliation (2026-08-13):** The isolated H-001 Testnet-10 canary is complete and independently evidenced, and GH-167 closes the bounded repository ThreatHint-v2 transport substrate. The rollout-capable core remains 84-88% complete and the complete roadmap vision remains 50-55% complete because production proof/artifact approval, privacy-reviewed semantic/actionable analysis, operated multi-host transport, remaining deployments, oracle evidence, and release gates are still open.
+**Status reconciliation (2026-08-14):** Exact main `5cd13bf` and its CI/Security/Pages runs pass. The isolated H-001 Testnet-10 canary is complete and independently evidenced, and GH-167 closes only the bounded repository ThreatHint-v2 transport substrate. No Prometheus protocol component is proven production-deployed. Production proof/artifact approval, privacy-reviewed semantic/actionable analysis, operated multi-host transport, remaining deployments, oracle evidence, PROM emission, and release gates remain open.
 
 **Deployment status:** Prometheus is in post-Toccata rollout verification. All seven current-Silverc fixture compile/ABI/runtime gates pass through the pinned compiler, and the deterministic release archive, keyless genesis request set, request verifier, operation procedure, receipt/evidence guards, handoff auditor, metrics-oracle handoff, and exact-commit release-hardening gates are implemented. Deployment requests carry one of two closed profiles bound to the exact release manifest: `full` selects all seven release fixtures and requires the public metrics-oracle key; `testnet-10-validator-staking-h001` selects only `ValidatorStakingH001`, requires the TLS-only official Testnet-10 resolver, omits the oracle key, and emits canary-only statuses that cannot satisfy full rollout or metrics readiness. On 2026-08-12 the H-001 signature was imported and fully verified, the exact acknowledged transaction was submitted once, and its covenant output was confirmed by the request-bound node and the independent Testnet-10 REST API. Transaction `c85fd1e79607370ff63faabbc3158e011158d2bde1af40d4eecd642189d8c22f` created instance `:0` with covenant ID `8cdb49adc2511ed5fa11f71317b66f203f37ce376a2603cd9b118236c1f8219f`; the public `operator_record` and evidence verifiers pass. See the [confirmed canary evidence](docs/evidence/gh-9-h001-canary-confirmed-2026-08-12.json). No signature or raw transaction is published. Full rollout remains gated by the other six state deployments, real oracle/sponsor inputs and signatures plus successor evidence, production proof/relation approval and independent review, operated multi-host protocol evidence, and exact-commit release hardening.
 
-**Progress estimate (2026-08-13):** the isolated H-001 Testnet-10 canary is **100% complete** with signature, full transaction verification, one-shot broadcast, confirmation, `operator_record`, and independent public evidence. A rollout-capable core network remains about **84–88% complete**: the repository v2 transport substrate now exists, but production proof authority, privacy-reviewed semantic/actionable v2 analysis, operated public multi-host transport, the six state-contract deployments, PROM emission, real metrics-oracle execution/evidence, remaining P2P paths, and production node evidence remain open. The complete roadmap vision remains about **50–55% complete**, so **45–50% remains**. These are scope-weighted engineering estimates, not calendar or release guarantees.
+**Internal engineering estimate (2026-08-14):** the isolated H-001 Testnet-10 canary work item is complete. The rollout-capable core is estimated at **84–88%** and the complete roadmap vision at **50–55%**. These are internal, scope-weighted engineering estimates, not evidence of production readiness, calendar progress, network decentralization, or release timing. The [claim audit](docs/claim-audit-2026-08-14.md) lists the remaining evidence gates.
 
 **Covenant genesis operator:** `prometheus-silverc-deployer` implements the official SilverScript genesis shape with Kaspa transaction version 1, compute budget 10, the exact contextual `storage_mass` commitment, P2SH from the compiled contract script, covenant-ID derivation from the funding outpoint plus the unbound genesis output, and funding-input binding only after the ID is derived. It verifies the exact live unspent funding UTXO during preflight and again immediately before broadcast, models the final 66-byte Schnorr signature script, and binds compute, transient, storage, normalized relay/overall mass, plus pinned relay and conservative operator fee floors into signing-request schema v2 before exporting a 32-byte sighash. A canonical `import-signature` path accepts only a public 64-byte BIP340 signature as 128 lowercase hex characters, derives every response field from the validated request, rejects normalized input/output path collisions, and writes output only after BIP340 plus complete Kaspa transaction verification. It persists an exclusive crash-recovery intent before submission, reconciles retries by transaction ID, applies per-request wRPC deadlines, and rebuilds the verified transaction before observing its exact covenant UTXO. The CLI has no private-key, seed, wallet, keystore, or raw-transaction input. Fifty unit/security tests, including eleven focused metrics-transition tests and exact-ID typed/remote mempool-absence classification, cover deterministic public vectors, fee/mass and profile tamper rejection, secret-field rejection, resolver/TLS fail-closed behavior, signature-import failure/collision guards, journal recovery, and public-file handoff roundtrips. Pinned v2.0.1 supports `testnet-10`; public resolver mode is TLS-only and restricted to testnet-10, while `testnet-12` and non-Toccata `simnet` fail closed. See the [operator runbook](docs/runbooks/silverc-genesis-operator.md).
 
@@ -249,8 +251,8 @@ Prometheus CI `30863940497`, Security Audit `30863940502`, and GitHub Pages
 ## Links
 
 - [Whitepaper v4](WHITEPAPER.md) — Full technical specification
-- [Audit Dashboard](modules/web/audit/index.html) — Live network transparency
-- [Audit Log](memory/AUDIT.md) — All audit results, public and immutable
+- [Audit Dashboard](modules/web/audit/index.html) — Development audit/status interface
+- [Audit Log](memory/AUDIT.md) — Public repository audit history
 - [Architecture Decisions](memory/MEMO.md) — 15 binding decisions
 - [Sprint Planning](memory/SPRINTS.md) — Detailed roadmap
 
@@ -258,7 +260,7 @@ Prometheus CI `30863940497`, Security Audit `30863940502`, and GitHub Pages
 
 ## License
 
-MIT — Fully open source. No foundation. No gatekeeper.
+MIT licensed. The specification assigns no founder or foundation token allocation. Repository openness does not prove decentralized operation; current operator and trust assumptions are documented above.
 
 ---
 

@@ -16,7 +16,7 @@
 | Projektname        | Prometheus                                             |
 | Token              | PROM (Prometheus Token)                                |
 | GitHub             | https://github.com/NeaBouli/prometheus-                |
-| Ziel-Launch        | 5. Mai 2026 (Kaspa Covenant-Hardfork)                  |
+| Ziel-Launch        | Kein festes Datum; readiness-gesteuerte Gates           |
 | Whitepaper         | Prometheus_Whitepaper_v4.docx (im Repo)                |
 | Status             | Phase 0 – Vorbereitung                                 |
 | Core Dev           | NeaBouli                                               |
