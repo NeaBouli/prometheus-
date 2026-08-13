@@ -45,7 +45,7 @@
 
 - PR #6 merged normally as `4176093`; main Prometheus CI `29406057800`, Security Audit `29406057729`, and Pages `29406056965` passed.
 - Opened issue #7 and branch `feature/GH-7-public-resolver-probe` for an official public-resolver target plus funding-free node/Toccata probe.
-- Direct `ssh sandbox` still fails public-key authentication. `ssh hub-sandbox` works with passwordless sudo, but the host has only about 1.9 GiB available RAM, no swap, 20 GiB free disk, and many active workloads, so no Kaspa node was installed there.
+- The direct operator path remained unavailable. A separate compatibility path was available, but it was not approved or suitable for installing a Kaspa node.
 - Added exact `kaspa-resolver://public` handling with mandatory TLS and testnet-10-only enforcement, standalone read-only `probe`, shared Python target validation, independent verifier checks, and CI artifact coverage. Resolver lookalikes, HTTP(S), credentials, queries, fragments, and unsupported networks fail closed.
 - Local 30-test Rust suite, workspace tests/clippy, Python compile/target checks, CI YAML parse, and checksum-verified Actionlint v1.7.12 pass. A real read-only probe confirmed `rusty-kaspa 2.0.1`, synced testnet-10, UTXO index, and DAA above Toccata activation. No funding, wallet, key, signature, or broadcast was used.
 - Final verification passed 135 workspace tests with two intentional live-test ignores, warning-free workspace Clippy, Memory Integrity, six Autodidactic tests, `git diff --check`, and a second read-only resolver probe at virtual DAA `517522160`. The seven-contract resolver request set independently verified with SHA-256 `f9b4838d116ff931ec5fd02ed3e119b1570b62c6836684e4d822c73166e82e2d`; an independent Terra review reported no remaining findings. Resolver availability remains best-effort and does not replace funded deployment or chain evidence.
@@ -101,7 +101,7 @@
 - Extended Prometheus CI with public receipt-evidence fixture generation, positive verification, secret/raw/tamper/confirmation negative coverage, handoff inclusion, readiness component assertions, and receipt-evidence safety tamper coverage.
 - Updated README, Whitepaper, public `whitepaper.html`, roadmap, Silverc module docs, llms.txt, Memory, and Bridge to describe public receipt-evidence verification as a release-hardening gate, not a deployment claim.
 - Local checks passed: Python syntax compile, CI YAML parse, fresh release archive -> deploy requests -> deploy request verification -> public orchestrator-result import -> operator receipts -> public receipt-evidence verification -> operator handoff -> release-readiness smoke, plus evidence secret/raw/tx/confirmation negative tests and readiness safety tamper rejection.
-- Direct `ssh sandbox` probe from this Codex shell failed with `Permission denied (publickey)`; Bridge documents this as a current local SSH-agent/key issue and does not include secrets.
+- A private operator access check remained unavailable; details are intentionally omitted and repository verification was unaffected.
 - GitHub Prometheus CI, Security Audit, and Pages passed for `4d7a6b8`; this is the public receipt-evidence verifier baseline.
 - Added `scripts/stage_metrics_oracle_status.py`, a public-only metrics-oracle status staging guard. It validates a signer-ready unsigned request plus public `operator_record` tx result, emits JSON/Markdown manual status drafts, rejects blocked requests, secret-like fields, and raw/serialized transactions, and does not write `memory/STATUS.md`.
 - Extended `scripts/build_silverc_operator_handoff.py` so `--metrics-tx-result` also includes `metrics-oracle-status-draft.json/.md` and exposes `metrics_oracle_status_draft_status`.
@@ -264,11 +264,11 @@
 
 - Codex onboarding check completed at 20:19 EEST: read bridge, cooperation rules, CLAUDE.md, BACKLOG.md, and required memory files.
 - Verified current repo state: branch `main`, HEAD `467ca03`, local uncommitted memory/bridge/docs assets present.
-- Verified direct Sandbox access via `ssh sandbox` using BatchMode: host `Sandbox`, user `root`.
+- Verified private operator access on 2026-07-07; host, account and topology details are intentionally omitted.
 - Completed read-only repository audit and documented findings in `CODEX_FINDINGS.md`.
 - Verified checks: `cargo fmt --all --check`, `cargo clippy --workspace -- -D warnings`, `cargo test --workspace`, Guardian pytest via temporary `/tmp` venv, memory integrity, and remote HEAD alignment.
 - Researched Kaspa Toccata status from current public sources; updated public docs/pages and memory/backlog from stale May 5 launch wording to post-Toccata ssc/H-001 verification status.
-- Checked direct Sandbox PATH for `kaspad` and `ssc`; neither was found there, so Sprint 9 still needs local tooling installation/verification.
+- Checked the private operator environment for required tooling; the result remains non-authoritative, so Sprint 9 still needs approved tooling installation and verification.
 - Replaced stale current-status wording that said Testnet-12 does not exist with a legacy Testnet-10 baseline plus TN12/Toccata tooling verification requirement.
 - Added H-001 Rust guardrail: canonical 17-byte commit-reveal preimage builder plus known hex vectors for normal, zero, endian-visible, and `u64::MAX` cases.
 - Updated `ValidatorStaking.ss` comments to document the same canonical H-001 byte preimage without changing contract logic.
@@ -279,7 +279,7 @@
 - Added Rust client runtime gate via `PROMETHEUS_RUNTIME`: development remains stub-capable; beta/mainnet/production reject ZK, Phi-3 fallback/heuristic, KRC-20 cache, and Fed-DART placeholder stubs.
 - Verified runtime gate with `cargo fmt --all --check`, `cargo test -p prometheus-client`, and `cargo clippy --workspace -- -D warnings`.
 - Added `CODEX_BRIDGE.md` as the central Codex handover/start file.
-- Documented direct Sandbox SSH access via local alias `ssh sandbox`.
+- Documented the private operational-access boundary without aliases or topology.
 - Consolidated Prometheus project identity, workflow logic, audit blockers, open issues, and Reputation Badge decision.
 - Explicitly excluded plaintext passwords, private keys, tokens, and other secrets from bridge documentation.
 
@@ -327,7 +327,7 @@ Rules for all dev agents:
 
 - Started GitHub issue #1 and branch `feature/GH-1-silverc-genesis-capability` to reduce the external deploy-orchestrator ambiguity without moving keys, signing, transaction payloads, or broadcast into the repository.
 - Verified official `kaspanet/silverscript` state: pinned commit `d25bd3427a093c17327ca3d6b9e1aa5f7688c863` differs from current `master` only by README commit `77ebf01`; current `silverc --help` still exposes compile/AST only and no network deploy command.
-- Verified server access: direct `ssh sandbox` still rejects the configured key, while `ssh hub-sandbox` succeeds as `deploy`; no secret or key material was read, copied, or changed.
+- Verified that direct and compatibility operator paths had different availability states; no topology, account, secret or key material was recorded or changed.
 - Added the official covenant-genesis profile to the public deploy procedure and made external capability verification require an exact attestation for transaction version 1, compiled-script P2SH, official funding-outpoint/unbound-output covenant-ID derivation, and post-derivation funding-input binding.
 - Added CI positive assertions and tamper rejection for transaction version, P2SH builder, covenant-ID builder, and binding order.
 - Local verification passed: Python compile, CI YAML parse, 55 pinned upstream Silverc tests, seven-artifact deterministic release archive, deploy preflight/request verification/procedure generation, positive capability verification, and all four genesis-profile tamper checks.
@@ -606,7 +606,7 @@ Rules for all dev agents:
 - Independent Terra review found one high implicit-listener advertisement, two medium schema/broadcast gaps, and two low evidence/test gaps. Only explicit advertisements now enter the libp2p external-address registry; runtime records use schema v2; IPv4 broadcast is rejected; the registry isolation regression passes; and the same-host process test now uses its emitted explicit bootstrap route for the actual relay circuit while still making no multi-host claim.
 - Terra rechecked all five findings as resolved and found no new blocker, high, or medium issue. The only residual low test-quality note is the usual local ephemeral-UDP-port handoff race in the same-host process fixture; protected Linux CI remains the authoritative cross-platform check.
 - Added a controlled two-host operator procedure with fixed UDP firewall guidance and explicit evidence requirements. Same-host tests remain packaging evidence only.
-- Direct `ssh sandbox` capability probe reached the host but failed public-key authentication. Therefore no real two-host or public reachability claim is made yet.
+- Private operator access remained unavailable. Therefore no real two-host or public reachability claim is made yet.
 - No wallet, private key, secret, signature, raw transaction, broadcast, contract, Guardian authorization, reputation, KAS/PROM, slash ACL, commit-reveal formula, or foreign untracked file was accessed or changed. `Prometheus-1.png` remains untouched and uncommitted.
 
 ## 2026-07-19 GH-52 merge and exact-main closeout
@@ -644,7 +644,7 @@ Rules for all dev agents:
 - PR #57 passed all ten protected contexts and merged normally as exact public/docs main `a78d3ed7d3f05c41a9adfa3746aa2a9884dd60b0`.
 - Exact-main Prometheus CI `29647112173`, Security Audit `29647112172`, and Pages `29647111845` completed successfully; live README, Whitepaper, Bridge, Pages Whitepaper/Roadmap, and `llms.txt` markers pass.
 - Opened issue #58 for the next autonomous product slice: dedicated owner-only ThreatHint verifier ingress, persistent freshness/replay admission, and bounded analyzer handoff. The sidecar remains fail-closed until a real independently approved Groth16/KIP-16 verifier exists.
-- Browser access remains useful for public GitHub, Pages, explorer, and read-only evidence checks. It cannot repair `ssh sandbox` public-key authentication, supply a second approved host, or replace external signing and explicit irreversible-broadcast approval.
+- Browser access remains useful for public GitHub, Pages, explorer, and read-only evidence checks. It cannot replace unavailable private operator access, supply a second approved host, or replace external signing and explicit irreversible-broadcast approval.
 
 ## 2026-07-23 GH-58 ThreatHint verifier ingress start
 
@@ -672,7 +672,7 @@ Rules for all dev agents:
 - Exact-main Prometheus CI `29962533693`, Security Audit `29962533720`, and Pages `29962533075` completed successfully for the same SHA. Rust workspace, Guardian Python, SilverScript, current-Silverc runtime/artifact smoke, Memory, HTML, dependency audits, Gitleaks, Pages build, and Pages deployment all passed.
 - The merged boundary is deliberately fail-closed: no independently approved production Groth16/KIP-16 relation, verifying key, or vectors are bundled, so the operated verifier remains unavailable as `busy` and cannot claim accepted analysis. A reviewed analyzer-domain adapter is also still required before durable outbox jobs can become analyzer indicators.
 - Opened issue #61 and branch `docs/GH-61-threat-hint-closeout` to synchronize Bridge, Memory, README, Whitepaper, Roadmap, and `llms.txt` through the normal protected PR path. Scope-weighted estimates remain core 76-80%, complete vision 42-47%, and 53-58% remaining.
-- The next non-documentation gates are external verifier specification/material, explicit analyzer mapping, real two-host Guardian evidence after `ssh sandbox` public-key access is repaired, and the separately approved H-001 signature/broadcast/evidence sequence. Browser access cannot substitute for host access, private signing, or irreversible broadcast approval.
+- The next non-documentation gates are external verifier specification/material, explicit analyzer mapping, real two-host Guardian evidence after private operator access is independently verified, and the separately approved H-001 signature/broadcast/evidence sequence. Browser access cannot substitute for host access, private signing, or irreversible broadcast approval.
 - No wallet, private key, secret, signature, raw transaction, broadcast, contract, Guardian/reporter authorization, reputation, KAS/PROM, slash ACL, commit-reveal behavior, emergency-stop policy, or foreign untracked file was accessed or changed. `Prometheus-1.png` remains untouched and uncommitted.
 
 ## 2026-07-23 GH-63 manifest-pinned KIP-16 verifier start
@@ -3599,6 +3599,21 @@ Rules for all dev agents:
 - No external, model, scan, submission, wallet, chain, deployment, or
   production action is in scope.
 - Status: `In Progress / Implementation next`.
+
+## 2026-08-13 16:08 EEST - SEC-DOC-1 public operational-data hygiene local PASS
+
+- Replaced concrete operational-access topology in the public Bridge and
+  generalized historical Bridge, Action Log and Memory references without
+  copying values into another repository file.
+- Added a deterministic, redacted-output documentation hygiene checker and 11
+  tests to the read-only Security Audit job. The checker covers tracked public
+  documentation/data formats and omits every matched value from diagnostics.
+- PASS: whole-tree checker; 11 unit tests; Ruff; workflow YAML; Python compile;
+  Memory Integrity; Bridge fence balance; `git diff --check`. Kimi final review:
+  APPROVED, no P0/P1/P2; its remaining P3 observation was also fixed and tested.
+- No access test, secret/key action, network/infrastructure write, deployment,
+  product code, contract, production system or audit-PR mutation occurred.
+- Status: `SEC-DOC-1 Complete local PASS / Protected PR next`.
 
 ## 2026-08-13 05:35 EEST - GH-180 complete local PASS
 

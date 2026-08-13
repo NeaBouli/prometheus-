@@ -28,6 +28,15 @@ jobs:
           GITLEAKS_ENABLE_UPLOAD_ARTIFACT: "false"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+
+      - name: Public Documentation Hygiene
+        run: |
+          python3 scripts/check_public_documentation_hygiene.py
+          python3 -m unittest scripts/test_public_documentation_hygiene.py
+
   dependency-audit:
     name: Dependency Audit
     runs-on: ubuntu-latest

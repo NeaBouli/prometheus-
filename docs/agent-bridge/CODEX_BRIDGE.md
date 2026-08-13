@@ -28,7 +28,7 @@ No product code, production artifact approval, semantic/actionable analyzer,
 transport, wallet, chain, server, secret, or production deployment is in
 scope. Sol owns publication and complete validation; Kimi K3 provides bounded
 read-only consistency review.
-Previous GH-52 CI note: final GH-52 product PR passed all ten protected contexts in Prometheus CI `29644104499` and Security Audit `29644104466`; independent review found no remaining blocker, high, or medium issue. Exact main `f2e52beebe5ec7d6a3e6e0e8d36bced8f6f68ac7` passed Prometheus CI `29644233106`, Security Audit `29644233098`, and Pages `29644232771`. Real two-host operation remains unproven because `ssh sandbox` rejects public-key authentication.
+Previous GH-52 CI note: final GH-52 product PR passed all ten protected contexts in Prometheus CI `29644104499` and Security Audit `29644104466`; independent review found no remaining blocker, high, or medium issue. Exact main `f2e52beebe5ec7d6a3e6e0e8d36bced8f6f68ac7` passed Prometheus CI `29644233106`, Security Audit `29644233098`, and Pages `29644232771`. Real two-host operation remains unproven; private operator access status is not recorded here.
 Current GH-55 verification note: PR #56 passed all ten protected CI/Security/CodeRabbit contexts with every review thread resolved. CodeRabbit found one major shared-admission defect: the ballot handler counted only ballot work while the ThreatHint handler counted both protocols. Both paths now use one shared inbound counter, and a mixed-protocol saturation regression proves the global cap. Local post-fix evidence is 6 schema tests, 8 focused client tests, 45 Guardian P2P unit tests plus 3 process tests, 229 workspace tests with two intentional live-network ignores, Rustfmt, warning-free workspace/all-target Clippy, locked optimized builds, package verification, Python/Memory/HTML/YAML checks, and Cargo Audit with no vulnerabilities. Exact-main Prometheus CI `29646732936`, Security Audit `29646732941`, and Pages `29646732673` pass. Rollout issue https://github.com/NeaBouli/prometheus-/issues/9 remains open.
 Current GH-48 note: the service config and all IPC paths fail closed on unsafe owner/mode/symlink/type conditions and do not expose local paths or ballot/collector bytes in JSON. Service paths now reject parent-directory components before identity/IPC use. Local submission frames require canonical PeerId, bounded exact ballot bytes, and request/response EOF. Signal shutdown stops admission/listeners and drains admitted work to a bounded deadline; a bounded dedicated JSON writer isolates stdout backpressure from the async owner loop, and `stopped` is emitted only after submission-server shutdown succeeds. The same-host process test proves exact relay delivery, ACK propagation, socket cleanup, and stable transport identity but is not public or multi-host evidence. No wallet, chain, contract, signing, reputation, KAS/PROM, slash ACL, commit-reveal, or Guardian authorization boundary changed.
 Completed PR #49 note: the first Rust Workspace run exposed Linux resetting a busy local connection with unread request bytes; bounded reject draining fixed it. CodeRabbit then identified delayed `stopped`, blocking stdout, parent traversal, unbounded test-frame allocation, stale Backlog baseline, and ambiguous Audit metadata. Commit `c61ebc2` fixed all six, added broken-stdout and collector-wait SIGTERM regressions, and passed every refreshed protected context before normal squash merge as `b14d36fc`.
@@ -56,9 +56,9 @@ Current GH-36 note: PR #37 merged normally as exact main `f8ebaac`; Prometheus C
 Current GH-39 note: issue #39 closed and PR #40 merged/exact-main verified at `d0f78a9`, adding the local public-verification and persistence boundary that GH-36 intentionally lacked. `BallotSession` binds the exact candidate, snapshot, network, validity window, nonce, and complete unique Guardian-to-BIP340-key map. Exact-schema canonical envelopes bind the full vote and freshness window; malformed, unknown, duplicate-field, noncanonical, oversized, cross-context, wrong-key, expired, future, and overlong input fails before persistence. Owner-controlled SQLite rejects symlink/unsafe paths and uses atomic primary/unique constraints for one vote per Guardian and one nonce per active session across restart and concurrent collectors. Markers are retained through the complete session validity window, a persistent monotonic time watermark rejects clock rollback after pruning, and stored envelopes are reverified before `EnsembleVoter`. Independent review found the forward-clock/prune/rollback reopening path; the watermark and restart regression close it, and final re-review reports no remaining blocking/high/medium finding. Production code exposes digest-only external signing requests and contains no private keys or signing method. Exact-main CI/Security/Pages passed and live Whitepaper, Roadmap, and GitHub README markers were verified. GH-42 now supplies direct ballot transport; operated discovery/NAT/relay infrastructure, trusted membership/key assignment, Sybil resistance, on-chain attestation, proposal submission, and production operation remain open. No wallet, chain, contract, reputation, KAS/PROM, slash ACL, commit-reveal formula, signature, raw transaction, or broadcast behavior changed.
 Current GitHub governance: `main` requires pull requests, strict up-to-date branches, linear history, resolved conversations, and nine successful CI/Security contexts. Admin enforcement is enabled; force pushes and branch deletion are disabled. Because `NeaBouli` is currently the repository's only collaborator and GitHub forbids self-approval, the formal approving-review count is zero in solo-maintainer mode. Increase it to one when a second collaborator is added.
 
-Purpose: This file is the local bridge for Codex/Claude Code handover. Read it before touching product code. It consolidates the project state, architecture rules, workflow logic, current open issues, the Reputation Badge decision, and the new direct Sandbox access note.
+Purpose: This file is the local bridge for Codex/Claude Code handover. Read it before touching product code. It consolidates project state, architecture rules, workflow logic, current open issues, the Reputation Badge decision, and the private operational-access boundary.
 
-Security rule: Do not write secrets, tokens, passwords, private keys, keystore material, wallet data, dumps, or backups into this bridge. Direct SSH access is documented by alias and host only. Any sensitive fallback data must remain in root-only server files or local keychains, never in this repository.
+Security rule: Do not write secrets, tokens, passwords, private keys, keystore material, wallet data, dumps, backups, access topology, account names, network addresses, authentication output, or private runbook locations into this bridge.
 
 ---
 
@@ -88,69 +88,26 @@ Mandatory safety checks:
 
 ---
 
-## 2. New Direct Sandbox Access
+## 2. Private Operational Access Boundary
 
-Status on 2026-07-07: direct SSH access to the Sandbox server was tested successfully from this machine.
+Operational access topology, account names, network addresses, local aliases,
+authentication diagnostics, jump-host relationships, and recovery procedures
+are maintained outside this public repository in owner-controlled private
+runbooks and local access configuration.
 
-Local SSH aliases:
+Public repository rules:
 
-```bash
-ssh hetzner
-ssh sandbox
-```
-
-Current local config:
-
-- `hetzner` -> root on `135.181.254.229`
-- `sandbox` -> root on `204.168.165.143`, direct, no ProxyJump
-- `hub-sandbox` -> deploy on `204.168.165.143`, still uses `ProxyJump hetzner` and is kept unchanged for compatibility
-
-Verified direct Sandbox test:
-
-```text
-host: Sandbox
-user: root
-access: direct ssh sandbox
-```
-
-Current Codex probe on 2026-07-12:
-
-```text
-ssh -o BatchMode=yes -o ConnectTimeout=10 sandbox 'hostname; whoami; ...'
-root@204.168.165.143: Permission denied (publickey).
-```
-
-Treat direct Sandbox access as currently unavailable from this Codex shell until
-the local SSH agent/key state is fixed. Do not add fallback passwords, private
-keys, or secret operational notes to this repository.
-
-Compatibility access verified on 2026-07-12:
-
-```text
-ssh hub-sandbox 'hostname; whoami'
-Sandbox
-deploy
-```
-
-Server work can continue through `hub-sandbox` without copying or changing key
-material. The direct `sandbox` root alias remains unavailable.
-
-Important:
-
-- Compatibility workflow: use `ssh hub-sandbox` as `deploy` through Hetzner while direct root access is unavailable.
-- Preferred direct workflow after key repair: use `ssh sandbox` directly.
-- Do not copy private keys or passwords into this repo.
-- Root-only operational notes exist on the Hetzner server under `/root/.agent-access/`. They may contain sensitive fallback information and must not be mirrored into git.
-
-If direct access fails:
-
-1. Check the local SSH agent: `ssh-add -l`
-2. Check local SSH config: `sed -n '1,220p' ~/.ssh/config`
-3. Check direct route: `ssh -o BatchMode=yes -o ConnectTimeout=10 sandbox 'hostname; whoami; uptime'`
-4. Only if needed, inspect root-only server docs over `ssh hetzner` without copying secrets into the repo.
+- Never record operational IP addresses, privileged SSH targets, local access
+  aliases, authentication output, fallback credentials, or private runbook
+  locations in tracked files.
+- Public operator documentation may use standards-reserved documentation
+  addresses and explicit placeholders only.
+- Validate access from the private operator context. A repository status entry
+  may record only `available`, `unavailable`, or `not tested` without topology
+  or authentication detail.
+- No public Bridge entry grants deployment or production authority.
 
 ---
-
 ## 3. Project Identity
 
 | Field | Value |
@@ -586,7 +543,7 @@ Sources consolidated into this file:
 - Memory layer files under `memory/`
 - User-provided project synthesis on 2026-07-07
 - Local file `/Users/gio/Downloads/PROMETHEUS_CODEX_HANDOVER.md` as historical handover
-- Live local SSH verification for `ssh sandbox` on 2026-07-07
+- Private operator access verification on 2026-07-07 (details intentionally omitted)
 
 Staleness warning:
 
@@ -614,14 +571,14 @@ If asked to continue project work:
 - Start with `memory/MEMO.md`, `memory/AUDIT.md`, `memory/TODO.md`, `memory/CHECKPOINT.md`, and this bridge.
 - Check git status first.
 - Do not overwrite existing uncommitted changes.
-- Use `ssh sandbox` for direct Sandbox access when server work is needed.
-- Use `ssh hetzner` only for Hetzner server work or recovery/bridge notes.
+- Use private operator runbooks for all operational access.
+- Keep access topology and recovery procedures outside this repository.
 
 ---
 
 ## 18. One-Line Decision Summary
 
-Prometheus does not need reputation badges; it needs readable, provable Kaspa L1 Guardian reputation. All seven current-Silverc compile/ABI/runtime gates and the repository-owned keyless Toccata-v1 genesis operator pass local and remote CI. GH-17 fee/mass hardening is merged and exact-main verified; GH-9 now has confirmed public funding plus a deterministic exact-main schema-v2 request/digest for its manifest-bound, non-promotable H-001 testnet-10 canary. An explicitly approved external signature, operator verification, one-shot broadcast, canary confirmation, receipt, and public evidence remain. The other contracts, metrics-oracle transaction, and exact-commit hardening still gate full rollout. Direct `ssh sandbox` remains unavailable from this Codex shell; no fallback secret is stored in the repo.
+Prometheus does not need reputation badges; it needs readable, provable Kaspa L1 Guardian reputation. All seven current-Silverc compile/ABI/runtime gates and the repository-owned keyless Toccata-v1 genesis operator pass local and remote CI. GH-17 fee/mass hardening is merged and exact-main verified; GH-9 now has confirmed public funding plus a deterministic exact-main schema-v2 request/digest for its manifest-bound, non-promotable H-001 testnet-10 canary. An explicitly approved external signature, operator verification, one-shot broadcast, canary confirmation, receipt, and public evidence remain. The other contracts, metrics-oracle transaction, and exact-commit hardening still gate full rollout. Private operator access status is intentionally omitted from this public repository.
 <!-- CODEX_CLAUDE_CODE_TERMINAL_BRIDGE_V1 -->
 ## Codex -> Claude Code Terminal Bridge
 
@@ -3052,9 +3009,9 @@ No direct `main` push or production action occurred.
   transaction, broadcast, deploy, chain mutation or production promotion is
   authorized or accessed. Any external BIP340 signature and one-shot broadcast
   remain separate explicit gates.
-- `ssh sandbox` still fails with `Permission denied (publickey)`; this does not
-  block the public resolver-based GH-9 refresh but still blocks real two-host
-  Guardian evidence.
+- Private operator access remained unavailable in that historical check; this
+  does not block the public resolver-based GH-9 refresh but still blocks real
+  two-host Guardian evidence.
 - **Status:** `In Progress / Public exact-main rebuild and live preflight`.
 
 ### 2026-08-04 13:36 EEST - GH-9 exact-main readiness refresh local PASS
@@ -4156,6 +4113,43 @@ No direct `main` push or production action occurred.
   vision 50-55%.
 - **Status:** `GH-180 Docs closeout local PASS / Protected docs PR next`.
 
+### 2026-08-13 15:19 EEST - Public operational-data hygiene started
+
+- SEC-DOC-1 is a generic repository-only remediation independent of private
+  audit details. The public Bridge's concrete access-topology section is being
+  replaced by a neutral private-runbook boundary without copying operational
+  values elsewhere in the repository.
+- Scope includes a standard-library checker and focused tests that reject
+  non-documentation IPv4 addresses, privileged SSH targets, operational alias
+  commands, and authentication diagnostics in tracked public documentation
+  formats while omitting matched values from diagnostics. Source and executable
+  formats remain under existing code-review and test-fixture boundaries. The
+  checker is added to the existing read-only Security Audit job.
+- Explicit documentation placeholders and loopback examples remain permitted.
+  No access test, secret rotation, infrastructure write, production action,
+  deployment, product code, contract or audit-PR mutation is in scope.
+- **Status:** `SEC-DOC-1 In Progress / Local verification next`.
+
+### 2026-08-13 16:08 EEST - SEC-DOC-1 local verification PASS
+
+- Replaced concrete public operational-access topology with a neutral private
+  boundary and generalized historical Bridge, Action Log and Memory references
+  while preserving direct-versus-compatibility availability semantics. No
+  operational values were copied to another repository file.
+- Added a deterministic tracked-document checker to the read-only Security
+  Audit job with pinned Python 3.11 setup. It reports only path, line and
+  category, never the matched value, and covers public documentation/data
+  formats for non-documentation IPv4, privileged targets/accounts, alias
+  commands, authentication diagnostics, jump-host topology and host references.
+- PASS: whole-tree documentation hygiene; 11 focused unit tests; Ruff; workflow
+  YAML parse; Python compile; all eight Memory Integrity files; balanced Bridge
+  fences; `git diff --check`. Kimi's final independent read-only review reports
+  APPROVED with no P0/P1/P2; its sole pre-existing P3 host-reference observation
+  was also neutralized and regression-covered afterward.
+- No access test, secret/key/credential action, network/infrastructure write,
+  deployment, product code, contract, source fixture, production system or
+  audit-PR mutation occurred.
+- **Status:** `SEC-DOC-1 Complete local PASS / Protected PR next`.
 ### 2026-08-13 14:36 EEST - Python dependency audit fail-closed fix started
 
 - A secret-free static review and an independent Kimi K3 review confirmed that
