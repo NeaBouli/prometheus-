@@ -2545,3 +2545,30 @@ Exact-main Prometheus CI `31658560850`, Security Audit `31658560811`, and Pages
 the GH-177 feature content. This documentation-only closeout reconciles the
 public and internal status surfaces; it changes no product behavior, rollout
 estimate, external effect, or production authority.
+
+## 2026-08-13 - GH-180 offline v2 pipeline integration local audit
+
+**Result:** LOCAL PASS. One new test module adds eight POSIX-only integration
+cases and changes no product source. Canonical synthetic transport bytes cross
+the real Python ingress, governed promotion, schema-v5 atomic acceptance and
+outbox, bounded worker, and durable GH-173 non-actionable result boundary.
+
+The tests verify exact statement digest, approval ID, observable commitment,
+report nonce, candidate binding, input identity, result schema and retention.
+Negative evidence covers rejection before trusted state for malformed and
+oversized frames, durable replay/restart, exactly one concurrent winner,
+lease-expiry recovery, redacted analyzer failure, and rollback without partial
+result on injected SQLite completion failure. A source guard keeps GH-177 out
+of worker, consumption, draft, ingress, and promotion modules.
+
+PASS: 8 new tests; 171 adjacent; Guardian 1303 passed/4 intentional live-model
+skips; Black; changed-file Pylint 10.00/10; full Guardian Pylint 9.85/10; Pip
+Audit; Rustfmt, warning-free Clippy and full workspace tests; Cargo Audit with
+no known vulnerability and eight allowed existing warnings; Memory Integrity;
+six Autodidactic tests. Kimi implemented the bounded test slice after a
+secret-free architecture review; Sol reviewed every line and reran the gates.
+Independent final diff review and protected publication remain pending.
+
+No real sample, network service, model, scan, disclosure, submission, wallet,
+signing, chain, reward, deployment, actionable result, production artifact
+approval, or production authority is exercised or added.

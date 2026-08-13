@@ -1395,3 +1395,23 @@ Boundary: no real sample, file/process scan, governed integration, model,
           authority, or production certification
 Estimates: unchanged; core 84-88%; complete vision 50-55%
 ```
+
+## GH-180 OFFLINE V2 PIPELINE INTEGRATION LOCAL PASS (2026-08-13)
+
+```text
+Status: complete local candidate PASS; protected PR/CI/merge pending
+Baseline: 440a5c12d2787f45eae9485ad0434952802f86ac
+Scope: canonical synthetic transport -> real Python ingress -> governed
+       promotion -> schema-v5 atomic outbox -> bounded worker -> durable
+       GH-173 non-actionable semantic-draft result
+Evidence: exact statement/approval/observable/nonce/candidate/result bindings;
+          malformed/oversized, replay/restart, duplicate concurrency, lease
+          expiry, redacted analyzer failure, and completion rollback
+Tests: 8 new; 171 adjacent; Guardian 1303 pass/4 skip; Black;
+       Pylint changed 10.00/full 9.85; Pip Audit; Rust fmt/clippy/workspace;
+       Cargo Audit with eight allowed existing warnings; Memory/Autodidactic
+Boundary: test composition only; no product runtime, GH-177 pipeline import,
+          real sample, model, network, scan, disclosure, submission, wallet,
+          chain, reward, deployment, actionable or production authority
+Estimates: unchanged; core 84-88%; complete vision 50-55%
+```

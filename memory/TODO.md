@@ -173,6 +173,7 @@
 - [ ] [P2] Sybil resistance final design: KAS/PROM stake per Guardian identity OR hardware ZK-fingerprint | Architect decision needed
 - [ ] [P3] Evaluate PLONK vs Groth16 for Light Client ZK-proofs | Claude Code | Post hardfork
 - [ ] [P3] YARA-specialized 8B fine-tuning on CVE/YARA datasets only | Claude Code | Sprint 12
+- [~] [P1] GH-180 deterministic offline ThreatHint-v2 pipeline integration gate | Codex Sol + Kimi K3 | Local candidate composes canonical synthetic transport through real ingress, governed promotion, schema-v5 atomic outbox, bounded worker, and durable non-actionable result; 8 new and 171 adjacent tests pass; 1303 Guardian tests passed and 4 intentional live-model tests skipped; protected PR/CI/merge/exact-main verification pending
 
 ---
 

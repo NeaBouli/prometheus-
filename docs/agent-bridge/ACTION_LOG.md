@@ -3577,6 +3577,18 @@ Rules for all dev agents:
   stale-status scan, evidence markers, and diff hygiene.
 - Status: `Docs closeout local PASS / Protected PR next`.
 
+## 2026-08-13 05:08 EEST - GH-180 offline v2 pipeline gate kickoff
+
+- Opened issue #180 and branch `feat/GH-180-v2-pipeline-integration` from exact
+  clean main `440a5c1`.
+- Kimi's read-only gap review confirmed that current ingress tests use a
+  promotion stub and worker tests start after outbox population; the adjacent
+  baseline is 165 passing tests.
+- Selected a synthetic-only, same-host, development integration gate across the
+  real transport/ingress/promotion/acceptance/outbox/worker/result boundaries.
+  No external or production effect and no GH-177 worker wiring are in scope.
+- Status: `In Progress / Bounded Kimi implementation next`.
+
 ## 2026-08-13 - GH-173 deterministic semantic draft kickoff
 
 - Opened issue #173 and branch `feat/GH-173-semantic-draft` from exact clean
@@ -3587,6 +3599,58 @@ Rules for all dev agents:
 - No external, model, scan, submission, wallet, chain, deployment, or
   production action is in scope.
 - Status: `In Progress / Implementation next`.
+
+## 2026-08-13 05:35 EEST - GH-180 complete local PASS
+
+- Added eight deterministic POSIX integration tests from canonical synthetic
+  transport through real ingress, governed promotion, schema-v5 atomic outbox,
+  bounded worker, and durable non-actionable semantic-draft completion.
+- Covered exact bindings, malformed/oversized rejection, replay/restart,
+  duplicate concurrency, lease recovery, redacted analysis failure,
+  transactional rollback, and structural GH-177 isolation.
+- Kimi implemented the bounded test slice; Sol reviewed it, synchronized local
+  candidate documentation, and reran the full relevant gate set.
+- PASS: 8 new; 171 adjacent; Guardian 1303/4; Black; Pylint 10.00/9.85;
+  Pip Audit; Rust fmt/Clippy/workspace; Cargo Audit allowed warnings only;
+  Memory Integrity; six Autodidactic tests; diff hygiene.
+- No product source or runtime authority changed. No real sample, model,
+  network, scan, wallet, chain, deployment, actionable or production action.
+- Status: `Complete local PASS / Independent review next`.
+
+## 2026-08-13 05:49 EEST - GH-180 independent review PASS
+
+- Kimi reproduced 8 new, 171 adjacent and Guardian 1303/4, found no P0/P1/P2,
+  and recommends protected publication.
+- Sol expanded the GH-177 isolation tripwire across the complete adjacent v2
+  acceptance/governance/preflight/verified-preflight/transport path.
+- The exact 171 set is now documented; the earlier kickoff count remains an
+  append-only historical baseline. No product source changed.
+- Status: `Review PASS / Final rerun next`.
+
+## 2026-08-13 05:54 EEST - GH-180 post-review rerun PASS
+
+- Expanded isolation guard passes; 8 new, 171 adjacent and Guardian 1303/4
+  pass again after review hardening.
+- Black, test Pylint 10.00, Memory, six Autodidactic, HTML/JSON-LD and diff
+  hygiene pass. No product source changed.
+- Status: `Complete local + review PASS / Protected PR next`.
+
+## 2026-08-13 06:00 EEST - PR #181 review fixes
+
+- Initial exact head `902ac95` passed eleven protected contexts. CodeRabbit
+  found two minor docs inconsistencies and three test-quality nits.
+- Accepted all five: canonical pass/skip wording, active TODO placement,
+  explicit SQLite close/commit, one failure-marker source, and propagated
+  thread exceptions. No product or security defect was found.
+- Status: `Review fixes local / Verification next`.
+
+## 2026-08-13 06:04 EEST - PR #181 review fixes PASS
+
+- All five accepted review improvements pass 8 new, 171 adjacent and full
+  Guardian 1303 passed/4 intentional skips, Black and Pylint 10.00/10.
+- Memory, Autodidactic, HTML/JSON-LD, wording/TODO and diff checks pass. No
+  product source changed.
+- Status: `Review fixes PASS / Protected recheck next`.
 
 ## 2026-08-13 04:46 EEST - GH-177 protected merge and docs closeout
 

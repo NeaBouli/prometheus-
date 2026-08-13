@@ -217,6 +217,7 @@ Core Dev benötigt: Apple Developer Account + Google Play Account (vor Sprint 13
 | 2026-07-31 | H-001 exact-main Readiness-Refresh | Codex Audit | Exact main `143a8a0` reproduziert den akzeptierten `205e1ca` Handoff nach dem Dependency-Security-Fix bytegleich und revalidiert den öffentlichen UTXO; Signatur, Broadcast und Chain-Evidenz bleiben gesondert freizugeben |
 | 2026-08-13 | ThreatHint-v2 Transport vertraut keinem impliziten Netzwerk | Codex Sol + Kimi Review | Der Library-Default bleibt leer und fail-closed; der betriebene Service verlangt ein explizites trusted network. Rust validiert vor owner-only IPC, Python validiert erneut und bezieht Session sowie Zeit aus separatem trusted local state. Peer-ID und Report-Nonce bleiben reine untrusted Transportmetadaten |
 | 2026-08-13 | Synthetische YARA-Scans bleiben isolierte Evidenz | Codex Sol + Kimi Review | GH-177 nutzt die YARA-X-Scan-API nur in einem standalone Offline-Evaluator ueber deterministisch erzeugte In-Memory-Bytes; Authority bleibt `none`, und Worker/Outbox/Result/Submission/Wallet/Chain bleiben strukturell unverbunden |
+| 2026-08-13 | ThreatHint-v2 End-to-End-Komposition bleibt ein Test-Gate | Codex Sol + Kimi Review | GH-180 verdrahtet bestehende Produktionsklassen nur in acht deterministischen POSIX-Integrationstests von kanonischen synthetischen Transportbytes bis zum dauerhaften nicht-actionable Resultat; kein neuer Runtime- oder Authority-Pfad, und GH-177 bleibt unverbunden |
 
 ## 2026-07-29 — Windows-PE-Producer exact-main Reintegration
 
