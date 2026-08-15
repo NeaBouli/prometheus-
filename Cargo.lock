@@ -3793,6 +3793,7 @@ dependencies = [
  "multibase",
  "prometheus-threat-hint",
  "prometheus-validator",
+ "reqwest",
  "serde",
  "serde_json",
  "sha2",

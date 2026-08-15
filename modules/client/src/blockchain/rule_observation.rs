@@ -326,6 +326,33 @@ async fn verify_rule_storage_observation_live_inner(
     manifest_json: &str,
     constructor_json: &str,
 ) -> Result<RuleStateMetadata, RuleObservationError> {
+    verify_observation_live_shared(
+        source,
+        address,
+        expected_manifest_sha256,
+        manifest_json,
+        constructor_json,
+    )
+    .await
+    .map(|(metadata, _)| metadata)
+}
+
+/// The single shared live/injected observation path: parse and check the
+/// address, invoke the injected [`RuleObservationSource`], enforce the exact
+/// Testnet-10 node network, returned-address equality, and entry cap, convert
+/// the returned UTXOs into one canonical observation, and run the unchanged
+/// GH-197 verification. Returns the decoded metadata and the verified manifest
+/// outpoint for the crate-internal GH-205 composition layer.
+///
+/// Callers are responsible for the runtime-mode gate; the public live entry
+/// points gate before delegating here.
+pub(crate) async fn verify_observation_live_shared(
+    source: &dyn RuleObservationSource,
+    address: &str,
+    expected_manifest_sha256: &str,
+    manifest_json: &str,
+    constructor_json: &str,
+) -> Result<(RuleStateMetadata, VerifiedManifestOutpoint), RuleObservationError> {
     let address = Address::try_from(address).map_err(|_| RuleObservationError)?;
     let expected_network = NetworkId::with_suffix(NetworkType::Testnet, 10);
     // Address prefixes identify the testnet family; the snapshot check below
@@ -340,7 +367,7 @@ async fn verify_rule_storage_observation_live_inner(
     }
 
     let observation_json = build_live_observation_json(&address, &snapshot)?;
-    verify_validated(
+    verify_observation_shared(
         expected_manifest_sha256,
         manifest_json,
         &observation_json,
@@ -396,6 +423,37 @@ fn verify_validated(
     observation_json: &str,
     constructor_json: &str,
 ) -> Result<RuleStateMetadata, RuleObservationError> {
+    verify_observation_shared(
+        expected_manifest_sha256,
+        manifest_json,
+        observation_json,
+        constructor_json,
+    )
+    .map(|(metadata, _)| metadata)
+}
+
+/// The verified manifest outpoint of a successful observation verification.
+///
+/// Crate-internal only, used by the GH-205 composition layer to reject
+/// duplicate verified manifest outpoints across one sync request. Never
+/// exposed through errors, Display, Debug, or logs.
+#[derive(PartialEq, Eq, Hash)]
+pub(crate) struct VerifiedManifestOutpoint {
+    /// Verified manifest `outpoint.transaction_id`.
+    pub transaction_id: String,
+    /// Verified manifest `outpoint.index`.
+    pub index: u32,
+}
+
+/// Identical verification pipeline to [`verify_validated`], additionally
+/// returning the verified manifest outpoint for the crate-internal
+/// composition layer. Public API and validation behavior are unchanged.
+pub(crate) fn verify_observation_shared(
+    expected_manifest_sha256: &str,
+    manifest_json: &str,
+    observation_json: &str,
+    constructor_json: &str,
+) -> Result<(RuleStateMetadata, VerifiedManifestOutpoint), RuleObservationError> {
     let expected_hash = parse_hash(expected_manifest_sha256)?;
 
     let manifest = parse_canonical::<Manifest>(manifest_json, MAX_MANIFEST_JSON_BYTES)?;
@@ -420,7 +478,12 @@ fn verify_validated(
     if hex::encode(constructor_hash) != manifest.constructor_json_sha256 {
         return Err(RuleObservationError);
     }
-    decode_rule_state(constructor_json).map_err(|_| RuleObservationError)
+    let metadata = decode_rule_state(constructor_json).map_err(|_| RuleObservationError)?;
+    let outpoint = VerifiedManifestOutpoint {
+        transaction_id: manifest.outpoint.transaction_id,
+        index: manifest.outpoint.index,
+    };
+    Ok((metadata, outpoint))
 }
 
 /// Parse a strict canonical compact JSON document: bounded before parsing,

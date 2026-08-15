@@ -1049,3 +1049,35 @@ Leistungsbasierte Emission. Guardians = "Miner" (KI statt GPU).
   production-deployed. Rollout estimates remain core 84-88% and complete
   vision 50-55%.
 - **Status:** `GH-180 Done / Exact-main verified / Docs closeout in progress`.
+
+## Checkpoint 2026-08-16: GH-205 local rule-content sync
+
+- Issue #205 and branch `feat/GH-205-rule-content-sync` start from exact clean
+  main `ef07b0b`.
+- The callable-only development path verifies every owner-pinned manifest
+  through the injected/live GH-203 Testnet-10 observation boundary, fetches
+  exact bytes from one credential-free loopback-only local IPFS gateway,
+  rechecks canonical Raw-CIDv1 bindings, and replaces one complete scanner
+  snapshot atomically after every entry succeeds.
+- The source rejects DNS, non-loopback hosts, credentials, redirects, proxies,
+  compression, non-success responses, timeout, and bodies above 64 KiB.
+  Deterministic timeout, 10 HTTP-source and 17 sync integration cases pass.
+- Kimi K3 implemented the bounded primary block; Sol corrected the live-source
+  composition and added timeout evidence. Claude Code was unavailable because
+  its OAuth session is expired and made no changes.
+- No automatic update, canonical manifest authority, independent RPC truth or
+  finality, IPFS availability/replication, production YARA, durable downgrade
+  protection, wallet, chain write, deployment, tokenomics, or production
+  authority is added.
+- **Status:** `GH-205 Local focused PASS / Full gates and protected PR next`.
+
+## Checkpoint 2026-08-16: GH-205 full local PASS
+
+- Kimi's independent review found no P0-P2 issue. Sol closed all three P3
+  observations, and Kimi's focused follow-up reports no remaining P0-P3.
+- Complete Rust workspace/doc-tests, all-target Clippy, rustfmt, release
+  performance, dependency audits, Guardian `1303/4`, public claims,
+  documentation hygiene, Memory, H-001 evidence, and diff gates pass.
+- Docker Compose rendering is locally unavailable and remains protected-CI
+  mandatory; the static Compose boundary verifier passes.
+- **Status:** `GH-205 Full local PASS / Protected PR next / Production false`.
