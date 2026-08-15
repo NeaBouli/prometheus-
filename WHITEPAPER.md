@@ -428,7 +428,7 @@ Prometheus CI `30863940497`, Security Audit `30863940502`, and GitHub Pages
 
 ## 8. Light Client
 
-This section describes the target Light Client architecture. The current Rust client contains development implementations and fail-closed runtime guards: beta/mainnet reject the Phi-3 heuristic, SHA-256 ZK placeholder, cached rule reader, local CID-bound rule ingestion, manifest-bound RuleStorage observation verifier, and federated-learning placeholder. GH-197 can compare one separately owner-pinned canonical Testnet-10 manifest with a bounded caller-supplied RPC-shaped UTXO set, require a unique exact outpoint/covenant/script/amount/block-DAA match and a checked virtual-DAA maturity proxy, bind the exact GH-193 constructor JSON, and then decode it. This proves only manifest-to-observation consistency: it is not a live chain reader and does not prove manifest authority, RPC truth, transaction history, finality, IPFS availability, or production readiness. These components must not be presented as a production threat-reporting pipeline.
+This section describes the target Light Client architecture. The current Rust client contains development implementations and fail-closed runtime guards: beta/mainnet reject the Phi-3 heuristic, SHA-256 ZK placeholder, cached rule reader, local CID-bound rule ingestion, manifest-bound RuleStorage observation verifier, and federated-learning placeholder. Merged and exact-main-verified GH-197/PR #198 can compare one separately owner-pinned canonical Testnet-10 manifest with a bounded caller-supplied RPC-shaped UTXO set, require a unique exact outpoint/covenant/script/amount/block-DAA match and a checked virtual-DAA maturity proxy, bind the exact GH-193 constructor JSON, and then decode it. This proves only manifest-to-observation consistency: it is not a live chain reader and does not prove manifest authority, RPC truth, transaction history, finality, IPFS availability, or production readiness. These components must not be presented as a production threat-reporting pipeline.
 
 ### 8.1 Phi-3-mini Integration
 
@@ -441,7 +441,7 @@ This section describes the target Light Client architecture. The current Rust cl
 
 - Pattern-based file scanning with custom matcher
 - GH-190 locally binds caller-supplied exact rule bytes to canonical lowercase Raw-CIDv1/sha2-256 metadata, enforces a bounded simple matcher grammar, and atomically replaces complete development snapshots; this is not real YARA syntax or a network source
-- GH-197 locally verifies a separately owner-pinned canonical Testnet-10 RuleStorage manifest against caller-supplied RPC-shaped UTXO observations before GH-193 state decoding; its virtual-DAA delta is a maturity proxy, not finality, and no chain provenance or RPC truth is established
+- Merged and exact-main-verified GH-197/PR #198 locally verifies a separately owner-pinned canonical Testnet-10 RuleStorage manifest against caller-supplied RPC-shaped UTXO observations before GH-193 state decoding; its virtual-DAA delta is a maturity proxy, not finality, and no chain provenance or RPC truth is established
 - Rules loaded from canonical L1 rule state and fetched from IPFS remain targets; PROM-RULES asset representation is also a deployment target
 - SHA-256 file hashing for threat identification
 - EICAR test standard for validation

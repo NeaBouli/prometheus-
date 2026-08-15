@@ -51,15 +51,18 @@ Boundary: development only; no RPC provenance, covenant-instance identity,
 ## GH-197 RULESTORAGE UTXO OBSERVATION BOUNDARY (2026-08-15)
 
 ```text
-Status: In review on feat/GH-197-rulestorage-utxo-observation
+Status: Done / PR #198 merged / exact-main and live Pages verified
+PR/SHA: #198 / 28da2d42f85233395c38d633f799befba0223797
+Runs: CI 31904377606; Security 31904377632; Pages 31904376972
 Scope: separately owner-pin-hashed canonical Testnet-10 manifest checked
        against bounded caller-supplied RPC-shaped UTXO observations before
        exact-byte constructor hashing and GH-193 decoding
 Checks: unique outpoint; exact covenant/script/amount/block DAA; non-coinbase;
         checked nonzero virtual-DAA maturity proxy; duplicate/ambiguity;
         canonical schema and byte caps; generic redacted errors; runtime gates
-Tests: 15 integration cases, 2 module unit cases, GH-193 regression, and
-       warning-free client all-target Clippy pass locally
+Tests: 15 integration cases, 2 module unit cases, GH-193 regression, full
+       workspace tests, warning-free workspace Clippy, exact-main CI/Security/
+       Pages, independent Kimi review, CodeRabbit and live readback pass
 Boundary: development only; no live RPC acquisition, manifest authority, RPC
           truth/history, consensus finality, IPFS availability, wallet, chain
           write, deployment, or production authority
