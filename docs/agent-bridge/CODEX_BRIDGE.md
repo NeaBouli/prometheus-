@@ -4331,3 +4331,18 @@ No direct `main` push or production action occurred.
   No contract/tokenomics/security-policy, wallet, chain, deployment, secret or
   private audit action occurred.
 - **Status:** `GH-190 Local PASS / Commit and protected PR next`.
+
+## 2026-08-15 - PR #191 review corrections local PASS
+
+- All eleven protected contexts passed at original head `b188620`. CodeRabbit
+  identified two valid documentation precision issues: the historical claim
+  audit mixed post-audit branch evidence into its pinned baseline, and
+  `llms.txt` used the overly broad term atomic rollback.
+- The audit now labels GH-190 as separate branch evidence pending protected
+  merge/exact-main verification. Public wording now says validate-all-then-swap
+  activation with failed-update last-known-good preservation. A low-value but
+  useful boundary helper assertion was also added.
+- Recheck PASS: 26 ingestion tests including the beta subprocess gate; all-target
+  client Clippy with warnings denied; 13-surface public claim consistency and 6
+  focused tests; Rustfmt and diff hygiene.
+- **Status:** `Review corrections local PASS / Push and protected recheck next`.

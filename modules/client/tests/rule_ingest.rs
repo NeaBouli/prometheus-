@@ -93,6 +93,10 @@ fn sized_rule_text(rule_id: &str, target: usize) -> String {
     }
     let text = format!("{header}{body}{footer}");
     assert_eq!(text.len(), target);
+    assert!(
+        i <= MAX_PATTERNS_PER_RULE,
+        "helper generated more literals than the parser accepts"
+    );
     text
 }
 

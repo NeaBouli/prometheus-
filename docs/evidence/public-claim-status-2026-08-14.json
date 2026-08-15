@@ -8,6 +8,13 @@
     "pages_run": 31747553216,
     "h001_canary": "docs/evidence/gh-9-h001-canary-confirmed-2026-08-12.json"
   },
+  "post_audit_branch_evidence": {
+    "issue": 190,
+    "pull_request": 191,
+    "baseline_commit": "5b67cdcccc2772c19468f3715e54d2da404711ca",
+    "status": "protected_merge_and_exact_main_verification_pending",
+    "scope": "local_raw_cidv1_exact_byte_ingestion_development_only"
+  },
   "classifications": {
     "light_client": {
       "status": "implemented_and_tested_development_foundation",

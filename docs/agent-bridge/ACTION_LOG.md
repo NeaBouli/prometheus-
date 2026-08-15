@@ -3839,6 +3839,15 @@ Rules for all dev agents:
   remain mandatory protected contexts before merge.
 - Status: `Local PASS / Commit and protected PR next`.
 
+## 2026-08-15 - PR #191 review corrections
+
+- Separated GH-190 branch evidence from the historical exact-main audit baseline
+  and replaced ambiguous rollback wording with exact validate-all-then-swap and
+  last-known-good semantics. Added the suggested test-helper boundary assertion.
+- Focused ingestion, all-target client Clippy, claim consistency, format and diff
+  checks pass. No product semantics or rollout boundary changed.
+- Status: `Local PASS / Protected recheck next`.
+
 ## 2026-08-14 - Public claim reconciliation protected merge closeout
 
 - PR #188 passed all eleven attached contexts at exact head `66bdac0` with no
