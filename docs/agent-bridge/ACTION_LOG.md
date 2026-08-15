@@ -3971,3 +3971,12 @@ Rules for all dev agents:
 - Switched the mutation to one first-occurrence replacement; retest and push
   follow.
 - Status: `Review fix local / Checks rerun next / Production false`.
+
+## 2026-08-15 - GH-199 closeout kickoff
+
+- PR #198 merged as exact main `28da2d4`; issue #197 closed.
+- Exact-main CI `31904377606`, Security `31904377632`, Pages `31904376972`,
+  and cache-busted public readback pass.
+- Started documentation-only issue #199 and branch
+  `docs/GH-199-gh197-closeout`.
+- Status: `GH-197 exact-main verified / Documentation closeout in progress / Production false`.

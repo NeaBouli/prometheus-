@@ -4503,3 +4503,19 @@ No direct `main` push or production action occurred.
   constructor fixture changed both integer-2 fields. The fixture now uses one
   first-occurrence replacement so it isolates the accepted-status failure.
 - **Status:** `GH-197 Review fix local / Focused retest and protected checks rerun next / Production false`.
+
+## 2026-08-15 - GH-197 exact-main closeout / GH-199 started
+
+- PR #198 squash-merged normally as exact main
+  `28da2d42f85233395c38d633f799befba0223797`; issue #197 closed and its
+  remote feature branch was deleted.
+- Exact-main Prometheus CI `31904377606`, Security Audit `31904377632`, and
+  Pages `31904376972` pass. Security includes Gitleaks, documentation hygiene,
+  Cargo and Python dependency audits.
+- Cache-busted live Start page, Roadmap, Whitepaper, FAQ and `llms.txt`, plus
+  the commit-pinned README, expose the synchronized GH-197 development-only
+  consistency boundary and its explicit nonclaims.
+- Issue #199 and branch `docs/GH-199-gh197-closeout` own this documentation-only
+  evidence synchronization. No product, wallet, chain, deployment, contract,
+  tokenomics or security-policy behavior changes.
+- **Status:** `GH-197 Merged and exact-main verified / GH-199 closeout in progress / Production false`.

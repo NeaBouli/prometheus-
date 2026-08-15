@@ -172,7 +172,8 @@ inference, Groth16 proofs, canonical rule loading, P2P submission, and the
 complete report pipeline are not production implementations yet. Runtime
 guards reject those placeholders in beta and mainnet profiles.
 
-GH-197 adds a local Testnet-10 consistency boundary: a separately
+Merged and exact-main-verified GH-197/PR #198 adds a local Testnet-10
+consistency boundary: a separately
 owner-pin-hashed canonical manifest must match exactly one entry in a bounded
 caller-supplied RPC-shaped RuleStorage UTXO set before GH-193 decodes the bound
 constructor JSON. This is not a live chain read and proves neither manifest
