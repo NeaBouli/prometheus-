@@ -12,6 +12,10 @@ a production malware detector or reporting client.
   evidence of production YARA malware detection or real-sample quality.
 - `blockchain/krc20.rs` observes the Kaspa DAG and returns a development cache;
   canonical Kaspa state/CID and IPFS content loading are not implemented.
+- `blockchain/rule_state.rs` strictly decodes exact caller-supplied current-
+  Silverc `RuleStorageState` constructor JSON into normalized accepted-rule
+  metadata. It is development-only and proves neither chain provenance nor
+  finality.
 - `blockchain/rule_ingest.rs` ingests a complete caller-supplied active-rule
   snapshot whose raw CIDv1 (sha2-256, canonical lowercase base32) must bind the
   exact caller-supplied content bytes. It parses a strict simple matcher

@@ -4367,3 +4367,53 @@ No direct `main` push or production action occurred.
   all production rollout gates remain open. No wallet, chain, deployment,
   tokenomics, contract, security-policy, secret or private-audit action occurred.
 - **Status:** `GH-190 Done / Exact-main and live Pages verified / Production false`.
+
+## 2026-08-15 - GH-193 RuleStorage state decoding boundary started
+
+- Exact clean baseline `7f33465627dde0e009b9ca33927de6d584a13768`; GitHub
+  issue #193 and branch `feat/GH-193-rulestorage-state-decoder` own this
+  repository-only block.
+- Scope is a bounded, development-only local decoder from an exact finalized
+  current-Silverc `RuleStorageState` representation into normalized
+  `ThreatRule` metadata for GH-190. It must preserve integer basis points and
+  block heights, accept only closed rule/status values, validate the exact
+  36-byte Raw-CIDv1/sha2-256 shape, reject duplicates, redact diagnostics, and
+  fail closed in beta/mainnet.
+- This boundary does not prove where the bytes came from. Live RPC/UTXO
+  discovery, covenant-instance authentication, finality proof, IPFS network
+  fetch, production YARA, durable rollback state, wallet, signing, broadcast,
+  deployment and production authority are explicitly excluded.
+- Kimi K3 owns the secret-free architecture review and one bounded
+  implementation block. Claude Code is reserved for a small helper review.
+  Sol retains schema/security decisions, integration, complete tests, GitHub
+  actions and closeout.
+- **Status:** `GH-193 In Progress / Architecture review next`.
+
+## 2026-08-15 - GH-193 implementation and local verification
+
+- Added a bounded development-only decoder for the exact 20-entry current-
+  Silverc `RuleStorageState` constructor JSON and a pinned valid/invalid corpus.
+  Accepted-state invariants, checked arithmetic, Raw-CIDv1/sha2-256 shape,
+  duplicate IDs, input budgets, generic errors, redacted diagnostics, and the
+  beta/mainnet process gate are covered. Provenance and production authority
+  remain explicitly unproven.
+- Kimi K3 supplied the architecture analysis, decoder core, unit tests and
+  vector. Its integration-test generation stalled and was terminated without
+  a running process; Sol reviewed the diff, added the independent adversarial
+  integration suite, fixed one Clippy finding, and synchronized public wording.
+  Claude Code was unavailable because its OAuth session had expired.
+- Verification: pinned Silverc seven-artifact smoke passed; new integration
+  suite `5 passed`; client all-targets `96 passed, 2 ignored` plus all client
+  integration targets passed; Clippy `-D warnings`, rustfmt and `git diff
+  --check` pass.
+- **Status:** `GH-193 Implemented and locally verified / PR and exact-main evidence pending / Production false`.
+
+## 2026-08-15 - GH-193 PR review follow-up
+
+- PR #194 protected CI/Security checks passed. CodeRabbit requested pre-merge
+  status synchronization and an unambiguous count-limit assertion; both were
+  accepted and implemented, with `memory/STATUS.md`, `memory/TODO.md`, and
+  `memory/AUDIT.md` added to the public status record.
+- Focused decoder tests, rustfmt, public-claim consistency, documentation
+  hygiene, and diff checks pass after the follow-up.
+- **Status:** `GH-193 Review fixes pushed next / Merge and exact-main evidence pending / Production false`.
