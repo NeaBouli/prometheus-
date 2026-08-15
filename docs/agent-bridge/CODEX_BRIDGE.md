@@ -4705,3 +4705,17 @@ No direct `main` push or production action occurred.
   wallet, signing, transaction, broadcast, deployment, contract, tokenomics,
   or secret-bearing action occurred.
 - **Status:** `GH-205 Full local PASS / Protected PR next / Production false`.
+
+## 2026-08-16 - GH-205 protected PR #206 handoff
+
+- Local implementation commit `4bbb709` is published only on
+  `feat/GH-205-rule-content-sync`; PR #206 targets protected `main` and is ready
+  for the repository-required CI, Security, Secret Detection, Pages, and review
+  contexts. Issue #205 closes only on normal merge.
+- This repository entry becomes final on normal protected merge and therefore
+  needs no recursive task-local exact-merge-SHA update. Exact-main workflow and
+  live Pages evidence remain GitHub/private-Bridge records.
+- No direct-main push, admin bypass, production action, wallet, signing,
+  transaction, broadcast, deployment, contract, tokenomics, or secret-bearing
+  action occurred.
+- **Status:** `GH-205 PR #206 checks and review pending / Production false`.

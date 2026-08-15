@@ -4099,3 +4099,11 @@ Rules for all dev agents:
   file is touched by GH-205. Docker Compose rendering remains protected-CI-only
   because Docker is unavailable locally; its static policy verifier passes.
 - Status: `Full local PASS / Protected PR next / Production false`.
+
+## 2026-08-16 - GH-205 protected handoff opened
+
+- Commit `4bbb709` is pushed on `feat/GH-205-rule-content-sync`; normal PR #206
+  targets protected `main` and closes issue #205 on merge.
+- No direct-main push, admin bypass, production action, wallet, chain write,
+  deployment, or secret-bearing action occurred.
+- Status: `PR #206 checks and review pending / Production false`.

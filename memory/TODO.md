@@ -10,7 +10,7 @@
 - [x] [P1] GH-173 deterministic non-actionable semantic draft in governed v2 worker | Codex Sol + Kimi K3 | PR #174 merged as exact main `1107b11`; CI `31654308969`, Security `31654308964`, Pages `31654308875`, review and v1/restart/binding evidence pass
 - [x] [P1] GH-197 manifest-bound Testnet-10 RuleStorage UTXO observation | Codex Sol + Kimi K3 | PR #198 merged as exact main `28da2d4`; CI `31904377606`, Security `31904377632`, Pages `31904376972`, independent review and live public-page readback pass; production authority remains false
 - [x] [P1] GH-203 live Testnet-10 RuleStorage RPC observation adapter | Codex Sol + Kimi K3 | PR #204 protected delivery; bounded lock/RPC waits, exact node network and returned-address checks, direct pinned-field conversion, unchanged GH-197 verification, and deterministic adversarial tests; independent RPC truth/finality and production authority remain false
-- [~] [P1] GH-205 complete-snapshot RuleStorage content sync | Codex Sol + Kimi K3 | Local implementation composes injected/live Testnet-10 observation, a restricted loopback-only local IPFS gateway, exact CID/content binding and one atomic scanner replacement; full gates, protected PR and exact-main evidence remain
+- [~] [P1] GH-205 complete-snapshot RuleStorage content sync | Codex Sol + Kimi K3 | Full local PASS at `4bbb709`; PR #206 protected checks, review, normal merge and exact-main evidence remain; production authority remains false
 
 ## ═══ SPRINT 0: SETUP & TESTNET (Woche 1) ═══
 

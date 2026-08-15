@@ -1081,3 +1081,9 @@ Leistungsbasierte Emission. Guardians = "Miner" (KI statt GPU).
 - Docker Compose rendering is locally unavailable and remains protected-CI
   mandatory; the static Compose boundary verifier passes.
 - **Status:** `GH-205 Full local PASS / Protected PR next / Production false`.
+
+## Checkpoint 2026-08-16: GH-205 PR #206 opened
+
+- Commit `4bbb709` is published on the feature branch only. Normal PR #206
+  targets protected `main` and closes issue #205 on merge.
+- **Status:** `GH-205 PR #206 checks and review pending / Production false`.

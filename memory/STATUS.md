@@ -90,7 +90,7 @@ Readiness: estimates unchanged; this closes acquisition plumbing only
 ## GH-205 COMPLETE-SNAPSHOT RULE CONTENT SYNC (2026-08-16)
 
 ```text
-Status: full local verification complete; protected PR pending
+Status: full local verification complete; protected PR #206 checks pending
 Scope: owner-pinned complete snapshot composes injected/live Testnet-10
        observation, constructor-state decoding, restricted local IPFS fetch,
        exact Raw-CIDv1 content binding, and one atomic scanner replacement
