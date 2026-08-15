@@ -3924,3 +3924,9 @@ Rules for all dev agents:
 - Accepted CodeRabbit's pre-merge status corrections and count-cap test
   hardening for PR #194. Focused tests and public documentation gates pass.
 - Status: `Review fixes ready / Merge pending / Production false`.
+
+## 2026-08-15 - GH-195 closeout kickoff
+
+- PR #194 merged at exact main `d0cd087`; CI, Security and Pages pass.
+- Started issue #195 to synchronize public status and Bridge evidence.
+- Status: `Documentation closeout in progress / Production false`.

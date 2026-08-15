@@ -35,12 +35,15 @@ lifecycle is a target supported only by a same-host development-stub fixture.
 ## GH-193 RULESTORAGE CONSTRUCTOR-STATE DECODER (2026-08-15)
 
 ```text
-Status: protected PR #194 open / reviewed head pending / not merged
+Status: Done / PR #194 merged / exact-main and live Pages verified
+PR/SHA: #194 / d0cd087287df14975ce30dfcc88aaa7c5cf37c85
+Runs: CI 31900314121; Security 31900314143; Pages 31900313745
 Scope: exact caller-supplied 20-entry current-Silverc constructor JSON;
        accepted-active invariant checks; integer basis points and block heights;
        bounded single/batch inputs; duplicate rejection; redacted diagnostics
 Tests: 6 unit and 5 integration cases plus complete client all-targets pass;
-       rustfmt, warning-free Clippy and public-documentation gates pass
+       exact-main CI/Security/Pages, rustfmt, warning-free Clippy and public
+       documentation gates pass
 Boundary: development only; no RPC provenance, covenant-instance identity,
           finality, IPFS fetch, content binding, wallet, chain or production authority
 ```

@@ -4417,3 +4417,13 @@ No direct `main` push or production action occurred.
 - Focused decoder tests, rustfmt, public-claim consistency, documentation
   hygiene, and diff checks pass after the follow-up.
 - **Status:** `GH-193 Review fixes pushed next / Merge and exact-main evidence pending / Production false`.
+
+## 2026-08-15 - GH-195 exact-main closeout started
+
+- PR #194 squash-merged normally as exact main
+  `d0cd087287df14975ce30dfcc88aaa7c5cf37c85`; issue #193 closed.
+- Exact-main CI `31900314121`, Security Audit `31900314143`, and Pages
+  `31900313745` pass. Live Roadmap and README were independently fetched.
+- Issue #195 and branch `docs/GH-195-gh193-closeout` own the documentation-only
+  synchronization from pre-merge wording to exact-main evidence.
+- **Status:** `GH-193 Merged and exact-main verified / GH-195 closeout in progress / Production false`.

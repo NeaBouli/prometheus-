@@ -2593,3 +2593,13 @@ Silverc RuleStorage constructor state. Local unit, integration, all-target,
 format, Clippy and documentation gates pass; protected PR checks are green.
 The work remains pre-merge and grants no chain provenance, finality, content
 availability, wallet, deployment or production authority.
+
+## 2026-08-15 - GH-193 protected merge and exact-main audit
+
+**Result:** PASS. PR #194 exact reviewed head `66882df` passed all protected
+contexts after the accepted status-synchronization and count-limit review
+fixes. It squash-merged normally as exact main `d0cd087`, closing issue #193.
+Exact-main CI `31900314121`, Security Audit `31900314143`, and Pages
+`31900313745` pass; live Roadmap and README fetches confirm publication. No
+production, wallet, chain, deployment, tokenomics or security-policy authority
+changed.
