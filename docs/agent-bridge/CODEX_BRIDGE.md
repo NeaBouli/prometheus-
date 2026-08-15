@@ -4519,3 +4519,30 @@ No direct `main` push or production action occurred.
   evidence synchronization. No product, wallet, chain, deployment, contract,
   tokenomics or security-policy behavior changes.
 - **Status:** `GH-197 Merged and exact-main verified / GH-199 closeout in progress / Production false`.
+
+## 2026-08-15 - GH-201 final status synchronization started
+
+- Documentation PR #200 merged normally as exact main
+  `a9e987c28a1984fe0f89a10991f7021253ed486a`, closing issue #199.
+- Exact-main Prometheus CI `31904938024`, Security Audit `31904938123`, and
+  Pages `31904937253` pass. Security includes Gitleaks, documentation hygiene,
+  Cargo audit, and Python dependency audit.
+- Issue #201 and branch `docs/GH-201-gh197-final-status` own the final removal
+  of stale task-current `in progress` wording. This is documentation-only and
+  changes no product behavior or public technical claim.
+- **Status:** `GH-197 and GH-199 Done / GH-201 status sync in progress / Production false`.
+
+## 2026-08-15 - GH-201 final repository handoff
+
+- GH-197 product PR #198 is merged and exact-main verified at `28da2d4`.
+- GH-199 documentation PR #200 is merged and exact-main verified at
+  `a9e987c`; CI `31904938024`, Security `31904938123`, and Pages
+  `31904937253` all pass.
+- GH-201 changes only task-current handoff metadata in `memory/CHECKPOINT.md`,
+  this append-only Bridge, and `docs/agent-bridge/ACTION_LOG.md`. It does not
+  change public claims or product behavior.
+- This entry becomes final when the normal protected GH-201 pull request is
+  merged. It intentionally needs no recursive task-local exact-SHA annotation;
+  final merge and exact-main workflow evidence is retained in GitHub and the
+  private cross-project Bridge.
+- **Status:** `GH-197 Done / GH-199 Done / GH-201 Done on normal merge / Production false`.
