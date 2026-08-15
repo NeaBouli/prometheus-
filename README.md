@@ -82,7 +82,7 @@ Guardian reputation is a separate canonical Kaspa L1 state in `GuardianReputatio
 |--------|--------|-------------|
 | 0 — Setup | DONE | Kaspa testnet-10 node, repo structure, CI/CD |
 | 1 — Contracts | ACCEPTED | 6 Silverscript contracts, 54 tests |
-| 2 — Client | DEVELOPMENT FOUNDATION | Kaspa RPC foundation, cache-only rule reader, custom YARA-style matcher, ZK stub, GH-190 exact-byte ingestion, and merged/exact-main-verified GH-193/PR #194 strict decoding of caller-supplied current-Silverc RuleStorage constructor state; provenance-authenticated L1 reads, IPFS fetching, production YARA, durable anti-downgrade state, and operated P2P reporting remain open |
+| 2 — Client | DEVELOPMENT FOUNDATION | Kaspa RPC foundation, cache-only rule reader, custom YARA-style matcher, ZK stub, GH-190 exact-byte ingestion, GH-193 strict current-Silverc constructor-state decoding, and GH-197 owner-pin manifest-to-caller-observation consistency checks for one Testnet-10 RuleStorage UTXO; provenance-authenticated L1 reads, independent RPC truth, finality, IPFS fetching, production YARA, durable anti-downgrade state, and operated P2P reporting remain open |
 | 3 — AI | DEVELOPMENT FOUNDATION | Phi-3 wrapper uses a development heuristic/stub and no ONNX Runtime session; Fed-DART is also a stub |
 | 4 — Guardian | CORE ACCEPTED / MEMBERSHIP SOURCE MERGED | YARA/analyzer foundation; GH-144 hardens local vLLM operation and GH-147 binds canonical local membership/key assignments without production trust |
 | 5 — Voting | TESTED STATE MACHINES | Commit-Reveal, quorum, bond, and slashing logic pass local Rust/Silverc gates; no operated validator network or trusted decentralized membership is proven |

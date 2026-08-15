@@ -3936,3 +3936,30 @@ Rules for all dev agents:
 - Clarified the `llms.txt` document-update date without moving the historical
   audit baseline. No claim or product behavior changed.
 - Status: `Review fix ready / Merge pending / Production false`.
+
+## 2026-08-15 - GH-197 kickoff
+
+- Opened issue #197 and branch
+  `feat/GH-197-rulestorage-utxo-observation` from exact clean main `1fbcc06`.
+- Started a manifest-bound, development-only Testnet-10 RuleStorage UTXO
+  observation verifier; no invented Silverc state wire format or production
+  authority is in scope.
+- Status: `In Progress / Kimi architecture review next`.
+
+## 2026-08-15 - GH-197 locally integrated
+
+- Kimi delivered architecture review plus the bounded verifier/tests; Sol
+  completed security review, duplicate rejection, pre-hash state-size
+  enforcement, repository-schema naming, and public documentation sync.
+- Focused observation `15/15`, module unit `2/2`, GH-193 regression `5/5`,
+  rustfmt, and client all-target Clippy with warnings denied pass.
+- Claude Code helper probe failed on expired OAuth and produced no changes.
+- Status: `Locally integrated / Full gates and protected PR pending / Production false`.
+
+## 2026-08-15 - GH-197 full local verification
+
+- Full workspace tests and warning-free workspace all-target Clippy pass.
+- Public claim, documentation hygiene, and H-001 evidence gates pass.
+- Independent Kimi final review found no P0-P2 issues; one cosmetic indentation
+  nit was fixed.
+- Status: `Full local PASS / Protected PR next / Production false`.

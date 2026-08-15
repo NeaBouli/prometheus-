@@ -1,5 +1,5 @@
 # PROMETHEUS — SESSION CHECKPOINT
-# Last updated: 2026-08-13
+# Last updated: 2026-08-15
 # Purpose: Full recovery document. If Claude (Architect) or Claude Code
 # loses context, read this file first. It contains the complete project state.
 
@@ -13,12 +13,12 @@
 | Repo | https://github.com/NeaBouli/prometheus- |
 | Branch | Canonical target `main`; product/public/status changes remain PR-only |
 | Lokaler Pfad | `$REPO_ROOT` |
-| Letzter grün verifizierter Produkt-/Public-Baseline | Exact product/public main `396d34793414add284d450f9b53d40ae287aaa4f`; Prometheus CI `31658560850`, Security `31658560811`, and Pages `31658560331` pass |
-| Aktueller Entwicklungs-Slice | GH-177 isolated synthetic YARA semantic-quality gate is merged and exact-main verified; documentation-only public closeout is in progress |
+| Letzter grün verifizierter Produkt-/Public-Baseline | Exact main `1fbcc06b441a82da1d8906e0ee731f4178ef099b`; Prometheus CI `31900951089`, Security `31900951083`, and Pages `31900950624` pass |
+| Aktueller Entwicklungs-Slice | GH-197 development-only manifest-bound Testnet-10 RuleStorage UTXO observation boundary is implemented and under local integration review |
 | Aktuelle Tooling-Baseline | H-001 Testnet-10 signature/import/full verification/one-shot broadcast/confirmation/receipt/independent evidence and repository-public hash revalidation pass on exact main. The bounded GH-167 ThreatHint-v2 repository transport substrate is merged and exact-main verified. Production proof artifacts/ceremony, independent cryptographic/privacy review, real semantic/actionable analysis, six state deployments, metrics-oracle evidence, operated multi-host transport, and rollout remain open. |
-| Aktueller HEAD | Documentation branch `docs/GH-177-closeout` from exact feature main `396d34793414add284d450f9b53d40ae287aaa4f`; product behavior is unchanged |
+| Aktueller HEAD | Feature branch `feat/GH-197-rulestorage-utxo-observation` from exact main `1fbcc06b441a82da1d8906e0ee731f4178ef099b`; protected PR and exact-main closeout remain |
 | Rollback-Tag | `pre-session-20260413` → `6347b85` |
-| Whitepaper | WHITEPAPER.md (root) + whitepaper.html (styled); GH-173 and GH-177 are merged/exact-main synchronized without semantic or production authority |
+| Whitepaper | WHITEPAPER.md (root) + whitepaper.html (styled); GH-197 wording is synchronized locally as a consistency-only development boundary without chain-truth, finality, or production claims |
 | Status | H-001 Testnet-10 canary is confirmed and independently evidenced. Rollout-capable core is estimated at 84-88%. GH-167 closes only the bounded repository v2 transport substrate. Production relation/key/ceremony approval and independent cryptographic/privacy review, real semantic/actionable analysis, six state deployments, metrics-oracle evidence, operated multi-host transport, crash-safe external side effects, and full rollout evidence remain gated. |
 | GitHub Pages | https://neabouli.github.io/prometheus-/ |
 | Google Search Console | Verified: googleaa2902079481c7a8 |

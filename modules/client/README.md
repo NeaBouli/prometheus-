@@ -16,6 +16,12 @@ a production malware detector or reporting client.
   Silverc `RuleStorageState` constructor JSON into normalized accepted-rule
   metadata. It is development-only and proves neither chain provenance nor
   finality.
+- `blockchain/rule_observation.rs` checks one separately SHA-256-pinned,
+  canonical Testnet-10 manifest against a bounded caller-supplied RPC-shaped
+  UTXO set before invoking the state decoder. It requires one unique outpoint
+  match plus exact covenant, script, amount, block-DAA, and maturity-proxy
+  agreement. It proves manifest-to-observation consistency only, not manifest
+  authority, RPC truth, transaction history, finality, or a live chain read.
 - `blockchain/rule_ingest.rs` ingests a complete caller-supplied active-rule
   snapshot whose raw CIDv1 (sha2-256, canonical lowercase base32) must bind the
   exact caller-supplied content bytes. It parses a strict simple matcher

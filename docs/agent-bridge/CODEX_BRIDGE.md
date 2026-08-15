@@ -4435,3 +4435,61 @@ No direct `main` push or production action occurred.
   document-update date and explicitly preserves the canonical 2026-08-14
   baseline and `5cd13bf` evidence below.
 - **Status:** `GH-195 review fix ready / Protected checks rerun next / Production false`.
+
+## 2026-08-15 - GH-197 RuleStorage UTXO observation started
+
+- Exact clean baseline `1fbcc06b441a82da1d8906e0ee731f4178ef099b`; issue
+  #197 and branch `feat/GH-197-rulestorage-utxo-observation` own this bounded
+  repository-only block.
+- Scope is a development-only, owner-manifest-bound Testnet-10 observation
+  verifier. It binds exact network, outpoint, covenant ID, script public key,
+  value, block/virtual DAA maturity, and the SHA-256 of exact constructor JSON
+  before GH-193 decoding.
+- Upstream Silverc has no standalone canonical state-blob format. This task
+  must not invent one and cannot claim independent manifest authority, complete
+  history or consensus finality, live IPFS, production YARA, wallet, chain,
+  deployment, tokenomics, security-policy or production authority.
+- Kimi K3 owns the large secret-free architecture/implementation contribution;
+  Sol owns security decisions, integration, complete verification and GitHub.
+  Claude Code is limited to one small read-only RPC/API helper check.
+- **Status:** `GH-197 In Progress / Architecture review next / Production false`.
+
+## 2026-08-15 - GH-197 implementation and Sol integration
+
+- Kimi K3 completed a read-only pinned-rusty-kaspa v2.0.1 architecture review
+  and the bounded product implementation. Sol then reviewed every written
+  file, aligned public manifest field names with repository `OutpointSpec` and
+  `ScriptSpec`, rejected duplicate outpoints globally, and moved the existing
+  16 KiB constructor-state cap before hashing.
+- The development-only verifier now requires a separately supplied lowercase
+  SHA-256 owner pin for exact canonical manifest bytes, exact `testnet-10`, one
+  unique matching outpoint, covenant/script/value/block-DAA equality,
+  non-coinbase status, checked nonzero virtual-DAA maturity, and an exact
+  constructor-byte hash before GH-193 decoding. Generic errors and runtime
+  gates remain fail closed.
+- Focused verification passes: 15 integration tests, 2 module unit tests, 5
+  GH-193 regression tests, rustfmt, and warning-free client all-target Clippy.
+  Claude Code was probed for a small helper check but its OAuth session was
+  expired; it made no changes.
+- README, module README, Markdown Whitepaper/FAQ/Roadmap, GitHub Pages HTML,
+  `llms.txt`, and Memory are synchronized locally. This proves only
+  owner-pin manifest-to-caller-observation consistency, not manifest
+  authority, live RPC acquisition or truth, transaction history, finality,
+  IPFS availability, chain deployment, or production readiness.
+- **Status:** `GH-197 Locally integrated / Full workspace and protected PR pending / Production false`.
+
+## 2026-08-15 - GH-197 full local gate and independent review
+
+- `cargo test --workspace` passed across all Rust crates and doc-tests; client
+  reports 98 passed and 2 intentional live-node ignores before its integration
+  targets. `cargo clippy --workspace --all-targets -- -D warnings` and rustfmt
+  pass.
+- Public claim consistency passed across 13 surfaces; its 6 unit tests, public
+  documentation hygiene plus 11 unit tests, and H-001 closeout evidence plus 4
+  unit tests all pass.
+- Kimi K3 independently reviewed the final code/docs diff and reported no
+  P0, P1, or P2 findings. The sole cosmetic HTML indentation nit was corrected.
+- Remaining risks are intentional and documented: the owner pin is out-of-band,
+  RPC-shaped observations and virtual DAA are caller supplied, DAA maturity is
+  not finality, and live authenticated acquisition remains a future boundary.
+- **Status:** `GH-197 Full local PASS / Protected PR next / Production false`.
