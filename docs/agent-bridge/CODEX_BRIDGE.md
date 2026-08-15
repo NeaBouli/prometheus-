@@ -4279,3 +4279,55 @@ No direct `main` push or production action occurred.
   chain, deployment, infrastructure, secret, private audit detail, direct-main
   push, admin bypass, or destructive Git action occurred.
 - **Status:** `PROMETHEUS-DOC-CLAIMS-20260814 Done / Exact-main and live Pages verified`.
+
+## 2026-08-15 - GH-190 CID-bound local rule ingestion started
+
+- Exact clean baseline `5b67cdcccc2772c19468f3715e54d2da404711ca`; GitHub
+  issue #190 and branch `feat/GH-190-cid-bound-rule-ingestion` own this bounded
+  repository-only task.
+- The intended trust boundary receives already trusted canonical RuleStorage
+  metadata and exact caller-supplied content bytes. It must validate the
+  existing 36-byte CIDv1/SHA-256 representation, rule type/activity and strict
+  resource bounds before atomically replacing the development matcher's rule
+  set. Every failure must preserve the prior known-good state.
+- Kimi K3 is assigned the independent secret-free architecture/security
+  review. Claude Code is reserved for a smaller bounded verification task;
+  Codex Sol retains architecture, security, all writes, integration, full
+  testing, external actions and closeout.
+- No Kaspa/IPFS network fetch, KRC-20 interpretation, contract/tokenomics or
+  security-policy change, production malware-detection claim, beta/mainnet
+  enablement, wallet, chain action, deployment or production authority is in
+  scope.
+- **Status:** `GH-190 In Progress / Kimi review and implementation next`.
+
+## 2026-08-15 - GH-190 full local verification PASS
+
+- The implemented boundary receives trusted caller-normalized finalized
+  `ThreatRule` metadata plus exact caller-supplied bytes; it does not prove that
+  metadata came from canonical Kaspa state. This clarification is authoritative
+  over the kickoff shorthand above.
+- Canonical lowercase 59-character Raw-CIDv1 with sha2-256 is checked before a
+  bounded decode; exact content is limited to 64 KiB. Only active YARA entries
+  enter the strict simple-matcher grammar. Up to 256 rules, 64 patterns per rule
+  and 1024 bytes per pattern compile off to the side before one atomic swap.
+  Empty complete snapshots clear rules; every error preserves prior state.
+- Sol review closed an explicit-mode runtime-gate bypass, unbounded CID decode,
+  sensitive `Debug` output and all `Result` callsites. A subprocess proves that
+  process `beta` cannot be weakened by an explicit Development mode. The legacy
+  parser/matcher now also rejects empty patterns in depth.
+- PASS: 90 client unit tests plus 2 intentional live-node ignores; 2 E2E, 5 CLI,
+  6 performance, 26 ingestion and 10 security integration tests; warning-free
+  all-target client Clippy; warning-free all-target workspace Clippy; complete
+  Rust workspace all-target tests; Guardian 1303 pass/4 intentional live-model
+  skips; claim consistency 13 surfaces plus 6 tests; documentation hygiene plus
+  11 tests; Memory Integrity plus 6 Autodidactic tests; five HTML pages and five
+  JSON-LD blocks; both workflow YAML files; Rustfmt and diff hygiene.
+- Kimi K3 performed architecture review, the bounded implementation and final
+  independent read-only review with no P0-P3 findings. Claude Code was attempted
+  for the smaller review but its OAuth session had expired and it changed
+  nothing. Sol retained final review and integration ownership.
+- Real Kaspa state decoding, IPFS network fetching, production YARA, durable
+  anti-downgrade state, production operation and every rollout gate remain open.
+  No contract/tokenomics/security-policy, wallet, chain, deployment, secret or
+  private audit action occurred.
+- **Status:** `GH-190 Local PASS / Commit and protected PR next`.

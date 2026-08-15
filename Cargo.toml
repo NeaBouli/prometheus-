@@ -36,6 +36,7 @@ anyhow = "1"
 log = "0.4"
 env_logger = "0.10"
 sha2 = "0.10"
+multibase = "=0.9.3"
 subtle = "=2.6.1"
 clap = { version = "4", features = ["derive"] }
 hex = "0.4"

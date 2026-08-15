@@ -37,11 +37,13 @@ async fn test_full_threat_lifecycle_under_60s() {
 
     // Set up YARA scanner with EICAR detection rule
     let mut scanner = YaraScanner::new().unwrap();
-    scanner.add_rule(CompiledRule {
-        name: "EICAR_Test".to_string(),
-        patterns: vec![b"EICAR".to_vec(), b"$H+H*".to_vec()],
-        required_matches: 1,
-    });
+    scanner
+        .add_rule(CompiledRule {
+            name: "EICAR_Test".to_string(),
+            patterns: vec![b"EICAR".to_vec(), b"$H+H*".to_vec()],
+            required_matches: 1,
+        })
+        .unwrap();
 
     // Scan the EICAR test content
     let scan_result = scanner.scan_bytes(EICAR).unwrap();
@@ -132,11 +134,13 @@ async fn test_full_threat_lifecycle_under_60s() {
 
     // Reload scanner with the new rule
     let mut reloaded_scanner = YaraScanner::new().unwrap();
-    reloaded_scanner.add_rule(CompiledRule {
-        name: "PROM-RULE-2026-0001".to_string(),
-        patterns: vec![new_rule_content.to_vec()],
-        required_matches: 1,
-    });
+    reloaded_scanner
+        .add_rule(CompiledRule {
+            name: "PROM-RULE-2026-0001".to_string(),
+            patterns: vec![new_rule_content.to_vec()],
+            required_matches: 1,
+        })
+        .unwrap();
 
     // Verify: EICAR detected by new rule
     let rescan = reloaded_scanner.scan_bytes(EICAR).unwrap();
