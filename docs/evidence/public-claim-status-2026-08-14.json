@@ -12,7 +12,14 @@
     "issue": 190,
     "pull_request": 191,
     "baseline_commit": "5b67cdcccc2772c19468f3715e54d2da404711ca",
-    "status": "protected_merge_and_exact_main_verification_pending",
+    "merge_commit": "9c2fafffe680606a4ec6d1fc0b9915de9cb646e4",
+    "status": "merged_and_exact_main_verified",
+    "exact_main_runs": {
+      "prometheus_ci": 31892079028,
+      "security_audit": 31892079026,
+      "pages": 31892078930
+    },
+    "live_pages_verified": true,
     "scope": "local_raw_cidv1_exact_byte_ingestion_development_only"
   },
   "classifications": {

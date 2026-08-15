@@ -1465,8 +1465,10 @@ Estimates: unchanged; core 84-88%; complete vision 50-55%
 ## GH-190 CID-BOUND LOCAL RULE INGESTION (2026-08-15)
 
 ```text
-Status: local implementation PASS; protected PR/CI/merge pending
+Status: Done / protected PR #191 merged / exact-main and live Pages verified
 Baseline: 5b67cdcccc2772c19468f3715e54d2da404711ca
+PR/SHA: #191 / 9c2fafffe680606a4ec6d1fc0b9915de9cb646e4
+Runs: CI 31892079028; Security 31892079026; Pages 31892078930
 Scope: complete caller-supplied active-rule snapshot; canonical lowercase
        Raw-CIDv1/sha2-256 binding to exact bytes; strict bounded simple matcher;
        validate-all-then-swap activation; empty complete snapshot clears rules

@@ -4346,3 +4346,24 @@ No direct `main` push or production action occurred.
   client Clippy with warnings denied; 13-surface public claim consistency and 6
   focused tests; Rustfmt and diff hygiene.
 - **Status:** `Review corrections local PASS / Push and protected recheck next`.
+
+## 2026-08-15 - GH-190 protected merge and exact-main closeout
+
+- Protected PR #191 passed its required checks after both actionable review
+  threads were fixed and resolved, then merged normally as
+  `9c2fafffe680606a4ec6d1fc0b9915de9cb646e4`; issue #190 closed and the remote
+  feature branch was deleted.
+- Exact-main Prometheus CI `31892079028`, Security Audit `31892079026`, and
+  Pages `31892078930` passed on that merge commit. Cache-busted live homepage,
+  Whitepaper, Roadmap and `llms.txt` plus the commit-pinned README expose the
+  synchronized Raw-CIDv1/exact-byte development boundary.
+- Kimi K3's architecture, implementation and final no-P0-P3 review remain the
+  independent contribution. Sol fixed the identified integration/security
+  gaps and retained final test, review, merge and publication ownership. Claude
+  Code remained unavailable because its OAuth session had expired and changed
+  nothing.
+- Canonical Kaspa state reads, IPFS network fetching, production YARA, durable
+  anti-downgrade state, real model evidence, operated multi-host reporting and
+  all production rollout gates remain open. No wallet, chain, deployment,
+  tokenomics, contract, security-policy, secret or private-audit action occurred.
+- **Status:** `GH-190 Done / Exact-main and live Pages verified / Production false`.
