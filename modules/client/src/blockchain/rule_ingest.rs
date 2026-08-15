@@ -25,12 +25,13 @@ use std::collections::HashSet;
 use std::fmt;
 
 use log::info;
-use sha2::{Digest, Sha256};
 
 use crate::runtime::{require_stub_allowed, require_stub_allowed_for, RuntimeMode};
 use crate::security::scanner::{CompiledRule, YaraScanner};
 
 use super::krc20::{RuleType, ThreatRule};
+use super::rule_fetch::verify_raw_cid_content_binding;
+use super::rule_state::RuleStateMetadata;
 
 /// Maximum number of rules accepted in one snapshot.
 pub const MAX_RULES_PER_SNAPSHOT: usize = 256;
@@ -42,12 +43,6 @@ pub const MAX_PATTERNS_PER_RULE: usize = 64;
 pub const MAX_PATTERN_BYTES: usize = 1024;
 /// Maximum bytes accepted for a rule identifier.
 pub const MAX_RULE_ID_BYTES: usize = 128;
-
-/// Exact byte length of a CIDv1 raw sha2-256/32 binary CID.
-const CID_RAW_SHA256_LEN: usize = 36;
-/// Header of a CIDv1 raw sha2-256/32 binary CID: version 0x01, codec raw
-/// (0x55), multihash sha2-256 (0x12), digest length 32 (0x20).
-const CID_RAW_SHA256_HEADER: [u8; 4] = [0x01, 0x55, 0x12, 0x20];
 
 /// One snapshot entry: finalized rule metadata from a trusted caller plus the
 /// exact content bytes the caller bound to the entry's CID.
@@ -64,6 +59,29 @@ impl fmt::Debug for RuleSnapshotEntry {
         f.debug_struct("RuleSnapshotEntry")
             .field("rule_type", &self.rule.rule_type)
             .field("active", &self.rule.active)
+            .field("content_len", &self.content.len())
+            .finish_non_exhaustive()
+    }
+}
+
+/// One metadata-native snapshot entry: GH-193 [`RuleStateMetadata`] used
+/// directly plus the exact content bytes bound to its CID.
+///
+/// Unlike [`RuleSnapshotEntry`] this path never constructs a `ThreatRule`, so
+/// no wall-clock timestamp is fabricated and no confidence/consensus basis
+/// points are converted into floating-point authority fields.
+pub struct RuleMetadataSnapshotEntry {
+    /// Validated, finalized accepted-and-active rule metadata.
+    pub metadata: RuleStateMetadata,
+    /// Exact content bytes for `metadata.ipfs_cid()`.
+    pub content: Vec<u8>,
+}
+
+impl fmt::Debug for RuleMetadataSnapshotEntry {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("RuleMetadataSnapshotEntry")
+            .field("rule_type", &self.metadata.rule_type())
+            .field("active", &self.metadata.active())
             .field("content_len", &self.content.len())
             .finish_non_exhaustive()
     }
@@ -113,6 +131,35 @@ pub fn ingest_rule_snapshot_for_mode(
     ingest_validated(scanner, snapshot)
 }
 
+/// Ingest a complete metadata-native active-rule snapshot into the scanner.
+///
+/// Uses GH-193 [`RuleStateMetadata`] fields directly; identical validation and
+/// atomic-replacement policy to [`ingest_rule_snapshot`]. Development-only:
+/// rejects beta/mainnet via `require_stub_allowed`.
+pub fn ingest_rule_state_snapshot(
+    scanner: &mut YaraScanner,
+    snapshot: &[RuleMetadataSnapshotEntry],
+) -> Result<(), RuleIngestError> {
+    require_stub_allowed("CID-bound rule ingestion").map_err(|_| RuleIngestError)?;
+    ingest_state_validated(scanner, snapshot)
+}
+
+/// Ingest a metadata-native snapshot under an explicit runtime mode.
+///
+/// Deterministic helper for tests and callers that select the mode
+/// themselves; identical policy to [`ingest_rule_state_snapshot`]. The
+/// explicit mode can only be stricter; it never weakens the process-wide
+/// beta/mainnet env gate.
+pub fn ingest_rule_state_snapshot_for_mode(
+    mode: RuntimeMode,
+    scanner: &mut YaraScanner,
+    snapshot: &[RuleMetadataSnapshotEntry],
+) -> Result<(), RuleIngestError> {
+    require_stub_allowed("CID-bound rule ingestion").map_err(|_| RuleIngestError)?;
+    require_stub_allowed_for(mode, "CID-bound rule ingestion").map_err(|_| RuleIngestError)?;
+    ingest_state_validated(scanner, snapshot)
+}
+
 /// Validate and compile the entire snapshot off to the side, then replace the
 /// scanner's rules exactly once.
 fn ingest_validated(
@@ -136,35 +183,91 @@ fn ingest_validated(
     Ok(())
 }
 
+/// Metadata-native counterpart of [`ingest_validated`]; same bounds, same
+/// single atomic replacement.
+fn ingest_state_validated(
+    scanner: &mut YaraScanner,
+    snapshot: &[RuleMetadataSnapshotEntry],
+) -> Result<(), RuleIngestError> {
+    if snapshot.len() > MAX_RULES_PER_SNAPSHOT {
+        return Err(RuleIngestError);
+    }
+
+    let mut seen_ids = HashSet::with_capacity(snapshot.len());
+    let mut compiled = Vec::with_capacity(snapshot.len());
+    for entry in snapshot {
+        compiled.push(compile_metadata_entry(entry, &mut seen_ids)?);
+    }
+
+    scanner
+        .replace_rules(compiled)
+        .map_err(|_| RuleIngestError)?;
+    info!("Ingested {} CID-bound rules", scanner.rule_count());
+    Ok(())
+}
+
 /// Validate one snapshot entry and compile it into a scanner rule.
 fn compile_entry(
     entry: &RuleSnapshotEntry,
     seen_ids: &mut HashSet<String>,
 ) -> Result<CompiledRule, RuleIngestError> {
-    let rule = &entry.rule;
+    compile_fields(
+        &entry.rule.rule_id,
+        &entry.rule.rule_type,
+        &entry.rule.ipfs_cid,
+        entry.rule.active,
+        &entry.content,
+        seen_ids,
+    )
+}
 
-    if !rule.active {
+/// Validate one metadata-native snapshot entry and compile it into a scanner
+/// rule, using [`RuleStateMetadata`] fields directly.
+fn compile_metadata_entry(
+    entry: &RuleMetadataSnapshotEntry,
+    seen_ids: &mut HashSet<String>,
+) -> Result<CompiledRule, RuleIngestError> {
+    let rule_type = entry.metadata.rule_type();
+    compile_fields(
+        entry.metadata.rule_id(),
+        &rule_type,
+        entry.metadata.ipfs_cid(),
+        entry.metadata.active(),
+        &entry.content,
+        seen_ids,
+    )
+}
+
+/// Shared entry validation and compilation for both snapshot entry shapes.
+fn compile_fields(
+    rule_id: &str,
+    rule_type: &RuleType,
+    ipfs_cid: &str,
+    active: bool,
+    content: &[u8],
+    seen_ids: &mut HashSet<String>,
+) -> Result<CompiledRule, RuleIngestError> {
+    if !active {
         return Err(RuleIngestError);
     }
-    if rule.rule_type != RuleType::Yara {
+    if *rule_type != RuleType::Yara {
         return Err(RuleIngestError);
     }
-    validate_rule_id(&rule.rule_id)?;
-    if !seen_ids.insert(rule.rule_id.clone()) {
+    validate_rule_id(rule_id)?;
+    if !seen_ids.insert(rule_id.to_string()) {
         return Err(RuleIngestError);
     }
 
-    let content = &entry.content;
     if content.is_empty() || content.len() > MAX_CONTENT_BYTES {
         return Err(RuleIngestError);
     }
-    verify_cid(&rule.ipfs_cid, content)?;
+    verify_cid(ipfs_cid, content)?;
 
     let text = std::str::from_utf8(content).map_err(|_| RuleIngestError)?;
-    let patterns = parse_rule_text(&rule.rule_id, text)?;
+    let patterns = parse_rule_text(rule_id, text)?;
 
     Ok(CompiledRule {
-        name: rule.rule_id.clone(),
+        name: rule_id.to_string(),
         patterns,
         required_matches: 1,
     })
@@ -186,29 +289,11 @@ fn validate_rule_id(rule_id: &str) -> Result<(), RuleIngestError> {
 
 /// Verify that `cid` is the canonical lowercase base32 CIDv1 raw sha2-256
 /// binding of the exact content bytes.
+///
+/// Delegates to the single shared binding implementation in `rule_fetch` so
+/// GH-190 ingestion and GH-205 content sync can never drift apart.
 fn verify_cid(cid: &str, content: &[u8]) -> Result<(), RuleIngestError> {
-    // A canonical base32-lower encoding of exactly 36 bytes is exactly 59
-    // ASCII characters including the multibase prefix. Bound before decode so
-    // attacker-controlled metadata cannot force an unbounded allocation.
-    if cid.len() != 59 || !cid.is_ascii() {
-        return Err(RuleIngestError);
-    }
-    let (base, bytes) = multibase::decode(cid).map_err(|_| RuleIngestError)?;
-    if base != multibase::Base::Base32Lower {
-        return Err(RuleIngestError);
-    }
-    // Re-encode to reject non-canonical forms.
-    if multibase::encode(base, &bytes) != cid {
-        return Err(RuleIngestError);
-    }
-    if bytes.len() != CID_RAW_SHA256_LEN || bytes[..4] != CID_RAW_SHA256_HEADER {
-        return Err(RuleIngestError);
-    }
-    let digest = Sha256::digest(content);
-    if digest[..] != bytes[4..CID_RAW_SHA256_LEN] {
-        return Err(RuleIngestError);
-    }
-    Ok(())
+    verify_raw_cid_content_binding(cid, content).map_err(|_| RuleIngestError)
 }
 
 /// Parse rule content under the strict simple matcher grammar and return the
@@ -317,6 +402,7 @@ fn parse_string_line(line: &str) -> Result<(&str, &[u8]), RuleIngestError> {
 
 #[cfg(test)]
 mod tests {
+    use super::super::rule_fetch::{CID_RAW_SHA256_HEADER, CID_RAW_SHA256_LEN};
     use super::*;
     use crate::security::scanner::compute_sha256;
 

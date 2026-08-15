@@ -183,6 +183,14 @@ uses the same verifier. This is a live node query, not independent proof of RPC
 truth, transaction history, consensus finality, manifest authority, IPFS
 availability, deployment, or production readiness.
 
+GH-205 composes one complete owner-pinned snapshot through that injected/live
+observation path, a credential-free loopback-only local IPFS gateway, exact
+Raw-CIDv1 content verification, and one atomic scanner replacement. It has no
+automatic update loop or product-runtime wiring. It does not prove canonical
+manifest authority, independent RPC truth or finality, IPFS availability or
+replication, production YARA quality, durable rollback protection, deployment,
+or production readiness.
+
 **Q: Why Kaspa and not Ethereum?**
 Prometheus targets Kaspa because its high-throughput BlockDAG and current
 SilverScript path can anchor compact protocol state. The repository verifies

@@ -4623,3 +4623,99 @@ No direct `main` push or production action occurred.
   live Pages evidence remain GitHub/private-Bridge records so no recursive
   task-local documentation PR is required.
 - **Status:** `GH-203 Done on normal PR #204 merge / Production false`.
+
+## 2026-08-16 - GH-205 bounded RuleStorage content sync started
+
+- Exact clean baseline `ef07b0b3ef9205f24a6df8bd76499448cb543b6e`, issue
+  #205, and branch `feat/GH-205-rule-content-sync` own this block.
+- Scope composes the merged GH-190/GH-193/GH-197/GH-203 boundaries for one
+  complete owner-pinned manifest snapshot: live Testnet-10 observation
+  verification, constructor-state decoding, restricted credential-free IPFS
+  content acquisition, exact Raw-CIDv1 verification, and one atomic local
+  scanner replacement after the whole set validates.
+- The concrete content source must enforce a closed URL policy, disabled
+  redirects/proxies/cookies/compression, bounded waits, non-2xx rejection, and
+  the existing 64 KiB exact-byte cap. Dependency-injected tests remain the
+  authoritative deterministic evidence.
+- Kimi owns the bounded product implementation after completing architecture
+  selection. Sol owns dependency and SSRF policy, security decisions, diff
+  review, integration, complete gates, public synchronization, and GitHub.
+  Claude Code is limited to one small read-only helper check.
+- No auto-update loop, production wiring, fabricated timestamp/floating-point
+  authority, manifest authority, independent RPC truth/history/finality, IPFS
+  availability claim, durable anti-downgrade state, wallet, signing,
+  transaction, broadcast, deployment, contracts, tokenomics, or production
+  authority.
+- **Status:** `GH-205 In Progress / Kimi implementation next / Production false`.
+
+## 2026-08-16 - GH-205 local implementation and public synchronization
+
+- Added a callable-only, development-only complete-snapshot composition over
+  the existing GH-190/GH-193/GH-197/GH-203 boundaries. Every owner-pinned entry
+  uses an explicit `kaspatest` address and the injected/live observation path;
+  caller-supplied observation JSON is not accepted.
+- The concrete content source permits only credential-free plain HTTP to an
+  explicit loopback IP literal and port at `/ipfs/`. DNS, non-loopback hosts,
+  credentials, alternate paths, query/fragment, redirects, proxies,
+  compression, non-success responses, timeout, and content above 64 KiB fail
+  closed with generic redacted diagnostics.
+- Every entry and content binding succeeds before the metadata-native ingest
+  performs exactly one atomic scanner replacement. Empty complete snapshots
+  clear the scanner; any non-empty failure preserves prior state.
+- Kimi K3 supplied the major implementation and correction. Sol reviewed all
+  changes, required live/injected GH-203 composition, added deterministic
+  timeout evidence, and synchronized README, Whitepaper, Roadmap, FAQ, public
+  HTML, `llms.txt`, module README, Memory, and Bridge. Claude Code OAuth was
+  expired and it made no changes.
+- Focused result: timeout `1/1`, rule fetch `10/10`, rule sync `17/17`; public
+  claim consistency `13` surfaces plus `6/6`, documentation hygiene plus
+  `11/11`, Memory plus Autodidactic `6/6`, H-001 evidence plus `4/4`, and diff
+  checks pass. Complete Rust/audit gates and independent final review remain.
+- No automatic update loop, canonical manifest authority, independent RPC
+  truth/history/finality, IPFS availability/replication, production YARA,
+  durable anti-downgrade, wallet, signing, transaction, broadcast, deployment,
+  contracts, tokenomics, or production authority is added.
+- **Status:** `GH-205 Local integration PASS / Full gates and review next / Production false`.
+
+## 2026-08-16 - GH-205 full local verification and independent review
+
+- Centralized the exact `reqwest 0.12.28` pin, documented that `.no_proxy()` is
+  load-bearing because rusty-kaspa enables system-proxy support in the unified
+  graph, and added deterministic no-response plus slow-body timeout coverage.
+  Kimi's focused re-review confirms all prior P3 notes closed with no remaining
+  P0-P3 finding.
+- Final focused evidence: timeout `2/2`, HTTP-source integration `10/10`, sync
+  `17/17`, ingestion `26/26`, owner-pinned observation `15/15`, live/injected
+  observation `8/8`, and constructor state `5/5` pass. Client lib reports
+  `105` passed and two intentional live-node ignores.
+- Complete `cargo test --workspace`, workspace all-target Clippy with warnings
+  denied, rustfmt, locked release performance `6/6`, Cargo audit, Guardian
+  `1303` passed with four intentional live-model skips, Black, Pylint
+  `9.85/10` and `10.00/10`, Compose policy, Python dependency audit, Memory,
+  six Autodidactic tests, 13-surface claims plus six tests, documentation
+  hygiene plus 11 tests, H-001 evidence plus four tests, and diff checks pass.
+- One pre-existing Guardian cancellation test and one debug scanner timing test
+  each failed once under concurrent full-suite load, then passed `10/10` and
+  `5/5` in isolation; the final complete workspace run passed. GH-205 touches
+  neither implementation. Docker itself is unavailable locally, so Compose
+  rendering remains a mandatory protected-CI check; the static Compose policy
+  verifier passes.
+- Cargo audit exits successfully with eight already allowed transitive
+  maintenance/yank warnings and no newly blocking advisory. No production,
+  wallet, signing, transaction, broadcast, deployment, contract, tokenomics,
+  or secret-bearing action occurred.
+- **Status:** `GH-205 Full local PASS / Protected PR next / Production false`.
+
+## 2026-08-16 - GH-205 protected PR #206 handoff
+
+- Local implementation commit `4bbb709` is published only on
+  `feat/GH-205-rule-content-sync`; PR #206 targets protected `main` and is ready
+  for the repository-required CI, Security, Secret Detection, Pages, and review
+  contexts. Issue #205 closes only on normal merge.
+- This repository entry becomes final on normal protected merge and therefore
+  needs no recursive task-local exact-merge-SHA update. Exact-main workflow and
+  live Pages evidence remain GitHub/private-Bridge records.
+- No direct-main push, admin bypass, production action, wallet, signing,
+  transaction, broadcast, deployment, contract, tokenomics, or secret-bearing
+  action occurred.
+- **Status:** `GH-205 PR #206 checks and review pending / Production false`.

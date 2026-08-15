@@ -4052,3 +4052,58 @@ Rules for all dev agents:
   direct documentation-test invocation lacked repository `PYTHONPATH`; the
   corrected CI-equivalent invocation passed all 11 tests.
 - Status: `Review fix verified locally / Refreshed protected checks and normal merge pending / Production false`.
+
+## 2026-08-16 - GH-205 kickoff
+
+- Opened issue #205 and branch `feat/GH-205-rule-content-sync` from exact clean
+  main `ef07b0b`.
+- Selected the next repository-owned Client boundary: complete-snapshot
+  composition of owner-pinned live RuleStorage verification, restricted IPFS
+  exact-byte acquisition, canonical CID binding, and one atomic scanner swap.
+- Kimi architecture selection found no P0 blocker and identified metadata-native
+  ingestion, complete-snapshot semantics, and outbound HTTP hardening as
+  mandatory acceptance points.
+- Status: `In Progress / Kimi implementation next / Production false`.
+
+## 2026-08-16 - GH-205 local integration milestone
+
+- Kimi implemented the primary bounded RuleStorage content-sync block. Sol
+  reviewed the diff, required the GH-203 injected/live observation source in
+  place of caller-supplied observation JSON, and added deterministic timeout
+  evidence for the restricted HTTP source.
+- The callable-only development path now verifies a complete owner-pinned
+  Testnet-10 snapshot, rejects duplicate outpoints/rule IDs/CIDs before fetch,
+  fetches exact bytes only from a credential-free loopback-IP-literal gateway,
+  rechecks canonical Raw-CIDv1 bindings, and swaps scanner state once after the
+  whole set succeeds. Beta/mainnet fail closed.
+- Deterministic timeout, 10 HTTP-source tests, 17 sync tests, 13-surface claim
+  consistency plus 6 tests, documentation hygiene plus 11 tests, Memory plus 6
+  Autodidactic tests, H-001 evidence plus 4 tests, and diff checks pass.
+- Claude Code remained unavailable because its OAuth session is expired and
+  made no changes.
+- Status: `Local integration PASS / Full workspace gates and review next / Production false`.
+
+## 2026-08-16 - GH-205 full local PASS
+
+- Sol closed all three independent Kimi P3 notes: `reqwest` is exact-pinned in
+  workspace dependencies, the load-bearing proxy disable is documented, and a
+  second deterministic test proves the total timeout during a slow body.
+- Kimi's focused follow-up reports no remaining P0-P3 finding. The complete
+  Rust workspace and doc-tests, workspace all-target Clippy with warnings
+  denied, rustfmt, release performance, Cargo audit, Guardian 1303/4, Black,
+  Pylint, Python dependency audit, public claims, documentation hygiene,
+  Memory, Autodidactic, H-001 evidence, and diff gates pass.
+- One pre-existing Guardian cancellation timing case and one debug scanner
+  timing case each failed once under concurrent full-suite load, then passed
+  10/10 and 5/5 in isolation; the final complete workspace run passed. Neither
+  file is touched by GH-205. Docker Compose rendering remains protected-CI-only
+  because Docker is unavailable locally; its static policy verifier passes.
+- Status: `Full local PASS / Protected PR next / Production false`.
+
+## 2026-08-16 - GH-205 protected handoff opened
+
+- Commit `4bbb709` is pushed on `feat/GH-205-rule-content-sync`; normal PR #206
+  targets protected `main` and closes issue #205 on merge.
+- No direct-main push, admin bypass, production action, wallet, chain write,
+  deployment, or secret-bearing action occurred.
+- Status: `PR #206 checks and review pending / Production false`.

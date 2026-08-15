@@ -22,13 +22,23 @@ a production malware detector or reporting client.
   match plus exact covenant, script, amount, block-DAA, and maturity-proxy
   agreement. It proves manifest-to-observation consistency only, not manifest
   authority, RPC truth, transaction history, finality, or a live chain read.
+- `blockchain/rule_fetch.rs` provides a credential-free, loopback-IP-literal-
+  only HTTP source for one local IPFS gateway. It disables redirects and
+  proxies, bounds waits and content to 64 KiB, and returns exact bytes only
+  after canonical Raw-CIDv1 validation. This is local development acquisition,
+  not IPFS availability, replication, or censorship-resistance evidence.
+- `blockchain/rule_sync.rs` composes the injected/live Testnet-10 observation,
+  constructor-state decoding, restricted content fetch, exact CID binding, and
+  one atomic complete-snapshot scanner replacement. It has no automatic update
+  loop or product-runtime wiring and grants no manifest, RPC, finality, YARA,
+  rollback, or production authority.
 - `blockchain/rule_ingest.rs` ingests a complete caller-supplied active-rule
   snapshot whose raw CIDv1 (sha2-256, canonical lowercase base32) must bind the
   exact caller-supplied content bytes. It parses a strict simple matcher
   grammar — not real YARA syntax — and replaces scanner rules atomically
   (an empty snapshot clears them). It is development-only: beta, mainnet, and
-  production profiles reject it. Real Kaspa/IPFS rule loading, production
-  YARA, and durable rollback protection remain open.
+  production profiles reject it. Canonical autonomous Kaspa/IPFS rule loading,
+  production YARA, and durable rollback protection remain open.
 - `network/zk_proof.rs` produces a development SHA-256 placeholder, not a
   production zero-knowledge proof.
 - The E2E lifecycle test is an in-process, same-host stub fixture. Its

@@ -1,7 +1,7 @@
 # PROMETHEUS – MODULE STATUS
 # Format: | Module | Status | Progress | Last Update | Audit | Testnet Address |
 # Status: PENDING | IN_PROGRESS | DONE | BLOCKED | PENDING_AUDIT | ACCEPTED | REJECTED
-# Last Updated: 2026-08-15
+# Last Updated: 2026-08-16
 
 ---
 
@@ -85,6 +85,27 @@ Boundary: development only; one connected node response is not independent RPC
           truth/history, consensus finality, manifest authority, IPFS
           availability, chain deployment, or production readiness
 Readiness: estimates unchanged; this closes acquisition plumbing only
+```
+
+## GH-205 COMPLETE-SNAPSHOT RULE CONTENT SYNC (2026-08-16)
+
+```text
+Status: full local verification complete; protected PR #206 checks pending
+Scope: owner-pinned complete snapshot composes injected/live Testnet-10
+       observation, constructor-state decoding, restricted local IPFS fetch,
+       exact Raw-CIDv1 content binding, and one atomic scanner replacement
+Checks: explicit kaspatest address; duplicate outpoint/rule/CID rejection before
+        fetch; loopback IP literals only; no credentials/DNS/proxy/redirect/
+        compression; bounded connect/total waits and 64 KiB streamed body;
+        complete rollback; generic redacted diagnostics; beta/mainnet rejection
+Tests: two deterministic timeout cases plus 10 HTTP-source and 17 sync cases;
+       GH-190/GH-193/GH-197/GH-203 regressions, full workspace, Clippy, audit,
+       Guardian, public claims, documentation, Memory and evidence gates pass
+Boundary: callable-only development plumbing; no automatic update loop,
+          canonical manifest authority, independent RPC truth/history/finality,
+          IPFS availability/replication, production YARA, durable anti-downgrade,
+          deployment, wallet, transaction, tokenomics, or production authority
+Readiness: estimates unchanged; this closes local complete-snapshot composition only
 ```
 
 All percentages below are internal, scope-weighted engineering estimates or
