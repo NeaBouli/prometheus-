@@ -4018,3 +4018,11 @@ Rules for all dev agents:
 - Full Rust workspace tests, all-target warning-free Clippy, rustfmt, public
   claims, documentation hygiene, H-001 evidence, and diff gates pass.
 - Status: `Full local PASS / PR #204 checks next / Production false`.
+
+## 2026-08-15 - GH-203 protected handoff ready
+
+- PR #204 head `3656c28` passed all eleven reported contexts and has no review
+  thread.
+- The append-only status becomes final on normal protected merge; no recursive
+  task-local exact-SHA update is required.
+- Status: `Done on normal PR #204 merge / Production false`.
