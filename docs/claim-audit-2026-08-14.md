@@ -6,15 +6,16 @@ This audit classifies public claims against exact repository main
 passed on that commit. The machine-readable companion is
 [`docs/evidence/public-claim-status-2026-08-14.json`](evidence/public-claim-status-2026-08-14.json).
 Post-audit work is labeled explicitly and is not retroactively treated as
-evidence on that pinned commit. GH-190 below is current-branch evidence against
-baseline `5b67cdcccc2772c19468f3715e54d2da404711ca`; protected merge and
-exact-main verification are pending.
+evidence on that pinned commit. GH-190 below is separate post-audit evidence:
+protected PR #191 merged as exact main
+`9c2fafffe680606a4ec6d1fc0b9915de9cb646e4`, with Prometheus CI
+`31892079028`, Security Audit `31892079026`, and Pages `31892078930` passing.
 
 ## Claim Audit
 
 | Claim | Current wording before correction | Evidence | Classification | Required correction | Files affected |
 |---|---|---|---|---|---|
-| Light Client malware detection | README described on-device Phi-3 as part of the present system; module comments described ONNX inference as running | On pinned audit commit `5cd13bf`, `modules/client/src/ai/phi3.rs` has no ONNX session, `blockchain/krc20.rs` returns a cache, and `network/zk_proof.rs` generates a SHA-256 placeholder. Separately labeled post-audit branch evidence: GH-190 adds bounded local Raw-CIDv1/exact-byte ingestion with 26 adversarial integration tests; protected merge is pending | Pinned baseline: implemented/tested development foundation. Current branch: additional local development candidate. Production detection remains blocked/unproven | Say explicitly that local caller-supplied ingestion is not canonical L1/IPFS loading, production YARA, operated P2P reporting, or production proving | README, Whitepaper, FAQ, roadmap, HTML, `llms.txt`, client status |
+| Light Client malware detection | README described on-device Phi-3 as part of the present system; module comments described ONNX inference as running | On pinned audit commit `5cd13bf`, `modules/client/src/ai/phi3.rs` has no ONNX session, `blockchain/krc20.rs` returns a cache, and `network/zk_proof.rs` generates a SHA-256 placeholder. Separately labeled post-audit evidence: GH-190 adds bounded local Raw-CIDv1/exact-byte ingestion with 26 adversarial integration tests and merged through protected PR #191 as exact main `9c2faff` | Pinned baseline: implemented/tested development foundation. Post-audit exact main: additional implemented/tested local development foundation. Production detection remains blocked/unproven | Say explicitly that local caller-supplied ingestion is not canonical L1/IPFS loading, production YARA, operated P2P reporting, or production proving | README, Whitepaper, FAQ, roadmap, HTML, `llms.txt`, client status |
 | Guardian model execution and economics | Guardian docs said nodes run LLaMA 3; public pages described generated rules, model quality, costs and break-even scenarios too much like current behavior | GH-144/PR #145 supplies hardened runtime configuration but explicitly performed no model pull or inference; GH-141/161 supply evidence machinery, not a completed independently evaluated run; no Guardian network, PROM market or active reward path exists | Implemented/tested machinery; real 8B/70B quality blocked/unproven; economics illustrative only | Distinguish runtime scaffolding from an evaluated model and label all cost, node-count, reward and break-even values as unproven scenarios | README, Whitepaper, FAQ, roadmap, Guardian economics HTML, Guardian README, `llms.txt` |
 | YARA quality and authority | Public copy sometimes collapsed generated, valid, and usable rules | PR #171 verifies compile-only YARA-X structure; PR #174 creates a non-actionable draft; PR #178 evaluates only 20 synthetic buffers with authority `none` | Syntax validation and non-actionable draft implemented/tested; actionable production rules blocked | Keep syntax-valid, non-actionable, synthetic-quality, and actionable-authorized classes separate | README, Whitepaper, FAQ, roadmap, HTML, Guardian README |
 | Validator network | Status tables called voting and slashing accepted without always stating that no network operates | Rust/Silverc Commit-Reveal, quorum, bond, and slashing tests pass; GH-147 binds a local membership file but proves no authority, key ownership, rotation, Sybil resistance, or multi-host operation | Implemented/tested state machines; operated validator network blocked/unproven | Preserve KAS-only staking and identify membership/operator trust assumptions | All core docs and status files |
@@ -64,9 +65,17 @@ results, not planned CI steps:
 | All workflow YAML parse, five public HTML pages parse, all JSON-LD blocks parse, required Pages files/meta checks | PASS |
 | `git diff --check` | PASS |
 
-Local Actionlint and Gitleaks executables were unavailable. Their protected
-GitHub checks remain mandatory before merge. Exact protected-PR and post-merge
-run IDs will be recorded in the append-only Bridge closeout.
+Local Actionlint and Gitleaks executables were unavailable for the original
+audit patch, so their protected GitHub checks remained mandatory before merge.
+Those protected checks passed; the exact post-merge run IDs are recorded below
+and in the append-only Bridge closeout.
+
+Post-audit GH-190 closeout: protected PR #191 merged normally as
+`9c2fafffe680606a4ec6d1fc0b9915de9cb646e4`; exact-main Prometheus CI
+`31892079028`, Security Audit `31892079026`, and Pages `31892078930` passed.
+Cache-busted live Pages and the commit-pinned README exposed the synchronized
+GH-190 boundary markers. This evidence does not alter the pinned audit baseline
+or any production-readiness classification above.
 
 ## Independent Review
 

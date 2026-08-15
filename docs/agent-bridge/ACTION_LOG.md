@@ -3884,3 +3884,15 @@ Rules for all dev agents:
 - No L1/IPFS network source, production YARA, durable anti-downgrade state,
   contract/tokenomics/security-policy, wallet, chain or deployment was added.
 - Status: `Local PASS / Commit and protected PR next`.
+
+## 2026-08-15 - GH-190 protected merge closeout
+
+- PR #191 merged normally as exact main
+  `9c2fafffe680606a4ec6d1fc0b9915de9cb646e4`; issue #190 closed and its remote
+  feature branch was deleted.
+- Exact-main Prometheus CI `31892079028`, Security Audit `31892079026`, and
+  Pages `31892078930` passed. Cache-busted live Pages and the commit-pinned
+  README expose the synchronized development-only ingestion markers.
+- Product boundaries and remaining canonical L1/IPFS, production YARA,
+  anti-downgrade, real-model, multi-host and rollout gates are unchanged.
+- Status: `Done / Exact-main and live Pages verified / Production false`.
