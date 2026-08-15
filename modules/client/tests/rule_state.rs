@@ -154,6 +154,11 @@ fn batch_is_bounded_atomic_and_duplicate_free() {
     let documents: Vec<_> = (0..=MAX_STATES_PER_BATCH)
         .map(|id| encoded(&valid_document(id as i64)))
         .collect();
+    let total_bytes: usize = documents.iter().map(String::len).sum();
+    assert!(
+        total_bytes <= MAX_BATCH_JSON_BYTES,
+        "batch must exceed the count cap without exceeding the byte cap"
+    );
     let refs: Vec<_> = documents.iter().map(String::as_str).collect();
     assert!(decode_rule_state_batch(&refs).is_err());
 

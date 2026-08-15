@@ -3918,3 +3918,9 @@ Rules for all dev agents:
   diff checks pass. Kimi contributed architecture/core/vector; Sol reviewed
   and completed integration; Claude OAuth was unavailable.
 - Status: `Locally verified / Protected PR pending / Production false`.
+
+## 2026-08-15 - GH-193 review follow-up
+
+- Accepted CodeRabbit's pre-merge status corrections and count-cap test
+  hardening for PR #194. Focused tests and public documentation gates pass.
+- Status: `Review fixes ready / Merge pending / Production false`.

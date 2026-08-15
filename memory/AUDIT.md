@@ -2585,3 +2585,11 @@ the remote feature branch.
 Exact-main Prometheus CI `31662874366`, Security Audit `31662874399`, and Pages
 `31662873670` pass. This documentation closeout changes no product behavior,
 rollout estimate, external effect, or production authority.
+
+## 2026-08-15 - GH-193 pre-merge audit
+
+PR #194 adds a development-only decoder for exact caller-supplied current-
+Silverc RuleStorage constructor state. Local unit, integration, all-target,
+format, Clippy and documentation gates pass; protected PR checks are green.
+The work remains pre-merge and grants no chain provenance, finality, content
+availability, wallet, deployment or production authority.

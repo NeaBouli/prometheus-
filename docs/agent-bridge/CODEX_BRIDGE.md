@@ -4407,3 +4407,13 @@ No direct `main` push or production action occurred.
   integration targets passed; Clippy `-D warnings`, rustfmt and `git diff
   --check` pass.
 - **Status:** `GH-193 Implemented and locally verified / PR and exact-main evidence pending / Production false`.
+
+## 2026-08-15 - GH-193 PR review follow-up
+
+- PR #194 protected CI/Security checks passed. CodeRabbit requested pre-merge
+  status synchronization and an unambiguous count-limit assertion; both were
+  accepted and implemented, with `memory/STATUS.md`, `memory/TODO.md`, and
+  `memory/AUDIT.md` added to the public status record.
+- Focused decoder tests, rustfmt, public-claim consistency, documentation
+  hygiene, and diff checks pass after the follow-up.
+- **Status:** `GH-193 Review fixes pushed next / Merge and exact-main evidence pending / Production false`.
