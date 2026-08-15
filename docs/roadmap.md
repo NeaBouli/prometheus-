@@ -32,7 +32,7 @@ real network operation are tracked in the later phases below.
 |--------|-------------|--------|
 | 0 | Kaspa Testnet-10, repo structure, CI/CD | ACCEPTED |
 | 1 | 6 Silverscript contracts, 54 tests | ACCEPTED |
-| 2 | Rust client: RPC foundation, custom YARA-style matcher, ZK stub, cache-only rule reader | DEVELOPMENT FOUNDATION |
+| 2 | Rust client: RPC foundation, custom YARA-style matcher, ZK stub, cache-only reader, bounded local Raw-CIDv1/exact-byte ingestion | DEVELOPMENT FOUNDATION; NO L1/IPFS NETWORK SOURCE |
 | 3 | Phi-3 heuristic/stub and Fed-DART placeholder | DEVELOPMENT FOUNDATION; NO ONNX INFERENCE |
 | 4 | Guardian interfaces, hardened local vLLM scaffold, and canonical owner-loaded membership source | TESTED FOUNDATION; NO EVALUATED REAL MODEL OR PRODUCTION TRUST |
 | 5 | Commit-Reveal voting, bond system, slashing | TESTED STATE MACHINES; NO OPERATED VALIDATOR NETWORK |
@@ -159,6 +159,7 @@ operation, and public release-hardening evidence for the exact rollout commit.
 - Operate and evidence an initial Guardian/Validator set only after membership, key lifecycle, Sybil, model, proof, privacy, and deployment gates pass
 
 **Sprint 10 — Real KRC-20 Reader + P2P Network**
+- GH-190 adds fail-closed local Raw-CIDv1/sha2-256 binding of caller-supplied exact rule bytes, strict bounded simple-matcher parsing, all-or-nothing activation, and beta/mainnet rejection; this is development ingestion, not Kaspa/IPFS distribution or production YARA
 - KRC-20 UTXO queries for "PROM-RULES" tick (real on-chain reads)
 - Rule content download from IPFS via CIDv1
 - Merged/exact-main verified: GH-42 Guardian ballot carrier has direct QUIC request/response, static peers, bounded resources, owner-only local collector ingress, cancellation-safe concurrent swarm progress, and relay/AutoNAT/DCUtR behaviours

@@ -3790,6 +3790,7 @@ dependencies = [
  "kaspa-rpc-core",
  "kaspa-wrpc-client",
  "log",
+ "multibase",
  "prometheus-threat-hint",
  "prometheus-validator",
  "serde",

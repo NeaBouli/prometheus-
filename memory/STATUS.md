@@ -1461,3 +1461,24 @@ Boundary: deterministic synthetic POSIX test composition only; no runtime,
           actionable result, production artifact approval or authority
 Estimates: unchanged; core 84-88%; complete vision 50-55%
 ```
+
+## GH-190 CID-BOUND LOCAL RULE INGESTION (2026-08-15)
+
+```text
+Status: local implementation PASS; protected PR/CI/merge pending
+Baseline: 5b67cdcccc2772c19468f3715e54d2da404711ca
+Scope: complete caller-supplied active-rule snapshot; canonical lowercase
+       Raw-CIDv1/sha2-256 binding to exact bytes; strict bounded simple matcher;
+       validate-all-then-swap activation; empty complete snapshot clears rules
+Bounds: 256 rules; 64 KiB content/rule; 64 patterns/rule; 1024 bytes/pattern;
+        128-byte rule ID; 59-byte canonical CID before decode
+Tests: client all-targets 90 unit pass/2 intentional live-node ignores plus
+       2 E2E, 5 CLI, 6 performance, 26 ingestion and 10 security tests pass;
+       client all-target Clippy passes with warnings denied
+Review: Kimi architecture review and implementation; Sol closed runtime-mode
+        bypass, CID decode allocation, redacted Debug and Result-callsite gaps;
+        Claude helper unavailable because its OAuth session had expired
+Boundary: development only; metadata/content remain caller-supplied; no
+          canonical Kaspa state decoding, IPFS network fetch, production YARA,
+          durable anti-downgrade state, wallet, chain, reward or deployment
+```

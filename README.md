@@ -82,7 +82,7 @@ Guardian reputation is a separate canonical Kaspa L1 state in `GuardianReputatio
 |--------|--------|-------------|
 | 0 — Setup | DONE | Kaspa testnet-10 node, repo structure, CI/CD |
 | 1 — Contracts | ACCEPTED | 6 Silverscript contracts, 54 tests |
-| 2 — Client | DEVELOPMENT FOUNDATION | Kaspa RPC foundation, cache-only rule reader, custom YARA-style pattern matcher, and ZK stub; canonical L1/IPFS rule loading and operated P2P reporting are open |
+| 2 — Client | DEVELOPMENT FOUNDATION | Kaspa RPC foundation, cache-only rule reader, custom YARA-style matcher, ZK stub, and GH-190's bounded local Raw-CIDv1/exact-byte rule ingestion with atomic rollback; canonical L1 state reads, IPFS fetching, production YARA, durable anti-downgrade state, and operated P2P reporting remain open |
 | 3 — AI | DEVELOPMENT FOUNDATION | Phi-3 wrapper uses a development heuristic/stub and no ONNX Runtime session; Fed-DART is also a stub |
 | 4 — Guardian | CORE ACCEPTED / MEMBERSHIP SOURCE MERGED | YARA/analyzer foundation; GH-144 hardens local vLLM operation and GH-147 binds canonical local membership/key assignments without production trust |
 | 5 — Voting | TESTED STATE MACHINES | Commit-Reveal, quorum, bond, and slashing logic pass local Rust/Silverc gates; no operated validator network or trusted decentralized membership is proven |

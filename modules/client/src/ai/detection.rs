@@ -132,7 +132,7 @@ mod tests {
         let model = Phi3Model::new(&PathBuf::from("/nonexistent/model.onnx")).unwrap();
         let mut scanner = YaraScanner::new().unwrap();
         for rule in rules {
-            scanner.add_rule(rule);
+            scanner.add_rule(rule).unwrap();
         }
         AnomalyDetector::new(Arc::new(model), Arc::new(Mutex::new(scanner)))
     }

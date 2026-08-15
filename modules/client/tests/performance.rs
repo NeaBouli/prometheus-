@@ -23,11 +23,13 @@ use tokio::sync::Mutex;
 #[test]
 fn test_scanner_10mb_under_500ms() {
     let mut scanner = YaraScanner::new().unwrap();
-    scanner.add_rule(CompiledRule {
-        name: "PerfTest".to_string(),
-        patterns: vec![b"MALWARE_SIG_PERF".to_vec()],
-        required_matches: 1,
-    });
+    scanner
+        .add_rule(CompiledRule {
+            name: "PerfTest".to_string(),
+            patterns: vec![b"MALWARE_SIG_PERF".to_vec()],
+            required_matches: 1,
+        })
+        .unwrap();
 
     // Create 10MB of data
     let data = vec![0x41u8; 10 * 1024 * 1024];
@@ -153,11 +155,13 @@ fn test_slashing_calculation_under_1ms() {
 #[test]
 fn test_100_sequential_scans_performance() {
     let mut scanner = YaraScanner::new().unwrap();
-    scanner.add_rule(CompiledRule {
-        name: "BulkTest".to_string(),
-        patterns: vec![b"BULK_TEST_PATTERN".to_vec()],
-        required_matches: 1,
-    });
+    scanner
+        .add_rule(CompiledRule {
+            name: "BulkTest".to_string(),
+            patterns: vec![b"BULK_TEST_PATTERN".to_vec()],
+            required_matches: 1,
+        })
+        .unwrap();
 
     let data = vec![0x55u8; 100_000]; // 100KB per scan
 

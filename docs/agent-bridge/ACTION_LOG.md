@@ -3839,6 +3839,15 @@ Rules for all dev agents:
   remain mandatory protected contexts before merge.
 - Status: `Local PASS / Commit and protected PR next`.
 
+## 2026-08-15 - PR #191 review corrections
+
+- Separated GH-190 branch evidence from the historical exact-main audit baseline
+  and replaced ambiguous rollback wording with exact validate-all-then-swap and
+  last-known-good semantics. Added the suggested test-helper boundary assertion.
+- Focused ingestion, all-target client Clippy, claim consistency, format and diff
+  checks pass. No product semantics or rollout boundary changed.
+- Status: `Local PASS / Protected recheck next`.
+
 ## 2026-08-14 - Public claim reconciliation protected merge closeout
 
 - PR #188 passed all eleven attached contexts at exact head `66bdac0` with no
@@ -3850,3 +3859,28 @@ Rules for all dev agents:
   closeout records evidence only and performs no product or external runtime
   action.
 - Status: `Done / Exact-main and live Pages verified`.
+
+## 2026-08-15 - GH-190 kickoff
+
+- Opened issue #190 and branch `feat/GH-190-cid-bound-rule-ingestion` from
+  exact clean main `5b67cdcccc2772c19468f3715e54d2da404711ca`.
+- Started the bounded fail-closed local rule-content ingestion block. Kimi K3
+  owns a read-only architecture/security review; Sol owns implementation and
+  integration; Claude Code is reserved for a small independent check.
+- Network fetching, chain/wallet/deployment actions, production authority and
+  contract/tokenomics/security-policy changes remain excluded.
+- Status: `In Progress / Review and implementation next`.
+
+## 2026-08-15 - GH-190 local implementation and verification
+
+- Added the development-only fail-closed Raw-CIDv1/exact-byte rule-ingestion
+  boundary and hardened every scanner mutation path to validate before mutation.
+- Sol closed runtime-mode bypass, allocation, diagnostic-redaction and legacy
+  empty-pattern gaps after Kimi's implementation. Kimi's final review found no
+  P0-P3. Claude Code was unavailable due to expired OAuth and changed nothing.
+- Full Rust workspace, Guardian, claim consistency, documentation hygiene,
+  Memory, HTML/JSON-LD, workflow YAML, format, lint and diff gates pass. Exact
+  counts and boundaries are recorded in the project Bridge.
+- No L1/IPFS network source, production YARA, durable anti-downgrade state,
+  contract/tokenomics/security-policy, wallet, chain or deployment was added.
+- Status: `Local PASS / Commit and protected PR next`.

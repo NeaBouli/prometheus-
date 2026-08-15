@@ -428,7 +428,7 @@ Prometheus CI `30863940497`, Security Audit `30863940502`, and GitHub Pages
 
 ## 8. Light Client
 
-This section describes the target Light Client architecture. The current Rust client contains development implementations and fail-closed runtime guards: beta/mainnet reject the Phi-3 heuristic, SHA-256 ZK placeholder, cached rule reader, and federated-learning placeholder. These components must not be presented as a production threat-reporting pipeline.
+This section describes the target Light Client architecture. The current Rust client contains development implementations and fail-closed runtime guards: beta/mainnet reject the Phi-3 heuristic, SHA-256 ZK placeholder, cached rule reader, local CID-bound rule ingestion, and federated-learning placeholder. These components must not be presented as a production threat-reporting pipeline.
 
 ### 8.1 Phi-3-mini Integration
 
@@ -440,7 +440,8 @@ This section describes the target Light Client architecture. The current Rust cl
 ### 8.2 YARA Scanner
 
 - Pattern-based file scanning with custom matcher
-- Rules loaded from canonical L1 rule state; PROM-RULES asset representation is a deployment target
+- GH-190 locally binds caller-supplied exact rule bytes to canonical lowercase Raw-CIDv1/sha2-256 metadata, enforces a bounded simple matcher grammar, and atomically replaces complete development snapshots; this is not real YARA syntax or a network source
+- Rules loaded from canonical L1 rule state and fetched from IPFS remain targets; PROM-RULES asset representation is also a deployment target
 - SHA-256 file hashing for threat identification
 - EICAR test standard for validation
 
