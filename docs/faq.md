@@ -176,8 +176,12 @@ Merged and exact-main-verified GH-197/PR #198 adds a local Testnet-10
 consistency boundary: a separately
 owner-pin-hashed canonical manifest must match exactly one entry in a bounded
 caller-supplied RPC-shaped RuleStorage UTXO set before GH-193 decodes the bound
-constructor JSON. This is not a live chain read and proves neither manifest
-authority, RPC truth, transaction history, finality, nor IPFS availability.
+constructor JSON. GH-203/PR #204 adds a development-only live adapter that
+queries one connected node for exact Testnet-10 virtual DAA and UTXOs for one
+explicit `kaspatest` address, converts only returned pinned-RPC fields, and then
+uses the same verifier. This is a live node query, not independent proof of RPC
+truth, transaction history, consensus finality, manifest authority, IPFS
+availability, deployment, or production readiness.
 
 **Q: Why Kaspa and not Ethereum?**
 Prometheus targets Kaspa because its high-throughput BlockDAG and current

@@ -4589,3 +4589,23 @@ No direct `main` push or production action occurred.
   does not establish independent RPC truth, history, consensus finality,
   manifest authority, availability, deployment, or production readiness.
 - **Status:** `GH-203 Locally integrated / Public synchronization and full gates next / Production false`.
+
+## 2026-08-15 - GH-203 full local verification and public synchronization
+
+- README, Markdown Whitepaper/Roadmap/FAQ, public Start/Roadmap/Whitepaper/FAQ
+  HTML, `llms.txt`, and Memory now consistently describe GH-203/PR #204 as a
+  development-only live single-node acquisition boundary before unchanged
+  GH-197 verification.
+- `cargo test --workspace`, `cargo clippy --workspace --all-targets -- -D
+  warnings`, and `cargo fmt --all -- --check` pass. The client reports 100 unit
+  tests with 98 passed and 2 intentional live-node ignores, plus 8 new GH-203,
+  15 GH-197, 5 GH-193, 26 ingestion, 6 performance, 5 CLI, 10 security, and 2
+  development E2E integration cases passing.
+- Public claim consistency passes across 13 surfaces plus 6 unit tests;
+  documentation hygiene plus 11 tests and H-001 public evidence plus 4 tests
+  pass. `git diff --check` passes.
+- Kimi's review verified the pinned v2.0.1 API assumptions and found no P0/P1
+  issue. Its trust notes were closed by requiring every returned entry to carry
+  the exact queried address and by documenting injected sources as caller
+  trusted. Claude Code remained unavailable due expired OAuth.
+- **Status:** `GH-203 Full local PASS / PR #204 protected checks next / Production false`.
