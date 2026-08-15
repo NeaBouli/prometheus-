@@ -3991,3 +3991,23 @@ Rules for all dev agents:
   and appended a self-finalizing repository handoff. No public claim or product
   behavior changed.
 - Status: `GH-197 Done / GH-199 Done / GH-201 Done on normal merge / Production false`.
+
+## 2026-08-15 - GH-203 kickoff
+
+- Opened issue #203 and branch `feat/GH-203-live-rule-observation` from clean
+  exact main `62d878a`.
+- Selected the next repository-owned Light Client boundary: live Testnet-10
+  UTXO/virtual-DAA acquisition through the existing connection, followed by
+  GH-197 verification under unchanged trust and production limitations.
+- Status: `In Progress / Kimi implementation next / Production false`.
+
+## 2026-08-15 - GH-203 locally integrated
+
+- Implemented bounded live Testnet-10 UTXO/virtual-DAA acquisition and canonical
+  GH-197 verification through the existing connection.
+- Eight new tests, 15 GH-197 regressions, rustfmt, warning-free client Clippy,
+  and diff checks pass.
+- Kimi completed architecture/type analysis and read-only security review. Sol
+  closed lock-timeout and missing-entry-address hardening. Claude Code was
+  unavailable due expired OAuth and made no changes.
+- Status: `Locally integrated / Docs and full gates next / Production false`.

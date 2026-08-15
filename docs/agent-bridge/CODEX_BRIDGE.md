@@ -4546,3 +4546,46 @@ No direct `main` push or production action occurred.
   final merge and exact-main workflow evidence is retained in GitHub and the
   private cross-project Bridge.
 - **Status:** `GH-197 Done / GH-199 Done / GH-201 Done on normal merge / Production false`.
+
+## 2026-08-15 - GH-203 live RuleStorage observation adapter started
+
+- Exact clean baseline `62d878a0656449cd7d1fd54b872cedd8a4a566d4`, issue
+  #203, and branch `feat/GH-203-live-rule-observation` own this bounded block.
+- Scope is development-only acquisition of one explicit Testnet-10 address's
+  UTXOs and current virtual DAA through the existing credential-free
+  `KaspaConnection`, canonical conversion of only pinned rusty-kaspa RPC
+  fields, and invocation of the existing GH-197 owner-pinned verifier.
+- The path must remain fail-closed and redacted on network/address/RPC/timeout/
+  size/covenant/mismatch failures and must retain beta/mainnet rejection.
+- Kimi K3 owns the bounded implementation contribution. Sol owns architecture,
+  security, integration, complete tests, documentation, and publication.
+  Claude Code may perform one small read-only helper check.
+- No wallet, keys, signing, transaction, broadcast, deployment, contracts,
+  tokenomics, commit-reveal, slash ACL, reputation, emergency stop, IPFS fetch,
+  rule activation, RPC-truth/finality claim, or production authority.
+- **Status:** `GH-203 In Progress / Kimi implementation next / Production false`.
+
+## 2026-08-15 - GH-203 local implementation milestone
+
+- Added a development-only async adapter over the existing connected
+  `KaspaConnection`. It bounds lock acquisition and each RPC call, queries
+  BlockDAG network/virtual DAA plus UTXOs for one explicit `kaspatest` address,
+  requires exact Testnet-10 from the node, and converts only pinned RPC fields
+  into the canonical GH-197 observation before verification.
+- The adapter rejects disconnected/unavailable/timeout responses, invalid or
+  non-Testnet addresses, missing or mismatched reported entry addresses,
+  wrong node network, oversized sets, missing/mismatched covenants, duplicates,
+  coinbase, immature state, and all manifest/state mismatches through one
+  generic redacted error. Beta/mainnet remain fail-closed.
+- Eight new deterministic dependency-injected tests pass; all 15 GH-197 tests,
+  client all-target Clippy with warnings denied, rustfmt, and diff checks pass.
+- Kimi K3 supplied the pinned rusty-kaspa type/architecture analysis and an
+  independent read-only security pass; Sol implemented and hardened the diff.
+  Kimi identified no P0/P1 issue and its address/DI trust notes were resolved in
+  code/documentation. Claude Code failed authentication because its OAuth
+  session is expired and made no changes.
+- The live adapter proves only that one connected node returned fields
+  consistent with the separately owner-pinned manifest at observation time. It
+  does not establish independent RPC truth, history, consensus finality,
+  manifest authority, availability, deployment, or production readiness.
+- **Status:** `GH-203 Locally integrated / Public synchronization and full gates next / Production false`.
