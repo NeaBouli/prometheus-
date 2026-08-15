@@ -4546,3 +4546,80 @@ No direct `main` push or production action occurred.
   final merge and exact-main workflow evidence is retained in GitHub and the
   private cross-project Bridge.
 - **Status:** `GH-197 Done / GH-199 Done / GH-201 Done on normal merge / Production false`.
+
+## 2026-08-15 - GH-203 live RuleStorage observation adapter started
+
+- Exact clean baseline `62d878a0656449cd7d1fd54b872cedd8a4a566d4`, issue
+  #203, and branch `feat/GH-203-live-rule-observation` own this bounded block.
+- Scope is development-only acquisition of one explicit Testnet-10 address's
+  UTXOs and current virtual DAA through the existing credential-free
+  `KaspaConnection`, canonical conversion of only pinned rusty-kaspa RPC
+  fields, and invocation of the existing GH-197 owner-pinned verifier.
+- The path must remain fail-closed and redacted on network/address/RPC/timeout/
+  size/covenant/mismatch failures and must retain beta/mainnet rejection.
+- Kimi K3 owns the bounded implementation contribution. Sol owns architecture,
+  security, integration, complete tests, documentation, and publication.
+  Claude Code may perform one small read-only helper check.
+- No wallet, keys, signing, transaction, broadcast, deployment, contracts,
+  tokenomics, commit-reveal, slash ACL, reputation, emergency stop, IPFS fetch,
+  rule activation, RPC-truth/finality claim, or production authority.
+- **Status:** `GH-203 In Progress / Kimi implementation next / Production false`.
+
+## 2026-08-15 - GH-203 local implementation milestone
+
+- Added a development-only async adapter over the existing connected
+  `KaspaConnection`. It bounds lock acquisition and each RPC call, queries
+  BlockDAG network/virtual DAA plus UTXOs for one explicit `kaspatest` address,
+  requires exact Testnet-10 from the node, and converts only pinned RPC fields
+  into the canonical GH-197 observation before verification.
+- The adapter rejects disconnected/unavailable/timeout responses, invalid or
+  non-Testnet addresses, missing or mismatched reported entry addresses,
+  wrong node network, oversized sets, missing/mismatched covenants, duplicates,
+  coinbase, immature state, and all manifest/state mismatches through one
+  generic redacted error. Beta/mainnet remain fail-closed.
+- Eight new deterministic dependency-injected tests pass; all 15 GH-197 tests,
+  client all-target Clippy with warnings denied, rustfmt, and diff checks pass.
+- Kimi K3 supplied the pinned rusty-kaspa type/architecture analysis and an
+  independent read-only security pass; Sol implemented and hardened the diff.
+  Kimi identified no P0/P1 issue and its address/DI trust notes were resolved in
+  code/documentation. Claude Code failed authentication because its OAuth
+  session is expired and made no changes.
+- The live adapter proves only that one connected node returned fields
+  consistent with the separately owner-pinned manifest at observation time. It
+  does not establish independent RPC truth, history, consensus finality,
+  manifest authority, availability, deployment, or production readiness.
+- **Status:** `GH-203 Locally integrated / Public synchronization and full gates next / Production false`.
+
+## 2026-08-15 - GH-203 full local verification and public synchronization
+
+- README, Markdown Whitepaper/Roadmap/FAQ, public Start/Roadmap/Whitepaper/FAQ
+  HTML, `llms.txt`, and Memory now consistently describe GH-203/PR #204 as a
+  development-only live single-node acquisition boundary before unchanged
+  GH-197 verification.
+- `cargo test --workspace`, `cargo clippy --workspace --all-targets -- -D
+  warnings`, and `cargo fmt --all -- --check` pass. The client reports 100 unit
+  tests with 98 passed and 2 intentional live-node ignores, plus 8 new GH-203,
+  15 GH-197, 5 GH-193, 26 ingestion, 6 performance, 5 CLI, 10 security, and 2
+  development E2E integration cases passing.
+- Public claim consistency passes across 13 surfaces plus 6 unit tests;
+  documentation hygiene plus 11 tests and H-001 public evidence plus 4 tests
+  pass. `git diff --check` passes.
+- Kimi's review verified the pinned v2.0.1 API assumptions and found no P0/P1
+  issue. Its trust notes were closed by requiring every returned entry to carry
+  the exact queried address and by documenting injected sources as caller
+  trusted. Claude Code remained unavailable due expired OAuth.
+- **Status:** `GH-203 Full local PASS / PR #204 protected checks next / Production false`.
+
+## 2026-08-15 - GH-203 protected handoff ready
+
+- PR #204 head `3656c28` passed all eleven reported contexts: Rust Workspace,
+  Rust Performance, Current Silverc, Python Guardian, Silverscript Contracts,
+  Memory Integrity, HTML Pages, Secret Detection, Dependency Audit, Security
+  Summary, and the rate-limited no-finding CodeRabbit context.
+- GitHub reports the PR mergeable with zero review threads. No direct main push,
+  admin merge, production action, wallet, signing, transaction, broadcast, or
+  deployment occurred.
+- This entry becomes final on normal protected merge. Exact-main workflow and
+  live Pages evidence remain GitHub/private-Bridge records so no recursive
+  task-local documentation PR is required.
+- **Status:** `GH-203 Done on normal PR #204 merge / Production false`.

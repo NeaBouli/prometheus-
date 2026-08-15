@@ -9,6 +9,7 @@
 - [x] [P1] GH-170 substring-only Guardian YARA check durch bounded compile-only YARA-X ersetzen | Codex Sol | PR #171 merged as exact main `8d8e29c`; CI `31650123073`, Security `31650123055`, Pages `31650122593`, review and live readback pass
 - [x] [P1] GH-173 deterministic non-actionable semantic draft in governed v2 worker | Codex Sol + Kimi K3 | PR #174 merged as exact main `1107b11`; CI `31654308969`, Security `31654308964`, Pages `31654308875`, review and v1/restart/binding evidence pass
 - [x] [P1] GH-197 manifest-bound Testnet-10 RuleStorage UTXO observation | Codex Sol + Kimi K3 | PR #198 merged as exact main `28da2d4`; CI `31904377606`, Security `31904377632`, Pages `31904376972`, independent review and live public-page readback pass; production authority remains false
+- [x] [P1] GH-203 live Testnet-10 RuleStorage RPC observation adapter | Codex Sol + Kimi K3 | PR #204 protected delivery; bounded lock/RPC waits, exact node network and returned-address checks, direct pinned-field conversion, unchanged GH-197 verification, and deterministic adversarial tests; independent RPC truth/finality and production authority remain false
 
 ## ═══ SPRINT 0: SETUP & TESTNET (Woche 1) ═══
 

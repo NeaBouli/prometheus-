@@ -14,11 +14,11 @@
 | Branch | Canonical target `main`; product/public/status changes remain PR-only |
 | Lokaler Pfad | `$REPO_ROOT` |
 | Letzter grün verifizierter Produkt-/Public-Baseline | Exact product main `28da2d42f85233395c38d633f799befba0223797` and exact documentation main `a9e987c28a1984fe0f89a10991f7021253ed486a`; latest Prometheus CI `31904938024`, Security `31904938123`, and Pages `31904937253` pass |
-| Aktueller Entwicklungs-Slice | GH-197 product work and GH-199 documentation closeout are complete; GH-201 only finalizes the task-current handoff wording and selects no new feature scope |
+| Aktueller Entwicklungs-Slice | GH-203/PR #204 adds the development-only live Testnet-10 RuleStorage RPC observation adapter; delivery remains protected-PR-only and production authority remains false |
 | Aktuelle Tooling-Baseline | H-001 Testnet-10 signature/import/full verification/one-shot broadcast/confirmation/receipt/independent evidence and repository-public hash revalidation pass on exact main. The bounded GH-167 ThreatHint-v2 repository transport substrate is merged and exact-main verified. Production proof artifacts/ceremony, independent cryptographic/privacy review, real semantic/actionable analysis, six state deployments, metrics-oracle evidence, operated multi-host transport, and rollout remain open. |
-| Aktueller HEAD | Canonical target `main`; GH-197 product and GH-199 evidence closeout are merged, with no active product feature branch |
+| Aktueller HEAD | Canonical target `main`; GH-203 is delivered only through protected PR #204 from `feat/GH-203-live-rule-observation` |
 | Rollback-Tag | `pre-session-20260413` → `6347b85` |
-| Whitepaper | WHITEPAPER.md (root) + whitepaper.html (styled); GH-197 is merged/exact-main synchronized as a consistency-only development boundary without chain-truth, finality, or production claims |
+| Whitepaper | WHITEPAPER.md (root) + whitepaper.html (styled); GH-203 documents a development-only live single-node query before unchanged GH-197 verification, without independent RPC-truth, finality, or production claims |
 | Status | H-001 Testnet-10 canary is confirmed and independently evidenced. Rollout-capable core is estimated at 84-88%. GH-167 closes only the bounded repository v2 transport substrate. Production relation/key/ceremony approval and independent cryptographic/privacy review, real semantic/actionable analysis, six state deployments, metrics-oracle evidence, operated multi-host transport, crash-safe external side effects, and full rollout evidence remain gated. |
 | GitHub Pages | https://neabouli.github.io/prometheus-/ |
 | Google Search Console | Verified: googleaa2902079481c7a8 |

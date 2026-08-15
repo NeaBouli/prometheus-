@@ -3991,3 +3991,64 @@ Rules for all dev agents:
   and appended a self-finalizing repository handoff. No public claim or product
   behavior changed.
 - Status: `GH-197 Done / GH-199 Done / GH-201 Done on normal merge / Production false`.
+
+## 2026-08-15 - GH-203 kickoff
+
+- Opened issue #203 and branch `feat/GH-203-live-rule-observation` from clean
+  exact main `62d878a`.
+- Selected the next repository-owned Light Client boundary: live Testnet-10
+  UTXO/virtual-DAA acquisition through the existing connection, followed by
+  GH-197 verification under unchanged trust and production limitations.
+- Status: `In Progress / Kimi implementation next / Production false`.
+
+## 2026-08-15 - GH-203 locally integrated
+
+- Implemented bounded live Testnet-10 UTXO/virtual-DAA acquisition and canonical
+  GH-197 verification through the existing connection.
+- Eight new tests, 15 GH-197 regressions, rustfmt, warning-free client Clippy,
+  and diff checks pass.
+- Kimi completed architecture/type analysis and read-only security review. Sol
+  closed lock-timeout and missing-entry-address hardening. Claude Code was
+  unavailable due expired OAuth and made no changes.
+- Status: `Locally integrated / Docs and full gates next / Production false`.
+
+## 2026-08-15 - GH-203 full local PASS
+
+- Synchronized 13 public/status surfaces with the single-node trust boundary.
+- Full Rust workspace tests, all-target warning-free Clippy, rustfmt, public
+  claims, documentation hygiene, H-001 evidence, and diff gates pass.
+- Status: `Full local PASS / PR #204 checks next / Production false`.
+
+## 2026-08-15 - GH-203 protected handoff ready
+
+- PR #204 head `3656c28` passed all eleven reported contexts and has no review
+  thread.
+- The append-only status becomes final on normal protected merge; no recursive
+  task-local exact-SHA update is required.
+- Status: `Done on normal PR #204 merge / Production false`.
+
+## 2026-08-15 - GH-203 automated review follow-up
+
+- CodeRabbit completed review on PR #204 and identified one valid availability
+  issue: the shared RPC client lock spans both bounded network requests.
+- Normal merge is paused while the lock is scoped independently per request;
+  the remaining reported test-file item contains no actionable code finding.
+- Status: `Review fix in progress / Full gates and protected merge pending / Production false`.
+
+## 2026-08-15 - GH-203 review fix verified
+
+- Scoped the shared RPC client mutex independently around the virtual-DAA and
+  address-UTXO requests while retaining a ten-second bound on each acquisition
+  and each RPC call. Removed one unnecessary Clippy allowance and clarified that
+  the address prefix selects the testnet family while the node snapshot enforces
+  exact Testnet-10.
+- Independent Kimi review against pinned rusty-kaspa v2.0.1 found no P0-P2
+  issue and confirmed that the local mutex never supplied cross-RPC node
+  atomicity. The review noted only pre-existing development-path P3 limitations.
+- Focused GH-203 `8/8`, GH-197 `15/15`, full Rust workspace, workspace all-target
+  Clippy with warnings denied, rustfmt, Memory Integrity, six Autodidactic tests,
+  13-surface public-claim consistency plus six tests, documentation hygiene plus
+  11 tests, H-001 evidence plus four tests, and diff checks pass. One initial
+  direct documentation-test invocation lacked repository `PYTHONPATH`; the
+  corrected CI-equivalent invocation passed all 11 tests.
+- Status: `Review fix verified locally / Refreshed protected checks and normal merge pending / Production false`.

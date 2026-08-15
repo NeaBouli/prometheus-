@@ -24,8 +24,13 @@
 //! This boundary proves **only** owner-pin manifest-to-caller-observation
 //! consistency. It does **not** prove manifest authority, RPC truth,
 //! transaction history, finality, IPFS/content availability, or production
-//! readiness. The virtual-DAA delta is a maturity proxy, not finality. No
-//! live RPC adapter is involved: observations are caller-supplied.
+//! readiness. The virtual-DAA delta is a maturity proxy, not finality.
+//!
+//! The pure verifier accepts caller-supplied observations. The development-only
+//! live adapter acquires UTXOs and virtual DAA from a connected
+//! [`KaspaConnection`] for one explicit Testnet-10 address, converts only fields
+//! returned by the pinned RPC API, and invokes the same verifier. This adds no
+//! RPC-truth, finality, manifest-authority, or production claim.
 //!
 //! This is a development-only path: every public entry point calls
 //! `require_stub_allowed` and therefore rejects beta/mainnet. The `_for_mode`
@@ -33,12 +38,21 @@
 //! beta/mainnet env gate.
 
 use std::collections::HashSet;
+use std::future::Future;
+use std::pin::Pin;
+use std::time::Duration;
 
+use kaspa_addresses::{Address, Prefix};
+use kaspa_rpc_core::api::rpc::RpcApi;
+use kaspa_rpc_core::RpcUtxosByAddressesEntry;
+use kaspa_wrpc_client::prelude::{NetworkId, NetworkType};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
+use tokio::time::timeout;
 
 use crate::runtime::{require_stub_allowed, require_stub_allowed_for, RuntimeMode};
 
+use super::connection::KaspaConnection;
 use super::rule_state::{decode_rule_state, RuleStateMetadata, MAX_STATE_JSON_BYTES};
 
 /// Maximum bytes accepted for the manifest JSON document, checked before parsing.
@@ -57,6 +71,8 @@ pub const OBSERVATION_KIND: &str = "prometheus.rule_storage.observation.v1";
 /// Exact network both documents are pinned to.
 pub const OBSERVATION_NETWORK_ID: &str = "testnet-10";
 
+const LIVE_OBSERVATION_RPC_TIMEOUT: Duration = Duration::from_secs(10);
+
 /// The single public observation error.
 ///
 /// Deliberately generic: Display/Debug/logging never contain manifest or
@@ -72,6 +88,73 @@ impl std::fmt::Display for RuleObservationError {
 }
 
 impl std::error::Error for RuleObservationError {}
+
+/// Node fields required to construct one canonical GH-197 observation.
+///
+/// Production snapshots copy these values directly from pinned rusty-kaspa RPC
+/// responses. The public shape also permits deterministic dependency-injected
+/// tests without network access.
+pub struct RuleObservationSnapshot {
+    /// Network reported by `get_block_dag_info`.
+    pub network_id: NetworkId,
+    /// Current virtual DAA score reported by the node.
+    pub virtual_daa_score: u64,
+    /// UTXOs returned for exactly the requested address.
+    pub utxos: Vec<RpcUtxosByAddressesEntry>,
+}
+
+/// Boxed future returned by [`RuleObservationSource`].
+pub type RuleObservationFuture<'a> = Pin<
+    Box<dyn Future<Output = Result<RuleObservationSnapshot, RuleObservationError>> + Send + 'a>,
+>;
+
+/// Dependency-injected source for RuleStorage observations.
+///
+/// Implementations other than [`KaspaConnection`] are caller-trusted test or
+/// embedding boundaries and do not constitute evidence that live RPC ran.
+pub trait RuleObservationSource {
+    /// Fetch one node snapshot for exactly `address`.
+    fn observe_address<'a>(&'a self, address: &'a Address) -> RuleObservationFuture<'a>;
+}
+
+impl RuleObservationSource for KaspaConnection {
+    fn observe_address<'a>(&'a self, address: &'a Address) -> RuleObservationFuture<'a> {
+        Box::pin(async move {
+            if !self.is_connected().await {
+                return Err(RuleObservationError);
+            }
+
+            let client = self.rpc_client();
+            let dag = {
+                let client = timeout(LIVE_OBSERVATION_RPC_TIMEOUT, client.lock())
+                    .await
+                    .map_err(|_| RuleObservationError)?;
+                timeout(LIVE_OBSERVATION_RPC_TIMEOUT, client.get_block_dag_info())
+                    .await
+                    .map_err(|_| RuleObservationError)?
+                    .map_err(|_| RuleObservationError)?
+            };
+            let utxos = {
+                let client = timeout(LIVE_OBSERVATION_RPC_TIMEOUT, client.lock())
+                    .await
+                    .map_err(|_| RuleObservationError)?;
+                timeout(
+                    LIVE_OBSERVATION_RPC_TIMEOUT,
+                    client.get_utxos_by_addresses(vec![address.clone()]),
+                )
+                .await
+                .map_err(|_| RuleObservationError)?
+                .map_err(|_| RuleObservationError)?
+            };
+
+            Ok(RuleObservationSnapshot {
+                network_id: dag.network,
+                virtual_daa_score: dag.virtual_daa_score,
+                utxos,
+            })
+        })
+    }
+}
 
 #[derive(Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -167,6 +250,141 @@ pub fn verify_rule_storage_observation_for_mode(
         observation_json,
         constructor_json,
     )
+}
+
+/// Acquire one live Testnet-10 address observation and run the GH-197 verifier.
+///
+/// The supplied connection must already be connected. Every failure is reduced
+/// to the generic [`RuleObservationError`], so node, address, outpoint, script,
+/// and covenant details are never exposed through diagnostics. The path is
+/// development-only and performs no wallet, signing, transaction, broadcast,
+/// deployment, IPFS, activation, or production action.
+pub async fn verify_rule_storage_observation_live(
+    connection: &KaspaConnection,
+    address: &str,
+    expected_manifest_sha256: &str,
+    manifest_json: &str,
+    constructor_json: &str,
+) -> Result<RuleStateMetadata, RuleObservationError> {
+    verify_rule_storage_observation_live_with_source(
+        connection,
+        address,
+        expected_manifest_sha256,
+        manifest_json,
+        constructor_json,
+    )
+    .await
+}
+
+/// Identical to [`verify_rule_storage_observation_live`] with an explicit mode.
+///
+/// The explicit mode can only tighten the process-wide runtime gate.
+pub async fn verify_rule_storage_observation_live_for_mode(
+    mode: RuntimeMode,
+    connection: &KaspaConnection,
+    address: &str,
+    expected_manifest_sha256: &str,
+    manifest_json: &str,
+    constructor_json: &str,
+) -> Result<RuleStateMetadata, RuleObservationError> {
+    require_stub_allowed("live RuleStorage UTXO observation").map_err(|_| RuleObservationError)?;
+    require_stub_allowed_for(mode, "live RuleStorage UTXO observation")
+        .map_err(|_| RuleObservationError)?;
+    verify_rule_storage_observation_live_inner(
+        connection,
+        address,
+        expected_manifest_sha256,
+        manifest_json,
+        constructor_json,
+    )
+    .await
+}
+
+/// Run the live adapter with an injected source for deterministic tests.
+pub async fn verify_rule_storage_observation_live_with_source(
+    source: &dyn RuleObservationSource,
+    address: &str,
+    expected_manifest_sha256: &str,
+    manifest_json: &str,
+    constructor_json: &str,
+) -> Result<RuleStateMetadata, RuleObservationError> {
+    require_stub_allowed("live RuleStorage UTXO observation").map_err(|_| RuleObservationError)?;
+    verify_rule_storage_observation_live_inner(
+        source,
+        address,
+        expected_manifest_sha256,
+        manifest_json,
+        constructor_json,
+    )
+    .await
+}
+
+async fn verify_rule_storage_observation_live_inner(
+    source: &dyn RuleObservationSource,
+    address: &str,
+    expected_manifest_sha256: &str,
+    manifest_json: &str,
+    constructor_json: &str,
+) -> Result<RuleStateMetadata, RuleObservationError> {
+    let address = Address::try_from(address).map_err(|_| RuleObservationError)?;
+    let expected_network = NetworkId::with_suffix(NetworkType::Testnet, 10);
+    // Address prefixes identify the testnet family; the snapshot check below
+    // enforces the exact Testnet-10 suffix reported by the connected node.
+    if address.prefix != Prefix::from(expected_network) {
+        return Err(RuleObservationError);
+    }
+
+    let snapshot = source.observe_address(&address).await?;
+    if snapshot.network_id != expected_network || snapshot.utxos.len() > MAX_OBSERVATION_ENTRIES {
+        return Err(RuleObservationError);
+    }
+
+    let observation_json = build_live_observation_json(&address, &snapshot)?;
+    verify_validated(
+        expected_manifest_sha256,
+        manifest_json,
+        &observation_json,
+        constructor_json,
+    )
+}
+
+fn build_live_observation_json(
+    address: &Address,
+    snapshot: &RuleObservationSnapshot,
+) -> Result<String, RuleObservationError> {
+    let mut entries = Vec::with_capacity(snapshot.utxos.len());
+    for entry in &snapshot.utxos {
+        if entry.address.as_ref() != Some(address) {
+            return Err(RuleObservationError);
+        }
+
+        entries.push(ObservationEntry {
+            outpoint: Outpoint {
+                transaction_id: entry.outpoint.transaction_id.to_string(),
+                index: entry.outpoint.index,
+            },
+            amount_sompi: entry.utxo_entry.amount,
+            script_public_key: ScriptPublicKey {
+                version: entry.utxo_entry.script_public_key.version(),
+                script_hex: hex::encode(entry.utxo_entry.script_public_key.script()),
+            },
+            block_daa_score: entry.utxo_entry.block_daa_score,
+            is_coinbase: entry.utxo_entry.is_coinbase,
+            covenant_id: entry
+                .utxo_entry
+                .covenant_id
+                .map(|covenant_id| covenant_id.to_string()),
+        });
+    }
+
+    serde_json::to_string(&Observation {
+        schema_version: OBSERVATION_SCHEMA_VERSION,
+        kind: OBSERVATION_KIND.to_string(),
+        network_id: OBSERVATION_NETWORK_ID.to_string(),
+        observed_virtual_daa_score: snapshot.virtual_daa_score,
+        entries,
+    })
+    .map_err(|_| RuleObservationError)
 }
 
 /// Run the full verification pipeline in dependency order: owner hash root,

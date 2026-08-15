@@ -69,6 +69,24 @@ Boundary: development only; no live RPC acquisition, manifest authority, RPC
 Readiness: estimates unchanged; this closes a local consistency boundary only
 ```
 
+## GH-203 LIVE RULESTORAGE RPC OBSERVATION ADAPTER (2026-08-15)
+
+```text
+Status: protected delivery through PR #204; production false
+Scope: existing connected client queries exact node network/current virtual DAA
+       and UTXOs for one explicit kaspatest address, then converts only pinned
+       rusty-kaspa fields into GH-197's canonical observation
+Checks: bounded lock and per-RPC waits; exact Testnet-10 node response; exact
+        returned address on every entry; 256-entry cap; generic redacted error;
+        unchanged owner-pin/hash/outpoint/covenant/script/amount/DAA/state gates
+Tests: 8 new deterministic cases plus all 15 GH-197 regressions and warning-free
+       client all-target Clippy pass locally
+Boundary: development only; one connected node response is not independent RPC
+          truth/history, consensus finality, manifest authority, IPFS
+          availability, chain deployment, or production readiness
+Readiness: estimates unchanged; this closes acquisition plumbing only
+```
+
 All percentages below are internal, scope-weighted engineering estimates or
 component-completion records. They are not production-readiness evidence.
 
