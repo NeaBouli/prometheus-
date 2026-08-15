@@ -3963,3 +3963,11 @@ Rules for all dev agents:
 - Independent Kimi final review found no P0-P2 issues; one cosmetic indentation
   nit was fixed.
 - Status: `Full local PASS / Protected PR next / Production false`.
+
+## 2026-08-15 - GH-197 PR #198 review follow-up
+
+- All required checks passed on `2c7968e`; CodeRabbit had one valid trivial
+  test-fixture isolation nit.
+- Switched the mutation to one first-occurrence replacement; retest and push
+  follow.
+- Status: `Review fix local / Checks rerun next / Production false`.

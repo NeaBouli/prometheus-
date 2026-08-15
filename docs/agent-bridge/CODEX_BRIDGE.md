@@ -4493,3 +4493,13 @@ No direct `main` push or production action occurred.
   RPC-shaped observations and virtual DAA are caller supplied, DAA maturity is
   not finality, and live authenticated acquisition remains a future boundary.
 - **Status:** `GH-197 Full local PASS / Protected PR next / Production false`.
+
+## 2026-08-15 - GH-197 PR #198 review follow-up
+
+- All required PR checks passed on head `2c7968e`, including GitHub Secret
+  Detection, Dependency Audit, Security Summary, Rust Workspace/Performance,
+  Current Silverc, Python Guardian, Memory, HTML, and CodeRabbit.
+- CodeRabbit raised one valid low-value test-maintainability nit: the invalid
+  constructor fixture changed both integer-2 fields. The fixture now uses one
+  first-occurrence replacement so it isolates the accepted-status failure.
+- **Status:** `GH-197 Review fix local / Focused retest and protected checks rerun next / Production false`.

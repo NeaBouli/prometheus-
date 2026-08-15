@@ -583,8 +583,11 @@ fn constructor_hash_is_checked_before_decode() {
     // The exact bound constructor that fails GH-193 semantics also fails.
     // serde_json serializes object keys sorted, so entries are
     // `{"data":..,"kind":"int"}`; flipping the accepted status fails decode.
-    let invalid = constructor_document()
-        .replace("\"data\":2,\"kind\":\"int\"", "\"data\":1,\"kind\":\"int\"");
+    let invalid = constructor_document().replacen(
+        "\"data\":2,\"kind\":\"int\"",
+        "\"data\":1,\"kind\":\"int\"",
+        1,
+    );
     assert_ne!(invalid, constructor_document());
     let manifest = manifest_json(&sha256_hex(&invalid));
     let fixture = Fixture {
