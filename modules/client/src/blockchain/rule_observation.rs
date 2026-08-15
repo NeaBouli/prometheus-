@@ -125,20 +125,27 @@ impl RuleObservationSource for KaspaConnection {
             }
 
             let client = self.rpc_client();
-            let client = timeout(LIVE_OBSERVATION_RPC_TIMEOUT, client.lock())
-                .await
-                .map_err(|_| RuleObservationError)?;
-            let dag = timeout(LIVE_OBSERVATION_RPC_TIMEOUT, client.get_block_dag_info())
+            let dag = {
+                let client = timeout(LIVE_OBSERVATION_RPC_TIMEOUT, client.lock())
+                    .await
+                    .map_err(|_| RuleObservationError)?;
+                timeout(LIVE_OBSERVATION_RPC_TIMEOUT, client.get_block_dag_info())
+                    .await
+                    .map_err(|_| RuleObservationError)?
+                    .map_err(|_| RuleObservationError)?
+            };
+            let utxos = {
+                let client = timeout(LIVE_OBSERVATION_RPC_TIMEOUT, client.lock())
+                    .await
+                    .map_err(|_| RuleObservationError)?;
+                timeout(
+                    LIVE_OBSERVATION_RPC_TIMEOUT,
+                    client.get_utxos_by_addresses(vec![address.clone()]),
+                )
                 .await
                 .map_err(|_| RuleObservationError)?
-                .map_err(|_| RuleObservationError)?;
-            let utxos = timeout(
-                LIVE_OBSERVATION_RPC_TIMEOUT,
-                client.get_utxos_by_addresses(vec![address.clone()]),
-            )
-            .await
-            .map_err(|_| RuleObservationError)?
-            .map_err(|_| RuleObservationError)?;
+                .map_err(|_| RuleObservationError)?
+            };
 
             Ok(RuleObservationSnapshot {
                 network_id: dag.network,
@@ -272,7 +279,6 @@ pub async fn verify_rule_storage_observation_live(
 /// Identical to [`verify_rule_storage_observation_live`] with an explicit mode.
 ///
 /// The explicit mode can only tighten the process-wide runtime gate.
-#[allow(clippy::too_many_arguments)]
 pub async fn verify_rule_storage_observation_live_for_mode(
     mode: RuntimeMode,
     connection: &KaspaConnection,
@@ -322,6 +328,8 @@ async fn verify_rule_storage_observation_live_inner(
 ) -> Result<RuleStateMetadata, RuleObservationError> {
     let address = Address::try_from(address).map_err(|_| RuleObservationError)?;
     let expected_network = NetworkId::with_suffix(NetworkType::Testnet, 10);
+    // Address prefixes identify the testnet family; the snapshot check below
+    // enforces the exact Testnet-10 suffix reported by the connected node.
     if address.prefix != Prefix::from(expected_network) {
         return Err(RuleObservationError);
     }
