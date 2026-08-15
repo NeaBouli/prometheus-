@@ -1,7 +1,7 @@
 # PROMETHEUS – MODULE STATUS
 # Format: | Module | Status | Progress | Last Update | Audit | Testnet Address |
 # Status: PENDING | IN_PROGRESS | DONE | BLOCKED | PENDING_AUDIT | ACCEPTED | REJECTED
-# Last Updated: 2026-08-14
+# Last Updated: 2026-08-15
 
 ---
 
@@ -46,6 +46,24 @@ Tests: 6 unit and 5 integration cases plus complete client all-targets pass;
        documentation gates pass
 Boundary: development only; no RPC provenance, covenant-instance identity,
           finality, IPFS fetch, content binding, wallet, chain or production authority
+```
+
+## GH-197 RULESTORAGE UTXO OBSERVATION BOUNDARY (2026-08-15)
+
+```text
+Status: In review on feat/GH-197-rulestorage-utxo-observation
+Scope: separately owner-pin-hashed canonical Testnet-10 manifest checked
+       against bounded caller-supplied RPC-shaped UTXO observations before
+       exact-byte constructor hashing and GH-193 decoding
+Checks: unique outpoint; exact covenant/script/amount/block DAA; non-coinbase;
+        checked nonzero virtual-DAA maturity proxy; duplicate/ambiguity;
+        canonical schema and byte caps; generic redacted errors; runtime gates
+Tests: 15 integration cases, 2 module unit cases, GH-193 regression, and
+       warning-free client all-target Clippy pass locally
+Boundary: development only; no live RPC acquisition, manifest authority, RPC
+          truth/history, consensus finality, IPFS availability, wallet, chain
+          write, deployment, or production authority
+Readiness: estimates unchanged; this closes a local consistency boundary only
 ```
 
 All percentages below are internal, scope-weighted engineering estimates or

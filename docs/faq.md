@@ -172,6 +172,12 @@ inference, Groth16 proofs, canonical rule loading, P2P submission, and the
 complete report pipeline are not production implementations yet. Runtime
 guards reject those placeholders in beta and mainnet profiles.
 
+GH-197 adds a local Testnet-10 consistency boundary: a separately
+owner-pin-hashed canonical manifest must match exactly one entry in a bounded
+caller-supplied RPC-shaped RuleStorage UTXO set before GH-193 decodes the bound
+constructor JSON. This is not a live chain read and proves neither manifest
+authority, RPC truth, transaction history, finality, nor IPFS availability.
+
 **Q: Why Kaspa and not Ethereum?**
 Prometheus targets Kaspa because its high-throughput BlockDAG and current
 SilverScript path can anchor compact protocol state. The repository verifies
