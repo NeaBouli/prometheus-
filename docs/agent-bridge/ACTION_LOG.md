@@ -3896,3 +3896,25 @@ Rules for all dev agents:
 - Product boundaries and remaining canonical L1/IPFS, production YARA,
   anti-downgrade, real-model, multi-host and rollout gates are unchanged.
 - Status: `Done / Exact-main and live Pages verified / Production false`.
+
+## 2026-08-15 - GH-193 kickoff
+
+- Opened issue #193 and branch `feat/GH-193-rulestorage-state-decoder` from
+  exact clean main `7f33465627dde0e009b9ca33927de6d584a13768`.
+- Started a development-only, fail-closed local RuleStorage state decoding
+  boundary ahead of GH-190. No live RPC/UTXO discovery, instance/finality
+  proof, IPFS fetch, wallet, chain write, deployment or production authority is
+  in scope.
+- Kimi K3 owns architecture review and a bounded implementation; Sol owns
+  security/schema decisions and integration; Claude Code is limited to a small
+  helper task.
+- Status: `In Progress / Architecture review next`.
+
+## 2026-08-15 - GH-193 locally verified
+
+- Implemented strict caller-supplied Silverc RuleStorage constructor-state
+  decoding with a pinned vector and adversarial unit/integration coverage.
+- Client all-targets, focused tests, rustfmt, Clippy with warnings denied, and
+  diff checks pass. Kimi contributed architecture/core/vector; Sol reviewed
+  and completed integration; Claude OAuth was unavailable.
+- Status: `Locally verified / Protected PR pending / Production false`.

@@ -160,6 +160,7 @@ operation, and public release-hardening evidence for the exact rollout commit.
 
 **Sprint 10 — Real KRC-20 Reader + P2P Network**
 - GH-190 adds fail-closed local Raw-CIDv1/sha2-256 binding of caller-supplied exact rule bytes, strict bounded simple-matcher parsing, all-or-nothing activation, and beta/mainnet rejection; this is development ingestion, not Kaspa/IPFS distribution or production YARA
+- GH-193 adds strict development-only decoding of exact caller-supplied current-Silverc `RuleStorageState` constructor JSON; provenance, covenant-instance authentication, finality, and live IPFS retrieval remain open
 - KRC-20 UTXO queries for "PROM-RULES" tick (real on-chain reads)
 - Rule content download from IPFS via CIDv1
 - Merged/exact-main verified: GH-42 Guardian ballot carrier has direct QUIC request/response, static peers, bounded resources, owner-only local collector ingress, cancellation-safe concurrent swarm progress, and relay/AutoNAT/DCUtR behaviours

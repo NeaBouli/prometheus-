@@ -1,0 +1,1254 @@
+{
+  "format": "rule-storage-state-v1",
+  "description": "Anchored vector for the development-only RuleStorageState constructor-args decoder. The document is a valid finalized accepted-and-active state in the exact upstream pinned silverc --constructor-args 20-entry Vec<Expr> JSON shape. Expected fields were pinned independently of the client: the CID is the canonical lowercase base32 Raw-CIDv1/sha2-256 re-encoding of the exact 36 state bytes (header 01 55 12 20, digest 00..1f), and consensus is votes_for*10000/total = 3*10000/4 = 7500. Decoding proves structure only: not RPC origin, covenant instance, script-template equality, finality, content availability, CID content binding, or production authority.",
+  "valid": [
+    {
+      "case": "finalized accepted active Yara rule from proposal 7",
+      "document": [
+        {
+          "kind": "array",
+          "data": [
+            {
+              "kind": "byte",
+              "data": 4
+            },
+            {
+              "kind": "byte",
+              "data": 4
+            },
+            {
+              "kind": "byte",
+              "data": 4
+            },
+            {
+              "kind": "byte",
+              "data": 4
+            },
+            {
+              "kind": "byte",
+              "data": 4
+            },
+            {
+              "kind": "byte",
+              "data": 4
+            },
+            {
+              "kind": "byte",
+              "data": 4
+            },
+            {
+              "kind": "byte",
+              "data": 4
+            },
+            {
+              "kind": "byte",
+              "data": 4
+            },
+            {
+              "kind": "byte",
+              "data": 4
+            },
+            {
+              "kind": "byte",
+              "data": 4
+            },
+            {
+              "kind": "byte",
+              "data": 4
+            },
+            {
+              "kind": "byte",
+              "data": 4
+            },
+            {
+              "kind": "byte",
+              "data": 4
+            },
+            {
+              "kind": "byte",
+              "data": 4
+            },
+            {
+              "kind": "byte",
+              "data": 4
+            },
+            {
+              "kind": "byte",
+              "data": 4
+            },
+            {
+              "kind": "byte",
+              "data": 4
+            },
+            {
+              "kind": "byte",
+              "data": 4
+            },
+            {
+              "kind": "byte",
+              "data": 4
+            },
+            {
+              "kind": "byte",
+              "data": 4
+            },
+            {
+              "kind": "byte",
+              "data": 4
+            },
+            {
+              "kind": "byte",
+              "data": 4
+            },
+            {
+              "kind": "byte",
+              "data": 4
+            },
+            {
+              "kind": "byte",
+              "data": 4
+            },
+            {
+              "kind": "byte",
+              "data": 4
+            },
+            {
+              "kind": "byte",
+              "data": 4
+            },
+            {
+              "kind": "byte",
+              "data": 4
+            },
+            {
+              "kind": "byte",
+              "data": 4
+            },
+            {
+              "kind": "byte",
+              "data": 4
+            },
+            {
+              "kind": "byte",
+              "data": 4
+            },
+            {
+              "kind": "byte",
+              "data": 4
+            }
+          ]
+        },
+        {
+          "kind": "int",
+          "data": 8
+        },
+        {
+          "kind": "int",
+          "data": 7
+        },
+        {
+          "kind": "array",
+          "data": [
+            {
+              "kind": "byte",
+              "data": 5
+            },
+            {
+              "kind": "byte",
+              "data": 5
+            },
+            {
+              "kind": "byte",
+              "data": 5
+            },
+            {
+              "kind": "byte",
+              "data": 5
+            },
+            {
+              "kind": "byte",
+              "data": 5
+            },
+            {
+              "kind": "byte",
+              "data": 5
+            },
+            {
+              "kind": "byte",
+              "data": 5
+            },
+            {
+              "kind": "byte",
+              "data": 5
+            },
+            {
+              "kind": "byte",
+              "data": 5
+            },
+            {
+              "kind": "byte",
+              "data": 5
+            },
+            {
+              "kind": "byte",
+              "data": 5
+            },
+            {
+              "kind": "byte",
+              "data": 5
+            },
+            {
+              "kind": "byte",
+              "data": 5
+            },
+            {
+              "kind": "byte",
+              "data": 5
+            },
+            {
+              "kind": "byte",
+              "data": 5
+            },
+            {
+              "kind": "byte",
+              "data": 5
+            },
+            {
+              "kind": "byte",
+              "data": 5
+            },
+            {
+              "kind": "byte",
+              "data": 5
+            },
+            {
+              "kind": "byte",
+              "data": 5
+            },
+            {
+              "kind": "byte",
+              "data": 5
+            },
+            {
+              "kind": "byte",
+              "data": 5
+            },
+            {
+              "kind": "byte",
+              "data": 5
+            },
+            {
+              "kind": "byte",
+              "data": 5
+            },
+            {
+              "kind": "byte",
+              "data": 5
+            },
+            {
+              "kind": "byte",
+              "data": 5
+            },
+            {
+              "kind": "byte",
+              "data": 5
+            },
+            {
+              "kind": "byte",
+              "data": 5
+            },
+            {
+              "kind": "byte",
+              "data": 5
+            },
+            {
+              "kind": "byte",
+              "data": 5
+            },
+            {
+              "kind": "byte",
+              "data": 5
+            },
+            {
+              "kind": "byte",
+              "data": 5
+            },
+            {
+              "kind": "byte",
+              "data": 5
+            }
+          ]
+        },
+        {
+          "kind": "array",
+          "data": [
+            {
+              "kind": "byte",
+              "data": 6
+            },
+            {
+              "kind": "byte",
+              "data": 6
+            },
+            {
+              "kind": "byte",
+              "data": 6
+            },
+            {
+              "kind": "byte",
+              "data": 6
+            },
+            {
+              "kind": "byte",
+              "data": 6
+            },
+            {
+              "kind": "byte",
+              "data": 6
+            },
+            {
+              "kind": "byte",
+              "data": 6
+            },
+            {
+              "kind": "byte",
+              "data": 6
+            },
+            {
+              "kind": "byte",
+              "data": 6
+            },
+            {
+              "kind": "byte",
+              "data": 6
+            },
+            {
+              "kind": "byte",
+              "data": 6
+            },
+            {
+              "kind": "byte",
+              "data": 6
+            },
+            {
+              "kind": "byte",
+              "data": 6
+            },
+            {
+              "kind": "byte",
+              "data": 6
+            },
+            {
+              "kind": "byte",
+              "data": 6
+            },
+            {
+              "kind": "byte",
+              "data": 6
+            },
+            {
+              "kind": "byte",
+              "data": 6
+            },
+            {
+              "kind": "byte",
+              "data": 6
+            },
+            {
+              "kind": "byte",
+              "data": 6
+            },
+            {
+              "kind": "byte",
+              "data": 6
+            },
+            {
+              "kind": "byte",
+              "data": 6
+            },
+            {
+              "kind": "byte",
+              "data": 6
+            },
+            {
+              "kind": "byte",
+              "data": 6
+            },
+            {
+              "kind": "byte",
+              "data": 6
+            },
+            {
+              "kind": "byte",
+              "data": 6
+            },
+            {
+              "kind": "byte",
+              "data": 6
+            },
+            {
+              "kind": "byte",
+              "data": 6
+            },
+            {
+              "kind": "byte",
+              "data": 6
+            },
+            {
+              "kind": "byte",
+              "data": 6
+            },
+            {
+              "kind": "byte",
+              "data": 6
+            },
+            {
+              "kind": "byte",
+              "data": 6
+            },
+            {
+              "kind": "byte",
+              "data": 6
+            }
+          ]
+        },
+        {
+          "kind": "int",
+          "data": 0
+        },
+        {
+          "kind": "array",
+          "data": [
+            {
+              "kind": "byte",
+              "data": 1
+            },
+            {
+              "kind": "byte",
+              "data": 85
+            },
+            {
+              "kind": "byte",
+              "data": 18
+            },
+            {
+              "kind": "byte",
+              "data": 32
+            },
+            {
+              "kind": "byte",
+              "data": 0
+            },
+            {
+              "kind": "byte",
+              "data": 1
+            },
+            {
+              "kind": "byte",
+              "data": 2
+            },
+            {
+              "kind": "byte",
+              "data": 3
+            },
+            {
+              "kind": "byte",
+              "data": 4
+            },
+            {
+              "kind": "byte",
+              "data": 5
+            },
+            {
+              "kind": "byte",
+              "data": 6
+            },
+            {
+              "kind": "byte",
+              "data": 7
+            },
+            {
+              "kind": "byte",
+              "data": 8
+            },
+            {
+              "kind": "byte",
+              "data": 9
+            },
+            {
+              "kind": "byte",
+              "data": 10
+            },
+            {
+              "kind": "byte",
+              "data": 11
+            },
+            {
+              "kind": "byte",
+              "data": 12
+            },
+            {
+              "kind": "byte",
+              "data": 13
+            },
+            {
+              "kind": "byte",
+              "data": 14
+            },
+            {
+              "kind": "byte",
+              "data": 15
+            },
+            {
+              "kind": "byte",
+              "data": 16
+            },
+            {
+              "kind": "byte",
+              "data": 17
+            },
+            {
+              "kind": "byte",
+              "data": 18
+            },
+            {
+              "kind": "byte",
+              "data": 19
+            },
+            {
+              "kind": "byte",
+              "data": 20
+            },
+            {
+              "kind": "byte",
+              "data": 21
+            },
+            {
+              "kind": "byte",
+              "data": 22
+            },
+            {
+              "kind": "byte",
+              "data": 23
+            },
+            {
+              "kind": "byte",
+              "data": 24
+            },
+            {
+              "kind": "byte",
+              "data": 25
+            },
+            {
+              "kind": "byte",
+              "data": 26
+            },
+            {
+              "kind": "byte",
+              "data": 27
+            },
+            {
+              "kind": "byte",
+              "data": 28
+            },
+            {
+              "kind": "byte",
+              "data": 29
+            },
+            {
+              "kind": "byte",
+              "data": 30
+            },
+            {
+              "kind": "byte",
+              "data": 31
+            }
+          ]
+        },
+        {
+          "kind": "int",
+          "data": 9000
+        },
+        {
+          "kind": "int",
+          "data": 100000
+        },
+        {
+          "kind": "int",
+          "data": 3
+        },
+        {
+          "kind": "int",
+          "data": 1
+        },
+        {
+          "kind": "int",
+          "data": 964000
+        },
+        {
+          "kind": "int",
+          "data": 2
+        },
+        {
+          "kind": "int",
+          "data": 3
+        },
+        {
+          "kind": "int",
+          "data": 2
+        },
+        {
+          "kind": "int",
+          "data": 50000
+        },
+        {
+          "kind": "int",
+          "data": 7500
+        },
+        {
+          "kind": "int",
+          "data": 965000
+        },
+        {
+          "kind": "bool",
+          "data": true
+        },
+        {
+          "kind": "int",
+          "data": 1
+        }
+      ],
+      "expected": {
+        "proposal_id": 7,
+        "rule_id": "PROM-RULE-0007",
+        "rule_type": "Yara",
+        "ipfs_cid": "bafkreiaaaebagbafaydqqcikbmga2dqpcaireeyuculbogazdinryhi6d4",
+        "guardian_id_hex": "0505050505050505050505050505050505050505050505050505050505050505",
+        "threat_hash_hex": "0606060606060606060606060606060606060606060606060606060606060606",
+        "confidence_bps": 9000,
+        "consensus_bps": 7500,
+        "stored_at_block": 965000,
+        "active": true
+      }
+    }
+  ],
+  "invalid": [
+    {
+      "case": "dag-pb codec (0x70) in the 36 CID bytes must fail closed",
+      "document": [
+        {
+          "kind": "array",
+          "data": [
+            {
+              "kind": "byte",
+              "data": 4
+            },
+            {
+              "kind": "byte",
+              "data": 4
+            },
+            {
+              "kind": "byte",
+              "data": 4
+            },
+            {
+              "kind": "byte",
+              "data": 4
+            },
+            {
+              "kind": "byte",
+              "data": 4
+            },
+            {
+              "kind": "byte",
+              "data": 4
+            },
+            {
+              "kind": "byte",
+              "data": 4
+            },
+            {
+              "kind": "byte",
+              "data": 4
+            },
+            {
+              "kind": "byte",
+              "data": 4
+            },
+            {
+              "kind": "byte",
+              "data": 4
+            },
+            {
+              "kind": "byte",
+              "data": 4
+            },
+            {
+              "kind": "byte",
+              "data": 4
+            },
+            {
+              "kind": "byte",
+              "data": 4
+            },
+            {
+              "kind": "byte",
+              "data": 4
+            },
+            {
+              "kind": "byte",
+              "data": 4
+            },
+            {
+              "kind": "byte",
+              "data": 4
+            },
+            {
+              "kind": "byte",
+              "data": 4
+            },
+            {
+              "kind": "byte",
+              "data": 4
+            },
+            {
+              "kind": "byte",
+              "data": 4
+            },
+            {
+              "kind": "byte",
+              "data": 4
+            },
+            {
+              "kind": "byte",
+              "data": 4
+            },
+            {
+              "kind": "byte",
+              "data": 4
+            },
+            {
+              "kind": "byte",
+              "data": 4
+            },
+            {
+              "kind": "byte",
+              "data": 4
+            },
+            {
+              "kind": "byte",
+              "data": 4
+            },
+            {
+              "kind": "byte",
+              "data": 4
+            },
+            {
+              "kind": "byte",
+              "data": 4
+            },
+            {
+              "kind": "byte",
+              "data": 4
+            },
+            {
+              "kind": "byte",
+              "data": 4
+            },
+            {
+              "kind": "byte",
+              "data": 4
+            },
+            {
+              "kind": "byte",
+              "data": 4
+            },
+            {
+              "kind": "byte",
+              "data": 4
+            }
+          ]
+        },
+        {
+          "kind": "int",
+          "data": 8
+        },
+        {
+          "kind": "int",
+          "data": 7
+        },
+        {
+          "kind": "array",
+          "data": [
+            {
+              "kind": "byte",
+              "data": 5
+            },
+            {
+              "kind": "byte",
+              "data": 5
+            },
+            {
+              "kind": "byte",
+              "data": 5
+            },
+            {
+              "kind": "byte",
+              "data": 5
+            },
+            {
+              "kind": "byte",
+              "data": 5
+            },
+            {
+              "kind": "byte",
+              "data": 5
+            },
+            {
+              "kind": "byte",
+              "data": 5
+            },
+            {
+              "kind": "byte",
+              "data": 5
+            },
+            {
+              "kind": "byte",
+              "data": 5
+            },
+            {
+              "kind": "byte",
+              "data": 5
+            },
+            {
+              "kind": "byte",
+              "data": 5
+            },
+            {
+              "kind": "byte",
+              "data": 5
+            },
+            {
+              "kind": "byte",
+              "data": 5
+            },
+            {
+              "kind": "byte",
+              "data": 5
+            },
+            {
+              "kind": "byte",
+              "data": 5
+            },
+            {
+              "kind": "byte",
+              "data": 5
+            },
+            {
+              "kind": "byte",
+              "data": 5
+            },
+            {
+              "kind": "byte",
+              "data": 5
+            },
+            {
+              "kind": "byte",
+              "data": 5
+            },
+            {
+              "kind": "byte",
+              "data": 5
+            },
+            {
+              "kind": "byte",
+              "data": 5
+            },
+            {
+              "kind": "byte",
+              "data": 5
+            },
+            {
+              "kind": "byte",
+              "data": 5
+            },
+            {
+              "kind": "byte",
+              "data": 5
+            },
+            {
+              "kind": "byte",
+              "data": 5
+            },
+            {
+              "kind": "byte",
+              "data": 5
+            },
+            {
+              "kind": "byte",
+              "data": 5
+            },
+            {
+              "kind": "byte",
+              "data": 5
+            },
+            {
+              "kind": "byte",
+              "data": 5
+            },
+            {
+              "kind": "byte",
+              "data": 5
+            },
+            {
+              "kind": "byte",
+              "data": 5
+            },
+            {
+              "kind": "byte",
+              "data": 5
+            }
+          ]
+        },
+        {
+          "kind": "array",
+          "data": [
+            {
+              "kind": "byte",
+              "data": 6
+            },
+            {
+              "kind": "byte",
+              "data": 6
+            },
+            {
+              "kind": "byte",
+              "data": 6
+            },
+            {
+              "kind": "byte",
+              "data": 6
+            },
+            {
+              "kind": "byte",
+              "data": 6
+            },
+            {
+              "kind": "byte",
+              "data": 6
+            },
+            {
+              "kind": "byte",
+              "data": 6
+            },
+            {
+              "kind": "byte",
+              "data": 6
+            },
+            {
+              "kind": "byte",
+              "data": 6
+            },
+            {
+              "kind": "byte",
+              "data": 6
+            },
+            {
+              "kind": "byte",
+              "data": 6
+            },
+            {
+              "kind": "byte",
+              "data": 6
+            },
+            {
+              "kind": "byte",
+              "data": 6
+            },
+            {
+              "kind": "byte",
+              "data": 6
+            },
+            {
+              "kind": "byte",
+              "data": 6
+            },
+            {
+              "kind": "byte",
+              "data": 6
+            },
+            {
+              "kind": "byte",
+              "data": 6
+            },
+            {
+              "kind": "byte",
+              "data": 6
+            },
+            {
+              "kind": "byte",
+              "data": 6
+            },
+            {
+              "kind": "byte",
+              "data": 6
+            },
+            {
+              "kind": "byte",
+              "data": 6
+            },
+            {
+              "kind": "byte",
+              "data": 6
+            },
+            {
+              "kind": "byte",
+              "data": 6
+            },
+            {
+              "kind": "byte",
+              "data": 6
+            },
+            {
+              "kind": "byte",
+              "data": 6
+            },
+            {
+              "kind": "byte",
+              "data": 6
+            },
+            {
+              "kind": "byte",
+              "data": 6
+            },
+            {
+              "kind": "byte",
+              "data": 6
+            },
+            {
+              "kind": "byte",
+              "data": 6
+            },
+            {
+              "kind": "byte",
+              "data": 6
+            },
+            {
+              "kind": "byte",
+              "data": 6
+            },
+            {
+              "kind": "byte",
+              "data": 6
+            }
+          ]
+        },
+        {
+          "kind": "int",
+          "data": 0
+        },
+        {
+          "kind": "array",
+          "data": [
+            {
+              "kind": "byte",
+              "data": 1
+            },
+            {
+              "kind": "byte",
+              "data": 112
+            },
+            {
+              "kind": "byte",
+              "data": 18
+            },
+            {
+              "kind": "byte",
+              "data": 32
+            },
+            {
+              "kind": "byte",
+              "data": 0
+            },
+            {
+              "kind": "byte",
+              "data": 1
+            },
+            {
+              "kind": "byte",
+              "data": 2
+            },
+            {
+              "kind": "byte",
+              "data": 3
+            },
+            {
+              "kind": "byte",
+              "data": 4
+            },
+            {
+              "kind": "byte",
+              "data": 5
+            },
+            {
+              "kind": "byte",
+              "data": 6
+            },
+            {
+              "kind": "byte",
+              "data": 7
+            },
+            {
+              "kind": "byte",
+              "data": 8
+            },
+            {
+              "kind": "byte",
+              "data": 9
+            },
+            {
+              "kind": "byte",
+              "data": 10
+            },
+            {
+              "kind": "byte",
+              "data": 11
+            },
+            {
+              "kind": "byte",
+              "data": 12
+            },
+            {
+              "kind": "byte",
+              "data": 13
+            },
+            {
+              "kind": "byte",
+              "data": 14
+            },
+            {
+              "kind": "byte",
+              "data": 15
+            },
+            {
+              "kind": "byte",
+              "data": 16
+            },
+            {
+              "kind": "byte",
+              "data": 17
+            },
+            {
+              "kind": "byte",
+              "data": 18
+            },
+            {
+              "kind": "byte",
+              "data": 19
+            },
+            {
+              "kind": "byte",
+              "data": 20
+            },
+            {
+              "kind": "byte",
+              "data": 21
+            },
+            {
+              "kind": "byte",
+              "data": 22
+            },
+            {
+              "kind": "byte",
+              "data": 23
+            },
+            {
+              "kind": "byte",
+              "data": 24
+            },
+            {
+              "kind": "byte",
+              "data": 25
+            },
+            {
+              "kind": "byte",
+              "data": 26
+            },
+            {
+              "kind": "byte",
+              "data": 27
+            },
+            {
+              "kind": "byte",
+              "data": 28
+            },
+            {
+              "kind": "byte",
+              "data": 29
+            },
+            {
+              "kind": "byte",
+              "data": 30
+            },
+            {
+              "kind": "byte",
+              "data": 31
+            }
+          ]
+        },
+        {
+          "kind": "int",
+          "data": 9000
+        },
+        {
+          "kind": "int",
+          "data": 100000
+        },
+        {
+          "kind": "int",
+          "data": 3
+        },
+        {
+          "kind": "int",
+          "data": 1
+        },
+        {
+          "kind": "int",
+          "data": 964000
+        },
+        {
+          "kind": "int",
+          "data": 2
+        },
+        {
+          "kind": "int",
+          "data": 3
+        },
+        {
+          "kind": "int",
+          "data": 2
+        },
+        {
+          "kind": "int",
+          "data": 50000
+        },
+        {
+          "kind": "int",
+          "data": 7500
+        },
+        {
+          "kind": "int",
+          "data": 965000
+        },
+        {
+          "kind": "bool",
+          "data": true
+        },
+        {
+          "kind": "int",
+          "data": 1
+        }
+      ]
+    }
+  ]
+}
