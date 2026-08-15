@@ -3930,3 +3930,9 @@ Rules for all dev agents:
 - PR #194 merged at exact main `d0cd087`; CI, Security and Pages pass.
 - Started issue #195 to synchronize public status and Bridge evidence.
 - Status: `Documentation closeout in progress / Production false`.
+
+## 2026-08-15 - GH-195 review clarification
+
+- Clarified the `llms.txt` document-update date without moving the historical
+  audit baseline. No claim or product behavior changed.
+- Status: `Review fix ready / Merge pending / Production false`.

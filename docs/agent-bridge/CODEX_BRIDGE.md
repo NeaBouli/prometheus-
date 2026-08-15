@@ -4427,3 +4427,11 @@ No direct `main` push or production action occurred.
 - Issue #195 and branch `docs/GH-195-gh193-closeout` own the documentation-only
   synchronization from pre-merge wording to exact-main evidence.
 - **Status:** `GH-193 Merged and exact-main verified / GH-195 closeout in progress / Production false`.
+
+## 2026-08-15 - GH-195 review clarification
+
+- CodeRabbit correctly identified that the `llms.txt` update date could be
+  mistaken for a new audit baseline. The header now labels 2026-08-15 as the
+  document-update date and explicitly preserves the canonical 2026-08-14
+  baseline and `5cd13bf` evidence below.
+- **Status:** `GH-195 review fix ready / Protected checks rerun next / Production false`.
