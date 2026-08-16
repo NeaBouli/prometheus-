@@ -1750,3 +1750,18 @@ Boundary: development only; metadata/content remain caller-supplied; no
           canonical Kaspa state decoding, IPFS network fetch, production YARA,
           durable anti-downgrade state, wallet, chain, reward or deployment
 ```
+
+## GH-216 MERGED / EXACT-MAIN VERIFIED (2026-08-16)
+
+```text
+Status: Done / PR #217 merged / exact-main verified / not production-deployed
+PR/SHA: #217 / 13c181282af19cc748624e9a376d2274b0703fbd
+Runs: CI 31978132036; Security 31978132044; Pages 31978131647
+Evidence: test-only real-binary loopback preflight/run, private checkpoint,
+          TERM/INT drain, restart exact replay, rollback/equivocation rejection,
+          and malformed/timeout/disconnected peer paths
+Boundary: local Development evidence only; no public Testnet operation,
+          independent RPC/IPFS truth or availability, deployment, Mainnet,
+          production YARA or production readiness
+Estimates: unchanged; core 84-88%; complete vision 50-55%
+```

@@ -5102,3 +5102,47 @@ No direct `main` push or production action occurred.
   chain, broadcast, deployment, public network or Mainnet behavior changed.
   Loopback evidence is not public Testnet or rollout evidence.
 - **Status:** `GH-216 local gates complete / Protected PR next / Production false`.
+
+## 2026-08-16 - GH-216 merged; public closeout started
+
+- Protected PR #217 merged normally without admin bypass as exact `main`
+  `13c181282af19cc748624e9a376d2274b0703fbd`; issue #216 is closed.
+- Exact-main Pages run `31978131647` passes. Prometheus CI `31978132036`
+  and Security Audit `31978132044` are still in progress and remain required
+  before the closeout can be called exact-main verified.
+- Branch `docs/GH-216-public-closeout` owns a documentation-only reconciliation
+  of README, Whitepaper, FAQ, Roadmap, public HTML and `llms.txt`. It may report
+  only test-only local real-binary loopback evidence and must retain the explicit
+  boundary that no public Testnet operation, independent RPC/IPFS truth or
+  availability, deployment, Mainnet or production readiness was proven.
+- Kimi will independently review the complete secret-free documentation diff;
+  Sol owns claim synchronization, verification, protected PR delivery and final
+  exact-main/live-page readback.
+- **Status:** `GH-216 merged / Docs closeout in progress / Production false`.
+
+## 2026-08-16 - GH-216 exact-main gates pass
+
+- Exact-main Prometheus CI `31978132036`, Security Audit `31978132044`, and
+  Pages `31978131647` all pass on full SHA
+  `13c181282af19cc748624e9a376d2274b0703fbd`.
+- The documentation-only closeout candidate synchronizes README, Whitepaper,
+  FAQ, Roadmap, public HTML, `llms.txt`, Memory and Bridge with that evidence.
+- Public wording remains Development-only: the harness uses ephemeral local
+  peers and does not prove public Testnet operation, independent RPC/IPFS truth
+  or availability, deployment, Mainnet, production YARA or production readiness.
+- **Status:** `GH-216 exact-main verified / Docs candidate under review / Production false`.
+
+## 2026-08-16 - GH-216 public closeout review and local gates pass
+
+- Kimi independently verified PR #217, issue #216, exact merge SHA, all three
+  exact-main runs, the real-binary test coverage and the final 15-file
+  documentation diff. Verdict: `SHIP`; no medium or high finding.
+- Sol added the relevant `modules/client/README.md` reconciliation identified
+  during review, then reran the complete documentation chain.
+- Public claim consistency passes across 13 synchronized surfaces with `6/6`
+  tests. Public documentation hygiene passes with `11/11` tests. Memory,
+  Autodidactic `6/6`, H-001 evidence `4/4`, HTML page/meta/infrastructure,
+  stale-launch and `git diff --check` gates pass.
+- No code, contract, workflow, architecture, tokenomics, wallet, chain,
+  deployment, Mainnet or production behavior changed.
+- **Status:** `GH-216 docs local PASS / Protected closeout PR next / Production false`.

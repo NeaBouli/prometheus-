@@ -2618,3 +2618,15 @@ changed.
   Guardian `1303/4`, release performance/build/package, Memory/H-001/claims,
   Black/Pylint and dependency audits pass.
 - Result: `SHIP for protected PR / Production false`.
+
+## 2026-08-16 - GH-216 exact-main and public-claim audit
+
+- PR #217 merged normally as exact main
+  `13c181282af19cc748624e9a376d2274b0703fbd`; issue #216 closed.
+- Exact-main CI `31978132036`, Security Audit `31978132044`, and Pages
+  `31978131647` all pass on that SHA.
+- Public surfaces describe only test-only real-binary loopback evidence and
+  retain the production-false boundary. No real/public Testnet operation,
+  independent RPC/IPFS truth/availability, wallet, chain, deployment, Mainnet,
+  production YARA or rollout readiness is inferred.
+- Result: `PASS / Documentation-only closeout candidate`.

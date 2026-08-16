@@ -213,6 +213,15 @@ availability, deployment, or production readiness. No signer or private-key API
 is included. GH-213 does not add key authority/rotation, persistent sequence
 authority, wallet, chain write, deployment, or Mainnet support.
 
+Merged and exact-main-verified GH-216/PR #217 at `13c1812` exercises that real
+CLI binary against test-only ephemeral loopback wRPC/IPFS peers. It covers
+offline/connected preflight, private checkpoint commit, SIGTERM/SIGINT drain,
+restart exact replay, rollback/equivocation rejection, and malformed, timed-out,
+or disconnected peers; CI `31978132036`, Security `31978132044`, and Pages
+`31978131647` pass. This is local Development evidence only, not public Testnet
+operation, independent RPC/IPFS truth or availability, deployment, Mainnet, or
+production readiness.
+
 **Q: Why Kaspa and not Ethereum?**
 Prometheus targets Kaspa because its high-throughput BlockDAG and current
 SilverScript path can anchor compact protocol state. The repository verifies
