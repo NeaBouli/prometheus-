@@ -11,7 +11,8 @@
 - [x] [P1] GH-197 manifest-bound Testnet-10 RuleStorage UTXO observation | Codex Sol + Kimi K3 | PR #198 merged as exact main `28da2d4`; CI `31904377606`, Security `31904377632`, Pages `31904376972`, independent review and live public-page readback pass; production authority remains false
 - [x] [P1] GH-203 live Testnet-10 RuleStorage RPC observation adapter | Codex Sol + Kimi K3 | PR #204 protected delivery; bounded lock/RPC waits, exact node network and returned-address checks, direct pinned-field conversion, unchanged GH-197 verification, and deterministic adversarial tests; independent RPC truth/finality and production authority remain false
 - [x] [P1] GH-205 complete-snapshot RuleStorage content sync | Codex Sol + Kimi K3 | PR #206 merged as exact main `11496af`; CI `31913541861`, Security `31913541880`, Pages `31913541497`, independent review and live public-page readback pass; production authority remains false
-- [~] [P1] GH-207 durable RuleStorage anti-downgrade checkpoint | Codex Sol + Kimi K3 | Local implementation and focused adversarial verification PASS; protected PR, exact-main evidence and live Pages readback remain; production authority remains false
+- [x] [P1] GH-207 durable RuleStorage anti-downgrade checkpoint | Codex Sol + Kimi K3 | PR #208 merged as exact main `a8d3868`; CI `31937017363`, Security `31937017451`, Pages `31937016816`, review and responsive live Roadmap/README readback pass; production authority remains false
+- [~] [P1] GH-209 bounded opt-in RuleStorage sync coordinator | Codex Sol + Kimi K3 | Issue #209 and branch `feat/GH-209-rule-sync-coordinator`; development/Testnet-10-only lifecycle, single-flight attempts, bounded timing/backoff, cancellation, status and deterministic adversarial evidence in progress; production authority remains false
 
 ## ═══ SPRINT 0: SETUP & TESTNET (Woche 1) ═══
 

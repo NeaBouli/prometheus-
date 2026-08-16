@@ -4131,3 +4131,12 @@ Rules for all dev agents:
   Guardian, and HTML Pages checks pass; remaining protected checks and review
   are pending.
 - Status: `PR #208 checks and review pending / Production false`.
+
+## 2026-08-16 - GH-207 closeout and GH-209 kickoff
+
+- GH-207 merged through protected PR #208 as exact main `a8d3868`; exact-main
+  CI, Security, Pages and live responsive Roadmap/README evidence pass.
+- Opened issue #209 and branch `feat/GH-209-rule-sync-coordinator` for the
+  development/Testnet-10-only bounded sync lifecycle. Kimi owns one isolated
+  implementation slice; Sol retains security, integration and publication.
+- Status: `GH-209 In Progress / Repository only / Production false`.

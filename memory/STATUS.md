@@ -125,6 +125,33 @@ Boundary: trusted owner-controlled parent path; callable development/Testnet-10
 Readiness: estimates unchanged; production remains false
 ```
 
+## GH-207 MERGED / EXACT-MAIN VERIFIED (2026-08-16)
+
+```text
+Status: Done / PR #208 merged / exact-main and live Pages verified
+PR/SHA: #208 / a8d386863016d9f44a49b0f473d4349c299149b9
+Runs: CI 31937017363; Security 31937017451; Pages 31937016816
+Review: Kimi found no P0-P3; CodeRabbit status wording fixed and thread resolved
+Live: README and Roadmap exact boundary readback; no horizontal Roadmap overflow
+      at 390/768/1280/1440 pixels
+Boundary: callable development/Testnet-10 only; no automatic updater, canonical
+          authority, independent RPC truth/finality, availability proof,
+          production YARA, deployment or production authority
+```
+
+## GH-209 BOUNDED RULE SYNC COORDINATOR STARTED (2026-08-16)
+
+```text
+Status: In Progress / issue #209 / protected branch only
+Baseline: a8d386863016d9f44a49b0f473d4349c299149b9
+Scope: explicit opt-in development/Testnet-10 coordinator; immediate and
+       periodic single-flight attempts; bounded interval/backoff; cancellation;
+       restart replay; non-sensitive status; deterministic adversarial tests
+Boundary: no canonical authority, independent RPC truth/history/finality,
+          availability/replication proof, production YARA, wallet, signing,
+          chain write, deployment, Mainnet, tokenomics or production action
+```
+
 All percentages below are internal, scope-weighted engineering estimates or
 component-completion records. They are not production-readiness evidence.
 

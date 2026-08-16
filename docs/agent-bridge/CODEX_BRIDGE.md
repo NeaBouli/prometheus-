@@ -4795,3 +4795,21 @@ No direct `main` push or production action occurred.
   transaction, broadcast, deployment, contract/tokenomics/security-policy
   change, or secret-bearing action occurred.
 - **Status:** `GH-207 PR #208 checks and review pending / Production false`.
+
+## 2026-08-16 - GH-207 exact-main closeout and GH-209 start
+
+- GH-207 PR #208 merged normally without bypass as exact main `a8d3868`.
+  Prometheus CI `31937017363`, Security Audit `31937017451`, and Pages
+  `31937016816` pass; issue #207 is closed. Live README and Roadmap readbacks
+  contain the synchronized boundary, and four responsive widths have no
+  horizontal Roadmap overflow.
+- Issue #209 and branch `feat/GH-209-rule-sync-coordinator` own the next bounded
+  block: an explicit opt-in development/Testnet-10 coordinator around the
+  checkpointed sync API, with single-flight attempts, bounded timing/backoff,
+  cancellation, restart replay, non-sensitive status and deterministic tests.
+- Kimi K3 owns one bounded implementation slice. Sol owns architecture,
+  security, integration, full verification, documentation, GitHub and closeout.
+- No canonical authority, independent RPC truth/history/finality, IPFS
+  availability/replication proof, production YARA, wallet, signing, chain write,
+  broadcast, deployment, Mainnet, tokenomics or production authority is added.
+- **Status:** `GH-209 In Progress / Kimi implementation next / Production false`.
