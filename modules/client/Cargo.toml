@@ -34,3 +34,4 @@ url.workspace = true
 [dev-dependencies]
 tempfile = "3"
 prometheus-validator = { path = "../validator-node" }
+tokio = { workspace = true, features = ["test-util"] }

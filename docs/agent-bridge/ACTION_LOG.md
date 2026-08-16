@@ -3964,6 +3964,12 @@ Rules for all dev agents:
   nit was fixed.
 - Status: `Full local PASS / Protected PR next / Production false`.
 
+## 2026-08-16 - GH-209 PR #210 review response
+
+- All protected checks passed. Accepted CodeRabbit's schedule-terminology finding
+  and two useful status/test nits; focused Rust and documentation gates pass again.
+- Status: `PR #210 follow-up verified / Normal merge next / Production false`.
+
 ## 2026-08-15 - GH-197 PR #198 review follow-up
 
 - All required checks passed on `2c7968e`; CodeRabbit had one valid trivial
@@ -4131,3 +4137,28 @@ Rules for all dev agents:
   Guardian, and HTML Pages checks pass; remaining protected checks and review
   are pending.
 - Status: `PR #208 checks and review pending / Production false`.
+
+## 2026-08-16 - GH-207 closeout and GH-209 kickoff
+
+- GH-207 merged through protected PR #208 as exact main `a8d3868`; exact-main
+  CI, Security, Pages and live responsive Roadmap/README evidence pass.
+- Opened issue #209 and branch `feat/GH-209-rule-sync-coordinator` for the
+  development/Testnet-10-only bounded sync lifecycle. Kimi owns one isolated
+  implementation slice; Sol retains security, integration and publication.
+- Status: `GH-209 In Progress / Repository only / Production false`.
+
+## 2026-08-16 - GH-209 local implementation reviewed
+
+- Implemented bounded opt-in RuleStorage sync coordination and deterministic
+  lifecycle tests without product/runtime or chain wiring.
+- Kimi K3 review: SHIP, no P0-P3. Claude Code OAuth expired; no Claude changes.
+- Coordinator `10/10`, RuleSync `22/22`, client lib `107/2 ignored`, focused
+  Clippy and rustfmt pass; full local gates remain.
+- Status: `Local implementation PASS / Full gates next / Production false`.
+
+## 2026-08-16 - GH-209 full local PASS
+
+- Full Rust, Guardian, lint, performance, dependency, documentation, Memory,
+  workflow and H-001 closeout-evidence gates pass locally.
+- Cargo Audit has no vulnerability and eight unchanged allowed warnings.
+- Status: `Full local PASS / Protected PR next / Production false`.

@@ -4795,3 +4795,58 @@ No direct `main` push or production action occurred.
   transaction, broadcast, deployment, contract/tokenomics/security-policy
   change, or secret-bearing action occurred.
 - **Status:** `GH-207 PR #208 checks and review pending / Production false`.
+
+## 2026-08-16 - GH-207 exact-main closeout and GH-209 start
+
+- GH-207 PR #208 merged normally without bypass as exact main `a8d3868`.
+  Prometheus CI `31937017363`, Security Audit `31937017451`, and Pages
+  `31937016816` pass; issue #207 is closed. Live README and Roadmap readbacks
+  contain the synchronized boundary, and four responsive widths have no
+  horizontal Roadmap overflow.
+- Issue #209 and branch `feat/GH-209-rule-sync-coordinator` own the next bounded
+  block: an explicit opt-in development/Testnet-10 coordinator around the
+  checkpointed sync API, with single-flight attempts, bounded timing/backoff,
+  cancellation, restart replay, non-sensitive status and deterministic tests.
+- Kimi K3 owns one bounded implementation slice. Sol owns architecture,
+  security, integration, full verification, documentation, GitHub and closeout.
+- No canonical authority, independent RPC truth/history/finality, IPFS
+  availability/replication proof, production YARA, wallet, signing, chain write,
+  broadcast, deployment, Mainnet, tokenomics or production authority is added.
+- **Status:** `GH-209 In Progress / Kimi implementation next / Production false`.
+
+## 2026-08-16 - GH-209 local implementation and independent review
+
+- Added the callable-only development/Testnet-10 RuleStorage coordinator around
+  GH-207: immediate first attempt, a fixed interval after success, sequential
+  retries with capped exponential failure backoff, bounded timeout, cancellation,
+  single-flight, replay and redacted status.
+- Coordinator `10/10`, RuleSync `22/22`, client library `107/2 ignored`, focused
+  Clippy and rustfmt pass. Kimi K3 returned SHIP with no P0-P3; Sol closed its
+  backoff-cap coverage note and documented the synchronous mutation-tail invariant.
+- Claude Code OAuth was expired and it changed nothing. Full gates and protected
+  PR workflow remain. No product wiring, autonomous authority, wallet, chain
+  action, deployment, Mainnet capability or production claim was added.
+- **Status:** `GH-209 Local implementation PASS / Full gates next / Production false`.
+
+## 2026-08-16 - GH-209 full local PASS
+
+- Complete Rust workspace and doc-tests, warning-free all-target Clippy,
+  rustfmt, release performance `6/6`, Guardian `1303/4`, Black, Pylint
+  `9.85/10` and `10.00/10`, Compose policy, Python dependency audit, public
+  claims `13` surfaces plus `6` tests, documentation hygiene plus `11` tests,
+  Memory, workflow YAML, H-001 closeout evidence and diff checks pass.
+- Cargo Audit reports no vulnerability and the same eight allowed maintenance/
+  yank warnings. No product, wallet, chain, deployment or production action ran.
+- **Status:** `GH-209 Full local PASS / Protected PR next / Production false`.
+
+## 2026-08-16 - GH-209 protected PR #210 review response
+
+- Commit `67af0f6` is published only on the feature branch; protected PR #210
+  targets `main`. All 11 protected checks pass.
+- CodeRabbit's one actionable documentation finding was accepted: all public
+  surfaces now distinguish the fixed post-success interval from sequential
+  retries with capped exponential failure backoff. Its status/fixture nits were
+  also closed by preserving completed outcomes and making impossible source calls
+  panic in tests. Focused tests `10/10`, Clippy, rustfmt, public claims, hygiene
+  and diff checks pass again.
+- **Status:** `PR #210 follow-up verified / Normal merge next / Production false`.
