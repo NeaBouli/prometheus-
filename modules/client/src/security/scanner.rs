@@ -84,6 +84,12 @@ impl YaraScanner {
         Ok(())
     }
 
+    /// Install a rule set already validated by the crate's preparation path.
+    pub(crate) fn install_prevalidated(&mut self, rules: Vec<CompiledRule>) {
+        self.rules = rules;
+        info!("Loaded {} prevalidated YARA rules", self.rules.len());
+    }
+
     /// Scan a file at the given path against all loaded rules.
     pub fn scan_file(&self, path: &Path) -> Result<ScanResult> {
         let data = fs::read(path).context("Failed to read file for scanning")?;
@@ -151,7 +157,7 @@ fn validate_rule(rule: &CompiledRule) -> Result<()> {
 }
 
 /// Validate a complete rule set: every rule valid and no duplicate names.
-fn validate_rule_set(rules: &[CompiledRule]) -> Result<()> {
+pub(crate) fn validate_rule_set(rules: &[CompiledRule]) -> Result<()> {
     let mut names = std::collections::HashSet::with_capacity(rules.len());
     for rule in rules {
         validate_rule(rule)?;

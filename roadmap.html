@@ -71,7 +71,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:500;padding:0 48px;height:56px;d
 .overview{max-width:1280px;margin:0 auto;padding:80px 48px 0}
 .overview-title{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--mint);text-transform:uppercase;margin-bottom:40px}
 .timeline-overview{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:var(--line)}
-.to-item{background:var(--void);padding:24px 20px;position:relative}
+.to-item{background:var(--void);padding:24px 20px;position:relative;min-width:0}
 .to-item.done{border-top:2px solid var(--mint)}
 .to-item.active{border-top:2px solid var(--gold);animation:pulse-border 3s ease infinite}
 .to-item.planned{border-top:2px solid var(--dim)}
@@ -91,7 +91,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:500;padding:0 48px;height:56px;d
 .phase-header{display:grid;grid-template-columns:80px 1fr;gap:0;border-bottom:1px solid var(--line);padding-bottom:24px;margin-bottom:40px;align-items:end}
 .phase-letter{font-family:'Space Mono',monospace;font-size:64px;font-weight:700;line-height:1;color:rgba(0,229,160,.1);transition:color .3s}
 .phase:hover .phase-letter{color:rgba(0,229,160,.18)}
-.phase-meta{}
+.phase-meta{min-width:0}
 .phase-tag{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--mint);text-transform:uppercase;margin-bottom:8px;display:block}
 .phase-title{font-size:clamp(22px,3vw,32px);font-weight:300;color:var(--text);letter-spacing:-.5px;margin-bottom:4px}
 .phase-date{font-family:'Space Mono',monospace;font-size:11px;color:var(--gold)}
@@ -101,12 +101,13 @@ nav{position:fixed;top:0;left:0;right:0;z-index:500;padding:0 48px;height:56px;d
 .s-planned{color:var(--dim);border:1px solid var(--line)}
 
 .sprints-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line)}
-.sprint{background:var(--void);padding:32px 28px;transition:background .3s}
+.sprint{background:var(--void);padding:32px 28px;transition:background .3s;min-width:0}
 .sprint:hover{background:var(--surface)}
 .sprint-num{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--dim);margin-bottom:12px}
 .sprint-title{font-size:15px;font-weight:400;color:var(--silver);margin-bottom:16px}
 .sprint-items{list-style:none}
-.sprint-items li{font-size:12px;font-weight:300;color:var(--muted);padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04);display:flex;gap:10px;align-items:flex-start;line-height:1.4}
+.sprint-items li{font-size:12px;font-weight:300;color:var(--muted);padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04);display:flex;gap:10px;align-items:flex-start;line-height:1.4;min-width:0;overflow-wrap:anywhere}
+.sprint-items code{white-space:normal;overflow-wrap:anywhere}
 .sprint-items li:last-child{border-bottom:none}
 .sprint-items li::before{content:'';flex-shrink:0;width:1px;height:12px;background:var(--mint);margin-top:2px;opacity:.4}
 .sprint-items li.done-item{color:#3A6050}
@@ -118,7 +119,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:500;padding:0 48px;height:56px;d
 .section-lbl{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--mint);text-transform:uppercase;margin-bottom:16px;display:block}
 .section-hdg{font-size:clamp(24px,3vw,36px);font-weight:300;color:var(--text);letter-spacing:-.5px;margin-bottom:40px}
 .devices-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line)}
-.device-card{background:var(--deep);padding:28px 24px;transition:background .3s}
+.device-card{background:var(--deep);padding:28px 24px;transition:background .3s;min-width:0}
 .device-card:hover{background:var(--panel)}
 .device-icon{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--dim);margin-bottom:16px}
 .device-name{font-size:15px;font-weight:400;color:var(--silver);margin-bottom:8px}
@@ -368,7 +369,8 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
           <li class="done-item">GH-193 merged and exact-main verified: strict development-only decoding of exact caller-supplied current-Silverc RuleStorage constructor state; no chain provenance, covenant authentication, finality, live IPFS retrieval, or production authority</li>
           <li class="done-item">GH-197/PR #198 merged and exact-main verified at <code>28da2d4</code>: development-only owner-pin manifest-to-caller-observation consistency for one Testnet-10 RuleStorage UTXO, with unique outpoint, covenant, script, amount, block-DAA, checked maturity-proxy, and exact constructor-byte checks</li>
           <li class="done-item">GH-203/PR #204: bounded development-only acquisition of exact node network/current virtual DAA and one explicit address's UTXOs through the existing connected client before unchanged GH-197 verification; one node response is not independent RPC truth/history, consensus finality, manifest authority, IPFS availability, deployment, or production readiness</li>
-          <li class="done-item">GH-205: callable-only development composition of one owner-pinned complete snapshot through injected/live Testnet-10 observation, a credential-free loopback-only local IPFS gateway, exact Raw-CIDv1 content binding, and one atomic scanner replacement; no automatic update, canonical manifest authority, independent RPC truth/finality, availability/replication proof, production YARA, durable anti-downgrade state, deployment, or production readiness</li>
+          <li class="done-item">GH-205: callable-only development composition of one owner-pinned complete snapshot through injected/live Testnet-10 observation, a credential-free loopback-only local IPFS gateway, exact Raw-CIDv1 content binding, and one atomic scanner replacement</li>
+          <li class="done-item">GH-207: owner-local POSIX checkpoint with minimum verified virtual-DAA ordering, exact-identity digest binding, restart-persistent rollback and same-order equivocation rejection, and exact replay recovery; no automatic update, canonical manifest authority, independent RPC truth/finality, availability/replication proof, production YARA, deployment, or production readiness</li>
           <li>Merged and exact-main-verified GH-86 provides isolated Rust/Python canonical bundle validators with one shared byte-exact valid/invalid corpus; no v1, P2P, proof, analyzer, committee, IPFS, chain, or public-rule wiring</li>
           <li class="done-item">Merged and exact-main-verified GH-90: local Rust <code>file_sha256</code> production from exact caller-supplied bytes plus typed scope, with Python validation of shared vectors; no path API, transport authorization, external provenance, privacy approval, or proof binding</li>
           <li class="done-item">Merged and exact-main-verified GH-94: local Rust <code>byte_pattern</code> production from exact caller-supplied bytes, checked offset, boolean wildcard mask, and typed scope, with mandatory local-only <code>review_required_v1</code> and Python validation of shared vectors; no pattern/path API, transport authorization, external provenance, privacy approval, or proof binding</li>

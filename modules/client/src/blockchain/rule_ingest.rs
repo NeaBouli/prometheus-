@@ -27,7 +27,7 @@ use std::fmt;
 use log::info;
 
 use crate::runtime::{require_stub_allowed, require_stub_allowed_for, RuntimeMode};
-use crate::security::scanner::{CompiledRule, YaraScanner};
+use crate::security::scanner::{validate_rule_set, CompiledRule, YaraScanner};
 
 use super::krc20::{RuleType, ThreatRule};
 use super::rule_fetch::verify_raw_cid_content_binding;
@@ -75,6 +75,30 @@ pub struct RuleMetadataSnapshotEntry {
     pub metadata: RuleStateMetadata,
     /// Exact content bytes for `metadata.ipfs_cid()`.
     pub content: Vec<u8>,
+}
+
+/// Fully compiled and validated rule set awaiting an infallible install.
+pub(crate) struct PreparedRuleSnapshot {
+    rules: Vec<CompiledRule>,
+}
+
+impl PreparedRuleSnapshot {
+    pub(crate) fn prepare(snapshot: &[RuleMetadataSnapshotEntry]) -> Result<Self, RuleIngestError> {
+        if snapshot.len() > MAX_RULES_PER_SNAPSHOT {
+            return Err(RuleIngestError);
+        }
+        let mut seen_ids = HashSet::with_capacity(snapshot.len());
+        let mut rules = Vec::with_capacity(snapshot.len());
+        for entry in snapshot {
+            rules.push(compile_metadata_entry(entry, &mut seen_ids)?);
+        }
+        validate_rule_set(&rules).map_err(|_| RuleIngestError)?;
+        Ok(Self { rules })
+    }
+
+    pub(crate) fn into_rules(self) -> Vec<CompiledRule> {
+        self.rules
+    }
 }
 
 impl fmt::Debug for RuleMetadataSnapshotEntry {

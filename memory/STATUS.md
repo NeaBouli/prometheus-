@@ -108,6 +108,23 @@ Boundary: callable-only development plumbing; no automatic update loop,
 Readiness: estimates unchanged; this closes local complete-snapshot composition only
 ```
 
+## GH-207 DURABLE RULE SYNC CHECKPOINT (2026-08-16)
+
+```text
+Status: local implementation and focused adversarial verification PASS; protected PR next
+Scope: owner-local POSIX checkpoint around GH-205; canonical exact-identity
+       digest, minimum verified observation virtual-DAA ordering, rollback and
+       same-order equivocation rejection, exact replay recovery
+Filesystem: final-component NOFOLLOW; owner/type/mode/size checks; nonblocking
+            exclusive lock; temp write, file fsync, atomic rename, directory fsync
+Transition: all network/content/parser/rule-set work completes before checkpoint
+            commit; only infallible prevalidated scanner assignment follows
+Boundary: trusted owner-controlled parent path; callable development/Testnet-10
+          only; no automatic updater, canonical authority, independent RPC truth,
+          availability/replication proof, production YARA, deployment or production
+Readiness: estimates unchanged; production remains false
+```
+
 All percentages below are internal, scope-weighted engineering estimates or
 component-completion records. They are not production-readiness evidence.
 

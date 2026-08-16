@@ -32,13 +32,19 @@ a production malware detector or reporting client.
   one atomic complete-snapshot scanner replacement. It has no automatic update
   loop or product-runtime wiring and grants no manifest, RPC, finality, YARA,
   rollback, or production authority.
+- `blockchain/rule_checkpoint.rs` adds a development-only owner-local POSIX
+  checkpoint around that sync. It digest-binds exact verified identities, uses
+  the minimum verified observation virtual DAA as the conservative snapshot
+  order, rejects rollback and same-order equivocation, and restores scanner
+  state through exact replay after restart. It adds no canonical authority,
+  automatic updater, availability proof, production YARA, or production wiring.
 - `blockchain/rule_ingest.rs` ingests a complete caller-supplied active-rule
   snapshot whose raw CIDv1 (sha2-256, canonical lowercase base32) must bind the
   exact caller-supplied content bytes. It parses a strict simple matcher
   grammar — not real YARA syntax — and replaces scanner rules atomically
   (an empty snapshot clears them). It is development-only: beta, mainnet, and
   production profiles reject it. Canonical autonomous Kaspa/IPFS rule loading,
-  production YARA, and durable rollback protection remain open.
+  production YARA, and canonical rule authority remain open.
 - `network/zk_proof.rs` produces a development SHA-256 placeholder, not a
   production zero-knowledge proof.
 - The E2E lifecycle test is an in-process, same-host stub fixture. Its

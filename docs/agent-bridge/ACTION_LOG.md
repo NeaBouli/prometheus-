@@ -4107,3 +4107,27 @@ Rules for all dev agents:
 - No direct-main push, admin bypass, production action, wallet, chain write,
   deployment, or secret-bearing action occurred.
 - Status: `PR #206 checks and review pending / Production false`.
+
+## 2026-08-16 - GH-207 durable checkpoint local integration
+
+- Issue #207 and `feat/GH-207-rule-sync-checkpoint` add owner-local,
+  restart-persistent rollback/equivocation rejection around GH-205 without
+  changing its public API or production boundary.
+- Preparation is fully fallible and mutation-free; canonical checkpoint commit
+  precedes only an infallible prevalidated scanner assignment. Exact replay
+  closes the documented commit-before-install process-crash gap.
+- Focused RuleSync `22/22`, checkpoint unit tests, compile, and four-viewport
+  Roadmap overflow verification pass. Full gates and Kimi current-diff review
+  remain; Claude Code was unavailable due expired OAuth and changed nothing.
+- Status: `Local integration PASS / Review and full gates next / Production false`.
+
+## 2026-08-16 - GH-207 full local PASS and protected handoff
+
+- Kimi's independent current-diff review found no P0-P3; Sol closed its one
+  actionable mode-bit P4. Full Rust, Guardian, dependency, documentation,
+  evidence, workflow, and responsive-browser gates pass locally.
+- Commit `e8b60f7` is pushed only to `feat/GH-207-rule-sync-checkpoint`; normal
+  PR #208 targets protected `main`. Initial Memory, secret, Silverscript,
+  Guardian, and HTML Pages checks pass; remaining protected checks and review
+  are pending.
+- Status: `PR #208 checks and review pending / Production false`.

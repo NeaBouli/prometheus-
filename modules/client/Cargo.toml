@@ -25,6 +25,7 @@ env_logger.workspace = true
 sha2.workspace = true
 multibase.workspace = true
 reqwest.workspace = true
+rustix.workspace = true
 hex = "0.4"
 prometheus-threat-hint = { version = "0.1.0", path = "../threat-hint" }
 toml = "0.8"
