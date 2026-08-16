@@ -2630,3 +2630,14 @@ changed.
   independent RPC/IPFS truth/availability, wallet, chain, deployment, Mainnet,
   production YARA or rollout readiness is inferred.
 - Result: `PASS / Documentation-only closeout candidate`.
+
+## 2026-08-17 - GH-216 final public closeout audit
+
+- Documentation PR #218 passed all eleven protected contexts and merged
+  normally as exact main `83c265b`.
+- Exact-main CI `31979118045`, Security `31979117981`, and Pages
+  `31979117415` pass; cache-busted live readback verifies all updated public
+  HTML/text surfaces and the raw main README.
+- CodeRabbit's required status passed but its content review was rate-limited;
+  independent Kimi final review was `SHIP` with no medium/high finding.
+- Result: `PASS / GH-216 complete / Production false`.

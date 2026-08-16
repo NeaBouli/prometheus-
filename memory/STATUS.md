@@ -1765,3 +1765,14 @@ Boundary: local Development evidence only; no public Testnet operation,
           production YARA or production readiness
 Estimates: unchanged; core 84-88%; complete vision 50-55%
 ```
+
+## GH-216 PUBLIC CLOSEOUT COMPLETE (2026-08-17)
+
+```text
+Status: Done / docs PR #218 merged / exact-main and live Pages verified
+PR/SHA: #218 / 83c265ba33c2698f10ae52b6062f47e4c9781127
+Runs: CI 31979118045; Security 31979117981; Pages 31979117415
+Readback: live index, Roadmap, FAQ, Whitepaper, llms.txt and raw main README pass
+Boundary: documentation/audit closeout only; production remains false
+Estimates: unchanged; core 84-88%; complete vision 50-55%
+```
