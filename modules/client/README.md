@@ -43,8 +43,8 @@ a production malware detector or reporting client.
   success, sequential retries with capped exponential failure backoff, bounded
   timeout, cancellation with no detached
   work, single-flight admission, and bounded non-sensitive status counters. It
-  accepts a caller-trusted complete-snapshot provider and adds no CLI/product
-  runtime, autonomous authority, RPC/finality proof, availability proof, wallet,
+  accepts a caller-trusted complete-snapshot provider and by itself adds no
+  product runtime, autonomous authority, RPC/finality proof, availability proof, wallet,
   chain action, Mainnet support, or production readiness.
 - `blockchain/rule_signed_snapshot.rs` adds a strict canonical
   development/Testnet-10 complete-snapshot envelope authenticated with BIP340
@@ -53,8 +53,17 @@ a production malware detector or reporting client.
   external nonzero minimum sequence and separately trusted clock are enforced,
   with the clock rechecked on every fetch. It includes no signer/private-key
   path, key-authority or rotation proof, persistent sequence authority,
-  CLI/product wiring, canonical L1/RPC/finality proof, availability proof,
+  canonical L1/RPC/finality proof, availability proof,
   wallet/chain action, deployment, Mainnet support, or production readiness.
+- `rule_sync_cli.rs` and the `rule-sync preflight/run` command are the GH-213
+  repository candidate for an operator-invoked composition of those existing
+  boundaries. They require private, no-symlink, bounded config and envelope
+  files, restrict the config to ASCII TOML,
+  accept only loopback-IP-literal RPC/IPFS endpoints, keep preflight offline and
+  checkpoint-free, emit redacted counters, and cancel without detached work.
+  This remains Development/Testnet-10 only and establishes no key authority,
+  persistent sequence authority, autonomous distribution, chain write,
+  availability, deployment, Mainnet, or production readiness.
 - `blockchain/rule_ingest.rs` ingests a complete caller-supplied active-rule
   snapshot whose raw CIDv1 (sha2-256, canonical lowercase base32) must bind the
   exact caller-supplied content bytes. It parses a strict simple matcher
