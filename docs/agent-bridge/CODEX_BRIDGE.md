@@ -5053,3 +5053,52 @@ No direct `main` push or production action occurred.
 - The only remaining closeout steps are protected PR delivery, final exact-main
   gates, and live public-page readback. Production remains false.
 - **Status:** `GH-213 closeout review SHIP / Protected docs PR next`.
+
+## 2026-08-16 - GH-216 loopback binary E2E start
+
+- Exact baseline is clean `main`
+  `d9857f23426a388b8b638bbbb405505e090bbc41`; GH-213 and its docs closeout
+  are merged, exact-main gated, and live-page verified.
+- Issue #216 and branch `test/GH-216-rule-sync-loopback-e2e` own one bounded
+  test/evidence block: compose the real `rule-sync` binary with test-only
+  loopback wRPC/IPFS peers, real signal drain, restart replay, anti-downgrade,
+  equivocation, malformed/slow/disconnected peer, and redaction checks.
+- Kimi K3 independently selected and threat-modeled this task, then owns the
+  secret-free test-only stub/fixture foundation and first binary scenarios.
+  Sol owns dependency decisions, architecture/security review, adversarial
+  completion, all full gates, public claims, GitHub, and closeout.
+- No real node, public network, real IPFS availability, production source/API,
+  new cryptography/signing, key authority/rotation, persistent sequence
+  authority, wallet, transaction, chain write/broadcast, deployment, Mainnet,
+  tokenomics, canonical authority, finality, availability, or production claim
+  is authorized. Loopback evidence is not Testnet operation evidence.
+- **Status:** `GH-216 In Progress / Kimi test foundation next / Production false`.
+
+## 2026-08-16 - GH-216 local implementation and full gates complete
+
+- Added a test-only binary harness in
+  `modules/client/tests/rule_sync_loopback_e2e.rs` with ephemeral Borsh wRPC and
+  HTTP IPFS peers. It executes offline and connected preflight, successful sync,
+  private checkpoint creation, SIGTERM cancellation during an in-flight request,
+  SIGINT replay drain, exact restart replay, lower-order rollback rejection,
+  canonical same-order equivocation rejection, malformed CID-bound content,
+  real attempt timeout, and a disconnected wRPC handshake.
+- Kimi supplied the protocol/threat-model analysis and two independent reviews.
+  Two bounded implementation runs remained in analysis and produced no diff, so
+  Sol implemented and integrated the harness. Kimi found a canonical JSON-order
+  test flaw and a lost-`Notify` wakeup race; Sol fixed both. Final Kimi verdict:
+  `SHIP`, no blocking finding.
+- Focused locked E2E: `5 passed`; direct stress: `20/20` complete test-binary
+  runs passed. `cargo test --workspace` passed on the uncontended rerun; the first
+  parallel run had one debug-only scanner timing miss (`8.12s`), while the clean
+  rerun passed at `4.50s`. Workspace rustfmt and Clippy pass with warnings denied.
+- Guardian: `1303 passed, 4 skipped`; Black `36 files unchanged`; Pylint
+  `9.85/10` and boundary Pylint `10.00/10`. Memory, H-001 evidence, public-claim
+  `13`-surface consistency and their unit tests pass.
+- Locked release performance, Guardian/Threat-Proof release binaries and package
+  gates pass. `cargo audit` reports no vulnerability and eight allowed legacy
+  transitive warnings; `pip-audit` reports no known vulnerability.
+- No production source, contract, workflow, tokenomics, wallet, key authority,
+  chain, broadcast, deployment, public network or Mainnet behavior changed.
+  Loopback evidence is not public Testnet or rollout evidence.
+- **Status:** `GH-216 local gates complete / Protected PR next / Production false`.

@@ -33,6 +33,9 @@ toml = "0.8"
 url.workspace = true
 
 [dev-dependencies]
+async-trait = "0.1"
 tempfile = "3"
 prometheus-validator = { path = "../validator-node" }
 tokio = { workspace = true, features = ["test-util"] }
+workflow-rpc = { version = "=0.18.0", default-features = false }
+workflow-serializer = "=0.18.0"

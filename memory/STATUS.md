@@ -265,6 +265,42 @@ Next: live public-page readback and the next separately scoped task
 All percentages below are internal, scope-weighted engineering estimates or
 component-completion records. They are not production-readiness evidence.
 
+## GH-216 RULE-SYNC BINARY LOOPBACK E2E START (2026-08-16)
+
+```text
+Baseline: d9857f23426a388b8b638bbbb405505e090bbc41
+Issue/branch: #216 / test/GH-216-rule-sync-loopback-e2e
+Scope: test-only local Borsh wRPC and IPFS peers driving the real GH-213 binary;
+       offline/connect preflight, successful run, real signal drain, restart,
+       anti-downgrade/equivocation and bounded peer-failure evidence
+Agents: Kimi owns the test harness foundation; Sol owns dependency/security
+        decisions, integration, adversarial completion, full gates and GitHub
+Boundary: no public or real Testnet peer, production source/API, new signing,
+          key authority/rotation, persistent sequence authority, wallet, chain,
+          broadcast, deployment, Mainnet, tokenomics, finality, availability or
+          production claim
+Status: In progress / Kimi implementation active / Production false
+```
+
+## GH-216 LOCAL GATE RESULT (2026-08-16)
+
+```text
+Implementation: test-only real-binary loopback wRPC/IPFS harness; no production
+                source, contract, workflow, chain or authority change
+Coverage: offline/connect preflight; success/private checkpoint; TERM/INT drain;
+          restart replay; rollback/equivocation rejection; malformed content;
+          attempt timeout; disconnected wRPC handshake; redacted bounded output
+Focused: 5 passed; stress 20/20 complete runs
+Rust: cargo test --workspace PASS on uncontended rerun; fmt/clippy PASS
+Guardian: 1303 passed, 4 skipped; Black PASS; Pylint 9.85/10 and 10.00/10
+Release: performance, two binaries and package set PASS
+Integrity: Memory, H-001, 13-surface public claims and unit tests PASS
+Audit: cargo audit 0 vulnerabilities / 8 allowed transitive warnings;
+       pip-audit no known vulnerabilities
+Review: Kimi final SHIP after canonical-order and Notify-race corrections
+Status: Local gates complete / protected PR pending / Production false
+```
+
 ## CURRENT SPRINT
 
 ```text

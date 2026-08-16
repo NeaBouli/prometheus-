@@ -4272,3 +4272,29 @@ Rules for all dev agents:
 - Claims `13/13`, claim tests `6/6`, hygiene plus tests `12/12`, Memory, H-001
   evidence plus tests `5/5`, stale-launch scan and diff checks pass.
 - Status: `Closeout ready for protected PR / Production false`.
+
+## 2026-08-16 - GH-216 started
+
+- Opened issue #216 and branch `test/GH-216-rule-sync-loopback-e2e` from clean
+  exact main `d9857f2`.
+- Scope is binary-level test-only loopback RuleStorage sync evidence with real
+  process signals, restart and adversarial peer behavior. Kimi owns the bounded
+  harness foundation; Sol owns integration, review and full gates.
+- No real network, chain, wallet, key, deployment, Mainnet, authority,
+  availability or production action/claim is in scope.
+- Status: `GH-216 In Progress / Production false`.
+
+## 2026-08-16 - GH-216 local implementation verified
+
+- Added the test-only real-binary loopback E2E harness and direct locked
+  dev-dependencies already present in the resolved dependency graph.
+- Covered offline/connect preflight, success/checkpoint, TERM/INT drain,
+  replay, rollback, same-order equivocation, malformed content, timeout and
+  disconnected wRPC failure without production or chain changes.
+- Kimi architecture/review contribution completed; final verdict `SHIP` after
+  Sol fixed Kimi's canonical-JSON fidelity and lost-wakeup findings.
+- Focused `5/5`, stress `20/20`, full Rust workspace, Clippy/rustfmt, Guardian
+  `1303/4`, release build/package/performance, Memory, H-001, claims, Black,
+  Pylint and audits pass. One parallel debug timing miss was non-reproducible on
+  the required uncontended rerun (`4.50s` under the `5s` gate).
+- Status: `Local gates complete / Protected PR next / Production false`.

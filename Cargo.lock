@@ -3782,6 +3782,7 @@ name = "prometheus-client"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "async-trait",
  "clap",
  "env_logger",
  "hex",
@@ -3803,6 +3804,8 @@ dependencies = [
  "tokio",
  "toml",
  "url",
+ "workflow-rpc",
+ "workflow-serializer",
 ]
 
 [[package]]
