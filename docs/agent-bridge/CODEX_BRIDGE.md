@@ -5025,3 +5025,31 @@ No direct `main` push or production action occurred.
   `10/10`, binary status `1/1`, client all-target Clippy, rustfmt, 13-surface
   claims, hygiene, Memory and diff checks pass after the fixes.
 - **Status:** `PR #214 review fixes local PASS / Follow-up protected checks next / Production false`.
+
+## 2026-08-16 - GH-213 merged and exact-main verified
+
+- Protected PR #214 merged normally without admin bypass as exact `main`
+  `bbe7efb69c8814e95699ecaa53daa9363a939403`; issue #213 is closed.
+- The review-fix head passed every reported protected context, and all five
+  CodeRabbit review threads are resolved. CodeRabbit's rate-limit note was a
+  successful status context, not a failed gate.
+- Exact-main Prometheus CI `31950806131`, Security Audit `31950806118`, and
+  Pages build/deployment `31950805653` all pass.
+- README, Whitepaper, FAQ, Roadmap, public HTML, `llms.txt`, Memory, Bridge, and
+  Action Log now classify GH-213 as merged and exact-main verified while
+  retaining Development/Testnet-10-only and production-false boundaries.
+- No wallet, key, transaction, broadcast, chain, deployment, Mainnet,
+  tokenomics, authority, availability, or production action occurred.
+- **Status:** `GH-213 DONE / Exact-main gates PASS / Production false`.
+
+## 2026-08-16 - GH-213 closeout review ready
+
+- Independent Kimi review of the complete documentation closeout diff reports
+  no P0/P1 finding and verdict `SHIP`; Claude remains unavailable because its
+  local OAuth session is expired and produced no change.
+- Public claim consistency passes across 13 surfaces with 6 unit tests;
+  documentation hygiene and 11 unit tests pass; Memory, H-001 evidence and its
+  4 unit tests, stale-launch scan, and diff checks pass.
+- The only remaining closeout steps are protected PR delivery, final exact-main
+  gates, and live public-page readback. Production remains false.
+- **Status:** `GH-213 closeout review SHIP / Protected docs PR next`.
