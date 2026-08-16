@@ -362,7 +362,7 @@ fn decode_fixed_hex<const N: usize>(value: &str) -> Result<[u8; N], RuleSnapshot
 fn domain_digest(domain: &[u8], bytes: &[u8]) -> [u8; 32] {
     let mut hasher = Sha256::new();
     hasher.update(domain);
-    hasher.update((bytes.len() as u32).to_be_bytes());
+    hasher.update((bytes.len() as u64).to_be_bytes());
     hasher.update(bytes);
     hasher.finalize().into()
 }

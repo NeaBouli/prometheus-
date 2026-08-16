@@ -4910,3 +4910,24 @@ No direct `main` push or production action occurred.
   passes. No secret, wallet, chain, broadcast, deployment, Mainnet or production
   action ran.
 - **Status:** `GH-211 Available local gates PASS / Protected PR and Docker CI next / Production false`.
+
+## 2026-08-16 - GH-211 PR #212 review response
+
+- All initial eleven protected checks passed, including the CI-owned Docker
+  Compose render. CodeRabbit completed with two actionable wording/status notes
+  and three low-severity maintainability notes; Sol accepted all five.
+- Public wording now says the verifier authenticates one owner-authorized
+  **snapshot envelope**, not a caller or request identity. The Roadmap keeps the
+  item neutral until protected delivery completes, and the index again names
+  GH-209 retry backoff, per-attempt timeout, shutdown cancellation and
+  single-flight guarantees.
+- The signing digest now uses a lossless big-endian `u64` payload-length prefix
+  in production and deterministic test signing. Boundary tests use the exported
+  manifest/state/rule-count constants rather than duplicated literals.
+- Focused envelope `10/10`, client all-target Clippy, rustfmt, public claims,
+  documentation hygiene and diff checks pass after the fixes. The follow-up
+  protected check run is pending.
+- Correction to the earlier local entry: references to an owner-authorized
+  "request" mean only the signed snapshot envelope; no caller authentication
+  or request identity is established.
+- **Status:** `PR #212 review response verified locally / Follow-up checks pending / Production false`.

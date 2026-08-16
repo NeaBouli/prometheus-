@@ -202,7 +202,7 @@ exact network, sequence, one-hour maximum validity window, entries, and explicit
 empty-snapshot order are authenticated with BIP340. Verification uses a
 separately owner-pinned x-only public key, an external nonzero minimum sequence,
 and a separately trusted clock rechecked on every fetch. This authenticates one
-owner-authorized request only; it is not proof of key authority or rotation,
+owner-authorized snapshot envelope only; it is not proof of key authority or rotation,
 persistent sequence authority, canonical L1 state, RPC truth or finality, IPFS
 availability, deployment, or production readiness. No signer or private-key API
 is included.

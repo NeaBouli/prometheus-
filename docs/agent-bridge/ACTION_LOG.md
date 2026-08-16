@@ -4200,3 +4200,12 @@ Rules for all dev agents:
 - Docker CLI is absent locally; protected CI must run the exact Compose render.
   The standalone Compose boundary verifier passes.
 - Status: `Available local gates PASS / Protected PR next / Production false`.
+
+## 2026-08-16 - GH-211 PR #212 review response
+
+- Initial eleven protected checks passed. Accepted all five CodeRabbit notes:
+  snapshot-envelope wording, neutral pre-merge Roadmap status, restored GH-209
+  guarantees on the index, lossless `u64` digest length and exported test limits.
+- Envelope `10/10`, client all-target Clippy, rustfmt, public claims,
+  documentation hygiene and diff checks pass after the changes.
+- Status: `Review fixes pushed next / Follow-up protected checks pending / Production false`.

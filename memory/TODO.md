@@ -13,7 +13,7 @@
 - [x] [P1] GH-205 complete-snapshot RuleStorage content sync | Codex Sol + Kimi K3 | PR #206 merged as exact main `11496af`; CI `31913541861`, Security `31913541880`, Pages `31913541497`, independent review and live public-page readback pass; production authority remains false
 - [x] [P1] GH-207 durable RuleStorage anti-downgrade checkpoint | Codex Sol + Kimi K3 | PR #208 merged as exact main `a8d3868`; CI `31937017363`, Security `31937017451`, Pages `31937016816`, review and responsive live Roadmap/README readback pass; production authority remains false
 - [x] [P1] GH-209 bounded opt-in RuleStorage sync coordinator | Codex Sol + Kimi K3 | PR #210 merged as exact main `d029f9f`; CI `31943658380`, Security `31943658391`, Pages `31943657944`, review and live public-page readback pass; production authority remains false
-- [~] [P1] GH-211 authenticated RuleStorage snapshot envelope provider | Codex Sol + Kimi K3 | Kimi SHIP/no P0-P2; strict canonical development/Testnet-10 BIP340 envelope, external nonzero minimum sequence, trusted per-fetch clock, 10 adversarial tests, full Rust/Guardian/docs/security/performance gates and 16/16 responsive Pages checks PASS; protected PR/CI remain (local Docker CLI absent); no signer or authority claim; production authority remains false
+- [~] [P1] GH-211 authenticated RuleStorage snapshot envelope provider | Codex Sol + Kimi K3 | PR #212; Kimi SHIP/no P0-P2; initial 11 protected checks PASS including Docker; all 5 CodeRabbit wording/maintainability notes fixed and focused gates PASS; follow-up checks/normal merge remain; strict canonical development/Testnet-10 BIP340 envelope only, no signer or authority claim; production authority remains false
 
 ## ═══ SPRINT 0: SETUP & TESTNET (Woche 1) ═══
 

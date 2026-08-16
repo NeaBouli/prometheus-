@@ -12,13 +12,15 @@ use prometheus_client::blockchain::rule_coordinator::{
     RuleCoordinator, RuleCoordinatorConfig, RuleSnapshotProvider,
 };
 use prometheus_client::blockchain::rule_fetch::{RuleContentFuture, RuleContentSource};
+use prometheus_client::blockchain::rule_ingest::MAX_RULES_PER_SNAPSHOT;
 use prometheus_client::blockchain::rule_observation::{
-    RuleObservationFuture, RuleObservationSource,
+    RuleObservationFuture, RuleObservationSource, MAX_MANIFEST_JSON_BYTES,
 };
 use prometheus_client::blockchain::rule_signed_snapshot::{
     RuleSnapshotEnvelopeError, RuleSnapshotTimeSource, SignedRuleSnapshotProvider,
     MAX_ADDRESS_BYTES, MAX_ENVELOPE_BYTES, MAX_VALIDITY_WINDOW_SECONDS,
 };
+use prometheus_client::blockchain::rule_state::MAX_STATE_JSON_BYTES;
 use prometheus_client::runtime::RuntimeMode;
 use prometheus_client::security::scanner::{CompiledRule, YaraScanner};
 use secp256k1::{Keypair, Message, Secp256k1, SecretKey};
@@ -88,7 +90,7 @@ fn public_key(secret: &SecretKey) -> [u8; 32] {
 fn domain_digest(bytes: &[u8]) -> [u8; 32] {
     let mut hasher = Sha256::new();
     hasher.update(SIGNING_DOMAIN);
-    hasher.update((bytes.len() as u32).to_be_bytes());
+    hasher.update((bytes.len() as u64).to_be_bytes());
     hasher.update(bytes);
     hasher.finalize().into()
 }
@@ -370,12 +372,12 @@ fn limits_empty_semantics_and_modes_are_enforced() {
         },
         {
             let mut entry = test_entry();
-            entry.manifest_json = "x".repeat(16 * 1024 + 1);
+            entry.manifest_json = "x".repeat(MAX_MANIFEST_JSON_BYTES + 1);
             entry
         },
         {
             let mut entry = test_entry();
-            entry.constructor_json = "x".repeat(16 * 1024 + 1);
+            entry.constructor_json = "x".repeat(MAX_STATE_JSON_BYTES + 1);
             entry
         },
     ];
@@ -387,7 +389,7 @@ fn limits_empty_semantics_and_modes_are_enforced() {
     }
 
     let mut too_many = empty_payload(9);
-    too_many.entries = vec![test_entry(); 257];
+    too_many.entries = vec![test_entry(); MAX_RULES_PER_SNAPSHOT + 1];
     too_many.empty_snapshot_order = None;
     assert!(provider(&too_many, &key, 7, clock.clone()).is_err());
 

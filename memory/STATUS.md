@@ -207,7 +207,7 @@ Tests: signed envelope 10/10; coordinator 10/10; RuleSync 22/22; focused
 Agents: Kimi implemented the primary module; Sol added per-fetch freshness,
         sequence-floor enforcement, adversarial composition tests and docs;
         Claude OAuth expired and Claude changed nothing
-Boundary: authenticates one owner-authorized request only; no signer/private
+Boundary: authenticates one owner-authorized snapshot envelope only; no signer/private
           key, key authority/rotation, persistent sequence authority, canonical
           L1/RPC/finality proof, product wiring, wallet/chain action, deployment,
           Mainnet support or production readiness
