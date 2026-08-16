@@ -197,6 +197,16 @@ autonomous authority and does not prove canonical manifest authority,
 independent RPC truth or finality, IPFS availability or replication, production
 YARA quality, deployment, or production readiness.
 
+GH-211 adds a strict canonical development/Testnet-10 snapshot envelope whose
+exact network, sequence, one-hour maximum validity window, entries, and explicit
+empty-snapshot order are authenticated with BIP340. Verification uses a
+separately owner-pinned x-only public key, an external nonzero minimum sequence,
+and a separately trusted clock rechecked on every fetch. This authenticates one
+owner-authorized snapshot envelope only; it is not proof of key authority or rotation,
+persistent sequence authority, canonical L1 state, RPC truth or finality, IPFS
+availability, deployment, or production readiness. No signer or private-key API
+is included.
+
 **Q: Why Kaspa and not Ethereum?**
 Prometheus targets Kaspa because its high-throughput BlockDAG and current
 SilverScript path can anchor compact protocol state. The repository verifies

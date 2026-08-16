@@ -181,6 +181,59 @@ Security/docs: Cargo Audit has no vulnerability and eight allowed warnings;
                Memory, workflow YAML, H-001 closeout evidence and diff PASS
 ```
 
+## GH-211 SIGNED SNAPSHOT PROVIDER STARTED (2026-08-16)
+
+```text
+Status: In Progress / issue #211 / protected branch only
+Baseline: d029f9ff061b89a3229ec49cb02eaf84b6159107
+Scope: strict canonical complete-snapshot envelope; separately owner-pinned
+       BIP340 x-only verification key and trusted time; bounded validity,
+       sequence, entries and empty-snapshot order; provider composition tests
+Boundary: no signer/private key, canonical authority, independent RPC/finality,
+          product wiring, wallet/chain action, deployment, Mainnet or production
+```
+
+## GH-211 LOCAL IMPLEMENTATION PASS (2026-08-16)
+
+```text
+Status: Local implementation PASS / independent review and full gates next
+Implementation: strict canonical compact JSON; deny unknown fields; 4 MiB,
+                256-entry and per-field bounds; exact Testnet-10/schema/kind;
+                domain-separated SHA-256 plus BIP340 verification; external
+                nonzero minimum sequence; one-hour maximum signed validity;
+                trusted clock and runtime mode rechecked on every fetch
+Tests: signed envelope 10/10; coordinator 10/10; RuleSync 22/22; focused
+       all-target Clippy and rustfmt PASS
+Agents: Kimi implemented the primary module; Sol added per-fetch freshness,
+        sequence-floor enforcement, adversarial composition tests and docs;
+        Claude OAuth expired and Claude changed nothing
+Boundary: authenticates one owner-authorized snapshot envelope only; no signer/private
+          key, key authority/rotation, persistent sequence authority, canonical
+          L1/RPC/finality proof, product wiring, wallet/chain action, deployment,
+          Mainnet support or production readiness
+```
+
+## GH-211 FULL AVAILABLE LOCAL GATES PASS (2026-08-16)
+
+```text
+Review: Kimi K3 SHIP; no P0-P2; duplicate-key P4 closed explicitly
+Rust: rustfmt; workspace all-target Clippy; release Guardian binaries;
+      package verification; full workspace tests/doc-tests; release performance
+      6/6 PASS
+Guardian: 1303 passed / 4 intentional model skips; Black PASS; Pylint 9.85
+          and 10.00; standalone Compose boundary PASS
+Docs/security: Memory; public hygiene 11/11; claims 13 surfaces + 6/6;
+               H-001 evidence 4/4; workflow YAML; Cargo Audit with no
+               vulnerability and eight unchanged allowed warnings; pip-audit
+               with no known vulnerability; diff check PASS
+Pages: Chromium 16/16 across index, Roadmap, Whitepaper and FAQ at
+       390/768/1280/1440; mobile index/FAQ overflow fixed
+Environment gap: Docker CLI absent locally, so only the Docker Compose render
+                 command awaits the protected CI environment; policy parser PASS
+Boundary: repository and documentation only; no wallet, chain, broadcast,
+          deployment, Mainnet or production action
+```
+
 All percentages below are internal, scope-weighted engineering estimates or
 component-completion records. They are not production-readiness evidence.
 

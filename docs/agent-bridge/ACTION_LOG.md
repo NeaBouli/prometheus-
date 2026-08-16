@@ -3964,6 +3964,14 @@ Rules for all dev agents:
   nit was fixed.
 - Status: `Full local PASS / Protected PR next / Production false`.
 
+## 2026-08-16 - GH-211 signed snapshot provider start
+
+- Opened issue #211 and branch `feat/GH-211-signed-rule-snapshot-provider` from
+  exact clean main `d029f9f`.
+- Kimi K3 owns strict canonical BIP340 envelope verification and adversarial
+  tests; Sol owns integration and publication. No signer, chain or production action.
+- Status: `In Progress / Repository only / Production false`.
+
 ## 2026-08-16 - GH-209 PR #210 review response
 
 - All protected checks passed. Accepted CodeRabbit's schedule-terminology finding
@@ -4162,3 +4170,42 @@ Rules for all dev agents:
   workflow and H-001 closeout-evidence gates pass locally.
 - Cargo Audit has no vulnerability and eight unchanged allowed warnings.
 - Status: `Full local PASS / Protected PR next / Production false`.
+
+## 2026-08-16 - GH-211 local implementation PASS
+
+- Implemented one strict canonical development/Testnet-10 complete-snapshot
+  envelope provider authenticated with BIP340 against a separately owner-pinned
+  x-only key, external nonzero minimum sequence, and separately trusted clock
+  rechecked on every fetch.
+- Kimi K3 provided the primary module and dependency wiring. Sol added the
+  dynamic freshness/runtime checks, sequence floor, adversarial and coordinator
+  tests, and synchronized README, Whitepaper, FAQ, Roadmap, Pages and `llms.txt`.
+- Signed-envelope `10/10`, coordinator `10/10`, RuleSync `22/22`, focused
+  all-target Clippy and rustfmt pass. Claude OAuth expired and changed nothing.
+- No signer/private key, authority/rotation claim, canonical L1/RPC/finality
+  proof, wallet/chain action, deployment, Mainnet or production action was added.
+- Status: `Local implementation PASS / Independent review and full gates next / Production false`.
+
+## 2026-08-16 - GH-211 review and full available local gates PASS
+
+- Kimi K3 returned SHIP with no P0-P2; Sol added the requested duplicate-key
+  regression case and retained persistent sequence authority as an explicit
+  nonclaim.
+- Full Rust, Guardian, formatting, lint, package, performance, dependency,
+  Memory, public-claim, documentation-hygiene, H-001 evidence and workflow-YAML
+  gates pass. Cargo Audit has no vulnerability and eight unchanged allowed
+  warnings; pip-audit has no known vulnerability.
+- Chromium responsive verification passes 16/16 on index, Roadmap, Whitepaper
+  and FAQ at four viewports. Mobile index/FAQ overflow was corrected.
+- Docker CLI is absent locally; protected CI must run the exact Compose render.
+  The standalone Compose boundary verifier passes.
+- Status: `Available local gates PASS / Protected PR next / Production false`.
+
+## 2026-08-16 - GH-211 PR #212 review response
+
+- Initial eleven protected checks passed. Accepted all five CodeRabbit notes:
+  snapshot-envelope wording, neutral pre-merge Roadmap status, restored GH-209
+  guarantees on the index, lossless `u64` digest length and exported test limits.
+- Envelope `10/10`, client all-target Clippy, rustfmt, public claims,
+  documentation hygiene and diff checks pass after the changes.
+- Status: `Review fixes pushed next / Follow-up protected checks pending / Production false`.
