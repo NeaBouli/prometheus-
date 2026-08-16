@@ -4817,8 +4817,9 @@ No direct `main` push or production action occurred.
 ## 2026-08-16 - GH-209 local implementation and independent review
 
 - Added the callable-only development/Testnet-10 RuleStorage coordinator around
-  GH-207: immediate first attempt, sequential fixed-delay scheduling, bounded
-  timeout/capped backoff, cancellation, single-flight, replay and redacted status.
+  GH-207: immediate first attempt, a fixed interval after success, sequential
+  retries with capped exponential failure backoff, bounded timeout, cancellation,
+  single-flight, replay and redacted status.
 - Coordinator `10/10`, RuleSync `22/22`, client library `107/2 ignored`, focused
   Clippy and rustfmt pass. Kimi K3 returned SHIP with no P0-P3; Sol closed its
   backoff-cap coverage note and documented the synchronous mutation-tail invariant.
@@ -4837,3 +4838,15 @@ No direct `main` push or production action occurred.
 - Cargo Audit reports no vulnerability and the same eight allowed maintenance/
   yank warnings. No product, wallet, chain, deployment or production action ran.
 - **Status:** `GH-209 Full local PASS / Protected PR next / Production false`.
+
+## 2026-08-16 - GH-209 protected PR #210 review response
+
+- Commit `67af0f6` is published only on the feature branch; protected PR #210
+  targets `main`. All 11 protected checks pass.
+- CodeRabbit's one actionable documentation finding was accepted: all public
+  surfaces now distinguish the fixed post-success interval from sequential
+  retries with capped exponential failure backoff. Its status/fixture nits were
+  also closed by preserving completed outcomes and making impossible source calls
+  panic in tests. Focused tests `10/10`, Clippy, rustfmt, public claims, hygiene
+  and diff checks pass again.
+- **Status:** `PR #210 follow-up verified / Normal merge next / Production false`.

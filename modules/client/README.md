@@ -40,7 +40,8 @@ a production malware detector or reporting client.
   availability proof, production YARA, or production wiring.
 - `blockchain/rule_coordinator.rs` adds an explicit opt-in development lifecycle
   around that durable transaction: one immediate attempt followed by sequential
-  fixed-delay attempts, bounded timeout/exponential backoff, cancellation with no detached
+  a fixed interval after success, sequential retries with capped exponential failure
+  backoff, bounded timeout, cancellation with no detached
   work, single-flight admission, and bounded non-sensitive status counters. It
   accepts a caller-trusted complete-snapshot provider and adds no CLI/product
   runtime, autonomous authority, RPC/finality proof, availability proof, wallet,

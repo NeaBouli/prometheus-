@@ -3964,6 +3964,12 @@ Rules for all dev agents:
   nit was fixed.
 - Status: `Full local PASS / Protected PR next / Production false`.
 
+## 2026-08-16 - GH-209 PR #210 review response
+
+- All protected checks passed. Accepted CodeRabbit's schedule-terminology finding
+  and two useful status/test nits; focused Rust and documentation gates pass again.
+- Status: `PR #210 follow-up verified / Normal merge next / Production false`.
+
 ## 2026-08-15 - GH-197 PR #198 review follow-up
 
 - All required checks passed on `2c7968e`; CodeRabbit had one valid trivial

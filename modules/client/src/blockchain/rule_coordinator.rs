@@ -107,7 +107,7 @@ pub type RuleSnapshotFuture<'a> =
 
 /// Caller-trusted source of one complete owner-pinned snapshot request.
 pub trait RuleSnapshotProvider: Send + Sync {
-    fn fetch_snapshot<'a>(&'a self) -> RuleSnapshotFuture<'a>;
+    fn fetch_snapshot(&self) -> RuleSnapshotFuture<'_>;
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -344,16 +344,13 @@ struct RunGuard<'a> {
 impl Drop for RunGuard<'_> {
     fn drop(&mut self) {
         self.running.store(false, Ordering::Release);
-        match self.status.lock() {
-            Ok(mut status) => {
-                status.phase = RuleCoordinatorPhase::Idle;
-                status.last_outcome = Some(RuleCoordinatorOutcome::Cancelled);
-            }
-            Err(poisoned) => {
-                let mut status = poisoned.into_inner();
-                status.phase = RuleCoordinatorPhase::Idle;
-                status.last_outcome = Some(RuleCoordinatorOutcome::Cancelled);
-            }
+        let mut status = match self.status.lock() {
+            Ok(status) => status,
+            Err(poisoned) => poisoned.into_inner(),
+        };
+        if status.phase == RuleCoordinatorPhase::Attempting {
+            status.last_outcome = Some(RuleCoordinatorOutcome::Cancelled);
         }
+        status.phase = RuleCoordinatorPhase::Idle;
     }
 }

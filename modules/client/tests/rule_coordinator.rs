@@ -19,11 +19,9 @@ use prometheus_client::blockchain::rule_coordinator::{
     RuleSnapshotRequest, MAX_ATTEMPT_TIMEOUT, MAX_FAILURE_BACKOFF, MAX_SUCCESS_INTERVAL,
     MIN_ATTEMPT_TIMEOUT, MIN_FAILURE_BACKOFF, MIN_SUCCESS_INTERVAL,
 };
-use prometheus_client::blockchain::rule_fetch::{
-    RuleContentFuture, RuleContentSource, RuleFetchError,
-};
+use prometheus_client::blockchain::rule_fetch::{RuleContentFuture, RuleContentSource};
 use prometheus_client::blockchain::rule_observation::{
-    RuleObservationError, RuleObservationFuture, RuleObservationSource,
+    RuleObservationFuture, RuleObservationSource,
 };
 use prometheus_client::blockchain::rule_sync::RuleSyncEntry;
 use prometheus_client::runtime::RuntimeMode;
@@ -87,7 +85,7 @@ struct PanicContentSource;
 
 impl RuleContentSource for PanicContentSource {
     fn fetch_rule_content<'a>(&'a self, _canonical_cid: &'a str) -> RuleContentFuture<'a> {
-        Box::pin(async { Err(RuleFetchError) })
+        Box::pin(async { unreachable!("content fetch must not run for empty snapshots") })
     }
 }
 
@@ -95,7 +93,7 @@ struct PanicObservationSource;
 
 impl RuleObservationSource for PanicObservationSource {
     fn observe_address<'a>(&'a self, _address: &'a Address) -> RuleObservationFuture<'a> {
-        Box::pin(async { Err(RuleObservationError) })
+        Box::pin(async { unreachable!("observation must not run for empty snapshots") })
     }
 }
 
@@ -133,7 +131,7 @@ impl SequenceProvider {
 }
 
 impl RuleSnapshotProvider for SequenceProvider {
-    fn fetch_snapshot<'a>(&'a self) -> RuleSnapshotFuture<'a> {
+    fn fetch_snapshot(&self) -> RuleSnapshotFuture<'_> {
         Box::pin(async move {
             self.calls.lock().unwrap().push(Instant::now());
             let step = {
@@ -323,7 +321,7 @@ async fn initial_success_stops_without_detached_mutation() {
     assert_eq!(coordinator.status().phase, RuleCoordinatorPhase::Idle);
     assert_eq!(
         coordinator.status().last_outcome,
-        Some(RuleCoordinatorOutcome::Cancelled)
+        Some(RuleCoordinatorOutcome::Succeeded)
     );
 }
 

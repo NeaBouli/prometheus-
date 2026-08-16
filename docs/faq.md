@@ -190,7 +190,8 @@ an owner-local POSIX checkpoint ordered by the minimum verified observation
 virtual DAA. It rejects rollback and same-order equivocation across restarts;
 exact replay restores the in-memory scanner after a crash or restart. GH-209
 adds an explicit opt-in development coordinator with one immediate attempt
-followed by sequential fixed-delay attempts, bounded timeout/backoff, cancellation, single-flight
+followed by a fixed interval after success and sequential retries with capped exponential failure
+backoff, bounded timeout, cancellation, single-flight
 admission and non-sensitive counters. It has no CLI/product-runtime wiring or
 autonomous authority and does not prove canonical manifest authority,
 independent RPC truth or finality, IPFS availability or replication, production
