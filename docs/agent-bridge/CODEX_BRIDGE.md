@@ -4850,3 +4850,19 @@ No direct `main` push or production action occurred.
   panic in tests. Focused tests `10/10`, Clippy, rustfmt, public claims, hygiene
   and diff checks pass again.
 - **Status:** `PR #210 follow-up verified / Normal merge next / Production false`.
+
+## 2026-08-16 - GH-211 signed snapshot provider kickoff
+
+- Exact clean baseline is `main@d029f9f`; issue #211 and branch
+  `feat/GH-211-signed-rule-snapshot-provider` own the next bounded block.
+- Scope is a strict canonical development/Testnet-10 complete-snapshot envelope
+  verified against one separately owner-pinned BIP340 x-only key and separately
+  trusted current time, then exposed only through the existing GH-209 provider
+  trait. Sequence, short validity, entries and empty-snapshot order are bound.
+- Kimi K3 owns the bounded implementation. Sol owns architecture, security,
+  integration, full gates, public claims and GitHub. Claude Code receives only a
+  small secret-free helper review if available.
+- No signer/private key, canonical authority, independent RPC truth/finality,
+  IPFS availability, product wiring, wallet/chain action, deployment, Mainnet,
+  tokenomics or production readiness is added.
+- **Status:** `GH-211 In Progress / Kimi implementation next / Production false`.

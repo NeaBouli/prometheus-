@@ -3964,6 +3964,14 @@ Rules for all dev agents:
   nit was fixed.
 - Status: `Full local PASS / Protected PR next / Production false`.
 
+## 2026-08-16 - GH-211 signed snapshot provider start
+
+- Opened issue #211 and branch `feat/GH-211-signed-rule-snapshot-provider` from
+  exact clean main `d029f9f`.
+- Kimi K3 owns strict canonical BIP340 envelope verification and adversarial
+  tests; Sol owns integration and publication. No signer, chain or production action.
+- Status: `In Progress / Repository only / Production false`.
+
 ## 2026-08-16 - GH-209 PR #210 review response
 
 - All protected checks passed. Accepted CodeRabbit's schedule-terminology finding

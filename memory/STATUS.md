@@ -181,6 +181,18 @@ Security/docs: Cargo Audit has no vulnerability and eight allowed warnings;
                Memory, workflow YAML, H-001 closeout evidence and diff PASS
 ```
 
+## GH-211 SIGNED SNAPSHOT PROVIDER STARTED (2026-08-16)
+
+```text
+Status: In Progress / issue #211 / protected branch only
+Baseline: d029f9ff061b89a3229ec49cb02eaf84b6159107
+Scope: strict canonical complete-snapshot envelope; separately owner-pinned
+       BIP340 x-only verification key and trusted time; bounded validity,
+       sequence, entries and empty-snapshot order; provider composition tests
+Boundary: no signer/private key, canonical authority, independent RPC/finality,
+          product wiring, wallet/chain action, deployment, Mainnet or production
+```
+
 All percentages below are internal, scope-weighted engineering estimates or
 component-completion records. They are not production-readiness evidence.
 
