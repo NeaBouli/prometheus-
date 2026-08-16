@@ -37,7 +37,14 @@ a production malware detector or reporting client.
   the minimum verified observation virtual DAA as the conservative snapshot
   order, rejects rollback and same-order equivocation, and restores scanner
   state through exact replay after restart. It adds no canonical authority,
-  automatic updater, availability proof, production YARA, or production wiring.
+  availability proof, production YARA, or production wiring.
+- `blockchain/rule_coordinator.rs` adds an explicit opt-in development lifecycle
+  around that durable transaction: one immediate attempt followed by sequential
+  fixed-delay attempts, bounded timeout/exponential backoff, cancellation with no detached
+  work, single-flight admission, and bounded non-sensitive status counters. It
+  accepts a caller-trusted complete-snapshot provider and adds no CLI/product
+  runtime, autonomous authority, RPC/finality proof, availability proof, wallet,
+  chain action, Mainnet support, or production readiness.
 - `blockchain/rule_ingest.rs` ingests a complete caller-supplied active-rule
   snapshot whose raw CIDv1 (sha2-256, canonical lowercase base32) must bind the
   exact caller-supplied content bytes. It parses a strict simple matcher

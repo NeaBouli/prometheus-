@@ -188,10 +188,13 @@ observation path, a credential-free loopback-only local IPFS gateway, exact
 Raw-CIDv1 content verification, and one atomic scanner replacement. GH-207 adds
 an owner-local POSIX checkpoint ordered by the minimum verified observation
 virtual DAA. It rejects rollback and same-order equivocation across restarts;
-exact replay restores the in-memory scanner after a crash or restart. It has no
-automatic update loop or product-runtime wiring and does not prove canonical
-manifest authority, independent RPC truth or finality, IPFS availability or
-replication, production YARA quality, deployment, or production readiness.
+exact replay restores the in-memory scanner after a crash or restart. GH-209
+adds an explicit opt-in development coordinator with one immediate attempt
+followed by sequential fixed-delay attempts, bounded timeout/backoff, cancellation, single-flight
+admission and non-sensitive counters. It has no CLI/product-runtime wiring or
+autonomous authority and does not prove canonical manifest authority,
+independent RPC truth or finality, IPFS availability or replication, production
+YARA quality, deployment, or production readiness.
 
 **Q: Why Kaspa and not Ethereum?**
 Prometheus targets Kaspa because its high-throughput BlockDAG and current

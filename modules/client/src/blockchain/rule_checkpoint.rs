@@ -409,6 +409,8 @@ async fn sync_validated(
         return Err(RuleCheckpointError);
     }
 
+    // Keep checkpoint replacement and scanner installation synchronous: the
+    // coordinator may cancel only before this indivisible mutation tail.
     let lock = store.lock()?;
     let replay = if let Some(current) = lock.read()? {
         let current = parse_checkpoint(&current)?;

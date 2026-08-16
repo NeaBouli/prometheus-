@@ -4813,3 +4813,27 @@ No direct `main` push or production action occurred.
   availability/replication proof, production YARA, wallet, signing, chain write,
   broadcast, deployment, Mainnet, tokenomics or production authority is added.
 - **Status:** `GH-209 In Progress / Kimi implementation next / Production false`.
+
+## 2026-08-16 - GH-209 local implementation and independent review
+
+- Added the callable-only development/Testnet-10 RuleStorage coordinator around
+  GH-207: immediate first attempt, sequential fixed-delay scheduling, bounded
+  timeout/capped backoff, cancellation, single-flight, replay and redacted status.
+- Coordinator `10/10`, RuleSync `22/22`, client library `107/2 ignored`, focused
+  Clippy and rustfmt pass. Kimi K3 returned SHIP with no P0-P3; Sol closed its
+  backoff-cap coverage note and documented the synchronous mutation-tail invariant.
+- Claude Code OAuth was expired and it changed nothing. Full gates and protected
+  PR workflow remain. No product wiring, autonomous authority, wallet, chain
+  action, deployment, Mainnet capability or production claim was added.
+- **Status:** `GH-209 Local implementation PASS / Full gates next / Production false`.
+
+## 2026-08-16 - GH-209 full local PASS
+
+- Complete Rust workspace and doc-tests, warning-free all-target Clippy,
+  rustfmt, release performance `6/6`, Guardian `1303/4`, Black, Pylint
+  `9.85/10` and `10.00/10`, Compose policy, Python dependency audit, public
+  claims `13` surfaces plus `6` tests, documentation hygiene plus `11` tests,
+  Memory, workflow YAML, H-001 closeout evidence and diff checks pass.
+- Cargo Audit reports no vulnerability and the same eight allowed maintenance/
+  yank warnings. No product, wallet, chain, deployment or production action ran.
+- **Status:** `GH-209 Full local PASS / Protected PR next / Production false`.
