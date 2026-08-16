@@ -65,6 +65,14 @@ a production malware detector or reporting client.
   This remains Development/Testnet-10 only and establishes no key authority,
   persistent sequence authority, autonomous distribution, chain write,
   availability, deployment, Mainnet, or production readiness.
+- Merged and exact-main-verified GH-216/PR #217 at `13c1812` adds a test-only
+  real-`prometheus-client` binary harness over ephemeral loopback wRPC/IPFS
+  peers. It covers offline/connected preflight, private checkpoint commit,
+  SIGTERM/SIGINT drain, restart exact replay, rollback/equivocation rejection,
+  and malformed, timeout, or disconnected peer paths; CI `31978132036`,
+  Security `31978132044`, and Pages `31978131647` pass. This remains local
+  Development evidence, not public Testnet operation, independent RPC/IPFS
+  truth or availability, deployment, Mainnet, or production readiness.
 - `blockchain/rule_ingest.rs` ingests a complete caller-supplied active-rule
   snapshot whose raw CIDv1 (sha2-256, canonical lowercase base32) must bind the
   exact caller-supplied content bytes. It parses a strict simple matcher
@@ -74,9 +82,10 @@ a production malware detector or reporting client.
   production YARA, and canonical rule authority remain open.
 - `network/zk_proof.rs` produces a development SHA-256 placeholder, not a
   production zero-knowledge proof.
-- The E2E lifecycle test is an in-process, same-host stub fixture. Its
+- The original E2E lifecycle test is an in-process, same-host stub fixture. Its
   under-60-second assertion is a target guard, not public-network performance
-  evidence.
+  evidence. The GH-216 real-binary harness also remains same-host and loopback;
+  neither fixture proves public-network performance or operation.
 
 Beta, mainnet, and production runtime profiles reject these stubs. Production
 use remains blocked on real Phi-3/ONNX inference and real-sample evaluation,

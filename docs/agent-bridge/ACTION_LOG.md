@@ -4298,3 +4298,30 @@ Rules for all dev agents:
   Pylint and audits pass. One parallel debug timing miss was non-reproducible on
   the required uncontended rerun (`4.50s` under the `5s` gate).
 - Status: `Local gates complete / Protected PR next / Production false`.
+
+## 2026-08-16 - GH-216 merge and docs closeout start
+
+- PR #217 merged normally as exact main `13c1812`; issue #216 closed.
+- Exact-main Pages `31978131647` passes; CI `31978132036` and Security
+  `31978132044` remain in progress.
+- Started `docs/GH-216-public-closeout` for synchronized Development-only public
+  evidence and Bridge/Memory closeout. No product, chain or deployment change.
+- Status: `Docs closeout in progress / Production false`.
+
+## 2026-08-16 - GH-216 exact-main verification
+
+- CI `31978132036`, Security `31978132044`, and Pages `31978131647` pass on
+  exact merge SHA `13c1812`.
+- Synchronized nine public claim surfaces plus Memory and Bridge as a
+  documentation-only candidate. No product, chain or deployment change.
+- Status: `Docs candidate under review / Production false`.
+
+## 2026-08-16 - GH-216 docs review and gates
+
+- Kimi final review of the 15-file documentation diff: `SHIP`, no medium/high
+  finding. The client module README now distinguishes the original in-process
+  lifecycle fixture from the GH-216 same-host real-binary loopback harness.
+- Claims `13/13`, claim tests `6/6`, hygiene `11/11`, Memory, Autodidactic
+  `6/6`, H-001 `4/4`, HTML/meta/infrastructure, stale-launch and diff checks
+  pass.
+- Status: `Protected docs PR next / Production false`.
