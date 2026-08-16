@@ -4719,3 +4719,63 @@ No direct `main` push or production action occurred.
   transaction, broadcast, deployment, contract, tokenomics, or secret-bearing
   action occurred.
 - **Status:** `GH-205 PR #206 checks and review pending / Production false`.
+
+## 2026-08-16 - GH-207 durable RuleStorage checkpoint started
+
+- Exact clean baseline `11496af28ed96dfcc9863ca3f5d77174b95c1f95`, issue
+  #207, and branch `feat/GH-207-rule-sync-checkpoint` own this bounded block.
+- Scope is a development-only Testnet-10 durable anti-downgrade boundary around
+  GH-205: owner-local canonical checkpoint state, exact snapshot/state binding,
+  restart-safe rollback and same-height equivocation rejection, safe local file
+  handling, bounded concurrency, and atomic accepted transitions.
+- Kimi K3 owns the primary bounded implementation. Sol owns architecture,
+  filesystem/security policy, integration, complete tests, documentation,
+  GitHub, and final review. Claude Code is limited to a small helper task.
+- No automatic update loop, production wiring, canonical manifest authority,
+  independent RPC truth/finality, IPFS availability/replication claim,
+  production YARA, wallet, signing, transaction, broadcast, deployment,
+  contract/tokenomics/security-policy change, or Mainnet readiness claim.
+- **Status:** `GH-207 In Progress / Architecture and Kimi implementation next / Production false`.
+
+## 2026-08-16 - GH-207 local implementation milestone
+
+- Added a separate durable development-only RuleStorage API. It fully verifies,
+  fetches, CID-binds and compiles a snapshot before locking or mutation; a
+  canonical owner-local checkpoint is then compared and durably committed before
+  one infallible prevalidated scanner assignment.
+- Non-empty order is the minimum verified observation virtual DAA. The digest
+  binds exact sorted rule/CID/outpoint, manifest block-DAA and per-entry virtual-
+  DAA identities. Lower orders and same-order different identities reject; exact
+  replay still restores scanner state after restart. Empty snapshots require an
+  explicit nonzero order.
+- The POSIX store uses final-component `NOFOLLOW`, owner/type/mode/size checks,
+  a nonblocking exclusive lock, bounded canonical JSON, temp-file fsync, atomic
+  rename and directory fsync. The owner-controlled ancestor path remains an
+  explicit development trust assumption.
+- The Roadmap grid overflow was reproduced at 390/768/1280 pixels and fixed by
+  allowing grid/flex children and technical labels to shrink/wrap. Chromium
+  verification at 390/768/1280/1440 reports exact viewport width and no offscreen
+  non-table content.
+- Focused RuleSync integration reports `22/22` pass; checkpoint unit tests and
+  client compile pass. Full gates and independent current-diff review remain.
+  Claude Code OAuth remained expired and it changed nothing.
+- Kimi's independent current-diff review reports no P0-P3. Its mode-bit P4 was
+  closed by explicitly rejecting setuid/setgid/sticky bits; crash-left owner-only
+  temp files remain a non-authoritative P4 hygiene note.
+- **Status:** `GH-207 Local integration PASS / Independent review and full gates next / Production false`.
+
+## 2026-08-16 - GH-207 full local PASS
+
+- Kimi's independent current-diff review found no P0-P3. Sol closed the sole
+  actionable mode-bit P4; Claude Code remained unavailable due expired OAuth.
+- Rustfmt, warning-free workspace all-target Clippy, the complete Rust workspace
+  and doc-tests, release performance `6/6`, focused RuleSync `22/22`, Guardian
+  `1303/4`, Black, Guardian Pylint `9.85/10`, Compose policy, Cargo/Python audits,
+  13-surface public claims plus six tests, documentation hygiene plus 11 tests,
+  Memory, H-001 evidence plus four tests, workflow YAML, responsive Chromium
+  checks at four widths, and diff checks pass.
+- Cargo Audit has no blocking vulnerability and the same eight allowed
+  maintenance/yank warnings. The local Python audit initially found only the
+  development venv's `pip 26.1`; updating that local tool to `26.1.2` cleared the
+  audit without a repository change.
+- **Status:** `GH-207 Full local PASS / Protected PR next / Production false`.

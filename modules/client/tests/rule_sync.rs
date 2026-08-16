@@ -7,6 +7,8 @@
 //! hashes, outpoints, CIDs, rule IDs, or content bytes.
 
 use std::collections::{HashMap, HashSet};
+use std::fs;
+use std::os::unix::fs::{symlink, PermissionsExt};
 use std::sync::Mutex;
 
 use kaspa_addresses::{Address, Prefix, Version};
@@ -15,6 +17,10 @@ use kaspa_rpc_core::{
     RpcScriptPublicKey, RpcTransactionOutpoint, RpcUtxoEntry, RpcUtxosByAddressesEntry,
 };
 use kaspa_wrpc_client::prelude::{NetworkId, NetworkType};
+use prometheus_client::blockchain::rule_checkpoint::{
+    sync_rule_snapshot_durable, sync_rule_snapshot_durable_for_mode, PosixRuleCheckpointStore,
+    RuleCheckpointError, RuleCheckpointLock, RuleCheckpointStore,
+};
 use prometheus_client::blockchain::rule_fetch::{
     RuleContentFuture, RuleContentSource, RuleFetchError,
 };
@@ -678,4 +684,349 @@ fn errors_and_entries_stay_redacted() {
     assert!(!debugged.contains(&txid('1')));
     assert!(!debugged.contains(COVENANT));
     assert!(!debugged.contains(&fixture.address.to_string()));
+}
+
+fn secure_checkpoint_dir() -> tempfile::TempDir {
+    let directory = tempfile::tempdir().unwrap();
+    fs::set_permissions(directory.path(), fs::Permissions::from_mode(0o700)).unwrap();
+    directory
+}
+
+fn source_at(fixture: &EntryFixture, virtual_daa: u64) -> MockObservationSource {
+    let mut source = MockObservationSource::with_fixtures(&[fixture]);
+    source
+        .responses
+        .get_mut(&fixture.address.to_string())
+        .unwrap()
+        .virtual_daa_score = virtual_daa;
+    source
+}
+
+#[tokio::test]
+async fn durable_first_write_restart_replay_and_forward_update() {
+    let directory = secure_checkpoint_dir();
+    let content_bytes = rule_content(7, "ALPHA");
+    let cid = cid_string_for(&content_bytes);
+    let fixture = entry_fixture(7, '1', 1, &content_bytes);
+    let entries = entries_of(&[&fixture]);
+    let content = MockContentSource::with_content(&cid, &content_bytes);
+    let store = PosixRuleCheckpointStore::open(directory.path()).unwrap();
+
+    let mut scanner = scanner_with_old_rule();
+    sync_rule_snapshot_durable(
+        &store,
+        &mut scanner,
+        &content,
+        &source_at(&fixture, OBSERVED_DAA),
+        &entries,
+        None,
+    )
+    .await
+    .unwrap();
+    assert!(scanner.scan_bytes(b"ALPHA").unwrap().is_threat);
+    let checkpoint = directory.path().join("rule-storage.checkpoint.json");
+    let first = fs::read(&checkpoint).unwrap();
+
+    // A fresh store/scanner converges through exact replay without rewriting.
+    let restarted = PosixRuleCheckpointStore::open(directory.path()).unwrap();
+    let mut fresh_scanner = YaraScanner::new().unwrap();
+    sync_rule_snapshot_durable(
+        &restarted,
+        &mut fresh_scanner,
+        &content,
+        &source_at(&fixture, OBSERVED_DAA),
+        &entries,
+        None,
+    )
+    .await
+    .unwrap();
+    assert!(fresh_scanner.scan_bytes(b"ALPHA").unwrap().is_threat);
+    assert_eq!(fs::read(&checkpoint).unwrap(), first);
+
+    sync_rule_snapshot_durable(
+        &restarted,
+        &mut fresh_scanner,
+        &content,
+        &source_at(&fixture, OBSERVED_DAA + 10),
+        &entries,
+        None,
+    )
+    .await
+    .unwrap();
+    assert_ne!(fs::read(checkpoint).unwrap(), first);
+}
+
+#[tokio::test]
+async fn durable_rollback_and_same_order_equivocation_preserve_scanner() {
+    let directory = secure_checkpoint_dir();
+    let a = rule_content(7, "ALPHA");
+    let b = rule_content(8, "BRAVO");
+    let fixture_a = entry_fixture(7, '1', 1, &a);
+    let fixture_b = entry_fixture(8, '3', 1, &b);
+    let content_a = MockContentSource::with_content(&cid_string_for(&a), &a);
+    let content_b = MockContentSource::with_content(&cid_string_for(&b), &b);
+    let store = PosixRuleCheckpointStore::open(directory.path()).unwrap();
+    let mut scanner = scanner_with_old_rule();
+
+    sync_rule_snapshot_durable(
+        &store,
+        &mut scanner,
+        &content_a,
+        &source_at(&fixture_a, OBSERVED_DAA + 10),
+        &entries_of(&[&fixture_a]),
+        None,
+    )
+    .await
+    .unwrap();
+    let checkpoint = fs::read(directory.path().join("rule-storage.checkpoint.json")).unwrap();
+
+    assert!(sync_rule_snapshot_durable(
+        &store,
+        &mut scanner,
+        &content_a,
+        &source_at(&fixture_a, OBSERVED_DAA),
+        &entries_of(&[&fixture_a]),
+        None,
+    )
+    .await
+    .is_err());
+    assert!(scanner.scan_bytes(b"ALPHA").unwrap().is_threat);
+
+    assert!(sync_rule_snapshot_durable(
+        &store,
+        &mut scanner,
+        &content_b,
+        &source_at(&fixture_b, OBSERVED_DAA + 10),
+        &entries_of(&[&fixture_b]),
+        None,
+    )
+    .await
+    .is_err());
+    assert!(scanner.scan_bytes(b"ALPHA").unwrap().is_threat);
+    assert!(!scanner.scan_bytes(b"BRAVO").unwrap().is_threat);
+    assert_eq!(
+        fs::read(directory.path().join("rule-storage.checkpoint.json")).unwrap(),
+        checkpoint
+    );
+}
+
+#[tokio::test]
+async fn durable_newest_rule_removal_and_explicit_empty_transitions() {
+    let directory = secure_checkpoint_dir();
+    let a = rule_content(7, "ALPHA");
+    let b = rule_content(8, "BRAVO");
+    let fixture_a = entry_fixture(7, '1', 1, &a);
+    let fixture_b = entry_fixture(8, '3', 1, &b);
+    let mut observation = MockObservationSource::with_fixtures(&[&fixture_a, &fixture_b]);
+    observation
+        .responses
+        .get_mut(&fixture_a.address.to_string())
+        .unwrap()
+        .virtual_daa_score = OBSERVED_DAA;
+    observation
+        .responses
+        .get_mut(&fixture_b.address.to_string())
+        .unwrap()
+        .virtual_daa_score = OBSERVED_DAA + 20;
+    let mut content = MockContentSource::with_content(&cid_string_for(&a), &a);
+    content.responses.insert(cid_string_for(&b), b);
+    let store = PosixRuleCheckpointStore::open(directory.path()).unwrap();
+    let mut scanner = scanner_with_old_rule();
+    sync_rule_snapshot_durable(
+        &store,
+        &mut scanner,
+        &content,
+        &observation,
+        &entries_of(&[&fixture_a, &fixture_b]),
+        None,
+    )
+    .await
+    .unwrap();
+
+    // Removing the newest-created rule is valid when verified observation time advances.
+    sync_rule_snapshot_durable(
+        &store,
+        &mut scanner,
+        &content,
+        &source_at(&fixture_a, OBSERVED_DAA + 10),
+        &entries_of(&[&fixture_a]),
+        None,
+    )
+    .await
+    .unwrap();
+    assert_eq!(scanner.rule_count(), 1);
+    assert!(scanner.scan_bytes(b"ALPHA").unwrap().is_threat);
+
+    assert!(sync_rule_snapshot_durable(
+        &store,
+        &mut scanner,
+        &content,
+        &MockObservationSource::default(),
+        &[],
+        None
+    )
+    .await
+    .is_err());
+    assert!(sync_rule_snapshot_durable(
+        &store,
+        &mut scanner,
+        &content,
+        &MockObservationSource::default(),
+        &[],
+        Some(0)
+    )
+    .await
+    .is_err());
+    assert!(scanner.scan_bytes(b"ALPHA").unwrap().is_threat);
+
+    sync_rule_snapshot_durable(
+        &store,
+        &mut scanner,
+        &content,
+        &MockObservationSource::default(),
+        &[],
+        Some(OBSERVED_DAA + 30),
+    )
+    .await
+    .unwrap();
+    assert_eq!(scanner.rule_count(), 0);
+    // Exact empty replay succeeds; lower and same-order nonempty equivocation fail.
+    sync_rule_snapshot_durable(
+        &store,
+        &mut scanner,
+        &content,
+        &MockObservationSource::default(),
+        &[],
+        Some(OBSERVED_DAA + 30),
+    )
+    .await
+    .unwrap();
+    assert!(sync_rule_snapshot_durable(
+        &store,
+        &mut scanner,
+        &content,
+        &MockObservationSource::default(),
+        &[],
+        Some(OBSERVED_DAA + 20)
+    )
+    .await
+    .is_err());
+    assert!(sync_rule_snapshot_durable(
+        &store,
+        &mut scanner,
+        &content,
+        &source_at(&fixture_a, OBSERVED_DAA + 30),
+        &entries_of(&[&fixture_a]),
+        None
+    )
+    .await
+    .is_err());
+    assert_eq!(scanner.rule_count(), 0);
+}
+
+struct FailingStore;
+struct FailingLock;
+
+impl RuleCheckpointStore for FailingStore {
+    fn lock(&self) -> Result<Box<dyn RuleCheckpointLock + '_>, RuleCheckpointError> {
+        Ok(Box::new(FailingLock))
+    }
+}
+
+impl RuleCheckpointLock for FailingLock {
+    fn read(&self) -> Result<Option<Vec<u8>>, RuleCheckpointError> {
+        Ok(None)
+    }
+    fn replace(&self, _canonical_bytes: &[u8]) -> Result<(), RuleCheckpointError> {
+        Err(RuleCheckpointError)
+    }
+}
+
+#[tokio::test]
+async fn injected_commit_failure_and_mode_gates_preserve_prior_state() {
+    let a = rule_content(7, "ALPHA");
+    let fixture = entry_fixture(7, '1', 1, &a);
+    let content = MockContentSource::with_content(&cid_string_for(&a), &a);
+    let entries = entries_of(&[&fixture]);
+    let mut scanner = scanner_with_old_rule();
+    assert!(sync_rule_snapshot_durable(
+        &FailingStore,
+        &mut scanner,
+        &content,
+        &source_at(&fixture, OBSERVED_DAA),
+        &entries,
+        None
+    )
+    .await
+    .is_err());
+    assert!(old_rule_intact(&scanner));
+
+    let directory = secure_checkpoint_dir();
+    let store = PosixRuleCheckpointStore::open(directory.path()).unwrap();
+    for mode in [RuntimeMode::Beta, RuntimeMode::Mainnet] {
+        assert!(sync_rule_snapshot_durable_for_mode(
+            mode,
+            &store,
+            &mut scanner,
+            &content,
+            &source_at(&fixture, OBSERVED_DAA),
+            &entries,
+            None
+        )
+        .await
+        .is_err());
+        assert!(old_rule_intact(&scanner));
+    }
+}
+
+#[test]
+fn posix_store_rejects_unsafe_state_and_contention() {
+    let unsafe_dir = tempfile::tempdir().unwrap();
+    fs::set_permissions(unsafe_dir.path(), fs::Permissions::from_mode(0o755)).unwrap();
+    assert!(PosixRuleCheckpointStore::open(unsafe_dir.path()).is_err());
+
+    let directory = secure_checkpoint_dir();
+    let linked = directory.path().with_extension("link");
+    symlink(directory.path(), &linked).unwrap();
+    assert!(PosixRuleCheckpointStore::open(&linked).is_err());
+    fs::remove_file(linked).unwrap();
+
+    let store_a = PosixRuleCheckpointStore::open(directory.path()).unwrap();
+    let store_b = PosixRuleCheckpointStore::open(directory.path()).unwrap();
+    let held = store_a.lock().unwrap();
+    assert!(store_b.lock().is_err());
+    drop(held);
+
+    let checkpoint = directory.path().join("rule-storage.checkpoint.json");
+    fs::write(&checkpoint, b"not-json").unwrap();
+    fs::set_permissions(&checkpoint, fs::Permissions::from_mode(0o600)).unwrap();
+    let lock = store_a.lock().unwrap();
+    assert!(lock.read().is_ok());
+    drop(lock);
+
+    fs::set_permissions(&checkpoint, fs::Permissions::from_mode(0o644)).unwrap();
+    let lock = store_a.lock().unwrap();
+    assert!(lock.read().is_err());
+    drop(lock);
+
+    fs::remove_file(&checkpoint).unwrap();
+    fs::write(&checkpoint, vec![b'x'; 2048]).unwrap();
+    fs::set_permissions(&checkpoint, fs::Permissions::from_mode(0o600)).unwrap();
+    let lock = store_a.lock().unwrap();
+    assert!(lock.read().is_err());
+    drop(lock);
+
+    fs::remove_file(&checkpoint).unwrap();
+    let target = directory.path().join("checkpoint-target");
+    fs::write(&target, b"target").unwrap();
+    fs::set_permissions(&target, fs::Permissions::from_mode(0o600)).unwrap();
+    symlink(&target, &checkpoint).unwrap();
+    let lock = store_a.lock().unwrap();
+    assert!(lock.read().is_err());
+    drop(lock);
+
+    fs::remove_file(&checkpoint).unwrap();
+    fs::create_dir(&checkpoint).unwrap();
+    let lock = store_a.lock().unwrap();
+    assert!(lock.read().is_err());
 }

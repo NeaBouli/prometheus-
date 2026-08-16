@@ -185,11 +185,13 @@ availability, deployment, or production readiness.
 
 GH-205 composes one complete owner-pinned snapshot through that injected/live
 observation path, a credential-free loopback-only local IPFS gateway, exact
-Raw-CIDv1 content verification, and one atomic scanner replacement. It has no
-automatic update loop or product-runtime wiring. It does not prove canonical
+Raw-CIDv1 content verification, and one atomic scanner replacement. GH-207 adds
+an owner-local POSIX checkpoint ordered by the minimum verified observation
+virtual DAA. It rejects rollback and same-order equivocation across restarts;
+exact replay restores the in-memory scanner after a crash or restart. It has no
+automatic update loop or product-runtime wiring and does not prove canonical
 manifest authority, independent RPC truth or finality, IPFS availability or
-replication, production YARA quality, durable rollback protection, deployment,
-or production readiness.
+replication, production YARA quality, deployment, or production readiness.
 
 **Q: Why Kaspa and not Ethereum?**
 Prometheus targets Kaspa because its high-throughput BlockDAG and current

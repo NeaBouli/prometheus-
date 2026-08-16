@@ -3794,6 +3794,7 @@ dependencies = [
  "prometheus-threat-hint",
  "prometheus-validator",
  "reqwest",
+ "rustix",
  "serde",
  "serde_json",
  "sha2",

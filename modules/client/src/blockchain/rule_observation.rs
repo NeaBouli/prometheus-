@@ -39,6 +39,7 @@
 
 use std::collections::HashSet;
 use std::future::Future;
+use std::hash::{Hash as StdHash, Hasher};
 use std::pin::Pin;
 use std::time::Duration;
 
@@ -437,12 +438,31 @@ fn verify_validated(
 /// Crate-internal only, used by the GH-205 composition layer to reject
 /// duplicate verified manifest outpoints across one sync request. Never
 /// exposed through errors, Display, Debug, or logs.
-#[derive(PartialEq, Eq, Hash)]
+#[derive(Clone)]
 pub(crate) struct VerifiedManifestOutpoint {
     /// Verified manifest `outpoint.transaction_id`.
     pub transaction_id: String,
     /// Verified manifest `outpoint.index`.
     pub index: u32,
+    /// Manifest block DAA verified against the selected UTXO.
+    pub block_daa_score: u64,
+    /// Virtual DAA from the verified live/injected observation.
+    pub observed_virtual_daa_score: u64,
+}
+
+impl PartialEq for VerifiedManifestOutpoint {
+    fn eq(&self, other: &Self) -> bool {
+        self.transaction_id == other.transaction_id && self.index == other.index
+    }
+}
+
+impl Eq for VerifiedManifestOutpoint {}
+
+impl StdHash for VerifiedManifestOutpoint {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.transaction_id.hash(state);
+        self.index.hash(state);
+    }
 }
 
 /// Identical verification pipeline to [`verify_validated`], additionally
@@ -482,6 +502,8 @@ pub(crate) fn verify_observation_shared(
     let outpoint = VerifiedManifestOutpoint {
         transaction_id: manifest.outpoint.transaction_id,
         index: manifest.outpoint.index,
+        block_daa_score: manifest.block_daa_score,
+        observed_virtual_daa_score: observation.observed_virtual_daa_score,
     };
     Ok((metadata, outpoint))
 }
