@@ -4325,3 +4325,12 @@ Rules for all dev agents:
   `6/6`, H-001 `4/4`, HTML/meta/infrastructure, stale-launch and diff checks
   pass.
 - Status: `Protected docs PR next / Production false`.
+
+## 2026-08-17 - GH-216 final public closeout
+
+- PR #218 merged normally as exact main `83c265b` after all eleven protected
+  contexts passed.
+- Exact-main CI `31979118045`, Security `31979117981`, and Pages
+  `31979117415` pass; live index, Roadmap, FAQ, Whitepaper, `llms.txt`, and raw
+  GitHub README readback contain the synchronized GH-216 boundary.
+- Status: `GH-216 DONE / Production false`.
