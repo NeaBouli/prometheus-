@@ -240,7 +240,8 @@ Boundary: repository and documentation only; no wallet, chain, broadcast,
 GH-211: PR #212 merged as exact main 8fed243c398d49c4d9255af260245f5b9086b80c
 Runs: CI 31947971446; Security 31947971540; Pages 31947970820; all PASS
 Live: README, Roadmap and Whitepaper synchronized; issue #211 closed
-GH-213: issue #213 / PR #214 / protected branch candidate
+GH-213: issue #213 closed; PR #214 merged as exact main bbe7efb69c8814e95699ecaa53daa9363a939403
+Runs: CI 31950806131; Security 31950806118; Pages 31950805653; all PASS
 Scope: private bounded config and signed-envelope reads with NOFOLLOW; ASCII
        TOML configuration;
        owner/type/mode/size checks; exact Development/Testnet-10; loopback-IP-
@@ -258,7 +259,7 @@ Boundary: no new cryptography, signer/private key, key authority/rotation,
           persistent sequence authority, wallet, transaction, chain write,
           broadcast, deployment, Mainnet, tokenomics, canonical authority,
           independent RPC/finality proof, availability proof or production claim
-Next: protected PR/CI and exact-main Pages delivery
+Next: live public-page readback and the next separately scoped task
 ```
 
 All percentages below are internal, scope-weighted engineering estimates or

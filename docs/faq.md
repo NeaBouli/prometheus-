@@ -192,10 +192,12 @@ exact replay restores the in-memory scanner after a crash or restart. GH-209
 adds an explicit opt-in development coordinator with one immediate attempt
 followed by a fixed interval after success and sequential retries with capped exponential failure
 backoff, bounded timeout, cancellation, single-flight
-admission and non-sensitive counters. The GH-213 repository candidate adds an
-operator-invoked Development/Testnet-10 preflight/run CLI with strict private
+admission and non-sensitive counters. Merged and exact-main-verified GH-213/PR
+#214 at `bbe7efb` adds an operator-invoked Development/Testnet-10 preflight/run
+CLI with strict private
 local files, offline non-mutating preflight, loopback-IP-literal RPC/IPFS,
-redacted counters, and signal cancellation. It adds no autonomous authority and
+redacted counters, and signal cancellation; CI `31950806131`, Security
+`31950806118`, and Pages `31950805653` pass. It adds no autonomous authority and
 does not prove canonical manifest authority,
 independent RPC truth or finality, IPFS availability or replication, production
 YARA quality, deployment, or production readiness.

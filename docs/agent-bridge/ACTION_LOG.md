@@ -4253,3 +4253,22 @@ Rules for all dev agents:
 - CLI `10/10`, binary status `1/1`, client Clippy/rustfmt, claims, hygiene,
   Memory and diff checks pass after the fixes.
 - Status: `Review fixes ready to push / Follow-up protected checks next`.
+
+## 2026-08-16 - GH-213 exact-main closeout
+
+- PR #214 merged normally as exact main `bbe7efb69c8814e95699ecaa53daa9363a939403`;
+  issue #213 closed and all review threads resolved.
+- Exact-main CI `31950806131`, Security `31950806118`, and Pages
+  `31950805653` pass.
+- Public claims and Memory were reconciled from repository-candidate wording to
+  merged/exact-main evidence without changing Development/Testnet-10 or
+  production-false boundaries.
+- Status: `GH-213 DONE / Production false`.
+
+## 2026-08-16 - GH-213 closeout review PASS
+
+- Independent Kimi review: no P0/P1, `SHIP`; Claude OAuth remains expired and
+  no Claude change exists.
+- Claims `13/13`, claim tests `6/6`, hygiene plus tests `12/12`, Memory, H-001
+  evidence plus tests `5/5`, stale-launch scan and diff checks pass.
+- Status: `Closeout ready for protected PR / Production false`.
