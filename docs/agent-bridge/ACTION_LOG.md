@@ -4209,3 +4209,38 @@ Rules for all dev agents:
 - Envelope `10/10`, client all-target Clippy, rustfmt, public claims,
   documentation hygiene and diff checks pass after the changes.
 - Status: `Review fixes pushed next / Follow-up protected checks pending / Production false`.
+
+## 2026-08-16 - GH-211 closed / GH-213 started
+
+- Verified PR #212 merged as `8fed243c`; exact-main CI `31947971446`, Security
+  `31947971540`, and Pages `31947970820` pass; live public readbacks are current.
+- Opened issue #213 and branch `feat/GH-213-rule-sync-cli` for the opt-in
+  Development/Testnet-10 RuleStorage preflight/run composition.
+- Assigned Kimi one bounded secret-free implementation block. Sol retains
+  architecture, security, diff review, integration, full gates, and publication.
+- No production, Mainnet, wallet, chain, broadcast, deployment, tokenomics, or
+  key-governance action is in scope.
+- Status: `GH-213 In Progress / Production false`.
+
+## 2026-08-16 - GH-213 local integration PASS
+
+- Implemented private strict config/envelope input, offline non-mutating
+  preflight, explicit bounded live probe, operator run, redacted status and
+  SIGINT/SIGTERM cancellation over the already merged RuleStorage APIs.
+- Kimi architecture/adversarial design applied; independent diff review `SHIP`,
+  no P0/P1. Sol closed probe-timeout, binary stderr/runtime, hard-link and
+  reload-wording notes. Claude OAuth remains expired; no Claude change.
+- CLI `10/10`, envelope `10/10`, coordinator `10/10`, RuleSync `22/22`, client
+  Clippy/rustfmt, 13-surface claims, hygiene `17/17`, Memory and diff pass.
+- Full repository gates and protected PR delivery remain. Production false.
+
+## 2026-08-16 - GH-213 full local gates PASS
+
+- Workspace tests/doc-tests, all-target Clippy, rustfmt, release binaries,
+  package gates and exact release performance pass.
+- Guardian complete unloaded rerun `1303 passed / 4 skipped`; one prior
+  contention-only timeout passed `10/10` isolated. Black, Pylint `9.85/10` and
+  `10.00/10`, Compose policy, Cargo/Python audits, Memory, H-001 evidence,
+  claims, hygiene, HTML static status and diff checks pass.
+- Docker CLI is unavailable locally; protected CI owns exact Compose rendering.
+- Status: `GH-213 Full local PASS / Protected PR next / Production false`.

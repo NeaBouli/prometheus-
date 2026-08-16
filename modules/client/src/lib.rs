@@ -6,5 +6,6 @@ pub mod ai;
 pub mod blockchain;
 pub mod miner_companion;
 pub mod network;
+pub mod rule_sync_cli;
 pub mod runtime;
 pub mod security;

@@ -4931,3 +4931,80 @@ No direct `main` push or production action occurred.
   "request" mean only the signed snapshot envelope; no caller authentication
   or request identity is established.
 - **Status:** `PR #212 review response verified locally / Follow-up checks pending / Production false`.
+
+## 2026-08-16 - GH-211 exact-main closeout and GH-213 start
+
+- GH-211 PR #212 merged normally as exact main
+  `8fed243c398d49c4d9255af260245f5b9086b80c`. Prometheus CI
+  `31947971446`, Security Audit `31947971540`, and Pages `31947970820`
+  all pass; live README, Roadmap, and Whitepaper carry the synchronized
+  snapshot-envelope boundary. Issue #211 is closed.
+- Issue #213 and branch `feat/GH-213-rule-sync-cli` own the next bounded block:
+  an explicit opt-in Development/Testnet-10 `rule-sync preflight/run` CLI that
+  composes the already merged GH-190/193/197/203/205/207/209/211 APIs through
+  strict owner-local configuration, bounded status, and clean cancellation.
+- Kimi K3 owns one secret-free implementation slice for the configuration and
+  library composition. Sol owns architecture, path/redaction policy, CLI
+  integration, full verification, documentation, GitHub, and closeout. Claude
+  Code OAuth is expired and it changes nothing.
+- No new cryptography, key authority/rotation, persistent sequence authority,
+  signer/private key, wallet, chain write, broadcast, deployment, Mainnet,
+  tokenomics, independent RPC/finality proof, IPFS availability claim, or
+  production readiness is authorized.
+- **Status:** `GH-213 In Progress / Kimi implementation next / Production false`.
+
+## 2026-08-16 - GH-213 local integration and independent review
+
+- Added the strict owner-invoked `rule-sync preflight/run` composition. Private
+  bounded ASCII config and envelope files use descriptor-based owner/type/mode/
+  size checks, final-component `NOFOLLOW`, and single-link enforcement; ancestor
+  directories remain an explicit owner-controlled development trust boundary.
+- Offline preflight verifies the current signed envelope and constructs only
+  inert factories: it performs no network request and never opens or mutates the
+  checkpoint. Optional `--connect` is explicit, read-only, and covered by a
+  redacted 15-second total timeout. Run connects one local Testnet-10 node,
+  composes the existing provider/coordinator/checkpoint/content/observation/
+  scanner APIs, reports only bounded counters, and drains on SIGINT/SIGTERM.
+- Kimi supplied the full architecture and adversarial design. Its write pass was
+  stopped after excessive design iteration with no diff; Sol implemented and
+  reviewed the resulting scope. Kimi's independent real-diff review returned
+  `SHIP` with no P0/P1. Sol closed its bounded-probe, stderr-redaction,
+  binary-runtime-gate, hard-link, and startup-reload wording notes. Claude Code
+  OAuth remains expired and changed nothing.
+- New focused evidence: CLI/config/binary `10/10`, signed envelope `10/10`,
+  coordinator `10/10`, durable RuleSync `22/22`; client all-target Clippy with
+  warnings denied and rustfmt pass. Public claims pass across 13 surfaces;
+  documentation hygiene `17/17`, Memory, and diff checks pass.
+- The one residual coverage note is a real-node binary signal-path test; the
+  unchanged GH-209 coordinator already tests cancellation, dropped in-flight
+  work, guard release, restart, timeout, and no detached mutation. Protected CI,
+  full repository gates, and final review remain.
+- No new cryptography, signer/private key, key authority/rotation, persistent
+  sequence authority, wallet, chain write, broadcast, deployment, Mainnet,
+  tokenomics, canonical authority, availability proof, or production claim.
+- **Status:** `GH-213 Local integration PASS / Full gates next / Production false`.
+
+## 2026-08-16 - GH-213 full local PASS
+
+- Complete Rust workspace tests and doc-tests pass; client library reports
+  `109 passed / 2 intentional live-node ignores`, with CLI `10/10`, signed
+  envelope `10/10`, coordinator `10/10`, durable RuleSync `22/22`, and release
+  performance `1/1` for the exact CI-selected budget test. Workspace all-target
+  Clippy with warnings denied, rustfmt, release Guardian binaries, verified
+  ThreatHint packaging, and the package set pass.
+- Guardian initially had one known three-second subprocess timing failure while
+  four heavy local jobs contended. The unchanged failing test then passed
+  `10/10` in isolation, and the complete unloaded rerun passed `1303/4` in
+  `92.55s`. Black passes; Pylint remains `9.85/10` and `10.00/10`; the
+  standalone Compose policy verifier passes. Docker CLI remains unavailable
+  locally, so exact Compose rendering remains a protected-CI gate.
+- Cargo Audit exits successfully with no vulnerability and the same eight
+  allowed maintenance/yank warnings. Python audit reports no known
+  vulnerabilities. Memory, six Autodidactic tests, H-001 evidence, public
+  claims across 13 surfaces, documentation hygiene `17/17`, HTML static status,
+  and diff checks pass.
+- README, Whitepaper, FAQ, Roadmap, public HTML, `llms.txt`, client README,
+  Memory, and Bridge consistently label GH-213 a repository candidate until
+  protected delivery; all retain the explicit Development/Testnet-10 and
+  production-false boundary.
+- **Status:** `GH-213 Full local PASS / Protected PR next / Production false`.

@@ -192,8 +192,11 @@ exact replay restores the in-memory scanner after a crash or restart. GH-209
 adds an explicit opt-in development coordinator with one immediate attempt
 followed by a fixed interval after success and sequential retries with capped exponential failure
 backoff, bounded timeout, cancellation, single-flight
-admission and non-sensitive counters. It has no CLI/product-runtime wiring or
-autonomous authority and does not prove canonical manifest authority,
+admission and non-sensitive counters. The GH-213 repository candidate adds an
+operator-invoked Development/Testnet-10 preflight/run CLI with strict private
+local files, offline non-mutating preflight, loopback-IP-literal RPC/IPFS,
+redacted counters, and signal cancellation. It adds no autonomous authority and
+does not prove canonical manifest authority,
 independent RPC truth or finality, IPFS availability or replication, production
 YARA quality, deployment, or production readiness.
 
@@ -205,7 +208,8 @@ and a separately trusted clock rechecked on every fetch. This authenticates one
 owner-authorized snapshot envelope only; it is not proof of key authority or rotation,
 persistent sequence authority, canonical L1 state, RPC truth or finality, IPFS
 availability, deployment, or production readiness. No signer or private-key API
-is included.
+is included. GH-213 does not add key authority/rotation, persistent sequence
+authority, wallet, chain write, deployment, or Mainnet support.
 
 **Q: Why Kaspa and not Ethereum?**
 Prometheus targets Kaspa because its high-throughput BlockDAG and current

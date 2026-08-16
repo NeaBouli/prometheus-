@@ -1,0 +1,14 @@
+# Opt-in Development/Testnet-10 RuleStorage sync example (GH-213).
+# This file contains a public verification key only. Never add secrets.
+enabled = true
+network = "testnet10"
+owner_xonly_public_key = "79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
+minimum_sequence = 1
+signed_envelope_path = "/home/operator/prometheus/rule-snapshot.envelope.json"
+rpc_url = "ws://127.0.0.1:17210"
+ipfs_gateway_url = "http://127.0.0.1:8080/ipfs/"
+checkpoint_dir = "/home/operator/prometheus/rule-sync-checkpoint"
+success_interval_secs = 60
+initial_failure_backoff_ms = 500
+max_failure_backoff_ms = 30000
+attempt_timeout_ms = 10000
