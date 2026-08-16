@@ -5,5 +5,6 @@ pub mod rule_coordinator;
 pub mod rule_fetch;
 pub mod rule_ingest;
 pub mod rule_observation;
+pub mod rule_signed_snapshot;
 pub mod rule_state;
 pub mod rule_sync;

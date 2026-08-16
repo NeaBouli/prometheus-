@@ -39,13 +39,22 @@ a production malware detector or reporting client.
   state through exact replay after restart. It adds no canonical authority,
   availability proof, production YARA, or production wiring.
 - `blockchain/rule_coordinator.rs` adds an explicit opt-in development lifecycle
-  around that durable transaction: one immediate attempt followed by sequential
-  a fixed interval after success, sequential retries with capped exponential failure
-  backoff, bounded timeout, cancellation with no detached
+  around that durable transaction: one immediate attempt, a fixed interval after
+  success, sequential retries with capped exponential failure backoff, bounded
+  timeout, cancellation with no detached
   work, single-flight admission, and bounded non-sensitive status counters. It
   accepts a caller-trusted complete-snapshot provider and adds no CLI/product
   runtime, autonomous authority, RPC/finality proof, availability proof, wallet,
   chain action, Mainnet support, or production readiness.
+- `blockchain/rule_signed_snapshot.rs` adds a strict canonical
+  development/Testnet-10 complete-snapshot envelope authenticated with BIP340
+  against a separately owner-pinned x-only key. It binds sequence, a maximum
+  one-hour validity window, entries, and explicit empty-snapshot order; an
+  external nonzero minimum sequence and separately trusted clock are enforced,
+  with the clock rechecked on every fetch. It includes no signer/private-key
+  path, key-authority or rotation proof, persistent sequence authority,
+  CLI/product wiring, canonical L1/RPC/finality proof, availability proof,
+  wallet/chain action, deployment, Mainnet support, or production readiness.
 - `blockchain/rule_ingest.rs` ingests a complete caller-supplied active-rule
   snapshot whose raw CIDv1 (sha2-256, canonical lowercase base32) must bind the
   exact caller-supplied content bytes. It parses a strict simple matcher

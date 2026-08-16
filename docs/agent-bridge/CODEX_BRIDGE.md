@@ -4866,3 +4866,47 @@ No direct `main` push or production action occurred.
   IPFS availability, product wiring, wallet/chain action, deployment, Mainnet,
   tokenomics or production readiness is added.
 - **Status:** `GH-211 In Progress / Kimi implementation next / Production false`.
+
+## 2026-08-16 - GH-211 local implementation PASS
+
+- Kimi K3 implemented the primary strict canonical BIP340 snapshot-envelope
+  module and dependency wiring. Sol reviewed every write, added external
+  nonzero minimum-sequence enforcement, trusted-clock and runtime-mode checks
+  on every fetch, adversarial tests, coordinator/checkpoint composition, and
+  synchronized public claims.
+- The envelope binds exact schema/kind/Testnet-10, sequence, a maximum one-hour
+  validity window, complete entries, and explicit empty-snapshot order. Parsing
+  is canonical compact JSON with unknown-field rejection and hard document,
+  entry, and field bounds. Errors and provider Debug remain redacted.
+- Focused evidence: signed-envelope `10/10`, coordinator `10/10`, RuleSync
+  `22/22`, client all-target Clippy with warnings denied, and rustfmt pass.
+- Claude Code's OAuth session was expired; it read or changed nothing. Kimi's
+  independent final-diff review and the full repository gate remain next.
+- This authenticates one owner-authorized request only. It proves no key
+  authority/rotation, persistent sequence authority, canonical L1/RPC truth or
+  finality, availability, product wiring, wallet/chain action, deployment,
+  Mainnet support, or production readiness.
+- **Status:** `GH-211 Local implementation PASS / Review and full gates next / Production false`.
+
+## 2026-08-16 - GH-211 independent review and full available local PASS
+
+- Kimi K3 independently reviewed the complete current diff and returned
+  `SHIP` with no P0-P2. Sol closed its explicit duplicate-JSON-key P4 coverage
+  note; the remaining sequence-floor persistence and provider-refresh points
+  are documented nonclaims, not hidden authority.
+- Full Rust workspace tests/doc-tests, warning-free all-target Clippy, rustfmt,
+  release Guardian binaries, package gates and release performance `6/6` pass.
+  Guardian reports `1303 passed / 4 skipped`; Black, Pylint `9.85/10` and
+  `10.00/10`, and the standalone Compose boundary verifier pass.
+- Memory, workflow YAML, H-001 evidence `4/4`, documentation hygiene `11/11`,
+  public claim synchronization `13` surfaces plus `6/6`, Cargo Audit and Python
+  dependency audit pass. Cargo Audit has no vulnerability and the same eight
+  allowed maintenance/yank warnings; pip-audit has no known vulnerability.
+- Chromium checks pass `16/16` for index, Roadmap, Whitepaper and FAQ at
+  `390/768/1280/1440`. Sol fixed pre-existing 390px index/FAQ overflow with
+  bounded mobile wrapping; no desktop content or claims changed.
+- Local Docker CLI is unavailable, so the exact `docker compose config` render
+  is deferred to protected CI; the repository-owned Compose policy parser
+  passes. No secret, wallet, chain, broadcast, deployment, Mainnet or production
+  action ran.
+- **Status:** `GH-211 Available local gates PASS / Protected PR and Docker CI next / Production false`.

@@ -225,7 +225,18 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
   .metrics-grid{grid-template-columns:1fr 1fr}
   .rm-row{grid-template-columns:80px 20px 1fr auto}
   footer{grid-template-columns:1fr;gap:16px;padding:24px}
+  .hero-body,.hero-status,.hero-h1,.hero-sub,.hero-actions,.hero-footnote,.hero-stat,
+  footer>*{min-width:0;max-width:100%}
+  .hero-status,.hero-actions,.f-links{flex-wrap:wrap}
+  .f-left{overflow-wrap:anywhere}
   .f-links{justify-content:flex-start}
+}
+@media(max-width:600px){
+  .rm-row{grid-template-columns:70px 16px minmax(0,1fr);align-items:start}
+  .rm-date{grid-column:1;grid-row:1 / span 2}
+  .rm-bar{grid-column:2;grid-row:1 / span 2;margin:0 8px}
+  .rm-content{grid-column:3;grid-row:1;min-width:0}
+  .rm-badge{grid-column:3;grid-row:2;justify-self:start;margin:0 0 12px;white-space:normal}
 }
 /* MOBILE NAV */
 .nav-burger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:8px;z-index:600}
@@ -347,7 +358,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
       <div class="lc-node"><span class="lc-t">t=36s</span></div>
       <div class="lc-time">T = 36 s</div>
       <div class="lc-who">All Clients</div>
-      <div class="lc-what">Target: P2P distribution or Kaspa polling and verified local loading. GH-190 verifies bounded caller-supplied exact bytes against Raw-CIDv1. Merged and exact-main-verified GH-197/PR #198 checks one separately owner-pin-hashed Testnet-10 manifest against bounded RuleStorage UTXO observations before local state decoding. GH-203/PR #204 adds a bounded development-only query to one connected Testnet-10 node. GH-205 composes that path with a credential-free loopback-only local IPFS gateway, exact CID/content binding, and one atomic complete-snapshot scanner replacement. GH-207 adds owner-local restart-persistent rollback and same-order equivocation rejection with exact replay recovery. GH-209 adds explicit opt-in development orchestration with one immediate attempt, a fixed interval after success, sequential retries with capped exponential failure backoff, bounded timeout, cancellation, single-flight admission, and non-sensitive status. It has no CLI/product-runtime wiring or autonomous provider and is not an independently authenticated canonical L1/IPFS source, availability or replication proof, chain-truth or finality proof, deployment, or public rule-distribution network.</div>
+      <div class="lc-what">Target: P2P distribution or Kaspa polling and verified local loading. GH-190 verifies bounded caller-supplied exact bytes against Raw-CIDv1. Merged and exact-main-verified GH-197/PR #198 checks one separately owner-pin-hashed Testnet-10 manifest against bounded RuleStorage UTXO observations before local state decoding. GH-203/PR #204 adds a bounded development-only query to one connected Testnet-10 node. GH-205 composes that path with a credential-free loopback-only local IPFS gateway, exact CID/content binding, and one atomic complete-snapshot scanner replacement. GH-207 adds owner-local restart-persistent rollback and same-order equivocation rejection with exact replay recovery. GH-209 adds bounded opt-in development orchestration. GH-211 authenticates one strict canonical complete-snapshot envelope with BIP340 against a separately owner-pinned key, external nonzero minimum sequence, and separately trusted per-fetch clock. It adds no signer, key-authority/rotation proof, persistent sequence authority, CLI/product-runtime wiring, or autonomous provider and is not an independently authenticated canonical L1/IPFS source, availability or replication proof, chain-truth or finality proof, deployment, or public rule-distribution network.</div>
       <div class="lc-tech">rusty-kaspa<br>libp2p broadcast<br>Local YARA engine</div>
     </div>
   </div>

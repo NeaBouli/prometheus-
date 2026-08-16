@@ -23,6 +23,7 @@ clap.workspace = true
 log.workspace = true
 env_logger.workspace = true
 sha2.workspace = true
+secp256k1.workspace = true
 multibase.workspace = true
 reqwest.workspace = true
 rustix.workspace = true
