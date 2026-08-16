@@ -170,20 +170,24 @@ impl RuleSyncConfig {
 }
 
 impl ValidatedRuleSyncConfig {
+    /// Return the validated bounded scheduling policy.
     pub fn coordinator_config(&self) -> RuleCoordinatorConfig {
         self.coordinator_config
     }
 
+    /// Build the existing Development/Testnet-10 coordinator.
     pub fn create_coordinator(&self) -> Result<RuleCoordinator, RuleSyncCliError> {
         RuleCoordinator::new_for_mode(self.mode, self.coordinator_config)
             .map_err(|_| RuleSyncCliError)
     }
 
+    /// Build an unconnected local Testnet-10 RPC client.
     pub fn create_connection(&self) -> Result<KaspaConnection, RuleSyncCliError> {
         require_development(self.mode)?;
         KaspaConnection::new(&self.rpc_url).map_err(|_| RuleSyncCliError)
     }
 
+    /// Build the credential-free loopback-only content source without fetching.
     pub fn create_content_source(&self) -> Result<LocalIpfsGatewaySource, RuleSyncCliError> {
         LocalIpfsGatewaySource::new_for_mode(self.mode, &self.ipfs_gateway_url)
             .map_err(|_| RuleSyncCliError)

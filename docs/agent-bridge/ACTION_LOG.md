@@ -4244,3 +4244,12 @@ Rules for all dev agents:
   claims, hygiene, HTML static status and diff checks pass.
 - Docker CLI is unavailable locally; protected CI owns exact Compose rendering.
 - Status: `GH-213 Full local PASS / Protected PR next / Production false`.
+
+## 2026-08-16 - GH-213 PR #214 review fixes
+
+- Accepted all five CodeRabbit findings plus the status-wire nit: explicit
+  Guardian counts, current Memory/TODO, accurate ASCII scope, wider bounded test
+  validity, stable status mappings and matching Roadmap wording.
+- CLI `10/10`, binary status `1/1`, client Clippy/rustfmt, claims, hygiene,
+  Memory and diff checks pass after the fixes.
+- Status: `Review fixes ready to push / Follow-up protected checks next`.

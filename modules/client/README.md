@@ -57,7 +57,8 @@ a production malware detector or reporting client.
   wallet/chain action, deployment, Mainnet support, or production readiness.
 - `rule_sync_cli.rs` and the `rule-sync preflight/run` command are the GH-213
   repository candidate for an operator-invoked composition of those existing
-  boundaries. They require private, no-symlink ASCII config and envelope files,
+  boundaries. They require private, no-symlink, bounded config and envelope
+  files, restrict the config to ASCII TOML,
   accept only loopback-IP-literal RPC/IPFS endpoints, keep preflight offline and
   checkpoint-free, emit redacted counters, and cancel without detached work.
   This remains Development/Testnet-10 only and establishes no key authority,

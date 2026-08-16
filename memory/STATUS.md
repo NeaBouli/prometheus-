@@ -240,24 +240,25 @@ Boundary: repository and documentation only; no wallet, chain, broadcast,
 GH-211: PR #212 merged as exact main 8fed243c398d49c4d9255af260245f5b9086b80c
 Runs: CI 31947971446; Security 31947971540; Pages 31947970820; all PASS
 Live: README, Roadmap and Whitepaper synchronized; issue #211 closed
-GH-213: issue #213 / feat/GH-213-rule-sync-cli / local candidate
-Scope: private bounded ASCII config and signed-envelope reads with NOFOLLOW,
+GH-213: issue #213 / PR #214 / protected branch candidate
+Scope: private bounded config and signed-envelope reads with NOFOLLOW; ASCII
+       TOML configuration;
        owner/type/mode/size checks; exact Development/Testnet-10; loopback-IP-
        literal RPC/IPFS; offline non-mutating preflight; explicit run composing
        GH-211 provider, GH-209 coordinator, GH-207 checkpoint, GH-205 content,
        GH-203 observation and atomic scanner replacement; redacted status;
        SIGINT/SIGTERM cancellation with no detached coordinator work
-Focused: new CLI 9/9; signed envelope 10/10; coordinator 10/10;
+Focused: new CLI 10/10; signed envelope 10/10; coordinator 10/10;
          durable RuleSync 22/22; client all-target Clippy PASS; rustfmt PASS
 Agents: Kimi supplied the full architecture/adversarial design; its write pass
         was stopped after excessive design iteration with no diff. Sol owns the
-        implementation and integration. Independent Kimi diff review is running.
-        Claude OAuth remains expired and produced no change.
+        implementation and integration. Independent Kimi diff review is SHIP
+        with no P0/P1. Claude OAuth remains expired and produced no change.
 Boundary: no new cryptography, signer/private key, key authority/rotation,
           persistent sequence authority, wallet, transaction, chain write,
           broadcast, deployment, Mainnet, tokenomics, canonical authority,
           independent RPC/finality proof, availability proof or production claim
-Next: independent review, full local gates, protected PR/CI and exact-main Pages
+Next: protected PR/CI and exact-main Pages delivery
 ```
 
 All percentages below are internal, scope-weighted engineering estimates or

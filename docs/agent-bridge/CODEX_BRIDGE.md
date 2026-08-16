@@ -4955,10 +4955,11 @@ No direct `main` push or production action occurred.
 
 ## 2026-08-16 - GH-213 local integration and independent review
 
-- Added the strict owner-invoked `rule-sync preflight/run` composition. Private
-  bounded ASCII config and envelope files use descriptor-based owner/type/mode/
-  size checks, final-component `NOFOLLOW`, and single-link enforcement; ancestor
-  directories remain an explicit owner-controlled development trust boundary.
+- Added the strict owner-invoked `rule-sync preflight/run` composition. Private,
+  bounded config and envelope files use descriptor-based owner/type/mode/size
+  checks, final-component `NOFOLLOW`, and single-link enforcement; the config is
+  restricted to ASCII TOML. Ancestor directories remain an explicit owner-
+  controlled development trust boundary.
 - Offline preflight verifies the current signed envelope and constructs only
   inert factories: it performs no network request and never opens or mutates the
   checkpoint. Optional `--connect` is explicit, read-only, and covered by a
@@ -4994,8 +4995,9 @@ No direct `main` push or production action occurred.
   ThreatHint packaging, and the package set pass.
 - Guardian initially had one known three-second subprocess timing failure while
   four heavy local jobs contended. The unchanged failing test then passed
-  `10/10` in isolation, and the complete unloaded rerun passed `1303/4` in
-  `92.55s`. Black passes; Pylint remains `9.85/10` and `10.00/10`; the
+  `10/10` in isolation, and the complete unloaded rerun reported `1303 passed /
+  4 intentional live-model skips` in `92.55s`. Black passes; Pylint remains
+  `9.85/10` and `10.00/10`; the
   standalone Compose policy verifier passes. Docker CLI remains unavailable
   locally, so exact Compose rendering remains a protected-CI gate.
 - Cargo Audit exits successfully with no vulnerability and the same eight
@@ -5008,3 +5010,18 @@ No direct `main` push or production action occurred.
   protected delivery; all retain the explicit Development/Testnet-10 and
   production-false boundary.
 - **Status:** `GH-213 Full local PASS / Protected PR next / Production false`.
+
+## 2026-08-16 - GH-213 PR #214 review response
+
+- Protected PR #214 passed all eleven reported contexts. CodeRabbit completed
+  with five minor synchronization/stability findings and one wire-format nit;
+  all six were accepted and fixed.
+- Guardian evidence is now unambiguous (`1303 passed / 4 intentional live-model
+  skips`); Memory/TODO match the completed local review/gates; ASCII is claimed
+  only for TOML while both files retain private descriptor checks; the binary
+  test envelope now has a bounded ten-minute window within the one-hour policy.
+- Operator status uses explicit stable phase/outcome mappings, including
+  `timed_out`, with one binary unit test covering every variant. Focused CLI
+  `10/10`, binary status `1/1`, client all-target Clippy, rustfmt, 13-surface
+  claims, hygiene, Memory and diff checks pass after the fixes.
+- **Status:** `PR #214 review fixes local PASS / Follow-up protected checks next / Production false`.

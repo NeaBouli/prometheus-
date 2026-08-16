@@ -56,8 +56,8 @@ fn signed_envelope_for(now: u64) -> Vec<u8> {
         kind: "prometheus.rule-snapshot.envelope.v1",
         network_id: "testnet-10",
         sequence: 7,
-        valid_from: now - 10,
-        valid_until: now + 10,
+        valid_from: now - 300,
+        valid_until: now + 300,
         empty_snapshot_order: Some(9),
         entries: Vec::new(),
     };

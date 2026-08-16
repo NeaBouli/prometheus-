@@ -9,6 +9,9 @@ use std::time::Duration;
 
 use clap::{Parser, Subcommand};
 use log::{info, warn};
+use prometheus_client::blockchain::rule_coordinator::{
+    RuleCoordinatorOutcome, RuleCoordinatorPhase,
+};
 use prometheus_client::miner_companion::MinerCompanionConfig;
 use prometheus_client::rule_sync_cli::{RuleSyncConfig, SystemRuleSnapshotClock};
 use prometheus_client::runtime::RuntimeMode;
@@ -170,14 +173,31 @@ async fn run_rule_sync(config_path: PathBuf) -> anyhow::Result<()> {
                         "successes": snapshot.successes,
                         "failures": snapshot.failures,
                         "consecutive_failures": snapshot.consecutive_failures,
-                        "phase": format!("{:?}", snapshot.phase).to_ascii_lowercase(),
-                        "last_outcome": snapshot.last_outcome.map(|value| format!("{value:?}").to_ascii_lowercase()),
+                        "phase": coordinator_phase_wire(snapshot.phase),
+                        "last_outcome": snapshot.last_outcome.map(coordinator_outcome_wire),
                     })
                 );
             }
         }
     }
     Ok(())
+}
+
+fn coordinator_phase_wire(phase: RuleCoordinatorPhase) -> &'static str {
+    match phase {
+        RuleCoordinatorPhase::Idle => "idle",
+        RuleCoordinatorPhase::Attempting => "attempting",
+        RuleCoordinatorPhase::Sleeping => "sleeping",
+    }
+}
+
+fn coordinator_outcome_wire(outcome: RuleCoordinatorOutcome) -> &'static str {
+    match outcome {
+        RuleCoordinatorOutcome::Succeeded => "succeeded",
+        RuleCoordinatorOutcome::Failed => "failed",
+        RuleCoordinatorOutcome::TimedOut => "timed_out",
+        RuleCoordinatorOutcome::Cancelled => "cancelled",
+    }
 }
 
 #[cfg(unix)]
@@ -253,4 +273,38 @@ async fn run_miner_companion(config_path: PathBuf) -> anyhow::Result<()> {
     }
 
     Ok(())
+}
+
+#[cfg(test)]
+mod rule_sync_status_tests {
+    use super::*;
+
+    #[test]
+    fn status_wire_values_are_stable() {
+        assert_eq!(coordinator_phase_wire(RuleCoordinatorPhase::Idle), "idle");
+        assert_eq!(
+            coordinator_phase_wire(RuleCoordinatorPhase::Attempting),
+            "attempting"
+        );
+        assert_eq!(
+            coordinator_phase_wire(RuleCoordinatorPhase::Sleeping),
+            "sleeping"
+        );
+        assert_eq!(
+            coordinator_outcome_wire(RuleCoordinatorOutcome::Succeeded),
+            "succeeded"
+        );
+        assert_eq!(
+            coordinator_outcome_wire(RuleCoordinatorOutcome::Failed),
+            "failed"
+        );
+        assert_eq!(
+            coordinator_outcome_wire(RuleCoordinatorOutcome::TimedOut),
+            "timed_out"
+        );
+        assert_eq!(
+            coordinator_outcome_wire(RuleCoordinatorOutcome::Cancelled),
+            "cancelled"
+        );
+    }
 }
