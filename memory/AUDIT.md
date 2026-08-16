@@ -2603,3 +2603,18 @@ Exact-main CI `31900314121`, Security Audit `31900314143`, and Pages
 `31900313745` pass; live Roadmap and README fetches confirm publication. No
 production, wallet, chain, deployment, tokenomics or security-policy authority
 changed.
+## 2026-08-16 - GH-216 binary loopback E2E local audit
+
+- Scope remained test-only: direct real-binary execution against ephemeral local
+  Borsh wRPC/IPFS fixtures. No real node, wallet, private operator material,
+  chain write, contract, deployment, Mainnet or production claim was introduced.
+- Verified canonical checkpoint replay, lower-order rejection and same-order
+  different-digest rejection. Kimi identified that an earlier test fixture used
+  noncanonical JSON map order; the final fixture uses the exact checkpoint struct
+  order and reaches the intended guard.
+- Verified stored `Notify` permit semantics, TERM/INT handling, bounded waits,
+  kill-on-drop child cleanup, private `0600` checkpoint mode and output redaction.
+- Evidence: focused `5/5`; stress `20/20`; workspace Rust, Clippy/rustfmt,
+  Guardian `1303/4`, release performance/build/package, Memory/H-001/claims,
+  Black/Pylint and dependency audits pass.
+- Result: `SHIP for protected PR / Production false`.
