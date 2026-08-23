@@ -4358,3 +4358,9 @@ Rules for all dev agents:
   regressions plus Memory, claims, hygiene, YAML and diff checks pass.
 - No contract, tokenomics, wallet, chain, deployment, Mainnet or production
   action occurred. Status: `Local complete / Protected PR pending`.
+
+## 2026-08-23 - GH-220 PR opened
+
+- Commit `dfaf103` pushed to the feature branch and protected PR #221 opened
+  against `main`; no direct-main or admin action.
+- Status: `PR checks pending / Production false`.

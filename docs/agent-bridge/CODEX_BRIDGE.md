@@ -5217,3 +5217,11 @@ No direct `main` push or production action occurred.
   independent cryptographic/privacy approval, real actionable model analysis,
   operated multi-host transport and complete release evidence.
 - **Status:** `GH-220 Local complete / Protected PR pending / Production false`.
+
+## 2026-08-23 - GH-220 protected PR opened
+
+- Commit `dfaf103` was pushed only to
+  `feat/GH-220-status-client-safety-foundations`; protected PR #221 targets
+  `main` and closes issue #220.
+- No direct-main push, admin merge, deployment or production action occurred.
+- **Status:** `PR #221 open / Required checks pending / Production false`.
