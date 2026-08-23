@@ -5225,3 +5225,22 @@ No direct `main` push or production action occurred.
   `main` and closes issue #220.
 - No direct-main push, admin merge, deployment or production action occurred.
 - **Status:** `PR #221 open / Required checks pending / Production false`.
+
+## 2026-08-23 - GH-220 dependency-audit remediation verified
+
+- PR #221's first protected check wave passed the product, documentation,
+  performance, contract and secret-detection contexts. Dependency Audit alone
+  identified RustSec advisory `RUSTSEC-2026-0258` in resolved `h2` `0.4.15`.
+- The remediation changes only the `Cargo.lock` resolution for `h2` to
+  `0.4.16` and its registry checksum. No product API, architecture, contract,
+  tokenomics, chain, deployment or production behavior changed.
+- Local post-update evidence: `cargo audit` reports zero known
+  vulnerabilities with the eight pre-existing allowed informational warnings;
+  workspace functional tests pass with 582 tests, zero failures and two
+  intentional live-network ignores when the timing test is separated; the
+  isolated 10 MB scanner timing test passes in 1.59 seconds; workspace
+  all-target Clippy with `-D warnings`, Rustfmt and lockfile diff checks pass.
+- A concurrent full-suite timing run reached 6.25 seconds while the host was
+  saturated; the unchanged test passed in isolation and the protected GitHub
+  Rust Performance context had already passed. No threshold was weakened.
+- **Status:** `PR #221 remediation locally PASS / Protected checks must rerun / Production false`.

@@ -4364,3 +4364,14 @@ Rules for all dev agents:
 - Commit `dfaf103` pushed to the feature branch and protected PR #221 opened
   against `main`; no direct-main or admin action.
 - Status: `PR checks pending / Production false`.
+
+## 2026-08-23 - GH-220 RustSec remediation
+
+- PR #221's initial protected wave was green except Dependency Audit, which
+  reported `RUSTSEC-2026-0258` for resolved `h2` `0.4.15`.
+- Updated only the `h2` lock resolution to `0.4.16`; local audit now reports
+  zero vulnerabilities and eight pre-existing allowed warnings.
+- Functional Rust tests pass `582/0/2` with the timing test separated; isolated
+  10 MB scanner performance passes in `1.59s`; all-target Clippy, Rustfmt and
+  exact lockfile-diff checks pass. No threshold or product behavior changed.
+- Status: `Local remediation PASS / Protected checks rerun next / Production false`.
