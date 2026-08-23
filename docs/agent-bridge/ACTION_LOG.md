@@ -4385,3 +4385,25 @@ Rules for all dev agents:
   and raw GitHub README readback contain the synchronized Development-only
   boundary.
 - Status: `GH-220 DONE / Exact-main and live Pages verified / Production false`.
+
+## 2026-08-23 - GH-223 started
+
+- Opened issue #223 and branch `fix/GH-223-phi3-authority-boundary` from clean
+  exact main `8df1ea4`.
+- Scope: prevent file-existence-only Phi-3 readiness and development-stub
+  quarantine authority; add focused regressions and synchronize status.
+- Kimi implements the bounded client slice; Sol integrates and verifies.
+- Status: `GH-223 In Progress / Production false`.
+
+## 2026-08-23 - GH-223 local gates passed
+
+- Replaced file-existence readiness and entropy authority in the Phi-3 wrapper
+  with a 16 MiB-bounded, fail-closed safe-default Development stub.
+- Synchronized public and machine-readable claims; added adversarial Rust and
+  claim-regression coverage.
+- Focused Phi-3 tests pass 10/10. Full Rust, Clippy, Rustfmt, Guardian, audit,
+  memory, status, public-hygiene and synchronized-documentation gates pass.
+- Kimi's final independent verdict is `SHIP`; its earlier two documentation
+  findings were corrected. Claude Code made no change because local OAuth is
+  expired.
+- Status: `GH-223 Local PASS / Protected PR next / Production false`.

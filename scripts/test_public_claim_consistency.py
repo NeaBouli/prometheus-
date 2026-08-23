@@ -46,11 +46,32 @@ class PublicClaimConsistencyTests(unittest.TestCase):
             any("market price" in error for error in MODULE.validate_status(changed))
         )
 
+    def test_phi3_stub_authority_is_rejected(self) -> None:
+        changed = copy.deepcopy(self.status)
+        changed["classifications"]["light_client"][
+            "phi3_stub_authority"
+        ] = "heuristic_quarantine"
+        self.assertTrue(
+            any("Phi-3 stub" in error for error in MODULE.validate_status(changed))
+        )
+
     def test_banned_claims_return_categories_only(self) -> None:
         self.assertEqual(
             MODULE.find_banned_claims("PROM cannot be purchased."),
             ["prom-cannot-be-purchased"],
         )
+
+    def test_stale_phi3_heuristic_claim_is_rejected(self) -> None:
+        stale_claims = (
+            "Phi-3 current implementation is a development-only heuristic/stub.",
+            "Phi-3-mini 3.8B is planned. Current code is a development heuristic/stub.",
+        )
+        for claim in stale_claims:
+            with self.subTest(claim=claim):
+                self.assertEqual(
+                    MODULE.find_banned_claims(claim),
+                    ["stale-phi3-heuristic"],
+                )
 
     def test_json_ld_validation(self) -> None:
         valid = '<script type="application/ld+json">{"name":"test"}</script>'

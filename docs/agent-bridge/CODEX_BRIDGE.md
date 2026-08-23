@@ -5264,3 +5264,50 @@ No direct `main` push or production action occurred.
   model inference, production YARA, P2P operation, chain write, deployment or
   production-readiness evidence. Existing rollout gates remain open.
 - **Status:** `GH-220 DONE / Exact-main and live Pages verified / Production false`.
+
+## 2026-08-23 - GH-223 Phi-3 authority boundary started
+
+- Issue #223 and branch `fix/GH-223-phi3-authority-boundary` start from clean
+  exact main `8df1ea46edd93c7881291928fd6b944ec29bb9d5` after GH-220 closeout.
+- The bounded repository-only task removes two misleading Development-stub
+  semantics: file existence must not imply a loaded ONNX model, and entropy
+  output must not grant suspicious/malware/quarantine authority.
+- Kimi K3 owns a secret-free implementation proposal and focused tests. Sol
+  owns API/security decisions, complete diff review, integration, full gates,
+  public claims and protected delivery. Claude Code remains unavailable due to
+  its expired local OAuth session and owns no file.
+- Excluded: model download, ONNX dependency or inference, real samples, path or
+  process monitoring, source-file mutation, automatic isolation, P2P, wallet,
+  signing, chain, deployment, Mainnet, contracts, tokenomics and production
+  claims.
+- **Status:** `GH-223 In Progress / Repository only / Production false`.
+
+## 2026-08-23 - GH-223 local implementation and review complete
+
+- `modules/client/src/ai/phi3.rs` now preserves the public API while enforcing
+  a fail-closed Development boundary: path existence never reports a loaded
+  ONNX model, the stub emits only a neutral default, Beta/Mainnet reject the
+  stub, and inputs above 16 MiB are rejected. No model inference, malware
+  verdict, quarantine action, monitoring or source-file mutation was added.
+- Ten focused adversarial tests pass, including fake existing model paths,
+  high-entropy input, exact input bounds, production-profile rejection and the
+  absence of quarantine recommendations. The full Rust workspace test suite
+  passed with 582 tests, zero failures and two intentional live-network
+  ignores; all-target Clippy with `-D warnings` and Rustfmt passed. Guardian
+  tests passed with 1303 tests and four skips. `cargo audit` reported zero
+  vulnerabilities and eight existing allowed warnings.
+- Public Markdown, HTML, `llms.txt`, module documentation, memory status and
+  the machine-readable claim artifact now agree on the Development-only
+  boundary. Memory integrity, project-status consistency, public hygiene,
+  synchronized-claim verification across 13 surfaces, 26 related Python tests,
+  Black and `git diff --check` pass.
+- Kimi K3 supplied the initial bounded implementation and two independent
+  reviews. Its first review blocked on stale wording in `WHITEPAPER.md` and
+  `docs/user-guide.md`; Sol corrected both and strengthened the regression for
+  decimal-containing Phi-3 wording. Kimi's final verdict is `SHIP` with no
+  remaining P0-P3 finding. Claude Code remained unavailable because its local
+  OAuth session is expired and made no change.
+- No chain write, wallet operation, signing, broadcast, deployment, contract,
+  tokenomics or production action occurred. Protected PR delivery, exact-main
+  CI/Security/Pages verification and public readback remain next.
+- **Status:** `GH-223 Local PASS / Protected PR next / Production false`.

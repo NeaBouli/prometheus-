@@ -33,7 +33,7 @@ real network operation are tracked in the later phases below.
 | 0 | Kaspa Testnet-10, repo structure, CI/CD | ACCEPTED |
 | 1 | 6 Silverscript contracts, 54 tests | ACCEPTED |
 | 2 | Rust client: RPC foundation, custom YARA-style matcher, bounded deterministic byte triage, owner-local byte vault, ZK stub, cache-only reader and bounded Raw-CIDv1/exact-byte ingestion | DEVELOPMENT FOUNDATION; NO MALWARE AUTHORITY OR AUTOMATIC SOURCE ISOLATION |
-| 3 | Phi-3 heuristic/stub and Fed-DART placeholder | DEVELOPMENT FOUNDATION; NO ONNX INFERENCE |
+| 3 | Phi-3 fail-closed safe-default stub and Fed-DART placeholder | DEVELOPMENT FOUNDATION; NO ONNX INFERENCE OR QUARANTINE AUTHORITY |
 | 4 | Guardian interfaces, hardened local vLLM scaffold, and canonical owner-loaded membership source | TESTED FOUNDATION; NO EVALUATED REAL MODEL OR PRODUCTION TRUST |
 | 5 | Commit-Reveal voting, bond system, slashing | TESTED STATE MACHINES; NO OPERATED VALIDATOR NETWORK |
 | 6 | Development-stub E2E lifecycle fixture <60s, Sybil + FP flood tests | ACCEPTED as test foundation; not production evidence |
@@ -227,7 +227,7 @@ operation, and public release-hardening evidence for the exact rollout commit.
 **Sprint 11 — Real Phi-3-mini Integration**
 - Download Phi-3-mini 3.8B from Microsoft HuggingFace
 - 4-bit quantization via ONNX Runtime
-- Replace entropy heuristic with real inference in phi3.rs
+- Implement real reviewed inference in the current fail-closed phi3.rs stub
 - Model update mechanism: IPFS distribution + on-chain hash verification
 - Test: does Phi-3 detect known malware samples?
 

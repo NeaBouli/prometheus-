@@ -3,9 +3,12 @@
 //! Wraps the Phi-3-mini 3.8B model (4-bit quantized) for local anomaly detection.
 //! Architecture Decision #8: runs on 4GB RAM, no GPU required.
 //!
-//! Graceful degradation: if the model file does not exist at the given path,
-//! the instance is created with `is_loaded() = false` and `analyze_bytes()`
-//! returns a safe default (not suspicious, confidence 0.0).
+//! Fail-closed stub: no ONNX runtime is integrated yet, so `is_loaded()` is
+//! always `false` — even when a file exists at the configured path — and
+//! `analyze_bytes()` always returns a safe default (not suspicious,
+//! confidence 0.0, no quarantine authority). The mere presence of a file
+//! must never be reported as a loaded model, and a heuristic must never
+//! emit suspicious/malware/quarantine decisions.
 //!
 //! ONNX Runtime integration (ort crate) deferred to avoid C-dependency
 //! build issues (same rationale as PATTERN-009). Full ONNX integration
@@ -14,14 +17,20 @@
 use std::path::{Path, PathBuf};
 
 use anyhow::Result;
-use log::{info, warn};
+use log::warn;
 
-use crate::runtime::require_stub_allowed;
+use crate::runtime::{require_stub_allowed_for, RuntimeMode};
 
 /// Minimum confidence threshold for reporting (from MEMO.md AUTO-TUNING)
 pub const MIN_CONFIDENCE_KI: f64 = 0.85;
 
-/// AI analysis result from Phi-3-mini inference.
+/// Maximum caller-supplied analysis input accepted by the development stub.
+pub const MAX_ANALYSIS_BYTES: usize = 16 * 1024 * 1024;
+
+/// Result shape reserved for future Phi-3-mini inference.
+///
+/// The current stub returns only [`AiAnalysis::default`]. None of these fields
+/// grants malware-verdict, quarantine, reporting, or other action authority.
 #[derive(Debug, Clone)]
 pub struct AiAnalysis {
     /// Whether the input appears suspicious
@@ -37,7 +46,10 @@ pub struct AiAnalysis {
 /// Recommended action after AI analysis.
 #[derive(Debug, Clone, PartialEq)]
 pub enum RecommendedAction {
-    /// Immediately quarantine the file
+    /// Legacy advisory label reserved for future reviewed inference.
+    ///
+    /// This label is not quarantine authority and is never emitted by the
+    /// current development stub.
     Quarantine,
     /// Continue monitoring, not yet confirmed threat
     Monitor,
@@ -60,86 +72,35 @@ impl Default for AiAnalysis {
 /// Runs the 3.8B parameter model in 4-bit quantization via ONNX Runtime.
 pub struct Phi3Model {
     model_path: PathBuf,
-    loaded: bool,
 }
 
 impl Phi3Model {
     /// Create a new Phi3Model instance.
-    /// If the model file does not exist at `model_path`, the instance is created
-    /// with `is_loaded() = false` (graceful degradation).
+    ///
+    /// Fail-closed: until a real ONNX Runtime session is wired in, the stub
+    /// never reports a loaded model, even if a file exists at `model_path`.
+    /// A path existing on disk is not proof of a validated model.
     pub fn new(model_path: &Path) -> Result<Self> {
-        let loaded = model_path.exists();
-        if loaded {
-            info!("Phi-3-mini model found at {:?}", model_path);
-            // Real ONNX Runtime session would be initialized here
-            // using ort::Session::builder()?.with_model_from_file(model_path)?
-        } else {
-            warn!(
-                "Phi-3-mini model not found at {:?} — running in stub mode",
-                model_path
-            );
-        }
+        warn!("Phi-3-mini ONNX runtime is unavailable; running in fail-closed stub mode");
 
         Ok(Self {
             model_path: model_path.to_path_buf(),
-            loaded,
         })
     }
 
     /// Run anomaly detection on raw bytes.
-    /// When model is not loaded: returns safe default (not suspicious, confidence 0.0).
-    /// When model is loaded: runs ONNX inference and returns analysis.
+    ///
+    /// Fail-closed stub: gated by the runtime profile (rejected in beta and
+    /// mainnet), and otherwise always returns a safe default — never
+    /// suspicious and never quarantine. Inputs above 16 MiB fail closed.
     pub async fn analyze_bytes(&self, data: &[u8]) -> Result<AiAnalysis> {
-        if !self.loaded {
-            require_stub_allowed("Phi-3 model fallback")?;
-            return Ok(AiAnalysis::default());
-        }
-
-        require_stub_allowed("Phi-3 heuristic inference")?;
-
-        // Stub: real ONNX inference will be implemented when model is available.
-        // The actual pipeline:
-        // 1. Tokenize the byte content into model input format
-        // 2. Run ONNX inference session
-        // 3. Parse output logits into threat classification
-        // 4. Return AiAnalysis with confidence and indicators
-
-        // Placeholder heuristic based on data entropy and known patterns
-        let entropy = calculate_entropy(data);
-        let is_suspicious = entropy > 7.5; // High entropy = possible encryption/packing
-        let confidence = if is_suspicious {
-            (entropy - 7.0).clamp(0.0, 1.0)
-        } else {
-            0.0
-        };
-
-        let mut indicators = Vec::new();
-        if entropy > 7.5 {
-            indicators.push(format!("High entropy: {:.2}", entropy));
-        }
-        if data.len() > 10_000_000 {
-            indicators.push("Large file size".to_string());
-        }
-
-        let recommended_action = if confidence >= MIN_CONFIDENCE_KI {
-            RecommendedAction::Quarantine
-        } else if confidence > 0.5 {
-            RecommendedAction::Monitor
-        } else {
-            RecommendedAction::Ignore
-        };
-
-        Ok(AiAnalysis {
-            is_suspicious,
-            confidence,
-            threat_indicators: indicators,
-            recommended_action,
-        })
+        stub_analysis(RuntimeMode::from_env(), data.len())
     }
 
     /// Check if the ONNX model is loaded and ready for inference.
+    /// Always `false` while the runtime is a stub without ONNX integration.
     pub fn is_loaded(&self) -> bool {
-        self.loaded
+        false
     }
 
     /// Get the model file path.
@@ -148,32 +109,37 @@ impl Phi3Model {
     }
 }
 
-/// Calculate Shannon entropy of byte data (0.0 = uniform, 8.0 = max random).
-fn calculate_entropy(data: &[u8]) -> f64 {
-    if data.is_empty() {
-        return 0.0;
+/// Fail-closed stub analysis for an explicit runtime mode.
+///
+/// Security-critical placeholder behavior is rejected in beta/mainnet; in
+/// development the stub returns a safe default and never emits suspicion,
+/// confidence, or quarantine authority from heuristics.
+fn stub_analysis(mode: RuntimeMode, input_len: usize) -> Result<AiAnalysis> {
+    require_stub_allowed_for(mode, "Phi-3 model stub")?;
+    if input_len > MAX_ANALYSIS_BYTES {
+        anyhow::bail!("Phi-3 analysis input exceeds the 16 MiB limit");
     }
-
-    let mut counts = [0u64; 256];
-    for &byte in data {
-        counts[byte as usize] += 1;
-    }
-
-    let len = data.len() as f64;
-    counts
-        .iter()
-        .filter(|&&c| c > 0)
-        .map(|&c| {
-            let p = c as f64 / len;
-            -p * p.log2()
-        })
-        .sum()
+    Ok(AiAnalysis::default())
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::io::Write;
     use std::path::PathBuf;
+
+    /// Maximal-entropy input: every byte value equally often (entropy = 8.0).
+    fn high_entropy_bytes() -> Vec<u8> {
+        (0..=255u8).cycle().take(2560).collect()
+    }
+
+    /// Create a fake "model" file on disk (bytes are not a real ONNX model).
+    fn fake_model_file() -> tempfile::NamedTempFile {
+        let mut file = tempfile::NamedTempFile::new().unwrap();
+        file.write_all(b"\x08\x03fake-phi3-mini-4bit-not-a-real-onnx-model")
+            .unwrap();
+        file
+    }
 
     #[test]
     fn test_new_without_model() {
@@ -205,29 +171,68 @@ mod tests {
     }
 
     #[test]
-    fn test_entropy_empty() {
-        assert_eq!(calculate_entropy(&[]), 0.0);
-    }
-
-    #[test]
-    fn test_entropy_uniform() {
-        // All same byte = 0 entropy
-        let data = vec![0x41u8; 1000];
-        assert_eq!(calculate_entropy(&data), 0.0);
-    }
-
-    #[test]
-    fn test_entropy_random() {
-        // Pseudo-random data has high entropy (close to 8.0)
-        let data: Vec<u8> = (0..=255).cycle().take(2560).collect();
-        let entropy = calculate_entropy(&data);
-        assert!(entropy > 7.9);
-    }
-
-    #[test]
     fn test_model_path() {
         let path = PathBuf::from("/models/phi3-mini-4bit.onnx");
         let model = Phi3Model::new(&path).unwrap();
         assert_eq!(model.model_path(), path);
+    }
+
+    /// Adversarial: an existing file at the model path must NOT be reported
+    /// as a loaded ONNX model — path existence is not proof of a model.
+    #[test]
+    fn test_existing_fake_model_file_is_not_loaded() {
+        let file = fake_model_file();
+        let model = Phi3Model::new(file.path()).unwrap();
+        assert!(!model.is_loaded());
+    }
+
+    /// Adversarial: even with a file present at the model path and
+    /// maximal-entropy input, the stub must stay fail-closed — no suspicion,
+    /// no confidence, no indicators, no quarantine authority.
+    #[tokio::test]
+    async fn test_high_entropy_input_stays_fail_closed_with_fake_model() {
+        let file = fake_model_file();
+        let model = Phi3Model::new(file.path()).unwrap();
+        let result = model.analyze_bytes(&high_entropy_bytes()).await.unwrap();
+        assert!(!result.is_suspicious);
+        assert_eq!(result.confidence, 0.0);
+        assert!(result.threat_indicators.is_empty());
+        assert_eq!(result.recommended_action, RecommendedAction::Ignore);
+    }
+
+    /// The stub must never recommend quarantine, whatever the input.
+    #[tokio::test]
+    async fn test_stub_never_recommends_quarantine() {
+        let model = Phi3Model::new(&PathBuf::from("/nonexistent/phi3.onnx")).unwrap();
+        for data in [&b""[..], &high_entropy_bytes(), &vec![0x41u8; 1000]] {
+            let result = model.analyze_bytes(data).await.unwrap();
+            assert_eq!(result.recommended_action, RecommendedAction::Ignore);
+            assert!(result.confidence < MIN_CONFIDENCE_KI);
+        }
+    }
+
+    /// Input bounds: empty and exactly-maximal inputs return the safe default,
+    /// while an oversized input fails closed without analysis.
+    #[tokio::test]
+    async fn test_input_bounds_fail_closed() {
+        let model = Phi3Model::new(&PathBuf::from("/nonexistent/phi3.onnx")).unwrap();
+        for data in [&b""[..], &vec![0u8; MAX_ANALYSIS_BYTES]] {
+            let result = model.analyze_bytes(data).await.unwrap();
+            assert_eq!(result.recommended_action, RecommendedAction::Ignore);
+            assert!(!result.is_suspicious);
+        }
+
+        let oversized = vec![0u8; MAX_ANALYSIS_BYTES + 1];
+        assert!(model.analyze_bytes(&oversized).await.is_err());
+    }
+
+    /// Production profiles reject the security-critical stub outright.
+    /// Tested through the explicit-mode helper to stay deterministic without
+    /// mutating process env in parallel tests.
+    #[test]
+    fn test_production_profiles_reject_stub() {
+        assert!(stub_analysis(RuntimeMode::Development, 0).is_ok());
+        assert!(stub_analysis(RuntimeMode::Beta, 0).is_err());
+        assert!(stub_analysis(RuntimeMode::Mainnet, 0).is_err());
     }
 }

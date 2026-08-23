@@ -4,7 +4,7 @@
 
 The repository currently provides development components for:
 - YARA-style pattern matching
-- a Phi-3 placeholder/heuristic
+- a bounded fail-closed Phi-3 safe-default stub
 - a SHA-256 ZK-proof placeholder
 - cached rule-reader and federated-learning placeholders
 

@@ -5,9 +5,11 @@ a production malware detector or reporting client.
 
 ## Current Boundary
 
-- `ai/phi3.rs` checks for a configured model path but runs a deterministic
-  entropy heuristic. It creates no ONNX Runtime session and performs no model
-  inference.
+- `ai/phi3.rs` is a fail-closed development stub. It never reports a loaded
+  model from path existence, creates no ONNX Runtime session, performs no
+  model inference, and in Development returns a safe default for inputs up to
+  16 MiB (not suspicious, confidence 0.0, no quarantine authority) instead of
+  heuristic verdicts. Beta/Mainnet profiles and oversized inputs fail closed.
 - `security/scanner.rs` is a custom YARA-style pattern matcher. It is not
   evidence of production YARA malware detection or real-sample quality.
 - `security/heuristic.rs` performs bounded, deterministic integer scoring over

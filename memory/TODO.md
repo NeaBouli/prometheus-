@@ -63,6 +63,7 @@
 - [x] [P1] Einfacher Datei-Scanner implementieren (scanner.rs, YARA-Integration) | Claude Code | Development-only Byte-Scanner mit begrenztem Pattern-Matcher; keine echte YARA-Engine und kein Produktions-Malware-Nachweis
 - [x] [P2] Heuristische Analyse (heuristic.rs) | Kimi K3 + Codex | GH-220: begrenzte deterministische Byte-Triage; kein API-Call-/Prozess-Monitoring, keine Malware- oder Quarantäne-Autorität
 - [x] [P2] Quarantäne-Management (quarantine.rs) | Kimi K3 + Codex | GH-220: owner-lokaler exakter Byte-Vault; kein Verschieben/Löschen von Quelldateien und keine automatische Isolation
+- [x] [P1] Phi-3 Stub-Autorität fail-closed härten | Kimi K3 + Codex | GH-223: Dateiexistenz ist kein geladener Modellnachweis; maximal 16 MiB; nur Safe-Default, keine Suspicious-/Quarantäne-Autorität
 - [~] [P2] P2P-Grundgerüst (p2p.rs mit libp2p) | Claude Code + Codex | Transport-Grundlagen existieren in getrennten Modulen; Client-Integration und betriebenes Multi-Host-Netz bleiben offen
 - [ ] [P2] ZK-Proof-Generierung (zk_proof.rs, Groth16) | Claude Code | Aktueller Client-Pfad ist nur ein dokumentierter Stub; reale v2-Relation, freigegebene Artefakte und Client-Integration bleiben offen
 - [ ] [P2] Tauri-App Grundgerüst (UI-Shell, System-Tray) | Claude Code | Rust-Client
@@ -187,7 +188,7 @@
 ## ═══ SPRINT 11: PHI-3 + LLAMA PRODUCTION (Juni 2026) ═══
 
 - [ ] [P0] Phi-3-mini 3.8B herunterladen + 4-bit ONNX quantisieren | Claude Code | -
-- [ ] [P0] Echte Inferenz statt Entropy-Heuristik in phi3.rs | Claude Code | Phi-3 model
+- [ ] [P0] Echte geprüfte Inferenz im fail-closed phi3.rs Stub implementieren | Claude Code | Phi-3 model
 - [ ] [P1] LLaMA 3 8B LoRA Fine-Tuning auf Security-Datensätzen | Claude Code | Datensätze
 - [ ] [P1] LLaMA 3 70B Fine-Tuning | Claude Code | 8B done
 - [ ] [P2] Fed-DART echte Implementierung (Gradient-Aggregation) | Claude Code | -
