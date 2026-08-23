@@ -4375,3 +4375,13 @@ Rules for all dev agents:
   10 MB scanner performance passes in `1.59s`; all-target Clippy, Rustfmt and
   exact lockfile-diff checks pass. No threshold or product behavior changed.
 - Status: `Local remediation PASS / Protected checks rerun next / Production false`.
+
+## 2026-08-23 - GH-220 final public closeout
+
+- PR #221 passed all eleven protected contexts and merged normally as exact
+  main `8c01cd8`; issue #220 closed.
+- Exact-main CI `32631843923`, Security `32631843937`, and Pages
+  `32631843610` pass. Cache-busted live Roadmap, Whitepaper, `llms.txt`, index
+  and raw GitHub README readback contain the synchronized Development-only
+  boundary.
+- Status: `GH-220 DONE / Exact-main and live Pages verified / Production false`.
