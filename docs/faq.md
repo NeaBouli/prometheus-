@@ -169,8 +169,10 @@ No operated validator network or production quorum is proven.
 **Q: Which Light Client features work today?**
 The Rust workspace contains tested development components, but Phi-3
 inference, Groth16 proofs, canonical rule loading, P2P submission, and the
-complete report pipeline are not production implementations yet. Runtime
-guards reject those placeholders in beta and mainnet profiles.
+complete report pipeline are not production implementations yet. Phi-3 is a
+fail-closed safe-default stub: file existence does not report a loaded model,
+and no suspicious or quarantine authority is emitted. Runtime guards reject
+those placeholders in beta and mainnet profiles.
 
 Merged and exact-main-verified GH-197/PR #198 adds a local Testnet-10
 consistency boundary: a separately
@@ -281,8 +283,9 @@ that already exists and give it to humanity in a new form.
 The target architecture names two locally operated model families:
 
 Phi-3-mini 3.8B is the Light Client target. Current Rust code has no ONNX
-Runtime session and uses only a development heuristic/stub, so no real-model or
-real-sample detection claim is made.
+Runtime session and uses a fail-closed safe-default stub. File existence never
+reports a loaded model, and the stub emits no suspicious or quarantine
+authority, so no real-model or real-sample detection claim is made.
 
 LLaMA 3 8B-first with 70B escalation is the Guardian target. Hardened local
 runtime configuration and evidence-capture machinery exist, but no real 8B/70B

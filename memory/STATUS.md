@@ -664,7 +664,7 @@ Whitepaper verification pass. GH-13 is accepted as development-only foundation.
 | client/network/p2p.rs        | PENDING         | 0%       | -           | -            | Sprint 2 Phase 2 |
 | client/network/zk_proof.rs   | DEVELOPMENT STUB | 100%    | 2026-03-21 | LOCAL PASS | 7 stub tests (PATTERN-004); no client Groth16 generator or production proof evidence |
 | **SPRINT 3 – PHI-3**         |                 |          |             |              |                 |
-| client/ai/phi3.rs            | DEVELOPMENT STUB | 100%    | 2026-03-21 | LOCAL PASS | 8 tests around an ONNX stub; no real Phi-3 model execution or malware-quality evidence |
+| client/ai/phi3.rs            | DEVELOPMENT STUB | 100%    | 2026-08-23 | LOCAL PASS | GH-223 fail-closed safe-default stub; file existence never reports a loaded ONNX model, input is bounded to 16 MiB, and no suspicious or quarantine authority is emitted; no real inference or malware-quality evidence |
 | client/ai/detection.rs       | DEVELOPMENT STUB | 100%    | 2026-03-21 | LOCAL PASS | 10 deterministic composition tests over scanner/AI stubs; no production verdict authority |
 | client/ai/federated.rs       | DEVELOPMENT STUB | 100%    | 2026-03-21 | LOCAL PASS | 10 Fed-DART stub tests; no operated federated-learning network |
 | **SPRINT 4 – GUARDIAN**      |                 |          |             |              |                 |

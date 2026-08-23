@@ -26,6 +26,7 @@
     "light_client": {
       "status": "implemented_and_tested_development_foundation",
       "phi3_onnx_inference": "not_implemented",
+      "phi3_stub_authority": "safe_default_only_no_quarantine_authority",
       "scanner": "custom_yara_style_pattern_matcher",
       "local_rule_ingestion": "raw_cidv1_exact_bytes_atomic_development_only",
       "canonical_rule_loading": "not_implemented",
