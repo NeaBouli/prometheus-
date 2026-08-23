@@ -31,46 +31,55 @@ REQUIRED_FRAGMENTS = {
         "no production Prometheus network",
         "stake KAS, never PROM",
         "fail-closed safe-default stub",
+        "single static loopback Guardian peer",
     ),
     Path("WHITEPAPER.md"): (
         "no ONNX session",
         "rule content is stored",
         "fail-closed safe-default stub",
+        "exactly one canonical static literal-loopback QUIC peer",
     ),
     Path("docs/roadmap.md"): (
         "scope-weighted engineering estimates",
         "NO OPERATED VALIDATOR NETWORK",
         "Phi-3 fail-closed safe-default stub",
+        "Development-only Light Client v1 ThreatHint sender",
     ),
     Path("docs/faq.md"): (
         "No PROM minting, emission, pool, or",
         "development placeholder",
         "fail-closed safe-default stub",
+        "Development-only v1 submission path",
     ),
     Path("memory/STATUS.md"): (
         "Production-deployed: no Prometheus protocol component",
         "stake KAS, never PROM",
         "GH-223 fail-closed safe-default stub",
+        "GH-226 one-shot v1 sender",
     ),
     Path("index.html"): (
         "No production protocol network or PROM emission is active",
         "Target: on-chain in under 60 seconds",
         "bounded fail-closed safe-default stub",
+        "one static literal-loopback Guardian peer",
     ),
     Path("roadmap.html"): (
         "not production evidence",
         "no ONNX session",
         "fail-closed safe-default stub",
+        "GH-226 implements one Development-only Light Client v1 ThreatHint sender",
     ),
     Path("whitepaper.html"): (
         "Current Phi-3 and proof generation are development stubs",
         "content on IPFS",
         "fail-closed safe-default stub",
+        "GH-226 adds one Development-only v1 ThreatHint sender",
     ),
     Path("faq.html"): (
         "not implemented, deployed, or active",
         "No completed fine-tuning",
         "fail-closed safe-default stub",
+        "GH-226 adds one Development-only Light Client v1 sender",
     ),
     Path("guardian-economics.html"): (
         "not active network economics",
@@ -80,11 +89,13 @@ REQUIRED_FRAGMENTS = {
         "Production protocol status: none proven deployed",
         "validators stake KAS, never PROM",
         "fail-closed safe-default stub",
+        "GH-226 adds one Development-only v1 ThreatHint sender",
     ),
     Path("modules/client/README.md"): (
         "development foundation",
         "creates no ONNX Runtime session",
         "safe default",
+        "threat-hint preflight|submit",
     ),
     Path("modules/guardian-node/README.md"): (
         "No actionable rule is authorized",
@@ -156,6 +167,10 @@ def validate_status(data: dict[str, Any]) -> list[str]:
         errors.append(
             "Phi-3 stub must remain safe-default without quarantine authority"
         )
+    if light.get("p2p_reporting") != "not_operated":
+        errors.append("Light Client P2P reporting must remain not operated")
+    if light.get("p2p_v1_submission") != "development_only_same_host_loopback_verified":
+        errors.append("Light Client v1 submission must remain development-only same-host evidence")
     if economics.get("status") != "illustrative_planning_only":
         errors.append("Guardian economics must remain illustrative planning only")
     if economics.get("active_rewards_or_market_price") is not False:

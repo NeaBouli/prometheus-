@@ -13,6 +13,8 @@ use prometheus_client::blockchain::rule_coordinator::{
     RuleCoordinatorOutcome, RuleCoordinatorPhase,
 };
 use prometheus_client::miner_companion::MinerCompanionConfig;
+#[cfg(unix)]
+use prometheus_client::network::p2p::{ThreatHintSubmissionStatus, ThreatHintSubmitConfig};
 use prometheus_client::rule_sync_cli::{RuleSyncConfig, SystemRuleSnapshotClock};
 use prometheus_client::runtime::RuntimeMode;
 use prometheus_client::security::scanner::YaraScanner;
@@ -36,6 +38,9 @@ enum Command {
     /// Opt-in Development/Testnet-10 RuleStorage synchronization.
     #[command(subcommand)]
     RuleSync(RuleSyncCommand),
+    /// Development-only v1 ThreatHint submission to one static loopback Guardian peer.
+    #[command(subcommand)]
+    ThreatHint(ThreatHintCommand),
 }
 
 #[derive(Debug, Subcommand)]
@@ -72,6 +77,26 @@ enum RuleSyncCommand {
     },
 }
 
+#[derive(Debug, Subcommand)]
+enum ThreatHintCommand {
+    /// Validate owner-local config and canonical hint offline; no identity
+    /// creation, mutation, or network activity.
+    Preflight {
+        #[arg(long)]
+        config: PathBuf,
+        #[arg(long)]
+        hint: PathBuf,
+    },
+    /// Submit one canonical v1 ThreatHint and print the bounded
+    /// remote-local-boundary status. No retry and no persistence.
+    Submit {
+        #[arg(long)]
+        config: PathBuf,
+        #[arg(long)]
+        hint: PathBuf,
+    },
+}
+
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     env_logger::init();
@@ -87,6 +112,12 @@ async fn main() -> anyhow::Result<()> {
         }
         Some(Command::RuleSync(RuleSyncCommand::Run { config })) => {
             run_rule_sync(config).await?;
+        }
+        Some(Command::ThreatHint(ThreatHintCommand::Preflight { config, hint })) => {
+            preflight_threat_hint(config, hint).await?;
+        }
+        Some(Command::ThreatHint(ThreatHintCommand::Submit { config, hint })) => {
+            submit_threat_hint(config, hint).await?;
         }
         None => {
             info!("Prometheus Light Client starting");
@@ -115,6 +146,37 @@ async fn preflight_rule_sync(config_path: PathBuf, connect: bool) -> anyhow::Res
 
     println!("{}", serde_json::to_string_pretty(&report)?);
     Ok(())
+}
+
+#[cfg(unix)]
+async fn preflight_threat_hint(config_path: PathBuf, hint_path: PathBuf) -> anyhow::Result<()> {
+    let config = ThreatHintSubmitConfig::from_toml_file(&config_path)?;
+    let validated = config.validate(RuntimeMode::from_env())?;
+    let report = validated.offline_preflight(&hint_path)?;
+    println!("{}", serde_json::to_string_pretty(&report)?);
+    Ok(())
+}
+
+#[cfg(not(unix))]
+async fn preflight_threat_hint(_config_path: PathBuf, _hint_path: PathBuf) -> anyhow::Result<()> {
+    anyhow::bail!("threat-hint commands are unsupported: the Guardian transport is Unix-only")
+}
+
+#[cfg(unix)]
+async fn submit_threat_hint(config_path: PathBuf, hint_path: PathBuf) -> anyhow::Result<()> {
+    let config = ThreatHintSubmitConfig::from_toml_file(&config_path)?;
+    let validated = config.validate(RuntimeMode::from_env())?;
+    let report = validated.submit(&hint_path).await?;
+    println!("{}", serde_json::to_string_pretty(&report)?);
+    if report.status == ThreatHintSubmissionStatus::TransportFailure {
+        anyhow::bail!("threat-hint submission ended in transport-failure");
+    }
+    Ok(())
+}
+
+#[cfg(not(unix))]
+async fn submit_threat_hint(_config_path: PathBuf, _hint_path: PathBuf) -> anyhow::Result<()> {
+    anyhow::bail!("threat-hint commands are unsupported: the Guardian transport is Unix-only")
 }
 
 async fn run_rule_sync(config_path: PathBuf) -> anyhow::Result<()> {

@@ -168,11 +168,21 @@ No operated validator network or production quorum is proven.
 
 **Q: Which Light Client features work today?**
 The Rust workspace contains tested development components, but Phi-3
-inference, Groth16 proofs, canonical rule loading, P2P submission, and the
-complete report pipeline are not production implementations yet. Phi-3 is a
+inference, Groth16 proofs, canonical rule loading, operated public/multi-host
+P2P reporting, and the complete report pipeline are not production
+implementations yet. Phi-3 is a
 fail-closed safe-default stub: file existence does not report a loaded model,
 and no suspicious or quarantine authority is emitted. Runtime guards reject
 those placeholders in beta and mainnet profiles.
+
+GH-226 adds one narrower Development-only v1 submission path. The real Light
+Client binary can send one exact canonical hint to one static literal-loopback
+Guardian QUIC peer under strict owner-only configuration, offline preflight,
+bounded execution and redacted status. Real same-host tests cover
+accepted/duplicate/rejected/busy and transport failure. This does not establish
+proof validity, reporter membership, privacy approval, public Testnet or
+multi-host operation, wallet/chain/reward behavior, deployment or production
+readiness.
 
 Merged and exact-main-verified GH-197/PR #198 adds a local Testnet-10
 consistency boundary: a separately

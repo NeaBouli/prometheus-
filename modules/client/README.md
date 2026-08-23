@@ -82,6 +82,15 @@ a production malware detector or reporting client.
   Security `31978132044`, and Pages `31978131647` pass. This remains local
   Development evidence, not public Testnet operation, independent RPC/IPFS
   truth or availability, deployment, Mainnet, or production readiness.
+- GH-226 adds `network/p2p.rs` and `threat-hint preflight|submit` as one
+  Development-only, dial-only v1 sender composed from the existing Guardian
+  P2P stack. It accepts one canonical static literal-loopback QUIC peer, strict
+  owner-only config/hint/identity paths, exact canonical bytes and a 1–60
+  second bound. Real same-host binary/QUIC tests cover
+  accepted/duplicate/rejected/busy/transport-failure with redacted output.
+  Beta and Mainnet reject before dialing. This grants no proof, membership,
+  discovery, public/multi-host, wallet, chain, reward, deployment or production
+  authority.
 - `blockchain/rule_ingest.rs` ingests a complete caller-supplied active-rule
   snapshot whose raw CIDv1 (sha2-256, canonical lowercase base32) must bind the
   exact caller-supplied content bytes. It parses a strict simple matcher
@@ -98,5 +107,5 @@ a production malware detector or reporting client.
 
 Beta, mainnet, and production runtime profiles reject these stubs. Production
 use remains blocked on real Phi-3/ONNX inference and real-sample evaluation,
-approved proof artifacts, canonical rule loading, reviewed P2P reporting,
+approved proof artifacts, canonical rule loading, operated public/multi-host P2P reporting,
 privacy controls, and multi-host evidence.

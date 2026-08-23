@@ -204,7 +204,8 @@ operation, and public release-hardening evidence for the exact rollout commit.
 - Pending: production authority/key/recipient attestation, independent approval of the v2 relation/production proof artifacts and cryptographic review, real privacy-reviewed semantic/actionable analysis, and operated multi-host v2 transport evidence
 - Proven on an isolated three-node harness: relay reservation/delivery, AutoNAT state, DCUtR relay fallback, and disconnect handling; real two-host operation remains pending
 - Pending: public operated relay/NAT infrastructure and broad discovery; mDNS remains excluded while its compatible dependency path has unresolved RustSec advisories
-- Light Client ↔ Guardian communication over P2P
+- GH-226 implements one Development-only Light Client v1 ThreatHint sender over the existing Guardian P2P stack: strict owner-local files, offline preflight, one static literal-loopback QUIC route, exact canonical bytes, bounded redacted outcomes, and real same-host binary/Guardian evidence. This is not public Testnet, multi-host, proof, membership, deployment or production evidence
+- Pending: operated public/multi-host Light Client ↔ Guardian reporting, reporter membership/identity authority, discovery, privacy-reviewed proof generation and production rollout
 - Guardian ↔ Validator communication over P2P
 
 **Sprint 10B — Guardian Decentralization**

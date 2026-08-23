@@ -32,6 +32,11 @@ prometheus-threat-hint = { version = "0.1.0", path = "../threat-hint" }
 toml = "0.8"
 url.workspace = true
 
+# The GH-226 v1 ThreatHint sender reuses the existing Unix-only Guardian
+# transport; no additional libp2p dependency is introduced here.
+[target.'cfg(unix)'.dependencies]
+prometheus-guardian-p2p = { version = "0.1.0", path = "../guardian-p2p" }
+
 [dev-dependencies]
 async-trait = "0.1"
 tempfile = "3"
