@@ -4334,3 +4334,44 @@ Rules for all dev agents:
   `31979117415` pass; live index, Roadmap, FAQ, Whitepaper, `llms.txt`, and raw
   GitHub README readback contain the synchronized GH-216 boundary.
 - Status: `GH-216 DONE / Production false`.
+
+## 2026-08-23 - GH-220 started
+
+- Opened issue #220 and branch
+  `feat/GH-220-status-client-safety-foundations` from clean exact main
+  `c243b69`.
+- Scope: status reconciliation + regression guard + bounded Development
+  heuristic + byte-only private quarantine vault. Kimi owns the client-module
+  block; Sol owns integration and all gates. Claude OAuth is expired.
+- No external, chain, deployment, contract or production action is in scope.
+- Status: `GH-220 In Progress / Production false`.
+
+## 2026-08-23 - GH-220 local implementation complete
+
+- Added bounded deterministic byte triage, private exact-byte vault, status
+  consistency CI guard and synchronized status/public documentation.
+- Kimi implemented and reviewed the client slice; Sol hardened, integrated and
+  fully retested it. Kimi's fresh final staged-diff review returned `SHIP` with
+  no P0-P3 finding. Claude OAuth remained expired and produced no change.
+- Final local gates: Rust 583 pass / 2 intentional ignores; Guardian 1,303 pass
+  / 4 intentional skips; workspace fmt/clippy clean; 30 combined docs/status
+  regressions plus Memory, claims, hygiene, YAML and diff checks pass.
+- No contract, tokenomics, wallet, chain, deployment, Mainnet or production
+  action occurred. Status: `Local complete / Protected PR pending`.
+
+## 2026-08-23 - GH-220 PR opened
+
+- Commit `dfaf103` pushed to the feature branch and protected PR #221 opened
+  against `main`; no direct-main or admin action.
+- Status: `PR checks pending / Production false`.
+
+## 2026-08-23 - GH-220 RustSec remediation
+
+- PR #221's initial protected wave was green except Dependency Audit, which
+  reported `RUSTSEC-2026-0258` for resolved `h2` `0.4.15`.
+- Updated only the `h2` lock resolution to `0.4.16`; local audit now reports
+  zero vulnerabilities and eight pre-existing allowed warnings.
+- Functional Rust tests pass `582/0/2` with the timing test separated; isolated
+  10 MB scanner performance passes in `1.59s`; all-target Clippy, Rustfmt and
+  exact lockfile-diff checks pass. No threshold or product behavior changed.
+- Status: `Local remediation PASS / Protected checks rerun next / Production false`.

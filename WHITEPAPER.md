@@ -432,6 +432,8 @@ This section describes the target Light Client architecture. The current Rust cl
 
 Merged and exact-main-verified GH-216/PR #217 at `13c1812` adds test-only real-binary loopback evidence for offline/connected preflight, a private checkpoint commit, SIGTERM/SIGINT drain, restart exact replay, rollback/equivocation rejection, and malformed, timeout, or disconnected peer paths; CI `31978132036`, Security `31978132044`, and Pages `31978131647` pass. This remains local Development evidence, not public Testnet operation, independent RPC/IPFS truth or availability, deployment, Mainnet, or production readiness.
 
+GH-220 adds two narrower Development foundations: deterministic integer triage over exact caller-supplied bytes and an owner-local digest-verified byte vault. The triage reports structural reasons only and supplies no malware verdict or quarantine authority. The vault accepts no source path, never moves or deletes source files, and performs no automatic isolation. Neither component is production endpoint-security evidence.
+
 ### 8.1 Phi-3-mini Integration
 
 - Model: Phi-3-mini 3.8B, 4-bit quantized (Architecture Decision #8)

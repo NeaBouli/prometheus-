@@ -10,6 +10,13 @@ a production malware detector or reporting client.
   inference.
 - `security/scanner.rs` is a custom YARA-style pattern matcher. It is not
   evidence of production YARA malware detection or real-sample quality.
+- `security/heuristic.rs` performs bounded, deterministic integer scoring over
+  exact caller-supplied bytes and reports only structural triage reasons. It
+  does not monitor APIs, processes, paths or the operating system, does not
+  label content malicious, and cannot authorize quarantine.
+- `security/quarantine.rs` is an owner-local, digest-verified exact-byte vault.
+  It never receives a source path, moves or deletes source files, prevents
+  execution, or performs automatic isolation.
 - `blockchain/krc20.rs` observes the Kaspa DAG and returns a development cache;
   canonical Kaspa state/CID and IPFS content loading are not implemented.
 - `blockchain/rule_state.rs` strictly decodes exact caller-supplied current-
