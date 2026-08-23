@@ -19,13 +19,14 @@ use prometheus_guardian_p2p::ingress::UnixBallotIngress;
 use prometheus_guardian_p2p::threat_hint_ingress::UnixThreatHintIngress;
 use prometheus_guardian_p2p::threat_hint_v2_ingress::UnixThreatHintV2Ingress;
 use prometheus_guardian_p2p::transport_identity::load_or_create_transport_identity;
-use prometheus_guardian_p2p::{GuardianP2p, GuardianP2pConfig, TransportEvent};
+use prometheus_guardian_p2p::{GuardianP2p, GuardianP2pConfig, TransportError, TransportEvent};
 use serde_json::Value;
 use sha2::{Digest, Sha256};
 use tempfile::TempDir;
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::net::UnixListener;
 use tokio::process::Command;
+use tokio::sync::oneshot;
 use tokio::task::JoinHandle;
 use tokio::time::timeout;
 
@@ -135,7 +136,10 @@ async fn serve_once(listener: Arc<UnixListener>, expected: Vec<u8>, status: &'st
     stream.shutdown().await.expect("close acknowledgement");
 }
 
-fn spawn_driver(fixture: &Fixture, mut node: GuardianP2p) -> JoinHandle<()> {
+fn spawn_driver(
+    fixture: &Fixture,
+    mut node: GuardianP2p,
+) -> (oneshot::Sender<()>, JoinHandle<Result<(), TransportError>>) {
     let ballot_ingress = UnixBallotIngress::configured(
         fixture.verifier_dir.join("unused-ballot.sock"),
         Duration::from_secs(2),
@@ -149,17 +153,22 @@ fn spawn_driver(fixture: &Fixture, mut node: GuardianP2p) -> JoinHandle<()> {
         Duration::from_secs(2),
     )
     .expect("configured ThreatHint-v2 ingress");
-    tokio::spawn(async move {
+    let (shutdown_tx, mut shutdown_rx) = oneshot::channel();
+    let task = tokio::spawn(async move {
         loop {
-            let _ = node
-                .next_verified_sidecar_event(
+            tokio::select! {
+                _ = &mut shutdown_rx => return Ok(()),
+                event = node.next_verified_sidecar_event(
                     &ballot_ingress,
                     &threat_hint_ingress,
                     &threat_hint_v2_ingress,
-                )
-                .await;
+                ) => {
+                    event?;
+                }
+            }
         }
-    })
+    });
+    (shutdown_tx, task)
 }
 
 fn command() -> Command {
@@ -236,7 +245,7 @@ async fn real_binary_loopback_submit_maps_remote_boundary_status() {
     assert_redacted(&fixture, &peer, &output);
 
     let listener = bind_verifier(&fixture.verifier_socket).await;
-    let driver = spawn_driver(&fixture, guardian);
+    let (shutdown, driver) = spawn_driver(&fixture, guardian);
 
     for status in ["accepted", "duplicate", "rejected", "busy"] {
         let serve = tokio::spawn(serve_once(
@@ -259,9 +268,14 @@ async fn real_binary_loopback_submit_maps_remote_boundary_status() {
         assert_eq!(mode & 0o777, 0o600);
     }
 
+    shutdown.send(()).expect("request clean Guardian shutdown");
+    timeout(Duration::from_secs(10), driver)
+        .await
+        .expect("bounded Guardian shutdown")
+        .expect("Guardian driver task")
+        .expect("Guardian driver transport");
+
     // A stopped Guardian boundary maps to a bounded transport-failure.
-    driver.abort();
-    let _ = driver.await;
     write_config(&fixture, &peer, &route, 2);
     let output = run_to_output(cli(&fixture, "submit")).await;
     assert!(!output.status.success());

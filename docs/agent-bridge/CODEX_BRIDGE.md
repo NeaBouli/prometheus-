@@ -5410,3 +5410,22 @@ No direct `main` push or production action occurred.
   protected GitHub CI check. No wallet, chain, signing, broadcast, deployment,
   Mainnet or production action occurred.
 - **Status:** `GH-226 Publication candidate PASS / Commit and protected PR next / Production false`.
+
+## 2026-08-24 - GH-226 PR #227 review remediation
+
+- Protected PR #227 opened at head `1aa5d76b4aca673549e0277ce2046c03fd40fae7`.
+  The initial Security, Rust workspace, Guardian, Silverc, Memory, HTML and
+  documentation checks passed; Rust Performance was still running when the
+  review delta began.
+- CodeRabbit completed with three inline comments. Sol rejected the date note
+  as a timezone false positive: the verified local EEST date is 2026-08-24.
+  The two valid notes were fixed: the Guardian test driver now propagates
+  transport errors and shuts down through an asserted bounded clean path, and
+  the example config explicitly requires the same valid peer ID in both peer
+  fields.
+- Post-fix focused verification passes: P2P unit 12/12, real-binary loopback
+  2/2, client all-target Clippy, Rustfmt, 13 synchronized public surfaces, 10
+  claim regressions and diff checks. The generic redacted error remains
+  deliberate for this Development-only security boundary; no sensitive
+  operator values are exposed.
+- **Status:** `GH-226 Review remediation PASS / Protected checks must rerun / Production false`.

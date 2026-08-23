@@ -4458,3 +4458,14 @@ Rules for all dev agents:
   Rustfmt, 13 synchronized public surfaces, 10 claim regressions and diff
   checks pass after the correction.
 - Status: `Publication candidate PASS / Protected PR next / Production false`.
+
+## 2026-08-24 - GH-226 PR #227 review remediation
+
+- PR #227 opened at exact head `1aa5d76`. Initial protected Security, Rust,
+  Guardian, Silverc, Memory, HTML and documentation checks passed.
+- CodeRabbit's date note was a UTC/EEST false positive. Sol fixed its two valid
+  comments: driver transport errors are propagated through a bounded clean
+  shutdown, and the example config now explains exact peer-ID replacement.
+- Post-fix unit 12/12, real-binary loopback 2/2, client all-target Clippy,
+  Rustfmt, 13 public surfaces, 10 claim regressions and diff checks pass.
+- Status: `Review remediation PASS / Protected checks must rerun / Production false`.

@@ -5,6 +5,9 @@
 # this surface before any network activity. The acknowledgement only reports
 # a remote local-boundary outcome; it is never proof, consensus, membership,
 # or reward authority.
+# Replace the placeholder with one valid base58btc Guardian transport peer ID.
+# The same value must appear in guardian_peer_id and in the trailing /p2p/
+# component of guardian_address; any mismatch is rejected.
 enabled = true
 network = "testnet10"
 guardian_peer_id = "12D3KooWReplaceWithTheStaticGuardianTransportPeerId"
