@@ -2,7 +2,7 @@
 # Format: - [ ] [PRIO] Beschreibung | Verantwortlich | Dependencies
 # PRIO: P0=Kritisch, P1=Hoch, P2=Mittel, P3=Niedrig
 # Status: [ ]=offen, [~]=in Arbeit, [x]=erledigt, [!]=blockiert
-# Last Updated: 2026-08-16
+# Last Updated: 2026-08-23
 
 ---
 
@@ -32,7 +32,7 @@
 - [x] [P0] GH-25 keyless GovernanceAutoTuning `reportMetrics` operator | Codex | Two-input value-preserving Rust transition, separate P2PK fee sponsor, dual external BIP340 verification, complete input execution, live UTXO checks, acknowledged journaled broadcast, successor observation, 49 deployer tests, independent review, PR #26, exact-main CI/Security/Pages, and live Whitepaper pass at `072f04a`; real chain operation/evidence continues under rollout execution gates
 - [x] [P0] GH-9 H-001 handoff von aktuellem exact main neu bauen | Codex | 2026-07-31 exact main `143a8a0` reproduced the accepted `205e1ca` seven-artifact archive/request/signing request after the dependency-security fix, live-revalidated the public UTXO, passed owner-only modes, full-directory Gitleaks, full Rust/Guardian gates, and independent review; external signature/broadcast/evidence remain
 - [x] [P0] GH-30 Required-Check-Laufzeiten begrenzen und Audit-Toolchains pinnen | Codex | PR #31 merged as `71e5783`; alle neun geschützten Kontextnamen unverändert; exact-main CI `29457601210`, Security `29457601183`, Pages `29457600490` green
-- [!] [P0] GH-9 `ValidatorStakingH001` Canary auf testnet-10 ausführen | Codex + externer Signer | Funding/identity and exact-main `143a8a0` refresh of the accepted `205e1ca` schema-v2 request/digest are live-revalidated and byte-identical; explicit external BIP340 response, operator verification, separately approved one-shot broadcast, confirmation, receipt, and independent evidence remain
+- [x] [P0] GH-9 `ValidatorStakingH001` Canary auf testnet-10 ausführen | Codex + externer Signer | Genau ein autorisierter Testnet-10-Broadcast ist bestätigt; `operator_record` und unabhängige öffentliche Evidence bestehen. Der Canary bleibt absichtlich non-promotable und beweist weder die sechs übrigen Deployments noch Mainnet- oder Produktionsreife
 - [x] [P0] rusty-kaspa als Dependency in Cargo.toml einbinden | Claude Code | 2026-03-21; pinned to v2.0.1 on 2026-07-07
 - [x] [P0] autodidactic.py vollständig testen (alle Memory-Operationen) | Codex | 2026-07-12; stdlib regression suite covers memory loading, next-task priority/dependency selection, in-progress completion, padded STATUS row replacement, and blocker detection; wired into Prometheus CI Memory Integrity job
 - [x] [P0] .gitignore konfigurieren (.secrets/, /tmp/, target/, __pycache__) | Claude Code | 2026-03-21
@@ -57,14 +57,14 @@
 
 ## ═══ SPRINT 2: LIGHT CLIENT BASIS (Woche 4-5) ═══
 
-- [ ] [P1] Rust-Projekt initialisieren (cargo new prometheus-client) | Claude Code | -
-- [ ] [P1] Kaspa RPC-Verbindung implementieren (connection.rs) | Claude Code | rusty-kaspa
-- [ ] [P1] KRC20-Asset-Leser implementieren (krc20.rs – Regeln von Chain lesen) | Claude Code | connection.rs
-- [ ] [P1] Einfacher Datei-Scanner implementieren (scanner.rs, YARA-Integration) | Claude Code | -
-- [ ] [P2] Heuristische Analyse (heuristic.rs – API-Call-Monitoring) | Claude Code | scanner.rs
-- [ ] [P2] Quarantäne-Management (quarantine.rs) | Claude Code | scanner.rs
-- [ ] [P2] P2P-Grundgerüst (p2p.rs mit libp2p) | Claude Code | -
-- [ ] [P2] ZK-Proof-Generierung (zk_proof.rs, Groth16) | Claude Code | -
+- [x] [P1] Rust-Projekt initialisieren (cargo new prometheus-client) | Claude Code | Development-Crate und Tests vorhanden; keine Produktionsfreigabe
+- [x] [P1] Kaspa RPC-Verbindung implementieren (connection.rs) | Claude Code | Bounded Development/Testnet-10-Verbindung vorhanden; Betrieb eines öffentlichen Client-Netzes bleibt offen
+- [~] [P1] KRC20-Asset-Leser implementieren (krc20.rs – Regeln von Chain lesen) | Claude Code + Codex | Cache-/RuleStorage-Lese-, Beobachtungs- und Sync-Grundlagen vorhanden; kanonische PROM-RULES-KRC20-Orchestrierung bleibt Zielarchitektur
+- [x] [P1] Einfacher Datei-Scanner implementieren (scanner.rs, YARA-Integration) | Claude Code | Development-only Byte-Scanner mit begrenztem Pattern-Matcher; keine echte YARA-Engine und kein Produktions-Malware-Nachweis
+- [x] [P2] Heuristische Analyse (heuristic.rs) | Kimi K3 + Codex | GH-220: begrenzte deterministische Byte-Triage; kein API-Call-/Prozess-Monitoring, keine Malware- oder Quarantäne-Autorität
+- [x] [P2] Quarantäne-Management (quarantine.rs) | Kimi K3 + Codex | GH-220: owner-lokaler exakter Byte-Vault; kein Verschieben/Löschen von Quelldateien und keine automatische Isolation
+- [~] [P2] P2P-Grundgerüst (p2p.rs mit libp2p) | Claude Code + Codex | Transport-Grundlagen existieren in getrennten Modulen; Client-Integration und betriebenes Multi-Host-Netz bleiben offen
+- [ ] [P2] ZK-Proof-Generierung (zk_proof.rs, Groth16) | Claude Code | Aktueller Client-Pfad ist nur ein dokumentierter Stub; reale v2-Relation, freigegebene Artefakte und Client-Integration bleiben offen
 - [ ] [P2] Tauri-App Grundgerüst (UI-Shell, System-Tray) | Claude Code | Rust-Client
 - [ ] [P2] Integration-Tests Client ↔ Testnet | Claude Code | Alle Client-Module
 - [x] [P2] GH-13 experimentellen opt-in Miner Companion als lokalen Testnet-10 wRPC Observer implementieren | Codex | PR #14 merged as 2e4b4ec; strict TOML, credential-free loopback, Development-only, scanning/reporting/rewards/validator/honeypot disabled; exact-merge CI/Security/Pages pass

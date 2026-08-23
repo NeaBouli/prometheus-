@@ -1,7 +1,7 @@
 # PROMETHEUS – MODULE STATUS
 # Format: | Module | Status | Progress | Last Update | Audit | Testnet Address |
-# Status: PENDING | IN_PROGRESS | DONE | BLOCKED | PENDING_AUDIT | ACCEPTED | REJECTED
-# Last Updated: 2026-08-16
+# Status: core lifecycle values plus evidence-qualified DEVELOPMENT/STUB/FIXTURE labels; every non-production label must retain its boundary in the row
+# Last Updated: 2026-08-23
 
 ---
 
@@ -657,16 +657,16 @@ Whitepaper verification pass. GH-13 is accepted as development-only foundation.
 | **SPRINT 2 – CLIENT**        |                 |          |             |              |                 |
 | client/blockchain/connection.rs | ACCEPTED      | 100%     | 2026-03-21  | ACCEPTED     | 4 tests, PATTERN-003 applied |
 | client/blockchain/krc20.rs   | ACCEPTED        | 100%     | 2026-03-21  | ACCEPTED     | 6 tests, cache-based pre-Covenant |
-| client/security/scanner.rs   | ACCEPTED        | 100%     | 2026-03-21  | ACCEPTED     | 10 tests, YARA pattern matching |
+| client/security/scanner.rs   | DEVELOPMENT ACCEPTED | 100% | 2026-03-21 | LOCAL PASS | Bounded custom byte-pattern matcher; not a real YARA engine and not production malware-detection evidence |
 | client/miner_companion.rs    | ACCEPTED        | 100%     | 2026-07-16  | REMOTE PASS  | GH-13 opt-in development-only local Testnet-10 wRPC observer; strict secret-safe preflight, no scanning/reporting/rewards/validator/honeypot/Stratum or firmware control; PR #14 and exact-merge CI/Security/Pages pass |
-| client/security/heuristic.rs | PENDING         | 0%       | -           | -            | Sprint 2 Phase 2 |
-| client/security/quarantine.rs| PENDING         | 0%       | -           | -            | Sprint 2 Phase 2 |
+| client/security/heuristic.rs | DEVELOPMENT ACCEPTED | 100% | 2026-08-23 | LOCAL PASS | GH-220 deterministic integer byte-triage foundation; no API/process monitoring, malware verdict or quarantine authority |
+| client/security/quarantine.rs| DEVELOPMENT ACCEPTED | 100% | 2026-08-23 | LOCAL PASS | GH-220 owner-local exact-byte vault foundation; no source move/delete or automatic isolation |
 | client/network/p2p.rs        | PENDING         | 0%       | -           | -            | Sprint 2 Phase 2 |
-| client/network/zk_proof.rs   | ACCEPTED        | 100%     | 2026-03-21  | ACCEPTED     | 7 tests, stub (PATTERN-004) |
+| client/network/zk_proof.rs   | DEVELOPMENT STUB | 100%    | 2026-03-21 | LOCAL PASS | 7 stub tests (PATTERN-004); no client Groth16 generator or production proof evidence |
 | **SPRINT 3 – PHI-3**         |                 |          |             |              |                 |
-| client/ai/phi3.rs            | ACCEPTED        | 100%     | 2026-03-21  | ACCEPTED     | 8 tests, ONNX stub, PATTERN-010 |
-| client/ai/detection.rs       | ACCEPTED        | 100%     | 2026-03-21  | ACCEPTED     | 10 tests, YARA+AI combined verdict |
-| client/ai/federated.rs       | ACCEPTED        | 100%     | 2026-03-21  | ACCEPTED     | 10 tests, Fed-DART stub (Decision #10) |
+| client/ai/phi3.rs            | DEVELOPMENT STUB | 100%    | 2026-03-21 | LOCAL PASS | 8 tests around an ONNX stub; no real Phi-3 model execution or malware-quality evidence |
+| client/ai/detection.rs       | DEVELOPMENT STUB | 100%    | 2026-03-21 | LOCAL PASS | 10 deterministic composition tests over scanner/AI stubs; no production verdict authority |
+| client/ai/federated.rs       | DEVELOPMENT STUB | 100%    | 2026-03-21 | LOCAL PASS | 10 Fed-DART stub tests; no operated federated-learning network |
 | **SPRINT 4 – GUARDIAN**      |                 |          |             |              |                 |
 | guardian-node/llm_server.py  | ACCEPTED        | 100%     | 2026-03-21  | ACCEPTED     | 6 tests (3 need LLM) |
 | guardian-node/yara_generator.py | ACCEPTED     | 100%     | 2026-03-21  | ACCEPTED     | 10 tests, PATTERN-011 |
@@ -677,7 +677,7 @@ Whitepaper verification pass. GH-13 is accepted as development-only foundation.
 | validator/voting/reveal.rs   | ACCEPTED        | 100%     | 2026-03-22  | ACCEPTED     | 8 tests, bond validation |
 | validator/slashing/mod.rs    | ACCEPTED        | 100%     | 2026-03-22  | ACCEPTED     | 11 tests, bit-identical to SS |
 | **SPRINT 6 – E2E**           |                 |          |             |              |                 |
-| tests/e2e_threat_lifecycle   | ACCEPTED        | 100%     | 2026-03-22  | ACCEPTED     | Full pipeline < 60s |
+| tests/e2e_threat_lifecycle   | DEVELOPMENT FIXTURE | 100% | 2026-03-22 | LOCAL PASS | Same-host/stub lifecycle only; under 60 seconds remains an unproven public multi-host target |
 | tests/performance            | ACCEPTED        | 100%     | 2026-03-22  | ACCEPTED     | 6 timing benchmarks |
 | tests/security_sybil         | ACCEPTED        | 100%     | 2026-03-22  | ACCEPTED     | 500:1 Sybil resistance |
 | tests/security_fp_flood      | ACCEPTED        | 100%     | 2026-03-22  | ACCEPTED     | 500 flood blocked |

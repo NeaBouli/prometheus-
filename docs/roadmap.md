@@ -1,6 +1,6 @@
 # Prometheus — Full Deployment Roadmap
 *Readiness-gated roadmap; no fixed public-release date is claimed.*
-*Last status reconciliation: 2026-08-14 (Europe/Athens project time), exact main `5cd13bf`; CI `31747553871`, Security `31747553891`, Pages `31747553216`.*
+*Current repository status refreshed 2026-08-23 against pre-branch exact main `c243b69`; the dated public claim audit remains the 2026-08-14 `5cd13bf` snapshot.*
 
 Evidence classes are intentionally separate: implemented/tested development
 foundations, the single demonstrated non-promotable Testnet-10 canary, no proven
@@ -32,7 +32,7 @@ real network operation are tracked in the later phases below.
 |--------|-------------|--------|
 | 0 | Kaspa Testnet-10, repo structure, CI/CD | ACCEPTED |
 | 1 | 6 Silverscript contracts, 54 tests | ACCEPTED |
-| 2 | Rust client: RPC foundation, custom YARA-style matcher, ZK stub, cache-only reader, bounded local Raw-CIDv1/exact-byte ingestion | DEVELOPMENT FOUNDATION; NO L1/IPFS NETWORK SOURCE |
+| 2 | Rust client: RPC foundation, custom YARA-style matcher, bounded deterministic byte triage, owner-local byte vault, ZK stub, cache-only reader and bounded Raw-CIDv1/exact-byte ingestion | DEVELOPMENT FOUNDATION; NO MALWARE AUTHORITY OR AUTOMATIC SOURCE ISOLATION |
 | 3 | Phi-3 heuristic/stub and Fed-DART placeholder | DEVELOPMENT FOUNDATION; NO ONNX INFERENCE |
 | 4 | Guardian interfaces, hardened local vLLM scaffold, and canonical owner-loaded membership source | TESTED FOUNDATION; NO EVALUATED REAL MODEL OR PRODUCTION TRUST |
 | 5 | Commit-Reveal voting, bond system, slashing | TESTED STATE MACHINES; NO OPERATED VALIDATOR NETWORK |

@@ -4334,3 +4334,27 @@ Rules for all dev agents:
   `31979117415` pass; live index, Roadmap, FAQ, Whitepaper, `llms.txt`, and raw
   GitHub README readback contain the synchronized GH-216 boundary.
 - Status: `GH-216 DONE / Production false`.
+
+## 2026-08-23 - GH-220 started
+
+- Opened issue #220 and branch
+  `feat/GH-220-status-client-safety-foundations` from clean exact main
+  `c243b69`.
+- Scope: status reconciliation + regression guard + bounded Development
+  heuristic + byte-only private quarantine vault. Kimi owns the client-module
+  block; Sol owns integration and all gates. Claude OAuth is expired.
+- No external, chain, deployment, contract or production action is in scope.
+- Status: `GH-220 In Progress / Production false`.
+
+## 2026-08-23 - GH-220 local implementation complete
+
+- Added bounded deterministic byte triage, private exact-byte vault, status
+  consistency CI guard and synchronized status/public documentation.
+- Kimi implemented and reviewed the client slice; Sol hardened, integrated and
+  fully retested it. Kimi's fresh final staged-diff review returned `SHIP` with
+  no P0-P3 finding. Claude OAuth remained expired and produced no change.
+- Final local gates: Rust 583 pass / 2 intentional ignores; Guardian 1,303 pass
+  / 4 intentional skips; workspace fmt/clippy clean; 30 combined docs/status
+  regressions plus Memory, claims, hygiene, YAML and diff checks pass.
+- No contract, tokenomics, wallet, chain, deployment, Mainnet or production
+  action occurred. Status: `Local complete / Protected PR pending`.

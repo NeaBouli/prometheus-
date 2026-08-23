@@ -1,5 +1,5 @@
 # PROMETHEUS — SESSION CHECKPOINT
-# Last updated: 2026-08-15
+# Last updated: 2026-08-23
 # Purpose: Full recovery document. If Claude (Architect) or Claude Code
 # loses context, read this file first. It contains the complete project state.
 
@@ -13,13 +13,13 @@
 | Repo | https://github.com/NeaBouli/prometheus- |
 | Branch | Canonical target `main`; product/public/status changes remain PR-only |
 | Lokaler Pfad | `$REPO_ROOT` |
-| Letzter grün verifizierter Produkt-/Public-Baseline | Exact product main `28da2d42f85233395c38d633f799befba0223797` and exact documentation main `a9e987c28a1984fe0f89a10991f7021253ed486a`; latest Prometheus CI `31904938024`, Security `31904938123`, and Pages `31904937253` pass |
-| Aktueller Entwicklungs-Slice | GH-203/PR #204 adds the development-only live Testnet-10 RuleStorage RPC observation adapter; delivery remains protected-PR-only and production authority remains false |
+| Letzter grün verifizierter Produkt-/Public-Baseline | Exact main `c243b69b2877413c80650c4c3662c4b0f2a50f39`; Prometheus CI `31979118045`, Security `31979117981`, and Pages `31979117415` pass |
+| Aktueller Entwicklungs-Slice | GH-220 reconciles status truth and adds bounded Development-only byte triage plus an owner-local byte vault; delivery remains protected-PR-only and production authority remains false |
 | Aktuelle Tooling-Baseline | H-001 Testnet-10 signature/import/full verification/one-shot broadcast/confirmation/receipt/independent evidence and repository-public hash revalidation pass on exact main. The bounded GH-167 ThreatHint-v2 repository transport substrate is merged and exact-main verified. Production proof artifacts/ceremony, independent cryptographic/privacy review, real semantic/actionable analysis, six state deployments, metrics-oracle evidence, operated multi-host transport, and rollout remain open. |
-| Aktueller HEAD | Canonical target `main`; GH-203 is delivered only through protected PR #204 from `feat/GH-203-live-rule-observation` |
+| Aktueller HEAD | Canonical target `main`; GH-220 is in progress on `feat/GH-220-status-client-safety-foundations` and is not yet merged |
 | Rollback-Tag | `pre-session-20260413` → `6347b85` |
-| Whitepaper | WHITEPAPER.md (root) + whitepaper.html (styled); GH-203 documents a development-only live single-node query before unchanged GH-197 verification, without independent RPC-truth, finality, or production claims |
-| Status | H-001 Testnet-10 canary is confirmed and independently evidenced. Rollout-capable core is estimated at 84-88%. GH-167 closes only the bounded repository v2 transport substrate. Production relation/key/ceremony approval and independent cryptographic/privacy review, real semantic/actionable analysis, six state deployments, metrics-oracle evidence, operated multi-host transport, crash-safe external side effects, and full rollout evidence remain gated. |
+| Whitepaper | WHITEPAPER.md (root) + whitepaper.html (styled); public claims remain synchronized through the GH-216 closeout and do not claim production operation |
+| Status | H-001 Testnet-10 canary is confirmed, independently evidenced and non-promotable. Rollout-capable core remains an internal scope-weighted estimate of 84-88%. Production false: relation/key/ceremony approval and independent cryptographic/privacy review, real semantic/actionable analysis, six state-contract deployments, metrics-oracle evidence, operated multi-host transport, crash-safe external side effects and full rollout evidence remain gated. |
 | GitHub Pages | https://neabouli.github.io/prometheus-/ |
 | Google Search Console | Verified: googleaa2902079481c7a8 |
 
@@ -56,17 +56,17 @@
 
 ## WAS WURDE BISHER GEMACHT (Gesamtübersicht)
 
-### Sprint 0-8: Code-Basis (alle ACCEPTED)
+### Sprint 0-8: Repository-Basis (Status nach Evidenzklasse)
 | Sprint | Status | Deliverables |
 |--------|--------|--------------|
 | 0 — Setup | ACCEPTED | kaspad v1.1.0 Testnet-10, Repo-Struktur, CI/CD |
-| 1 — Contracts | ACCEPTED | 6 Silverscript Contracts (54 Tests), 5 Audit-Fixes |
-| 2 — Client | ACCEPTED | Rust: KaspaConnection, KRC-20 Reader, YARA Scanner, ZK-Stub |
-| 3 — AI | ACCEPTED | Phi-3 ONNX Wrapper, AnomalyDetector, Fed-DART Client |
-| 4 — Guardian | ACCEPTED | Docker vLLM, LLM Server, YARA Generator, Analyzer (Python) |
-| 5 — Voting | ACCEPTED | Commit-Reveal, Bond System, SlashingEngine (Rust) |
-| 6 — E2E | ACCEPTED | Lifecycle <60s, Sybil 500:1, FP-Flood blocked |
-| 7 — Dashboard | ACCEPTED | Audit-Dashboard, README.md, WHITEPAPER.md |
+| 1 — Contracts | DEVELOPMENT ACCEPTED | Current-Silverc compile/ABI/runtime evidence; H-001 canary only, six deployments remain |
+| 2 — Client | DEVELOPMENT PARTIAL | Kaspa/RuleStorage sync and bounded scanner foundations; real YARA, client P2P and Groth16 generation remain open |
+| 3 — AI | STUBS ONLY | Phi-3/ONNX and Fed-DART interfaces are development stubs; no real-model detection evidence |
+| 4 — Guardian | DEVELOPMENT ACCEPTED | Bounded local analysis foundations; no production-authorized actionable rules or independently evaluated live model |
+| 5 — Voting | DEVELOPMENT ACCEPTED | Tested state machines; no operated validator network, trusted membership or decentralized authority evidence |
+| 6 — E2E | SYNTHETIC/LOCAL | Same-host fixtures only; under-60-second public multi-host lifecycle remains a target |
+| 7 — Dashboard | STATIC DEVELOPMENT | Audit dashboard uses mock/static data; public documentation is not network-operation evidence |
 | 8 — Docs | DONE | CONTRIBUTING.md, 5 Wiki-Guides, SECURITY.md |
 
 ### Web-Präsenz (alle live auf GitHub Pages)

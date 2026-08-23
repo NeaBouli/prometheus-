@@ -1,8 +1,9 @@
 # prometheus — Backlog
 
 ## 🔴 Aktiv (diese Session)
-- Latest documented green baseline is exact main `db33f566caed4f3acb3807c1dbafe0342ca8a7da`; run `git log --oneline -1` for the current working HEAD.
-- Prometheus CI `31308756777`, Security Audit `31308756786`, and GitHub Pages `31308756387` are green for exact main. Current-Silverc CI validates the keyless Toccata-v1 operator, operator runbook, request/receipt/evidence pipeline, release-readiness audit, metrics-oracle handoff, exact-commit hardening gates, and the strict release performance gate.
+- Latest documented green baseline is exact main `c243b69b2877413c80650c4c3662c4b0f2a50f39`; run `git log --oneline -1` for the current working HEAD.
+- Prometheus CI `31979118045`, Security Audit `31979117981`, and GitHub Pages `31979117415` are green for exact main. GH-220 is a repository-only status/client-safety slice and is not rollout evidence.
+- The H-001 Testnet-10 canary is confirmed, independently evidenced and non-promotable. The next rollout gates are the six state-contract deployments, metrics-oracle signatures/evidence, production v2 relation/key/ceremony approval, privacy-reviewed actionable analysis, operated multi-host transport and complete release evidence.
 - GH-131/M-002, GH-132, GH-135/M-001, GH-138/M-003, and GH-141/M-004 are merged and exact-main verified. GH-135 strictly parses separate model-provided integer basis points, replaces the indicator-count/YARA-shape heuristic, preserves the `0.85` policy, and fails closed on malformed output.
 - GH-138/M-003 provides deterministic, internally SHA-256-consistent synthetic confidence evaluation. Its co-versioned manifest is not an external tamper anchor and it does not establish live-model quality, production calibration, or authorization.
 - GH-141/M-004 is merged and exact-main verified at `bf3f74f`: a literal-loopback, proxy-independent runner captures canonical local-model candidate predictions and an offline evaluator keeps them non-authorizing. No live result or independently verified model artifact is included.

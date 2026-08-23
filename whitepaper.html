@@ -425,6 +425,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
 
       <div class="sec-sub">Wächter-KI — Phi-3-mini (Light Client)</div>
       <p>Target architecture: Microsoft's Phi-3-mini 3.8B runs locally on the end user's device for inference. Reporting and model-update paths remain separate, bounded data flows. The planned model is 4-bit quantized and targets ONNX Runtime on 4 GB RAM without GPU on Windows, macOS, Linux, and mobile; production inference is not yet wired.</p>
+      <p>GH-220 adds deterministic integer triage over exact bounded caller bytes and an owner-local digest-verified byte vault as Development foundations. The triage reports structural reasons only and has no malware or quarantine authority. The vault accepts no source path, never moves or deletes source files, and performs no automatic isolation. Neither component is production endpoint-security evidence.</p>
 
       <div class="sec-sub">Jäger-KI — LLaMA 3 (Guardian Nodes)</div>
       <p>The Guardian target uses LLaMA 3 8B first with optional 70B escalation. Hardened local runtime configuration and evidence-capture machinery exist, but no completed fine-tuning, real 8B/70B inference run, real-sample evaluation, calibration, or production authorization is proven. Planned inputs include:</p>

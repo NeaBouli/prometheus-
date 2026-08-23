@@ -1,6 +1,6 @@
 # PROMETHEUS – PERSISTENT MEMORY (MEMO)
 # Version: 4.0
-# Last Updated: 2026-08-13
+# Last Updated: 2026-08-23
 # Maintainer: Claude Code (auto-update) + Claude (audit)
 #
 # WICHTIG: Diese Datei ist das Langzeitgedächtnis des Projekts.
@@ -18,7 +18,7 @@
 | GitHub             | https://github.com/NeaBouli/prometheus-                |
 | Ziel-Launch        | Kein festes Datum; readiness-gesteuerte Gates           |
 | Whitepaper         | Prometheus_Whitepaper_v4.docx (im Repo)                |
-| Status             | Phase 0 – Vorbereitung                                 |
+| Status             | Development + begrenzter Testnet-10-Canary; Production false |
 | Core Dev           | NeaBouli                                               |
 | Architect / Auditor| Claude (claude.ai)                                     |
 | Implementierung    | Claude Code (autonomous agent)                         |
