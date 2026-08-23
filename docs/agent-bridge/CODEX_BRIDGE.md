@@ -5244,3 +5244,23 @@ No direct `main` push or production action occurred.
   saturated; the unchanged test passed in isolation and the protected GitHub
   Rust Performance context had already passed. No threshold was weakened.
 - **Status:** `PR #221 remediation locally PASS / Protected checks must rerun / Production false`.
+
+## 2026-08-23 - GH-220 exact-main and public closeout verified
+
+- Protected PR #221 passed all eleven reported contexts and merged normally,
+  without admin bypass, as exact `main`
+  `8c01cd8258083a4431dd771a0bebbc5b84476d51`; issue #220 closed.
+- Exact-main Prometheus CI `32631843923`, Security Audit `32631843937`, and
+  Pages deployment `32631843610` pass on that full SHA. Dependency Audit and
+  Security Summary pass with resolved `h2` `0.4.16`.
+- Cache-busted live readback passes for the Pages index, Roadmap, Whitepaper
+  and `llms.txt`; raw GitHub `main` README also contains the synchronized
+  Development-only Phi-3 boundary. The public GH-220 client-safety wording is
+  live and remains explicitly non-production.
+- Kimi's final independent staged-diff review was `SHIP` with no P0-P3
+  finding. CodeRabbit was review-rate-limited and produced no content review;
+  its required status and every repository protection context passed.
+- GH-220 adds no malware verdict, quarantine authority, endpoint monitoring,
+  model inference, production YARA, P2P operation, chain write, deployment or
+  production-readiness evidence. Existing rollout gates remain open.
+- **Status:** `GH-220 DONE / Exact-main and live Pages verified / Production false`.
