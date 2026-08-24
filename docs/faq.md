@@ -175,7 +175,9 @@ fail-closed safe-default stub: file existence does not report a loaded model,
 and no suspicious or quarantine authority is emitted. Runtime guards reject
 those placeholders in beta and mainnet profiles.
 
-GH-226 adds one narrower Development-only v1 submission path. The real Light
+Merged and exact-main-verified GH-226/PR #227 at `6c39af5` adds one narrower
+Development-only v1 submission path. Prometheus CI `32675287618`, Security
+Audit `32675287530`, and Pages `32675287300` pass. The real Light
 Client binary can send one exact canonical hint to one static literal-loopback
 Guardian QUIC peer under strict owner-only configuration, offline preflight,
 bounded execution and redacted status. Real same-host tests cover

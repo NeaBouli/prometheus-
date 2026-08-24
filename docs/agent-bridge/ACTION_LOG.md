@@ -4469,3 +4469,21 @@ Rules for all dev agents:
 - Post-fix unit 12/12, real-binary loopback 2/2, client all-target Clippy,
   Rustfmt, 13 public surfaces, 10 claim regressions and diff checks pass.
 - Status: `Review remediation PASS / Protected checks must rerun / Production false`.
+
+## 2026-08-24 - GH-226 final public closeout
+
+- PR #227 passed all eleven protected contexts and merged normally as exact
+  main `6c39af5`; issue #226 is closed and all three review threads are
+  resolved.
+- Exact-main CI `32675287618`, Security `32675287530`, and Pages `32675287300`
+  pass. Cache-busted live Index, Roadmap, Whitepaper, FAQ, `llms.txt` and raw
+  GitHub README readback contain the synchronized Development-only boundary.
+- Status: `GH-226 DONE / Exact-main and live Pages verified / Production false`.
+
+## 2026-08-24 - GH-226 documentation closeout review PASS
+
+- Kimi K3 returned `SHIP` for the exact 13-file documentation closeout diff;
+  no P0-P2 finding or claim drift remains.
+- Claim, status, Memory, H-001 evidence, HTML/documentation hygiene, workflow
+  YAML and diff gates pass on the publication candidate.
+- Status: `Docs closeout PASS / Protected PR next / Production false`.
