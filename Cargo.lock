@@ -3792,6 +3792,7 @@ dependencies = [
  "kaspa-wrpc-client",
  "log",
  "multibase",
+ "prometheus-guardian-p2p",
  "prometheus-threat-hint",
  "prometheus-validator",
  "reqwest",

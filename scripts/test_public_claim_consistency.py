@@ -55,6 +55,20 @@ class PublicClaimConsistencyTests(unittest.TestCase):
             any("Phi-3 stub" in error for error in MODULE.validate_status(changed))
         )
 
+    def test_operated_p2p_claim_is_rejected(self) -> None:
+        changed = copy.deepcopy(self.status)
+        changed["classifications"]["light_client"]["p2p_reporting"] = "operated"
+        self.assertTrue(
+            any("P2P reporting" in error for error in MODULE.validate_status(changed))
+        )
+
+    def test_v1_submission_scope_drift_is_rejected(self) -> None:
+        changed = copy.deepcopy(self.status)
+        changed["classifications"]["light_client"]["p2p_v1_submission"] = "public"
+        self.assertTrue(
+            any("v1 submission" in error for error in MODULE.validate_status(changed))
+        )
+
     def test_banned_claims_return_categories_only(self) -> None:
         self.assertEqual(
             MODULE.find_banned_claims("PROM cannot be purchased."),

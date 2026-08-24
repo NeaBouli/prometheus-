@@ -64,7 +64,7 @@
 - [x] [P2] Heuristische Analyse (heuristic.rs) | Kimi K3 + Codex | GH-220: begrenzte deterministische Byte-Triage; kein API-Call-/Prozess-Monitoring, keine Malware- oder Quarantäne-Autorität
 - [x] [P2] Quarantäne-Management (quarantine.rs) | Kimi K3 + Codex | GH-220: owner-lokaler exakter Byte-Vault; kein Verschieben/Löschen von Quelldateien und keine automatische Isolation
 - [x] [P1] Phi-3 Stub-Autorität fail-closed härten | Kimi K3 + Codex | GH-223: Dateiexistenz ist kein geladener Modellnachweis; maximal 16 MiB; nur Safe-Default, keine Suspicious-/Quarantäne-Autorität
-- [~] [P2] P2P-Grundgerüst (p2p.rs mit libp2p) | Claude Code + Codex | Transport-Grundlagen existieren in getrennten Modulen; Client-Integration und betriebenes Multi-Host-Netz bleiben offen
+- [~] [P2] P2P-Grundgerüst (p2p.rs mit libp2p) | Kimi K3 + Codex | GH-226 schließt den Development-only v1 Einzelsender über einen statischen Loopback-Guardian mit realem Binary/QUIC-Test; öffentliches Multi-Host-Netz, Membership/Discovery, Proof-Autorität und Produktion bleiben offen
 - [ ] [P2] ZK-Proof-Generierung (zk_proof.rs, Groth16) | Claude Code | Aktueller Client-Pfad ist nur ein dokumentierter Stub; reale v2-Relation, freigegebene Artefakte und Client-Integration bleiben offen
 - [ ] [P2] Tauri-App Grundgerüst (UI-Shell, System-Tray) | Claude Code | Rust-Client
 - [ ] [P2] Integration-Tests Client ↔ Testnet | Claude Code | Alle Client-Module

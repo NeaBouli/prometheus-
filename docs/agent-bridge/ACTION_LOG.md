@@ -4417,3 +4417,55 @@ Rules for all dev agents:
   `llms.txt` and raw GitHub README readback all contain the synchronized
   fail-closed Phi-3 boundary.
 - Status: `GH-223 DONE / Exact-main and live Pages verified / Production false`.
+
+## 2026-08-24 - GH-226 started
+
+- Opened issue #226 and branch `feat/GH-226-client-threat-hint-v1` from clean
+  exact main `76b62b0`.
+- Scope is a bounded Development-only client v1 ThreatHint sender reusing the
+  Guardian P2P stack plus same-host binary/QUIC evidence.
+- Kimi implements the bounded slice; Sol integrates and verifies.
+- Status: `GH-226 In Progress / Production false`.
+
+## 2026-08-24 - GH-226 local integration milestone
+
+- Kimi implemented the bounded Development-only v1 sender; Sol reviewed and
+  hardened path canonicality plus real duplicate-ACK coverage.
+- Focused Rustfmt, client Clippy, 12 unit tests and 2 real-binary Guardian QUIC
+  loopback tests pass.
+- Public Markdown/HTML, machine-readable status, Memory and client docs are
+  synchronized without public/multi-host, proof, membership, chain, deployment
+  or production claims.
+- Status: `GH-226 Local integration PASS / Full gates next / Production false`.
+
+## 2026-08-24 - GH-226 full local verification
+
+- Workspace Rustfmt, all-target Clippy, all Rust tests, locked release
+  performance/build/package gates, 1303 Guardian tests (4 intentional skips),
+  Black/Pylint, Cargo audit, public/status/Memory consistency, HTML and workflow
+  YAML all pass. Docker Compose rendering remains for GitHub CI because Docker
+  is unavailable locally.
+- CI Clippy now covers all targets. Kimi's two independent final reviews are
+  `SHIP` with no P0-P2 finding; all actionable P3 test gaps were closed.
+- Status: `GH-226 Local PASS / Protected PR next / Production false`.
+
+## 2026-08-24 - GH-226 staged publication review
+
+- Kimi K3 returned `SHIP` for the exact staged diff with no P0-P2 finding or
+  claim drift. Sol corrected its final P3 status-integrity note by mapping the
+  local sender-capacity error to `transport-failure`, not remote `busy`.
+- Focused unit 12/12, real-binary loopback 2/2, client all-target Clippy,
+  Rustfmt, 13 synchronized public surfaces, 10 claim regressions and diff
+  checks pass after the correction.
+- Status: `Publication candidate PASS / Protected PR next / Production false`.
+
+## 2026-08-24 - GH-226 PR #227 review remediation
+
+- PR #227 opened at exact head `1aa5d76`. Initial protected Security, Rust,
+  Guardian, Silverc, Memory, HTML and documentation checks passed.
+- CodeRabbit's date note was a UTC/EEST false positive. Sol fixed its two valid
+  comments: driver transport errors are propagated through a bounded clean
+  shutdown, and the example config now explains exact peer-ID replacement.
+- Post-fix unit 12/12, real-binary loopback 2/2, client all-target Clippy,
+  Rustfmt, 13 public surfaces, 10 claim regressions and diff checks pass.
+- Status: `Review remediation PASS / Protected checks must rerun / Production false`.

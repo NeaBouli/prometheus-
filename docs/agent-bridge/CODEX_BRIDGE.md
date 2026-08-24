@@ -5328,3 +5328,104 @@ No direct `main` push or production action occurred.
   authority and changes no wallet, chain, contract, tokenomics or deployment
   behavior. Existing rollout gates remain open.
 - **Status:** `GH-223 DONE / Exact-main and live Pages verified / Production false`.
+
+## 2026-08-24 - GH-226 client v1 ThreatHint transport started
+
+- Issue #226 and branch `feat/GH-226-client-threat-hint-v1` start from clean
+  exact main `76b62b0ce3d7bec413a10921210e3cff81f4274c`.
+- Scope: compose one Development-only Light Client v1 ThreatHint sender from
+  the existing Guardian libp2p transport, strict owner-local config/identity,
+  one static route, exact canonical bytes, bounded ACK/failure handling and
+  same-host real-binary QUIC loopback evidence.
+- A transport ACK is one local Guardian boundary result only. It grants no
+  proof, consensus, membership, reputation, reward or chain authority.
+- Kimi K3 owns the bounded implementation proposal. Sol owns architecture,
+  security, diff review, integration, complete verification, public claims and
+  protected publication.
+- Excluded: ThreatHint-v2, proof generation/verification, ballots, discovery,
+  relay operation, retries, public/multi-host operation, wallet, chain,
+  contracts, tokenomics, rewards, deployment, Mainnet and production claims.
+- **Status:** `GH-226 In Progress / Repository only / Production false`.
+
+## 2026-08-24 - GH-226 implementation and documentation integration
+
+- Kimi K3 implemented the bounded Unix-only sender, CLI wiring, strict private
+  input handling, example configuration, unit tests and real-binary QUIC
+  loopback evidence. Sol reviewed every changed path and retained the required
+  mechanical `Cargo.lock` update.
+- Sol additionally rejected parent-directory path components and extended the
+  real Guardian/verifier loopback scenario to cover the `duplicate` ACK beside
+  accepted, rejected, busy and bounded transport failure.
+- Focused verification passes: 12/12 P2P unit tests, 2/2 real-binary loopback
+  tests, Rustfmt, and client all-target Clippy with warnings denied.
+- README, Whitepaper, Markdown/HTML FAQ and Roadmap, client README, `llms.txt`,
+  Memory and the machine-readable public-claim status now describe the same
+  Development-only same-host boundary. Operated public/multi-host reporting,
+  proof and membership authority, wallet/chain/reward behavior, deployment,
+  Mainnet and production remain explicitly open.
+- Claude Code remains unavailable because its OAuth session is expired and
+  made no change.
+- **Status:** `GH-226 Integrated locally / Full gates and independent review next / Production false`.
+
+## 2026-08-24 - GH-226 full local verification and final review
+
+- Full Rust verification passes: workspace Rustfmt; workspace all-target Clippy
+  with warnings denied; `cargo test --workspace`; locked release performance
+  gate; locked Guardian and proof binary builds; and locked ThreatHint package
+  verification (33 packaged files).
+- Focused GH-226 evidence passes: 12/12 P2P unit tests and 2/2 real-binary
+  loopback tests, including exact accepted/duplicate/rejected/busy mapping,
+  bounded transport failure, Beta/Mainnet pre-network rejection, hardlink and
+  non-ASCII rejection, exact 1/60 second bounds and redacted output.
+- Guardian Python verification in an isolated Python 3.12 environment passes:
+  Black 36 files unchanged, Pylint 9.85/10 and 10/10, and 1303 tests passed
+  with 4 intentional live-model skips. Local Python 3.14 could not install the
+  pinned `coincurve` package; no repository file was changed for that tooling
+  limitation.
+- Public claims (13 surfaces), project status, Memory, HTML/SEO/infrastructure
+  files, stale-launch wording, workflow YAML and `git diff --check` pass.
+  `cargo audit` reports no blocking vulnerability and the existing eight
+  allowed transitive warnings. Docker was unavailable locally, so Compose
+  rendering remains a GitHub CI gate.
+- CI now runs workspace Clippy with `--all-targets`, closing the prior test-
+  target lint gap. Both Kimi K3 read-only reviews return `SHIP` with no P0-P2
+  finding; Sol closed the remaining P3 test-pinning notes. Claude Code made no
+  change because its OAuth session remains expired.
+- No wallet, signing, chain write, broadcast, deployment, contract, tokenomics,
+  reward, Mainnet or production action occurred.
+- **Status:** `GH-226 Local PASS / Protected PR next / Production false`.
+
+## 2026-08-24 - GH-226 staged publication review
+
+- Kimi K3 independently reviewed the exact 26-file staged publication diff
+  and returned `SHIP` with no P0-P2 finding and no public-claim drift.
+- Sol closed Kimi's remaining P3 status-integrity note: a local sender-capacity
+  failure now maps to `transport-failure`, while only a real Guardian `busy`
+  acknowledgement maps to `busy`.
+- Post-correction verification passes: 12/12 focused P2P unit tests, 2/2 real-
+  binary QUIC loopback tests, client all-target Clippy with warnings denied,
+  Rustfmt, 13-surface public-claim consistency, 10 claim regression tests and
+  `git diff --check`.
+- Docker remains unavailable locally; unchanged Compose surfaces remain a
+  protected GitHub CI check. No wallet, chain, signing, broadcast, deployment,
+  Mainnet or production action occurred.
+- **Status:** `GH-226 Publication candidate PASS / Commit and protected PR next / Production false`.
+
+## 2026-08-24 - GH-226 PR #227 review remediation
+
+- Protected PR #227 opened at head `1aa5d76b4aca673549e0277ce2046c03fd40fae7`.
+  The initial Security, Rust workspace, Guardian, Silverc, Memory, HTML and
+  documentation checks passed; Rust Performance was still running when the
+  review delta began.
+- CodeRabbit completed with three inline comments. Sol rejected the date note
+  as a timezone false positive: the verified local EEST date is 2026-08-24.
+  The two valid notes were fixed: the Guardian test driver now propagates
+  transport errors and shuts down through an asserted bounded clean path, and
+  the example config explicitly requires the same valid peer ID in both peer
+  fields.
+- Post-fix focused verification passes: P2P unit 12/12, real-binary loopback
+  2/2, client all-target Clippy, Rustfmt, 13 synchronized public surfaces, 10
+  claim regressions and diff checks. The generic redacted error remains
+  deliberate for this Development-only security boundary; no sensitive
+  operator values are exposed.
+- **Status:** `GH-226 Review remediation PASS / Protected checks must rerun / Production false`.

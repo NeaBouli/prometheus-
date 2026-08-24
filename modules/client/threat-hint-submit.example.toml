@@ -1,0 +1,16 @@
+# Development-only GH-226 v1 ThreatHint submission example.
+# Every path must be absolute and owner-only (parent directory mode 0700,
+# file mode 0600, no symlinks). Never add secrets, wallet, seed, or signing
+# material to this file; unknown fields are rejected. Beta and Mainnet reject
+# this surface before any network activity. The acknowledgement only reports
+# a remote local-boundary outcome; it is never proof, consensus, membership,
+# or reward authority.
+# Replace the placeholder with one valid base58btc Guardian transport peer ID.
+# The same value must appear in guardian_peer_id and in the trailing /p2p/
+# component of guardian_address; any mismatch is rejected.
+enabled = true
+network = "testnet10"
+guardian_peer_id = "12D3KooWReplaceWithTheStaticGuardianTransportPeerId"
+guardian_address = "/ip4/127.0.0.1/udp/4001/quic-v1/p2p/12D3KooWReplaceWithTheStaticGuardianTransportPeerId"
+identity_path = "/home/operator/prometheus/threat-hint/client.identity"
+submission_timeout_secs = 10
