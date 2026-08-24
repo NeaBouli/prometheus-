@@ -90,7 +90,8 @@ a production malware detector or reporting client.
   accepted/duplicate/rejected/busy/transport-failure with redacted output.
   Beta and Mainnet reject before dialing. This grants no proof, membership,
   discovery, public/multi-host, wallet, chain, reward, deployment or production
-  authority.
+  authority. PR #227 merged as exact main `6c39af5`; Prometheus CI
+  `32675287618`, Security Audit `32675287530`, and Pages `32675287300` pass.
 - `blockchain/rule_ingest.rs` ingests a complete caller-supplied active-rule
   snapshot whose raw CIDv1 (sha2-256, canonical lowercase base32) must bind the
   exact caller-supplied content bytes. It parses a strict simple matcher

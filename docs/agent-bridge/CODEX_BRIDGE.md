@@ -5429,3 +5429,40 @@ No direct `main` push or production action occurred.
   deliberate for this Development-only security boundary; no sensitive
   operator values are exposed.
 - **Status:** `GH-226 Review remediation PASS / Protected checks must rerun / Production false`.
+
+## 2026-08-24 - GH-226 exact-main and public closeout
+
+- Protected PR #227 passed all eleven required contexts on corrected head
+  `f943d43c19dcbe38fe4df4f17641b509c27c7ddc` and merged normally, without
+  admin bypass, as exact main `6c39af5e2367dc34f068c9e6fbc2ba0bcce32995`.
+  Issue #226 is closed.
+- Exact-main Prometheus CI `32675287618`, Security Audit `32675287530`, and
+  Pages deployment `32675287300` pass on that full SHA. The Pages run emitted
+  one non-blocking upstream Node.js action deprecation warning; deployment
+  itself passed.
+- Cache-busted live readback passes for the Pages index, Roadmap, Whitepaper,
+  FAQ and `llms.txt`; raw GitHub main README contains the synchronized GH-226
+  Development-only boundary.
+- CodeRabbit's three inline threads were answered and resolved. Two valid
+  findings were fixed; its date note was verified as a UTC/EEST false positive.
+  Kimi K3's final staged review returned `SHIP` with no P0-P2 finding or claim
+  drift.
+- No wallet, signing, broadcast, chain write, contract, tokenomics, reward,
+  deployment, Mainnet or production action occurred. Public multi-host
+  operation, proof and membership authority, privacy approval and production
+  readiness remain open.
+- **Status:** `GH-226 DONE / Exact-main and live Pages verified / Production false`.
+
+## 2026-08-24 - GH-226 documentation closeout review
+
+- Kimi K3 independently reviewed the exact 13-file documentation closeout
+  diff and returned `SHIP` with no P0-P2 finding or public-claim drift.
+- The 13-surface claim gate and 10 regression tests, project-status gate and
+  7 tests, Memory integrity and 6 tests, H-001 evidence gate and 4 tests,
+  public-documentation hygiene and 11 tests, workflow YAML parsing and
+  `git diff --check` all pass on the publication candidate.
+- The closeout remains documentation-only. Development-only, same-host and
+  literal-loopback boundaries remain explicit; no public multi-host, proof,
+  membership, wallet, chain, reward, deployment, Mainnet or production claim
+  was introduced. KAS/PROM economics are unchanged.
+- **Status:** `GH-226 Docs closeout SHIP / Protected documentation PR next / Production false`.
