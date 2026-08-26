@@ -5558,3 +5558,15 @@ No direct `main` push or production action occurred.
 - No direct `main` push, admin merge, firewall/IAM, deployment, wallet, signing,
   chain, Mainnet or production action occurred.
 - **Status:** `PR #230 Checks pending / Issue #229 external UDP gate open / Production false`.
+
+## 2026-08-26 - PR #230 Linux CI portability correction
+
+- First PR run `33015542384` passed Secret Detection, Contracts and Pages but
+  exposed one Linux-only test-client behavior in Memory Integrity: rejecting an
+  oversized AF_UNIX frame can surface `ECONNRESET` instead of macOS EOF.
+- The boundary itself failed closed correctly. Sol made the test client treat
+  reset/broken-pipe as the expected no-ACK outcome and close its socket in a
+  `finally` block, eliminating the accompanying ResourceWarning.
+- Post-fix combined Python 21/21 passes locally with ResourceWarnings promoted
+  to errors; syntax and diff checks pass. No product behavior changed.
+- **Status:** `PR #230 Portability fix ready / CI rerun next / Production false`.

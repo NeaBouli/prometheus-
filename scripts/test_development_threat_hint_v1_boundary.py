@@ -110,30 +110,37 @@ class BoundaryTestCase(unittest.TestCase):
         """
         client = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
         client.settimeout(PROCESS_DEADLINE_SECS)
-        deadline = time.monotonic() + READY_DEADLINE_SECS
-        while True:
+        try:
+            deadline = time.monotonic() + READY_DEADLINE_SECS
+            while True:
+                try:
+                    client.connect(self.socket_path)
+                    break
+                except ConnectionRefusedError:
+                    if time.monotonic() >= deadline:
+                        raise
+                    time.sleep(0.01)
             try:
-                client.connect(self.socket_path)
-                break
-            except ConnectionRefusedError:
-                if time.monotonic() >= deadline:
-                    raise
-                time.sleep(0.01)
-        client.sendall(
-            struct.pack(">I", len(payload) if length is None else length)
-        )
-        client.sendall(payload)
-        if trailing:
-            client.sendall(trailing)
-        client.shutdown(socket.SHUT_WR)
-        response = b""
-        while True:
-            chunk = client.recv(4096)
-            if not chunk:
-                break
-            response += chunk
-        client.close()
-        return response
+                client.sendall(
+                    struct.pack(">I", len(payload) if length is None else length)
+                )
+                client.sendall(payload)
+                if trailing:
+                    client.sendall(trailing)
+                client.shutdown(socket.SHUT_WR)
+            except (BrokenPipeError, ConnectionResetError):
+                return b""
+            response = b""
+            while True:
+                try:
+                    chunk = client.recv(4096)
+                except ConnectionResetError:
+                    return response
+                if not chunk:
+                    return response
+                response += chunk
+        finally:
+            client.close()
 
     def assert_receipt(self, status, digest=DIGEST, payload_bytes=len(PAYLOAD)):
         with open(self.receipt_path, "rb") as handle:

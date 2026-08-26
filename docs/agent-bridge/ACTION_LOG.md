@@ -4536,3 +4536,11 @@ Rules for all dev agents:
 - Updated issue #229 with repository-pass and external direct-UDP checklists;
   the issue remains open and is not auto-closed by the PR.
 - Status: `PR checks pending / Real two-host evidence still blocked / Production false`.
+
+## 2026-08-26 - PR #230 first CI correction
+
+- Linux returned connection reset for the intentionally oversized boundary
+  frame where macOS returned EOF; the fail-closed server behavior was correct.
+- Hardened only the test client to accept reset/broken-pipe as no ACK and always
+  close its socket. Python 21/21 passes with ResourceWarnings treated as errors.
+- Status: `Portability fix verified locally / CI rerun next / Production false`.
