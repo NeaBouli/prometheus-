@@ -5658,3 +5658,34 @@ No direct `main` push or production action occurred.
 - No wallet, signing, chain, contract, tokenomics, infrastructure, Mainnet or
   production action occurred.
 - **Status:** `GH-229 Repository/docs closeout DONE / Issue #229 real UDP gate OPEN / Production false`.
+
+## 2026-08-27 - GH-229 distinct-host direct-UDP execution preflight
+
+- User requested the real two-host block. Branch
+  `ops/GH-229-distinct-host-udp-evidence` starts from clean exact main
+  `27e8b02c346811a7c9580d4a3e4ef46db21fecae`.
+- Scope is one bounded Development/Testnet-10 direct UDP/QUIC run between two
+  physically distinct, already authorized hosts, followed only by strict
+  redacted non-authorizing evidence if the existing route is reachable.
+- Sol owns all host and external actions. Kimi K3 receives a secret-free
+  security/runbook review; Claude Code receives a small command/artifact audit.
+- Initial phase is read-only reachability and runtime preflight. Persistent
+  firewall/IAM mutation, Mainnet, wallet, signing, chain, reward, deployment and
+  production actions are excluded.
+- **Status:** `GH-229 Distinct-host preflight IN PROGRESS / Network mutation not authorized / Production false`.
+
+## 2026-08-27 - GH-229 distinct-host reachability result
+
+- Both authorized machines are reachable and physically distinct. Bounded
+  random-payload probes over the existing direct UDP paths in both directions
+  and address families timed out without receipt. No network rule changed.
+- Kimi K3 returned repository/procedure `conditional SHIP` and execution
+  `BLOCK` until a separately authorized temporary direct-UDP allowance exists.
+  Its focused boundary/evidence suite passes 23 tests and 26 subtests.
+- Kimi also identified two pre-run documentation requirements: define the
+  canonical challenge/execution-attestation recipe and start the single-shot
+  boundary only after Guardian readiness and sender preflight to preserve its
+  60-second window.
+- Claude Code was invoked for the requested small read-only helper task but its
+  local budget is exhausted; it made no change.
+- **Status:** `GH-229 External UDP gate BLOCKED / Exact temporary rule approval required / Production false`.

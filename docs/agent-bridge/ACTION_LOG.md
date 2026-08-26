@@ -4606,3 +4606,26 @@ Rules for all dev agents:
   issue #229 was immediately reopened, the phrase removed, and open state
   verified. The real two-host UDP gate is unchanged.
 - Status: `Repository/docs block DONE / Issue #229 evidence gate OPEN / Production false`.
+
+## 2026-08-27 - GH-229 distinct-host direct-UDP preflight started
+
+- Created branch `ops/GH-229-distinct-host-udp-evidence` from exact clean main
+  `27e8b02c346811a7c9580d4a3e4ef46db21fecae`.
+- Recorded a bounded Development/Testnet-10 two-host scope and delegated
+  secret-free reviews to Kimi K3 and Claude Code.
+- No network, firewall, IAM, deployment, wallet, signing, chain, reward,
+  Mainnet or production mutation has occurred.
+- Status: `Read-only host/runtime preflight next / Production false`.
+
+## 2026-08-27 - GH-229 distinct-host preflight result
+
+- Confirmed two physically distinct authorized machines and available Python/
+  temporary runtime support; remote Rust tooling remains absent as previously
+  recorded.
+- Existing direct UDP was tested with bounded random payloads in both
+  directions and address families; all listeners timed out. No persistent or
+  temporary network rule changed.
+- Kimi K3 returned conditional repository SHIP and execution BLOCK; focused
+  Python safety gates pass 23 tests plus 26 subtests. Claude Code was budget-
+  blocked and made no change.
+- Status: `Awaiting exact temporary UDP-rule authorization / Production false`.
