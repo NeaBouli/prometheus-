@@ -5570,3 +5570,16 @@ No direct `main` push or production action occurred.
 - Post-fix combined Python 21/21 passes locally with ResourceWarnings promoted
   to errors; syntax and diff checks pass. No product behavior changed.
 - **Status:** `PR #230 Portability fix ready / CI rerun next / Production false`.
+
+## 2026-08-26 - PR #230 protected checks and review remediation
+
+- Exact-head CI and Security runs `33015747709` and `33015747702` pass all ten
+  repository contexts; CodeRabbit also completed successfully.
+- CodeRabbit's one actionable minor finding correctly identified that the
+  verifier's default path named an intentionally absent real evidence file.
+  The remediation requires `--evidence` explicitly, adds CLI regressions and
+  documents the invocation without creating placeholder or synthetic public
+  evidence.
+- The docstring-coverage warning is advisory and mostly counts small test
+  functions; no bulk commentary churn is accepted for this bounded patch.
+- **Status:** `PR #230 Review remediation in progress / Protected checks must rerun / Production false`.

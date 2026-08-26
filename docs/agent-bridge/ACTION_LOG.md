@@ -4544,3 +4544,13 @@ Rules for all dev agents:
 - Hardened only the test client to accept reset/broken-pipe as no ACK and always
   close its socket. Python 21/21 passes with ResourceWarnings treated as errors.
 - Status: `Portability fix verified locally / CI rerun next / Production false`.
+
+## 2026-08-26 - PR #230 exact-head review remediation
+
+- CI run `33015747709`, Security run `33015747702` and CodeRabbit pass on
+  `4c472d1`; all ten repository-owned contexts are green.
+- Accepted CodeRabbit's single minor finding: the real two-host evidence file
+  must not be fabricated, so the verifier now requires an explicit
+  `--evidence` path and the operator runbook shows the exact safe invocation.
+- Added subprocess regressions for missing and valid explicit CLI input.
+- Status: `Review remediation active / Rerun local and protected gates / Production false`.

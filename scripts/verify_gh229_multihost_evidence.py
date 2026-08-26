@@ -11,9 +11,6 @@ import sys
 from pathlib import Path
 from typing import Any
 
-DEFAULT_EVIDENCE = Path(
-    "docs/evidence/gh-229-controlled-multihost-2026-08-26.json"
-)
 LOWER_HEX_32 = re.compile(r"^[0-9a-f]{64}$")
 LOWER_HEX_20 = re.compile(r"^[0-9a-f]{40}$")
 UTC_TIMESTAMP = re.compile(
@@ -200,7 +197,12 @@ def load_and_verify(path: Path) -> None:
 def main() -> int:
     """CLI entry point with data-minimal diagnostics."""
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--evidence", type=Path, default=DEFAULT_EVIDENCE)
+    parser.add_argument(
+        "--evidence",
+        type=Path,
+        required=True,
+        help="path to the redacted operator-attested evidence record",
+    )
     args = parser.parse_args()
     try:
         load_and_verify(args.evidence)

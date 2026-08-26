@@ -172,7 +172,13 @@ submission_timeout_secs = 60
 7. Stop both processes, remove the temporary UDP allowance, and verify the owned
    AF_UNIX socket is gone. Keep network identifiers, PeerIds, hostnames, paths,
    raw payloads and private receipts out of Git. Publish only a record accepted
-   by `scripts/verify_gh229_multihost_evidence.py`.
+   by the explicit verifier invocation below; the repository intentionally has
+   no default or placeholder evidence artifact:
+
+```bash
+python3 scripts/verify_gh229_multihost_evidence.py \
+  --evidence /path/to/redacted-gh229-evidence.json
+```
 
 The repository unit tests validate this procedure's route and evidence policy.
 They do not constitute the real two-host run. Until the direct run and redacted

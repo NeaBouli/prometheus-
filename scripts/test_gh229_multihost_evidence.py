@@ -5,6 +5,10 @@ from __future__ import annotations
 
 import copy
 import importlib.util
+import json
+import subprocess
+import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -61,6 +65,33 @@ def valid_evidence() -> dict[str, object]:
 
 
 class Gh229EvidenceTests(unittest.TestCase):
+    def test_cli_requires_explicit_evidence_path(self) -> None:
+        result = subprocess.run(
+            [sys.executable, str(SCRIPT)],
+            capture_output=True,
+            check=False,
+            text=True,
+        )
+        self.assertEqual(result.returncode, 2)
+        self.assertIn("--evidence", result.stderr)
+
+    def test_cli_accepts_valid_explicit_evidence_path(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            evidence_path = Path(directory) / "evidence.json"
+            evidence_path.write_text(
+                json.dumps(valid_evidence()), encoding="utf-8"
+            )
+            result = subprocess.run(
+                [sys.executable, str(SCRIPT), "--evidence", str(evidence_path)],
+                capture_output=True,
+                check=False,
+                text=True,
+            )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(
+            result.stdout.strip(), "GH229_CONTROLLED_MULTIHOST_EVIDENCE_VERIFIED"
+        )
+
     def test_valid_synthetic_record_passes(self) -> None:
         MODULE.verify_evidence(valid_evidence())
 
