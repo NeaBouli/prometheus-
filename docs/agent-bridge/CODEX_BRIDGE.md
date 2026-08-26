@@ -5546,3 +5546,15 @@ No direct `main` push or production action occurred.
 - `cargo audit` reports no vulnerability and the existing eight allowed
   unmaintained/yanked/unsound warnings. No dependency changed in GH-229.
 - **Status:** `GH-229 Security review PASS / P3 closed / Protected PR next / Production false`.
+
+## 2026-08-26 - GH-229 protected PR opened
+
+- Repository candidate commit `dfcd980` was pushed only to
+  `feat/GH-229-controlled-multihost-evidence`; protected PR #230 is open against
+  `main`.
+- Issue #229 now contains the exact repository checklist and remains open until
+  a real distinct-host direct-UDP run and strict redacted evidence exist. PR #230
+  intentionally does not auto-close it.
+- No direct `main` push, admin merge, firewall/IAM, deployment, wallet, signing,
+  chain, Mainnet or production action occurred.
+- **Status:** `PR #230 Checks pending / Issue #229 external UDP gate open / Production false`.

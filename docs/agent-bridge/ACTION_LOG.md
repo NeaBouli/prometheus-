@@ -4528,3 +4528,11 @@ Rules for all dev agents:
   claims, Memory, YAML, HTML, diff and Cargo Audit gates pass. Cargo Audit has no
   vulnerability and the unchanged eight allowed warnings.
 - Status: `Security review PASS / Protected PR next / Production false`.
+
+## 2026-08-26 - GH-229 PR #230 opened
+
+- Pushed repository candidate `dfcd980` to the protected feature branch and
+  opened PR #230 against `main`.
+- Updated issue #229 with repository-pass and external direct-UDP checklists;
+  the issue remains open and is not auto-closed by the PR.
+- Status: `PR checks pending / Real two-host evidence still blocked / Production false`.
