@@ -1780,15 +1780,16 @@ Estimates: unchanged; core 84-88%; complete vision 50-55%
 ## GH-229 CONTROLLED REMOTE THREATHINT REPOSITORY GATE (2026-08-26)
 
 ```text
-Status: Repository implementation and integration PASS / protected PR next
-Baseline: 711a7d446b16f0680b6e038302d7b0394f29c936
+Status: Repository capability merged and exact-main verified / live evidence open
+PR/SHA: #230 / fba8bb459dce25b340155a603de133cb903c1c93
+Runs: CI 33017195813; Security 33017196184; Pages 33017194744
 Scope: optional Development/Testnet-10 single direct literal-IP/UDP/QUIC-v1
        Light Client route; unchanged loopback default; non-authorizing local
        rejected/busy receiver; strict redacted operator-attested evidence gate
 Safety: Beta/Mainnet reject before identity/network; no DNS/TCP/relay/retry;
         unsafe/special/mapped routes fail closed; no proof/membership authority,
         wallet, signing, chain, reward, deployment or production action
-Tests: Python boundary/evidence 21/21; P2P unit 16/16; real binary 3/3 in two
+Tests: Python boundary/evidence 23/23; P2P unit 16/16; real binary 3/3 in two
        focused runs and client all-targets; client library 167 pass/2 intentional
        live ignores; Clippy/rustfmt/docs/HTML/YAML/Memory/diff gates PASS
 External gate: direct IPv4/IPv6 UDP to the approved sandbox remains closed;

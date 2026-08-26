@@ -10,9 +10,10 @@ Startpunkt fuer Codex/Claude Code:
 
 Keine Secrets, Tokens, Passwoerter, privaten Keys oder Wallet-Daten in diese Bridge schreiben.
 
-Aktiver Handover: GH-229 baut auf dem vollstaendig geschlossenen GH-226-Stand
-auf und prueft eine explizite Development-/Testnet-10-only Direct-QUIC-Route
-fuer kontrollierte Zwei-Host-Evidence. Bestehender Loopback bleibt Standard;
+Aktiver Handover: GH-229/PR #230 ist als getestete Repository-Faehigkeit auf
+exaktem Main `fba8bb4` integriert. Die explizite Development-/Testnet-10-only
+Direct-QUIC-Route fuer kontrollierte Zwei-Host-Evidence behaelt Loopback als
+Standard;
 Transport-ACKs verleihen keine Proof-, Membership-, Reward-, Chain-, Mainnet-
 oder Produktionsautoritaet. Der vorhandene direkte Sandbox-UDP-Pfad ist ohne
 Infrastrukturaenderung geschlossen, daher darf bis zu einem ausdruecklich

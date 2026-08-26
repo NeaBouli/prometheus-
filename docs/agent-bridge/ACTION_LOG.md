@@ -4554,3 +4554,44 @@ Rules for all dev agents:
   `--evidence` path and the operator runbook shows the exact safe invocation.
 - Added subprocess regressions for missing and valid explicit CLI input.
 - Status: `Review remediation active / Rerun local and protected gates / Production false`.
+
+## 2026-08-26 - GH-229 PR #230 merge closeout
+
+- Review remediation commit `f190ebd` passed all eleven PR contexts. The one
+  CodeRabbit thread was answered and resolved.
+- PR #230 merged normally by the accepted squash strategy as exact main
+  `fba8bb459dce25b340155a603de133cb903c1c93`.
+- Exact-main CI `33017195813`, Security `33017196184`, and Pages `33017194744`
+  pass; live Index/Roadmap and raw exact-commit README readback pass.
+- Public status surfaces now classify GH-229 as merged tested repository
+  capability while preserving the open direct-UDP evidence gate and all
+  non-production boundaries. Issue #229 remains open for that real run.
+- Status: `Repository closeout PASS / Documentation closeout PR next / Production false`.
+
+## 2026-08-26 - GH-229 documentation and Roadmap layout closeout
+
+- Reconciled fourteen public/status/handover surfaces to merged exact main
+  `fba8bb4` and runs `33017195813`, `33017196184`, and `33017194744` while
+  retaining the open direct-UDP evidence gate.
+- Browser overflow checks found and corrected a generic Roadmap list flex-flow
+  defect that split text around inline `code` elements into narrow columns.
+- Status: `Docs and layout patched / Full verification and protected PR next / Production false`.
+
+## 2026-08-26 - GH-229 documentation closeout review
+
+- Kimi independent review: `SHIP`, no P0-P2; exact PR/SHA/runs, open issue and
+  23-test result independently verified. Cosmetic `Security Audit` naming note
+  closed.
+- Sol browser checks: desktop 1440x1000 and mobile 390x844 have zero document
+  and list-item horizontal overflow; the corrected mobile entry wraps normally.
+- Claim 13 surfaces, 10 regressions, Memory, project status plus 7 regressions,
+  four HTML pages and diff hygiene pass.
+- Status: `Local docs closeout PASS / Protected PR next / Production false`.
+
+## 2026-08-26 - GH-229 documentation closeout PR #231
+
+- Pushed `5792c77` to `docs/GH-229-merge-closeout` and opened protected PR
+  #231 against `main`.
+- Issue #229 remains open; the closeout PR does not claim or create real
+  two-host evidence.
+- Status: `Protected checks pending / Production false`.
