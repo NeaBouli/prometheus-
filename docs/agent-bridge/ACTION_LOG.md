@@ -4587,3 +4587,11 @@ Rules for all dev agents:
 - Claim 13 surfaces, 10 regressions, Memory, project status plus 7 regressions,
   four HTML pages and diff hygiene pass.
 - Status: `Local docs closeout PASS / Protected PR next / Production false`.
+
+## 2026-08-26 - GH-229 documentation closeout PR #231
+
+- Pushed `5792c77` to `docs/GH-229-merge-closeout` and opened protected PR
+  #231 against `main`.
+- Issue #229 remains open; the closeout PR does not claim or create real
+  two-host evidence.
+- Status: `Protected checks pending / Production false`.

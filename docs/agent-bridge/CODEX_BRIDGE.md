@@ -5628,3 +5628,13 @@ No direct `main` push or production action occurred.
 - Local gates pass: 13 synchronized public surfaces, 10 claim tests, Memory,
   project-status verifier plus 7 tests, four-page HTML parse and diff check.
 - **Status:** `GH-229 Docs closeout PASS / Protected PR next / Production false`.
+
+## 2026-08-26 - GH-229 documentation closeout PR opened
+
+- Closeout commit `5792c77` is pushed only to
+  `docs/GH-229-merge-closeout`; protected PR #231 targets `main`.
+- Scope remains fourteen documentation/status/CSS surfaces. Issue #229 remains
+  open and PR #231 does not auto-close it.
+- No direct `main` push, admin merge, deployment, wallet, signing, chain,
+  Mainnet or production action occurred.
+- **Status:** `PR #231 Protected checks pending / Real two-host UDP gate OPEN / Production false`.
