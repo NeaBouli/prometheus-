@@ -5,6 +5,9 @@
 //! peer is an ephemeral loopback fixture. This is not public Testnet or
 //! production evidence; the acknowledgement only reports a remote
 //! local-boundary outcome, and no fixture value may appear in process output.
+//! Negative coverage for the GH-229 controlled-remote opt-in verifies that
+//! unsafe or non-Development remote routes reject before identity mutation or
+//! any network activity; no remote dial is ever attempted here.
 
 #![cfg(unix)]
 
@@ -74,8 +77,21 @@ fn fixture() -> Fixture {
 }
 
 fn write_config(fixture: &Fixture, peer: &str, route: &str, timeout_secs: u64) {
+    write_config_with_mode(fixture, peer, route, timeout_secs, None);
+}
+
+fn write_config_with_mode(
+    fixture: &Fixture,
+    peer: &str,
+    route: &str,
+    timeout_secs: u64,
+    route_mode: Option<&str>,
+) {
+    let mode_line = route_mode
+        .map(|mode| format!("route_mode = \"{mode}\"\n"))
+        .unwrap_or_default();
     let text = format!(
-        "enabled = true\nnetwork = \"testnet10\"\nguardian_peer_id = \"{peer}\"\nguardian_address = \"{route}\"\nidentity_path = \"{}\"\nsubmission_timeout_secs = {timeout_secs}\n",
+        "enabled = true\nnetwork = \"testnet10\"\n{mode_line}guardian_peer_id = \"{peer}\"\nguardian_address = \"{route}\"\nidentity_path = \"{}\"\nsubmission_timeout_secs = {timeout_secs}\n",
         fixture.identity_path.display()
     );
     write_private(&fixture.config_path, text.as_bytes());
@@ -227,27 +243,37 @@ fn stdout_status(output: &std::process::Output) -> String {
 async fn real_binary_loopback_submit_maps_remote_boundary_status() {
     let fixture = fixture();
     write_private(&fixture.hint_path, VALID_HINT);
-    let (guardian, route, peer) = start_guardian(&fixture).await;
-    write_config(&fixture, &peer, &route, 10);
-
-    // Offline preflight validates without creating the identity or dialing.
-    let output = run_to_output(cli(&fixture, "preflight")).await;
-    assert!(output.status.success());
-    assert_eq!(
-        stdout_status(&output),
-        "ready-for-development-threat-hint-submit"
-    );
-    assert!(
-        !fixture.identity_path.exists(),
-        "preflight must not create the transport identity"
-    );
-    assert_eq!(guardian.pending_work(), (0, 0));
-    assert_redacted(&fixture, &peer, &output);
-
     let listener = bind_verifier(&fixture.verifier_socket).await;
-    let (shutdown, driver) = spawn_driver(&fixture, guardian);
+    let mut stopped_route = String::new();
+    let mut stopped_peer = String::new();
 
-    for status in ["accepted", "duplicate", "rejected", "busy"] {
+    for (index, status) in ["accepted", "duplicate", "rejected", "busy"]
+        .into_iter()
+        .enumerate()
+    {
+        // Each short-lived real client gets a fresh Guardian lifecycle. This
+        // avoids overlapping connection-close events in libp2p 0.29 while
+        // preserving exact real-binary status coverage.
+        let (guardian, route, peer) = start_guardian(&fixture).await;
+        write_config(&fixture, &peer, &route, 10);
+
+        if index == 0 {
+            // Offline preflight validates without creating the identity or dialing.
+            let output = run_to_output(cli(&fixture, "preflight")).await;
+            assert!(output.status.success());
+            assert_eq!(
+                stdout_status(&output),
+                "ready-for-development-threat-hint-submit"
+            );
+            assert!(
+                !fixture.identity_path.exists(),
+                "preflight must not create the transport identity"
+            );
+            assert_eq!(guardian.pending_work(), (0, 0));
+            assert_redacted(&fixture, &peer, &output);
+        }
+
+        let (shutdown, driver) = spawn_driver(&fixture, guardian);
         let serve = tokio::spawn(serve_once(
             Arc::clone(&listener),
             VALID_HINT.to_vec(),
@@ -266,21 +292,23 @@ async fn real_binary_loopback_submit_maps_remote_boundary_status() {
             .permissions()
             .mode();
         assert_eq!(mode & 0o777, 0o600);
+
+        shutdown.send(()).expect("request clean Guardian shutdown");
+        timeout(Duration::from_secs(10), driver)
+            .await
+            .expect("bounded Guardian shutdown")
+            .expect("Guardian driver task")
+            .expect("Guardian driver transport");
+        stopped_route = route;
+        stopped_peer = peer;
     }
 
-    shutdown.send(()).expect("request clean Guardian shutdown");
-    timeout(Duration::from_secs(10), driver)
-        .await
-        .expect("bounded Guardian shutdown")
-        .expect("Guardian driver task")
-        .expect("Guardian driver transport");
-
     // A stopped Guardian boundary maps to a bounded transport-failure.
-    write_config(&fixture, &peer, &route, 2);
+    write_config(&fixture, &stopped_peer, &stopped_route, 2);
     let output = run_to_output(cli(&fixture, "submit")).await;
     assert!(!output.status.success());
     assert_eq!(stdout_status(&output), "transport-failure");
-    assert_redacted(&fixture, &peer, &output);
+    assert_redacted(&fixture, &stopped_peer, &output);
 }
 
 #[tokio::test]
@@ -308,5 +336,97 @@ async fn beta_and_mainnet_reject_before_network_activity() {
     assert!(
         !fixture.identity_path.exists(),
         "rejected runs must not create the transport identity"
+    );
+}
+
+#[tokio::test]
+async fn controlled_remote_rejects_unsafe_routes_and_non_development_modes() {
+    let fixture = fixture();
+    write_private(&fixture.hint_path, VALID_HINT);
+    let (guardian, loopback_route, peer) = start_guardian(&fixture).await;
+    drop(guardian);
+
+    // Remote mode never accepts a loopback-shaped route.
+    for route in [
+        loopback_route.clone(),
+        format!("/ip6/::ffff:7f00:1/udp/4001/quic-v1/p2p/{peer}"),
+        format!("/ip6/::ffff:808:808/udp/4001/quic-v1/p2p/{peer}"),
+        format!("/ip4/169.254.10.20/udp/4001/quic-v1/p2p/{peer}"),
+        format!("/ip4/192.0.2.10/udp/4001/quic-v1/p2p/{peer}"),
+        format!("/ip4/198.18.1.10/udp/4001/quic-v1/p2p/{peer}"),
+        format!("/ip4/255.255.255.255/udp/4001/quic-v1/p2p/{peer}"),
+        format!("/dns4/guardian.example.invalid/udp/4001/quic-v1/p2p/{peer}"),
+    ] {
+        write_config_with_mode(
+            &fixture,
+            &peer,
+            &route,
+            2,
+            Some("controlled-remote-testnet10"),
+        );
+        for verb in ["preflight", "submit"] {
+            let output = run_to_output(cli(&fixture, verb)).await;
+            assert!(
+                !output.status.success(),
+                "remote mode must reject route {route} ({verb})"
+            );
+            assert_redacted(&fixture, &peer, &output);
+        }
+    }
+    assert!(
+        !fixture.identity_path.exists(),
+        "rejected remote runs must not create the transport identity"
+    );
+
+    // A syntactically valid bounded remote route is gated by Beta and Mainnet
+    // before identity mutation or any dial.
+    let remote_route = format!("/ip4/10.8.0.1/udp/4001/quic-v1/p2p/{peer}");
+    write_config_with_mode(
+        &fixture,
+        &peer,
+        &remote_route,
+        2,
+        Some("controlled-remote-testnet10"),
+    );
+    for mode in ["beta", "mainnet"] {
+        for verb in ["preflight", "submit"] {
+            let mut command = cli(&fixture, verb);
+            command.env("PROMETHEUS_RUNTIME", mode);
+            let output = run_to_output(command).await;
+            assert!(
+                !output.status.success(),
+                "{mode} {verb} must reject the remote route before network activity"
+            );
+            assert_redacted(&fixture, &peer, &output);
+        }
+    }
+    assert!(
+        !fixture.identity_path.exists(),
+        "gated remote runs must not create the transport identity"
+    );
+
+    // Development offline preflight accepts the bounded remote route without
+    // creating the identity or dialing.
+    let output = run_to_output(cli(&fixture, "preflight")).await;
+    assert!(output.status.success(), "remote preflight exit status");
+    assert_eq!(
+        stdout_status(&output),
+        "ready-for-development-threat-hint-submit"
+    );
+    let report: Value = serde_json::from_slice(&output.stdout).expect("JSON preflight report");
+    assert_eq!(
+        report["route_scope"].as_str().expect("route_scope field"),
+        "single-static-controlled-remote-quic-peer"
+    );
+    assert!(
+        !fixture.identity_path.exists(),
+        "remote preflight must not create the transport identity"
+    );
+    assert_redacted(&fixture, &peer, &output);
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(
+        !stdout.contains("10.8.0.1") && !stderr.contains("10.8.0.1"),
+        "process output must not expose the remote literal"
     );
 }

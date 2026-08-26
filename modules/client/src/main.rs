@@ -38,7 +38,7 @@ enum Command {
     /// Opt-in Development/Testnet-10 RuleStorage synchronization.
     #[command(subcommand)]
     RuleSync(RuleSyncCommand),
-    /// Development-only v1 ThreatHint submission to one static loopback Guardian peer.
+    /// Development-only v1 ThreatHint submission to one bounded static Guardian peer.
     #[command(subcommand)]
     ThreatHint(ThreatHintCommand),
 }

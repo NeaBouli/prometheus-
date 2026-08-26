@@ -10,7 +10,15 @@ Startpunkt fuer Codex/Claude Code:
 
 Keine Secrets, Tokens, Passwoerter, privaten Keys oder Wallet-Daten in diese Bridge schreiben.
 
-Aktiver Handover: GH-58 ist nach PR #60 als exact main `22bc55a` verifiziert. Der separate owner-only Verifier-IPC, trusted Network/Domain Binding, persistente Freshness/Replay-Abwehr und atomare dauerhafte Analyzer-Outbox sind gemergt. Development-Stubs bleiben gesperrt; ohne unabhaengig freigegebenen echten Groth16-Verifier und expliziten Analyzer-Domain-Adapter antwortet der operated Sidecar fail-closed mit `busy` und behauptet keine akzeptierte Analyse. Echte Zwei-Host-Evidence wartet weiterhin auf unabhaengig verifizierten privaten Operatorzugriff. Verbindlicher Status und offene Gates stehen in `CODEX_BRIDGE.md`; laufende Schritte stehen in `ACTION_LOG.md`.
+Aktiver Handover: GH-229 baut auf dem vollstaendig geschlossenen GH-226-Stand
+auf und prueft eine explizite Development-/Testnet-10-only Direct-QUIC-Route
+fuer kontrollierte Zwei-Host-Evidence. Bestehender Loopback bleibt Standard;
+Transport-ACKs verleihen keine Proof-, Membership-, Reward-, Chain-, Mainnet-
+oder Produktionsautoritaet. Der vorhandene direkte Sandbox-UDP-Pfad ist ohne
+Infrastrukturaenderung geschlossen, daher darf bis zu einem ausdruecklich
+begrenzten temporaeren Reachability-Gate keine reale Multi-Host-Behauptung
+veroeffentlicht werden. Verbindlicher Status und offene Gates stehen in
+`CODEX_BRIDGE.md`; laufende Schritte stehen in `ACTION_LOG.md`.
 <!-- CODEX_CLAUDE_CODE_TERMINAL_BRIDGE_V1 -->
 ## Codex -> Claude Code Terminal Bridge
 

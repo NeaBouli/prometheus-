@@ -1,4 +1,4 @@
-# Guardian P2P Operator Runbook (GH-48 + GH-52)
+# Guardian P2P Operator Runbook (GH-48 + GH-52 + GH-229)
 
 ## Purpose
 
@@ -115,6 +115,68 @@ This procedure creates real multi-host evidence only when the relay and Guardian
 8. Stop all processes and verify owned submission sockets are removed. Keep transport identity files unchanged for repeatability.
 
 Passing this procedure proves controlled reachability and exact opaque ballot/ACK transport between the tested hosts. It does not prove broad discovery, Guardian membership, Sybil resistance, public-service hardening, or production readiness.
+
+### Controlled Light Client ThreatHint procedure (GH-229)
+
+This separate procedure covers one Development/Testnet-10 Light Client sender
+and one directly reachable Guardian host. It is not a relay procedure and does
+not authorize a public service.
+
+1. Obtain a separately approved, temporary direct UDP path from the sender host
+   to one fixed Guardian UDP port. Restrict the path to the approved sender where
+   infrastructure permits. If direct UDP is unavailable, stop. An SSH/TCP tunnel,
+   relay, DNS route, same-host process, container or namespace is not equivalent
+   two-host QUIC evidence.
+2. On the Guardian host, create a dedicated owner-only runtime directory. Run
+   the committed Development boundary with one expected canonical payload digest:
+
+```bash
+mkdir -p /run/prometheus/gh-229
+chmod 700 /run/prometheus/gh-229
+python3 scripts/development_threat_hint_v1_boundary.py \
+  --socket /run/prometheus/gh-229/threat-hint.sock \
+  --receipt /run/prometheus/gh-229/receipt.json \
+  --expected-sha256 '<lowercase-sha256-of-canonical-v1-payload>' \
+  --status rejected \
+  --timeout 60
+```
+
+   The boundary accepts exactly one owner-local AF_UNIX connection, writes one
+   atomic owner-only redacted receipt and can return only `rejected` or `busy`.
+   It cannot return `accepted` or `duplicate` and has no proof, membership,
+   publication, chain or reward authority.
+3. Configure the Guardian's `threat_hint_socket` to that socket and bind exactly
+   the approved direct UDP listener. Record the static transport `PeerId`
+   privately; do not place it in public evidence.
+4. On the sender host, keep the existing strict client config and add the
+   explicit opt-in below. Use one canonical literal IP route whose trailing
+   `PeerId` exactly matches `guardian_peer_id`:
+
+```toml
+enabled = true
+network = "testnet10"
+route_mode = "controlled-remote-testnet10"
+guardian_peer_id = "<guardian-transport-peer-id>"
+guardian_address = "/ip4/<approved-guardian-ip>/udp/<approved-port>/quic-v1/p2p/<guardian-transport-peer-id>"
+identity_path = "/var/lib/prometheus/light-client/client.identity"
+submission_timeout_secs = 60
+```
+
+5. Run `prometheus-client threat-hint preflight` first. It must report
+   `single-static-controlled-remote-quic-peer` without creating the identity or
+   dialing. Then run one `submit`. No retries are permitted.
+6. A valid controlled run requires the sender to report `rejected` and the local
+   Guardian receipt to report the same payload digest and `rejected`. This proves
+   only one operator-attested delivery and non-authorizing acknowledgement. Host
+   separation is not independently proven by the redacted public record.
+7. Stop both processes, remove the temporary UDP allowance, and verify the owned
+   AF_UNIX socket is gone. Keep network identifiers, PeerIds, hostnames, paths,
+   raw payloads and private receipts out of Git. Publish only a record accepted
+   by `scripts/verify_gh229_multihost_evidence.py`.
+
+The repository unit tests validate this procedure's route and evidence policy.
+They do not constitute the real two-host run. Until the direct run and redacted
+record exist, public multi-host Light Client operation remains unproven.
 
 6) Start processes
 

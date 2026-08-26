@@ -186,6 +186,15 @@ proof validity, reporter membership, privacy approval, public Testnet or
 multi-host operation, wallet/chain/reward behavior, deployment or production
 readiness.
 
+GH-229 adds a repository candidate for a separately controlled
+Development/Testnet-10 run. Loopback remains the default. The explicit remote
+mode accepts only one canonical direct literal-IP/UDP/QUIC-v1 Guardian peer and
+rejects unsafe/special ranges, mapped IPv6, DNS, TCP, relay and peer mismatches.
+Its committed receiver can return only non-authorizing `rejected` or `busy`
+outcomes. The approved hosts currently lack direct UDP reachability, so this is
+tested capability rather than real two-host, public Testnet or production
+evidence; tunnels, containers and same-host processes are not substitutes.
+
 Merged and exact-main-verified GH-197/PR #198 adds a local Testnet-10
 consistency boundary: a separately
 owner-pin-hashed canonical manifest must match exactly one entry in a bounded

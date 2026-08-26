@@ -4487,3 +4487,44 @@ Rules for all dev agents:
 - Claim, status, Memory, H-001 evidence, HTML/documentation hygiene, workflow
   YAML and diff gates pass on the publication candidate.
 - Status: `Docs closeout PASS / Protected PR next / Production false`.
+
+## 2026-08-26 - GH-229 controlled multi-host evidence started
+
+- Opened issue #229 and branch
+  `feat/GH-229-controlled-multihost-evidence` from clean exact main `711a7d4`.
+- Scope is bounded Development/Testnet-10 direct-QUIC evidence between distinct
+  approved hosts, with strict static route policy, redacted public evidence and
+  no persistent firewall/IAM, wallet, chain, deployment or production action.
+- Status: `GH-229 In Progress / Architecture and access preflight next / Production false`.
+
+## 2026-08-26 - GH-229 architecture/access milestone
+
+- Sandbox SSH passes; existing IPv4 and IPv6 UDP ingress are closed without
+  any firewall/IAM mutation. Docker/Python are available, Cargo is absent.
+- Kimi K3 returns conditional `SHIP`; Sol added the strict public evidence gate
+  and seven passing adversarial tests. Claude Code is budget-blocked.
+- Status: `Repository implementation active / Real QUIC run externally gated / Production false`.
+
+## 2026-08-26 - GH-229 repository block verified
+
+- Added the explicit Development/Testnet-10 controlled direct-QUIC route while
+  preserving loopback default behavior; hardened unsafe IP/route rejection and
+  Beta/Mainnet pre-network gates.
+- Added the non-authorizing atomic local receiver, strict redacted evidence
+  verifier, 21 Python tests, expanded Rust unit/real-binary tests, CI wiring,
+  operator runbook and synchronized README/Whitepaper/Roadmap/FAQ/Pages/llms.
+- Removed a reproduced test-only libp2p connection-close race by giving each
+  short-lived real client status case an independent Guardian lifecycle. Two
+  consecutive focused runs and full client all-targets are green.
+- Direct UDP between approved hosts remains unavailable; no infrastructure or
+  production mutation occurred and no two-host evidence is claimed.
+- Status: `Repository PASS / Two-host evidence external gate OPEN / Protected PR next / Production false`.
+
+## 2026-08-26 - GH-229 independent review closed
+
+- Kimi found no P0-P2; Sol closed its single P3 transition-prefix hardening note
+  with explicit rejected IPv6 vectors.
+- Post-fix P2P 16/16, real binary 3/3, Python 21/21, Clippy, rustfmt, public
+  claims, Memory, YAML, HTML, diff and Cargo Audit gates pass. Cargo Audit has no
+  vulnerability and the unchanged eight allowed warnings.
+- Status: `Security review PASS / Protected PR next / Production false`.

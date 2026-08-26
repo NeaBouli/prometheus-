@@ -8,6 +8,15 @@
 # Replace the placeholder with one valid base58btc Guardian transport peer ID.
 # The same value must appear in guardian_peer_id and in the trailing /p2p/
 # component of guardian_address; any mismatch is rejected.
+#
+# route_mode is optional and defaults to "loopback", which accepts exactly one
+# literal-loopback QUIC route as shown below. The explicit GH-229 opt-in
+# route_mode = "controlled-remote-testnet10" accepts exactly one bounded direct
+# literal-IP QUIC route to the same static peer on Testnet-10; loopback,
+# link-local, documentation, benchmarking, broadcast/reserved, IPv4-mapped,
+# wildcard, and multicast literals stay rejected, as do DNS, TCP, and relay
+# routes. It remains Development-only and carries no proof authority.
+# route_mode = "loopback"
 enabled = true
 network = "testnet10"
 guardian_peer_id = "12D3KooWReplaceWithTheStaticGuardianTransportPeerId"

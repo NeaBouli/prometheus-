@@ -5466,3 +5466,83 @@ No direct `main` push or production action occurred.
   membership, wallet, chain, reward, deployment, Mainnet or production claim
   was introduced. KAS/PROM economics are unchanged.
 - **Status:** `GH-226 Docs closeout SHIP / Protected documentation PR next / Production false`.
+
+## 2026-08-26 - GH-229 controlled two-host Testnet-10 evidence start
+
+- Issue #229 and branch `feat/GH-229-controlled-multihost-evidence` start from
+  clean exact main `711a7d446b16f0680b6e038302d7b0394f29c936`.
+- Scope is one explicit Development/Testnet-10-only static direct-QUIC Light
+  Client route, exact literal-IP/PeerId binding, bounded redacted evidence and
+  one controlled distinct-host submission if temporary reachability works
+  without persistent firewall or IAM mutation. Existing loopback behavior is
+  preserved.
+- A transport acknowledgement remains delivery evidence only. It grants no
+  proof, Guardian membership, consensus, Sybil protection, on-chain
+  attestation, wallet, chain, reward, deployment, Mainnet or production
+  authority.
+- Sol owns architecture, security, host actions, integration and full gates.
+  Kimi K3 receives a bounded secret-free architecture/implementation review;
+  Claude Code may assist only with a small isolated helper if available.
+- No secret, wallet, signing, transaction, broadcast, contract, tokenomics,
+  reward, Mainnet or production action is in scope.
+- **Status:** `GH-229 In Progress / Architecture and access preflight next / Production false`.
+
+## 2026-08-26 - GH-229 architecture and access preflight
+
+- Sandbox SSH and temporary workspace access pass; Docker and Python are
+  available but Cargo is not installed. No persistent host state changed.
+- Existing direct IPv4 and IPv6 UDP ingress both fail a bounded random-payload
+  probe. No firewall or IAM mutation occurred. QUIC cannot be represented by a
+  TCP SSH tunnel, so real controlled two-host evidence remains externally gated.
+- Kimi K3's secret-free read-only review returns conditional `SHIP`. Required
+  controls are explicit remote Testnet-10 opt-in, unchanged loopback default,
+  strict unsafe/mapped-IP rejection, a committed non-authorizing receiver and
+  public evidence classified as operator-attested rather than independent proof.
+- The strict evidence verifier and seven adversarial unit tests pass locally;
+  it rejects authorizing outcomes, network identifiers, unknown fields, equal
+  execution attestations and any wallet/chain/deployment/production flag.
+- Claude Code is unavailable because its configured budget is exhausted and
+  made no change.
+- **Status:** `GH-229 Repository implementation in progress / Direct UDP external gate closed / Production false`.
+
+## 2026-08-26 - GH-229 repository capability and integration PASS
+
+- Kimi K3 implemented the bounded route-policy and receiver slice; Sol reviewed
+  every changed file, extended reserved-IP rejection, made receipt publication
+  atomic, isolated real-binary Guardian lifecycles to remove a reproduced
+  libp2p connection-close test race, and integrated CLI help, CI, runbook and
+  synchronized public status surfaces.
+- The absent/default `route_mode` remains exact loopback. The only remote wire
+  value is `controlled-remote-testnet10`, valid only in Development with
+  Testnet-10 and one canonical direct literal-IP/UDP/QUIC-v1 peer. DNS, TCP,
+  relay, mismatched peer, mapped IPv6, loopback, link-local, documentation,
+  benchmarking, multicast and reserved routes fail closed. Beta/Mainnet reject
+  before identity mutation or networking.
+- The committed single-shot AF_UNIX boundary can return only `rejected` or
+  `busy`, writes one atomic owner-only redacted receipt and grants no proof or
+  operating authority. The public evidence schema requires a non-authorizing,
+  operator-attested classification and rejects network identifiers, unknown
+  fields and every wallet/chain/deployment/Mainnet/production flag.
+- Verification: 21 combined Python boundary/evidence tests pass; focused P2P
+  unit tests pass 16/16; the real-binary ThreatHint integration passes 3/3 in
+  two consecutive focused runs and inside full client all-targets; client
+  all-targets passes 167 library tests with 2 intentional live-node ignores plus
+  every integration target; warning-free client Clippy, rustfmt, workflow YAML,
+  13-surface public claims, HTML parse, Memory/status and diff gates pass.
+- Existing direct sandbox IPv4/IPv6 UDP remains closed. No firewall, IAM,
+  deployment, wallet, signing, chain, contract, tokenomics, Mainnet or
+  production action occurred. A TCP/SSH tunnel is not accepted as QUIC evidence.
+- **Status:** `GH-229 Repository PASS / Real two-host UDP evidence BLOCKED / Protected PR next / Production false`.
+
+## 2026-08-26 - GH-229 final security review delta
+
+- Kimi K3's independent read-only review found no P0-P2 blocker. Its only
+  residual P3 observation was that globally shaped IPv6 transition/special
+  prefixes could be admitted by the first conservative policy.
+- Sol closed that P3 by rejecting the IANA 2001 special block used here,
+  documentation, Teredo/6to4-style and deprecated 6bone prefixes, with explicit
+  adversarial vectors. Focused P2P 16/16, real-binary 3/3, Python 21/21,
+  rustfmt, warning-free Clippy, public claims and diff checks pass afterward.
+- `cargo audit` reports no vulnerability and the existing eight allowed
+  unmaintained/yanked/unsound warnings. No dependency changed in GH-229.
+- **Status:** `GH-229 Security review PASS / P3 closed / Protected PR next / Production false`.
