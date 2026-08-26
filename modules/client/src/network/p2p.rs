@@ -4,8 +4,13 @@
 //! This module only composes the existing reviewed `prometheus-guardian-p2p`
 //! transport. It introduces no new libp2p transport, discovery, relay,
 //! AutoNAT, or public-address operation: exactly one canonical static Guardian
-//! peer id and one literal-loopback QUIC multiaddress are accepted, and the
-//! node runs dial-only with zero listeners. It contains no signer,
+//! peer id and one literal QUIC multiaddress are accepted, and the node runs
+//! dial-only with zero listeners. The default route mode accepts only a
+//! literal-loopback route. The explicit `controlled-remote-testnet10` opt-in
+//! (GH-229) accepts exactly one bounded direct literal-IP route to the same
+//! static peer while rejecting loopback, link-local, documentation,
+//! benchmarking, broadcast/reserved, IPv4-mapped, wildcard, and multicast
+//! ranges. It contains no signer,
 //! private-key, wallet, seed, transaction, ballot, ThreatHint-v2, deployment,
 //! Mainnet, key-governance, or production authority. Beta and Mainnet are
 //! rejected before any network activity regardless of the proof bytes a
@@ -61,6 +66,29 @@ pub enum ThreatHintNetwork {
     Testnet10,
 }
 
+/// Optional route policy for the single static Guardian peer. The default is
+/// loopback; `controlled-remote-testnet10` is an explicit Development-only
+/// GH-229 opt-in for one bounded direct literal-IP route to the same peer.
+#[derive(Debug, Clone, Copy, Default, Deserialize, Serialize, PartialEq, Eq)]
+#[serde(rename_all = "kebab-case")]
+pub enum ThreatHintRouteMode {
+    /// Accept only one canonical literal-loopback QUIC route.
+    #[default]
+    Loopback,
+    /// Accept only one canonical bounded direct literal-IP QUIC route.
+    ControlledRemoteTestnet10,
+}
+
+impl ThreatHintRouteMode {
+    /// Stable data-minimal route scope reported in preflight and submissions.
+    const fn route_scope(self) -> &'static str {
+        match self {
+            Self::Loopback => "single-static-loopback-quic-peer",
+            Self::ControlledRemoteTestnet10 => "single-static-controlled-remote-quic-peer",
+        }
+    }
+}
+
 /// Strict explicit configuration. Every field is required; unknown fields,
 /// including any wallet, seed, or signing material, are denied.
 #[derive(Deserialize)]
@@ -68,6 +96,8 @@ pub enum ThreatHintNetwork {
 pub struct ThreatHintSubmitConfig {
     enabled: bool,
     network: ThreatHintNetwork,
+    #[serde(default)]
+    route_mode: ThreatHintRouteMode,
     guardian_peer_id: String,
     guardian_address: String,
     identity_path: PathBuf,
@@ -85,6 +115,7 @@ impl fmt::Debug for ThreatHintSubmitConfig {
 pub struct ValidatedThreatHintConfig {
     mode: RuntimeMode,
     network: ThreatHintNetwork,
+    route_mode: ThreatHintRouteMode,
     guardian: StaticPeer,
     identity_path: PathBuf,
     submission_timeout: Duration,
@@ -179,11 +210,16 @@ impl ThreatHintSubmitConfig {
             return Err(ThreatHintP2pError);
         }
         validate_identity_path(&self.identity_path)?;
-        let guardian = parse_static_route(&self.guardian_peer_id, &self.guardian_address)?;
+        let guardian = parse_static_route(
+            &self.guardian_peer_id,
+            &self.guardian_address,
+            self.route_mode,
+        )?;
 
         Ok(ValidatedThreatHintConfig {
             mode,
             network: self.network,
+            route_mode: self.route_mode,
             guardian,
             identity_path: self.identity_path.clone(),
             submission_timeout: Duration::from_secs(self.submission_timeout_secs),
@@ -205,7 +241,7 @@ impl ValidatedThreatHintConfig {
             status: "ready-for-development-threat-hint-submit",
             runtime: "development-only",
             network: self.network,
-            route_scope: "single-static-loopback-quic-peer",
+            route_scope: self.route_mode.route_scope(),
             identity,
             hint: "canonical-v1",
             ack_scope: "remote-local-boundary-only",
@@ -214,7 +250,7 @@ impl ValidatedThreatHintConfig {
         })
     }
 
-    /// Submit one canonical v1 ThreatHint to the single static loopback peer.
+    /// Submit one canonical v1 ThreatHint to the single static peer.
     ///
     /// The total network phase is bounded by the configured timeout, the real
     /// transport event loop is driven, and the outcome is reduced to a stable
@@ -273,7 +309,7 @@ impl ValidatedThreatHintConfig {
             status,
             runtime: "development-only",
             network: self.network,
-            route_scope: "single-static-loopback-quic-peer",
+            route_scope: self.route_mode.route_scope(),
             ack_scope: "remote-local-boundary-only",
             ack_authority: "none",
             retries: 0,
@@ -292,11 +328,14 @@ fn require_development(mode: RuntimeMode) -> Result<(), ThreatHintP2pError> {
 }
 
 /// Parse exactly one canonical static Guardian peer route: a canonical peer id
-/// and a canonical `/ip4|ip6/<loopback>/udp/<port>/quic-v1/p2p/<peer>` literal.
-/// DNS, wildcard, unspecified, multicast, relay, and any other form fail.
+/// and a canonical `/ip4|ip6/<literal>/udp/<port>/quic-v1/p2p/<peer>` route.
+/// The route mode bounds the literal: loopback-only by default, or the GH-229
+/// controlled-remote literal policy on explicit opt-in. DNS, TCP, wildcard,
+/// unspecified, multicast, relay, and any other form fail.
 fn parse_static_route(
     peer_text: &str,
     address_text: &str,
+    route_mode: ThreatHintRouteMode,
 ) -> Result<StaticPeer, ThreatHintP2pError> {
     if peer_text.is_empty() || address_text.is_empty() {
         return Err(ThreatHintP2pError);
@@ -308,16 +347,29 @@ fn parse_static_route(
     if peer.peer_id.to_string() != peer_text || peer.address.to_string() != address_text {
         return Err(ThreatHintP2pError);
     }
-    if !is_single_loopback_quic_route(address_text, peer_text) {
+    let accepted = match route_mode {
+        ThreatHintRouteMode::Loopback => is_single_loopback_quic_route(address_text, peer_text),
+        ThreatHintRouteMode::ControlledRemoteTestnet10 => {
+            is_single_controlled_remote_quic_route(address_text, peer_text)
+        }
+    };
+    if !accepted {
         return Err(ThreatHintP2pError);
     }
     Ok(peer)
 }
 
-/// Strictly match the canonical text form of one direct literal-loopback
-/// QUIC-v1 route. The canonical round-trip check in `parse_static_route` runs
-/// first, so the text shape is fully determined here.
-fn is_single_loopback_quic_route(address: &str, peer_text: &str) -> bool {
+/// The literal of one direct QUIC-v1 route after canonical text checks.
+enum RouteLiteral {
+    V4(Ipv4Addr),
+    V6(Ipv6Addr),
+}
+
+/// Strictly match the canonical text form of one direct literal QUIC-v1 route
+/// and return its parsed literal. The canonical round-trip check in
+/// `parse_static_route` runs first, so the text shape is fully determined
+/// here.
+fn canonical_quic_route_literal(address: &str, peer_text: &str) -> Option<RouteLiteral> {
     let segments: Vec<&str> = address.split('/').collect();
     if segments.len() != 8
         || !segments[0].is_empty()
@@ -326,23 +378,62 @@ fn is_single_loopback_quic_route(address: &str, peer_text: &str) -> bool {
         || segments[6] != "p2p"
         || segments[7] != peer_text
     {
-        return false;
+        return None;
     }
     match segments[4].parse::<u16>() {
-        Ok(0) | Err(_) => return false,
+        Ok(0) | Err(_) => return None,
         Ok(_) => {}
     }
     match segments[1] {
-        "ip4" => segments[2]
-            .parse::<Ipv4Addr>()
-            .map(|ip| ip.is_loopback())
-            .unwrap_or(false),
-        "ip6" => segments[2]
-            .parse::<Ipv6Addr>()
-            .map(|ip| ip.is_loopback())
-            .unwrap_or(false),
-        _ => false,
+        "ip4" => segments[2].parse::<Ipv4Addr>().ok().map(RouteLiteral::V4),
+        "ip6" => segments[2].parse::<Ipv6Addr>().ok().map(RouteLiteral::V6),
+        _ => None,
     }
+}
+
+/// Accept exactly one direct literal-loopback QUIC-v1 route.
+fn is_single_loopback_quic_route(address: &str, peer_text: &str) -> bool {
+    match canonical_quic_route_literal(address, peer_text) {
+        Some(RouteLiteral::V4(ip)) => ip.is_loopback(),
+        Some(RouteLiteral::V6(ip)) => ip.is_loopback(),
+        None => false,
+    }
+}
+
+/// Accept exactly one direct literal QUIC-v1 route for the GH-229 controlled
+/// remote opt-in: no loopback, link-local, documentation, benchmarking,
+/// broadcast/reserved, IPv4-mapped, wildcard, unspecified, or multicast
+/// literal. RFC1918, CGNAT, ULA, and normal global literals are allowed.
+fn is_single_controlled_remote_quic_route(address: &str, peer_text: &str) -> bool {
+    match canonical_quic_route_literal(address, peer_text) {
+        Some(RouteLiteral::V4(ip)) => is_allowed_remote_ipv4(ip),
+        Some(RouteLiteral::V6(ip)) => is_allowed_remote_ipv6(ip),
+        None => false,
+    }
+}
+
+fn is_allowed_remote_ipv4(ip: Ipv4Addr) -> bool {
+    let [a, b, c, d] = ip.octets();
+    !(a == 0 // 0/8 "this network"
+        || a == 127 // 127/8 loopback
+        || (a == 169 && b == 254) // 169.254/16 link-local
+        || (a == 192 && b == 0 && c == 0 && d != 9 && d != 10) // IETF protocol assignments
+        || (a == 192 && b == 0 && c == 2) // 192.0.2/24 documentation
+        || (a == 192 && b == 88 && c == 99) // deprecated 6to4 relay anycast
+        || (a == 198 && ((b == 51 && c == 100) || b == 18 || b == 19)) // TEST-NET-2, 198.18/15
+        || (a == 203 && b == 0 && c == 113) // 203.0.113/24 documentation
+        || a >= 224) // 224/4 multicast and 240/4 reserved including broadcast
+}
+
+fn is_allowed_remote_ipv6(ip: Ipv6Addr) -> bool {
+    let segments = ip.segments();
+    let unique_local = (segments[0] & 0xfe00) == 0xfc00;
+    let special_or_transition = segments[0] == 0x2001
+        && (segments[1] <= 0x01ff || segments[1] == 0x0db8)
+        || segments[0] == 0x2002
+        || segments[0] == 0x3ffe;
+    let normal_global_unicast = (segments[0] & 0xe000) == 0x2000 && !special_or_transition;
+    unique_local || normal_global_unicast
 }
 
 fn validate_identity_path(path: &Path) -> Result<(), ThreatHintP2pError> {
@@ -483,8 +574,21 @@ mod tests {
     }
 
     fn config_text(peer: &str, identity_path: &Path, address: &str, timeout_secs: u64) -> String {
+        config_text_with_route_mode(peer, identity_path, address, timeout_secs, None)
+    }
+
+    fn config_text_with_route_mode(
+        peer: &str,
+        identity_path: &Path,
+        address: &str,
+        timeout_secs: u64,
+        route_mode: Option<&str>,
+    ) -> String {
+        let mode_line = route_mode
+            .map(|mode| format!("route_mode = \"{mode}\"\n"))
+            .unwrap_or_default();
         format!(
-            "enabled = true\nnetwork = \"testnet10\"\nguardian_peer_id = \"{peer}\"\nguardian_address = \"{address}\"\nidentity_path = \"{}\"\nsubmission_timeout_secs = {timeout_secs}\n",
+            "enabled = true\nnetwork = \"testnet10\"\n{mode_line}guardian_peer_id = \"{peer}\"\nguardian_address = \"{address}\"\nidentity_path = \"{}\"\nsubmission_timeout_secs = {timeout_secs}\n",
             identity_path.display()
         )
     }
@@ -769,6 +873,232 @@ mod tests {
             .expect("parses")
             .validate(RuntimeMode::Development)
             .expect("literal loopback IPv6 route is valid");
+    }
+
+    /// Write a remote-mode config and return its validation result.
+    fn validate_remote_config(peer: &str, identity: &Path, address: &str) -> bool {
+        let directory = owner_only_dir();
+        let path = directory.path().join("config.toml");
+        write_private(
+            &path,
+            config_text_with_route_mode(
+                peer,
+                identity,
+                address,
+                10,
+                Some("controlled-remote-testnet10"),
+            )
+            .as_bytes(),
+        );
+        ThreatHintSubmitConfig::from_toml_file(&path)
+            .expect("parses")
+            .validate(RuntimeMode::Development)
+            .is_ok()
+    }
+
+    #[test]
+    fn controlled_remote_accepts_bounded_literal_routes() {
+        let fixture = fixture();
+        let peer = fixture.peer.clone();
+        let identity = fixture.identity_path.clone();
+        for address in [
+            format!("/ip4/10.8.0.1/udp/4001/quic-v1/p2p/{peer}"),
+            format!("/ip4/172.16.5.4/udp/4001/quic-v1/p2p/{peer}"),
+            format!("/ip4/192.168.1.20/udp/4001/quic-v1/p2p/{peer}"),
+            format!("/ip4/100.64.0.1/udp/4001/quic-v1/p2p/{peer}"),
+            format!("/ip4/100.127.255.254/udp/4001/quic-v1/p2p/{peer}"),
+            format!("/ip4/8.8.8.8/udp/4001/quic-v1/p2p/{peer}"),
+            format!("/ip6/fd00::1/udp/4001/quic-v1/p2p/{peer}"),
+            format!("/ip6/fc00::ffff/udp/4001/quic-v1/p2p/{peer}"),
+            format!("/ip6/2606:4700:4700::1111/udp/4001/quic-v1/p2p/{peer}"),
+        ] {
+            assert!(
+                validate_remote_config(&peer, &identity, &address),
+                "bounded remote route must validate: {address}"
+            );
+        }
+    }
+
+    #[test]
+    fn controlled_remote_rejects_forbidden_ranges_and_shapes() {
+        let fixture = fixture();
+        let other_dir = owner_only_dir();
+        let other_peer = generated_peer_text(other_dir.path());
+        let peer = fixture.peer.clone();
+        let identity = fixture.identity_path.clone();
+
+        let forbidden = [
+            // Loopback: full 127/8 and ::1.
+            format!("/ip4/127.0.0.1/udp/4001/quic-v1/p2p/{peer}"),
+            format!("/ip4/127.53.0.9/udp/4001/quic-v1/p2p/{peer}"),
+            format!("/ip6/::1/udp/4001/quic-v1/p2p/{peer}"),
+            // IPv4-mapped IPv6 in canonical text form, loopback and global.
+            format!("/ip6/::ffff:7f00:1/udp/4001/quic-v1/p2p/{peer}"),
+            format!("/ip6/::ffff:808:808/udp/4001/quic-v1/p2p/{peer}"),
+            // Link-local: 169.254/16 and fe80::/10.
+            format!("/ip4/169.254.0.1/udp/4001/quic-v1/p2p/{peer}"),
+            format!("/ip4/169.254.255.254/udp/4001/quic-v1/p2p/{peer}"),
+            format!("/ip6/fe80::1/udp/4001/quic-v1/p2p/{peer}"),
+            format!("/ip6/febf::ffff/udp/4001/quic-v1/p2p/{peer}"),
+            // Documentation: all three IPv4 nets and 2001:db8::/32.
+            format!("/ip4/192.0.2.1/udp/4001/quic-v1/p2p/{peer}"),
+            format!("/ip4/192.0.0.1/udp/4001/quic-v1/p2p/{peer}"),
+            format!("/ip4/192.88.99.1/udp/4001/quic-v1/p2p/{peer}"),
+            format!("/ip4/198.51.100.1/udp/4001/quic-v1/p2p/{peer}"),
+            format!("/ip4/203.0.113.1/udp/4001/quic-v1/p2p/{peer}"),
+            format!("/ip6/2001:db8::1/udp/4001/quic-v1/p2p/{peer}"),
+            format!("/ip6/2001:db8:ffff::ffff/udp/4001/quic-v1/p2p/{peer}"),
+            format!("/ip6/100::1/udp/4001/quic-v1/p2p/{peer}"),
+            format!("/ip6/2001::1/udp/4001/quic-v1/p2p/{peer}"),
+            format!("/ip6/2002:7f00:1::1/udp/4001/quic-v1/p2p/{peer}"),
+            format!("/ip6/3ffe::1/udp/4001/quic-v1/p2p/{peer}"),
+            // 0/8 "this network" including the unspecified wildcard.
+            format!("/ip4/0.0.0.0/udp/4001/quic-v1/p2p/{peer}"),
+            format!("/ip4/0.1.2.3/udp/4001/quic-v1/p2p/{peer}"),
+            format!("/ip6/::/udp/4001/quic-v1/p2p/{peer}"),
+            // 198.18/15 benchmarking.
+            format!("/ip4/198.18.0.1/udp/4001/quic-v1/p2p/{peer}"),
+            format!("/ip4/198.19.255.254/udp/4001/quic-v1/p2p/{peer}"),
+            // 224/4 multicast and 240/4 reserved including broadcast.
+            format!("/ip4/224.0.0.1/udp/4001/quic-v1/p2p/{peer}"),
+            format!("/ip4/239.255.255.255/udp/4001/quic-v1/p2p/{peer}"),
+            format!("/ip4/240.0.0.1/udp/4001/quic-v1/p2p/{peer}"),
+            format!("/ip4/255.255.255.255/udp/4001/quic-v1/p2p/{peer}"),
+            format!("/ip6/ff02::1/udp/4001/quic-v1/p2p/{peer}"),
+            // Shape violations: DNS, TCP, plain quic, relay, missing or
+            // mismatched /p2p/, zero port, and trailing components.
+            format!("/dns4/guardian.example.invalid/udp/4001/quic-v1/p2p/{peer}"),
+            format!("/ip4/10.8.0.1/tcp/4001/p2p/{peer}"),
+            format!("/ip4/10.8.0.1/udp/4001/quic/p2p/{peer}"),
+            format!("/ip4/10.8.0.1/udp/4001/quic-v1/p2p/{other_peer}/p2p-circuit/p2p/{peer}"),
+            "/ip4/10.8.0.1/udp/4001/quic-v1".to_owned(),
+            format!("/ip4/10.8.0.1/udp/4001/quic-v1/p2p/{other_peer}"),
+            format!("/ip4/10.8.0.1/udp/0/quic-v1/p2p/{peer}"),
+            format!("/ip4/10.8.0.1/udp/4001/quic-v1/p2p/{peer}/ws"),
+        ];
+        for address in forbidden {
+            assert!(
+                !validate_remote_config(&peer, &identity, &address),
+                "forbidden remote route must fail: {address}"
+            );
+        }
+
+        // Dotted IPv4-mapped text is noncanonical and fails before policy.
+        let dotted = format!("/ip6/::ffff:127.0.0.1/udp/4001/quic-v1/p2p/{peer}");
+        assert!(!validate_remote_config(&peer, &identity, &dotted));
+        let dotted = format!("/ip6/::ffff:8.8.8.8/udp/4001/quic-v1/p2p/{peer}");
+        assert!(!validate_remote_config(&peer, &identity, &dotted));
+    }
+
+    #[test]
+    fn route_mode_defaults_to_loopback_and_rejects_unknown_values() {
+        let fixture = fixture();
+        let remote = format!(
+            "/ip4/10.8.0.1/udp/4001/quic-v1/p2p/{peer}",
+            peer = fixture.peer
+        );
+
+        // Absent field keeps exact loopback behavior: the bounded remote
+        // literal stays rejected.
+        let directory = owner_only_dir();
+        let path = directory.path().join("config.toml");
+        write_private(
+            &path,
+            config_text(&fixture.peer, &fixture.identity_path, &remote, 10).as_bytes(),
+        );
+        assert!(ThreatHintSubmitConfig::from_toml_file(&path)
+            .expect("parses")
+            .validate(RuntimeMode::Development)
+            .is_err());
+
+        // Explicit loopback mode behaves identically to the absent default.
+        let path = directory.path().join("explicit.toml");
+        write_private(
+            &path,
+            config_text_with_route_mode(
+                &fixture.peer,
+                &fixture.identity_path,
+                &remote,
+                10,
+                Some("loopback"),
+            )
+            .as_bytes(),
+        );
+        assert!(ThreatHintSubmitConfig::from_toml_file(&path)
+            .expect("parses")
+            .validate(RuntimeMode::Development)
+            .is_err());
+
+        // Unknown wire values are rejected at parse time.
+        let path = directory.path().join("unknown.toml");
+        write_private(
+            &path,
+            config_text_with_route_mode(
+                &fixture.peer,
+                &fixture.identity_path,
+                &fixture.address,
+                10,
+                Some("public"),
+            )
+            .as_bytes(),
+        );
+        assert!(ThreatHintSubmitConfig::from_toml_file(&path).is_err());
+    }
+
+    #[test]
+    fn remote_mode_reports_controlled_scope_and_stays_redacted() {
+        let fixture = fixture();
+        let remote = format!(
+            "/ip4/10.8.0.1/udp/4001/quic-v1/p2p/{peer}",
+            peer = fixture.peer
+        );
+        let directory = owner_only_dir();
+        let config_path = directory.path().join("config.toml");
+        write_private(
+            &config_path,
+            config_text_with_route_mode(
+                &fixture.peer,
+                &fixture.identity_path,
+                &remote,
+                10,
+                Some("controlled-remote-testnet10"),
+            )
+            .as_bytes(),
+        );
+        let validated = ThreatHintSubmitConfig::from_toml_file(&config_path)
+            .expect("parses")
+            .validate(RuntimeMode::Development)
+            .expect("valid remote config");
+
+        let preflight = validated
+            .offline_preflight(&fixture.hint_path)
+            .expect("remote preflight");
+        assert_eq!(
+            preflight.route_scope,
+            "single-static-controlled-remote-quic-peer"
+        );
+        let output = serde_json::to_string(&preflight).expect("serialize preflight");
+        for forbidden in [
+            fixture.peer.as_str(),
+            "10.8.0.1",
+            fixture.identity_path.to_string_lossy().as_ref(),
+        ] {
+            assert!(
+                !output.contains(forbidden),
+                "remote report must not expose {forbidden:?}: {output}"
+            );
+        }
+
+        // Beta and Mainnet reject the remote mode before identity mutation or
+        // any network activity, exactly like the loopback default.
+        let config = ThreatHintSubmitConfig::from_toml_file(&config_path).expect("parses");
+        for mode in [RuntimeMode::Beta, RuntimeMode::Mainnet] {
+            assert!(config.validate(mode).is_err());
+        }
+        assert!(
+            !fixture.identity_path.exists(),
+            "rejected remote runs must not create the transport identity"
+        );
     }
 
     #[test]
