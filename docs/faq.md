@@ -186,8 +186,10 @@ proof validity, reporter membership, privacy approval, public Testnet or
 multi-host operation, wallet/chain/reward behavior, deployment or production
 readiness.
 
-GH-229 adds a repository candidate for a separately controlled
-Development/Testnet-10 run. Loopback remains the default. The explicit remote
+Merged GH-229/PR #230 at exact main `fba8bb4` adds a tested repository
+capability for a separately controlled Development/Testnet-10 run; exact-main
+CI `33017195813`, Security Audit `33017196184`, and Pages `33017194744` pass.
+Loopback remains the default. The explicit remote
 mode accepts only one canonical direct literal-IP/UDP/QUIC-v1 Guardian peer and
 rejects unsafe/special ranges, mapped IPv6, DNS, TCP, relay and peer mismatches.
 Its committed receiver can return only non-authorizing `rejected` or `busy`

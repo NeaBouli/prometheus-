@@ -5583,3 +5583,48 @@ No direct `main` push or production action occurred.
 - The docstring-coverage warning is advisory and mostly counts small test
   functions; no bulk commentary churn is accepted for this bounded patch.
 - **Status:** `PR #230 Review remediation in progress / Protected checks must rerun / Production false`.
+
+## 2026-08-26 - GH-229 repository capability merged and exact-main verified
+
+- PR #230 merged normally by the repository's accepted squash strategy as
+  exact main `fba8bb459dce25b340155a603de133cb903c1c93`; no admin bypass or direct
+  `main` push occurred. The first attempted regular merge-commit was rejected
+  without mutation because that strategy was unavailable for this PR.
+- Exact-main Prometheus CI `33017195813`, Security Audit `33017196184`, and
+  Pages `33017194744` pass. Live cache-busted Index and Roadmap plus raw exact-
+  commit README readback contain the bounded GH-229 status.
+- CodeRabbit's only actionable thread was fixed by commit `f190ebd`, answered,
+  and resolved. The verifier now requires an explicit `--evidence` path; no
+  synthetic or placeholder real-run artifact was committed. Combined Python
+  boundary/evidence regressions pass 23/23.
+- Issue #229 remains open intentionally. Direct IPv4/IPv6 UDP between the
+  approved hosts is still unavailable, so no real two-host delivery, public
+  reporting, deployment, Mainnet, or production claim is enabled.
+- **Status:** `GH-229 Repository capability MERGED / Exact-main GREEN / Real two-host UDP gate OPEN / Production false`.
+
+## 2026-08-26 - GH-229 documentation closeout layout correction
+
+- The exact-main wording is synchronized across README, Whitepaper, FAQ,
+  Roadmap, public HTML, `llms.txt`, module README, Memory and Bridge surfaces.
+- Mobile browser verification exposed that `.sprint-items li` used flex layout
+  with direct text and inline `code` children, splitting long entries into
+  narrow sibling columns. The Roadmap list now uses normal inline flow with an
+  absolutely positioned one-pixel marker, preserving wrapping for every long
+  status entry rather than special-casing GH-229.
+- **Status:** `Docs closeout implementation PASS / Visual and protected gates next / Production false`.
+
+## 2026-08-26 - GH-229 documentation closeout review PASS
+
+- Kimi K3 independently verified PR #230, exact main, all three run IDs, open
+  issue #229, the 23-test boundary/evidence result, claim synchronization and
+  CSS behavior. It returned `SHIP` with no P0-P2 finding.
+- Kimi's cosmetic P3 workflow-name note is closed: new status text now uses the
+  exact `Security Audit` name. Its state note is expected before publication;
+  Sol independently ran the browser verification Kimi intentionally did not.
+- Playwright with local Chrome reports zero document or `.sprint-items li`
+  horizontal overflow at 1440x1000 and 390x844. The GH-229 entry uses normal
+  `list-item` flow and exactly matches its container width at both viewports;
+  visual mobile readback confirms coherent wrapping.
+- Local gates pass: 13 synchronized public surfaces, 10 claim tests, Memory,
+  project-status verifier plus 7 tests, four-page HTML parse and diff check.
+- **Status:** `GH-229 Docs closeout PASS / Protected PR next / Production false`.

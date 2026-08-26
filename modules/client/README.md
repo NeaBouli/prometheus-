@@ -92,13 +92,15 @@ a production malware detector or reporting client.
   discovery, public/multi-host, wallet, chain, reward, deployment or production
   authority. PR #227 merged as exact main `6c39af5`; Prometheus CI
   `32675287618`, Security Audit `32675287530`, and Pages `32675287300` pass.
-- GH-229 preserves that loopback default and adds one explicit
+- Merged GH-229/PR #230 at exact main `fba8bb4` preserves that loopback default
+  and adds one explicit
   `controlled-remote-testnet10` route for a single canonical direct
   literal-IP/UDP/QUIC-v1 peer. Unsafe/special ranges, mapped IPv6, DNS, TCP,
   relay and peer mismatches fail closed. The repository includes a
   non-authorizing `rejected`/`busy` boundary and redacted evidence verifier;
   direct UDP between the approved hosts is still closed, so no real two-host,
-  public reporting, deployment or production claim is made.
+  public reporting, deployment or production claim is made. Exact-main CI
+  `33017195813`, Security Audit `33017196184`, and Pages `33017194744` pass.
 - `blockchain/rule_ingest.rs` ingests a complete caller-supplied active-rule
   snapshot whose raw CIDv1 (sha2-256, canonical lowercase base32) must bind the
   exact caller-supplied content bytes. It parses a strict simple matcher
