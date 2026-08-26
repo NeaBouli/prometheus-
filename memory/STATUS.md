@@ -1783,6 +1783,8 @@ Estimates: unchanged; core 84-88%; complete vision 50-55%
 Status: Repository capability merged and exact-main verified / live evidence open
 PR/SHA: #230 / fba8bb459dce25b340155a603de133cb903c1c93
 Runs: CI 33017195813; Security 33017196184; Pages 33017194744
+Docs closeout: PR #231 / 8c807cf30eccf17c67b87b3e76ebf230a3aaead0
+Docs runs: CI 33019602434; Security 33019602405; Pages 33019601773
 Scope: optional Development/Testnet-10 single direct literal-IP/UDP/QUIC-v1
        Light Client route; unchanged loopback default; non-authorizing local
        rejected/busy receiver; strict redacted operator-attested evidence gate

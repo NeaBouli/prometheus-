@@ -4595,3 +4595,14 @@ Rules for all dev agents:
 - Issue #229 remains open; the closeout PR does not claim or create real
   two-host evidence.
 - Status: `Protected checks pending / Production false`.
+
+## 2026-08-26 - GH-229 documentation closeout final evidence
+
+- PR #231 merged as exact main `8c807cf30eccf17c67b87b3e76ebf230a3aaead0`.
+- Exact-main CI `33019602434`, Security `33019602405`, and Pages `33019601773`
+  pass. Live README/Roadmap content and desktop/mobile zero-overflow readback
+  pass.
+- GitHub briefly interpreted a negated closing phrase as an issue keyword;
+  issue #229 was immediately reopened, the phrase removed, and open state
+  verified. The real two-host UDP gate is unchanged.
+- Status: `Repository/docs block DONE / Issue #229 evidence gate OPEN / Production false`.
