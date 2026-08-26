@@ -5638,3 +5638,23 @@ No direct `main` push or production action occurred.
 - No direct `main` push, admin merge, deployment, wallet, signing, chain,
   Mainnet or production action occurred.
 - **Status:** `PR #231 Protected checks pending / Real two-host UDP gate OPEN / Production false`.
+
+## 2026-08-26 - GH-229 documentation closeout merged and live verified
+
+- PR #231 passed all eleven protected contexts and merged normally by the
+  accepted squash strategy as exact main
+  `8c807cf30eccf17c67b87b3e76ebf230a3aaead0`.
+- Exact-main Prometheus CI `33019602434`, Security Audit `33019602405`, and
+  Pages `33019601773` pass. Cache-busted live Roadmap and raw exact-commit
+  README contain the synchronized merged-capability status and open gate.
+- Live Chrome/Playwright checks at 1440x1000 and 390x844 report zero document
+  or Roadmap-list horizontal overflow; the GH-229 item exactly fits its
+  container and renders in normal list flow.
+- The phrase `does not close #229` in the merged PR body was interpreted by
+  GitHub as a closing keyword despite its negation. Sol immediately reopened
+  issue #229, replaced the phrase with `remains open`, and verified state
+  `OPEN` / reason `REOPENED`. The real direct-UDP acceptance criteria remain
+  unsatisfied.
+- No wallet, signing, chain, contract, tokenomics, infrastructure, Mainnet or
+  production action occurred.
+- **Status:** `GH-229 Repository/docs closeout DONE / Issue #229 real UDP gate OPEN / Production false`.
