@@ -122,13 +122,75 @@ This separate procedure covers one Development/Testnet-10 Light Client sender
 and one directly reachable Guardian host. It is not a relay procedure and does
 not authorize a public service.
 
+Operational order is binding: Guardian configuration and readiness first,
+sender configuration and preflight second, the single-shot boundary last. The
+boundary accepts exactly one connection inside its 60-second window, so
+starting it before the Guardian reports listener readiness or before the
+sender preflight passes can consume the only attempt. The execution challenge
+is created once, copied privately to both real hosts, attested on each host
+against its actual binary, and removed after evidence construction.
+
 1. Obtain a separately approved, temporary direct UDP path from the sender host
    to one fixed Guardian UDP port. Restrict the path to the approved sender where
    infrastructure permits. If direct UDP is unavailable, stop. An SSH/TCP tunnel,
    relay, DNS route, same-host process, container or namespace is not equivalent
    two-host QUIC evidence.
-2. On the Guardian host, create a dedicated owner-only runtime directory. Run
-   the committed Development boundary with one expected canonical payload digest:
+2. On the Guardian host, apply this runbook's full Guardian configuration
+   requirements without relaxation:
+
+   - one owner-only `0700` identity directory; a generated identity is `0600`
+     and an existing identity has no execute, group, or world bits;
+   - an owner-only `0600` service config that preflight accepts with no
+     unknown or unbounded fields;
+   - distinct absolute paths for the identity, collector, ThreatHint-v1,
+     ThreatHint-v2, and submission sockets;
+   - collector and both ThreatHint verifier boundary sockets in an owner-only
+     runtime directory with mode `0600`;
+   - `threat_hint_v2_trusted_network_id = "testnet-10"`;
+   - exactly the approved direct literal-IP/UDP/QUIC-v1 listener; no DNS,
+     relay, TCP, or retry routes;
+   - bounded health, ingress, startup, drain, and submission limits.
+
+   Run `prometheus-guardian-p2p preflight`, then start the Guardian and wait
+   for listener readiness (`ready: true` is listener readiness only, not
+   Guardian authorization). Record the static transport `PeerId` privately;
+   do not place it in public evidence.
+3. On the sender host, keep the existing strict client config and add the
+   explicit opt-in below. Use one canonical literal IP route whose trailing
+   `PeerId` exactly matches `guardian_peer_id`:
+
+```toml
+enabled = true
+network = "testnet10"
+route_mode = "controlled-remote-testnet10"
+guardian_peer_id = "<guardian-transport-peer-id>"
+guardian_address = "/ip4/<approved-guardian-ip>/udp/<approved-port>/quic-v1/p2p/<guardian-transport-peer-id>"
+identity_path = "/var/lib/prometheus/light-client/client.identity"
+submission_timeout_secs = 60
+```
+
+4. Run `prometheus-client threat-hint preflight` first. It must report
+   `single-static-controlled-remote-quic-peer` without creating the identity or
+   dialing. If preflight fails, stop; do not start the boundary.
+5. Create the execution challenge once, on one operator-controlled host, in a
+   dedicated canonical owner-only `0700` directory that is separate from the
+   Guardian socket runtime directory:
+
+```bash
+install -d -m 0700 /run/prometheus/gh-229-attestation
+python3 scripts/gh229_execution_attestation.py create-challenge \
+  --output /run/prometheus/gh-229-attestation/challenge.bin
+```
+
+   The command refuses symlinked or existing paths and emits only the fixed
+   token `GH229_CHALLENGE_CREATED`. Copy the 32-byte file privately to an
+   owner-only `0700` directory on the other real host over an
+   already-authenticated operator channel, never through Git or any public
+   channel, and keep it owner-only `0600` on both hosts.
+6. Only now, on the Guardian host, create the dedicated owner-only runtime
+   directory and start the committed Development boundary with one expected
+   canonical payload digest; its 60-second window must cover exactly one
+   submit:
 
 ```bash
 mkdir -p /run/prometheus/gh-229
@@ -144,45 +206,81 @@ python3 scripts/development_threat_hint_v1_boundary.py \
    The boundary accepts exactly one owner-local AF_UNIX connection, writes one
    atomic owner-only redacted receipt and can return only `rejected` or `busy`.
    It cannot return `accepted` or `duplicate` and has no proof, membership,
-   publication, chain or reward authority.
-3. Configure the Guardian's `threat_hint_socket` to that socket and bind exactly
-   the approved direct UDP listener. Record the static transport `PeerId`
-   privately; do not place it in public evidence.
-4. On the sender host, keep the existing strict client config and add the
-   explicit opt-in below. Use one canonical literal IP route whose trailing
-   `PeerId` exactly matches `guardian_peer_id`:
-
-```toml
-enabled = true
-network = "testnet10"
-route_mode = "controlled-remote-testnet10"
-guardian_peer_id = "<guardian-transport-peer-id>"
-guardian_address = "/ip4/<approved-guardian-ip>/udp/<approved-port>/quic-v1/p2p/<guardian-transport-peer-id>"
-identity_path = "/var/lib/prometheus/light-client/client.identity"
-submission_timeout_secs = 60
-```
-
-5. Run `prometheus-client threat-hint preflight` first. It must report
-   `single-static-controlled-remote-quic-peer` without creating the identity or
-   dialing. Then run one `submit`. No retries are permitted.
-6. A valid controlled run requires the sender to report `rejected` and the local
+   publication, chain or reward authority. The Guardian's `threat_hint_socket`
+   must point at that socket.
+7. Immediately run one `submit` from the sender. No retries are permitted.
+8. A valid controlled run requires the sender to report `rejected` and the local
    Guardian receipt to report the same payload digest and `rejected`. This proves
    only one operator-attested delivery and non-authorizing acknowledgement. Host
    separation is not independently proven by the redacted public record.
-7. Stop both processes, remove the temporary UDP allowance, and verify the owned
-   AF_UNIX socket is gone. Keep network identifiers, PeerIds, hostnames, paths,
-   raw payloads and private receipts out of Git. Publish only a record accepted
-   by the explicit verifier invocation below; the repository intentionally has
-   no default or placeholder evidence artifact:
+9. On each real host, run `attest` against that host's actual binary: the
+   client binary with `--role sender` on the sender host, and the Guardian
+   binary with `--role guardian` on the Guardian host. Both runs use the same
+   private challenge copy, the exact 40-lowercase-hex source commit, and the
+   canonical payload digest:
+
+```bash
+python3 scripts/gh229_execution_attestation.py attest \
+  --challenge /run/prometheus/gh-229-attestation/challenge.bin \
+  --role sender \
+  --source-commit '<exact-40-lowercase-hex-source-commit>' \
+  --artifact /path/to/actual-binary \
+  --payload-sha256 '<lowercase-sha256-of-canonical-v1-payload>'
+```
+
+   Each run emits one canonical compact JSON line containing only `role`,
+   `challenge_sha256`, `artifact_sha256`, and
+   `execution_attestation_sha256`. Map the outputs into the existing verifier
+   schema: the shared `challenge_sha256` becomes `challenge_sha256`; the
+   sender line's `artifact_sha256` and `execution_attestation_sha256` become
+   `artifacts.client_sha256` and `execution_attestations.sender_sha256`; the
+   Guardian line's become `artifacts.guardian_sha256` and
+   `execution_attestations.guardian_sha256`; the shared `--payload-sha256`
+   remains `delivery.payload_sha256`. These are operator attestations and are
+   not independent host proof.
+10. Stop both processes, remove the temporary UDP allowance, remove the
+    private challenge file from both hosts, and verify the owned AF_UNIX
+    socket is gone. Keep network identifiers, PeerIds, hostnames, paths, raw
+    payloads and private receipts out of Git. Publish only a record accepted
+    by the explicit verifier invocation below. The dated committed record is
+    immutable evidence for its one bounded run, never a reusable placeholder:
 
 ```bash
 python3 scripts/verify_gh229_multihost_evidence.py \
-  --evidence /path/to/redacted-gh229-evidence.json
+  --evidence docs/evidence/gh-229-controlled-two-host-2026-08-27.json
 ```
 
 The repository unit tests validate this procedure's route and evidence policy.
-They do not constitute the real two-host run. Until the direct run and redacted
-record exist, public multi-host Light Client operation remains unproven.
+They do not constitute a real two-host run. The dated redacted record proves
+only one operator-attested controlled distinct-host delivery; public multi-host
+Light Client operation remains unproven.
+
+The public verifier checks only the closed record schema, non-authorizing
+outcome and redaction policy. It cannot recompute the operator attestations or
+prove provenance because the challenge, binaries and canonical payload remain
+private by design.
+
+#### Execution attestation formula (GH-229)
+
+`attest` computes one deterministic domain-separated digest over versioned
+canonical binary framing:
+
+```text
+execution_attestation_sha256 = SHA-256(frame)
+
+frame = "prometheus-gh229-execution-attestation" || 0x00 || 0x01 ||
+        u8(n)  || role           ||   # ASCII "sender" (n=6) or "guardian" (n=8)
+        u8(32) || challenge      ||   # raw 32 challenge bytes
+        u8(20) || source_commit  ||   # raw 20 bytes from 40 lowercase hex
+        u8(32) || artifact_hash  ||   # raw SHA-256 of the actual artifact bytes
+        u8(32) || payload_hash        # raw SHA-256 of the canonical v1 payload
+```
+
+`u8(n)` is one unsigned length byte; every other field is raw bytes in the
+fixed order above. The `0x00` terminator separates the domain string and the
+`0x01` byte versions the framing. Because the role is inside the frame, the
+sender and guardian attestations over otherwise identical inputs always
+differ, which the evidence verifier requires.
 
 6) Start processes
 

@@ -29,10 +29,13 @@ jobs:
           python3 scripts/test_project_status_consistency.py
       - name: Test Autodidactic Workflow Helper
         run: python3 scripts/test_autodidactic.py
-      - name: Test GH-229 Controlled Multi-host Safety Gates
+      - name: Test GH-229 Public Record Schema/Redaction Safety Gates
         run: |
           python3 -m unittest scripts.test_development_threat_hint_v1_boundary
           python3 -m unittest scripts.test_gh229_multihost_evidence
+          python3 -m unittest scripts.test_gh229_execution_attestation
+          python3 scripts/verify_gh229_multihost_evidence.py \
+            --evidence docs/evidence/gh-229-controlled-two-host-2026-08-27.json
 
   # ─── Silverscript Contract Lint ─────────────────────────────────────────────
   contract-check:

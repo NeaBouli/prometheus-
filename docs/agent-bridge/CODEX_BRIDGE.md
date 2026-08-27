@@ -5658,3 +5658,101 @@ No direct `main` push or production action occurred.
 - No wallet, signing, chain, contract, tokenomics, infrastructure, Mainnet or
   production action occurred.
 - **Status:** `GH-229 Repository/docs closeout DONE / Issue #229 real UDP gate OPEN / Production false`.
+
+## 2026-08-27 - GH-229 distinct-host direct-UDP execution preflight
+
+- User requested the real two-host block. Branch
+  `ops/GH-229-distinct-host-udp-evidence` starts from clean exact main
+  `27e8b02c346811a7c9580d4a3e4ef46db21fecae`.
+- Scope is one bounded Development/Testnet-10 direct UDP/QUIC run between two
+  physically distinct, already authorized hosts, followed only by strict
+  redacted non-authorizing evidence if the existing route is reachable.
+- Sol owns all host and external actions. Kimi K3 receives a secret-free
+  security/runbook review; Claude Code receives a small command/artifact audit.
+- Initial phase is read-only reachability and runtime preflight. Persistent
+  firewall/IAM mutation, Mainnet, wallet, signing, chain, reward, deployment and
+  production actions are excluded.
+- **Status:** `GH-229 Distinct-host preflight IN PROGRESS / Network mutation not authorized / Production false`.
+
+## 2026-08-27 - GH-229 distinct-host reachability result
+
+- Both authorized machines are reachable and physically distinct. Bounded
+  random-payload probes over the existing direct UDP paths in both directions
+  and address families timed out without receipt. No network rule changed.
+- Kimi K3 returned repository/procedure `conditional SHIP` and execution
+  `BLOCK` until a separately authorized temporary direct-UDP allowance exists.
+  Its focused boundary/evidence suite passes 23 tests and 26 subtests.
+- Kimi also identified two pre-run documentation requirements: define the
+  canonical challenge/execution-attestation recipe and start the single-shot
+  boundary only after Guardian readiness and sender preflight to preserve its
+  60-second window.
+- Claude Code was invoked for the requested small read-only helper task but its
+  local budget is exhausted; it made no change.
+- **Status:** `GH-229 External UDP gate BLOCKED / Exact temporary rule approval required / Production false`.
+
+## 2026-08-27 - GH-229 exact temporary UDP authorization
+
+- Owner approved one temporary sender-restricted IPv4 UDP allowance on one
+  fixed port for at most 30 minutes, Development/Testnet-10 only, and exactly
+  one QUIC submission attempt. Immediate rule removal is mandatory.
+- No other firewall/IAM, deployment, wallet, signing, chain, reward, Mainnet or
+  production action is authorized.
+- Both pinned binaries, offline preflights, Guardian listener, canonical hint
+  and owner-only shared challenge are ready before the rule opens.
+- **Status:** `GH-229 One controlled QUIC attempt AUTHORIZED / Cleanup mandatory / Production false`.
+
+## 2026-08-27 - GH-229 controlled distinct-host run completed
+
+- Sol opened the exact sender-restricted UDP allowance only after both pinned
+  binaries, offline preflights, Guardian listener and private challenge were
+  ready. Exactly one Development/Testnet-10 direct-QUIC submit was attempted.
+- Sender and Guardian both recorded the expected non-authorizing `rejected`
+  outcome. Retries were zero, persistence was false and acknowledgement
+  authority was `none`.
+- The temporary UDP rule was removed immediately and absence was verified.
+  Guardian, local collector and owned sockets were stopped/removed; no listener
+  or public service remains.
+- Both real hosts produced role-bound operator attestations against their
+  actual binaries and one shared private challenge. The public redacted record
+  intentionally classifies separation as operator-attested, not independently
+  proven.
+- Kimi K3 supplied the bounded challenge/attestation helper, focused tests and
+  runbook/CI patch. Sol reviewed that diff, fixed a challenge-creation race and
+  reran the focused suite. Claude Code was invoked but budget-blocked and made
+  no change.
+- Public claim synchronization and protected-PR verification are in progress.
+- **Status:** `GH-229 One controlled distinct-host run PASS / Public evidence verification in progress / Production false`.
+
+## 2026-08-27 - GH-229 evidence integration locally verified
+
+- The strict redacted dated evidence verifies with
+  `GH229_CONTROLLED_MULTIHOST_EVIDENCE_VERIFIED`; public claims pass across 13
+  synchronized surfaces.
+- Focused GH-229 helper, boundary and evidence coverage passes 44 tests. Public
+  claim/hygiene coverage passes 21 tests; project-status coverage passes 7
+  tests. Memory, HTML parse, workflow YAML, Python compile and diff checks pass.
+- Kimi K3 independently returned `SHIP`, with no P0/P1 finding. Sol fixed its
+  P2 runbook path-order finding by separating and creating the challenge
+  directory before use, and closed its P3 date-basis note with the exact UTC
+  timestamp plus operator-local date. New files are included in the pending
+  commit, closing the remaining process note.
+- Task-owned local and remote temporary runtime directories were removed. The
+  temporary firewall marker remains absent.
+- No product Rust code, wallet, signing, chain, reward, deployment, Mainnet or
+  production behavior changed.
+- **Status:** `GH-229 Local integration PASS / Protected PR next / Production false`.
+
+## 2026-08-27 - GH-229 PR #233 review hardening
+
+- All initial protected CI/Security contexts passed. CodeRabbit completed with
+  two actionable comments; neither changes the recorded run or public claim.
+- The public verifier now explicitly reports schema/redaction validation only;
+  it does not imply private-input provenance or independently recompute the
+  operator attestations.
+- Artifact hashing now rejects group/world-writable files and immediate parent
+  directories and requires trusted root/invoking-account ownership. Two focused
+  regressions cover both writable-path cases.
+- Post-fix local results: 46 focused GH-229 tests pass; strict public record
+  schema/redaction, 13 claim surfaces, Memory, project status, Python compile
+  and diff hygiene pass.
+- **Status:** `PR #233 Review findings fixed / Protected rerun next / Production false`.
