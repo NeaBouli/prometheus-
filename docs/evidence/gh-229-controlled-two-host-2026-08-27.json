@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "evidence_kind": "operator_attested_controlled_two_host_delivery",
+  "issue": 229,
+  "observed_at_utc": "2026-08-26T23:36:04Z",
+  "source_commit": "27e8b02c346811a7c9580d4a3e4ef46db21fecae",
+  "network": "testnet-10",
+  "runtime": "development-only",
+  "transport": "direct-quic-v1",
+  "route_scope": "single-static-controlled-remote-quic-peer",
+  "separation_claim": "operator-attested-not-independently-proven",
+  "challenge_sha256": "08ceffa5fe67933cc224c93d24c70334aecf39a23d9eab9e8794fed8854970c7",
+  "artifacts": {
+    "client_sha256": "6d24ede425aad745bc9de65877a983befe16c03e9f1359cdedaf4e4be963c825",
+    "guardian_sha256": "773e2b7b1bcc81f70403bfab94d2064ba2dd017719a052f38f5dba6624c23216",
+    "toolchain": "rustc 1.95.0 (59807616e 2026-04-14)"
+  },
+  "execution_attestations": {
+    "sender_sha256": "5120581bf1125c57493c5e7c01be86eb023acdf40d381e5fdc10c0d0c39333ff",
+    "guardian_sha256": "1c62d12239af6cbba24d4693f8ed03e2d5ccbaf61c2077d28016afc1ee5d2ac5"
+  },
+  "delivery": {
+    "payload_sha256": "78cf84720c29e67457e60b7f0862c80bad8b7dc8980888c403e5628fe9a9d767",
+    "sender_status": "rejected",
+    "guardian_receipt_status": "rejected",
+    "ack_scope": "remote-local-boundary-only",
+    "ack_authority": "none",
+    "retries": 0,
+    "persisted": false
+  },
+  "safety": {
+    "contains_network_identifiers": false,
+    "contains_raw_payload": false,
+    "contains_secrets": false,
+    "chain_writes": false,
+    "wallet_or_signing": false,
+    "deployment": false,
+    "mainnet": false,
+    "production": false
+  }
+}

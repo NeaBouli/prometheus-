@@ -11,15 +11,17 @@ Startpunkt fuer Codex/Claude Code:
 Keine Secrets, Tokens, Passwoerter, privaten Keys oder Wallet-Daten in diese Bridge schreiben.
 
 Aktiver Handover: GH-229/PR #230 ist als getestete Repository-Faehigkeit auf
-exaktem Main `fba8bb4` integriert. Die explizite Development-/Testnet-10-only
-Direct-QUIC-Route fuer kontrollierte Zwei-Host-Evidence behaelt Loopback als
-Standard;
-Transport-ACKs verleihen keine Proof-, Membership-, Reward-, Chain-, Mainnet-
-oder Produktionsautoritaet. Der vorhandene direkte Sandbox-UDP-Pfad ist ohne
-Infrastrukturaenderung geschlossen, daher darf bis zu einem ausdruecklich
-begrenzten temporaeren Reachability-Gate keine reale Multi-Host-Behauptung
-veroeffentlicht werden. Verbindlicher Status und offene Gates stehen in
-`CODEX_BRIDGE.md`; laufende Schritte stehen in `ACTION_LOG.md`.
+exaktem Main `fba8bb4` integriert. Um `2026-08-26T23:36:04Z` (2026-08-27
+Operator-Lokalzeit) wurde genau ein operator-attestierter
+Development-/Testnet-10-Direct-QUIC-Lauf zwischen zwei getrennten kontrollierten
+Hosts ausgefuehrt: `rejected`/`rejected`, null
+Retries, keine Persistenz und ACK-Autoritaet `none`. Die temporaere
+senderbeschraenkte UDP-Regel wurde sofort entfernt; kein Listener oder
+oeffentlicher Dienst bleibt aktiv. Der redigierte Nachweis beweist die
+Hosttrennung nicht unabhaengig und autorisiert weder oeffentlichen Netzbetrieb
+noch Proof, Membership, Reward, Chain, Mainnet, Deployment oder Produktion.
+Verbindlicher Status und offene Gates stehen in `CODEX_BRIDGE.md`; laufende
+Schritte stehen in `ACTION_LOG.md`.
 <!-- CODEX_CLAUDE_CODE_TERMINAL_BRIDGE_V1 -->
 ## Codex -> Claude Code Terminal Bridge
 

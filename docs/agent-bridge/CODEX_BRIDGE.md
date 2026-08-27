@@ -5689,3 +5689,55 @@ No direct `main` push or production action occurred.
 - Claude Code was invoked for the requested small read-only helper task but its
   local budget is exhausted; it made no change.
 - **Status:** `GH-229 External UDP gate BLOCKED / Exact temporary rule approval required / Production false`.
+
+## 2026-08-27 - GH-229 exact temporary UDP authorization
+
+- Owner approved one temporary sender-restricted IPv4 UDP allowance on one
+  fixed port for at most 30 minutes, Development/Testnet-10 only, and exactly
+  one QUIC submission attempt. Immediate rule removal is mandatory.
+- No other firewall/IAM, deployment, wallet, signing, chain, reward, Mainnet or
+  production action is authorized.
+- Both pinned binaries, offline preflights, Guardian listener, canonical hint
+  and owner-only shared challenge are ready before the rule opens.
+- **Status:** `GH-229 One controlled QUIC attempt AUTHORIZED / Cleanup mandatory / Production false`.
+
+## 2026-08-27 - GH-229 controlled distinct-host run completed
+
+- Sol opened the exact sender-restricted UDP allowance only after both pinned
+  binaries, offline preflights, Guardian listener and private challenge were
+  ready. Exactly one Development/Testnet-10 direct-QUIC submit was attempted.
+- Sender and Guardian both recorded the expected non-authorizing `rejected`
+  outcome. Retries were zero, persistence was false and acknowledgement
+  authority was `none`.
+- The temporary UDP rule was removed immediately and absence was verified.
+  Guardian, local collector and owned sockets were stopped/removed; no listener
+  or public service remains.
+- Both real hosts produced role-bound operator attestations against their
+  actual binaries and one shared private challenge. The public redacted record
+  intentionally classifies separation as operator-attested, not independently
+  proven.
+- Kimi K3 supplied the bounded challenge/attestation helper, focused tests and
+  runbook/CI patch. Sol reviewed that diff, fixed a challenge-creation race and
+  reran the focused suite. Claude Code was invoked but budget-blocked and made
+  no change.
+- Public claim synchronization and protected-PR verification are in progress.
+- **Status:** `GH-229 One controlled distinct-host run PASS / Public evidence verification in progress / Production false`.
+
+## 2026-08-27 - GH-229 evidence integration locally verified
+
+- The strict redacted dated evidence verifies with
+  `GH229_CONTROLLED_MULTIHOST_EVIDENCE_VERIFIED`; public claims pass across 13
+  synchronized surfaces.
+- Focused GH-229 helper, boundary and evidence coverage passes 44 tests. Public
+  claim/hygiene coverage passes 21 tests; project-status coverage passes 7
+  tests. Memory, HTML parse, workflow YAML, Python compile and diff checks pass.
+- Kimi K3 independently returned `SHIP`, with no P0/P1 finding. Sol fixed its
+  P2 runbook path-order finding by separating and creating the challenge
+  directory before use, and closed its P3 date-basis note with the exact UTC
+  timestamp plus operator-local date. New files are included in the pending
+  commit, closing the remaining process note.
+- Task-owned local and remote temporary runtime directories were removed. The
+  temporary firewall marker remains absent.
+- No product Rust code, wallet, signing, chain, reward, deployment, Mainnet or
+  production behavior changed.
+- **Status:** `GH-229 Local integration PASS / Protected PR next / Production false`.

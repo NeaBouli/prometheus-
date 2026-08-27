@@ -4629,3 +4629,40 @@ Rules for all dev agents:
   Python safety gates pass 23 tests plus 26 subtests. Claude Code was budget-
   blocked and made no change.
 - Status: `Awaiting exact temporary UDP-rule authorization / Production false`.
+
+## 2026-08-27 - GH-229 temporary network window authorized
+
+- Recorded exact owner authorization for one sender-restricted IPv4 UDP rule
+  on one fixed port, maximum 30 minutes, and one Development/Testnet-10 QUIC
+  submission attempt with immediate cleanup.
+- Pinned sender and Guardian builds, offline preflights, Guardian readiness,
+  canonical hint and private shared challenge are complete before activation.
+- Status: `Ready for one controlled attempt / Production false`.
+
+## 2026-08-27 - GH-229 one-shot distinct-host result
+
+- Applied one exact sender-restricted temporary UDP allowance only after
+  Guardian readiness and sender offline preflight; executed exactly one
+  Development/Testnet-10 direct-QUIC submit.
+- Sender/Guardian result: `rejected`/`rejected`; retries `0`; persisted `false`;
+  acknowledgement authority `none`.
+- Removed and verified absence of the temporary rule immediately; stopped all
+  task-owned processes and sockets. No public service remains.
+- Generated role-bound operator attestations on both real hosts and one strict
+  redacted evidence record. Host separation remains operator-attested, not
+  independently proven.
+- Kimi implemented the bounded helper/tests/runbook block; Sol reviewed and
+  hardened it. Claude Code was budget-blocked and changed nothing.
+- Status: `Controlled run PASS / Docs, CI and protected PR in progress / Production false`.
+
+## 2026-08-27 - GH-229 local integration closeout
+
+- Verified the dated redacted record, 13 synchronized public claim surfaces,
+  44 focused GH-229 tests, 21 claim/hygiene tests, 7 project-status tests,
+  Memory, HTML, YAML, Python compile and diff hygiene.
+- Kimi final review: `SHIP`, no P0/P1. Sol fixed the runbook challenge-directory
+  order and documented exact UTC/operator-local date basis, then reran the
+  complete local gate.
+- Removed both exact task-owned temporary runtime directories and reconfirmed
+  the temporary firewall marker is absent.
+- Status: `Local integration PASS / Protected PR next / Production false`.

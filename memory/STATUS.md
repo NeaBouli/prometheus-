@@ -1777,25 +1777,33 @@ Boundary: documentation/audit closeout only; production remains false
 Estimates: unchanged; core 84-88%; complete vision 50-55%
 ```
 
-## GH-229 CONTROLLED REMOTE THREATHINT REPOSITORY GATE (2026-08-26)
+## GH-229 CONTROLLED DISTINCT-HOST THREATHINT EVIDENCE (2026-08-27)
 
 ```text
-Status: Repository capability merged and exact-main verified / live evidence open
+Status: Repository capability merged and exact-main verified / one bounded
+        operator-attested distinct-host Development/Testnet-10 run demonstrated
 PR/SHA: #230 / fba8bb459dce25b340155a603de133cb903c1c93
 Runs: CI 33017195813; Security 33017196184; Pages 33017194744
 Docs closeout: PR #231 / 8c807cf30eccf17c67b87b3e76ebf230a3aaead0
 Docs runs: CI 33019602434; Security 33019602405; Pages 33019601773
+Run source: 27e8b02c346811a7c9580d4a3e4ef46db21fecae
+Public evidence: docs/evidence/gh-229-controlled-two-host-2026-08-27.json
 Scope: optional Development/Testnet-10 single direct literal-IP/UDP/QUIC-v1
        Light Client route; unchanged loopback default; non-authorizing local
        rejected/busy receiver; strict redacted operator-attested evidence gate
 Safety: Beta/Mainnet reject before identity/network; no DNS/TCP/relay/retry;
         unsafe/special/mapped routes fail closed; no proof/membership authority,
         wallet, signing, chain, reward, deployment or production action
-Tests: Python boundary/evidence 23/23; P2P unit 16/16; real binary 3/3 in two
-       focused runs and client all-targets; client library 167 pass/2 intentional
-       live ignores; Clippy/rustfmt/docs/HTML/YAML/Memory/diff gates PASS
-External gate: direct IPv4/IPv6 UDP to the approved sandbox remains closed;
-               no real two-host/public operation is claimed and TCP/SSH tunnels
-               are not accepted as substitutes
+Observed: 2026-08-26T23:36:04Z (2026-08-27 operator-local); one exact canonical
+          hint; sender/Guardian rejected/rejected; zero retries; not persisted;
+          acknowledgement authority none; temporary
+          sender-restricted UDP allowance removed immediately; no listener or
+          public service remains
+Attestation: two distinct controlled hosts operator-attested with one private
+             challenge and actual binary hashes; separation is not independently
+             proven by the redacted public record
+Remaining gates: operated public networking; independent separation evidence;
+                 relay/v2; proof/membership/privacy/model/YARA/chain/reward;
+                 deployment, Mainnet and production
 Estimates: unchanged; core 84-88%; complete vision 50-55%; production false
 ```

@@ -189,13 +189,16 @@ readiness.
 Merged GH-229/PR #230 at exact main `fba8bb4` adds a tested repository
 capability for a separately controlled Development/Testnet-10 run; exact-main
 CI `33017195813`, Security Audit `33017196184`, and Pages `33017194744` pass.
-Loopback remains the default. The explicit remote
-mode accepts only one canonical direct literal-IP/UDP/QUIC-v1 Guardian peer and
-rejects unsafe/special ranges, mapped IPv6, DNS, TCP, relay and peer mismatches.
-Its committed receiver can return only non-authorizing `rejected` or `busy`
-outcomes. The approved hosts currently lack direct UDP reachability, so this is
-tested capability rather than real two-host, public Testnet or production
-evidence; tunnels, containers and same-host processes are not substitutes.
+Loopback remains the default. The explicit remote mode accepts only one
+canonical direct literal-IP/UDP/QUIC-v1 Guardian peer and rejects unsafe or
+mismatched routes. At `2026-08-26T23:36:04Z` (2026-08-27 operator-local), one
+operator-attested run from source commit `27e8b02` delivered one canonical hint
+between two distinct controlled hosts.
+Sender and Guardian both recorded non-authorizing `rejected`, with zero retries,
+no persistence and acknowledgement authority `none`; the temporary UDP rule
+was removed immediately. The [redacted evidence](evidence/gh-229-controlled-two-host-2026-08-27.json)
+does not independently prove host separation and is not public-network,
+relay/v2, proof, membership, deployment or production evidence.
 
 Merged and exact-main-verified GH-197/PR #198 adds a local Testnet-10
 consistency boundary: a separately
