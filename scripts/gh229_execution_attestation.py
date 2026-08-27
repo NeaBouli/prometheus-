@@ -198,16 +198,26 @@ def read_challenge(path):
 
 
 def hash_artifact(path):
-    """Stream-hash the actual regular artifact bytes without symlinks."""
+    """Stream-hash trusted, non-writable regular artifact bytes."""
+    euid = os.geteuid()
     require_canonical_absolute(path)
-    require_real_parent(path)
+    parent_stat = require_real_parent(path)
+    if (
+        parent_stat.st_uid not in (0, euid)
+        or parent_stat.st_mode & 0o022
+    ):
+        fail("artifact")
     try:
         descriptor = os.open(path, os.O_RDONLY | os.O_NOFOLLOW)
     except OSError:
         fail("artifact")
     try:
         metadata = os.fstat(descriptor)
-        if not stat.S_ISREG(metadata.st_mode):
+        if (
+            not stat.S_ISREG(metadata.st_mode)
+            or metadata.st_uid not in (0, euid)
+            or metadata.st_mode & 0o022
+        ):
             fail("artifact")
         digest = hashlib.sha256()
         while True:

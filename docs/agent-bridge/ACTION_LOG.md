@@ -4666,3 +4666,13 @@ Rules for all dev agents:
 - Removed both exact task-owned temporary runtime directories and reconfirmed
   the temporary firewall marker is absent.
 - Status: `Local integration PASS / Protected PR next / Production false`.
+
+## 2026-08-27 - GH-229 PR #233 review fixes
+
+- Renamed the public verifier success semantics to schema/redaction validation;
+  private operator inputs intentionally remain outside Git and CI.
+- Hardened artifact hashing against untrusted ownership and group/world-writable
+  artifact files or immediate parents; added two regressions.
+- Post-fix: 46 focused tests and all local record/claim/Memory/status/compile/
+  diff gates pass.
+- Status: `Review findings fixed / Commit and protected rerun next / Production false`.

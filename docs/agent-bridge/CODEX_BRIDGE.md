@@ -5741,3 +5741,18 @@ No direct `main` push or production action occurred.
 - No product Rust code, wallet, signing, chain, reward, deployment, Mainnet or
   production behavior changed.
 - **Status:** `GH-229 Local integration PASS / Protected PR next / Production false`.
+
+## 2026-08-27 - GH-229 PR #233 review hardening
+
+- All initial protected CI/Security contexts passed. CodeRabbit completed with
+  two actionable comments; neither changes the recorded run or public claim.
+- The public verifier now explicitly reports schema/redaction validation only;
+  it does not imply private-input provenance or independently recompute the
+  operator attestations.
+- Artifact hashing now rejects group/world-writable files and immediate parent
+  directories and requires trusted root/invoking-account ownership. Two focused
+  regressions cover both writable-path cases.
+- Post-fix local results: 46 focused GH-229 tests pass; strict public record
+  schema/redaction, 13 claim surfaces, Memory, project status, Python compile
+  and diff hygiene pass.
+- **Status:** `PR #233 Review findings fixed / Protected rerun next / Production false`.

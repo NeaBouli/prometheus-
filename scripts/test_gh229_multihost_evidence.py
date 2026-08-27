@@ -89,7 +89,7 @@ class Gh229EvidenceTests(unittest.TestCase):
             )
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(
-            result.stdout.strip(), "GH229_CONTROLLED_MULTIHOST_EVIDENCE_VERIFIED"
+            result.stdout.strip(), "GH229_PUBLIC_RECORD_SCHEMA_REDACTION_VERIFIED"
         )
 
     def test_valid_synthetic_record_passes(self) -> None:

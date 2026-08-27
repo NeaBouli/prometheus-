@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""Verify the public, redacted GH-229 controlled two-host evidence record."""
+"""Validate schema and redaction policy for one public GH-229 record.
+
+This gate validates the closed public schema, non-authorizing outcome and
+redaction policy. It cannot recompute private operator attestations because the
+challenge, binaries and canonical payload intentionally remain outside Git.
+"""
 
 from __future__ import annotations
 
@@ -110,7 +115,7 @@ def _reject_sensitive_content(value: Any, key: str = "root") -> None:
 
 
 def verify_evidence(data: dict[str, Any]) -> None:
-    """Validate one strict public GH-229 evidence object."""
+    """Validate one strict public GH-229 record's schema and redaction policy."""
     _require_exact_keys(data, TOP_LEVEL_KEYS, "evidence")
     _reject_sensitive_content(data)
 
@@ -209,7 +214,7 @@ def main() -> int:
     except EvidenceError as error:
         print(f"GH229_EVIDENCE_REJECTED: {error}", file=sys.stderr)
         return 1
-    print("GH229_CONTROLLED_MULTIHOST_EVIDENCE_VERIFIED")
+    print("GH229_PUBLIC_RECORD_SCHEMA_REDACTION_VERIFIED")
     return 0
 
 

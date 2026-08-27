@@ -255,6 +255,11 @@ They do not constitute a real two-host run. The dated redacted record proves
 only one operator-attested controlled distinct-host delivery; public multi-host
 Light Client operation remains unproven.
 
+The public verifier checks only the closed record schema, non-authorizing
+outcome and redaction policy. It cannot recompute the operator attestations or
+prove provenance because the challenge, binaries and canonical payload remain
+private by design.
+
 #### Execution attestation formula (GH-229)
 
 `attest` computes one deterministic domain-separated digest over versioned

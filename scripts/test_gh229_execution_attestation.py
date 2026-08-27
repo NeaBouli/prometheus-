@@ -304,6 +304,18 @@ class AttestationTestCase(unittest.TestCase):
         self.assertEqual(result.returncode, 1)
         self.assertEqual(result.stderr, b"attestation: artifact\n")
 
+    def test_attest_rejects_group_or_world_writable_artifact(self):
+        os.chmod(self.artifact_path, 0o666)
+        result = self.run_attest()
+        self.assertEqual(result.returncode, 1)
+        self.assertEqual(result.stderr, b"attestation: artifact\n")
+
+    def test_attest_rejects_group_or_world_writable_artifact_parent(self):
+        os.chmod(self.root, 0o722)
+        result = self.run_attest()
+        self.assertEqual(result.returncode, 1)
+        self.assertEqual(result.stderr, b"attestation: artifact\n")
+
     def test_attest_rejects_missing_challenge_and_artifact(self):
         missing = os.path.join(self.root, "missing.bin")
         for overrides, reason in (
