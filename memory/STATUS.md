@@ -1807,3 +1807,27 @@ Remaining gates: operated public networking; independent separation evidence;
                  deployment, Mainnet and production
 Estimates: unchanged; core 84-88%; complete vision 50-55%; production false
 ```
+
+## GH-234 LIGHT CLIENT THREATHINT-V2 ONE-SHOT SENDER (2026-08-29)
+
+```text
+Status: Implemented and locally verified / protected draft PR #235 open
+Issue/Code: GH-234 / b450740
+Capability: GH-234 one-shot v2 sender
+Scope: Development/Testnet-10-only real Light Client preflight and one-shot
+       submit of one owner-prepared canonical ThreatHintV2TransportPayload
+Transport: existing /prometheus/threat-hint/2.0.0 request/ACK behavior; one
+           static peer; loopback default; existing controlled-remote opt-in
+Safety: strict owner-only payload/config, canonical trusted-network reparse
+        before identity/network, Beta/Mainnet fail before activity, no retry,
+        persistence, listener, discovery, DNS, TCP or relay
+Local evidence: p2p unit 20 passed; v2 real-binary loopback 3 passed; v1
+                regression 3 passed; fmt and client all-target clippy passed
+Authority: acknowledgement authority none; no proof generation, production
+           approval verification, membership, model/YARA, wallet, chain,
+           reward, deployment, Mainnet or production action
+Remaining gates: protected PR checks/review, complete workspace verification,
+                 merge and exact-main CI/Security/Pages readback; public or
+                 multi-host v2 operation remains unproven
+Estimates: unchanged; core 84-88%; complete vision 50-55%; production false
+```

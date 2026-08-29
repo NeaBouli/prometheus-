@@ -61,7 +61,7 @@
 |--------|--------|--------------|
 | 0 — Setup | ACCEPTED | kaspad v1.1.0 Testnet-10, Repo-Struktur, CI/CD |
 | 1 — Contracts | DEVELOPMENT ACCEPTED | Current-Silverc compile/ABI/runtime evidence; H-001 canary only, six deployments remain |
-| 2 — Client | DEVELOPMENT PARTIAL | Kaspa/RuleStorage sync, bounded scanner foundations and GH-226 same-host v1 ThreatHint submission; real YARA, public multi-host P2P and Groth16 generation remain open |
+| 2 — Client | DEVELOPMENT PARTIAL | Kaspa/RuleStorage sync, bounded scanner foundations, GH-226 same-host v1 and GH-234/PR #235 same-host v2 ThreatHint submission; proof generation/approval authority, real YARA and public multi-host P2P remain open |
 | 3 — AI | STUBS ONLY | Phi-3 is a bounded fail-closed safe-default stub with no loaded-model or quarantine authority; Fed-DART is also a stub; no real-model detection evidence |
 | 4 — Guardian | DEVELOPMENT ACCEPTED | Bounded local analysis foundations; no production-authorized actionable rules or independently evaluated live model |
 | 5 — Voting | DEVELOPMENT ACCEPTED | Tested state machines; no operated validator network, trusted membership or decentralized authority evidence |

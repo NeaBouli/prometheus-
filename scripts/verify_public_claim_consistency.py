@@ -32,54 +32,63 @@ REQUIRED_FRAGMENTS = {
         "stake KAS, never PROM",
         "fail-closed safe-default stub",
         "single static loopback Guardian peer",
+        "GH-234 Light Client ThreatHint-v2 submission",
     ),
     Path("WHITEPAPER.md"): (
         "no ONNX session",
         "rule content is stored",
         "fail-closed safe-default stub",
         "exactly one canonical static literal-loopback QUIC peer",
+        "GH-234/PR #235",
     ),
     Path("docs/roadmap.md"): (
         "scope-weighted engineering estimates",
         "NO OPERATED VALIDATOR NETWORK",
         "Phi-3 fail-closed safe-default stub",
         "Development-only Light Client v1 ThreatHint sender",
+        "Development/Testnet-10-only Light Client ThreatHint-v2 sender",
     ),
     Path("docs/faq.md"): (
         "No PROM minting, emission, pool, or",
         "development placeholder",
         "fail-closed safe-default stub",
         "Development-only v1 submission path",
+        "Development/Testnet-10-only Light Client v2 submission command",
     ),
     Path("memory/STATUS.md"): (
         "Production-deployed: no Prometheus protocol component",
         "stake KAS, never PROM",
         "GH-223 fail-closed safe-default stub",
         "GH-226 one-shot v1 sender",
+        "GH-234 one-shot v2 sender",
     ),
     Path("index.html"): (
         "No production protocol network or PROM emission is active",
         "Target: on-chain in under 60 seconds",
         "bounded fail-closed safe-default stub",
         "one static literal-loopback Guardian peer",
+        "GH-234 ThreatHint-v2 submission",
     ),
     Path("roadmap.html"): (
         "not production evidence",
         "no ONNX session",
         "fail-closed safe-default stub",
         "GH-226 implements one Development-only Light Client v1 ThreatHint sender",
+        "GH-234/PR #235",
     ),
     Path("whitepaper.html"): (
         "Current Phi-3 and proof generation are development stubs",
         "content on IPFS",
         "fail-closed safe-default stub",
         "GH-226 adds one Development-only v1 ThreatHint sender",
+        "GH-234/PR #235",
     ),
     Path("faq.html"): (
         "not implemented, deployed, or active",
         "No completed fine-tuning",
         "fail-closed safe-default stub",
         "GH-226 adds one Development-only Light Client v1 sender",
+        "GH-234/PR #235",
     ),
     Path("guardian-economics.html"): (
         "not active network economics",
@@ -90,12 +99,14 @@ REQUIRED_FRAGMENTS = {
         "validators stake KAS, never PROM",
         "fail-closed safe-default stub",
         "GH-226 adds one Development-only v1 ThreatHint sender",
+        "GH-234/PR #235",
     ),
     Path("modules/client/README.md"): (
         "development foundation",
         "creates no ONNX Runtime session",
         "safe default",
         "threat-hint preflight|submit",
+        "threat-hint-v2 preflight|submit",
     ),
     Path("modules/guardian-node/README.md"): (
         "No actionable rule is authorized",
@@ -137,6 +148,7 @@ def validate_status(data: dict[str, Any]) -> list[str]:
     performance = classes.get("performance", {})
     light = classes.get("light_client", {})
     economics = classes.get("guardian_economics", {})
+    gh_234 = data.get("post_audit_updates", {}).get("gh_234", {})
 
     if (
         validators.get("stake_asset") != "KAS"
@@ -171,6 +183,12 @@ def validate_status(data: dict[str, Any]) -> list[str]:
         errors.append("Light Client P2P reporting must remain not operated")
     if light.get("p2p_v1_submission") != "development_only_same_host_loopback_verified":
         errors.append("Light Client v1 submission must remain development-only same-host evidence")
+    if gh_234.get("classification") != "development_only_same_host_loopback_verified":
+        errors.append("GH-234 v2 submission must remain development-only same-host evidence")
+    if gh_234.get("public_or_multihost_v2") is not False:
+        errors.append("GH-234 must not claim public or multi-host v2 operation")
+    if gh_234.get("production_authority") is not False:
+        errors.append("GH-234 production authority must remain false")
     if economics.get("status") != "illustrative_planning_only":
         errors.append("Guardian economics must remain illustrative planning only")
     if economics.get("active_rewards_or_market_price") is not False:

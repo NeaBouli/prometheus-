@@ -5756,3 +5756,108 @@ No direct `main` push or production action occurred.
   schema/redaction, 13 claim surfaces, Memory, project status, Python compile
   and diff hygiene pass.
 - **Status:** `PR #233 Review findings fixed / Protected rerun next / Production false`.
+
+## 2026-08-29 - GH-234 Light Client ThreatHint-v2 sender started
+
+- Issue #234 and branch `feat/GH-234-client-threat-hint-v2` start from clean
+  exact main `46f6ebfa4a4b4a75ac844c3f0dbe07f0b2ceed0d` in an isolated worktree.
+- Scope is one fail-closed Development/Testnet-10 Light Client submission path
+  that reuses the existing canonical v2 proof-envelope, Observable Bundle,
+  approval and `/prometheus/threat-hint/2.0.0` transport boundaries.
+- Literal loopback remains the default. Beta/Mainnet/Production must reject
+  before identity or network mutation; no automatic retry, discovery, DNS,
+  TCP or relay path is enabled.
+- Kimi K3 receives the bounded secret-free implementation block. Claude Code
+  receives a small read-only CLI/test audit. Sol owns architecture, security,
+  integration, diff review, complete testing and external writes.
+- Proof generation, production relation/keys, signing, membership authority,
+  model/YARA execution, wallet, chain, reward, deployment, firewall/IAM,
+  Mainnet and production actions remain excluded.
+- **Status:** `GH-234 In Progress / Repository only / Production false`.
+
+## 2026-08-29 - GH-234 implementation and local integration checkpoint
+
+- Kimi K3 implemented the bounded client block in the isolated worktree:
+  separate `threat-hint-v2 preflight|submit`, canonical shared v2 payload
+  loading, one-shot Guardian v2 transport, redacted reports, unit coverage,
+  real-binary loopback coverage, example config and module documentation.
+- Kimi's long-running wrapper stopped producing progress after `cargo check`
+  and formatting; Sol terminated only that delegated process, retained the
+  valid diff, reviewed every changed file and reran the relevant gates.
+- Sol corrected v2 config errors so they cannot expose the old v1 error label,
+  fixed an invalid network-mismatch test assumption, and added a named GH-234
+  CI gate plus an unchanged-v1 regression run.
+- Actual local results: `cargo fmt --all --check` PASS;
+  `cargo clippy -p prometheus-client --all-targets -- -D warnings` PASS;
+  p2p unit tests 20/20 PASS; v2 real-binary loopback 3/3 PASS; v1 real-binary
+  regression 3/3 PASS. Earlier Kimi `cargo check -p prometheus-client --tests`
+  also passed.
+- Claude Code's small secret-free read-only audit was attempted but stopped
+  immediately at its configured USD budget; it read or changed no files.
+- Functional code is commit `b450740`; protected draft PR #235 is open.
+  README, Whitepaper, Roadmap, FAQ, Pages HTML, `llms.txt`, machine status,
+  Memory and Bridge are synchronized in the pending documentation commit.
+- Remaining: documentation/status gates, complete workspace/CI-equivalent
+  verification, Kimi final read-only review, protected PR checks/review, merge
+  and exact-main CI/Security/Pages readback.
+- No public/multi-host v2 run, proof/approval authority, membership, model/YARA,
+  wallet, chain, reward, deployment, firewall/IAM, Mainnet or production action
+  occurred.
+- **Status:** `GH-234 Local focused gates PASS / Draft PR #235 / Production false`.
+
+## 2026-08-29 - GH-234 public status synchronization verified
+
+- Synchronized README, Whitepaper, Markdown Roadmap/FAQ, GitHub Pages HTML,
+  `llms.txt`, client README, machine-readable claim status, claim-audit table,
+  Memory and Agent Bridge to PR #235/code commit `b450740`.
+- Actual results: public claim consistency PASS for 13 surfaces; claim unit
+  tests 10/10 PASS; documentation hygiene tests 11/11 PASS; Memory integrity,
+  project-status consistency, five-page HTML parse, workflow YAML parse, Python
+  compile and `git diff --check` PASS.
+- Claims remain Development/Testnet-10 repository evidence only. Public or
+  multi-host v2 operation and every production authority remain false/open.
+- **Status:** `Docs/status synchronized locally / Documentation commit next / Production false`.
+
+## 2026-08-29 - GH-234 full local verification and independent review
+
+- Kimi K3 completed a read-only review of commits `b450740` and `824a81b` and
+  returned `APPROVE`: no P0, P1 or P2 findings. It independently reran p2p unit
+  20/20, v2 binary 3/3, v1 binary 3/3, client clippy, fmt, claim consistency,
+  HTML/YAML/Python and diff checks. It changed no tracked file.
+- Sol accepted and fixed Kimis cosmetic P3: the open PR's Pages row now uses
+  the active badge style while retaining the visible `Tested locally` label.
+  Kimis optional network-mismatch test note requires no patch: the shared
+  invalid vector is a Testnet-10 wire made invalid by a separately supplied
+  Mainnet trust anchor; the dependency corpus and client helper already test
+  that trust-anchor mismatch, while production remains hard-pinned to
+  `testnet-10`.
+- `cargo fmt --all --check` and
+  `cargo clippy --workspace --all-targets -- -D warnings` PASS.
+- The first workspace test attempt ran concurrently with Kimi and triggered the
+  existing scanner timing gate at 7.74s; isolated repetition passed at 2.20s.
+  A later workspace attempt reached an existing sidecar shutdown test 8ms past
+  its 10s deadline; isolated repetition passed in 3.42s.
+- Final uncontended `cargo test --workspace` PASS, including v2/v1 client
+  loopback, all 76 Guardian unit tests, all five sidecar process tests, all
+  proof/validator/deployer suites and doc tests. The timing observations did
+  not reproduce in the final complete run.
+- Remaining: commit/push this review closeout, mark PR #235 ready, protected
+  CI/Security/Pages and review, normal merge, exact-main readback and issue
+  closeout. Public/multi-host v2 and production remain false.
+- **Status:** `GH-234 Full local PASS / Kimi APPROVE / Protected PR next / Production false`.
+
+## 2026-08-29 - GH-234 CodeRabbit provenance findings resolved locally
+
+- Two documentation-only review findings were confirmed and corrected. The
+  dated `2026-08-14` machine-readable baseline no longer misclassifies GH-234;
+  its update is isolated under explicit `post_audit_updates.gh_234` metadata.
+- `memory/AUDIT.md` now carries the protected-PR audit and `llms.txt` marks the
+  claim as a `2026-08-29` post-audit update. No merge, public/multi-host v2,
+  deployment or production completion is claimed.
+- The machine gate now rejects a missing GH-234 record, classification drift,
+  public/multi-host v2 claims and production authority. Actual verification:
+  claim consistency PASS on 13 surfaces; 12/12 claim tests; Memory, project
+  status, hygiene, YAML, HTML, Python, rustfmt and diff checks PASS.
+- Next gates remain commit/push, corrected-head protected checks and review,
+  normal merge, exact-main CI/Security/Pages and public readback.
+- **Status:** `GH-234 Review corrections local PASS / Merge pending / Production false`.

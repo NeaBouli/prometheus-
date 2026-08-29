@@ -86,3 +86,9 @@ classifications and identified residual homepage, Guardian, validator,
 rule-distribution, performance and economics wording. Those findings are
 resolved in this patch; Sol retained scope, integration, security review and
 test ownership.
+
+## Post-audit GH-234 classification (2026-08-29)
+
+| Claim | Current wording | Evidence | Classification | Required boundary | Files affected |
+|---|---|---|---|---|---|
+| Light Client ThreatHint-v2 reporting | GH-234/PR #235, code commit `b450740`, adds one owner-prepared canonical v2 one-shot sender | Client p2p unit tests (20 pass), real same-host binary/QUIC v2 tests (3 pass), v1 regression (3 pass), strict fmt and clippy | Implemented and tested Development/Testnet-10 repository boundary; not demonstrated on a public or multi-host v2 network; not production-deployed | Keep proof generation, production approval verification, membership, privacy authority, model/YARA, wallet, chain, rewards, deployment, Mainnet and production disabled/unproven | README, Whitepaper, Roadmap, FAQ, HTML, `llms.txt`, client README, machine status and Memory |
