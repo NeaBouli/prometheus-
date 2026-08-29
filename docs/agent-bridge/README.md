@@ -10,16 +10,15 @@ Startpunkt fuer Codex/Claude Code:
 
 Keine Secrets, Tokens, Passwoerter, privaten Keys oder Wallet-Daten in diese Bridge schreiben.
 
-Aktiver Handover: GH-229/PR #230 ist als getestete Repository-Faehigkeit auf
-exaktem Main `fba8bb4` integriert. Um `2026-08-26T23:36:04Z` (2026-08-27
-Operator-Lokalzeit) wurde genau ein operator-attestierter
-Development-/Testnet-10-Direct-QUIC-Lauf zwischen zwei getrennten kontrollierten
-Hosts ausgefuehrt: `rejected`/`rejected`, null
-Retries, keine Persistenz und ACK-Autoritaet `none`. Die temporaere
-senderbeschraenkte UDP-Regel wurde sofort entfernt; kein Listener oder
-oeffentlicher Dienst bleibt aktiv. Der redigierte Nachweis beweist die
-Hosttrennung nicht unabhaengig und autorisiert weder oeffentlichen Netzbetrieb
-noch Proof, Membership, Reward, Chain, Mainnet, Deployment oder Produktion.
+Aktiver Handover: GH-234/PR #235, code commit `b450740`, ergaenzt den
+Development-/Testnet-10-only Light Client um einen separaten one-shot
+ThreatHint-v2-Sender fuer ein owner-prepared canonical shared payload. Lokale
+Unit- und reale same-host Binary-/QUIC-Tests pruefen strict private inputs,
+trusted-network parsing vor Identity/Netzwerk, genau einen Request, redigierte
+ACK-Status, Beta/Mainnet-Gates und unveraendertes v1-Verhalten. Der PR ist noch
+im geschuetzten Review-/CI-Prozess. Public/multi-host v2, Proof- oder
+Approval-Autoritaet, Membership, Model/YARA, Wallet, Chain, Reward, Mainnet,
+Deployment und Produktion bleiben offen bzw. ausgeschlossen.
 Verbindlicher Status und offene Gates stehen in `CODEX_BRIDGE.md`; laufende
 Schritte stehen in `ACTION_LOG.md`.
 <!-- CODEX_CLAUDE_CODE_TERMINAL_BRIDGE_V1 -->

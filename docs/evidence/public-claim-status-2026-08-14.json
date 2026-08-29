@@ -34,6 +34,7 @@
       "durable_rule_rollback_protection": "not_implemented",
       "p2p_reporting": "not_operated",
       "p2p_v1_submission": "development_only_same_host_loopback_verified",
+      "p2p_v2_submission": "development_only_same_host_loopback_verified",
       "proof_generation": "development_stub_only"
     },
     "guardian_analysis": {

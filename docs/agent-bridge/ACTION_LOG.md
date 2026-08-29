@@ -4676,3 +4676,35 @@ Rules for all dev agents:
 - Post-fix: 46 focused tests and all local record/claim/Memory/status/compile/
   diff gates pass.
 - Status: `Review findings fixed / Commit and protected rerun next / Production false`.
+
+## 2026-08-29 - GH-234 Light Client ThreatHint-v2 block opened
+
+- Created issue #234 and isolated branch
+  `feat/GH-234-client-threat-hint-v2` from exact clean main `46f6ebf`.
+- Recorded Development/Testnet-10-only scope, fail-before-network runtime
+  gates, canonical v2 reuse, one-shot transport and explicit non-authority
+  boundaries.
+- Kimi K3 implementation and Claude Code read-only helper audit are next;
+  Sol retains security, integration, full verification and protected delivery.
+- Status: `In progress / Repository only / Production false`.
+
+## 2026-08-29 - GH-234 implementation integrated locally
+
+- Kimi K3 delivered the bounded v2 client sender, tests, example and module
+  docs; Sol reviewed and hardened the full diff. Claude Code was budget-blocked
+  before reading or changing files.
+- Sol fixed version-specific error mapping and the network-mismatch regression,
+  then added an explicit CI gate for v2 unit/real-binary and v1 regression.
+- PASS: fmt; client all-target clippy with warnings denied; p2p unit 20/20;
+  v2 real-binary loopback 3/3; v1 real-binary regression 3/3.
+- Commit `b450740` pushed; protected draft PR #235 opened. Public docs, Pages,
+  machine status, Memory and Bridge synchronization is pending commit/test.
+- Status: `Focused local PASS / Draft PR #235 / Production false`.
+
+## 2026-08-29 - GH-234 public surfaces verified
+
+- README, Whitepaper, Roadmap, FAQ, Pages, `llms.txt`, machine status, claim
+  audit, Memory and Bridge now carry the same bounded GH-234 claim.
+- PASS: 13-surface claim check; claim tests 10/10; hygiene tests 11/11; Memory,
+  project status, HTML, workflow YAML, Python compile and diff hygiene.
+- Status: `Public status synchronized locally / Commit next / Production false`.

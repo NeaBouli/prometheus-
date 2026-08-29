@@ -5756,3 +5756,64 @@ No direct `main` push or production action occurred.
   schema/redaction, 13 claim surfaces, Memory, project status, Python compile
   and diff hygiene pass.
 - **Status:** `PR #233 Review findings fixed / Protected rerun next / Production false`.
+
+## 2026-08-29 - GH-234 Light Client ThreatHint-v2 sender started
+
+- Issue #234 and branch `feat/GH-234-client-threat-hint-v2` start from clean
+  exact main `46f6ebfa4a4b4a75ac844c3f0dbe07f0b2ceed0d` in an isolated worktree.
+- Scope is one fail-closed Development/Testnet-10 Light Client submission path
+  that reuses the existing canonical v2 proof-envelope, Observable Bundle,
+  approval and `/prometheus/threat-hint/2.0.0` transport boundaries.
+- Literal loopback remains the default. Beta/Mainnet/Production must reject
+  before identity or network mutation; no automatic retry, discovery, DNS,
+  TCP or relay path is enabled.
+- Kimi K3 receives the bounded secret-free implementation block. Claude Code
+  receives a small read-only CLI/test audit. Sol owns architecture, security,
+  integration, diff review, complete testing and external writes.
+- Proof generation, production relation/keys, signing, membership authority,
+  model/YARA execution, wallet, chain, reward, deployment, firewall/IAM,
+  Mainnet and production actions remain excluded.
+- **Status:** `GH-234 In Progress / Repository only / Production false`.
+
+## 2026-08-29 - GH-234 implementation and local integration checkpoint
+
+- Kimi K3 implemented the bounded client block in the isolated worktree:
+  separate `threat-hint-v2 preflight|submit`, canonical shared v2 payload
+  loading, one-shot Guardian v2 transport, redacted reports, unit coverage,
+  real-binary loopback coverage, example config and module documentation.
+- Kimi's long-running wrapper stopped producing progress after `cargo check`
+  and formatting; Sol terminated only that delegated process, retained the
+  valid diff, reviewed every changed file and reran the relevant gates.
+- Sol corrected v2 config errors so they cannot expose the old v1 error label,
+  fixed an invalid network-mismatch test assumption, and added a named GH-234
+  CI gate plus an unchanged-v1 regression run.
+- Actual local results: `cargo fmt --all --check` PASS;
+  `cargo clippy -p prometheus-client --all-targets -- -D warnings` PASS;
+  p2p unit tests 20/20 PASS; v2 real-binary loopback 3/3 PASS; v1 real-binary
+  regression 3/3 PASS. Earlier Kimi `cargo check -p prometheus-client --tests`
+  also passed.
+- Claude Code's small secret-free read-only audit was attempted but stopped
+  immediately at its configured USD budget; it read or changed no files.
+- Functional code is commit `b450740`; protected draft PR #235 is open.
+  README, Whitepaper, Roadmap, FAQ, Pages HTML, `llms.txt`, machine status,
+  Memory and Bridge are synchronized in the pending documentation commit.
+- Remaining: documentation/status gates, complete workspace/CI-equivalent
+  verification, Kimi final read-only review, protected PR checks/review, merge
+  and exact-main CI/Security/Pages readback.
+- No public/multi-host v2 run, proof/approval authority, membership, model/YARA,
+  wallet, chain, reward, deployment, firewall/IAM, Mainnet or production action
+  occurred.
+- **Status:** `GH-234 Local focused gates PASS / Draft PR #235 / Production false`.
+
+## 2026-08-29 - GH-234 public status synchronization verified
+
+- Synchronized README, Whitepaper, Markdown Roadmap/FAQ, GitHub Pages HTML,
+  `llms.txt`, client README, machine-readable claim status, claim-audit table,
+  Memory and Agent Bridge to PR #235/code commit `b450740`.
+- Actual results: public claim consistency PASS for 13 surfaces; claim unit
+  tests 10/10 PASS; documentation hygiene tests 11/11 PASS; Memory integrity,
+  project-status consistency, five-page HTML parse, workflow YAML parse, Python
+  compile and `git diff --check` PASS.
+- Claims remain Development/Testnet-10 repository evidence only. Public or
+  multi-host v2 operation and every production authority remain false/open.
+- **Status:** `Docs/status synchronized locally / Documentation commit next / Production false`.
