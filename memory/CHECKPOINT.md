@@ -863,11 +863,13 @@ Leistungsbasierte Emission. Guardians = "Miner" (KI statt GPU).
   deployment, Mainnet and production remain open or false.
 - **Status:** `GH-234 repository delivery complete / Production false`.
 
-## Checkpoint 2026-08-29: GH-238 repository-only v2 evidence preparation in progress
+## Checkpoint 2026-08-29: GH-238 merged exact-main
 
-- On the current feature branch, GH-238 implements and locally tests
-  repository-only preparation for one later controlled distinct-host
-  Development/Testnet-10 ThreatHint-v2 attempt.
+- PR #239 merged normally as exact main `912d96d`; issue #238 closed.
+- Exact-main CI `33279351831`, Security Audit `33279351822`, and Pages
+  `33279351387` pass.
+- GH-238 implements and locally tests repository-only preparation for one
+  later controlled distinct-host Development/Testnet-10 ThreatHint-v2 attempt.
 - The tooling binds challenge-bound, role-specific operator attestations over
   the source commit, actual executable digest, exact canonical payload digest,
   exact v2 protocol, shared observed UTC time, actual rejected status, one
@@ -878,7 +880,7 @@ Leistungsbasierte Emission. Guardians = "Miner" (KI statt GPU).
   host separation is not independently proven. A later real run requires
   separate explicit authorization; no port, firewall, host, IAM, wallet, chain,
   deployment, Mainnet or production action or authority is added.
-- **Status:** `GH-238 In Progress / Repository preparation implemented and locally tested / Real remote evidence open / Production false`.
+- **Status:** `GH-238 repository preparation merged exact-main / Real remote evidence open / Production false`.
 
 ## Checkpoint 2026-08-04: GH-144 merged exact-main
 

@@ -6,6 +6,8 @@ from __future__ import annotations
 import copy
 import importlib.util
 import json
+import shutil
+import tempfile
 import unittest
 from pathlib import Path
 from typing import Any
@@ -133,6 +135,89 @@ class PublicClaimConsistencyTests(unittest.TestCase):
                         for error in MODULE.validate_status(changed)
                     )
                 )
+
+    def test_gh_238_status_drift_is_rejected(self) -> None:
+        changed = copy.deepcopy(self.status)
+        changed["post_audit_updates"]["gh_238"]["status"] = (
+            "repository_preparation_implemented_and_locally_tested"
+        )
+        self.assertTrue(
+            any(
+                "exact-main verification" in error
+                for error in MODULE.validate_status(changed)
+            )
+        )
+
+    def test_gh_238_pull_request_identity_drift_is_rejected(self) -> None:
+        changed = copy.deepcopy(self.status)
+        changed["post_audit_updates"]["gh_238"]["pull_request"] = 238
+        self.assertTrue(
+            any(
+                "machine status identity" in error
+                for error in MODULE.validate_status(changed)
+            )
+        )
+
+    def test_malformed_gh_238_merge_commit_is_rejected(self) -> None:
+        changed = copy.deepcopy(self.status)
+        changed["post_audit_updates"]["gh_238"]["merge_commit"] = "912d96d"
+        self.assertTrue(
+            any("merge commit" in error for error in MODULE.validate_status(changed))
+        )
+
+    def test_incomplete_gh_238_exact_main_evidence_is_rejected(self) -> None:
+        changed = copy.deepcopy(self.status)
+        del changed["post_audit_updates"]["gh_238"]["exact_main_runs"]["pages"]
+        self.assertTrue(
+            any("run evidence" in error for error in MODULE.validate_status(changed))
+        )
+
+    def test_non_positive_gh_238_run_ids_are_rejected(self) -> None:
+        changed = copy.deepcopy(self.status)
+        changed["post_audit_updates"]["gh_238"]["exact_main_runs"]["pages"] = 0
+        self.assertTrue(
+            any(
+                "positive integers" in error
+                for error in MODULE.validate_status(changed)
+            )
+        )
+
+    def test_boolean_gh_238_run_ids_are_rejected(self) -> None:
+        changed = copy.deepcopy(self.status)
+        changed["post_audit_updates"]["gh_238"]["exact_main_runs"]["pages"] = True
+        self.assertTrue(
+            any(
+                "positive integers" in error
+                for error in MODULE.validate_status(changed)
+            )
+        )
+
+    def test_gh_238_public_surface_drift_is_rejected(self) -> None:
+        root = SCRIPT.parents[1]
+        run_id = str(
+            self.status["post_audit_updates"]["gh_238"]["exact_main_runs"]["pages"]
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_root = Path(tmp)
+            status_target = tmp_root / MODULE.STATUS_PATH
+            status_target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy(root / MODULE.STATUS_PATH, status_target)
+            for relative in MODULE.PUBLIC_FILES:
+                target = tmp_root / relative
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy(root / relative, target)
+            drifted = tmp_root / "docs/roadmap.md"
+            drifted.write_text(
+                drifted.read_text(encoding="utf-8").replace(run_id, "0"),
+                encoding="utf-8",
+            )
+            errors = MODULE.verify(tmp_root)
+            self.assertTrue(
+                any(
+                    "docs/roadmap.md" in error and "GH-238 exact-main" in error
+                    for error in errors
+                )
+            )
 
     def test_missing_gh_238_status_is_rejected(self) -> None:
         changed = copy.deepcopy(self.status)

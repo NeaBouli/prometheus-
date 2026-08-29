@@ -2672,7 +2672,7 @@ changed.
 
 ## 2026-08-29 - GH-238 repository-preparation status synchronization audit
 
-- GH-238 on the current feature branch implements and locally tests
+- GH-238 implements and locally tests
   repository-only preparation for one later controlled distinct-host
   Development/Testnet-10 ThreatHint-v2 attempt. The tooling uses
   challenge-bound role-specific operator attestations over the source commit,
@@ -2686,10 +2686,24 @@ changed.
   surfaces; the public claim-consistency gate now requires the concise GH-238
   marker and its non-operation caveat on each canonical public surface.
 - No real GH-238 remote run has occurred and no GH-238 evidence record exists;
-  host separation is not independently proven. PR #239 exists, but GH-238 is
-  not merged, exact-main, deployed, demonstrated or complete; no merge,
-  exact-main or remote-run IDs are claimed. GH-229 and GH-234 claims are
+  host separation is not independently proven. PR #239 has since merged
+  normally as exact main `912d96d`; issue #238 is closed. No remote run or
+  evidence record is claimed. GH-229 and GH-234 claims are
   unchanged. No port, firewall, host,
   IAM, wallet, chain, deployment, Mainnet or production action or authority is
   added; a later real run requires separate explicit authorization.
 - Result: `Local PASS / GH-238 repository preparation implemented and locally tested / Real remote evidence open / Production false`.
+
+## 2026-08-29 - GH-238 merge and exact-main audit
+
+- PR #239 merged normally as exact main
+  `912d96d2d178ef3a2192547ed2bcca6df0fa38b4`; issue #238 closed.
+- Exact-main Prometheus CI `33279351831`, Security Audit `33279351822`, and
+  Pages `33279351387` pass on that SHA.
+- Public claims remain bounded to implemented and locally tested
+  repository-only preparation. No real GH-238 remote run has occurred and no
+  GH-238 evidence record exists; host separation is not independently proven.
+  No port, firewall, host, IAM, wallet, chain, deployment, Mainnet or
+  production action or authority is added; a later real run requires separate
+  explicit authorization.
+- Result: `PASS / GH-238 repository preparation merged exact-main / Real remote evidence open / Production false`.

@@ -131,7 +131,8 @@ a production malware detector or reporting client.
   same-host binary/QUIC tests cover accepted/rejected/busy/transport-failure
   with exact bytes, one attempt, and redacted output. This grants no public or
   multi-host operation, wallet, chain, deployment, or production authority.
-- GH-238 implements and locally tests repository-only preparation for one
+- Merged and exact-main-verified GH-238/PR #239, exact main `912d96d`,
+  implements and locally tests repository-only preparation for one
   later controlled distinct-host
   Development/Testnet-10 ThreatHint-v2 attempt. The tooling uses
   challenge-bound, role-specific operator attestations over the source commit,
@@ -139,7 +140,8 @@ a production malware detector or reporting client.
   v2 protocol, one shared observed UTC time, the actual rejected status, one
   attempt, zero retries and no persistence, with strict owner-only/no-symlink
   files, the exact 9,265-byte Rust wire bound, atomic no-clobber record output,
-  a closed redacted verifier and CI test wiring.
+  a closed redacted verifier and CI test wiring. Exact-main CI `33279351831`,
+  Security Audit `33279351822`, and Pages `33279351387` pass.
   No real GH-238 remote run has occurred and no GH-238 evidence record exists;
   host separation is not independently proven. This repository preparation is
   not a deployment or remote demonstration and adds no port, firewall, host,

@@ -232,17 +232,31 @@ def validate_status(data: dict[str, Any]) -> list[str]:
         errors.append("GH-234 must not claim public or multi-host v2 operation")
     if gh_234.get("production_authority") is not False:
         errors.append("GH-234 production authority must remain false")
-    if gh_238.get("issue") != 238:
+    if gh_238.get("issue") != 238 or gh_238.get("pull_request") != 239:
         errors.append("GH-238 machine status identity is invalid")
+    if gh_238.get("status") != "merged_and_exact_main_verified":
+        errors.append("GH-238 must retain merged exact-main verification status")
     if (
-        gh_238.get("status") != "repository_preparation_implemented_and_locally_tested"
-        or gh_238.get("classification") != "development_testnet10_repository_only"
+        gh_238.get("classification") != "development_testnet10_repository_only"
         or gh_238.get("transport") != "direct-quic-v1"
         or gh_238.get("protocol") != "/prometheus/threat-hint/2.0.0"
     ):
         errors.append(
             "GH-238 must remain repository-only Development/Testnet-10 preparation"
         )
+    gh_238_merge_commit = gh_238.get("merge_commit")
+    if (
+        not isinstance(gh_238_merge_commit, str)
+        or re.fullmatch(r"[0-9a-f]{40}", gh_238_merge_commit) is None
+    ):
+        errors.append("GH-238 merge commit must be one full lowercase SHA-1")
+    gh_238_exact_main_runs = gh_238.get("exact_main_runs", {})
+    if set(gh_238_exact_main_runs) != {"prometheus_ci", "security_audit", "pages"}:
+        errors.append("GH-238 exact-main run evidence is incomplete")
+    elif not all(
+        type(run_id) is int and run_id > 0 for run_id in gh_238_exact_main_runs.values()
+    ):
+        errors.append("GH-238 exact-main run IDs must be positive integers")
     for field in (
         "remote_run",
         "evidence_record",
@@ -301,6 +315,16 @@ def verify(root: Path) -> list[str]:
             for name in ("prometheus_ci", "security_audit", "pages")
         ),
     )
+    gh_238 = status.get("post_audit_updates", {}).get("gh_238", {})
+    gh_238_merge_commit = gh_238.get("merge_commit", "")
+    gh_238_run_ids = gh_238.get("exact_main_runs", {})
+    gh_238_evidence_fragments = (
+        gh_238_merge_commit[:7] if isinstance(gh_238_merge_commit, str) else "",
+        *(
+            str(gh_238_run_ids.get(name, ""))
+            for name in ("prometheus_ci", "security_audit", "pages")
+        ),
+    )
 
     for relative in PUBLIC_FILES:
         path = root / relative
@@ -328,6 +352,10 @@ def verify(root: Path) -> list[str]:
                     errors.append(
                         f"{relative}: GH-238 repository-only boundary missing"
                     )
+                    break
+            for fragment in gh_238_evidence_fragments:
+                if not fragment or fragment not in text:
+                    errors.append(f"{relative}: GH-238 exact-main evidence missing")
                     break
         if relative.suffix == ".html" and "5cd13bf" not in text:
             errors.append(f"{relative}: exact reconciliation baseline missing")

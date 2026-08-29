@@ -4861,3 +4861,39 @@ Rules for all dev agents:
   documentation hygiene, Ruff, mypy, Python compile, workflow YAML and diff.
 - No real remote run, record or external action occurred.
 - Status: `GH-238 PR #239 review corrections local PASS / Commit and protected rerun next / Production false`.
+
+## 2026-08-29 - GH-238 merged exact-main verification complete
+
+- Protected PR #239 squash-merged normally without admin bypass as exact main
+  `912d96d2d178ef3a2192547ed2bcca6df0fa38b4`; issue #238 is closed.
+- Exact-main Prometheus CI `33279351831`, Security Audit `33279351822`, and
+  Pages `33279351387` pass on that exact commit.
+- Branch `docs/GH-238-exact-main-closeout` now synchronizes README,
+  Whitepaper, Roadmap, FAQ, Pages, `llms.txt`, machine status, Memory and
+  Bridge with this evidence. Kimi receives an independent secret-free review;
+  Sol owns integration, all checks and protected publication.
+- No real GH-238 remote run or evidence record exists. No host, network,
+  firewall/IAM, wallet, chain, deployment, Mainnet or production action is in
+  scope.
+- Status: `GH-238 product exact-main PASS / Documentation closeout in progress / External run false / Production false`.
+
+## 2026-08-29 - GH-238 documentation closeout local gate passed
+
+- README, Whitepaper, Roadmap, FAQ, Pages, `llms.txt`, client README, machine
+  status and Memory now identify PR #239, exact product main `912d96d`, CI
+  `33279351831`, Security `33279351822`, and Pages `33279351387` while keeping
+  every remote-run, evidence, host-proof, infrastructure and production field
+  false.
+- The first Sol rerun found one misplaced assertion in a newly added PR-identity
+  regression. Sol separated the two tests; the final claim suite passes 23/23.
+- PASS: 13-surface claim verification; 72 focused GH-238 evidence tests;
+  Memory, project status, documentation hygiene and autodidactic suites; Ruff,
+  mypy, Python compile, workflow YAML, five-page HTML parse and diff hygiene.
+- Chrome DevTools measurements at 390px and desktop width show no page-level
+  horizontal overflow on Roadmap, Whitepaper or FAQ; each GH-238 block remains
+  within its viewport. Intended wide tables remain locally scrollable.
+- Kimi K3 independently reviewed all 19 changed files and returned `APPROVE`,
+  no P0-P2. Claude Code was session-limit blocked before repository access and
+  read or changed no file.
+- No real GH-238 remote run, evidence record or external/production action
+  occurred. Status: `GH-238 Docs closeout local PASS / Protected PR next / Production false`.

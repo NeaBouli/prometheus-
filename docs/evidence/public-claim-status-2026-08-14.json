@@ -42,7 +42,14 @@
     "gh_238": {
       "as_of": "2026-08-29",
       "issue": 238,
-      "status": "repository_preparation_implemented_and_locally_tested",
+      "pull_request": 239,
+      "merge_commit": "912d96d2d178ef3a2192547ed2bcca6df0fa38b4",
+      "status": "merged_and_exact_main_verified",
+      "exact_main_runs": {
+        "prometheus_ci": 33279351831,
+        "security_audit": 33279351822,
+        "pages": 33279351387
+      },
       "classification": "development_testnet10_repository_only",
       "transport": "direct-quic-v1",
       "protocol": "/prometheus/threat-hint/2.0.0",
