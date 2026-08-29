@@ -4777,7 +4777,7 @@ Rules for all dev agents:
   GH-234 status patch after normal publication.
 - Status: `GH-234 Complete / Product and public exact-main PASS / Production false`.
 
-## 2026-08-30 - GH-238 controlled two-host v2 evidence preparation opened
+## 2026-08-29 - GH-238 controlled two-host v2 evidence preparation opened
 
 - Created issue #238 and isolated branch
   `feat/GH-238-v2-multihost-evidence` from exact clean main `efe6e95`.
@@ -4790,7 +4790,7 @@ Rules for all dev agents:
   integration, complete verification and protected delivery.
 - Status: `GH-238 In progress / Repository only / External run false / Production false`.
 
-## 2026-08-30 - GH-238 repository preparation pre-PR gate passed
+## 2026-08-29 - GH-238 repository preparation pre-PR gate passed
 
 - Kimi K3 implemented the bounded challenge/attestation, redacted record and
   verifier block and then independently reviewed the security boundary. Sol
@@ -4813,7 +4813,7 @@ Rules for all dev agents:
   wallet, signing, chain, deployment, Mainnet or production action occurred.
 - Status: `GH-238 Full local PASS / Final Kimi review and protected PR next / External run false / Production false`.
 
-## 2026-08-30 - GH-238 independent review approved
+## 2026-08-29 - GH-238 independent review approved
 
 - Kimi's first complete read-only review returned `REQUEST_CHANGES` for one P2:
   the later-run procedure created the challenge on one host but did not state
@@ -4834,3 +4834,30 @@ Rules for all dev agents:
   remain valid because no Rust or public-page layout code changed afterward.
 - No real GH-238 remote run, evidence record or external action occurred.
 - Status: `GH-238 Reviewed APPROVE / Full local PASS / Protected PR next / External run false / Production false`.
+
+## 2026-08-29 - GH-238 protected PR review corrections opened
+
+- PR #239 at commit `c892f99` passed all ten technical CI/Security contexts and
+  CodeRabbit completed with five actionable comments plus one privacy nit.
+- Corrections remove the machine-local worktree path, use host-local attestation
+  directories while preserving identical challenge bytes, record the current PR
+  state, widen future UTC/toolchain-date syntax without relaxing the earliest
+  observation or rustc-version boundary, and fail closed on non-UTF-8 evidence.
+- The public status date is normalized to the GitHub publication date
+  `2026-08-29`; the later real-run lower boundary remains `2026-08-30T00:00:00Z`.
+- Status: `GH-238 Review corrections in progress / No remote run / Production false`.
+
+## 2026-08-29 - GH-238 protected review corrections verified locally
+
+- All five actionable CodeRabbit comments and the machine-local-path privacy nit
+  are resolved in the working tree. The observation lower bound remains
+  `2026-08-30T00:00:00Z`; future strict UTC years and rustc-1.95 build dates are
+  accepted without weakening source/runtime/transport/protocol boundaries.
+- The first combined rerun correctly exposed that a syntactically valid 2025 UTC
+  value now reaches the separate lower-bound rejection instead of argparse. The
+  regression expectation was corrected to require the data-minimal timestamp
+  failure; the final 134-test rerun passed.
+- PASS after correction: 134 combined tests, 13 public surfaces, Memory/status/
+  documentation hygiene, Ruff, mypy, Python compile, workflow YAML and diff.
+- No real remote run, record or external action occurred.
+- Status: `GH-238 PR #239 review corrections local PASS / Commit and protected rerun next / Production false`.

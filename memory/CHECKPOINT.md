@@ -863,7 +863,7 @@ Leistungsbasierte Emission. Guardians = "Miner" (KI statt GPU).
   deployment, Mainnet and production remain open or false.
 - **Status:** `GH-234 repository delivery complete / Production false`.
 
-## Checkpoint 2026-08-30: GH-238 repository-only v2 evidence preparation in progress
+## Checkpoint 2026-08-29: GH-238 repository-only v2 evidence preparation in progress
 
 - On the current feature branch, GH-238 implements and locally tests
   repository-only preparation for one later controlled distinct-host

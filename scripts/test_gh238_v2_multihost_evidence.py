@@ -164,6 +164,19 @@ class Gh238EvidenceTests(unittest.TestCase):
         self.assertEqual(result.returncode, 1)
         self.assertNotIn(marker, result.stderr)
         self.assertNotIn(str(evidence_path), result.stderr)
+        with tempfile.TemporaryDirectory() as directory:
+            evidence_path = Path(directory) / "non-utf8.json"
+            evidence_path.write_bytes(b"{\xff}")
+            result = subprocess.run(
+                [sys.executable, str(SCRIPT), "--evidence", str(evidence_path)],
+                capture_output=True,
+                check=False,
+                text=True,
+            )
+        self.assertEqual(result.returncode, 1)
+        self.assertEqual(result.stdout, "")
+        self.assertIn("GH238_EVIDENCE_REJECTED", result.stderr)
+        self.assertNotIn(str(evidence_path), result.stderr)
 
     def test_valid_synthetic_record_passes(self) -> None:
         MODULE.verify_evidence(valid_evidence())
@@ -315,6 +328,12 @@ class Gh238EvidenceTests(unittest.TestCase):
                 mutate(changed)
                 with self.assertRaises(MODULE.EvidenceError):
                     MODULE.verify_evidence(changed)
+        future = valid_evidence()
+        future["observed_at_utc"] = "2027-01-02T03:04:05Z"
+        artifacts = future["artifacts"]
+        assert isinstance(artifacts, dict)
+        artifacts["toolchain"] = "rustc 1.95.0 (59807616e 2027-04-14)"
+        MODULE.verify_evidence(future)
 
     def test_bool_identity_fields_are_rejected(self) -> None:
         for field, value in (

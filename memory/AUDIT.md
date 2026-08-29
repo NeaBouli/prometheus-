@@ -2670,7 +2670,7 @@ changed.
   proof/approval authority, deployment, Mainnet and production remain false.
 - Result: `PASS / GH-234 repository delivery complete / Production false`.
 
-## 2026-08-30 - GH-238 repository-preparation status synchronization audit
+## 2026-08-29 - GH-238 repository-preparation status synchronization audit
 
 - GH-238 on the current feature branch implements and locally tests
   repository-only preparation for one later controlled distinct-host
@@ -2686,9 +2686,10 @@ changed.
   surfaces; the public claim-consistency gate now requires the concise GH-238
   marker and its non-operation caveat on each canonical public surface.
 - No real GH-238 remote run has occurred and no GH-238 evidence record exists;
-  host separation is not independently proven. GH-238 is not merged,
-  exact-main, deployed, demonstrated or complete; no commit/PR/run IDs are
-  claimed. GH-229 and GH-234 claims are unchanged. No port, firewall, host,
+  host separation is not independently proven. PR #239 exists, but GH-238 is
+  not merged, exact-main, deployed, demonstrated or complete; no merge,
+  exact-main or remote-run IDs are claimed. GH-229 and GH-234 claims are
+  unchanged. No port, firewall, host,
   IAM, wallet, chain, deployment, Mainnet or production action or authority is
   added; a later real run requires separate explicit authorization.
 - Result: `Local PASS / GH-238 repository preparation implemented and locally tested / Real remote evidence open / Production false`.

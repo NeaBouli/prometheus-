@@ -22,11 +22,11 @@ from typing import Any
 LOWER_HEX_32 = re.compile(r"^[0-9a-f]{64}$")
 LOWER_HEX_20 = re.compile(r"^[0-9a-f]{40}$")
 UTC_TIMESTAMP = re.compile(
-    r"^2026-[0-9]{2}-[0-9]{2}T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]Z$"
+    r"^20[0-9]{2}-[0-9]{2}-[0-9]{2}T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]Z$"
 )
 EARLIEST_OBSERVATION = dt.datetime(2026, 8, 30, tzinfo=dt.timezone.utc)
 TOOLCHAIN = re.compile(
-    r"^rustc 1\.95\.0 \([0-9a-f]{9} 2026-[0-9]{2}-[0-9]{2}\)(?: \(Homebrew\))?$"
+    r"^rustc 1\.95\.0 \([0-9a-f]{9} 20[0-9]{2}-[0-9]{2}-[0-9]{2}\)(?: \(Homebrew\))?$"
 )
 PROTOCOL = "/prometheus/threat-hint/2.0.0"
 IPV4_LITERAL = re.compile(r"(?<![0-9])(?:[0-9]{1,3}\.){3}[0-9]{1,3}(?![0-9])")
@@ -255,7 +255,7 @@ def load_and_verify(path: Path) -> None:
         data = json.loads(
             path.read_text(encoding="utf-8"), object_pairs_hook=_reject_duplicate_keys
         )
-    except (OSError, json.JSONDecodeError) as error:
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as error:
         raise EvidenceError("evidence file is missing or invalid") from error
     verify_evidence(_require_object(data, "evidence"))
 

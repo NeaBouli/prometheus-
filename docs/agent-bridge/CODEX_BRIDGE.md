@@ -5909,11 +5909,10 @@ No direct `main` push or production action occurred.
   status update after its normal protected merge.
 - **Status:** `GH-234 Complete / Product and public exact-main PASS / Production false`.
 
-## 2026-08-30 - GH-238 controlled distinct-host ThreatHint-v2 evidence start
+## 2026-08-29 - GH-238 controlled distinct-host ThreatHint-v2 evidence start
 
 - Issue #238 and branch `feat/GH-238-v2-multihost-evidence` start from clean
-  exact main `efe6e9586655924a49404dbebbcd7a08d0806d2c` in isolated worktree
-  `/Users/gio/Desktop/repos/prometheus-gh238-v2-multihost`.
+  exact main `efe6e9586655924a49404dbebbcd7a08d0806d2c` in an isolated worktree.
 - Build scope: a v2-specific, challenge-bound sender/Guardian execution
   attestation; deterministic redacted record builder; strict public verifier;
   adversarial/CLI tests; operator runbook; CI and bounded status updates.
@@ -5929,7 +5928,7 @@ No direct `main` push or production action occurred.
   Mainnet and production. Host separation remains operator-attested only.
 - **Status:** `GH-238 In Progress / Repository only / External run false / Production false`.
 
-## 2026-08-30 - GH-238 full local verification before protected delivery
+## 2026-08-29 - GH-238 full local verification before protected delivery
 
 - Kimi K3 delivered the secret-free repository tooling and supplied an
   independent security review. Sol reviewed every write diff and fixed the
@@ -5955,7 +5954,7 @@ No direct `main` push or production action occurred.
   production action was performed.
 - **Status:** `GH-238 Full local PASS / Protected PR pending / External run false / Production false`.
 
-## 2026-08-30 - GH-238 review corrections closed
+## 2026-08-29 - GH-238 review corrections closed
 
 - Kimi's independent full-diff review found one P2 runbook omission: the later
   authorized run lacked explicit private distribution and cleanup of the single
@@ -5977,3 +5976,33 @@ No direct `main` push or production action occurred.
 - No GH-238 record was created and no host/network/firewall/IAM, wallet, chain,
   deployment, Mainnet or production action occurred.
 - **Status:** `GH-238 Kimi APPROVE / Full local PASS / Protected PR pending / External run false / Production false`.
+
+## 2026-08-29 - GH-238 protected PR #239 review handoff
+
+- Source commit `c892f99` passed all ten technical GitHub contexts; CodeRabbit
+  completed with five actionable comments. The review corrections remove the
+  machine-local path, make the shared challenge path host-local, update the
+  live PR status, accept future strict UTC/toolchain dates while retaining the
+  earliest observation and rustc-version gates, and catch non-UTF-8 evidence
+  without path-bearing traceback output.
+- Public status entries use the GitHub publication date `2026-08-29`. This does
+  not change the later real-run lower boundary of `2026-08-30T00:00:00Z`.
+- No remote run, record, infrastructure, wallet, chain, deployment, Mainnet or
+  production action occurred.
+- **Status:** `GH-238 PR #239 review corrections in progress / Production false`.
+
+## 2026-08-29 - GH-238 PR #239 corrections local gate
+
+- The five actionable protected-review findings are fixed: actual publication
+  date, public-path privacy, host-local challenge directories, current PR status,
+  future strict timestamp/toolchain syntax and non-UTF-8 fail-closed diagnostics.
+- One intermediate 134-test run failed only because the old test expected the
+  newly year-neutral parser to reject a valid 2025 syntax at argparse. The test
+  now verifies the intended separate earliest-observation failure and fixed
+  diagnostic. Final combined result: 134 tests OK.
+- PASS: 13-surface claims, Memory/status/hygiene, Ruff, mypy, compile, CI YAML
+  and diff hygiene. Full Rust and browser gates remain applicable; no Rust or
+  page-layout code changed in this correction.
+- No remote execution, evidence record, infrastructure, wallet, chain,
+  deployment, Mainnet or production action occurred.
+- **Status:** `GH-238 PR #239 review corrections local PASS / Protected rerun next / Production false`.

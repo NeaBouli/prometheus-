@@ -862,12 +862,15 @@ class BuildRecordTests(EvidenceTestCase):
         for observed_at in (
             "2026-08-30 12:34:56Z",
             "2026-08-30T12:34:56+00:00",
-            "2025-08-30T12:34:56Z",
         ):
             with self.subTest(observed_at=observed_at):
                 result = self.run_attest(observed_at_utc=observed_at)
                 self.assertEqual(result.returncode, 2)
                 self.assertEqual(result.stdout, b"")
+        before_boundary = self.run_attest(observed_at_utc="2025-08-30T12:34:56Z")
+        self.assertEqual(before_boundary.returncode, 1)
+        self.assertEqual(before_boundary.stdout, b"")
+        self.assertEqual(before_boundary.stderr, b"gh238-evidence: timestamp\n")
         result = self.run_build_record(
             sender_path,
             guardian_path,
@@ -876,6 +879,10 @@ class BuildRecordTests(EvidenceTestCase):
         )
         self.assertEqual(result.returncode, 2)
         self.assertEqual(result.stdout, b"")
+        MODULE.validate_observation("2027-01-02T03:04:05Z")
+        self.assertIsNotNone(
+            MODULE.TOOLCHAIN.fullmatch("rustc 1.95.0 (59807616e 2027-04-14)")
+        )
 
     def test_cli_offers_no_option_to_promote_delivery_or_safety(self):
         sender_path, guardian_path, output = self.build_record_paths()

@@ -53,11 +53,11 @@ CHALLENGE_TOKEN = "GH238_CHALLENGE_CREATED"
 RECORD_TOKEN = "GH238_RECORD_WRITTEN"
 DIAGNOSTIC_PREFIX = "gh238-evidence"
 UTC_TIMESTAMP = re.compile(
-    r"2026-[0-9]{2}-[0-9]{2}T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]Z"
+    r"20[0-9]{2}-[0-9]{2}-[0-9]{2}T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]Z"
 )
 EARLIEST_OBSERVATION = dt.datetime(2026, 8, 30, tzinfo=dt.timezone.utc)
 TOOLCHAIN = re.compile(
-    r"rustc 1\.95\.0 \([0-9a-f]{9} 2026-[0-9]{2}-[0-9]{2}\)(?: \(Homebrew\))?"
+    r"rustc 1\.95\.0 \([0-9a-f]{9} 20[0-9]{2}-[0-9]{2}-[0-9]{2}\)(?: \(Homebrew\))?"
 )
 ATTESTATION_KEYS = {
     "role",

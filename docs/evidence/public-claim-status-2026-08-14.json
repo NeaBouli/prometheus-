@@ -40,7 +40,7 @@
       "production_authority": false
     },
     "gh_238": {
-      "as_of": "2026-08-30",
+      "as_of": "2026-08-29",
       "issue": 238,
       "status": "repository_preparation_implemented_and_locally_tested",
       "classification": "development_testnet10_repository_only",

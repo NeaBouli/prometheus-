@@ -1832,13 +1832,14 @@ Remaining gates: public or multi-host v2 operation, production proof/approval
 Estimates: unchanged; core 84-88%; complete vision 50-55%; production false
 ```
 
-## GH-238 CONTROLLED DISTINCT-HOST THREATHINT-V2 PREPARATION (2026-08-30)
+## GH-238 CONTROLLED DISTINCT-HOST THREATHINT-V2 PREPARATION (2026-08-29)
 
 ```text
 Status: In progress / repository preparation implemented and locally tested /
         production false
-Branch: current feature branch only; not merged, not exact-main, not deployed,
-        not demonstrated, not complete; no commit/PR/run IDs exist yet
+Branch: PR #239 exists on the current feature branch; it is not merged,
+        exact-main, deployed, demonstrated or complete; no merge, exact-main,
+        deployment or remote-run IDs exist yet
 Capability: repository-only preparation for one later controlled distinct-host
             Development/Testnet-10 ThreatHint-v2 attempt
 Tooling: challenge-bound role-specific operator attestations over source

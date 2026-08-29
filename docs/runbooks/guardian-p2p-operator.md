@@ -321,10 +321,10 @@ python3 scripts/gh238_v2_execution_evidence.py create-challenge \
    token `GH238_CHALLENGE_CREATED`. Keep the 32-byte file owner-only `0600`;
    it is never committed or sent over a public channel. Through a separately
    authorized private operator channel, copy these exact challenge bytes once
-   to the same owner-only path in a canonical `0700` directory on the second
-   host, export the same `GH238_ATTESTATION_DIR` value there, and set the copied
-   file to owner-only `0600`. Never create a second challenge: both
-   attestations must bind the identical challenge digest.
+   into a host-local `GH238_ATTESTATION_DIR` under a canonical owner-only `0700`
+   directory on the second host and set the copied file to owner-only `0600`.
+   The literal directory path may differ between hosts; only the challenge bytes
+   and resulting digest must match. Never create a second challenge.
 
 2. Only after the separate host and firewall authorization exists, start the
    Guardian with the controlled configuration documented below and wait for
