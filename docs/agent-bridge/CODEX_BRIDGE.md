@@ -5892,3 +5892,19 @@ No direct `main` push or production action occurred.
   change. No product, wallet, chain, deployment, Mainnet or production action
   occurred.
 - **Status:** `GH-234 Documentation closeout local PASS / Protected PR next / Production false`.
+
+## 2026-08-29 - GH-234 final handoff
+
+- Documentation PR #236 passed all ten protected contexts and merged normally
+  as exact documentation main `69b64e4207b077457560359f691221f6a8c2415f`.
+- Its exact-main Prometheus CI `33273294417`, Security Audit `33273294441`, and
+  Pages `33273294070` pass.
+- Cache-busted live readback verifies index, Roadmap, Whitepaper, FAQ,
+  `llms.txt`, and raw-main README all expose product main `f146fb2` and runs
+  `33272578070`/`33272577951`/`33272577407` with the Development/Testnet-10,
+  same-host-only and production-false boundary intact.
+- Primary repository and unrelated worktrees remain untouched. This final
+  Bridge-only publication changes no architecture, runtime, wallet, chain,
+  deployment, Mainnet or production state and needs no recursive GH-234
+  status update after its normal protected merge.
+- **Status:** `GH-234 Complete / Product and public exact-main PASS / Production false`.
