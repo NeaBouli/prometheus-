@@ -4917,6 +4917,7 @@ Rules for all dev agents:
   `llms.txt`, and raw-main README; each exposes product main `912d96d` and the
   product CI/Security/Pages evidence without claiming a real GH-238 remote run
   or evidence record.
-- This Bridge-only final handoff changes no public claim or runtime behavior and
+- This Bridge-only final handoff updates public status documentation but changes
+  no product capability claim, runtime behavior or production authority and
   requires no successor GH-238 status patch after normal publication.
 - Status: `GH-238 Complete / Product and public exact-main PASS / Real remote evidence open / Production false`.
