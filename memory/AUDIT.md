@@ -2669,3 +2669,26 @@ changed.
   Development/Testnet-10 repository behavior. Public/multi-host v2 operation,
   proof/approval authority, deployment, Mainnet and production remain false.
 - Result: `PASS / GH-234 repository delivery complete / Production false`.
+
+## 2026-08-30 - GH-238 repository-preparation status synchronization audit
+
+- GH-238 on the current feature branch implements and locally tests
+  repository-only preparation for one later controlled distinct-host
+  Development/Testnet-10 ThreatHint-v2 attempt. The tooling uses
+  challenge-bound role-specific operator attestations over the source commit,
+  actual executable digest, exact canonical payload digest, exact v2 protocol,
+  shared observed UTC time, actual rejected status, one attempt, zero retries
+  and no persistence, with strict owner-only/no-symlink files, the exact
+  9,265-byte Rust wire bound, atomic no-clobber record output, a closed
+  redacted verifier and CI tests.
+- Bounded local documentation synchronization states the same facts across
+  README, whitepaper, roadmap, FAQ, llms.txt, client README and memory status
+  surfaces; the public claim-consistency gate now requires the concise GH-238
+  marker and its non-operation caveat on each canonical public surface.
+- No real GH-238 remote run has occurred and no GH-238 evidence record exists;
+  host separation is not independently proven. GH-238 is not merged,
+  exact-main, deployed, demonstrated or complete; no commit/PR/run IDs are
+  claimed. GH-229 and GH-234 claims are unchanged. No port, firewall, host,
+  IAM, wallet, chain, deployment, Mainnet or production action or authority is
+  added; a later real run requires separate explicit authorization.
+- Result: `Local PASS / GH-238 repository preparation implemented and locally tested / Real remote evidence open / Production false`.

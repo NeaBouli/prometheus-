@@ -1,4 +1,4 @@
-# Guardian P2P Operator Runbook (GH-48 + GH-52 + GH-229)
+# Guardian P2P Operator Runbook (GH-48 + GH-52 + GH-229 + GH-238)
 
 ## Purpose
 
@@ -281,6 +281,167 @@ fixed order above. The `0x00` terminator separates the domain string and the
 `0x01` byte versions the framing. Because the role is inside the frame, the
 sender and guardian attestations over otherwise identical inputs always
 differ, which the evidence verifier requires.
+
+### Controlled Light Client ThreatHint-v2 repository preparation (GH-238)
+
+**Repository-preparation only.** This section prepares the GH-238 evidence
+tooling for one Development/Testnet-10 Light Client sender and one directly
+reachable Guardian host speaking the exact Guardian v2 protocol
+`/prometheus/threat-hint/2.0.0` over one static controlled remote QUIC-v1
+transport peer. **No real v2 two-host run has been executed by this task.**
+Executing the run requires a separate, explicit firewall and host
+authorization; until that authorization exists, do not open ports, create
+tunnels, or run these steps against any remote host. Everything below that
+touches only local files is preparation, not evidence of delivery.
+
+The GH-238 tool mirrors the GH-229 fail-closed owner-only, no-symlink,
+regular-file discipline and adds three differences: `attest` derives every
+digest from actual files (there is no caller-supplied payload digest), the
+artifact must be a trusted non-group/world-writable regular **executable**,
+and the frame additionally binds the exact v2 protocol string. A new
+`build-record` subcommand constructs the redacted public record
+deterministically. Both roles must explicitly attest the same observed UTC
+time, actual non-authorizing `rejected` outcome, exactly one attempt, zero
+retries and no persistence; the builder copies those bound observations and
+fails closed on every mismatch or other outcome. No CLI option can promote the
+public record. Host separation remains operator-attested only and is never
+independently proven by the record.
+
+1. Create the execution challenge once, on one operator-controlled host, in a
+   dedicated canonical owner-only `0700` directory:
+
+```bash
+export GH238_ATTESTATION_DIR="${XDG_RUNTIME_DIR:-$HOME/.local/state}/prometheus-gh238-attestation"
+install -d -m 0700 "$GH238_ATTESTATION_DIR"
+python3 scripts/gh238_v2_execution_evidence.py create-challenge \
+  --output "$GH238_ATTESTATION_DIR/challenge.bin"
+```
+
+   The command refuses symlinked or existing paths and emits only the fixed
+   token `GH238_CHALLENGE_CREATED`. Keep the 32-byte file owner-only `0600`;
+   it is never committed or sent over a public channel. Through a separately
+   authorized private operator channel, copy these exact challenge bytes once
+   to the same owner-only path in a canonical `0700` directory on the second
+   host, export the same `GH238_ATTESTATION_DIR` value there, and set the copied
+   file to owner-only `0600`. Never create a second challenge: both
+   attestations must bind the identical challenge digest.
+
+2. Only after the separate host and firewall authorization exists, start the
+   Guardian with the controlled configuration documented below and wait for
+   listener readiness. Run the sender's offline preflight first; it must pass
+   without identity creation or network activity. Then run exactly one submit
+   command and capture its data-minimal JSON privately:
+
+```bash
+prometheus-client threat-hint-v2 preflight \
+  --config /path/to/owner-only-controlled-remote-testnet10.toml \
+  --payload /path/to/owner-only-canonical-v2-payload
+
+prometheus-client threat-hint-v2 submit \
+  --config /path/to/owner-only-controlled-remote-testnet10.toml \
+  --payload /path/to/owner-only-canonical-v2-payload
+```
+
+   Do not retry. In the Guardian's private operator stream, require exactly one
+   matching `inbound-threat-hint-v2-processed` event. Continue only when the
+   sender status and Guardian status are both exactly `rejected`; `accepted`,
+   `busy`, `transport-failure`, a missing/duplicate receipt or any retry aborts
+   evidence construction. Keep raw logs private because they may contain peer
+   or network identifiers. Stop the temporary listener and remove any
+   separately authorized temporary network rule immediately after the one
+   attempt.
+
+3. Record one shared strict UTC observation time immediately after reviewing
+   those two private outcomes. On each real host, run `attest` against that
+   host's actual executable binary and the exact canonical v2 payload file,
+   both owner-only and symlink-free. The flags are explicit operator assertions
+   about the just-reviewed attempt, not independent measurement:
+
+```bash
+python3 scripts/gh238_v2_execution_evidence.py attest \
+  --challenge "$GH238_ATTESTATION_DIR/challenge.bin" \
+  --role sender \
+  --source-commit '<exact-40-lowercase-hex-source-commit>' \
+  --artifact /path/to/actual-executable-binary \
+  --payload /path/to/owner-only-canonical-v2-payload \
+  --observed-at-utc '<shared-strict-UTC-observation-timestamp>' \
+  --observed-status rejected \
+  --one-shot \
+  --no-persistence
+```
+
+   Each run emits one strict compact JSON line containing only `role`,
+   `source_commit`, `challenge_sha256`, `artifact_sha256`, `payload_sha256`,
+   `protocol`, `observed_at_utc`, `observed_status`, `attempts`, `retries`,
+   `persisted`, and `execution_attestation_sha256` — no paths and no raw data.
+   Use role `guardian` on the Guardian host. Store each line as an owner-only
+   `0600` file. These are operator attestations, not independent host proof.
+
+4. Build the redacted public record from the two owner-only attestation
+   files. The builder requires the same challenge, source commit, payload
+   digest, protocol, observed UTC time, rejected outcome, attempt count, retry
+   count and persistence result on both sides, distinct roles, distinct
+   artifact/attestation digests, and the pinned `rustc 1.95.0` toolchain:
+
+```bash
+python3 scripts/gh238_v2_execution_evidence.py build-record \
+  --sender-attestation "$GH238_ATTESTATION_DIR/sender.json" \
+  --guardian-attestation "$GH238_ATTESTATION_DIR/guardian.json" \
+  --toolchain '<pinned-rustc-1.95.0-toolchain-string>' \
+  --output "$GH238_ATTESTATION_DIR/record.json"
+```
+
+   The record is written atomically to a new owner-only `0600` file under an
+   owner-only `0700` parent, refusing any existing output. Its delivery
+   outcome comes from the two matching attestations and remains
+   `rejected`/`rejected` with one attempt, ack authority `none`, zero retries
+   and `persisted: false`; every safety flag is fixed `false`,
+   including `independent_host_proof`, `public_networking`,
+   `proof_validity`, `approval_membership_or_privacy_authority`,
+   `deployment`, `mainnet` and `production`.
+
+5. Before any commit, gate the record with the public verifier, which
+   recursively rejects unknown fields, arrays, network identifiers, paths,
+   key/secret/wallet/chain material and any authorizing claim:
+
+```bash
+python3 scripts/verify_gh238_v2_multihost_evidence.py \
+  --evidence "$GH238_ATTESTATION_DIR/record.json"
+```
+
+   A record is only committed as a dated file under `docs/evidence/` after a
+   separately authorized real run has completed. No GH-238 record exists in
+   the repository yet. After successful construction and verification, or on
+   any abort, remove the private challenge file from both hosts. The redacted
+   record and any separately retained private attestations remain subject to
+   the operator's authorized retention policy.
+
+#### Execution attestation formula (GH-238)
+
+`attest` computes one deterministic domain-separated digest over versioned
+canonical binary framing:
+
+```text
+execution_attestation_sha256 = SHA-256(frame)
+
+frame = "prometheus-gh238-v2-execution-attestation" || 0x00 || 0x01 ||
+        u8(n)  || role           ||   # ASCII "sender" (n=6) or "guardian" (n=8)
+        u8(32) || challenge      ||   # raw 32 challenge bytes
+        u8(20) || source_commit  ||   # raw 20 bytes from 40 lowercase hex
+        u8(32) || artifact_hash  ||   # raw SHA-256 of the actual executable bytes
+        u8(32) || payload_hash   ||   # raw SHA-256 of the actual v2 payload file
+        u8(29) || protocol       ||   # ASCII "/prometheus/threat-hint/2.0.0"
+        u8(20) || observed_at    ||   # strict UTC timestamp
+        u8(8)  || status         ||   # ASCII "rejected"
+        u8(1)  || attempts       ||   # ASCII "1"
+        u8(1)  || retries        ||   # ASCII "0"
+        u8(5)  || persisted           # ASCII "false"
+```
+
+`u8(n)` is one unsigned length byte; every other field is raw bytes in the
+fixed order above. Role, protocol and observed non-authorizing outcome are
+inside the frame, so sender and Guardian attestations always differ and cannot
+be rebound to another protocol, time or outcome.
 
 6) Start processes
 

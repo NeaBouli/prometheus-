@@ -36,6 +36,10 @@ jobs:
           python3 -m unittest scripts.test_gh229_execution_attestation
           python3 scripts/verify_gh229_multihost_evidence.py \
             --evidence docs/evidence/gh-229-controlled-two-host-2026-08-27.json
+      - name: Test GH-238 v2 Public Record Schema/Redaction Safety Gates
+        run: |
+          python3 -m unittest scripts.test_gh238_v2_execution_evidence
+          python3 -m unittest scripts.test_gh238_v2_multihost_evidence
 
   # ─── Silverscript Contract Lint ─────────────────────────────────────────────
   contract-check:

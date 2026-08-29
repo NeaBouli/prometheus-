@@ -10,8 +10,15 @@ Startpunkt fuer Codex/Claude Code:
 
 Keine Secrets, Tokens, Passwoerter, privaten Keys oder Wallet-Daten in diese Bridge schreiben.
 
-Abgeschlossener Handover: GH-234/PR #235, code commit `b450740`, exact main
-`f146fb2`, ergaenzt den
+Aktiver Handover: GH-238 bereitet repository-only eine kontrollierte
+distinct-host ThreatHint-v2-Evidenzgrenze vor: challenge-gebundene
+Sender-/Guardian-Attestationen, deterministischer redigierter Builder,
+fail-closed Verifier, adversariale Tests, Runbook und CI. Ein realer Remote-Run,
+Host-/Firewall-/IAM-Aktionen, Wallet, Chain, Mainnet und Produktion sind nicht
+Teil dieses Blocks.
+
+Abgeschlossener Produkt-Handover: GH-234/PR #235, code commit `b450740`, exact
+main `f146fb2`, ergaenzt den
 Development-/Testnet-10-only Light Client um einen separaten one-shot
 ThreatHint-v2-Sender fuer ein owner-prepared canonical shared payload. Lokale
 Unit- und reale same-host Binary-/QUIC-Tests pruefen strict private inputs,

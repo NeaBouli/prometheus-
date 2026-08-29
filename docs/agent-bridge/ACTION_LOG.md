@@ -4776,3 +4776,61 @@ Rules for all dev agents:
   it changes no product claim or runtime behavior and requires no successor
   GH-234 status patch after normal publication.
 - Status: `GH-234 Complete / Product and public exact-main PASS / Production false`.
+
+## 2026-08-30 - GH-238 controlled two-host v2 evidence preparation opened
+
+- Created issue #238 and isolated branch
+  `feat/GH-238-v2-multihost-evidence` from exact clean main `efe6e95`.
+- Repository-only scope: v2-specific execution challenge/attestation, strict
+  redacted evidence builder/verifier, adversarial tests, runbook and CI.
+- No host access, real network attempt, network identifiers, firewall/IAM,
+  wallet, signing, chain, deployment, Mainnet or production action is allowed.
+- Kimi K3 owns the bounded primary implementation block; Claude Code receives
+  one small read-only CLI/schema audit. Sol retains architecture, security,
+  integration, complete verification and protected delivery.
+- Status: `GH-238 In progress / Repository only / External run false / Production false`.
+
+## 2026-08-30 - GH-238 repository preparation pre-PR gate passed
+
+- Kimi K3 implemented the bounded challenge/attestation, redacted record and
+  verifier block and then independently reviewed the security boundary. Sol
+  integrated and hardened outcome/time/one-shot/no-persistence binding, exact
+  cross-language wire sizing, duplicate-key rejection, concurrent-mutation
+  checks, durable no-clobber publication and the operator procedure.
+- Claude Code was invoked for the small read-only helper audit but stopped at
+  its configured budget before reading or changing repository files.
+- PASS: 72 focused GH-238 tests; 134 combined GH-238/GH-229/v1/claim tests;
+  public claims across 13 surfaces; Memory and project-status consistency;
+  committed GH-229 evidence verification; Python compile, Ruff check/format,
+  mypy, workflow YAML and diff hygiene.
+- PASS: complete `cargo test --workspace`; workspace clippy with all targets,
+  all features and warnings denied; complete rustfmt check.
+- Local browser verification at 1440x900 and 390x844 found no page-level
+  horizontal overflow on Roadmap, Whitepaper or FAQ. The GH-238 Roadmap item
+  remains inside the mobile content bounds; the hardware table keeps its
+  intentional scroll container.
+- No real GH-238 remote run or evidence record exists. No host, firewall/IAM,
+  wallet, signing, chain, deployment, Mainnet or production action occurred.
+- Status: `GH-238 Full local PASS / Final Kimi review and protected PR next / External run false / Production false`.
+
+## 2026-08-30 - GH-238 independent review approved
+
+- Kimi's first complete read-only review returned `REQUEST_CHANGES` for one P2:
+  the later-run procedure created the challenge on one host but did not state
+  its private byte-identical transfer to the second host or removal afterward.
+- Sol fixed the full lifecycle, made sender preflight mandatory before the one
+  submit, replaced the root-oriented runtime path with a portable owner-local
+  directory, and separated actual `direct-quic-v1` transport from the exact
+  ThreatHint-v2 protocol in builder, verifier, tests, runbook and machine status.
+  Claim-test typing is now mypy-clean.
+- Kimi's focused second read-only review returned `APPROVE`: no P0-P2. Its last
+  P3 about missing machine-status transport pin was then removed by adding and
+  drift-testing `transport: direct-quic-v1` separately from the v2 protocol.
+- Final PASS after all corrections: 134 combined tests; 13-surface public claim
+  gate; Memory/status/hygiene suites; Ruff check/format; mypy; Python compile;
+  workflow YAML; GH-229 committed-record regression; diff hygiene and
+  data-minimal diff secret scan. Earlier complete workspace tests, all-target/
+  all-feature clippy with warnings denied, rustfmt and browser layout checks
+  remain valid because no Rust or public-page layout code changed afterward.
+- No real GH-238 remote run, evidence record or external action occurred.
+- Status: `GH-238 Reviewed APPROVE / Full local PASS / Protected PR next / External run false / Production false`.

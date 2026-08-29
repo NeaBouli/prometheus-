@@ -8,6 +8,7 @@ import importlib.util
 import json
 import unittest
 from pathlib import Path
+from typing import Any
 
 SCRIPT = Path(__file__).with_name("verify_public_claim_consistency.py")
 SPEC = importlib.util.spec_from_file_location("claim_consistency", SCRIPT)
@@ -17,6 +18,8 @@ SPEC.loader.exec_module(MODULE)
 
 
 class PublicClaimConsistencyTests(unittest.TestCase):
+    status: dict[str, Any]
+
     @classmethod
     def setUpClass(cls) -> None:
         status_path = SCRIPT.parents[1] / MODULE.STATUS_PATH
@@ -48,9 +51,9 @@ class PublicClaimConsistencyTests(unittest.TestCase):
 
     def test_phi3_stub_authority_is_rejected(self) -> None:
         changed = copy.deepcopy(self.status)
-        changed["classifications"]["light_client"][
-            "phi3_stub_authority"
-        ] = "heuristic_quarantine"
+        changed["classifications"]["light_client"]["phi3_stub_authority"] = (
+            "heuristic_quarantine"
+        )
         self.assertTrue(
             any("Phi-3 stub" in error for error in MODULE.validate_status(changed))
         )
@@ -73,7 +76,10 @@ class PublicClaimConsistencyTests(unittest.TestCase):
         changed = copy.deepcopy(self.status)
         changed["post_audit_updates"]["gh_234"]["public_or_multihost_v2"] = True
         self.assertTrue(
-            any("public or multi-host" in error for error in MODULE.validate_status(changed))
+            any(
+                "public or multi-host" in error
+                for error in MODULE.validate_status(changed)
+            )
         )
 
     def test_missing_gh_234_post_audit_record_is_rejected(self) -> None:
@@ -96,6 +102,44 @@ class PublicClaimConsistencyTests(unittest.TestCase):
         self.assertTrue(
             any("merge commit" in error for error in MODULE.validate_status(changed))
         )
+
+    def test_gh_238_remote_or_authorizing_scope_drift_is_rejected(self) -> None:
+        for field in (
+            "remote_run",
+            "evidence_record",
+            "independent_host_proof",
+            "network_or_infrastructure_action",
+            "production_authority",
+        ):
+            with self.subTest(field=field):
+                changed = copy.deepcopy(self.status)
+                changed["post_audit_updates"]["gh_238"][field] = True
+                self.assertTrue(
+                    any(
+                        f"GH-238 {field}" in error
+                        for error in MODULE.validate_status(changed)
+                    )
+                )
+        for field, value in (
+            ("transport", "direct-quic-v2"),
+            ("protocol", "/prometheus/threat-hint/3.0.0"),
+        ):
+            with self.subTest(field=field):
+                changed = copy.deepcopy(self.status)
+                changed["post_audit_updates"]["gh_238"][field] = value
+                self.assertTrue(
+                    any(
+                        "GH-238 must remain repository-only" in error
+                        for error in MODULE.validate_status(changed)
+                    )
+                )
+
+    def test_missing_gh_238_status_is_rejected(self) -> None:
+        changed = copy.deepcopy(self.status)
+        del changed["post_audit_updates"]["gh_238"]
+        errors = MODULE.validate_status(changed)
+        self.assertTrue(any("GH-238 machine status" in error for error in errors))
+        self.assertTrue(any("GH-238 remote_run" in error for error in errors))
 
     def test_banned_claims_return_categories_only(self) -> None:
         self.assertEqual(

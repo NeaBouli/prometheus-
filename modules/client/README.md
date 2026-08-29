@@ -131,6 +131,20 @@ a production malware detector or reporting client.
   same-host binary/QUIC tests cover accepted/rejected/busy/transport-failure
   with exact bytes, one attempt, and redacted output. This grants no public or
   multi-host operation, wallet, chain, deployment, or production authority.
+- GH-238 implements and locally tests repository-only preparation for one
+  later controlled distinct-host
+  Development/Testnet-10 ThreatHint-v2 attempt. The tooling uses
+  challenge-bound, role-specific operator attestations over the source commit,
+  the actual executable digest, the exact canonical payload digest, the exact
+  v2 protocol, one shared observed UTC time, the actual rejected status, one
+  attempt, zero retries and no persistence, with strict owner-only/no-symlink
+  files, the exact 9,265-byte Rust wire bound, atomic no-clobber record output,
+  a closed redacted verifier and CI test wiring.
+  No real GH-238 remote run has occurred and no GH-238 evidence record exists;
+  host separation is not independently proven. This repository preparation is
+  not a deployment or remote demonstration and adds no port, firewall, host,
+  IAM, wallet, chain, deployment, Mainnet or production action or authority; a
+  later real run requires separate explicit authorization.
 - `blockchain/rule_ingest.rs` ingests a complete caller-supplied active-rule
   snapshot whose raw CIDv1 (sha2-256, canonical lowercase base32) must bind the
   exact caller-supplied content bytes. It parses a strict simple matcher
