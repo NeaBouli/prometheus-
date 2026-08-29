@@ -4905,3 +4905,18 @@ Rules for all dev agents:
 - No direct-main push, admin bypass, live readback, remote run, evidence record
   or production action occurred.
 - Status: `PR #240 protected checks/review pending / Production false`.
+
+## 2026-08-29 - GH-238 product and public closeout complete
+
+- Documentation PR #240 passed all eleven contexts with zero review threads and
+  squash-merged normally as exact documentation main `3f607ad`.
+- Exact-main CI `33280802027`, Security Audit `33280802098`, and Pages
+  `33280801126` pass on full SHA
+  `3f607adef72260463229013271abcd9c72e0fc8c`.
+- Cache-busted live readback passed for Pages Roadmap, Whitepaper, FAQ,
+  `llms.txt`, and raw-main README; each exposes product main `912d96d` and the
+  product CI/Security/Pages evidence without claiming a real GH-238 remote run
+  or evidence record.
+- This Bridge-only final handoff changes no public claim or runtime behavior and
+  requires no successor GH-238 status patch after normal publication.
+- Status: `GH-238 Complete / Product and public exact-main PASS / Real remote evidence open / Production false`.
