@@ -5817,3 +5817,31 @@ No direct `main` push or production action occurred.
 - Claims remain Development/Testnet-10 repository evidence only. Public or
   multi-host v2 operation and every production authority remain false/open.
 - **Status:** `Docs/status synchronized locally / Documentation commit next / Production false`.
+
+## 2026-08-29 - GH-234 full local verification and independent review
+
+- Kimi K3 completed a read-only review of commits `b450740` and `824a81b` and
+  returned `APPROVE`: no P0, P1 or P2 findings. It independently reran p2p unit
+  20/20, v2 binary 3/3, v1 binary 3/3, client clippy, fmt, claim consistency,
+  HTML/YAML/Python and diff checks. It changed no tracked file.
+- Sol accepted and fixed Kimis cosmetic P3: the open PR's Pages row now uses
+  the active badge style while retaining the visible `Tested locally` label.
+  Kimis optional network-mismatch test note requires no patch: the shared
+  invalid vector is a Testnet-10 wire made invalid by a separately supplied
+  Mainnet trust anchor; the dependency corpus and client helper already test
+  that trust-anchor mismatch, while production remains hard-pinned to
+  `testnet-10`.
+- `cargo fmt --all --check` and
+  `cargo clippy --workspace --all-targets -- -D warnings` PASS.
+- The first workspace test attempt ran concurrently with Kimi and triggered the
+  existing scanner timing gate at 7.74s; isolated repetition passed at 2.20s.
+  A later workspace attempt reached an existing sidecar shutdown test 8ms past
+  its 10s deadline; isolated repetition passed in 3.42s.
+- Final uncontended `cargo test --workspace` PASS, including v2/v1 client
+  loopback, all 76 Guardian unit tests, all five sidecar process tests, all
+  proof/validator/deployer suites and doc tests. The timing observations did
+  not reproduce in the final complete run.
+- Remaining: commit/push this review closeout, mark PR #235 ready, protected
+  CI/Security/Pages and review, normal merge, exact-main readback and issue
+  closeout. Public/multi-host v2 and production remain false.
+- **Status:** `GH-234 Full local PASS / Kimi APPROVE / Protected PR next / Production false`.

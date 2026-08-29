@@ -4708,3 +4708,16 @@ Rules for all dev agents:
 - PASS: 13-surface claim check; claim tests 10/10; hygiene tests 11/11; Memory,
   project status, HTML, workflow YAML, Python compile and diff hygiene.
 - Status: `Public status synchronized locally / Commit next / Production false`.
+
+## 2026-08-29 - GH-234 full local gate complete
+
+- Kimi final read-only review: `APPROVE`; no P0/P1/P2. Cosmetic open-PR badge
+  styling corrected; its optional network-vector note is already covered by
+  shared corpus and helper trust-anchor mismatch tests.
+- PASS: workspace clippy with warnings denied and final uncontended
+  `cargo test --workspace`, including all client/Guardian/process/proof/
+  validator/deployer/doc tests.
+- Two existing timing gates failed only in earlier loaded runs and passed both
+  isolated repetition and the final complete workspace run: scanner 2.20s
+  against 5s; broken-stdout sidecar 3.42s against 10s.
+- Status: `Full local PASS / Kimi APPROVE / PR #235 ready next / Production false`.
