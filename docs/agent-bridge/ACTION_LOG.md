@@ -4762,3 +4762,17 @@ Rules for all dev agents:
   hygiene, workflow YAML, five HTML pages, Python compile, rustfmt and diff.
 - Claude Code remained budget-blocked and read or changed no file.
 - Status: `GH-234 Docs closeout local PASS / Protected PR next / Production false`.
+
+## 2026-08-29 - GH-234 public closeout complete
+
+- Documentation PR #236 passed all ten protected contexts and squash-merged
+  normally as exact documentation main `69b64e4`.
+- Exact-main CI `33273294417`, Security Audit `33273294441`, and Pages
+  `33273294070` pass.
+- Cache-busted live readback passed for Pages index, Roadmap, Whitepaper, FAQ,
+  `llms.txt`, and raw-main README; each carries product main `f146fb2` and the
+  product exact-main CI/Security/Pages evidence.
+- This final handoff records the completed GH-234 product and public closeout;
+  it changes no product claim or runtime behavior and requires no successor
+  GH-234 status patch after normal publication.
+- Status: `GH-234 Complete / Product and public exact-main PASS / Production false`.
