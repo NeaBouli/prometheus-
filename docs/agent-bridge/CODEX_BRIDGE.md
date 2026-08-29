@@ -5861,3 +5861,34 @@ No direct `main` push or production action occurred.
 - Next gates remain commit/push, corrected-head protected checks and review,
   normal merge, exact-main CI/Security/Pages and public readback.
 - **Status:** `GH-234 Review corrections local PASS / Merge pending / Production false`.
+
+## 2026-08-29 - GH-234 normal merge and exact-main verification
+
+- Review correction commit `4222fa8` passed ten protected contexts on PR #235;
+  both CodeRabbit provenance threads were resolved without product-code change.
+- PR #235 squash-merged normally as exact main
+  `f146fb2cef3adca4a8b7e861aa47cab506a56bed`; issue #234 closed.
+- Exact-main Prometheus CI `33272578070`, Security Audit `33272577951`, and
+  Pages `33272577407` pass. The primary repository worktree remained untouched.
+- This closeout synchronizes every public and machine-readable GH-234 status
+  with exact-main evidence. The delivered boundary remains Development/
+  Testnet-10-only same-host repository evidence; public/multi-host v2,
+  proof/approval authority, deployment, Mainnet and production remain false.
+- **Status:** `GH-234 Repository delivery complete / Exact-main PASS / Production false`.
+
+## 2026-08-29 - GH-234 public closeout local final gate
+
+- README, Whitepaper, Roadmap, FAQ, Pages HTML, `llms.txt`, client README,
+  machine status, claim audit, Memory and Bridge now consistently cite exact
+  product main `f146fb2` and CI/Security/Pages runs
+  `33272578070`/`33272577951`/`33272577407`.
+- Kimi's independent review found no blocking status contradiction. Its P3
+  about premature live-readback wording was accepted: only the successful
+  Pages deployment run is claimed until post-closeout live readback occurs.
+- The machine gate derives and enforces the exact evidence across all GH-234
+  public surfaces. Actual results: 13-surface consistency PASS; claim tests
+  14/14; Memory/status/hygiene/YAML/HTML/Python/rustfmt/diff PASS.
+- Claude Code remained budget-blocked before repository access and made no
+  change. No product, wallet, chain, deployment, Mainnet or production action
+  occurred.
+- **Status:** `GH-234 Documentation closeout local PASS / Protected PR next / Production false`.

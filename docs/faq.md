@@ -200,14 +200,16 @@ was removed immediately. The [redacted evidence](evidence/gh-229-controlled-two-
 does not independently prove host separation and is not public-network,
 relay/v2, proof, membership, deployment or production evidence.
 
-GH-234/PR #235, code commit `b450740`, adds a separate
+Merged and exact-main-verified GH-234/PR #235, code commit `b450740`, exact
+main `f146fb2`, adds a separate
 Development/Testnet-10-only Light Client v2 submission command. It accepts one
 owner-only canonical shared v2 transport payload, reparses it against separately
 trusted `testnet-10` before identity or network activity, and sends it exactly
 once over the existing Guardian v2 channel. Local unit and real same-host
 binary/QUIC tests cover offline preflight, accepted/rejected/busy/transport-
 failure, redaction, Beta/Mainnet fail-before-network behavior and the unchanged
-v1 sender. This does not generate proofs, verify production approval authority,
+v1 sender. Exact-main CI `33272578070`, Security Audit `33272577951`, and Pages
+`33272577407` pass. This does not generate proofs, verify production approval authority,
 or establish privacy, membership, reward, chain, public multi-host, deployment,
 Mainnet or production authority.
 

@@ -2657,3 +2657,15 @@ changed.
 - Remaining gates: all corrected-head protected checks, normal review-required
   merge, and exact-main CI, Security Audit and Pages verification.
 - Result: `PASS for continued protected review / Production false / Merge pending`.
+
+## 2026-08-29 - GH-234 merge and exact-main audit
+
+- PR #235 passed all corrected-head protected contexts with both actionable
+  review threads resolved and squash-merged normally as exact main
+  `f146fb2cef3adca4a8b7e861aa47cab506a56bed`; issue #234 closed.
+- Exact-main Prometheus CI `33272578070`, Security Audit `33272577951`, and
+  Pages `33272577407` pass on that SHA.
+- Public claims remain bounded to implemented and same-host-tested
+  Development/Testnet-10 repository behavior. Public/multi-host v2 operation,
+  proof/approval authority, deployment, Mainnet and production remain false.
+- Result: `PASS / GH-234 repository delivery complete / Production false`.
