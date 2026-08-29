@@ -6048,3 +6048,20 @@ No direct `main` push or production action occurred.
 - Required CI/Security contexts and independent review are pending. No merge or
   live Pages/readme readback is claimed.
 - **Status:** `PR #240 OPEN / Protected checks pending / Production false`.
+
+## 2026-08-29 - GH-238 final handoff
+
+- Documentation PR #240 passed all eleven contexts, had zero review threads and
+  merged normally as exact documentation main
+  `3f607adef72260463229013271abcd9c72e0fc8c`.
+- Its exact-main Prometheus CI `33280802027`, Security Audit `33280802098`, and
+  Pages `33280801126` pass.
+- Cache-busted live readback verifies Roadmap, Whitepaper, FAQ, `llms.txt`, and
+  raw-main README all expose product main `912d96d` and product runs
+  `33279351831`/`33279351822`/`33279351387` with the repository-only,
+  no-remote-run, no-record and production-false boundaries intact.
+- This final Bridge-only publication changes no architecture, runtime, host,
+  network, infrastructure, wallet, chain, deployment, Mainnet or production
+  state and needs no recursive GH-238 status update after its normal protected
+  merge.
+- **Status:** `GH-238 Complete / Product and public exact-main PASS / Real remote evidence open / Production false`.
