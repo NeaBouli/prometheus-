@@ -4897,3 +4897,11 @@ Rules for all dev agents:
   read or changed no file.
 - No real GH-238 remote run, evidence record or external/production action
   occurred. Status: `GH-238 Docs closeout local PASS / Protected PR next / Production false`.
+
+## 2026-08-29 - GH-238 documentation closeout PR opened
+
+- Commit `1f8e879` is pushed on `docs/GH-238-exact-main-closeout`; normal
+  protected PR #240 is open against `main`.
+- No direct-main push, admin bypass, live readback, remote run, evidence record
+  or production action occurred.
+- Status: `PR #240 protected checks/review pending / Production false`.

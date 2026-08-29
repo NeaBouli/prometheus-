@@ -6040,3 +6040,11 @@ No direct `main` push or production action occurred.
   infrastructure action, wallet, chain, deployment, Mainnet or production
   action occurred.
 - **Status:** `GH-238 Docs closeout local PASS / Protected PR next / Real remote evidence open / Production false`.
+
+## 2026-08-29 - GH-238 documentation closeout protected delivery
+
+- Commit `1f8e879` is published only on the documentation branch; normal PR
+  #240 is open against protected `main`.
+- Required CI/Security contexts and independent review are pending. No merge or
+  live Pages/readme readback is claimed.
+- **Status:** `PR #240 OPEN / Protected checks pending / Production false`.
