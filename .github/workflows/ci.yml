@@ -2421,6 +2421,11 @@ jobs:
             -p prometheus-threat-hint \
             -p prometheus-threat-proof \
             -p prometheus-guardian-p2p
+      - name: Verify GH-234 ThreatHint-v2 client boundary
+        run: |
+          cargo test -p prometheus-client --lib network::p2p
+          cargo test -p prometheus-client --test threat_hint_v2_p2p_loopback
+          cargo test -p prometheus-client --test threat_hint_p2p_loopback
       - name: Tests
         run: cargo test --workspace
         timeout-minutes: 30

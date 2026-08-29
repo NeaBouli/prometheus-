@@ -14,7 +14,10 @@ use prometheus_client::blockchain::rule_coordinator::{
 };
 use prometheus_client::miner_companion::MinerCompanionConfig;
 #[cfg(unix)]
-use prometheus_client::network::p2p::{ThreatHintSubmissionStatus, ThreatHintSubmitConfig};
+use prometheus_client::network::p2p::{
+    ThreatHintSubmissionStatus, ThreatHintSubmitConfig, ThreatHintV2P2pError,
+    ThreatHintV2SubmissionStatus,
+};
 use prometheus_client::rule_sync_cli::{RuleSyncConfig, SystemRuleSnapshotClock};
 use prometheus_client::runtime::RuntimeMode;
 use prometheus_client::security::scanner::YaraScanner;
@@ -41,6 +44,10 @@ enum Command {
     /// Development-only v1 ThreatHint submission to one bounded static Guardian peer.
     #[command(subcommand)]
     ThreatHint(ThreatHintCommand),
+    /// Development-only ThreatHint-v2 submission of one owner-prepared canonical
+    /// transport payload to one bounded static Guardian peer.
+    #[command(subcommand)]
+    ThreatHintV2(ThreatHintV2Command),
 }
 
 #[derive(Debug, Subcommand)]
@@ -97,6 +104,26 @@ enum ThreatHintCommand {
     },
 }
 
+#[derive(Debug, Subcommand)]
+enum ThreatHintV2Command {
+    /// Validate owner-local config and the canonical v2 transport payload
+    /// offline; no identity creation, mutation, or network activity.
+    Preflight {
+        #[arg(long)]
+        config: PathBuf,
+        #[arg(long)]
+        payload: PathBuf,
+    },
+    /// Submit one canonical ThreatHint-v2 transport payload once and print the
+    /// bounded remote-local-boundary status. No retry and no persistence.
+    Submit {
+        #[arg(long)]
+        config: PathBuf,
+        #[arg(long)]
+        payload: PathBuf,
+    },
+}
+
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     env_logger::init();
@@ -118,6 +145,12 @@ async fn main() -> anyhow::Result<()> {
         }
         Some(Command::ThreatHint(ThreatHintCommand::Submit { config, hint })) => {
             submit_threat_hint(config, hint).await?;
+        }
+        Some(Command::ThreatHintV2(ThreatHintV2Command::Preflight { config, payload })) => {
+            preflight_threat_hint_v2(config, payload).await?;
+        }
+        Some(Command::ThreatHintV2(ThreatHintV2Command::Submit { config, payload })) => {
+            submit_threat_hint_v2(config, payload).await?;
         }
         None => {
             info!("Prometheus Light Client starting");
@@ -177,6 +210,52 @@ async fn submit_threat_hint(config_path: PathBuf, hint_path: PathBuf) -> anyhow:
 #[cfg(not(unix))]
 async fn submit_threat_hint(_config_path: PathBuf, _hint_path: PathBuf) -> anyhow::Result<()> {
     anyhow::bail!("threat-hint commands are unsupported: the Guardian transport is Unix-only")
+}
+
+#[cfg(unix)]
+async fn preflight_threat_hint_v2(
+    config_path: PathBuf,
+    payload_path: PathBuf,
+) -> anyhow::Result<()> {
+    let config =
+        ThreatHintSubmitConfig::from_toml_file(&config_path).map_err(|_| ThreatHintV2P2pError)?;
+    let validated = config
+        .validate(RuntimeMode::from_env())
+        .map_err(|_| ThreatHintV2P2pError)?;
+    let report = validated.offline_preflight_v2(&payload_path)?;
+    println!("{}", serde_json::to_string_pretty(&report)?);
+    Ok(())
+}
+
+#[cfg(not(unix))]
+async fn preflight_threat_hint_v2(
+    _config_path: PathBuf,
+    _payload_path: PathBuf,
+) -> anyhow::Result<()> {
+    anyhow::bail!("threat-hint-v2 commands are unsupported: the Guardian transport is Unix-only")
+}
+
+#[cfg(unix)]
+async fn submit_threat_hint_v2(config_path: PathBuf, payload_path: PathBuf) -> anyhow::Result<()> {
+    let config =
+        ThreatHintSubmitConfig::from_toml_file(&config_path).map_err(|_| ThreatHintV2P2pError)?;
+    let validated = config
+        .validate(RuntimeMode::from_env())
+        .map_err(|_| ThreatHintV2P2pError)?;
+    let report = validated.submit_v2(&payload_path).await?;
+    println!("{}", serde_json::to_string_pretty(&report)?);
+    if report.status == ThreatHintV2SubmissionStatus::TransportFailure {
+        anyhow::bail!("threat-hint-v2 submission ended in transport-failure");
+    }
+    Ok(())
+}
+
+#[cfg(not(unix))]
+async fn submit_threat_hint_v2(
+    _config_path: PathBuf,
+    _payload_path: PathBuf,
+) -> anyhow::Result<()> {
+    anyhow::bail!("threat-hint-v2 commands are unsupported: the Guardian transport is Unix-only")
 }
 
 async fn run_rule_sync(config_path: PathBuf) -> anyhow::Result<()> {

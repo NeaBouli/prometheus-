@@ -1,5 +1,5 @@
-//! Strict configuration and bounded sender for the Development-only GH-226
-//! v1 ThreatHint submission CLI.
+//! Strict configuration and bounded senders for the Development-only GH-226
+//! v1 and GH-234 v2 ThreatHint submission CLIs.
 //!
 //! This module only composes the existing reviewed `prometheus-guardian-p2p`
 //! transport. It introduces no new libp2p transport, discovery, relay,
@@ -10,13 +10,19 @@
 //! (GH-229) accepts exactly one bounded direct literal-IP route to the same
 //! static peer while rejecting loopback, link-local, documentation,
 //! benchmarking, broadcast/reserved, IPv4-mapped, wildcard, and multicast
-//! ranges. It contains no signer,
-//! private-key, wallet, seed, transaction, ballot, ThreatHint-v2, deployment,
-//! Mainnet, key-governance, or production authority. Beta and Mainnet are
+//! ranges. The GH-234 v2 path accepts exactly one owner-prepared canonical
+//! `ThreatHintV2TransportPayload` binary and parses it exclusively with
+//! `prometheus_threat_hint::ThreatHintV2TransportPayload::parse_canonical`
+//! against the separately trusted `testnet-10` network, before any identity
+//! load or network activity, then sends it once over the independent
+//! `/prometheus/threat-hint/2.0.0` channel. It contains no signer,
+//! private-key, wallet, seed, transaction, ballot, proof-generation,
+//! approval-verification, deployment, Mainnet, key-governance, or production
+//! authority. Beta and Mainnet are
 //! rejected before any network activity regardless of the proof bytes a
 //! canonical hint claims. An acknowledgement only reports a remote
-//! local-boundary outcome; it is never proof, consensus, membership, or
-//! reward authority. There is no retry and no persistence.
+//! local-boundary outcome; it is never proof, approval, consensus, membership,
+//! reward, or chain authority. There is no retry and no persistence.
 
 use std::fmt;
 use std::fs::File;
@@ -29,8 +35,9 @@ use std::time::Duration;
 use prometheus_guardian_p2p::transport_identity::load_or_create_transport_identity;
 use prometheus_guardian_p2p::{
     GuardianP2p, GuardianP2pConfig, StaticPeer, ThreatHintAckStatus, ThreatHintBytes,
-    TransportError, TransportEvent, MAX_THREAT_HINT_BYTES,
+    ThreatHintV2AckStatus, TransportError, TransportEvent, MAX_THREAT_HINT_BYTES,
 };
+use prometheus_threat_hint::{ThreatHintV2TransportPayload, MAX_TRANSPORT_PAYLOAD_BYTES};
 use rustix::fs::{self, FileType, Mode, OFlags};
 use rustix::process;
 use serde::{Deserialize, Serialize};
@@ -541,6 +548,215 @@ fn status_from_ack(status: ThreatHintAckStatus) -> ThreatHintSubmissionStatus {
         ThreatHintAckStatus::Duplicate => ThreatHintSubmissionStatus::Duplicate,
         ThreatHintAckStatus::Rejected => ThreatHintSubmissionStatus::Rejected,
         ThreatHintAckStatus::Busy => ThreatHintSubmissionStatus::Busy,
+    }
+}
+
+// ---------------------------------------------------------------------------
+// GH-234 ThreatHint-v2 sender
+//
+// The v2 CLI reuses the GH-226/GH-229 config schema, Development-only runtime
+// gate, owner-only identity handling, timeout bound, and one-static-peer route
+// policy unchanged. The only new input is the owner-prepared canonical v2
+// transport payload binary.
+// ---------------------------------------------------------------------------
+
+/// The only separately trusted network id this development surface accepts for
+/// v2 payload parsing and inbound transport validation. Trust is never derived
+/// from payload bytes.
+const V2_TRUSTED_NETWORK_ID: &str = "testnet-10";
+
+/// Generic redacted failure for v2 configuration, preflight, and factories.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ThreatHintV2P2pError;
+
+impl fmt::Display for ThreatHintV2P2pError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str("ThreatHint v2 submit CLI request rejected")
+    }
+}
+
+impl std::error::Error for ThreatHintV2P2pError {}
+
+/// Stable data-only outcome of one bounded v2 submission. The v2 wire has no
+/// duplicate status; suppression belongs to the downstream promotion boundary.
+#[derive(Debug, Clone, Copy, Deserialize, Serialize, PartialEq, Eq)]
+#[serde(rename_all = "kebab-case")]
+pub enum ThreatHintV2SubmissionStatus {
+    Accepted,
+    Rejected,
+    Busy,
+    TransportFailure,
+}
+
+impl ThreatHintV2SubmissionStatus {
+    /// Stable machine-readable status name.
+    pub const fn as_str(self) -> &'static str {
+        match self {
+            Self::Accepted => "accepted",
+            Self::Rejected => "rejected",
+            Self::Busy => "busy",
+            Self::TransportFailure => "transport-failure",
+        }
+    }
+}
+
+/// Data-minimal machine-readable offline v2 preflight result. It carries no
+/// paths, addresses, peer ids, nonces, payload bytes or hashes, keys,
+/// signatures, or operator identity.
+#[derive(Debug, Clone, Serialize, PartialEq, Eq)]
+pub struct ThreatHintV2Preflight {
+    pub status: &'static str,
+    pub runtime: &'static str,
+    pub network: ThreatHintNetwork,
+    pub route_scope: &'static str,
+    pub identity: &'static str,
+    pub payload: &'static str,
+    pub ack_scope: &'static str,
+    pub chain_writes: &'static str,
+    pub network_activity: &'static str,
+}
+
+/// Data-minimal machine-readable v2 submission report. It carries no paths,
+/// addresses, peer ids, nonces, payload bytes or hashes, keys, signatures, or
+/// operator identity, and never implies proof, approval, membership, reward,
+/// or chain authority.
+#[derive(Debug, Clone, Serialize, PartialEq, Eq)]
+pub struct ThreatHintV2SubmitReport {
+    pub status: ThreatHintV2SubmissionStatus,
+    pub runtime: &'static str,
+    pub network: ThreatHintNetwork,
+    pub route_scope: &'static str,
+    pub ack_scope: &'static str,
+    pub ack_authority: &'static str,
+    pub retries: u8,
+    pub persisted: bool,
+}
+
+impl ValidatedThreatHintConfig {
+    /// Verify all v2 inputs offline: the owner-only payload is read, parsed
+    /// canonically against the separately trusted Testnet-10 network, and
+    /// reparse-checked before the read-only identity metadata check. No
+    /// identity is created or loaded and no network activity occurs.
+    pub fn offline_preflight_v2(
+        &self,
+        payload_path: &Path,
+    ) -> Result<ThreatHintV2Preflight, ThreatHintV2P2pError> {
+        require_development(self.mode).map_err(|_| ThreatHintV2P2pError)?;
+        let _payload = read_canonical_v2_payload(payload_path)?;
+        let identity =
+            preflight_identity_path(&self.identity_path).map_err(|_| ThreatHintV2P2pError)?;
+        Ok(ThreatHintV2Preflight {
+            status: "ready-for-development-threat-hint-v2-submit",
+            runtime: "development-only",
+            network: self.network,
+            route_scope: self.route_mode.route_scope(),
+            identity,
+            payload: "canonical-v2-transport",
+            ack_scope: "remote-local-boundary-only",
+            chain_writes: "none",
+            network_activity: "none",
+        })
+    }
+
+    /// Submit one canonical ThreatHint-v2 transport payload to the single
+    /// static peer. The payload is read and canonically reparsed before the
+    /// identity is loaded; exactly one `send_threat_hint_v2` attempt is driven
+    /// to its matching request-id acknowledgement within the configured
+    /// timeout. There is no retry, persistence, discovery, or listener.
+    pub async fn submit_v2(
+        &self,
+        payload_path: &Path,
+    ) -> Result<ThreatHintV2SubmitReport, ThreatHintV2P2pError> {
+        require_development(self.mode).map_err(|_| ThreatHintV2P2pError)?;
+        let payload = read_canonical_v2_payload(payload_path)?;
+        let keypair = load_or_create_transport_identity(&self.identity_path)
+            .map_err(|_| ThreatHintV2P2pError)?;
+
+        let mut transport_config = GuardianP2pConfig::default();
+        transport_config.static_peers.push(self.guardian.clone());
+        transport_config.request_timeout = self.submission_timeout;
+        transport_config.max_concurrent_requests = MAX_IN_FLIGHT_REQUESTS;
+        transport_config.threat_hint_v2_trusted_network_id = V2_TRUSTED_NETWORK_ID.to_owned();
+        let mut node =
+            GuardianP2p::new(keypair, transport_config).map_err(|_| ThreatHintV2P2pError)?;
+
+        let status = match node.send_threat_hint_v2(self.guardian.peer_id, payload) {
+            Ok(request_id) => {
+                let drive = async {
+                    loop {
+                        match node.next_event().await {
+                            TransportEvent::OutboundThreatHintV2Ack {
+                                request_id: received,
+                                status,
+                                ..
+                            } if received == request_id => {
+                                break v2_status_from_ack(status);
+                            }
+                            TransportEvent::OutboundThreatHintV2Failure {
+                                request_id: received,
+                                ..
+                            } if received == request_id => {
+                                break ThreatHintV2SubmissionStatus::TransportFailure;
+                            }
+                            _ => {}
+                        }
+                    }
+                };
+                time::timeout(self.submission_timeout, drive)
+                    .await
+                    .unwrap_or(ThreatHintV2SubmissionStatus::TransportFailure)
+            }
+            // `OutboundBusy` is a local sender-capacity failure, not the
+            // Guardian's boundary `busy` acknowledgement.
+            Err(TransportError::OutboundBusy { .. }) => {
+                ThreatHintV2SubmissionStatus::TransportFailure
+            }
+            Err(_) => ThreatHintV2SubmissionStatus::TransportFailure,
+        };
+
+        Ok(ThreatHintV2SubmitReport {
+            status,
+            runtime: "development-only",
+            network: self.network,
+            route_scope: self.route_mode.route_scope(),
+            ack_scope: "remote-local-boundary-only",
+            ack_authority: "none",
+            retries: 0,
+            persisted: false,
+        })
+    }
+}
+
+/// Read one canonical v2 transport payload from an owner-only file with a
+/// strict size cap, then parse it exclusively through
+/// [`ThreatHintV2TransportPayload::parse_canonical`] against the separately
+/// trusted Testnet-10 network and require an exact canonical re-emission of
+/// the same bytes.
+fn read_canonical_v2_payload(
+    path: &Path,
+) -> Result<ThreatHintV2TransportPayload, ThreatHintV2P2pError> {
+    read_canonical_v2_payload_for_network(path, V2_TRUSTED_NETWORK_ID)
+}
+
+fn read_canonical_v2_payload_for_network(
+    path: &Path,
+    trusted_network_id: &str,
+) -> Result<ThreatHintV2TransportPayload, ThreatHintV2P2pError> {
+    let bytes =
+        read_owner_file(path, MAX_TRANSPORT_PAYLOAD_BYTES).map_err(|_| ThreatHintV2P2pError)?;
+    let payload = ThreatHintV2TransportPayload::parse_canonical(&bytes, trusted_network_id)
+        .map_err(|_| ThreatHintV2P2pError)?;
+    if payload.to_canonical_bytes() != bytes {
+        return Err(ThreatHintV2P2pError);
+    }
+    Ok(payload)
+}
+
+fn v2_status_from_ack(status: ThreatHintV2AckStatus) -> ThreatHintV2SubmissionStatus {
+    match status {
+        ThreatHintV2AckStatus::Accepted => ThreatHintV2SubmissionStatus::Accepted,
+        ThreatHintV2AckStatus::Rejected => ThreatHintV2SubmissionStatus::Rejected,
+        ThreatHintV2AckStatus::Busy => ThreatHintV2SubmissionStatus::Busy,
     }
 }
 
@@ -1257,6 +1473,257 @@ mod tests {
                 assert!(
                     !output.contains(forbidden),
                     "report must not expose {forbidden:?}: {output}"
+                );
+            }
+        }
+    }
+
+    // ------------------------------------------------------------------
+    // GH-234 ThreatHint-v2 unit coverage
+    // ------------------------------------------------------------------
+
+    fn v2_vector_wire(case: &str) -> Vec<u8> {
+        let corpus: serde_json::Value = serde_json::from_str(include_str!(
+            "../../../threat-hint/tests/vectors/threat-hint-v2-transport-v1.json"
+        ))
+        .expect("transport vector corpus");
+        for group in ["valid_cases", "invalid_cases"] {
+            if let Some(entry) = corpus[group]
+                .as_array()
+                .and_then(|cases| cases.iter().find(|entry| entry["name"] == case))
+            {
+                let encoded = entry["wire_hex"].as_str().expect("wire hex");
+                assert!(encoded.len() % 2 == 0, "even-length hex");
+                return (0..encoded.len())
+                    .step_by(2)
+                    .map(|offset| {
+                        u8::from_str_radix(&encoded[offset..offset + 2], 16).expect("hex pair")
+                    })
+                    .collect();
+            }
+        }
+        panic!("unknown vector case {case}");
+    }
+
+    /// Hex of the untrusted 32-byte report nonce inside one canonical frame.
+    fn v2_vector_nonce_hex(wire: &[u8]) -> String {
+        wire[5..37]
+            .iter()
+            .map(|byte| format!("{byte:02x}"))
+            .collect()
+    }
+
+    fn write_v2_payload(directory: &Path, bytes: &[u8]) -> PathBuf {
+        let path = directory.join("payload.bin");
+        write_private(&path, bytes);
+        path
+    }
+
+    #[test]
+    fn v2_payload_file_is_strict() {
+        let fixture = fixture();
+        let validated = fixture
+            .load()
+            .validate(RuntimeMode::Development)
+            .expect("valid");
+        let valid_wire = v2_vector_wire("base_review_required");
+
+        let directory = owner_only_dir();
+        let payload_path = write_v2_payload(directory.path(), &valid_wire);
+        let preflight = validated
+            .offline_preflight_v2(&payload_path)
+            .expect("valid v2 payload");
+        assert_eq!(
+            preflight.status,
+            "ready-for-development-threat-hint-v2-submit"
+        );
+        assert_eq!(preflight.payload, "canonical-v2-transport");
+        assert_eq!(preflight.network_activity, "none");
+
+        let mut bad_magic = valid_wire.clone();
+        bad_magic[0] = b'X';
+        let mut nonce_mismatch = valid_wire.clone();
+        nonce_mismatch[5] ^= 0x01;
+        let mut trailing = valid_wire.clone();
+        trailing.push(0x00);
+        let oversized = vec![b'P'; MAX_TRANSPORT_PAYLOAD_BYTES + 1];
+        for (name, bytes) in [
+            ("empty.bin", &b""[..]),
+            ("truncated.bin", &valid_wire[..40]),
+            ("bad-magic.bin", &bad_magic[..]),
+            ("nonce-mismatch.bin", &nonce_mismatch[..]),
+            ("trailing.bin", &trailing[..]),
+            ("oversized.bin", &oversized[..]),
+            (
+                "noncanonical.bin",
+                &v2_vector_wire("noncanonical_envelope")[..],
+            ),
+        ] {
+            let directory = owner_only_dir();
+            let path = write_v2_payload(directory.path(), bytes);
+            assert!(
+                validated.offline_preflight_v2(&path).is_err(),
+                "invalid v2 payload must fail: {name}"
+            );
+        }
+
+        assert!(
+            read_canonical_v2_payload_for_network(&payload_path, "mainnet").is_err(),
+            "the client payload path must reject a separately trusted network mismatch"
+        );
+
+        let group_readable = owner_only_dir();
+        let path = write_v2_payload(group_readable.path(), &valid_wire);
+        fs::set_permissions(&path, fs::Permissions::from_mode(0o640)).expect("mode 0640");
+        assert!(validated.offline_preflight_v2(&path).is_err());
+
+        let symlinked = owner_only_dir();
+        let link = symlinked.path().join("payload.bin");
+        symlink(&payload_path, &link).expect("payload symlink");
+        assert!(validated.offline_preflight_v2(&link).is_err());
+
+        let hard_linked = owner_only_dir();
+        let link = hard_linked.path().join("payload.bin");
+        fs::hard_link(&payload_path, &link).expect("payload hard link");
+        assert!(validated.offline_preflight_v2(&link).is_err());
+
+        let parent_alias = payload_path
+            .parent()
+            .expect("payload parent")
+            .join("nested")
+            .join("..")
+            .join("payload.bin");
+        assert!(validated.offline_preflight_v2(&parent_alias).is_err());
+
+        assert!(validated
+            .offline_preflight_v2(Path::new("relative-payload.bin"))
+            .is_err());
+    }
+
+    #[test]
+    fn v2_beta_and_mainnet_reject_before_identity_or_network() {
+        // The runtime gate runs in validate() before the payload path is even
+        // consulted: no payload read, identity load, or network activity can
+        // follow a Beta or Mainnet rejection.
+        let fixture = fixture();
+        let config = fixture.load();
+        for mode in [RuntimeMode::Beta, RuntimeMode::Mainnet] {
+            assert!(config.validate(mode).is_err());
+        }
+        assert!(
+            !fixture.identity_path.exists(),
+            "rejected runs must not create the transport identity"
+        );
+    }
+
+    #[test]
+    fn v2_identity_preflight_states_and_metadata_guards() {
+        let fixture = fixture();
+        let directory = owner_only_dir();
+        let payload_path =
+            write_v2_payload(directory.path(), &v2_vector_wire("base_review_required"));
+        let validated = fixture
+            .load()
+            .validate(RuntimeMode::Development)
+            .expect("valid");
+
+        let preflight = validated
+            .offline_preflight_v2(&payload_path)
+            .expect("preflight without identity");
+        assert_eq!(preflight.identity, "owner-only-create-on-submit");
+        assert!(
+            !fixture.identity_path.exists(),
+            "v2 preflight must not create the transport identity"
+        );
+
+        let keypair = load_or_create_transport_identity(&fixture.identity_path).expect("identity");
+        drop(keypair);
+        let preflight = validated
+            .offline_preflight_v2(&payload_path)
+            .expect("preflight with existing identity");
+        assert_eq!(preflight.identity, "owner-only-existing");
+
+        fs::set_permissions(&fixture.identity_path, fs::Permissions::from_mode(0o644))
+            .expect("mode 0644");
+        assert!(validated.offline_preflight_v2(&payload_path).is_err());
+    }
+
+    #[test]
+    fn v2_reports_debug_and_errors_are_stable_and_redacted() {
+        assert_eq!(ThreatHintV2SubmissionStatus::Accepted.as_str(), "accepted");
+        assert_eq!(ThreatHintV2SubmissionStatus::Rejected.as_str(), "rejected");
+        assert_eq!(ThreatHintV2SubmissionStatus::Busy.as_str(), "busy");
+        assert_eq!(
+            ThreatHintV2SubmissionStatus::TransportFailure.as_str(),
+            "transport-failure"
+        );
+        assert_eq!(
+            v2_status_from_ack(ThreatHintV2AckStatus::Accepted),
+            ThreatHintV2SubmissionStatus::Accepted
+        );
+        assert_eq!(
+            v2_status_from_ack(ThreatHintV2AckStatus::Rejected),
+            ThreatHintV2SubmissionStatus::Rejected
+        );
+        assert_eq!(
+            v2_status_from_ack(ThreatHintV2AckStatus::Busy),
+            ThreatHintV2SubmissionStatus::Busy
+        );
+        assert_eq!(
+            ThreatHintV2P2pError.to_string(),
+            "ThreatHint v2 submit CLI request rejected"
+        );
+
+        let fixture = fixture();
+        let directory = owner_only_dir();
+        let valid_wire = v2_vector_wire("base_review_required");
+        let payload_path = write_v2_payload(directory.path(), &valid_wire);
+        let config = fixture.load();
+        let validated = config.validate(RuntimeMode::Development).expect("valid");
+
+        let nonce_hex = v2_vector_nonce_hex(&valid_wire);
+        for debug in [format!("{config:?}"), format!("{validated:?}")] {
+            for forbidden in [
+                fixture.peer.as_str(),
+                fixture.identity_path.to_string_lossy().as_ref(),
+                "127.0.0.1",
+                nonce_hex.as_str(),
+            ] {
+                assert!(
+                    !debug.contains(forbidden),
+                    "debug output must not expose {forbidden:?}: {debug}"
+                );
+            }
+        }
+
+        let preflight = serde_json::to_string(
+            &validated
+                .offline_preflight_v2(&payload_path)
+                .expect("preflight"),
+        )
+        .expect("serialize preflight");
+        let submit = serde_json::to_string(&ThreatHintV2SubmitReport {
+            status: ThreatHintV2SubmissionStatus::Accepted,
+            runtime: "development-only",
+            network: ThreatHintNetwork::Testnet10,
+            route_scope: "single-static-loopback-quic-peer",
+            ack_scope: "remote-local-boundary-only",
+            ack_authority: "none",
+            retries: 0,
+            persisted: false,
+        })
+        .expect("serialize submit report");
+        for output in [preflight, submit] {
+            for forbidden in [
+                fixture.peer.as_str(),
+                payload_path.to_string_lossy().as_ref(),
+                fixture.identity_path.to_string_lossy().as_ref(),
+                "127.0.0.1",
+                nonce_hex.as_str(),
+            ] {
+                assert!(
+                    !output.contains(forbidden),
+                    "v2 report must not expose {forbidden:?}: {output}"
                 );
             }
         }

@@ -106,6 +106,29 @@ a production malware detector or reporting client.
   relay/v2, deployment or production evidence. Exact-main CI `33017195813`,
   Security Audit `33017196184`, and Pages `33017194744` pass for the merged
   capability.
+- GH-234 adds the separate `threat-hint-v2 preflight|submit --config
+  <owner-only TOML> --payload <owner-only canonical binary>` command as one
+  Development-only, dial-only sender for an owner-prepared canonical
+  ThreatHint-v2 transport payload (proof envelope, Observable Bundle, approval,
+  and report nonce in the shared `ThreatHintV2TransportPayload` framing). It
+  reuses the GH-226/GH-229 route, identity, timeout, and one-static-peer policy
+  unchanged. The payload is read from an owner-only, no-symlink, size-bounded
+  file and parsed exclusively with
+  `prometheus_threat_hint::ThreatHintV2TransportPayload::parse_canonical`
+  against the separately trusted `testnet-10` network — with an exact canonical
+  re-emission check — before any identity load or network activity. On submit
+  the client pins `threat_hint_v2_trusted_network_id` to `testnet-10`, sends
+  exactly once over `/prometheus/threat-hint/2.0.0`, drives only the matching
+  request-id events, and reports a data-minimal
+  accepted/rejected/busy/transport-failure status. There is no retry,
+  persistence, discovery, or listener. The client never generates, signs, or
+  verifies proof or approval authority, and the acknowledgement is never proof,
+  approval, membership, reward, or chain authority. Beta and Mainnet reject
+  before identity or network activity; loopback remains the default and the
+  GH-229 `controlled-remote-testnet10` opt-in applies unchanged. Real
+  same-host binary/QUIC tests cover accepted/rejected/busy/transport-failure
+  with exact bytes, one attempt, and redacted output. This grants no public or
+  multi-host operation, wallet, chain, deployment, or production authority.
 - `blockchain/rule_ingest.rs` ingests a complete caller-supplied active-rule
   snapshot whose raw CIDv1 (sha2-256, canonical lowercase base32) must bind the
   exact caller-supplied content bytes. It parses a strict simple matcher
