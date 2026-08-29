@@ -106,7 +106,9 @@ a production malware detector or reporting client.
   relay/v2, deployment or production evidence. Exact-main CI `33017195813`,
   Security Audit `33017196184`, and Pages `33017194744` pass for the merged
   capability.
-- GH-234 adds the separate `threat-hint-v2 preflight|submit --config
+- Merged and exact-main-verified GH-234/PR #235 (code `b450740`, exact main
+  `f146fb2`; CI `33272578070`, Security `33272577951`, Pages `33272577407`) adds
+  the separate `threat-hint-v2 preflight|submit --config
   <owner-only TOML> --payload <owner-only canonical binary>` command as one
   Development-only, dial-only sender for an owner-prepared canonical
   ThreatHint-v2 transport payload (proof envelope, Observable Bundle, approval,

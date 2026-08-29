@@ -61,7 +61,7 @@
 |--------|--------|--------------|
 | 0 — Setup | ACCEPTED | kaspad v1.1.0 Testnet-10, Repo-Struktur, CI/CD |
 | 1 — Contracts | DEVELOPMENT ACCEPTED | Current-Silverc compile/ABI/runtime evidence; H-001 canary only, six deployments remain |
-| 2 — Client | DEVELOPMENT PARTIAL | Kaspa/RuleStorage sync, bounded scanner foundations, GH-226 same-host v1 and GH-234/PR #235 same-host v2 ThreatHint submission; proof generation/approval authority, real YARA and public multi-host P2P remain open |
+| 2 — Client | DEVELOPMENT PARTIAL | Kaspa/RuleStorage sync, bounded scanner foundations, GH-226 same-host v1 and exact-main-verified GH-234/PR #235 same-host v2 ThreatHint submission; proof generation/approval authority, real YARA and public multi-host P2P remain open |
 | 3 — AI | STUBS ONLY | Phi-3 is a bounded fail-closed safe-default stub with no loaded-model or quarantine authority; Fed-DART is also a stub; no real-model detection evidence |
 | 4 — Guardian | DEVELOPMENT ACCEPTED | Bounded local analysis foundations; no production-authorized actionable rules or independently evaluated live model |
 | 5 — Voting | DEVELOPMENT ACCEPTED | Tested state machines; no operated validator network, trusted membership or decentralized authority evidence |
@@ -852,6 +852,16 @@ Leistungsbasierte Emission. Guardians = "Miner" (KI statt GPU).
   key ownership/rotation, Sybil resistance, multi-host evidence, L1 attestation,
   protected review, exact-main verification and production operation remain.
 - **Status:** `Local PASS / Protected PR next`.
+
+## Checkpoint 2026-08-29: GH-234 merged exact-main
+
+- PR #235 squash-merged normally as exact main `f146fb2`; issue #234 closed.
+- Exact-main CI `33272578070`, Security Audit `33272577951`, and Pages
+  `33272577407` pass.
+- The delivered v2 sender remains Development/Testnet-10-only same-host
+  repository evidence. Public/multi-host v2, proof/approval authority,
+  deployment, Mainnet and production remain open or false.
+- **Status:** `GH-234 repository delivery complete / Production false`.
 
 ## Checkpoint 2026-08-04: GH-144 merged exact-main
 

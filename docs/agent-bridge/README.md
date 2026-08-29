@@ -10,13 +10,15 @@ Startpunkt fuer Codex/Claude Code:
 
 Keine Secrets, Tokens, Passwoerter, privaten Keys oder Wallet-Daten in diese Bridge schreiben.
 
-Aktiver Handover: GH-234/PR #235, code commit `b450740`, ergaenzt den
+Abgeschlossener Handover: GH-234/PR #235, code commit `b450740`, exact main
+`f146fb2`, ergaenzt den
 Development-/Testnet-10-only Light Client um einen separaten one-shot
 ThreatHint-v2-Sender fuer ein owner-prepared canonical shared payload. Lokale
 Unit- und reale same-host Binary-/QUIC-Tests pruefen strict private inputs,
 trusted-network parsing vor Identity/Netzwerk, genau einen Request, redigierte
-ACK-Status, Beta/Mainnet-Gates und unveraendertes v1-Verhalten. Der PR ist noch
-im geschuetzten Review-/CI-Prozess. Public/multi-host v2, Proof- oder
+ACK-Status, Beta/Mainnet-Gates und unveraendertes v1-Verhalten. Exact-main CI
+`33272578070`, Security `33272577951` und Pages `33272577407` sind gruen.
+Public/multi-host v2, Proof- oder
 Approval-Autoritaet, Membership, Model/YARA, Wallet, Chain, Reward, Mainnet,
 Deployment und Produktion bleiben offen bzw. ausgeschlossen.
 Verbindlicher Status und offene Gates stehen in `CODEX_BRIDGE.md`; laufende

@@ -4737,3 +4737,28 @@ Rules for all dev agents:
 - Git history confirms `p2p_v2_submission` entered the dated file only in
   GH-234 documentation commit `824a81b`, not in the 2026-08-14 baseline.
 - Status: `Review findings fixed locally / Commit and protected rerun next / Production false`.
+
+## 2026-08-29 - GH-234 merged and exact-main verified
+
+- Review correction commit `4222fa8` passed all ten protected contexts; both
+  actionable review threads were answered and resolved.
+- PR #235 squash-merged normally as exact main `f146fb2`; issue #234 closed.
+- Exact-main Prometheus CI `33272578070`, Security Audit `33272577951`, and
+  Pages `33272577407` pass.
+- A documentation-only closeout branch synchronizes README, Whitepaper,
+  Roadmap, FAQ, Pages, `llms.txt`, machine status, Memory and Bridge with this
+  exact evidence. Product behavior and production authority remain unchanged.
+- Status: `GH-234 merged exact-main PASS / Documentation closeout next / Production false`.
+
+## 2026-08-29 - GH-234 documentation closeout reviewed
+
+- Kimi independently reviewed all 21 closeout files. Its only useful P3 noted
+  that a successful Pages deployment run should not be mislabeled as a live
+  readback before this closeout is published; the premature flag was removed.
+- The claim gate now derives the short merge SHA and all three exact-main run
+  IDs from canonical machine status and requires them on every GH-234 public
+  surface. It also rejects malformed full merge SHAs and incomplete run sets.
+- PASS: 13 synchronized surfaces; claim tests 14/14; Memory, project status,
+  hygiene, workflow YAML, five HTML pages, Python compile, rustfmt and diff.
+- Claude Code remained budget-blocked and read or changed no file.
+- Status: `GH-234 Docs closeout local PASS / Protected PR next / Production false`.

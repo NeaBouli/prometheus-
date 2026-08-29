@@ -26,6 +26,16 @@ PUBLIC_FILES = (
     Path("modules/guardian-node/README.md"),
 )
 
+GH234_PUBLIC_FILES = tuple(
+    path
+    for path in PUBLIC_FILES
+    if path
+    not in {
+        Path("guardian-economics.html"),
+        Path("modules/guardian-node/README.md"),
+    }
+)
+
 REQUIRED_FRAGMENTS = {
     Path("README.md"): (
         "no production Prometheus network",
@@ -185,6 +195,22 @@ def validate_status(data: dict[str, Any]) -> list[str]:
         errors.append("Light Client v1 submission must remain development-only same-host evidence")
     if gh_234.get("classification") != "development_only_same_host_loopback_verified":
         errors.append("GH-234 v2 submission must remain development-only same-host evidence")
+    if gh_234.get("status") != "merged_and_exact_main_verified":
+        errors.append("GH-234 must retain merged exact-main verification status")
+    merge_commit = gh_234.get("merge_commit")
+    if (
+        not isinstance(merge_commit, str)
+        or re.fullmatch(r"[0-9a-f]{40}", merge_commit) is None
+    ):
+        errors.append("GH-234 merge commit must be one full lowercase SHA-1")
+    exact_main_runs = gh_234.get("exact_main_runs", {})
+    if set(exact_main_runs) != {"prometheus_ci", "security_audit", "pages"}:
+        errors.append("GH-234 exact-main run evidence is incomplete")
+    elif not all(
+        isinstance(run_id, int) and run_id > 0
+        for run_id in exact_main_runs.values()
+    ):
+        errors.append("GH-234 exact-main run IDs must be positive integers")
     if gh_234.get("public_or_multihost_v2") is not False:
         errors.append("GH-234 must not claim public or multi-host v2 operation")
     if gh_234.get("production_authority") is not False:
@@ -228,6 +254,16 @@ def verify(root: Path) -> list[str]:
     except (OSError, json.JSONDecodeError):
         return [f"{STATUS_PATH}: missing or invalid canonical status"]
     errors.extend(f"{STATUS_PATH}: {item}" for item in validate_status(status))
+    gh_234 = status.get("post_audit_updates", {}).get("gh_234", {})
+    merge_commit = gh_234.get("merge_commit", "")
+    run_ids = gh_234.get("exact_main_runs", {})
+    gh_234_evidence_fragments = (
+        merge_commit[:7] if isinstance(merge_commit, str) else "",
+        *(
+            str(run_ids.get(name, ""))
+            for name in ("prometheus_ci", "security_audit", "pages")
+        ),
+    )
 
     for relative in PUBLIC_FILES:
         path = root / relative
@@ -239,6 +275,11 @@ def verify(root: Path) -> list[str]:
         for fragment in REQUIRED_FRAGMENTS.get(relative, ()):
             if fragment.casefold() not in text.casefold():
                 errors.append(f"{relative}: required status boundary missing")
+        if relative in GH234_PUBLIC_FILES:
+            for fragment in gh_234_evidence_fragments:
+                if not fragment or fragment not in text:
+                    errors.append(f"{relative}: GH-234 exact-main evidence missing")
+                    break
         if relative.suffix == ".html" and "5cd13bf" not in text:
             errors.append(f"{relative}: exact reconciliation baseline missing")
         for category in find_banned_claims(text):

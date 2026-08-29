@@ -1811,8 +1811,8 @@ Estimates: unchanged; core 84-88%; complete vision 50-55%; production false
 ## GH-234 LIGHT CLIENT THREATHINT-V2 ONE-SHOT SENDER (2026-08-29)
 
 ```text
-Status: Implemented and locally verified / protected draft PR #235 open
-Issue/Code: GH-234 / b450740
+Status: Merged and exact-main verified / production false
+Issue/Code: GH-234 / PR #235 / code b450740 / exact main f146fb2
 Capability: GH-234 one-shot v2 sender
 Scope: Development/Testnet-10-only real Light Client preflight and one-shot
        submit of one owner-prepared canonical ThreatHintV2TransportPayload
@@ -1826,8 +1826,8 @@ Local evidence: p2p unit 20 passed; v2 real-binary loopback 3 passed; v1
 Authority: acknowledgement authority none; no proof generation, production
            approval verification, membership, model/YARA, wallet, chain,
            reward, deployment, Mainnet or production action
-Remaining gates: protected PR checks/review, complete workspace verification,
-                 merge and exact-main CI/Security/Pages readback; public or
-                 multi-host v2 operation remains unproven
+Exact-main evidence: CI 33272578070; Security 33272577951; Pages 33272577407
+Remaining gates: public or multi-host v2 operation, production proof/approval
+                 authority and deployment remain unproven
 Estimates: unchanged; core 84-88%; complete vision 50-55%; production false
 ```

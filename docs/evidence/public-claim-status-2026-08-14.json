@@ -28,7 +28,13 @@
       "issue": 234,
       "pull_request": 235,
       "code_commit": "b450740",
-      "status": "protected_pr_checks_passed_review_findings_in_progress",
+      "merge_commit": "f146fb2cef3adca4a8b7e861aa47cab506a56bed",
+      "status": "merged_and_exact_main_verified",
+      "exact_main_runs": {
+        "prometheus_ci": 33272578070,
+        "security_audit": 33272577951,
+        "pages": 33272577407
+      },
       "classification": "development_only_same_host_loopback_verified",
       "public_or_multihost_v2": false,
       "production_authority": false

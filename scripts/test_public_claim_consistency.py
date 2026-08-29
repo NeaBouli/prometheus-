@@ -83,6 +83,20 @@ class PublicClaimConsistencyTests(unittest.TestCase):
         self.assertTrue(any("GH-234 v2 submission" in error for error in errors))
         self.assertTrue(any("production authority" in error for error in errors))
 
+    def test_incomplete_gh_234_exact_main_evidence_is_rejected(self) -> None:
+        changed = copy.deepcopy(self.status)
+        del changed["post_audit_updates"]["gh_234"]["exact_main_runs"]["pages"]
+        self.assertTrue(
+            any("run evidence" in error for error in MODULE.validate_status(changed))
+        )
+
+    def test_malformed_gh_234_merge_commit_is_rejected(self) -> None:
+        changed = copy.deepcopy(self.status)
+        changed["post_audit_updates"]["gh_234"]["merge_commit"] = "f146fb2"
+        self.assertTrue(
+            any("merge commit" in error for error in MODULE.validate_status(changed))
+        )
+
     def test_banned_claims_return_categories_only(self) -> None:
         self.assertEqual(
             MODULE.find_banned_claims("PROM cannot be purchased."),
