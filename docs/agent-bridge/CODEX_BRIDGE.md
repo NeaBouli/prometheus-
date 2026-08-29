@@ -5908,3 +5908,101 @@ No direct `main` push or production action occurred.
   deployment, Mainnet or production state and needs no recursive GH-234
   status update after its normal protected merge.
 - **Status:** `GH-234 Complete / Product and public exact-main PASS / Production false`.
+
+## 2026-08-29 - GH-238 controlled distinct-host ThreatHint-v2 evidence start
+
+- Issue #238 and branch `feat/GH-238-v2-multihost-evidence` start from clean
+  exact main `efe6e9586655924a49404dbebbcd7a08d0806d2c` in an isolated worktree.
+- Build scope: a v2-specific, challenge-bound sender/Guardian execution
+  attestation; deterministic redacted record builder; strict public verifier;
+  adversarial/CLI tests; operator runbook; CI and bounded status updates.
+- Evidence may bind only exact source commit, artifact and canonical payload
+  digests, role, protocol, one-shot result and explicit non-authority flags.
+  It must reject paths, addresses, peer/network identifiers, raw payloads,
+  secrets, signatures and wallet/chain material.
+- Kimi K3 receives the major secret-free implementation block. Claude Code is
+  restricted to a small read-only schema/CLI audit; Sol owns architecture,
+  security, integration, full tests, review and GitHub actions.
+- Excluded until separately authorized: real host/network execution, temporary
+  firewall rules, IAM, wallet/signing, chain writes, rewards, deployment,
+  Mainnet and production. Host separation remains operator-attested only.
+- **Status:** `GH-238 In Progress / Repository only / External run false / Production false`.
+
+## 2026-08-29 - GH-238 full local verification before protected delivery
+
+- Kimi K3 delivered the secret-free repository tooling and supplied an
+  independent security review. Sol reviewed every write diff and fixed the
+  material integrity gap by binding the observed UTC time, rejected outcome,
+  one attempt, zero retries and no-persistence assertion into both role
+  attestations instead of deriving an unbound delivery claim later.
+- Further Sol hardening covers the exact Rust v2 wire maximum through the
+  canonical cross-language vector, duplicate JSON keys at every depth,
+  payload/artifact mutation and ownership checks, parent-directory durability,
+  no-clobber publication, exact protocol framing and strict non-authority
+  language. Claude Code was budget-blocked before repository access.
+- Actual PASS results: 72 focused GH-238 tests; 134 combined evidence/v1/claim
+  tests; 13 public claim surfaces; Memory and project-status gates; GH-229
+  committed-record verification; Python compile, Ruff, mypy, YAML and diff
+  checks; full workspace Rust tests; workspace clippy with all targets/features
+  and warnings denied; full rustfmt check.
+- Browser checks at desktop 1440x900 and mobile 390x844 verify Roadmap,
+  Whitepaper and FAQ without page-level horizontal overflow. GH-238 is visible
+  and the mobile Roadmap item is geometrically contained.
+- The prepared schema remains operator-attested, not independently proven host
+  separation. No real distinct-host execution or public GH-238 record exists,
+  and no external, network-policy, wallet, chain, deployment, Mainnet or
+  production action was performed.
+- **Status:** `GH-238 Full local PASS / Protected PR pending / External run false / Production false`.
+
+## 2026-08-29 - GH-238 review corrections closed
+
+- Kimi's independent full-diff review found one P2 runbook omission: the later
+  authorized run lacked explicit private distribution and cleanup of the single
+  shared challenge. Sol added exact-byte private transfer to both owner-only
+  host paths, prohibition of a second challenge, mandatory offline v2 preflight,
+  and challenge removal from both hosts after success or any abort.
+- Sol also made the run directory owner-local and portable, renamed the record's
+  actual transport to `direct-quic-v1` while keeping
+  `/prometheus/threat-hint/2.0.0` as the separately pinned protocol, and enforced
+  that distinction in the public machine status and drift tests. The modified
+  claim tests now pass mypy without inherited `attr-defined` warnings.
+- Kimi follow-up verdict: `APPROVE`, no P0-P2. Its remaining machine-status P3
+  was closed before delivery by adding the explicit transport pin.
+- Final actual results: 134 combined tests OK; 13 public surfaces PASS; Memory,
+  status and documentation hygiene PASS; Ruff, mypy, Python compile, CI YAML,
+  GH-229 evidence regression, diff hygiene and data-minimal secret scan PASS.
+  The prior full Rust workspace test/clippy/rustfmt and desktop/mobile browser
+  gates remain applicable; subsequent edits touched only Python/docs/status.
+- No GH-238 record was created and no host/network/firewall/IAM, wallet, chain,
+  deployment, Mainnet or production action occurred.
+- **Status:** `GH-238 Kimi APPROVE / Full local PASS / Protected PR pending / External run false / Production false`.
+
+## 2026-08-29 - GH-238 protected PR #239 review handoff
+
+- Source commit `c892f99` passed all ten technical GitHub contexts; CodeRabbit
+  completed with five actionable comments. The review corrections remove the
+  machine-local path, make the shared challenge path host-local, update the
+  live PR status, accept future strict UTC/toolchain dates while retaining the
+  earliest observation and rustc-version gates, and catch non-UTF-8 evidence
+  without path-bearing traceback output.
+- Public status entries use the GitHub publication date `2026-08-29`. This does
+  not change the later real-run lower boundary of `2026-08-30T00:00:00Z`.
+- No remote run, record, infrastructure, wallet, chain, deployment, Mainnet or
+  production action occurred.
+- **Status:** `GH-238 PR #239 review corrections in progress / Production false`.
+
+## 2026-08-29 - GH-238 PR #239 corrections local gate
+
+- The five actionable protected-review findings are fixed: actual publication
+  date, public-path privacy, host-local challenge directories, current PR status,
+  future strict timestamp/toolchain syntax and non-UTF-8 fail-closed diagnostics.
+- One intermediate 134-test run failed only because the old test expected the
+  newly year-neutral parser to reject a valid 2025 syntax at argparse. The test
+  now verifies the intended separate earliest-observation failure and fixed
+  diagnostic. Final combined result: 134 tests OK.
+- PASS: 13-surface claims, Memory/status/hygiene, Ruff, mypy, compile, CI YAML
+  and diff hygiene. Full Rust and browser gates remain applicable; no Rust or
+  page-layout code changed in this correction.
+- No remote execution, evidence record, infrastructure, wallet, chain,
+  deployment, Mainnet or production action occurred.
+- **Status:** `GH-238 PR #239 review corrections local PASS / Protected rerun next / Production false`.

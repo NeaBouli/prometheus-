@@ -213,6 +213,21 @@ v1 sender. Exact-main CI `33272578070`, Security Audit `33272577951`, and Pages
 or establish privacy, membership, reward, chain, public multi-host, deployment,
 Mainnet or production authority.
 
+GH-238 implements and locally tests repository-only preparation for one later
+controlled distinct-host
+Development/Testnet-10 ThreatHint-v2 attempt. The tooling uses challenge-bound,
+role-specific operator attestations over the source commit, the actual
+executable digest, the exact canonical payload digest, the exact v2 protocol,
+one shared observed UTC time, the actual rejected status, one attempt, zero
+retries and no persistence, with strict owner-only/no-symlink files, the exact
+9,265-byte Rust wire bound, atomic no-clobber record output, a closed redacted
+verifier and CI test wiring. No real GH-238 remote run has occurred and no
+GH-238 evidence record exists; host separation is not independently proven.
+This repository preparation is not a deployment or remote demonstration and
+adds no port, firewall, host, IAM, wallet, chain, deployment, Mainnet or
+production action or authority; a later real run requires separate explicit
+authorization.
+
 Merged and exact-main-verified GH-197/PR #198 adds a local Testnet-10
 consistency boundary: a separately
 owner-pin-hashed canonical manifest must match exactly one entry in a bounded

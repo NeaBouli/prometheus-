@@ -38,6 +38,19 @@
       "classification": "development_only_same_host_loopback_verified",
       "public_or_multihost_v2": false,
       "production_authority": false
+    },
+    "gh_238": {
+      "as_of": "2026-08-29",
+      "issue": 238,
+      "status": "repository_preparation_implemented_and_locally_tested",
+      "classification": "development_testnet10_repository_only",
+      "transport": "direct-quic-v1",
+      "protocol": "/prometheus/threat-hint/2.0.0",
+      "remote_run": false,
+      "evidence_record": false,
+      "independent_host_proof": false,
+      "network_or_infrastructure_action": false,
+      "production_authority": false
     }
   },
   "classifications": {

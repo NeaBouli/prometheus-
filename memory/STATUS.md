@@ -1831,3 +1831,31 @@ Remaining gates: public or multi-host v2 operation, production proof/approval
                  authority and deployment remain unproven
 Estimates: unchanged; core 84-88%; complete vision 50-55%; production false
 ```
+
+## GH-238 CONTROLLED DISTINCT-HOST THREATHINT-V2 PREPARATION (2026-08-29)
+
+```text
+Status: In progress / repository preparation implemented and locally tested /
+        production false
+Branch: PR #239 exists on the current feature branch; it is not merged,
+        exact-main, deployed, demonstrated or complete; no merge, exact-main,
+        deployment or remote-run IDs exist yet
+Capability: repository-only preparation for one later controlled distinct-host
+            Development/Testnet-10 ThreatHint-v2 attempt
+Tooling: challenge-bound role-specific operator attestations over source
+         commit, actual executable digest, exact canonical payload digest,
+         exact v2 protocol, shared observed UTC time, actual rejected status,
+         one attempt, zero retries and no persistence; strict owner-only
+         no-symlink files; exact 9,265-byte Rust wire bound; atomic no-clobber
+         record output; closed redacted verifier; CI tests
+Evidence: local unit/CLI/adversarial tests only; host separation is not
+          independently proven
+Boundary: no real GH-238 remote run has occurred; no GH-238 evidence record
+          exists in the repository
+Authority: none added; no port, firewall, host, IAM, wallet, chain, deployment,
+           Mainnet or production action or authority; a later real run requires
+           separate explicit authorization
+Remaining gates: separate explicit authorization, one real distinct-host run,
+                 redacted record, protected review, exact-main verification
+Estimates: unchanged; core 84-88%; complete vision 50-55%; production false
+```

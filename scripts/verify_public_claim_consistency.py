@@ -36,6 +36,19 @@ GH234_PUBLIC_FILES = tuple(
     }
 )
 
+GH238_PUBLIC_FILES = (
+    Path("README.md"),
+    Path("WHITEPAPER.md"),
+    Path("docs/roadmap.md"),
+    Path("docs/faq.md"),
+    Path("memory/STATUS.md"),
+    Path("roadmap.html"),
+    Path("whitepaper.html"),
+    Path("faq.html"),
+    Path("llms.txt"),
+    Path("modules/client/README.md"),
+)
+
 REQUIRED_FRAGMENTS = {
     Path("README.md"): (
         "no production Prometheus network",
@@ -159,6 +172,7 @@ def validate_status(data: dict[str, Any]) -> list[str]:
     light = classes.get("light_client", {})
     economics = classes.get("guardian_economics", {})
     gh_234 = data.get("post_audit_updates", {}).get("gh_234", {})
+    gh_238 = data.get("post_audit_updates", {}).get("gh_238", {})
 
     if (
         validators.get("stake_asset") != "KAS"
@@ -192,9 +206,13 @@ def validate_status(data: dict[str, Any]) -> list[str]:
     if light.get("p2p_reporting") != "not_operated":
         errors.append("Light Client P2P reporting must remain not operated")
     if light.get("p2p_v1_submission") != "development_only_same_host_loopback_verified":
-        errors.append("Light Client v1 submission must remain development-only same-host evidence")
+        errors.append(
+            "Light Client v1 submission must remain development-only same-host evidence"
+        )
     if gh_234.get("classification") != "development_only_same_host_loopback_verified":
-        errors.append("GH-234 v2 submission must remain development-only same-host evidence")
+        errors.append(
+            "GH-234 v2 submission must remain development-only same-host evidence"
+        )
     if gh_234.get("status") != "merged_and_exact_main_verified":
         errors.append("GH-234 must retain merged exact-main verification status")
     merge_commit = gh_234.get("merge_commit")
@@ -207,14 +225,33 @@ def validate_status(data: dict[str, Any]) -> list[str]:
     if set(exact_main_runs) != {"prometheus_ci", "security_audit", "pages"}:
         errors.append("GH-234 exact-main run evidence is incomplete")
     elif not all(
-        isinstance(run_id, int) and run_id > 0
-        for run_id in exact_main_runs.values()
+        isinstance(run_id, int) and run_id > 0 for run_id in exact_main_runs.values()
     ):
         errors.append("GH-234 exact-main run IDs must be positive integers")
     if gh_234.get("public_or_multihost_v2") is not False:
         errors.append("GH-234 must not claim public or multi-host v2 operation")
     if gh_234.get("production_authority") is not False:
         errors.append("GH-234 production authority must remain false")
+    if gh_238.get("issue") != 238:
+        errors.append("GH-238 machine status identity is invalid")
+    if (
+        gh_238.get("status") != "repository_preparation_implemented_and_locally_tested"
+        or gh_238.get("classification") != "development_testnet10_repository_only"
+        or gh_238.get("transport") != "direct-quic-v1"
+        or gh_238.get("protocol") != "/prometheus/threat-hint/2.0.0"
+    ):
+        errors.append(
+            "GH-238 must remain repository-only Development/Testnet-10 preparation"
+        )
+    for field in (
+        "remote_run",
+        "evidence_record",
+        "independent_host_proof",
+        "network_or_infrastructure_action",
+        "production_authority",
+    ):
+        if gh_238.get(field) is not False:
+            errors.append(f"GH-238 {field} must remain false")
     if economics.get("status") != "illustrative_planning_only":
         errors.append("Guardian economics must remain illustrative planning only")
     if economics.get("active_rewards_or_market_price") is not False:
@@ -279,6 +316,18 @@ def verify(root: Path) -> list[str]:
             for fragment in gh_234_evidence_fragments:
                 if not fragment or fragment not in text:
                     errors.append(f"{relative}: GH-234 exact-main evidence missing")
+                    break
+        if relative in GH238_PUBLIC_FILES:
+            normalized_text = " ".join(text.split()).casefold()
+            for fragment in (
+                "GH-238",
+                "No real GH-238 remote run has occurred",
+                "no GH-238 evidence record exists",
+            ):
+                if fragment.casefold() not in normalized_text:
+                    errors.append(
+                        f"{relative}: GH-238 repository-only boundary missing"
+                    )
                     break
         if relative.suffix == ".html" and "5cd13bf" not in text:
             errors.append(f"{relative}: exact reconciliation baseline missing")
