@@ -1835,11 +1835,9 @@ Estimates: unchanged; core 84-88%; complete vision 50-55%; production false
 ## GH-238 CONTROLLED DISTINCT-HOST THREATHINT-V2 PREPARATION (2026-08-29)
 
 ```text
-Status: In progress / repository preparation implemented and locally tested /
+Status: Merged and exact-main verified / repository preparation only /
         production false
-Branch: PR #239 exists on the current feature branch; it is not merged,
-        exact-main, deployed, demonstrated or complete; no merge, exact-main,
-        deployment or remote-run IDs exist yet
+Issue/Code: GH-238 / PR #239 / exact main 912d96d
 Capability: repository-only preparation for one later controlled distinct-host
             Development/Testnet-10 ThreatHint-v2 attempt
 Tooling: challenge-bound role-specific operator attestations over source
@@ -1848,14 +1846,15 @@ Tooling: challenge-bound role-specific operator attestations over source
          one attempt, zero retries and no persistence; strict owner-only
          no-symlink files; exact 9,265-byte Rust wire bound; atomic no-clobber
          record output; closed redacted verifier; CI tests
-Evidence: local unit/CLI/adversarial tests only; host separation is not
-          independently proven
+Evidence: local unit/CLI/adversarial tests only; exact-main CI 33279351831,
+          Security 33279351822 and Pages 33279351387 pass; host separation is
+          not independently proven
 Boundary: no real GH-238 remote run has occurred; no GH-238 evidence record
           exists in the repository
 Authority: none added; no port, firewall, host, IAM, wallet, chain, deployment,
            Mainnet or production action or authority; a later real run requires
            separate explicit authorization
 Remaining gates: separate explicit authorization, one real distinct-host run,
-                 redacted record, protected review, exact-main verification
+                 redacted record, independent host-separation proof
 Estimates: unchanged; core 84-88%; complete vision 50-55%; production false
 ```

@@ -6006,3 +6006,45 @@ No direct `main` push or production action occurred.
 - No remote execution, evidence record, infrastructure, wallet, chain,
   deployment, Mainnet or production action occurred.
 - **Status:** `GH-238 PR #239 review corrections local PASS / Protected rerun next / Production false`.
+
+## 2026-08-29 - GH-238 exact-main documentation closeout started
+
+- PR #239 merged normally as exact main
+  `912d96d2d178ef3a2192547ed2bcca6df0fa38b4`; issue #238 is closed.
+- Exact-main CI `33279351831`, Security Audit `33279351822`, and Pages
+  `33279351387` pass.
+- The isolated closeout branch updates all public and machine-readable GH-238
+  status surfaces to this exact evidence and keeps the real distinct-host run,
+  evidence record, host-separation proof and production authority explicitly
+  false.
+- Kimi K3 will independently review the complete secret-free documentation
+  diff. Sol retains integration, verification and normal protected PR delivery.
+- **Status:** `GH-238 Product merged exact-main PASS / Docs closeout in progress / Production false`.
+
+## 2026-08-29 - GH-238 exact-main documentation closeout approved locally
+
+- All ten canonical GH-238 public/status surfaces now derive and carry exact
+  product main `912d96d` plus CI `33279351831`, Security `33279351822`, and
+  Pages `33279351387`. Machine status pins PR #239, the full merge SHA,
+  `direct-quic-v1`, `/prometheus/threat-hint/2.0.0`, and all five non-authority
+  fields as false.
+- Actual PASS: 23 claim tests and 13-surface verification; 72 focused GH-238
+  tests; Memory, project status, public-hygiene and autodidactic checks; Ruff,
+  mypy, compile, YAML, HTML and diff checks. One intermediate test-placement
+  failure was fixed before the final green run.
+- Desktop and emulated 390px Chrome measurements pass without page-level
+  overflow; GH-238 content stays inside Roadmap, Whitepaper and FAQ bounds.
+- Kimi final verdict: `APPROVE`, no P0-P2. Claude Code hit its own session limit
+  before repository access and made no contribution.
+- No live Pages readback is claimed yet. No remote run, record, host/network or
+  infrastructure action, wallet, chain, deployment, Mainnet or production
+  action occurred.
+- **Status:** `GH-238 Docs closeout local PASS / Protected PR next / Real remote evidence open / Production false`.
+
+## 2026-08-29 - GH-238 documentation closeout protected delivery
+
+- Commit `1f8e879` is published only on the documentation branch; normal PR
+  #240 is open against protected `main`.
+- Required CI/Security contexts and independent review are pending. No merge or
+  live Pages/readme readback is claimed.
+- **Status:** `PR #240 OPEN / Protected checks pending / Production false`.

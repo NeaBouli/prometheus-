@@ -10,12 +10,13 @@ Startpunkt fuer Codex/Claude Code:
 
 Keine Secrets, Tokens, Passwoerter, privaten Keys oder Wallet-Daten in diese Bridge schreiben.
 
-Aktiver Handover: GH-238 bereitet repository-only eine kontrollierte
-distinct-host ThreatHint-v2-Evidenzgrenze vor: challenge-gebundene
-Sender-/Guardian-Attestationen, deterministischer redigierter Builder,
-fail-closed Verifier, adversariale Tests, Runbook und CI. Ein realer Remote-Run,
-Host-/Firewall-/IAM-Aktionen, Wallet, Chain, Mainnet und Produktion sind nicht
-Teil dieses Blocks.
+Aktiver Handover: GH-238/PR #239 ist als exact main `912d96d` gemergt; CI
+`33279351831`, Security `33279351822` und Pages `33279351387` sind gruen. Der
+Dokumentations-Closeout synchronisiert diese repository-only Vorbereitung ueber
+README, Whitepaper, Roadmap, FAQ, Pages, `llms.txt`, Machine Status, Memory und
+Bridge. Ein realer GH-238 Remote-Run oder Evidenz-Record existiert nicht;
+Host-Trennung ist nicht unabhaengig bewiesen. Host-/Firewall-/IAM-Aktionen,
+Wallet, Chain, Mainnet und Produktion sind nicht Teil dieses Blocks.
 
 Abgeschlossener Produkt-Handover: GH-234/PR #235, code commit `b450740`, exact
 main `f146fb2`, ergaenzt den
