@@ -22,6 +22,18 @@
     "live_pages_verified": true,
     "scope": "local_raw_cidv1_exact_byte_ingestion_development_only"
   },
+  "post_audit_updates": {
+    "gh_234": {
+      "as_of": "2026-08-29",
+      "issue": 234,
+      "pull_request": 235,
+      "code_commit": "b450740",
+      "status": "protected_pr_checks_passed_review_findings_in_progress",
+      "classification": "development_only_same_host_loopback_verified",
+      "public_or_multihost_v2": false,
+      "production_authority": false
+    }
+  },
   "classifications": {
     "light_client": {
       "status": "implemented_and_tested_development_foundation",
@@ -34,7 +46,6 @@
       "durable_rule_rollback_protection": "not_implemented",
       "p2p_reporting": "not_operated",
       "p2p_v1_submission": "development_only_same_host_loopback_verified",
-      "p2p_v2_submission": "development_only_same_host_loopback_verified",
       "proof_generation": "development_stub_only"
     },
     "guardian_analysis": {

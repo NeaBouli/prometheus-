@@ -4721,3 +4721,19 @@ Rules for all dev agents:
   isolated repetition and the final complete workspace run: scanner 2.20s
   against 5s; broken-stdout sidecar 3.42s against 10s.
 - Status: `Full local PASS / Kimi APPROVE / PR #235 ready next / Production false`.
+
+## 2026-08-29 - GH-234 review-provenance correction verified
+
+- Addressed both actionable CodeRabbit findings without changing product code:
+  `memory/AUDIT.md` now records the bounded protected-PR audit, and the dated
+  machine status restores its pre-GH-234 baseline classifications while
+  carrying GH-234 only in an explicit `2026-08-29` post-audit record.
+- `llms.txt` now identifies GH-234 as a dated post-audit update. The claim gate
+  fails closed when the record is missing or when public/multi-host or
+  production-authority boundaries drift.
+- PASS: 13-surface claim consistency; claim tests 12/12; Memory integrity;
+  project-status consistency; documentation hygiene; workflow YAML; five HTML
+  pages; Python compile; rustfmt and diff hygiene.
+- Git history confirms `p2p_v2_submission` entered the dated file only in
+  GH-234 documentation commit `824a81b`, not in the 2026-08-14 baseline.
+- Status: `Review findings fixed locally / Commit and protected rerun next / Production false`.

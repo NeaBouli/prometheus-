@@ -69,6 +69,20 @@ class PublicClaimConsistencyTests(unittest.TestCase):
             any("v1 submission" in error for error in MODULE.validate_status(changed))
         )
 
+    def test_gh_234_post_audit_scope_drift_is_rejected(self) -> None:
+        changed = copy.deepcopy(self.status)
+        changed["post_audit_updates"]["gh_234"]["public_or_multihost_v2"] = True
+        self.assertTrue(
+            any("public or multi-host" in error for error in MODULE.validate_status(changed))
+        )
+
+    def test_missing_gh_234_post_audit_record_is_rejected(self) -> None:
+        changed = copy.deepcopy(self.status)
+        del changed["post_audit_updates"]["gh_234"]
+        errors = MODULE.validate_status(changed)
+        self.assertTrue(any("GH-234 v2 submission" in error for error in errors))
+        self.assertTrue(any("production authority" in error for error in errors))
+
     def test_banned_claims_return_categories_only(self) -> None:
         self.assertEqual(
             MODULE.find_banned_claims("PROM cannot be purchased."),

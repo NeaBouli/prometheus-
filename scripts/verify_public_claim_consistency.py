@@ -148,6 +148,7 @@ def validate_status(data: dict[str, Any]) -> list[str]:
     performance = classes.get("performance", {})
     light = classes.get("light_client", {})
     economics = classes.get("guardian_economics", {})
+    gh_234 = data.get("post_audit_updates", {}).get("gh_234", {})
 
     if (
         validators.get("stake_asset") != "KAS"
@@ -182,8 +183,12 @@ def validate_status(data: dict[str, Any]) -> list[str]:
         errors.append("Light Client P2P reporting must remain not operated")
     if light.get("p2p_v1_submission") != "development_only_same_host_loopback_verified":
         errors.append("Light Client v1 submission must remain development-only same-host evidence")
-    if light.get("p2p_v2_submission") != "development_only_same_host_loopback_verified":
-        errors.append("Light Client v2 submission must remain development-only same-host evidence")
+    if gh_234.get("classification") != "development_only_same_host_loopback_verified":
+        errors.append("GH-234 v2 submission must remain development-only same-host evidence")
+    if gh_234.get("public_or_multihost_v2") is not False:
+        errors.append("GH-234 must not claim public or multi-host v2 operation")
+    if gh_234.get("production_authority") is not False:
+        errors.append("GH-234 production authority must remain false")
     if economics.get("status") != "illustrative_planning_only":
         errors.append("Guardian economics must remain illustrative planning only")
     if economics.get("active_rewards_or_market_price") is not False:

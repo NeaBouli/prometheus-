@@ -5845,3 +5845,19 @@ No direct `main` push or production action occurred.
   CI/Security/Pages and review, normal merge, exact-main readback and issue
   closeout. Public/multi-host v2 and production remain false.
 - **Status:** `GH-234 Full local PASS / Kimi APPROVE / Protected PR next / Production false`.
+
+## 2026-08-29 - GH-234 CodeRabbit provenance findings resolved locally
+
+- Two documentation-only review findings were confirmed and corrected. The
+  dated `2026-08-14` machine-readable baseline no longer misclassifies GH-234;
+  its update is isolated under explicit `post_audit_updates.gh_234` metadata.
+- `memory/AUDIT.md` now carries the protected-PR audit and `llms.txt` marks the
+  claim as a `2026-08-29` post-audit update. No merge, public/multi-host v2,
+  deployment or production completion is claimed.
+- The machine gate now rejects a missing GH-234 record, classification drift,
+  public/multi-host v2 claims and production authority. Actual verification:
+  claim consistency PASS on 13 surfaces; 12/12 claim tests; Memory, project
+  status, hygiene, YAML, HTML, Python, rustfmt and diff checks PASS.
+- Next gates remain commit/push, corrected-head protected checks and review,
+  normal merge, exact-main CI/Security/Pages and public readback.
+- **Status:** `GH-234 Review corrections local PASS / Merge pending / Production false`.
