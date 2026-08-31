@@ -4921,3 +4921,77 @@ Rules for all dev agents:
   no product capability claim, runtime behavior or production authority and
   requires no successor GH-238 status patch after normal publication.
 - Status: `GH-238 Complete / Product and public exact-main PASS / Real remote evidence open / Production false`.
+## 2026-08-31 - GH-242 membership-bound ballot sessions started
+
+- Opened issue #242 and branch `feat/GH-242-membership-bound-ballot-sessions`
+  from exact main `3ab29504f21d9bfa943b7bcc19a427791ecadb42`.
+- Scope: add one local fail-closed operated session-establishment path that
+  owner-loads the merged GH-147 canonical Guardian membership source, derives
+  the existing membership snapshot and BIP340 signer assignments internally,
+  binds a separately trusted network and expected epoch, and registers only the
+  resulting source-bound context for authenticated ballot ingress.
+- Existing ensemble math, signed-ballot wire, replay ledger, transport bytes,
+  and the GH-147 schema remain unchanged. Epoch is an operator-pinned identity
+  boundary only, not clock, finality, rotation, or chain authority.
+- Explicit exclusions: key ownership or rotation authority, Sybil resistance,
+  discovery, public/multi-host operation, on-chain attestation, wallet, chain,
+  reward, deployment, Mainnet, production authority, slash ACL, commit-reveal
+  formula, and emergency stop.
+- Kimi K3 independently selected this as the highest-value repository-only
+  block after GH-238 and is assigned the bounded implementation/test core.
+  Claude Code stopped before repository access at its configured USD budget;
+  it made no edit and supplied no review.
+
+### 2026-08-31 - GH-242 implementation and Guardian gates pass
+
+- Kimi implemented the bounded `BallotIngress` establishment core and focused
+  adversarial tests in its two-file allowlist. Sol reviewed the complete diff,
+  corrected the test network to the unchanged signed-ballot grammar, and made
+  the derived registered context available to the external signing workflow.
+- Thirty-two focused ballot-ingress tests pass. The complete Guardian suite
+  passes 1,326 tests with four intentional live-model skips. Black passes, focused
+  source/test Pylint is 10.00/10, and complete Guardian-package Pylint is
+  9.85/10 above the required 7.0 threshold.
+- README, Whitepaper, Roadmap, FAQ, Landing Page, `llms.txt`, Guardian module
+  docs, machine status, Memory and Bridge are synchronized as implemented and
+  locally tested only. Protected merge and exact-main evidence remain pending.
+
+### 2026-08-31 - GH-242 independent review findings closed
+
+- Kimi's independent full-diff review found no P0/P1 issue and identified two
+  P2 coverage gaps: successful single-load counting and explicit isolation of
+  two distinct membership sources.
+- Sol added both adversarial regressions. The successful path now proves one
+  canonical loader call; two source files establish distinct sessions, reject
+  a cross-source signer, and continue to accept each correctly bound signer.
+- Final local evidence is 32 focused tests and 1,326 complete Guardian tests
+  with four intentional live-model skips. Protected review remains pending.
+
+### 2026-08-31 - GH-242 complete local delivery gates pass
+
+- Kimi re-reviewed the complete current 22-file diff after the test fixes and
+  returned `APPROVE` with no remaining P0/P1/P2. Its independent rerun also
+  passed all 32 focused ballot-ingress tests and all 25 public-claim tests.
+- Sol's final post-review run passes 1,326 Guardian tests with four intentional
+  live-model skips, Black, focused Pylint 10.00/10, package Pylint 9.85/10,
+  `cargo test --workspace`, `cargo fmt --all -- --check`, and workspace Clippy
+  across all targets/features with warnings denied.
+- The 13-surface public claim gate, documentation hygiene, Memory integrity,
+  project-status consistency, autodidactic tests, workflow YAML parse, HTML
+  parse, diff hygiene, secret-pattern scan, and RustSec policy gate pass.
+  `cargo audit` reports only nine policy-allowed warnings and no failing
+  vulnerability gate.
+- Local browser measurements at 1280px show no page-level overflow on Landing
+  or Roadmap, and both display the qualified GH-242 status. No external,
+  infrastructure, wallet, chain, deployment, Mainnet or production action
+  occurred. Status: `Local PASS / Protected PR next / Production false`.
+
+### 2026-08-31 - GH-242 protected PR opened
+
+- Commit `0b95d8a` is pushed only on
+  `feat/GH-242-membership-bound-ballot-sessions`; normal protected PR #243 is
+  open against `main` and closes issue #242 on merge.
+- Required CI/Security/Pages contexts and repository review remain pending.
+  No direct-main push, bypass, external runtime, wallet, chain, deployment,
+  Mainnet or production action occurred.
+- Status: `PR #243 OPEN / Protected checks pending / Production false`.

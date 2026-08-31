@@ -6065,3 +6065,62 @@ No direct `main` push or production action occurred.
   state and needs no recursive GH-238 status update after its normal protected
   merge.
 - **Status:** `GH-238 Complete / Product and public exact-main PASS / Real remote evidence open / Production false`.
+## 2026-08-31 - GH-242 canonical membership consumption started
+
+Issue #242 starts from exact main
+`3ab29504f21d9bfa943b7bcc19a427791ecadb42`. GH-147 already defines and
+owner-loads one canonical local Guardian membership source, but the operated
+ballot-session path still permits independently caller-constructed snapshots
+and signer maps. GH-242 is limited to a new source-bound establishment path:
+it must load the canonical source, derive the existing snapshot and BIP340
+signers internally, enforce a separately trusted network and expected epoch,
+and register only that derived context on the operated ingress path. It must
+accept no caller-supplied member list, signer key map, or membership digest.
+
+The epoch is only an explicitly operator-pinned committee identity. It proves
+no time, freshness, key rotation, finality, source authority, or on-chain
+state. Existing ensemble math, ballot wire, replay behavior, transport, and the
+GH-147 schema must remain byte- and behavior-compatible. Key ownership and
+rotation, Sybil resistance, discovery, public/multi-host operation, on-chain
+attestation, proposal submission, wallet, chain, reward, deployment, Mainnet,
+and production operation remain open. No slash ACL, commit-reveal formula,
+KAS/PROM role, Guardian reputation, or emergency-stop policy may change.
+
+Kimi K3 selected this repository-only slice through an independent read-only
+review and is assigned the bounded implementation/test core. Claude Code was
+invoked for a small read-only blocker scan but exhausted its configured USD
+budget before repository access; it made no edit and returned no finding.
+
+Local implementation evidence now passes: 32 focused ballot-ingress tests;
+1,326 complete Guardian tests with four intentional live-model skips; Black;
+focused source/test Pylint 10.00/10; and complete Guardian-package Pylint
+9.85/10. Sol corrected the focused fixture network to the unchanged
+signed-ballot `mainnet|testnet-N` grammar and made the internally derived,
+already registered context the data-only return value required by the external
+signing workflow. Public and machine-readable status surfaces describe only an
+implemented and locally tested owner-local boundary. Protected PR review,
+merge, exact-main CI/Security/Pages and live Pages readback remain pending.
+
+Kimi's independent final review found no P0/P1 and two P2 test-coverage gaps.
+Both are closed: the successful establishment path now asserts exactly one
+canonical loader call, and two distinct source files prove session isolation,
+cross-source signer rejection, and correctly bound acceptance. No runtime,
+protocol, authority, chain, deployment or production scope was added.
+
+Final local delivery evidence passes after those fixes: Kimi re-reviewed the
+complete current 22-file diff and returned `APPROVE` with no remaining
+P0/P1/P2; its independent reruns pass 32 focused tests and 25 public-claim
+tests. Sol's post-review suite passes 1,326 Guardian tests with four intentional
+live-model skips, Black, focused Pylint 10.00/10, package Pylint 9.85/10,
+`cargo test --workspace`, cargo fmt and workspace/all-target/all-feature Clippy
+with warnings denied. Public claims, documentation hygiene, Memory, project
+status, autodidactic, workflow YAML, HTML, diff, secret-pattern and RustSec
+policy gates pass. Browser measurements at 1280px show no page-level overflow
+on Landing or Roadmap. Protected PR review, merge, exact-main CI/Security/Pages
+and cache-busted live readback remain pending; production remains false.
+
+Commit `0b95d8a` is published only on the GH-242 feature branch. Normal
+protected PR #243 is open against `main` and closes issue #242 on merge.
+Required CI/Security/Pages contexts and repository review are pending. There
+was no direct-main push, bypass, external runtime, wallet, chain, deployment,
+Mainnet or production action.

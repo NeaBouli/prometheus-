@@ -301,6 +301,11 @@ contract invariant is not proof of decentralized operation. Current evidence
 depends on owner-operated policy/membership files and local trust anchors; no
 public multi-host protocol network is operating. Availability still depends on
 Kaspa, IPFS replication, participating nodes, clients, and network access.
+GH-242 removes one local caller-assertion path by deriving ballot committees and
+public BIP340 signer assignments only from an owner-loaded canonical membership
+source with a separately trusted network and expected epoch. That does not make
+the source externally authoritative, prove key ownership or rotation, prevent
+Sybil identities, or establish decentralized or production operation.
 
 **Q: When will the mobile app be available?**
 Desktop and mobile releases are readiness-gated rather than date-gated.

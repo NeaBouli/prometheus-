@@ -3,6 +3,16 @@
 The libp2p carrier is intentionally untrusted by this boundary. It forwards one
 bounded opaque frame; this module resolves a locally registered session and
 delegates every protocol and authorization check to ``signed_ballots``.
+
+Operated sessions are established only from the canonical GH-147 owner-only
+Guardian membership source: the caller pins a separately trusted network id
+and expected epoch, the source is owner-loaded exactly once, and the snapshot,
+BIP340 signers, and ballot session are derived internally. No caller-supplied
+member list, signer map, snapshot, source digest, or context is accepted. The
+epoch is an operator-pinned committee identity only; it proves no time,
+freshness, key rotation, finality, source authority, or on-chain state. Every
+establishment failure raises the one stable redacted ``BallotIngressError``
+without values, ids, paths, keys, or digests.
 """
 
 from __future__ import annotations
@@ -19,6 +29,10 @@ from collections.abc import Callable
 from typing import Final, Literal
 
 from .ensemble import EnsembleCandidate, MembershipSnapshot
+from .guardian_membership_source import (
+    MAX_MEMBERSHIP_EPOCH,
+    load_guardian_membership_source,
+)
 from .signed_ballots import (
     MAX_BALLOT_WIRE_BYTES,
     AuthenticatedBallotCollector,
@@ -38,17 +52,44 @@ _LOWER_HEX_32 = re.compile(r"[0-9a-f]{64}")
 IngressStatus = Literal["accepted", "duplicate", "rejected", "busy"]
 
 
+_INGRESS_ESTABLISHMENT_ERROR: Final[str] = "invalid ballot session establishment"
+
+
 class BallotIngressError(ValueError):
     """The local ingress configuration or frame is unsafe."""
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, init=False)
 class BallotContext:
-    """Locally trusted verification context for one committed session."""
+    """Locally trusted verification context for one committed session.
+
+    Direct construction is disabled; ``BallotIngress.establish_session`` is
+    the only supported construction path, so the candidate, snapshot, and
+    session always derive from one canonical owner-loaded membership source.
+    """
 
     candidate: EnsembleCandidate
     snapshot: MembershipSnapshot
     session: BallotSession
+
+    def __init__(self) -> None:
+        raise TypeError("direct ballot context construction is disabled")
+
+    def __reduce__(self) -> object:
+        raise TypeError("ballot context is not serializable")
+
+
+def _derive_context(
+    candidate: EnsembleCandidate,
+    snapshot: MembershipSnapshot,
+    session: BallotSession,
+) -> BallotContext:
+    """Bind the internally derived views into the one trusted context."""
+    context = object.__new__(BallotContext)
+    object.__setattr__(context, "candidate", candidate)
+    object.__setattr__(context, "snapshot", snapshot)
+    object.__setattr__(context, "session", session)
+    return context
 
 
 @dataclass(frozen=True)
@@ -127,11 +168,69 @@ class BallotIngress:
         self._collector = collector
         self._contexts: dict[str, BallotContext] = {}
 
-    def register(self, context: BallotContext) -> None:
+    # Explicit separately-trusted inputs keep every commitment visible; the
+    # epoch is validated before any file access.
+    # pylint: disable-next=too-many-arguments
+    def establish_session(
+        self,
+        membership_source_path: Path,
+        *,
+        expected_network_id: str,
+        expected_epoch: int,
+        candidate: EnsembleCandidate,
+        session_nonce: str,
+        valid_from_ms: int,
+        valid_until_ms: int,
+    ) -> BallotContext:
+        """Establish one session bound to the canonical membership source.
+
+        The owner-only source is loaded exactly once via
+        ``load_guardian_membership_source``; the snapshot and BIP340 signers
+        are derived internally from that source and committed through the
+        existing ``BallotSession``. The expected epoch is an operator-pinned
+        committee identity only: it proves no time, freshness, key rotation,
+        finality, source authority, or on-chain state. Re-establishing the
+        exact same derived session is idempotent; a conflicting context for
+        the same session id is rejected. Every failure raises the one stable
+        redacted ``BallotIngressError`` without values, ids, paths, keys, or
+        digests.
+        """
+        if (
+            type(expected_epoch) is not int  # pylint: disable=unidiomatic-typecheck
+            or expected_epoch < 0
+            or expected_epoch > MAX_MEMBERSHIP_EPOCH
+        ):
+            raise BallotIngressError(_INGRESS_ESTABLISHMENT_ERROR)
+        try:
+            source = load_guardian_membership_source(
+                membership_source_path, expected_network_id=expected_network_id
+            )
+        except Exception:  # pylint: disable=broad-exception-caught
+            raise BallotIngressError(_INGRESS_ESTABLISHMENT_ERROR) from None
+        if source.epoch != expected_epoch:
+            raise BallotIngressError(_INGRESS_ESTABLISHMENT_ERROR)
+        try:
+            snapshot = source.to_membership_snapshot()
+            session = BallotSession.create(
+                candidate,
+                snapshot,
+                source.to_ballot_signers(),
+                network_id=source.network_id,
+                session_nonce=session_nonce,
+                valid_from_ms=valid_from_ms,
+                valid_until_ms=valid_until_ms,
+            )
+        except Exception:  # pylint: disable=broad-exception-caught
+            raise BallotIngressError(_INGRESS_ESTABLISHMENT_ERROR) from None
+        context = _derive_context(candidate, snapshot, session)
+        self._register_context(context)
+        return context
+
+    def _register_context(self, context: BallotContext) -> None:
         session_id = context.session.session_id
         current = self._contexts.get(session_id)
         if current is not None and current != context:
-            raise BallotIngressError("session id is already registered")
+            raise BallotIngressError(_INGRESS_ESTABLISHMENT_ERROR)
         self._contexts[session_id] = context
 
     def process(self, wire: bytes, now_ms: int) -> IngressAck:

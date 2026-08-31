@@ -1,5 +1,5 @@
 # PROMETHEUS — SESSION CHECKPOINT
-# Last updated: 2026-08-23
+# Last updated: 2026-08-31
 # Purpose: Full recovery document. If Claude (Architect) or Claude Code
 # loses context, read this file first. It contains the complete project state.
 
@@ -1116,3 +1116,20 @@ Leistungsbasierte Emission. Guardians = "Miner" (KI statt GPU).
 - Commit `4bbb709` is published on the feature branch only. Normal PR #206
   targets protected `main` and closes issue #205 on merge.
 - **Status:** `GH-205 PR #206 checks and review pending / Production false`.
+## Checkpoint 2026-08-31: GH-242 membership-bound ballot sessions
+
+- GH-242 consumes the merged GH-147 source in the local authenticated ballot
+  path. `BallotIngress.establish_session` owner-loads one canonical source once,
+  enforces a separately trusted network and expected epoch, derives the existing
+  snapshot and public BIP340 signers internally, then registers and returns the
+  unchanged session context.
+- Direct `BallotContext` construction and the former public arbitrary
+  registration path are disabled. Establishment errors are one fixed redacted
+  category. Thirty-two focused tests, Black and focused Pylint 10.00/10 pass;
+  the complete Guardian suite passes 1,326 tests with four intentional skips.
+- No ensemble formula, ballot wire/session digest, replay ledger, transport,
+  private-key, chain, KAS/PROM, slash ACL, commit-reveal, reputation or
+  emergency-stop behavior changed.
+- This is owner-local assignment consumption only. External source authority,
+  key ownership/rotation, Sybil resistance, multi-host operation, on-chain
+  attestation, protected merge/exact-main evidence and production trust remain.

@@ -2,7 +2,7 @@
 # Every completed module is audited by Claude (Architect) before proceeding to the next sprint.
 # Format: | Module | Version | Date | Auditor | Result | Notes |
 # Result: ACCEPTED | REJECTED | NEEDS_CHANGES
-# Last Updated: 2026-08-29
+# Last Updated: 2026-08-31
 
 ---
 
@@ -2707,3 +2707,26 @@ changed.
   production action or authority is added; a later real run requires separate
   explicit authorization.
 - Result: `PASS / GH-238 repository preparation merged exact-main / Real remote evidence open / Production false`.
+## 2026-08-31 - GH-242 local membership consumption audit
+
+- The former public `BallotIngress.register(BallotContext(...))` caller-asserted
+  committee path is removed. The replacement accepts no caller members, public
+  keys, snapshot, source digest or context.
+- Exact built-in epoch bounds are checked before file access. One canonical
+  owner-only GH-147 source is loaded once, its network and epoch are restricted
+  by separately trusted inputs, and its snapshot and BIP340 signer views are
+  derived in the same call before unchanged session registration.
+- Direct context construction and serialization fail. All establishment errors
+  collapse to one data-minimal category. Adversarial tests cover source/network/
+  epoch mismatch, unsafe or missing files, source changes, idempotency,
+  conflicting same-session state, bypass attempts and existing transport/ACK
+  behavior.
+- Local evidence so far: 32 focused tests, 1,326 complete Guardian tests with
+  four intentional live-model skips, Black, focused Pylint 10.00/10 and
+  package Pylint 9.85/10 pass. Repository-wide gates remain before `Done`.
+- Kimi's independent full-diff review found no P0/P1 and two P2 test gaps;
+  successful one-load counting and distinct-source signer/session isolation
+  were added and pass before protected delivery.
+- Residual trust is explicit: owner-local source authorship, in-process owner
+  trust, key ownership/rotation, Sybil resistance, public/multi-host operation,
+  L1 attestation and production authority are not proven.

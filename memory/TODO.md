@@ -2,7 +2,7 @@
 # Format: - [ ] [PRIO] Beschreibung | Verantwortlich | Dependencies
 # PRIO: P0=Kritisch, P1=Hoch, P2=Mittel, P3=Niedrig
 # Status: [ ]=offen, [~]=in Arbeit, [x]=erledigt, [!]=blockiert
-# Last Updated: 2026-08-23
+# Last Updated: 2026-08-31
 
 ---
 
@@ -176,7 +176,7 @@
 ## ═══ SPRINT 10B: GUARDIAN DECENTRALIZATION (parallel to Sprint 10) ═══
 
 - [x] [P1] Design and implement hybrid routing: 8B default, 70B escalation when confidence < 0.70 | Codex | GH-33/PR #34 merged as `ce1d213`; dependency-injected local router, threat/rule hash binding, finite confidence and strict submission checks, fail-closed escalation, 47 passed/3 live-model skipped; exact-main CI/Security/Pages green; live wiring/calibration remains operational work
-- [~] [P1] Implement ensemble voting protocol: 5+ 8B Guardians vote on same YARA rule via majority | Codex | GH-36/39 plus merged/exact-main GH-42/GH-44/GH-48/GH-52 are implemented. Public/multi-host operation, broad discovery, trusted membership/key assignment, Sybil resistance, on-chain attestation, and production evidence remain
+- [~] [P1] Implement ensemble voting protocol: 5+ 8B Guardians vote on same YARA rule via majority | Codex | GH-36/39 plus merged/exact-main GH-42/GH-44/GH-48/GH-52 are implemented. GH-242 locally binds operated session establishment to the owner-loaded GH-147 source without changing ensemble math. Externally trusted membership authority, key ownership/rotation, public/multi-host operation, broad discovery, Sybil resistance, on-chain attestation, and production evidence remain
 - [ ] [P2] Guardian Pooling Contract: on-chain PROM split for shared 70B nodes | Claude Code | Contracts live
 - [ ] [P2] Specialization sharding: Guardian registers attack class (ransomware/network/privilege) during PoW registration | Claude Code | Sprint 11
 - [ ] [P2] Sybil resistance final design: KAS/PROM stake per Guardian identity OR hardware ZK-fingerprint | Architect decision needed
@@ -269,6 +269,7 @@
 - [x] [P2] Add deterministic Guardian confidence evaluation/calibration gate | Codex Sol | GH-138/PR #139 merged and exact-main verified at `52209cc`; CI `30697333650`, Security `30697333643`, and Pages `30697333307` pass. The canonical 24-case synthetic evidence is internally consistency-checked but not externally anchored. Live-model semantic quality, real adversarial evidence, production calibration, and authorization remain separate gates
 - [x] [P3] Disable reconstruction/serialization of the older data-only `ThreatHintV2PreflightReceipt` | Codex Sol | Closed in ticket 009 with direct, `dataclasses.replace`, and pickle regressions
 - [x] [P1] GH-147 canonical Guardian membership source and public-key assignment | Codex Sol + Kimi K3 | PR #148 merged as exact main `aeecffb`; CI `30863940497`, Security `30863940502`, and Pages `30863940053` pass after 198 focused tests, Guardian 1043/4, Black 30 and Pylint 10.00/9.84. External source authority, key ownership/rotation, Sybil resistance and L1 attestation remain separate work
+- [x] [P1] GH-242 bind local ballot sessions to the canonical membership source | Codex Sol + Kimi K3 | Implemented and locally tested: owner-load once; separately trusted network/epoch; internal snapshot/signer derivation; no public caller-context registration; unchanged ballot wire, replay and ensemble math. Protected merge/exact-main evidence remains pending
 - [x] [P1] GH-152 permanent governed ThreatHint-v2 identity pairing | Codex Sol + Kimi K3 | PR #153 merged as exact main `3d203aa`; CI `31306353671`, Security `31306353670`, and Pages `31306353328` pass after 63 focused and 1050/4 full Guardian tests; Kimi final review PASS with no P0-P2
 - [x] [P2] GH-155 Guardian sidecar process-test CI stability | Codex Sol + Kimi K3 | PR #156 merged as exact main `db33f56`; CI `31308756777`, Security `31308756786`, and Pages `31308756387` pass after deterministic kill/reap coverage, 20-pass stress, full local gates, and Kimi review PASS with no P0-P2; test-only, no production behavior
 - [x] [P2] GH-158 synchronize August public status and GH-155 reliability evidence | Codex Sol + Kimi K3 | PR #159 merged as exact main `ed75b58`; CI `31311389618`, Security `31311389613`, and Pages `31311389052` pass; live Pages verified, H-001 remains 96% and core rollout remains 84-88%
