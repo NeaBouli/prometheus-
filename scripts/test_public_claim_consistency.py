@@ -248,6 +248,63 @@ class PublicClaimConsistencyTests(unittest.TestCase):
         errors = MODULE.validate_status(changed)
         self.assertTrue(any("GH-242" in error for error in errors))
 
+    def test_gh_242_status_drift_is_rejected(self) -> None:
+        changed = copy.deepcopy(self.status)
+        changed["post_audit_updates"]["gh_242"][
+            "status"
+        ] = "implemented_and_locally_tested_repository_boundary"
+        self.assertTrue(
+            any(
+                "GH-242 repository boundary" in error
+                for error in MODULE.validate_status(changed)
+            )
+        )
+
+    def test_incomplete_gh_242_exact_main_evidence_is_rejected(self) -> None:
+        changed = copy.deepcopy(self.status)
+        del changed["post_audit_updates"]["gh_242"]["exact_main_runs"]["pages"]
+        self.assertTrue(
+            any(
+                "GH-242 exact-main" in error
+                for error in MODULE.validate_status(changed)
+            )
+        )
+
+    def test_malformed_gh_242_merge_commit_is_rejected(self) -> None:
+        changed = copy.deepcopy(self.status)
+        changed["post_audit_updates"]["gh_242"]["merge_commit"] = "5cb132c"
+        self.assertTrue(
+            any(
+                "GH-242 merge commit" in error
+                for error in MODULE.validate_status(changed)
+            )
+        )
+
+    def test_gh_242_public_surface_drift_is_rejected(self) -> None:
+        root = SCRIPT.parents[1]
+        merge_commit = self.status["post_audit_updates"]["gh_242"]["merge_commit"]
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_root = Path(tmp)
+            status_target = tmp_root / MODULE.STATUS_PATH
+            status_target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy(root / MODULE.STATUS_PATH, status_target)
+            for relative in MODULE.PUBLIC_FILES:
+                target = tmp_root / relative
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy(root / relative, target)
+            drifted = tmp_root / "README.md"
+            drifted.write_text(
+                drifted.read_text(encoding="utf-8").replace(merge_commit, "0" * 40),
+                encoding="utf-8",
+            )
+            errors = MODULE.verify(tmp_root)
+            self.assertTrue(
+                any(
+                    "README.md" in error and "GH-242 exact-main" in error
+                    for error in errors
+                )
+            )
+
     def test_banned_claims_return_categories_only(self) -> None:
         self.assertEqual(
             MODULE.find_banned_claims("PROM cannot be purchased."),

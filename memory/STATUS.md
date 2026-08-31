@@ -1861,9 +1861,10 @@ Estimates: unchanged; core 84-88%; complete vision 50-55%; production false
 ## GH-242 MEMBERSHIP-BOUND BALLOT SESSION ESTABLISHMENT (2026-08-31)
 
 ```text
-Status: implemented and locally tested repository boundary; protected merge and
-        exact-main evidence pending
-Issue: #242
+Status: merged and exact-main verified repository boundary; production false
+Issue: #242 / PR #243
+Exact main: 5cb132c670d1e7771ccaf6dab2ddf5b1a6fd905a
+Runs: CI 33433012614 / Security 33433012605 / Pages 33433011653
 Input: one owner-only canonical GH-147 source path plus separately trusted
        network and expected epoch, candidate, nonce and validity window
 Derivation: source loaded exactly once; snapshot and public BIP340 signer map
@@ -1876,7 +1877,7 @@ Compatibility: signed-ballot wire/session digest inputs, replay ledger,
                transport bytes and ensemble formula unchanged
 Evidence: 32 focused tests, 1,326 complete Guardian tests with 4 intentional
           live-model skips, Black, focused Pylint 10.00/10 and package Pylint
-          9.85/10 pass; repository-wide gates remain
+          9.85/10 pass; protected and exact-main gates pass
 Boundary: epoch is an operator-pinned committee identity only; no time,
           freshness, rotation, finality, source or chain authority
 Remaining: external source authority, key ownership/rotation, Sybil resistance,

@@ -202,8 +202,8 @@ resolved and squash-merged normally without bypass as exact main `aeecffb`.
 Prometheus CI `30863940497`, Security Audit `30863940502`, and GitHub Pages
 `30863940053` pass on that SHA.
 
-**GH-242 membership-bound ballot session establishment (implemented and
-locally tested):** the operated local `BallotIngress` API no longer accepts a
+**GH-242 membership-bound ballot session establishment (merged and exact-main
+verified):** the operated local `BallotIngress` API no longer accepts a
 caller-constructed committee context. It owner-loads one canonical GH-147
 source exactly once, checks a separately trusted network plus expected epoch,
 derives the membership snapshot and public BIP340 signer map internally, and
@@ -214,6 +214,10 @@ operator-pinned committee identity, not time, finality, rotation, source or
 chain authority. This closes a local caller-assertion gap only: external source
 authority, key ownership/rotation, Sybil resistance, multi-host operation,
 on-chain attestation and production trust remain open.
+
+Protected PR #243 merged normally as exact main
+`5cb132c670d1e7771ccaf6dab2ddf5b1a6fd905a`. Prometheus CI `33433012614`,
+Security Audit `33433012605`, and GitHub Pages `33433011653` pass on that SHA.
 
 **GH-103 merged and exact-main verified — local ELF import extraction:** the Rust Threat Observable boundary can derive one checked `api_import` from exact caller-supplied Linux ELF bytes. It uses the pinned read-only `object` parser, accepts no path, import string, platform, format, or generic observable value, and derives `linux`/`elf` internally. Inputs are capped at 16 MiB and 4096 dynamic symbols; names must match the existing closed ASCII grammar, are byte-sorted and deduplicated, and one checked index is selected. Every result is local-only `review_required_v1`, with shared exact-byte vectors independently parsed by Python. This neither proves external artifact provenance nor authorizes disclosure, transport, proof acceptance, analysis, or publication.
 

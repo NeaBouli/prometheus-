@@ -432,8 +432,10 @@ session. It accepts no caller-supplied committee, signer map, snapshot, source
 digest, or context; direct context construction and public arbitrary
 registration are disabled. All establishment failures are data-minimal. Epoch
 is an operator-pinned committee identity only, not time, freshness, rotation,
-finality, source authority, or chain state. This is implemented and locally
-tested repository evidence, not externally trusted membership, key ownership,
+finality, source authority, or chain state. PR #243 merged normally as exact
+main `5cb132c670d1e7771ccaf6dab2ddf5b1a6fd905a`; Prometheus CI `33433012614`,
+Security Audit `33433012605`, and Pages `33433011653` pass on that SHA. This is
+merged repository evidence, not externally trusted membership, key ownership,
 Sybil resistance, on-chain attestation, multi-host operation, or production
 authority.
 
