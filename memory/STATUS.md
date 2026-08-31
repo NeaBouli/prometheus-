@@ -1865,6 +1865,9 @@ Status: merged and exact-main verified repository boundary; production false
 Issue: #242 / PR #243
 Exact main: 5cb132c670d1e7771ccaf6dab2ddf5b1a6fd905a
 Runs: CI 33433012614 / Security 33433012605 / Pages 33433011653
+Public closeout: PR #244 / exact main
+                 d9b275452e70717372747ef9359abaec956fcf49
+Public runs: CI 33435673539 / Security 33435673520 / Pages 33435672362
 Input: one owner-only canonical GH-147 source path plus separately trusted
        network and expected epoch, candidate, nonce and validity window
 Derivation: source loaded exactly once; snapshot and public BIP340 signer map
@@ -1882,4 +1885,5 @@ Boundary: epoch is an operator-pinned committee identity only; no time,
           freshness, rotation, finality, source or chain authority
 Remaining: external source authority, key ownership/rotation, Sybil resistance,
            public/multi-host operation, L1 attestation and production trust
+Live readback: raw-main README, Landing, Roadmap, Whitepaper, FAQ and llms.txt
 ```

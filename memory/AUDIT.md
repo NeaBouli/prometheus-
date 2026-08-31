@@ -2733,4 +2733,9 @@ changed.
 - PR #243 merged normally as exact main
   `5cb132c670d1e7771ccaf6dab2ddf5b1a6fd905a`; issue #242 is closed. Exact-main
   CI `33433012614`, Security Audit `33433012605`, and Pages `33433011653` pass.
-  Result: `PASS / Merged exact-main repository boundary / Production false`.
+- Public closeout PR #244 merged normally as exact main
+  `d9b275452e70717372747ef9359abaec956fcf49`; exact-main CI `33435673539`,
+  Security Audit `33435673520`, and Pages `33435672362` pass. Cache-busted live
+  readback verifies raw-main README, Landing, Roadmap, Whitepaper, FAQ and
+  `llms.txt` expose the bounded GH-242 evidence.
+- Result: `PASS / Product and public exact-main verified / Production false`.

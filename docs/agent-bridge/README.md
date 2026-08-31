@@ -10,18 +10,21 @@ Startpunkt fuer Codex/Claude Code:
 
 Keine Secrets, Tokens, Passwoerter, privaten Keys oder Wallet-Daten in diese Bridge schreiben.
 
-Abgeschlossener Handover: GH-242/PR #243 ist als exact main
-`5cb132c670d1e7771ccaf6dab2ddf5b1a6fd905a` gemergt. Exact-main CI
-`33433012614`, Security Audit `33433012605` und Pages `33433011653` sind
-gruen. Der lokale BallotIngress-Pfad owner-laedt die kanonische
+Abgeschlossener Produkt- und Public-Handover: GH-242/PR #243 ist als Produkt
+exact main `5cb132c670d1e7771ccaf6dab2ddf5b1a6fd905a` gemergt; der synchronisierte
+Public-Closeout PR #244 ist als exact main
+`d9b275452e70717372747ef9359abaec956fcf49` gemergt. Seine Exact-main CI
+`33435673539`, Security Audit `33435673520` und Pages `33435672362` sind gruen,
+und README, Landing, Roadmap, Whitepaper, FAQ sowie `llms.txt` wurden live
+verifiziert. Der lokale BallotIngress-Pfad owner-laedt die kanonische
 GH-147-Mitgliedschaft genau einmal, bindet ein separat vorgegebenes Netzwerk
 und eine erwartete Epoch, leitet Snapshot und oeffentliche BIP340-Signer intern
 ab und akzeptiert keinen oeffentlichen caller-konstruierten Kontext mehr.
 Ensemble-Formel, Ballot-Wire, Replay und Transport bleiben unveraendert.
 Externe Membership-Autoritaet, Key Ownership/Rotation, Sybil Resistance,
 Multi-Host, L1-Attestierung und Produktion bleiben offen. Commit `0b95d8a` ist
-der reviewed feature commit; die Aenderungen sind ueber den normalen
-geschuetzten PR #243 als exact main integriert. Issue #242 ist geschlossen.
+der reviewed feature commit; die Aenderungen sind ueber die normalen
+geschuetzten PRs #243 und #244 integriert. Issue #242 ist geschlossen.
 
 Abgeschlossener Produkt-Handover: GH-234/PR #235, code commit `b450740`, exact
 main `f146fb2`, ergaenzt den
