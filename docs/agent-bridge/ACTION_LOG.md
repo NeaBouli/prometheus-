@@ -5042,3 +5042,66 @@ Rules for all dev agents:
   After its normal protected merge it needs no recursive GH-242 status update.
 - Status: `GH-242 Complete / Product and public exact-main PASS / Production
   false`.
+
+## 2026-09-01 - GH-246 started
+
+- Created isolated branch `feat/GH-246-guardian-membership-transitions` from
+  exact remote main `96adf67c3b7830cb2904c1d933e87bad61709395`; the preserved desktop
+  feature checkout and `Prometheus-1.png` remain untouched.
+- Accepted scope is repository-only signed Guardian membership transition
+  verification, durable owner-only epoch/source high-water, replay and
+  equivocation rejection, and current-membership enforcement for new ballot
+  sessions.
+- No signing, private-key, wallet, chain, broadcast, deployment, Mainnet,
+  production, external membership-authority, key-rotation, Sybil-resistance,
+  reputation, KAS/PROM, slash ACL, commit-reveal or emergency-stop change is
+  authorized.
+- Status: `Ticket active / Analysis next / Production false`.
+
+### 2026-09-01 - GH-246 local product and documentation gates pass
+
+- Implemented `guardian_membership_transition.py`, its adversarial test suite,
+  and mandatory race-free `BallotIngress` current-source consumption.
+- 54 focused tests and all 1,348 Guardian tests pass with four intentional
+  live-model skips; focused Pylint is 10.00/10.
+- README, Whitepaper, Roadmap, FAQ, Landing, public HTML, `llms.txt`, Guardian
+  README, machine status, verifier/tests and Memory are synchronized as a
+  local protected-review candidate. Public-claim, docs-hygiene, Memory,
+  project-status and autodidactic gates pass.
+- Kimi provided architecture/threat-model/state-machine/test design but wrote
+  no file; Sol implemented/integrated. Claude stopped at its configured budget
+  before repository access and made no change.
+- Status: `Local PASS / Independent final diff review and complete gates next /
+  Production false`.
+
+### 2026-09-01 - GH-246 independent review and complete local gates pass
+
+- Kimi K3 independently reviewed the complete diff read-only and returned
+  `APPROVE`: no P0-P2 finding. Its one non-blocking P3 documentation finding
+  was corrected by marking the old GH-242 path-input API as superseded by the
+  GH-246 stored-current-source boundary.
+- Complete local gates pass: Guardian `1,348 passed, 4 skipped`; Rust workspace
+  tests pass with two intentional ignored live-node tests; workspace Clippy
+  with warnings denied, Rustfmt, package Pylint 9.85/10, focused Pylint
+  10.00/10, Cargo audit with nine allowed dependency-maintenance warnings, and
+  Python dependency audit with no known vulnerability.
+- Public-claim, documentation-hygiene, Memory, project-status, compose-policy,
+  workflow-YAML and HTML parsing gates pass. Desktop and mobile browser checks
+  found no page-width or heading overflow; the Roadmap renders without console
+  warnings after its intended entrance animation.
+- Status: `Local complete / Protected PR next / Production false`.
+
+### 2026-09-01 - PR #247 review findings resolved
+
+- All required CI and Security checks passed on initial PR commit `5bcf3ea`.
+  CodeRabbit completed with two minor inline findings and two review notes.
+- Sol verified and fixed all four: malformed non-object GH-246 machine records
+  now fail closed without an exception; every GH-246 public surface is checked
+  against its explicit owner-local/non-production claim set plus positive
+  authority/production drift rejection; SQLite size checks derive from the
+  canonical Python limits; and `llms.txt` carries the current document date.
+- Focused transition/ingress remains `54 passed`; public-claim coverage is now
+  `34 tests` and passes. Black, focused Pylint 10.00/10, documentation hygiene,
+  Memory Integrity and diff checks pass after the fixes.
+- Status: `Review findings resolved / Updated protected checks next /
+  Production false`.

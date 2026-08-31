@@ -439,6 +439,22 @@ merged repository evidence, not externally trusted membership, key ownership,
 Sybil resistance, on-chain attestation, multi-host operation, or production
 authority.
 
+GH-246 adds an owner-local continuity layer above GH-147/GH-242. An exact
+owner-only policy pins one network, one public BIP340 transition key, and one
+bootstrap epoch/source digest. Canonical signed transition bytes bind exact
+previous and next source digests, a strictly advancing epoch, a bounded
+validity window, and a unique nonce. One owner-only SQLite ledger atomically
+persists the accepted canonical source bytes, clock/epoch high-water, and
+transition history. New ballot sessions derive the stored current source while
+the same transaction lock is held; pre-existing bounded sessions are not
+retroactively rewritten. Local tests cover signature and source manipulation,
+rollback, same-epoch equivocation, replay, restart, concurrency, schema/path
+tampering, and redacted failure behavior. This repository-only candidate
+contains no signing/private-key API and does not establish external authority,
+key ownership or rotation, Sybil resistance, L1 attestation, public multi-host
+operation, deployment, or production trust. Issue #246 protected review and
+exact-main evidence remain pending.
+
 ---
 
 ## 8. Light Client

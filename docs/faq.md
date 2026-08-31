@@ -309,6 +309,12 @@ Sybil identities, or establish decentralized or production operation.
 PR #243 merged normally as exact main
 `5cb132c670d1e7771ccaf6dab2ddf5b1a6fd905a`; exact-main CI `33433012614`,
 Security Audit `33433012605`, and Pages `33433011653` pass.
+GH-246 locally adds signed, durable owner-pinned transition continuity: new
+ballot sessions use only the current canonical source stored in an owner-only
+ledger, while rollback, same-epoch equivocation and replay fail closed. This
+does not answer who should control the pinned public authority key, prove its
+ownership or rotation, resist Sybil identities, or establish decentralized or
+production operation. Protected review and exact-main evidence are pending.
 
 **Q: When will the mobile app be available?**
 Desktop and mobile releases are readiness-gated rather than date-gated.

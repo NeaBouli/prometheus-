@@ -2739,3 +2739,25 @@ changed.
   readback verifies raw-main README, Landing, Roadmap, Whitepaper, FAQ and
   `llms.txt` expose the bounded GH-242 evidence.
 - Result: `PASS / Product and public exact-main verified / Production false`.
+
+## Audit GH-246: Guardian membership transition continuity (local candidate)
+
+- One owner-pinned public BIP340 authority verifies exact canonical membership
+  transitions and advances an owner-only SQLite current-source ledger. There
+  is no signer, private-key, wallet, chain, broadcast or production path.
+- Rollback, same-epoch equivocation, replay, clock rollback, invalid windows,
+  source/network/signature mismatch, restart, unsafe paths and concurrent
+  duplicate application fail closed. New ballot sessions consume only stored
+  current source bytes under the same ledger transaction lock.
+- Kimi K3 independently returned `APPROVE` with no P0-P2 finding. Its sole P3
+  stale-doc finding was fixed before delivery.
+- Evidence passes: 54 focused and 1,348 complete Guardian tests with four
+  intentional skips; complete Rust workspace tests with two intentional
+  ignored live-node tests; Rustfmt; Clippy with warnings denied; Pylint
+  9.85/10 package and 10.00/10 focused; public/docs/Memory/status gates;
+  Cargo audit with nine allowed warnings; Python audit with no known
+  vulnerability; desktop/mobile public-page checks without viewport overflow.
+- Residual trust remains explicit: external authority, key ownership/rotation,
+  Sybil resistance, L1 attestation, public multi-host operation and production
+  authority are not proven.
+- Result: `LOCAL PASS / Protected review pending / Production false`.

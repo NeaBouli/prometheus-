@@ -79,6 +79,22 @@
       "sybil_resistance_proven": false,
       "on_chain_attestation": false,
       "production_authority": false
+    },
+    "gh_246": {
+      "as_of": "2026-09-01",
+      "issue": 246,
+      "status": "implemented_and_locally_verified_protected_review_pending",
+      "classification": "owner_local_signed_membership_continuity",
+      "public_bip340_verification": true,
+      "durable_current_source": true,
+      "ballot_current_source_lock": true,
+      "signing_or_private_key_api": false,
+      "external_membership_authority": false,
+      "key_ownership_or_rotation_proven": false,
+      "sybil_resistance_proven": false,
+      "on_chain_attestation": false,
+      "public_multihost_operation": false,
+      "production_authority": false
     }
   },
   "classifications": {

@@ -987,3 +987,14 @@ external effect. GH-177 remains absent from worker, consumption, draft,
 ingress, promotion, acceptance, governance, preflight, verified-preflight, and
 transport modules. PR #181 merged as exact main `a28ad00`; CI, Security Audit,
 and Pages pass on that SHA. This remains a development test gate only.
+
+## Guardian Membership Transition Continuity (GH-246)
+
+`GuardianMembershipAuthority` owner-loads one exact policy and bootstrap
+source, verifies canonical BIP340 transition envelopes, and atomically advances
+an owner-only SQLite current-source ledger. `apply_transition` accepts only
+public signed bytes, one owner-only next-source path, and separately trusted
+current time. `current_source` accepts only network/epoch restrictions and
+holds the ledger transaction through the caller context. `BallotIngress`
+consumes that context; it accepts no source path, digest, member set or signer
+map. No signing, transport, chain, key-rotation or production API is exposed.

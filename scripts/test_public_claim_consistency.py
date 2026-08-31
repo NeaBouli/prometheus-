@@ -305,6 +305,95 @@ class PublicClaimConsistencyTests(unittest.TestCase):
                 )
             )
 
+    def test_gh_246_authority_or_production_drift_is_rejected(self) -> None:
+        for field in (
+            "signing_or_private_key_api",
+            "external_membership_authority",
+            "key_ownership_or_rotation_proven",
+            "sybil_resistance_proven",
+            "on_chain_attestation",
+            "public_multihost_operation",
+            "production_authority",
+        ):
+            with self.subTest(field=field):
+                changed = copy.deepcopy(self.status)
+                changed["post_audit_updates"]["gh_246"][field] = True
+                self.assertTrue(
+                    any("GH-246" in error for error in MODULE.validate_status(changed))
+                )
+
+    def test_missing_gh_246_status_is_rejected(self) -> None:
+        changed = copy.deepcopy(self.status)
+        del changed["post_audit_updates"]["gh_246"]
+        self.assertTrue(
+            any("GH-246" in error for error in MODULE.validate_status(changed))
+        )
+
+    def test_malformed_gh_246_status_is_rejected_without_exception(self) -> None:
+        for value in (None, [], "invalid", 246):
+            with self.subTest(value=value):
+                changed = copy.deepcopy(self.status)
+                changed["post_audit_updates"]["gh_246"] = value
+                self.assertTrue(
+                    any(
+                        "GH-246 machine status record must be an object" in error
+                        for error in MODULE.validate_status(changed)
+                    )
+                )
+
+    def test_gh_246_public_surface_drift_is_rejected(self) -> None:
+        root = SCRIPT.parents[1]
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_root = Path(tmp)
+            status_target = tmp_root / MODULE.STATUS_PATH
+            status_target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy(root / MODULE.STATUS_PATH, status_target)
+            for relative in MODULE.PUBLIC_FILES:
+                target = tmp_root / relative
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy(root / relative, target)
+            drifted = tmp_root / "README.md"
+            drifted.write_text(
+                drifted.read_text(encoding="utf-8").replace(
+                    "no signer/private-key path",
+                    "signer/private-key boundary status",
+                ),
+                encoding="utf-8",
+            )
+            errors = MODULE.verify(tmp_root)
+            self.assertTrue(
+                any(
+                    "README.md" in error and "GH-246 canonical" in error
+                    for error in errors
+                )
+            )
+
+    def test_gh_246_positive_authority_claim_is_rejected(self) -> None:
+        root = SCRIPT.parents[1]
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_root = Path(tmp)
+            status_target = tmp_root / MODULE.STATUS_PATH
+            status_target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy(root / MODULE.STATUS_PATH, status_target)
+            for relative in MODULE.PUBLIC_FILES:
+                target = tmp_root / relative
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy(root / relative, target)
+            drifted = tmp_root / "README.md"
+            drifted.write_text(
+                drifted.read_text(encoding="utf-8")
+                + "\nGH-246 provides external membership authority.\n",
+                encoding="utf-8",
+            )
+            errors = MODULE.verify(tmp_root)
+            self.assertTrue(
+                any(
+                    "README.md" in error
+                    and "authority or production claim drift" in error
+                    for error in errors
+                )
+            )
+
     def test_banned_claims_return_categories_only(self) -> None:
         self.assertEqual(
             MODULE.find_banned_claims("PROM cannot be purchased."),

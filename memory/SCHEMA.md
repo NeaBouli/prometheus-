@@ -906,3 +906,13 @@ candidate binding is one nonzero lowercase 32-byte SHA-256 over a fixed domain,
 the approved report nonce, and the transient raw candidate digest. Compile status
 is an exact boolean. Existing canonical v1 wires remain accepted on read and
 completion retry. No rule source or observable value is stored in this result.
+
+### Guardian membership continuity ledger v1 (GH-246)
+
+The owner-only SQLite ledger has exact STRICT singleton tables for immutable
+network/authority/bootstrap anchors, current epoch/digest/canonical source
+bytes, and trusted-clock high-water, plus transition history uniquely keyed by
+transition ID, nonce, and next epoch. Applying a verified transition inserts
+history and replaces current source/epoch/high-water in one `BEGIN IMMEDIATE`
+transaction. The schema stores public source/signature evidence only and no
+private key.

@@ -7,6 +7,15 @@ quality evaluation, calibration, or production authority. Current YARA
 evidence is limited to compile-valid syntax, a deterministic non-actionable
 draft, and synthetic regression fixtures. No actionable rule is authorized.
 
+GH-246 adds a repository-only membership continuity boundary. One owner-only
+policy pins a network, public BIP340 transition key, bootstrap source, and
+SQLite ledger. Signed transitions advance exact canonical source bytes with
+durable epoch, clock, nonce, and equivocation protection. `BallotIngress`
+establishes new sessions from only that stored current source under the ledger
+lock. There is no signing/private-key API and no external authority, key
+rotation, Sybil-resistance, L1, deployment, or production claim.
+Protected review and exact-main evidence remain pending.
+
 ## Target Hardware Requirements
 
 ### LLaMA 3 8B (Default — Architecture Decision #16)
@@ -226,14 +235,13 @@ It includes no private keys or signing, key ownership/rotation, discovery,
 transport, Sybil resistance, on-chain attestation, reputation, or production
 authority.
 
-GH-242 consumes that source at local ballot-session establishment. The operated
-`BallotIngress.establish_session` call accepts only an owner-only source path,
-separately trusted network and expected epoch, candidate, session nonce, and
-validity window. It loads the source once, derives the existing snapshot and
-public signer map internally, registers the unchanged session, and returns the
-derived data-only context. The former public arbitrary `register` path and
-direct `BallotContext` construction are disabled. Epoch is an identity pin,
-not time, freshness, rotation, finality, source authority, or chain state.
+GH-242 introduced local ballot-session establishment from one owner-only source
+path. That historical path-input API is superseded by GH-246: current
+`BallotIngress.establish_session` receives no source path and consumes only the
+authority ledger's stored current source under the transition lock. The former
+public arbitrary `register` path and direct `BallotContext` construction remain
+disabled. Epoch is an identity pin, not time, freshness, rotation, finality,
+source authority, or chain state.
 PR #243 merged normally as exact main
 `5cb132c670d1e7771ccaf6dab2ddf5b1a6fd905a`; exact-main CI `33433012614`,
 Security Audit `33433012605`, and Pages `33433011653` pass. External source
