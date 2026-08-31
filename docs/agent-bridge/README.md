@@ -18,7 +18,8 @@ und eine erwartete Epoch, leitet Snapshot und oeffentliche BIP340-Signer intern
 ab und akzeptiert keinen oeffentlichen caller-konstruierten Kontext mehr.
 Ensemble-Formel, Ballot-Wire, Replay und Transport bleiben unveraendert.
 Externe Membership-Autoritaet, Key Ownership/Rotation, Sybil Resistance,
-Multi-Host, L1-Attestierung und Produktion bleiben offen.
+Multi-Host, L1-Attestierung und Produktion bleiben offen. Commit `0b95d8a` ist
+in normalem geschuetztem PR #243 veroeffentlicht; Checks und Review sind offen.
 
 Abgeschlossener Produkt-Handover: GH-234/PR #235, code commit `b450740`, exact
 main `f146fb2`, ergaenzt den

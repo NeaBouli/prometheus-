@@ -6118,3 +6118,9 @@ status, autodidactic, workflow YAML, HTML, diff, secret-pattern and RustSec
 policy gates pass. Browser measurements at 1280px show no page-level overflow
 on Landing or Roadmap. Protected PR review, merge, exact-main CI/Security/Pages
 and cache-busted live readback remain pending; production remains false.
+
+Commit `0b95d8a` is published only on the GH-242 feature branch. Normal
+protected PR #243 is open against `main` and closes issue #242 on merge.
+Required CI/Security/Pages contexts and repository review are pending. There
+was no direct-main push, bypass, external runtime, wallet, chain, deployment,
+Mainnet or production action.

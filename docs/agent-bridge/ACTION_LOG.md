@@ -4985,3 +4985,13 @@ Rules for all dev agents:
   or Roadmap, and both display the qualified GH-242 status. No external,
   infrastructure, wallet, chain, deployment, Mainnet or production action
   occurred. Status: `Local PASS / Protected PR next / Production false`.
+
+### 2026-08-31 - GH-242 protected PR opened
+
+- Commit `0b95d8a` is pushed only on
+  `feat/GH-242-membership-bound-ballot-sessions`; normal protected PR #243 is
+  open against `main` and closes issue #242 on merge.
+- Required CI/Security/Pages contexts and repository review remain pending.
+  No direct-main push, bypass, external runtime, wallet, chain, deployment,
+  Mainnet or production action occurred.
+- Status: `PR #243 OPEN / Protected checks pending / Production false`.
