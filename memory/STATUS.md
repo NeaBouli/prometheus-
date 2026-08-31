@@ -1891,18 +1891,20 @@ Live readback: raw-main README, Landing, Roadmap, Whitepaper, FAQ and llms.txt
 ## GH-246 SIGNED MEMBERSHIP CONTINUITY (2026-09-01)
 
 ```text
-Status: local implementation and full Guardian tests pass; protected review pending
-Issue: #246
+Status: merged and exact-main verified owner-local continuity; production false
+Issue: #246; PR #247
+Exact main: f12e821bb492caae3b94e5b3c882488eb7f2982d
 Capability: owner-pinned canonical BIP340 membership transitions plus durable
             current-source/epoch/clock/replay/equivocation state
 Ballot integration: new sessions consume only the stored current source while
                     the same SQLite transaction lock is held
 Evidence: 54 focused transition/ingress tests; 1,348 complete Guardian tests
           pass with 4 intentional live-model skips; Black and focused Pylint
-          10.00/10 pass
+          10.00/10 pass; CI 33452085421, Security Audit 33452085419 and Pages
+          33452084065 pass on exact main
 Authority: public verification only; no signer/private-key API
-Remaining: protected PR/exact-main evidence, external/decentralized authority,
-           key ownership/rotation, Sybil resistance, L1 attestation,
+Remaining: external/decentralized authority, key ownership/rotation,
+           Sybil resistance, L1 attestation,
            public multi-host operation and production trust
 Estimates: unchanged; core 84-88%; complete vision 50-55%; production false
 ```

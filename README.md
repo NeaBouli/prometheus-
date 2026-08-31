@@ -219,8 +219,8 @@ Protected PR #243 merged normally as exact main
 `5cb132c670d1e7771ccaf6dab2ddf5b1a6fd905a`. Prometheus CI `33433012614`,
 Security Audit `33433012605`, and GitHub Pages `33433011653` pass on that SHA.
 
-**GH-246 signed Guardian membership continuity (local candidate; protected
-review pending):** one exact owner-only policy pins the network, a public
+**GH-246 signed Guardian membership continuity (merged and exact-main
+verified):** one exact owner-only policy pins the network, a public
 BIP340 authority key, the bootstrap epoch/source digest, and a private SQLite
 ledger. Canonical signed transitions bind the exact previous and next source
 digests, strictly advancing epoch, validity window, and nonce. The ledger
@@ -233,8 +233,9 @@ remain unchanged. This is public-signature verification and owner-local
 continuity only: the repository includes no signer/private-key path and proves
 no external or decentralized membership authority, key ownership/rotation,
 Sybil resistance, L1 attestation, multi-host operation, deployment, or
-production trust. Issue #246 is locally implemented; protected PR and
-exact-main CI/Security/Pages evidence remain pending.
+production trust. PR #247 squash-merged normally as exact main
+`f12e821bb492caae3b94e5b3c882488eb7f2982d`; CI `33452085421`, Security Audit
+`33452085419`, and Pages `33452084065` pass on that SHA.
 
 **GH-103 merged and exact-main verified — local ELF import extraction:** the Rust Threat Observable boundary can derive one checked `api_import` from exact caller-supplied Linux ELF bytes. It uses the pinned read-only `object` parser, accepts no path, import string, platform, format, or generic observable value, and derives `linux`/`elf` internally. Inputs are capped at 16 MiB and 4096 dynamic symbols; names must match the existing closed ASCII grammar, are byte-sorted and deduplicated, and one checked index is selected. Every result is local-only `review_required_v1`, with shared exact-byte vectors independently parsed by Python. This neither proves external artifact provenance nor authorizes disclosure, transport, proof acceptance, analysis, or publication.
 

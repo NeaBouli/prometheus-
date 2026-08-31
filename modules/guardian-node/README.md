@@ -14,7 +14,9 @@ durable epoch, clock, nonce, and equivocation protection. `BallotIngress`
 establishes new sessions from only that stored current source under the ledger
 lock. There is no signing/private-key API and no external authority, key
 rotation, Sybil-resistance, L1, deployment, or production claim.
-Protected review and exact-main evidence remain pending.
+PR #247 squash-merged normally as exact main
+`f12e821bb492caae3b94e5b3c882488eb7f2982d`; CI `33452085421`, Security Audit
+`33452085419`, and Pages `33452084065` pass.
 
 ## Target Hardware Requirements
 

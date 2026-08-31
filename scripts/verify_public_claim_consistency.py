@@ -65,16 +65,16 @@ GH242_PUBLIC_FILES = (
 
 GH246_PUBLIC_FILES = GH242_PUBLIC_FILES
 
-GH246_LOCAL_REQUIRED_FRAGMENTS = {
+GH246_REQUIRED_FRAGMENTS = {
     Path("README.md"): (
         "no signer/private-key path",
         "no external or decentralized membership authority",
-        "protected PR and exact-main CI/Security/Pages evidence remain pending",
+        "production trust",
     ),
     Path("WHITEPAPER.md"): (
         "contains no signing/private-key API",
         "does not establish external authority",
-        "protected review and exact-main evidence remain pending",
+        "deployment, or production trust",
     ),
     Path("docs/roadmap.md"): (
         "owner-pinned public verification only",
@@ -84,7 +84,6 @@ GH246_LOCAL_REQUIRED_FRAGMENTS = {
     Path("docs/faq.md"): (
         "does not answer who should control the pinned public authority key",
         "decentralized or production operation",
-        "Protected review and exact-main evidence are pending",
     ),
     Path("memory/STATUS.md"): (
         "Authority: public verification only; no signer/private-key API",
@@ -109,7 +108,6 @@ GH246_LOCAL_REQUIRED_FRAGMENTS = {
     Path("faq.html"): (
         "does not establish who should control the pinned key",
         "decentralized or production operation",
-        "Protected review and exact-main evidence remain pending",
     ),
     Path("llms.txt"): (
         "no signer/private-key path",
@@ -392,17 +390,33 @@ def validate_status(data: dict[str, Any]) -> list[str]:
     ):
         if gh_242.get(field) is not False:
             errors.append(f"GH-242 {field} must remain false")
-    if gh_246.get("issue") != 246:
+    if gh_246.get("issue") != 246 or gh_246.get("pull_request") != 247:
         errors.append("GH-246 machine status identity is invalid")
     if (
-        gh_246.get("status")
-        != "implemented_and_locally_verified_protected_review_pending"
+        gh_246.get("status") != "merged_and_exact_main_verified_owner_local_continuity"
         or gh_246.get("classification") != "owner_local_signed_membership_continuity"
         or gh_246.get("public_bip340_verification") is not True
         or gh_246.get("durable_current_source") is not True
         or gh_246.get("ballot_current_source_lock") is not True
     ):
         errors.append("GH-246 local repository boundary is invalid")
+    gh_246_merge_commit = gh_246.get("merge_commit")
+    if (
+        not isinstance(gh_246_merge_commit, str)
+        or re.fullmatch(r"[0-9a-f]{40}", gh_246_merge_commit) is None
+    ):
+        errors.append("GH-246 merge commit must be one full lowercase SHA-1")
+    gh_246_exact_main_runs = gh_246.get("exact_main_runs", {})
+    if not isinstance(gh_246_exact_main_runs, dict) or set(gh_246_exact_main_runs) != {
+        "prometheus_ci",
+        "security_audit",
+        "pages",
+    }:
+        errors.append("GH-246 exact-main run evidence is incomplete")
+    elif not all(
+        type(run_id) is int and run_id > 0 for run_id in gh_246_exact_main_runs.values()
+    ):
+        errors.append("GH-246 exact-main run IDs must be positive integers")
     for field in (
         "signing_or_private_key_api",
         "external_membership_authority",
@@ -476,10 +490,24 @@ def verify(root: Path) -> list[str]:
     gh_242 = status.get("post_audit_updates", {}).get("gh_242", {})
     gh_246_value = status.get("post_audit_updates", {}).get("gh_246", {})
     gh_246 = gh_246_value if isinstance(gh_246_value, dict) else {}
+    gh_246_merge_commit = gh_246.get("merge_commit", "")
+    gh_246_run_ids_value = gh_246.get("exact_main_runs", {})
+    gh_246_run_ids = (
+        gh_246_run_ids_value if isinstance(gh_246_run_ids_value, dict) else {}
+    )
+    gh_246_evidence = (
+        "GH-246",
+        f"PR #{gh_246.get('pull_request', '')}",
+        gh_246_merge_commit if isinstance(gh_246_merge_commit, str) else "",
+        *(
+            str(gh_246_run_ids.get(name, ""))
+            for name in ("prometheus_ci", "security_audit", "pages")
+        ),
+    )
     gh_246_claims = (
-        GH246_LOCAL_REQUIRED_FRAGMENTS
+        GH246_REQUIRED_FRAGMENTS
         if gh_246.get("status")
-        == "implemented_and_locally_verified_protected_review_pending"
+        == "merged_and_exact_main_verified_owner_local_continuity"
         and gh_246.get("classification") == "owner_local_signed_membership_continuity"
         else {}
     )
@@ -535,6 +563,11 @@ def verify(root: Path) -> list[str]:
                         f"{relative}: GH-246 canonical local boundary missing"
                     )
                     break
+            if not all(
+                fragment and fragment.casefold() in normalized_text
+                for fragment in gh_246_evidence
+            ):
+                errors.append(f"{relative}: GH-246 exact-main evidence missing")
             if any(pattern.search(text) for pattern in GH246_PROHIBITED_CLAIMS):
                 errors.append(f"{relative}: GH-246 authority or production claim drift")
         if relative.suffix == ".html" and "5cd13bf" not in text:

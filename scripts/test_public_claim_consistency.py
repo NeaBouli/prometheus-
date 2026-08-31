@@ -322,6 +322,26 @@ class PublicClaimConsistencyTests(unittest.TestCase):
                     any("GH-246" in error for error in MODULE.validate_status(changed))
                 )
 
+    def test_incomplete_gh_246_exact_main_evidence_is_rejected(self) -> None:
+        changed = copy.deepcopy(self.status)
+        del changed["post_audit_updates"]["gh_246"]["exact_main_runs"]["pages"]
+        self.assertTrue(
+            any(
+                "GH-246 exact-main run evidence" in error
+                for error in MODULE.validate_status(changed)
+            )
+        )
+
+    def test_malformed_gh_246_merge_commit_is_rejected(self) -> None:
+        changed = copy.deepcopy(self.status)
+        changed["post_audit_updates"]["gh_246"]["merge_commit"] = "f12e821"
+        self.assertTrue(
+            any(
+                "GH-246 merge commit" in error
+                for error in MODULE.validate_status(changed)
+            )
+        )
+
     def test_missing_gh_246_status_is_rejected(self) -> None:
         changed = copy.deepcopy(self.status)
         del changed["post_audit_updates"]["gh_246"]

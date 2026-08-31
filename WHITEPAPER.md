@@ -452,8 +452,9 @@ rollback, same-epoch equivocation, replay, restart, concurrency, schema/path
 tampering, and redacted failure behavior. This repository-only candidate
 contains no signing/private-key API and does not establish external authority,
 key ownership or rotation, Sybil resistance, L1 attestation, public multi-host
-operation, deployment, or production trust. Issue #246 protected review and
-exact-main evidence remain pending.
+operation, deployment, or production trust. PR #247 squash-merged normally as
+exact main `f12e821bb492caae3b94e5b3c882488eb7f2982d`; CI `33452085421`, Security
+Audit `33452085419`, and Pages `33452084065` pass on that SHA.
 
 ---
 

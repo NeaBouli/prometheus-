@@ -6251,3 +6251,37 @@ false`.
   public-claim `34 tests` pass, Black, focused Pylint 10.00/10,
   documentation hygiene, Memory Integrity and diff checks pass.
 - Status: `PR #247 findings resolved / Updated checks next / Production false`.
+
+### 2026-09-01 - GH-246 product exact-main pass and public closeout
+
+- PR #247 squash-merged normally as exact main
+  `f12e821bb492caae3b94e5b3c882488eb7f2982d`; issue #246 is closed.
+- Exact-main Prometheus CI `33452085421`, Security Audit `33452085419`, and
+  Pages `33452084065` pass on that SHA.
+- This isolated documentation closeout replaces the public `local candidate /
+  protected review pending` wording with the exact PR/SHA/run evidence across
+  README, Whitepaper, Roadmap, FAQ, Landing, public HTML, `llms.txt`, Guardian
+  README, canonical machine status and Memory. The public verifier now requires
+  PR #247, the full merge SHA, all three run IDs and the explicit owner-local,
+  non-production boundaries on every GH-246 surface.
+- No product code, architecture, tokenomics, contract, wallet, chain,
+  deployment, Mainnet or production authority changes in this closeout.
+- Status: `Product exact-main PASS / Public closeout candidate / Production
+  false`.
+
+### 2026-09-01 - GH-246 public closeout local validation pass
+
+- Canonical public-claim verification passes across all 13 synchronized
+  surfaces; its 36-unit-test suite includes malformed SHA/run evidence and
+  positive authority/production drift rejection.
+- Documentation hygiene passes 11 tests. Memory Integrity, project-status and
+  autodidactic suites pass 7 and 6 tests respectively; workflow YAML and five
+  public HTML pages parse, and `git diff --check` passes.
+- Desktop and mobile browser checks confirm PR #247, the full product SHA and
+  exact run evidence on Landing, Roadmap, Whitepaper and FAQ with no stale
+  GH-246 review wording or console warning. One mobile Landing overflow caused
+  by unbroken exact SHAs was found and fixed with bounded roadmap text wrapping;
+  the 375px viewport now has equal document/body/viewport width and no H1
+  overflow.
+- Status: `Local closeout PASS / Protected documentation PR next / Production
+  false`.

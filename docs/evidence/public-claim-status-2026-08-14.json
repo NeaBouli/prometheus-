@@ -83,8 +83,15 @@
     "gh_246": {
       "as_of": "2026-09-01",
       "issue": 246,
-      "status": "implemented_and_locally_verified_protected_review_pending",
+      "pull_request": 247,
+      "status": "merged_and_exact_main_verified_owner_local_continuity",
       "classification": "owner_local_signed_membership_continuity",
+      "merge_commit": "f12e821bb492caae3b94e5b3c882488eb7f2982d",
+      "exact_main_runs": {
+        "prometheus_ci": 33452085421,
+        "security_audit": 33452085419,
+        "pages": 33452084065
+      },
       "public_bip340_verification": true,
       "durable_current_source": true,
       "ballot_current_source_lock": true,
