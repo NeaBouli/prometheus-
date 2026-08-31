@@ -53,9 +53,9 @@ class PublicClaimConsistencyTests(unittest.TestCase):
 
     def test_phi3_stub_authority_is_rejected(self) -> None:
         changed = copy.deepcopy(self.status)
-        changed["classifications"]["light_client"]["phi3_stub_authority"] = (
-            "heuristic_quarantine"
-        )
+        changed["classifications"]["light_client"][
+            "phi3_stub_authority"
+        ] = "heuristic_quarantine"
         self.assertTrue(
             any("Phi-3 stub" in error for error in MODULE.validate_status(changed))
         )
@@ -138,9 +138,9 @@ class PublicClaimConsistencyTests(unittest.TestCase):
 
     def test_gh_238_status_drift_is_rejected(self) -> None:
         changed = copy.deepcopy(self.status)
-        changed["post_audit_updates"]["gh_238"]["status"] = (
-            "repository_preparation_implemented_and_locally_tested"
-        )
+        changed["post_audit_updates"]["gh_238"][
+            "status"
+        ] = "repository_preparation_implemented_and_locally_tested"
         self.assertTrue(
             any(
                 "exact-main verification" in error
@@ -225,6 +225,28 @@ class PublicClaimConsistencyTests(unittest.TestCase):
         errors = MODULE.validate_status(changed)
         self.assertTrue(any("GH-238 machine status" in error for error in errors))
         self.assertTrue(any("GH-238 remote_run" in error for error in errors))
+
+    def test_gh_242_authority_or_behavior_drift_is_rejected(self) -> None:
+        for field in (
+            "caller_supplied_committee_or_signers",
+            "ballot_wire_or_ensemble_formula_changed",
+            "external_membership_authority",
+            "key_ownership_or_rotation_proven",
+            "sybil_resistance_proven",
+            "on_chain_attestation",
+            "production_authority",
+        ):
+            with self.subTest(field=field):
+                changed = copy.deepcopy(self.status)
+                changed["post_audit_updates"]["gh_242"][field] = True
+                errors = MODULE.validate_status(changed)
+                self.assertTrue(any("GH-242" in error for error in errors))
+
+    def test_missing_gh_242_status_is_rejected(self) -> None:
+        changed = copy.deepcopy(self.status)
+        del changed["post_audit_updates"]["gh_242"]
+        errors = MODULE.validate_status(changed)
+        self.assertTrue(any("GH-242" in error for error in errors))
 
     def test_banned_claims_return_categories_only(self) -> None:
         self.assertEqual(

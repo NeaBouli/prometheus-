@@ -549,6 +549,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
         </button>
         <div class="faq-a"><div class="faq-a-inner">
           <p>Prometheus has no repository-controlled emergency-stop entrypoint. That invariant is not proof of decentralized operation. Current evidence relies on owner-controlled policies, membership files, and local trust anchors; no public multi-host Prometheus network is operating.</p>
+          <p>GH-242 removes one local caller-assertion path by deriving ballot committees and public BIP340 signer assignments only from an owner-loaded canonical membership source with a separately trusted network and expected epoch. It does not make that source externally authoritative, prove key ownership or rotation, prevent Sybil identities, or establish decentralized or production operation.</p>
           <p>Availability also depends on Kaspa, IPFS replication, participating nodes, clients, and network access.</p>
           <div class="callout"><p><strong>No central kill switch.</strong> This invariant does not justify absolute claims about uninterrupted access or network operation.</p></div>
         </div></div>

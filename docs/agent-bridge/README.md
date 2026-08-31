@@ -10,13 +10,15 @@ Startpunkt fuer Codex/Claude Code:
 
 Keine Secrets, Tokens, Passwoerter, privaten Keys oder Wallet-Daten in diese Bridge schreiben.
 
-Aktiver Handover: GH-238 Produkt- und Public-Closeout ist abgeschlossen. PR #239
-ist als Produkt-main `912d96d`, PR #240 als Dokumentations-main `3f607ad`
-gemergt; beide Exact-Main-Ketten sind gruen und der cache-busted Live-Readback
-von README, Roadmap, Whitepaper, FAQ und `llms.txt` besteht. Ein realer GH-238
-Remote-Run oder Evidenz-Record existiert nicht; Host-Trennung ist nicht
-unabhaengig bewiesen. Host-/Firewall-/IAM-Aktionen, Wallet, Chain, Mainnet und
-Produktion bleiben offen bzw. ausgeschlossen.
+Aktiver Handover: GH-242 ist auf Branch
+`feat/GH-242-membership-bound-ballot-sessions` implementiert und lokal
+getestet. Der lokale BallotIngress-Pfad owner-laedt die kanonische
+GH-147-Mitgliedschaft genau einmal, bindet ein separat vorgegebenes Netzwerk
+und eine erwartete Epoch, leitet Snapshot und oeffentliche BIP340-Signer intern
+ab und akzeptiert keinen oeffentlichen caller-konstruierten Kontext mehr.
+Ensemble-Formel, Ballot-Wire, Replay und Transport bleiben unveraendert.
+Externe Membership-Autoritaet, Key Ownership/Rotation, Sybil Resistance,
+Multi-Host, L1-Attestierung und Produktion bleiben offen.
 
 Abgeschlossener Produkt-Handover: GH-234/PR #235, code commit `b450740`, exact
 main `f146fb2`, ergaenzt den

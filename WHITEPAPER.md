@@ -424,6 +424,19 @@ resolved and squash-merged normally without bypass as exact main `aeecffb`.
 Prometheus CI `30863940497`, Security Audit `30863940502`, and GitHub Pages
 `30863940053` pass on that SHA.
 
+GH-242 composes that source with local authenticated ballot intake. The
+operated establishment call accepts an owner-only source path plus a separately
+trusted network and expected epoch, loads the source once, derives the existing
+snapshot and BIP340 signer map internally, and registers the unchanged ballot
+session. It accepts no caller-supplied committee, signer map, snapshot, source
+digest, or context; direct context construction and public arbitrary
+registration are disabled. All establishment failures are data-minimal. Epoch
+is an operator-pinned committee identity only, not time, freshness, rotation,
+finality, source authority, or chain state. This is implemented and locally
+tested repository evidence, not externally trusted membership, key ownership,
+Sybil resistance, on-chain attestation, multi-host operation, or production
+authority.
+
 ---
 
 ## 8. Light Client

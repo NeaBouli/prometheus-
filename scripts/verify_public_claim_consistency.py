@@ -49,6 +49,20 @@ GH238_PUBLIC_FILES = (
     Path("modules/client/README.md"),
 )
 
+GH242_PUBLIC_FILES = (
+    Path("README.md"),
+    Path("WHITEPAPER.md"),
+    Path("docs/roadmap.md"),
+    Path("docs/faq.md"),
+    Path("memory/STATUS.md"),
+    Path("index.html"),
+    Path("roadmap.html"),
+    Path("whitepaper.html"),
+    Path("faq.html"),
+    Path("llms.txt"),
+    Path("modules/guardian-node/README.md"),
+)
+
 REQUIRED_FRAGMENTS = {
     Path("README.md"): (
         "no production Prometheus network",
@@ -173,6 +187,7 @@ def validate_status(data: dict[str, Any]) -> list[str]:
     economics = classes.get("guardian_economics", {})
     gh_234 = data.get("post_audit_updates", {}).get("gh_234", {})
     gh_238 = data.get("post_audit_updates", {}).get("gh_238", {})
+    gh_242 = data.get("post_audit_updates", {}).get("gh_242", {})
 
     if (
         validators.get("stake_asset") != "KAS"
@@ -266,6 +281,25 @@ def validate_status(data: dict[str, Any]) -> list[str]:
     ):
         if gh_238.get(field) is not False:
             errors.append(f"GH-238 {field} must remain false")
+    if gh_242.get("issue") != 242:
+        errors.append("GH-242 machine status identity is invalid")
+    if (
+        gh_242.get("status") != "implemented_and_locally_tested_repository_boundary"
+        or gh_242.get("classification") != "owner_local_membership_bound_ballot_session"
+        or gh_242.get("canonical_source_loaded_once") is not True
+    ):
+        errors.append("GH-242 repository boundary classification is invalid")
+    for field in (
+        "caller_supplied_committee_or_signers",
+        "ballot_wire_or_ensemble_formula_changed",
+        "external_membership_authority",
+        "key_ownership_or_rotation_proven",
+        "sybil_resistance_proven",
+        "on_chain_attestation",
+        "production_authority",
+    ):
+        if gh_242.get(field) is not False:
+            errors.append(f"GH-242 {field} must remain false")
     if economics.get("status") != "illustrative_planning_only":
         errors.append("Guardian economics must remain illustrative planning only")
     if economics.get("active_rewards_or_market_price") is not False:
@@ -357,6 +391,8 @@ def verify(root: Path) -> list[str]:
                 if not fragment or fragment not in text:
                     errors.append(f"{relative}: GH-238 exact-main evidence missing")
                     break
+        if relative in GH242_PUBLIC_FILES and "GH-242" not in text:
+            errors.append(f"{relative}: GH-242 membership-bound status missing")
         if relative.suffix == ".html" and "5cd13bf" not in text:
             errors.append(f"{relative}: exact reconciliation baseline missing")
         for category in find_banned_claims(text):

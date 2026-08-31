@@ -226,6 +226,15 @@ It includes no private keys or signing, key ownership/rotation, discovery,
 transport, Sybil resistance, on-chain attestation, reputation, or production
 authority.
 
+GH-242 consumes that source at local ballot-session establishment. The operated
+`BallotIngress.establish_session` call accepts only an owner-only source path,
+separately trusted network and expected epoch, candidate, session nonce, and
+validity window. It loads the source once, derives the existing snapshot and
+public signer map internally, registers the unchanged session, and returns the
+derived data-only context. The former public arbitrary `register` path and
+direct `BallotContext` construction are disabled. Epoch is an identity pin,
+not time, freshness, rotation, finality, source authority, or chain state.
+
 ## Authenticated Ballot Intake
 
 `BallotSession` binds one candidate, membership snapshot, network, validity

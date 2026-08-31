@@ -58,6 +58,20 @@
       "independent_host_proof": false,
       "network_or_infrastructure_action": false,
       "production_authority": false
+    },
+    "gh_242": {
+      "as_of": "2026-08-31",
+      "issue": 242,
+      "status": "implemented_and_locally_tested_repository_boundary",
+      "classification": "owner_local_membership_bound_ballot_session",
+      "canonical_source_loaded_once": true,
+      "caller_supplied_committee_or_signers": false,
+      "ballot_wire_or_ensemble_formula_changed": false,
+      "external_membership_authority": false,
+      "key_ownership_or_rotation_proven": false,
+      "sybil_resistance_proven": false,
+      "on_chain_attestation": false,
+      "production_authority": false
     }
   },
   "classifications": {
