@@ -4,15 +4,16 @@ The libp2p carrier is intentionally untrusted by this boundary. It forwards one
 bounded opaque frame; this module resolves a locally registered session and
 delegates every protocol and authorization check to ``signed_ballots``.
 
-Operated sessions are established only from the canonical GH-147 owner-only
-Guardian membership source: the caller pins a separately trusted network id
-and expected epoch, the source is owner-loaded exactly once, and the snapshot,
-BIP340 signers, and ballot session are derived internally. No caller-supplied
-member list, signer map, snapshot, source digest, or context is accepted. The
-epoch is an operator-pinned committee identity only; it proves no time,
-freshness, key rotation, finality, source authority, or on-chain state. Every
-establishment failure raises the one stable redacted ``BallotIngressError``
-without values, ids, paths, keys, or digests.
+Operated sessions are established only from the current canonical source held
+by ``GuardianMembershipAuthority``. The authority keeps one owner-pinned
+public BIP340 transition key plus durable source/epoch high-water state and
+holds its SQLite transaction lock while this module derives and registers the
+session. No caller-supplied source path, member list, signer map, snapshot,
+source digest, or context is accepted. This proves owner-local continuity only,
+not external authority, key ownership or rotation, Sybil resistance, finality,
+on-chain state, or production trust. Every establishment failure raises the
+one stable redacted ``BallotIngressError`` without values, ids, keys, or
+digests.
 """
 
 from __future__ import annotations
@@ -29,10 +30,8 @@ from collections.abc import Callable
 from typing import Final, Literal
 
 from .ensemble import EnsembleCandidate, MembershipSnapshot
-from .guardian_membership_source import (
-    MAX_MEMBERSHIP_EPOCH,
-    load_guardian_membership_source,
-)
+from .guardian_membership_source import MAX_MEMBERSHIP_EPOCH
+from .guardian_membership_transition import GuardianMembershipAuthority
 from .signed_ballots import (
     MAX_BALLOT_WIRE_BYTES,
     AuthenticatedBallotCollector,
@@ -164,8 +163,17 @@ class IngressAck:
 class BallotIngress:
     """Resolve local sessions and invoke the existing authenticated collector."""
 
-    def __init__(self, collector: AuthenticatedBallotCollector) -> None:
+    def __init__(
+        self,
+        collector: AuthenticatedBallotCollector,
+        membership_authority: GuardianMembershipAuthority,
+    ) -> None:
+        if (  # pylint: disable-next=unidiomatic-typecheck
+            type(membership_authority) is not GuardianMembershipAuthority
+        ):
+            raise BallotIngressError(_INGRESS_ESTABLISHMENT_ERROR)
         self._collector = collector
+        self._membership_authority = membership_authority
         self._contexts: dict[str, BallotContext] = {}
 
     # Explicit separately-trusted inputs keep every commitment visible; the
@@ -173,7 +181,6 @@ class BallotIngress:
     # pylint: disable-next=too-many-arguments
     def establish_session(
         self,
-        membership_source_path: Path,
         *,
         expected_network_id: str,
         expected_epoch: int,
@@ -184,16 +191,12 @@ class BallotIngress:
     ) -> BallotContext:
         """Establish one session bound to the canonical membership source.
 
-        The owner-only source is loaded exactly once via
-        ``load_guardian_membership_source``; the snapshot and BIP340 signers
-        are derived internally from that source and committed through the
-        existing ``BallotSession``. The expected epoch is an operator-pinned
-        committee identity only: it proves no time, freshness, key rotation,
-        finality, source authority, or on-chain state. Re-establishing the
-        exact same derived session is idempotent; a conflicting context for
-        the same session id is rejected. Every failure raises the one stable
-        redacted ``BallotIngressError`` without values, ids, paths, keys, or
-        digests.
+        The authority validates the separately trusted network/epoch
+        restrictions and yields the stored current canonical source while
+        retaining its transition lock. Snapshot and public BIP340 signers are
+        derived and registered before that lock is released. Re-establishing
+        the exact same session is idempotent; a conflicting context for the
+        same id is rejected. Every failure is redacted.
         """
         if (
             type(expected_epoch) is not int  # pylint: disable=unidiomatic-typecheck
@@ -202,28 +205,26 @@ class BallotIngress:
         ):
             raise BallotIngressError(_INGRESS_ESTABLISHMENT_ERROR)
         try:
-            source = load_guardian_membership_source(
-                membership_source_path, expected_network_id=expected_network_id
-            )
+            with self._membership_authority.current_source(
+                expected_network_id=expected_network_id,
+                expected_epoch=expected_epoch,
+            ) as source:
+                snapshot = source.to_membership_snapshot()
+                session = BallotSession.create(
+                    candidate,
+                    snapshot,
+                    source.to_ballot_signers(),
+                    network_id=source.network_id,
+                    session_nonce=session_nonce,
+                    valid_from_ms=valid_from_ms,
+                    valid_until_ms=valid_until_ms,
+                )
+                context = _derive_context(candidate, snapshot, session)
+                self._register_context(context)
         except Exception:  # pylint: disable=broad-exception-caught
+            # Ballot/session validators use multiple local exception classes;
+            # this operated boundary intentionally exposes one category only.
             raise BallotIngressError(_INGRESS_ESTABLISHMENT_ERROR) from None
-        if source.epoch != expected_epoch:
-            raise BallotIngressError(_INGRESS_ESTABLISHMENT_ERROR)
-        try:
-            snapshot = source.to_membership_snapshot()
-            session = BallotSession.create(
-                candidate,
-                snapshot,
-                source.to_ballot_signers(),
-                network_id=source.network_id,
-                session_nonce=session_nonce,
-                valid_from_ms=valid_from_ms,
-                valid_until_ms=valid_until_ms,
-            )
-        except Exception:  # pylint: disable=broad-exception-caught
-            raise BallotIngressError(_INGRESS_ESTABLISHMENT_ERROR) from None
-        context = _derive_context(candidate, snapshot, session)
-        self._register_context(context)
         return context
 
     def _register_context(self, context: BallotContext) -> None:

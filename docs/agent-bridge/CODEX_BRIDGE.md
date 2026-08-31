@@ -6150,3 +6150,88 @@ evidence. This final Bridge-only handoff adds no public claim or product change
 and needs no recursive GH-242 status update after normal protected merge.
 Status: `GH-242 Complete / Product and public exact-main PASS / Production
 false`.
+
+## 2026-09-01 - GH-246 Guardian membership transition continuity started
+
+- **Base:** exact protected `main`
+  `96adf67c3b7830cb2904c1d933e87bad61709395`, after the completed GH-242
+  membership-bound ballot-session handoff.
+- **Scope:** one repository-only, public-verification path for canonical
+  BIP340-signed Guardian membership transitions plus owner-only durable
+  high-water state. The transition must bind the separately trusted network,
+  exact previous and next canonical source digests, strictly advancing epoch,
+  bounded validity window, and unique nonce. New ballot sessions must consume
+  only the currently accepted source.
+- **Security invariants:** rollback, same-epoch equivocation, stale/future
+  windows, source substitution, network mismatch, signature failure, replay,
+  restart and concurrent duplicate application fail closed. The implementation
+  exposes no signer or private-key path and stores no secret material.
+- **Explicit exclusions:** no external authority selection, key ownership or
+  key rotation proof, Sybil resistance, membership discovery, transport,
+  public multi-host operation, L1 attestation, wallet, transaction, broadcast,
+  deployment, Mainnet or production authorization. KAS/PROM separation,
+  Guardian reputation, slash ACL, commit-reveal and no-emergency-stop policy
+  remain unchanged.
+- **Roles:** Sol owns architecture, security, integration, GitHub writes,
+  complete tests and closure. Kimi K3 receives a bounded secret-free
+  architecture/implementation assignment and later independent review. Claude
+  Code may perform only one small bounded read-only helper task if available.
+- **Status:** `GH-246 Active / Bridge ticket opened / Product edits not yet
+  started / Production false`.
+
+### 2026-09-01 - GH-246 implementation and local integration pass
+
+- Added one exact owner-only authority policy, canonical public BIP340
+  transition verifier, and exact-schema owner-only SQLite ledger. The ledger
+  stores immutable network/key/bootstrap anchors, current canonical source
+  bytes, trusted-clock high-water, and transition history unique by transition
+  ID, nonce, and next epoch.
+- Transition application binds exact previous/current and next source digests,
+  strictly advancing epoch, bounded validity, trusted current time, and one
+  nonce. Signature/source manipulation, rollback, same-epoch equivocation,
+  replay, clock rollback, restart, concurrent duplicate, schema/path/mode and
+  redaction cases fail closed.
+- `BallotIngress` now requires `GuardianMembershipAuthority`; it accepts no
+  source path and derives/registers every new session from the stored current
+  source while the same `BEGIN IMMEDIATE` transaction lock is held. Existing
+  bounded sessions remain valid and unchanged.
+- Focused transition/ingress evidence passes 54 tests. The complete Guardian
+  suite passes 1,348 tests with four intentional live-model skips. Black and
+  focused transition Pylint 10.00/10 pass. All 13 public surfaces, public-claim
+  tests (31), documentation hygiene (11), Memory Integrity, project status
+  (7), and autodidactic tests (6) pass.
+- Kimi K3 supplied the independent architecture/threat-model review and full
+  state-machine/test design. Its attempted bounded implementation was stopped
+  before any edit after the wrapper remained in planning; Sol implemented and
+  reviewed the code. Claude Code was unavailable at its configured local USD
+  budget and read/changed no repository file.
+- Public claims remain `local candidate / protected review pending /
+  production false`. No signer/private-key path, external authority, key
+  ownership/rotation proof, Sybil resistance, transport, host, L1, wallet,
+  chain, broadcast, deployment or Mainnet action was added.
+
+### 2026-09-01 - GH-246 independent review and complete local gates pass
+
+- Kimi K3 completed a secret-free, read-only review of the full product,
+  integration, test, documentation and machine-status diff. Verdict:
+  `APPROVE`; no P0, P1 or P2 finding.
+- Its only P3 finding was stale present-tense GH-242 prose in the Guardian
+  README. The historical paragraph now explicitly says GH-246 supersedes the
+  old path-input API and that current ingress consumes only ledger-held source
+  bytes under the transition lock.
+- Real final local evidence: focused transition/ingress `54 passed`; complete
+  Guardian `1,348 passed, 4 skipped`; complete locked Rust workspace tests pass
+  with two intentional ignored live-node tests; workspace Clippy with
+  `-D warnings`, Rustfmt, package Pylint 9.85/10, focused Pylint 10.00/10,
+  Cargo audit with nine allowed warnings, and Python dependency audit with no
+  known vulnerability all pass.
+- Public-claim consistency covers 13 surfaces and passes with 31 tests and 23
+  subtests. Documentation hygiene, Memory Integrity, project status,
+  autodidactic, Guardian compose policy, workflow YAML and public HTML parsing
+  also pass. Desktop/mobile browser checks found no document-width or H1
+  overflow and no Roadmap console warning after its intended entrance
+  animation.
+- Kimi wrote no file. Claude remained unavailable at its local budget and
+  accessed no repository file. Sol owns the complete diff and all external
+  actions.
+- Status: `Local complete / Protected PR next / Production false`.

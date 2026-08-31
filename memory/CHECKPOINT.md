@@ -1136,3 +1136,15 @@ Leistungsbasierte Emission. Guardians = "Miner" (KI statt GPU).
 - PR #243 merged normally as exact main
   `5cb132c670d1e7771ccaf6dab2ddf5b1a6fd905a`; issue #242 is closed. Exact-main
   CI `33433012614`, Security Audit `33433012605`, and Pages `33433011653` pass.
+
+## Checkpoint 2026-09-01: GH-246 local membership continuity
+
+- One owner-only policy pins network, public BIP340 authority key, bootstrap
+  source identity and ledger. Exact signed transitions advance durable current
+  canonical source bytes with epoch/clock/replay/equivocation high-water.
+- `BallotIngress` requires that authority and derives new sessions under the
+  same ledger lock. No mutable source path can bypass current membership.
+- 54 focused transition/ingress tests and all 1,348 Guardian tests pass; four
+  live-model cases remain intentionally skipped. Protected review is pending.
+- This is owner-local public verification only, not external authority, key
+  ownership/rotation, Sybil resistance, L1, deployment or production trust.

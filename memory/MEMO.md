@@ -245,3 +245,12 @@ Core Dev benötigt: Apple Developer Account + Google Play Account (vor Sprint 13
   oder Promotion-Autoritaet.
 - Der alte Dirty-Branch und `Prometheus-1.png` bleiben fremde, unberuehrte
   Arbeit.
+
+## 2026-09-01 - GH-246 authority decision
+
+- Membership-transition continuity uses one owner-pinned public BIP340 key for
+  local verification. Committee quorum was not added because that would invent
+  a new governance rule outside the approved scope.
+- This decision proves only owner-local continuity and anti-rollback. External
+  authority selection, key ownership/rotation, Sybil resistance, L1
+  attestation, public multi-host operation and production trust remain open.

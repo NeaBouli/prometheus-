@@ -305,6 +305,30 @@ class PublicClaimConsistencyTests(unittest.TestCase):
                 )
             )
 
+    def test_gh_246_authority_or_production_drift_is_rejected(self) -> None:
+        for field in (
+            "signing_or_private_key_api",
+            "external_membership_authority",
+            "key_ownership_or_rotation_proven",
+            "sybil_resistance_proven",
+            "on_chain_attestation",
+            "public_multihost_operation",
+            "production_authority",
+        ):
+            with self.subTest(field=field):
+                changed = copy.deepcopy(self.status)
+                changed["post_audit_updates"]["gh_246"][field] = True
+                self.assertTrue(
+                    any("GH-246" in error for error in MODULE.validate_status(changed))
+                )
+
+    def test_missing_gh_246_status_is_rejected(self) -> None:
+        changed = copy.deepcopy(self.status)
+        del changed["post_audit_updates"]["gh_246"]
+        self.assertTrue(
+            any("GH-246" in error for error in MODULE.validate_status(changed))
+        )
+
     def test_banned_claims_return_categories_only(self) -> None:
         self.assertEqual(
             MODULE.find_banned_claims("PROM cannot be purchased."),
