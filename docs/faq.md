@@ -306,6 +306,9 @@ public BIP340 signer assignments only from an owner-loaded canonical membership
 source with a separately trusted network and expected epoch. That does not make
 the source externally authoritative, prove key ownership or rotation, prevent
 Sybil identities, or establish decentralized or production operation.
+PR #243 merged normally as exact main
+`5cb132c670d1e7771ccaf6dab2ddf5b1a6fd905a`; exact-main CI `33433012614`,
+Security Audit `33433012605`, and Pages `33433011653` pass.
 
 **Q: When will the mobile app be available?**
 Desktop and mobile releases are readiness-gated rather than date-gated.

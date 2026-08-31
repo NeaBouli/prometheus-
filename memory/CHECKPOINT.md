@@ -1132,4 +1132,7 @@ Leistungsbasierte Emission. Guardians = "Miner" (KI statt GPU).
   emergency-stop behavior changed.
 - This is owner-local assignment consumption only. External source authority,
   key ownership/rotation, Sybil resistance, multi-host operation, on-chain
-  attestation, protected merge/exact-main evidence and production trust remain.
+  attestation and production trust remain.
+- PR #243 merged normally as exact main
+  `5cb132c670d1e7771ccaf6dab2ddf5b1a6fd905a`; issue #242 is closed. Exact-main
+  CI `33433012614`, Security Audit `33433012605`, and Pages `33433011653` pass.

@@ -281,14 +281,27 @@ def validate_status(data: dict[str, Any]) -> list[str]:
     ):
         if gh_238.get(field) is not False:
             errors.append(f"GH-238 {field} must remain false")
-    if gh_242.get("issue") != 242:
+    if gh_242.get("issue") != 242 or gh_242.get("pull_request") != 243:
         errors.append("GH-242 machine status identity is invalid")
     if (
-        gh_242.get("status") != "implemented_and_locally_tested_repository_boundary"
+        gh_242.get("status") != "merged_and_exact_main_verified_repository_boundary"
         or gh_242.get("classification") != "owner_local_membership_bound_ballot_session"
         or gh_242.get("canonical_source_loaded_once") is not True
     ):
         errors.append("GH-242 repository boundary classification is invalid")
+    gh_242_merge_commit = gh_242.get("merge_commit")
+    if (
+        not isinstance(gh_242_merge_commit, str)
+        or re.fullmatch(r"[0-9a-f]{40}", gh_242_merge_commit) is None
+    ):
+        errors.append("GH-242 merge commit must be one full lowercase SHA-1")
+    gh_242_exact_main_runs = gh_242.get("exact_main_runs", {})
+    if set(gh_242_exact_main_runs) != {"prometheus_ci", "security_audit", "pages"}:
+        errors.append("GH-242 exact-main run evidence is incomplete")
+    elif not all(
+        type(run_id) is int and run_id > 0 for run_id in gh_242_exact_main_runs.values()
+    ):
+        errors.append("GH-242 exact-main run IDs must be positive integers")
     for field in (
         "caller_supplied_committee_or_signers",
         "ballot_wire_or_ensemble_formula_changed",
@@ -359,6 +372,7 @@ def verify(root: Path) -> list[str]:
             for name in ("prometheus_ci", "security_audit", "pages")
         ),
     )
+    gh_242 = status.get("post_audit_updates", {}).get("gh_242", {})
 
     for relative in PUBLIC_FILES:
         path = root / relative
@@ -391,8 +405,18 @@ def verify(root: Path) -> list[str]:
                 if not fragment or fragment not in text:
                     errors.append(f"{relative}: GH-238 exact-main evidence missing")
                     break
-        if relative in GH242_PUBLIC_FILES and "GH-242" not in text:
-            errors.append(f"{relative}: GH-242 membership-bound status missing")
+        if relative in GH242_PUBLIC_FILES:
+            normalized_text = " ".join(text.split())
+            gh_242_evidence = (
+                "GH-242",
+                f"PR #{gh_242.get('pull_request', '')}",
+                str(gh_242.get("merge_commit", "")),
+                *(str(run_id) for run_id in gh_242.get("exact_main_runs", {}).values()),
+            )
+            if not all(
+                fragment and fragment in normalized_text for fragment in gh_242_evidence
+            ):
+                errors.append(f"{relative}: GH-242 exact-main evidence missing")
         if relative.suffix == ".html" and "5cd13bf" not in text:
             errors.append(f"{relative}: exact reconciliation baseline missing")
         for category in find_banned_claims(text):

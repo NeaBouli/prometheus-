@@ -6124,3 +6124,19 @@ protected PR #243 is open against `main` and closes issue #242 on merge.
 Required CI/Security/Pages contexts and repository review are pending. There
 was no direct-main push, bypass, external runtime, wallet, chain, deployment,
 Mainnet or production action.
+
+PR #243 subsequently merged normally without bypass as exact main
+`5cb132c670d1e7771ccaf6dab2ddf5b1a6fd905a`; issue #242 is closed. Exact-main
+Prometheus CI `33433012614`, Security Audit `33433012605`, and Pages
+`33433011653` pass on that SHA. The active closeout is documentation/status
+reconciliation only. External source authority, key ownership/rotation, Sybil
+resistance, public multi-host operation, L1 attestation and production trust
+remain open.
+
+The documentation closeout now passes all local gates. Kimi K3's first review
+found one stale Bridge-entry P2; after correction its independent re-review
+returned `APPROVE` with no P0/P1/P2. Sol also closed the remaining P3 verifier
+hardening note. Thirteen public surfaces and 29 fail-closed claim tests pass,
+alongside documentation hygiene, project status, Memory, workflow YAML, HTML,
+Black, scope, secret-pattern and diff checks. The next action is one normal
+protected documentation PR; production remains false.

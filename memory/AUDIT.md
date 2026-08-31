@@ -2721,12 +2721,16 @@ changed.
   epoch mismatch, unsafe or missing files, source changes, idempotency,
   conflicting same-session state, bypass attempts and existing transport/ACK
   behavior.
-- Local evidence so far: 32 focused tests, 1,326 complete Guardian tests with
+- Local evidence: 32 focused tests, 1,326 complete Guardian tests with
   four intentional live-model skips, Black, focused Pylint 10.00/10 and
-  package Pylint 9.85/10 pass. Repository-wide gates remain before `Done`.
+  package Pylint 9.85/10 pass.
 - Kimi's independent full-diff review found no P0/P1 and two P2 test gaps;
   successful one-load counting and distinct-source signer/session isolation
   were added and pass before protected delivery.
 - Residual trust is explicit: owner-local source authorship, in-process owner
   trust, key ownership/rotation, Sybil resistance, public/multi-host operation,
   L1 attestation and production authority are not proven.
+- PR #243 merged normally as exact main
+  `5cb132c670d1e7771ccaf6dab2ddf5b1a6fd905a`; issue #242 is closed. Exact-main
+  CI `33433012614`, Security Audit `33433012605`, and Pages `33433011653` pass.
+  Result: `PASS / Merged exact-main repository boundary / Production false`.

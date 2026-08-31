@@ -234,6 +234,11 @@ public signer map internally, registers the unchanged session, and returns the
 derived data-only context. The former public arbitrary `register` path and
 direct `BallotContext` construction are disabled. Epoch is an identity pin,
 not time, freshness, rotation, finality, source authority, or chain state.
+PR #243 merged normally as exact main
+`5cb132c670d1e7771ccaf6dab2ddf5b1a6fd905a`; exact-main CI `33433012614`,
+Security Audit `33433012605`, and Pages `33433011653` pass. External source
+authority, key ownership/rotation, Sybil resistance, multi-host operation, L1
+attestation, and production trust remain open.
 
 ## Authenticated Ballot Intake
 

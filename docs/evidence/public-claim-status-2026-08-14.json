@@ -62,7 +62,14 @@
     "gh_242": {
       "as_of": "2026-08-31",
       "issue": 242,
-      "status": "implemented_and_locally_tested_repository_boundary",
+      "pull_request": 243,
+      "merge_commit": "5cb132c670d1e7771ccaf6dab2ddf5b1a6fd905a",
+      "status": "merged_and_exact_main_verified_repository_boundary",
+      "exact_main_runs": {
+        "prometheus_ci": 33433012614,
+        "security_audit": 33433012605,
+        "pages": 33433011653
+      },
       "classification": "owner_local_membership_bound_ballot_session",
       "canonical_source_loaded_once": true,
       "caller_supplied_committee_or_signers": false,

@@ -4995,3 +4995,35 @@ Rules for all dev agents:
   No direct-main push, bypass, external runtime, wallet, chain, deployment,
   Mainnet or production action occurred.
 - Status: `PR #243 OPEN / Protected checks pending / Production false`.
+
+### 2026-08-31 - GH-242 product merge and exact-main verification pass
+
+- PR #243 merged normally without bypass as exact main
+  `5cb132c670d1e7771ccaf6dab2ddf5b1a6fd905a`; issue #242 is closed.
+- Exact-main Prometheus CI `33433012614`, Security Audit `33433012605`, and
+  Pages `33433011653` all pass on that exact SHA.
+- This closeout branch is documentation/status-only. It will synchronize the
+  public Markdown, HTML, `llms.txt`, machine status, Memory and Bridge with the
+  verified merge evidence while preserving every production-false and
+  external-authority boundary.
+- Status: `Product exact-main PASS / Documentation closeout in progress /
+  Production false`.
+
+### 2026-08-31 - GH-242 documentation closeout review-ready
+
+- The Bridge entry point, README, Whitepaper, Roadmap, FAQ, Landing, public
+  HTML, `llms.txt`, Guardian README, machine status and Memory now agree on PR
+  #243, exact main `5cb132c670d1e7771ccaf6dab2ddf5b1a6fd905a`, and passing
+  runs `33433012614` / `33433012605` / `33433011653`.
+- Kimi K3 found one P2 stale Bridge-entry status. Sol corrected it; Kimi's
+  independent re-review returned `APPROVE` with no P0/P1/P2. Its P3 note about
+  a weak PR-number substring was also hardened to require exact `PR #243`, with
+  a new public-surface drift regression.
+- Local closeout gates pass: 13 synchronized surfaces, 29 public-claim tests,
+  11 documentation-hygiene tests, 7 project-status tests, 6 autodidactic tests,
+  Memory integrity, Black, two workflow YAML parses, four HTML parses, scope
+  allowlist, secret-pattern scan and diff hygiene. Browser checks at desktop
+  width show no overflow on Landing or Roadmap and confirm the GH-242 evidence.
+- Claude Code remained unavailable because its configured budget was exhausted
+  before repository access; it made no change and returned no finding.
+- Status: `Closeout local PASS / Normal protected PR next / Production false`.
