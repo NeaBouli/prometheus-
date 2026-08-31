@@ -396,14 +396,15 @@ class GuardianMembershipAuthority:
                     CHECK(length(bootstrap_membership_source_sha256) = 32)
             ) STRICT
             """)
-        connection.execute("""
+        connection.execute(f"""
             CREATE TABLE current_membership (
                 singleton INTEGER PRIMARY KEY CHECK(singleton = 1),
                 epoch INTEGER NOT NULL CHECK(epoch >= 0),
                 membership_source_sha256 BLOB NOT NULL
                     CHECK(length(membership_source_sha256) = 32),
                 source_wire BLOB NOT NULL
-                    CHECK(length(source_wire) >= 1 AND length(source_wire) <= 300000)
+                    CHECK(length(source_wire) >= 1
+                        AND length(source_wire) <= {MAX_MEMBERSHIP_SOURCE_BYTES})
             ) STRICT
             """)
         connection.execute("""
@@ -412,7 +413,7 @@ class GuardianMembershipAuthority:
                 high_water_ms INTEGER NOT NULL CHECK(high_water_ms >= 0)
             ) STRICT
             """)
-        connection.execute("""
+        connection.execute(f"""
             CREATE TABLE membership_transitions (
                 transition_id BLOB PRIMARY KEY CHECK(length(transition_id) = 32),
                 nonce BLOB NOT NULL UNIQUE CHECK(length(nonce) = 32),
@@ -426,7 +427,8 @@ class GuardianMembershipAuthority:
                 not_after_ms INTEGER NOT NULL CHECK(not_after_ms > not_before_ms),
                 applied_at_ms INTEGER NOT NULL CHECK(applied_at_ms >= not_before_ms),
                 transition_wire BLOB NOT NULL
-                    CHECK(length(transition_wire) >= 1 AND length(transition_wire) <= 2048)
+                    CHECK(length(transition_wire) >= 1
+                        AND length(transition_wire) <= {MAX_MEMBERSHIP_TRANSITION_BYTES})
             ) STRICT
             """)
         connection.execute(

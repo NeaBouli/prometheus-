@@ -6235,3 +6235,19 @@ false`.
   accessed no repository file. Sol owns the complete diff and all external
   actions.
 - Status: `Local complete / Protected PR next / Production false`.
+
+### 2026-09-01 - PR #247 review findings resolved
+
+- Initial PR commit `5bcf3ea` passed Prometheus CI, Security Audit and the
+  CodeRabbit completion check. Review produced no high-severity finding.
+- Sol independently validated and resolved every actionable note: non-mapping
+  GH-246 machine status now records a stable invariant error instead of
+  raising; the public gate consumes the canonical GH-246 status and enforces
+  explicit per-surface owner-local/non-production fragments plus positive
+  external-authority/production drift rejection; SQL length constraints use
+  the Python constants; and the `llms.txt` update date is current.
+- Added malformed-status, generic-keyword drift and positive-authority drift
+  tests. Actual post-fix results: focused transition/ingress `54 passed`,
+  public-claim `34 tests` pass, Black, focused Pylint 10.00/10,
+  documentation hygiene, Memory Integrity and diff checks pass.
+- Status: `PR #247 findings resolved / Updated checks next / Production false`.

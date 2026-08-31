@@ -65,6 +65,77 @@ GH242_PUBLIC_FILES = (
 
 GH246_PUBLIC_FILES = GH242_PUBLIC_FILES
 
+GH246_LOCAL_REQUIRED_FRAGMENTS = {
+    Path("README.md"): (
+        "no signer/private-key path",
+        "no external or decentralized membership authority",
+        "protected PR and exact-main CI/Security/Pages evidence remain pending",
+    ),
+    Path("WHITEPAPER.md"): (
+        "contains no signing/private-key API",
+        "does not establish external authority",
+        "protected review and exact-main evidence remain pending",
+    ),
+    Path("docs/roadmap.md"): (
+        "owner-pinned public verification only",
+        "external/decentralized authority",
+        "production trust remain open",
+    ),
+    Path("docs/faq.md"): (
+        "does not answer who should control the pinned public authority key",
+        "decentralized or production operation",
+        "Protected review and exact-main evidence are pending",
+    ),
+    Path("memory/STATUS.md"): (
+        "Authority: public verification only; no signer/private-key API",
+        "external/decentralized authority",
+        "production trust",
+    ),
+    Path("index.html"): (
+        "owner-only durable current source",
+        "no external authority",
+        "deployment or production claim",
+    ),
+    Path("roadmap.html"): (
+        "owner-pinned public verification only",
+        "not external authority",
+        "multi-host or production trust",
+    ),
+    Path("whitepaper.html"): (
+        "contains no signer/private-key path",
+        "proves no external authority",
+        "deployment or production trust",
+    ),
+    Path("faq.html"): (
+        "does not establish who should control the pinned key",
+        "decentralized or production operation",
+        "Protected review and exact-main evidence remain pending",
+    ),
+    Path("llms.txt"): (
+        "no signer/private-key path",
+        "no external/decentralized authority",
+        "deployment or production trust",
+    ),
+    Path("modules/guardian-node/README.md"): (
+        "There is no signing/private-key API",
+        "no external authority",
+        "deployment, or production claim",
+    ),
+}
+
+GH246_PROHIBITED_CLAIMS = (
+    re.compile(
+        r"GH-246[^\n]{0,500}(?:provides|establishes|proves|uses) (?:an? )?"
+        r"(?:external|decentralized) (?:membership )?authority",
+        re.I,
+    ),
+    re.compile(
+        r"GH-246[^\n]{0,500}(?:is|provides|establishes|proves|supports) "
+        r"(?:now )?(?:production[- ]ready|production support|production authority)",
+        re.I,
+    ),
+)
+
 REQUIRED_FRAGMENTS = {
     Path("README.md"): (
         "no production Prometheus network",
@@ -190,7 +261,12 @@ def validate_status(data: dict[str, Any]) -> list[str]:
     gh_234 = data.get("post_audit_updates", {}).get("gh_234", {})
     gh_238 = data.get("post_audit_updates", {}).get("gh_238", {})
     gh_242 = data.get("post_audit_updates", {}).get("gh_242", {})
-    gh_246 = data.get("post_audit_updates", {}).get("gh_246", {})
+    gh_246_value = data.get("post_audit_updates", {}).get("gh_246", {})
+    if not isinstance(gh_246_value, dict):
+        errors.append("GH-246 machine status record must be an object")
+        gh_246: dict[str, Any] = {}
+    else:
+        gh_246 = gh_246_value
 
     if (
         validators.get("stake_asset") != "KAS"
@@ -398,7 +474,15 @@ def verify(root: Path) -> list[str]:
         ),
     )
     gh_242 = status.get("post_audit_updates", {}).get("gh_242", {})
-    gh_246 = status.get("post_audit_updates", {}).get("gh_246", {})
+    gh_246_value = status.get("post_audit_updates", {}).get("gh_246", {})
+    gh_246 = gh_246_value if isinstance(gh_246_value, dict) else {}
+    gh_246_claims = (
+        GH246_LOCAL_REQUIRED_FRAGMENTS
+        if gh_246.get("status")
+        == "implemented_and_locally_verified_protected_review_pending"
+        and gh_246.get("classification") == "owner_local_signed_membership_continuity"
+        else {}
+    )
 
     for relative in PUBLIC_FILES:
         path = root / relative
@@ -445,15 +529,14 @@ def verify(root: Path) -> list[str]:
                 errors.append(f"{relative}: GH-242 exact-main evidence missing")
         if relative in GH246_PUBLIC_FILES:
             normalized_text = " ".join(text.split()).casefold()
-            for fragment in (
-                "GH-246",
-                "owner",
-                "protected review",
-                "production",
-            ):
+            for fragment in gh_246_claims.get(relative, ()):
                 if fragment.casefold() not in normalized_text:
-                    errors.append(f"{relative}: GH-246 local boundary missing")
+                    errors.append(
+                        f"{relative}: GH-246 canonical local boundary missing"
+                    )
                     break
+            if any(pattern.search(text) for pattern in GH246_PROHIBITED_CLAIMS):
+                errors.append(f"{relative}: GH-246 authority or production claim drift")
         if relative.suffix == ".html" and "5cd13bf" not in text:
             errors.append(f"{relative}: exact reconciliation baseline missing")
         for category in find_banned_claims(text):

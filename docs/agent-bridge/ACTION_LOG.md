@@ -5090,3 +5090,18 @@ Rules for all dev agents:
   found no page-width or heading overflow; the Roadmap renders without console
   warnings after its intended entrance animation.
 - Status: `Local complete / Protected PR next / Production false`.
+
+### 2026-09-01 - PR #247 review findings resolved
+
+- All required CI and Security checks passed on initial PR commit `5bcf3ea`.
+  CodeRabbit completed with two minor inline findings and two review notes.
+- Sol verified and fixed all four: malformed non-object GH-246 machine records
+  now fail closed without an exception; every GH-246 public surface is checked
+  against its explicit owner-local/non-production claim set plus positive
+  authority/production drift rejection; SQLite size checks derive from the
+  canonical Python limits; and `llms.txt` carries the current document date.
+- Focused transition/ingress remains `54 passed`; public-claim coverage is now
+  `34 tests` and passes. Black, focused Pylint 10.00/10, documentation hygiene,
+  Memory Integrity and diff checks pass after the fixes.
+- Status: `Review findings resolved / Updated protected checks next /
+  Production false`.
