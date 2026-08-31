@@ -6140,3 +6140,13 @@ hardening note. Thirteen public surfaces and 29 fail-closed claim tests pass,
 alongside documentation hygiene, project status, Memory, workflow YAML, HTML,
 Black, scope, secret-pattern and diff checks. The next action is one normal
 protected documentation PR; production remains false.
+
+Documentation/status PR #244 subsequently merged normally without bypass as
+exact main `d9b275452e70717372747ef9359abaec956fcf49`. Exact-main Prometheus CI
+`33435673539`, Security Audit `33435673520`, and Pages `33435672362` pass on
+that SHA. Cache-busted live readback verifies raw-main README, Landing,
+Roadmap, Whitepaper, FAQ and `llms.txt` expose the synchronized GH-242 product
+evidence. This final Bridge-only handoff adds no public claim or product change
+and needs no recursive GH-242 status update after normal protected merge.
+Status: `GH-242 Complete / Product and public exact-main PASS / Production
+false`.

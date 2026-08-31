@@ -5027,3 +5027,18 @@ Rules for all dev agents:
 - Claude Code remained unavailable because its configured budget was exhausted
   before repository access; it made no change and returned no finding.
 - Status: `Closeout local PASS / Normal protected PR next / Production false`.
+
+### 2026-08-31 - GH-242 public exact-main and live closeout pass
+
+- Documentation/status PR #244 merged normally without bypass as exact main
+  `d9b275452e70717372747ef9359abaec956fcf49`.
+- Its exact-main Prometheus CI `33435673539`, Security Audit `33435673520`, and
+  Pages `33435672362` pass on that exact SHA.
+- Cache-busted live readback confirms raw-main README, Landing, Roadmap,
+  Whitepaper, FAQ and `llms.txt` all expose the GH-242 product merge SHA and
+  product exact-main run evidence with the production-false boundaries intact.
+- This final Bridge-only handoff changes no public claim, architecture,
+  runtime, protocol, wallet, chain, deployment, Mainnet or production state.
+  After its normal protected merge it needs no recursive GH-242 status update.
+- Status: `GH-242 Complete / Product and public exact-main PASS / Production
+  false`.
