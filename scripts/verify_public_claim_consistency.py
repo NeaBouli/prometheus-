@@ -123,12 +123,14 @@ GH246_REQUIRED_FRAGMENTS = {
 
 GH246_PROHIBITED_CLAIMS = (
     re.compile(
-        r"GH-246[^\n]{0,500}(?:provides|establishes|proves|uses) (?:an? )?"
+        r"GH-246[^\n]{0,500}(?:provides|establishes|proves|uses|enables|"
+        r"authorizes|confers) (?:an? )?"
         r"(?:external|decentralized) (?:membership )?authority",
         re.I,
     ),
     re.compile(
-        r"GH-246[^\n]{0,500}(?:is|provides|establishes|proves|supports) "
+        r"GH-246[^\n]{0,500}(?:is|provides|establishes|proves|supports|enables|"
+        r"authorizes|confers) "
         r"(?:now )?(?:production[- ]ready|production support|production authority)",
         re.I,
     ),
