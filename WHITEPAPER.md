@@ -1,5 +1,7 @@
 # Prometheus: Decentralized AI-Powered Threat Intelligence on Kaspa
 
+*Project status reviewed through 2026-09-01; immutable public claim-audit baseline: 2026-08-14.*
+
 **Whitepaper v4.0 — March 2026**
 
 **Current status reconciliation — August 2026:** The isolated H-001 Testnet-10 canary is complete: external BIP340 signing, full Kaspa transaction verification, one-shot broadcast, confirmed covenant output, `operator_record`, and independent public REST evidence pass. This non-promotable canary does not authorize Mainnet or full rollout. The rollout-capable core remains 84-88% complete and the complete roadmap vision remains 50-55% complete; production proof artifacts and independent cryptographic review, privacy-reviewed semantic/actionable analysis, six state deployments, metrics-oracle evidence, and production multi-host/node operation remain open.

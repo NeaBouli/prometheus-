@@ -1,5 +1,7 @@
 # Prometheus — Frequently Asked Questions
 
+*Project status reviewed through 2026-09-01; immutable public claim-audit baseline: 2026-08-14.*
+
 ---
 
 ## Tokenomics

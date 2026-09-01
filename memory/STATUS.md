@@ -1,11 +1,16 @@
 # PROMETHEUS – MODULE STATUS
 # Format: | Module | Status | Progress | Last Update | Audit | Testnet Address |
 # Status: core lifecycle values plus evidence-qualified DEVELOPMENT/STUB/FIXTURE labels; every non-production label must retain its boundary in the row
-# Last Updated: 2026-08-31
+# Last Updated: 2026-09-01
 
 ---
 
 ## PUBLIC CLAIM RECONCILIATION (2026-08-14)
+
+Latest project/public status review: 2026-09-01. The section date and exact
+evidence below remain the immutable 2026-08-14 audit baseline; later exact-main
+updates are recorded in the dated status sections that follow and in the
+machine-readable post-audit ledger.
 
 ```text
 Baseline: exact main 5cd13bf6f9c170711e26364263bd0dcd8aad8c09
