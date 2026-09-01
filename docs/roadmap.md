@@ -1,6 +1,6 @@
 # Prometheus — Full Deployment Roadmap
 *Readiness-gated roadmap; no fixed public-release date is claimed.*
-*Current repository status refreshed 2026-08-23 against pre-branch exact main `c243b69`; the dated public claim audit remains the 2026-08-14 `5cd13bf` snapshot.*
+*Project status reviewed through 2026-09-01. The immutable public claim-audit baseline remains 2026-08-14 at exact main `5cd13bf`; later exact-main updates are recorded below and in the machine-readable post-audit ledger.*
 
 Evidence classes are intentionally separate: implemented/tested development
 foundations, the single demonstrated non-promotable Testnet-10 canary, no proven

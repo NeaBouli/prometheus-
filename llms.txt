@@ -1,6 +1,6 @@
 # Prometheus — Threat Intelligence Target Architecture
 # https://neabouli.github.io/prometheus-/
-# llms.txt v1.2 — document updated 2026-09-01; dated audit baseline remains 2026-08-14
+# llms.txt v1.2 — project status reviewed through 2026-09-01; immutable dated audit baseline remains 2026-08-14
 
 ## Project Identity
 Prometheus is a development-stage protocol targeting decentralized,

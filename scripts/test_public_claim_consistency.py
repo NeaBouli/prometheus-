@@ -30,6 +30,25 @@ class PublicClaimConsistencyTests(unittest.TestCase):
     def test_canonical_status_passes(self) -> None:
         self.assertEqual(MODULE.validate_status(self.status), [])
 
+    def test_audit_baseline_date_drift_is_rejected(self) -> None:
+        changed = copy.deepcopy(self.status)
+        changed["as_of"] = MODULE.LATEST_PROJECT_UPDATE
+        self.assertTrue(
+            any("baseline date" in error for error in MODULE.validate_status(changed))
+        )
+
+    def test_latest_project_update_metadata_drift_is_rejected(self) -> None:
+        for value in (None, {}, {"as_of": MODULE.AUDIT_BASELINE_DATE}):
+            with self.subTest(value=value):
+                changed = copy.deepcopy(self.status)
+                changed["latest_project_update"] = value
+                self.assertTrue(
+                    any(
+                        "latest project update" in error
+                        for error in MODULE.validate_status(changed)
+                    )
+                )
+
     def test_prom_staking_is_rejected(self) -> None:
         changed = copy.deepcopy(self.status)
         changed["classifications"]["validators"]["prom_staking"] = True
@@ -466,6 +485,96 @@ class PublicClaimConsistencyTests(unittest.TestCase):
         invalid = '<script type="application/ld+json">{broken}</script>'
         self.assertEqual(MODULE.validate_json_ld(valid), [])
         self.assertEqual(MODULE.validate_json_ld(invalid), ["invalid JSON-LD block 1"])
+
+    def test_json_ld_update_date_validation(self) -> None:
+        current = (
+            '<script type="application/ld+json">'
+            '{"dateModified":"2026-09-01"}</script>'
+        )
+        stale = (
+            '<script type="application/ld+json">'
+            '{"dateModified":"2026-08-14"}</script>'
+        )
+        self.assertEqual(MODULE.validate_json_ld_update_date(current), [])
+        self.assertEqual(
+            MODULE.validate_json_ld_update_date(stale),
+            ["current JSON-LD dateModified missing"],
+        )
+        mixed = current + stale
+        self.assertEqual(
+            MODULE.validate_json_ld_update_date(mixed),
+            ["stale JSON-LD dateModified present"],
+        )
+
+    def test_latest_public_metadata_drift_is_rejected(self) -> None:
+        root = SCRIPT.parents[1]
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_root = Path(tmp)
+            status_target = tmp_root / MODULE.STATUS_PATH
+            status_target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy(root / MODULE.STATUS_PATH, status_target)
+            for relative in MODULE.PUBLIC_FILES:
+                target = tmp_root / relative
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy(root / relative, target)
+            shutil.copy(root / MODULE.SITEMAP_PATH, tmp_root / MODULE.SITEMAP_PATH)
+            readme = tmp_root / "README.md"
+            readme.write_text(
+                readme.read_text(encoding="utf-8").replace(
+                    "Public project status was reviewed through 2026-09-01.",
+                    "Public project status date pending.",
+                    1,
+                ),
+                encoding="utf-8",
+            )
+            errors = MODULE.verify(tmp_root)
+            self.assertTrue(
+                any(
+                    "README.md" in error and "latest project/audit" in error
+                    for error in errors
+                )
+            )
+
+    def test_stale_public_metadata_residue_is_rejected(self) -> None:
+        root = SCRIPT.parents[1]
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_root = Path(tmp)
+            status_target = tmp_root / MODULE.STATUS_PATH
+            status_target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy(root / MODULE.STATUS_PATH, status_target)
+            for relative in MODULE.PUBLIC_FILES:
+                target = tmp_root / relative
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy(root / relative, target)
+            shutil.copy(root / MODULE.SITEMAP_PATH, tmp_root / MODULE.SITEMAP_PATH)
+            readme = tmp_root / "README.md"
+            readme.write_text(
+                readme.read_text(encoding="utf-8")
+                + "\nStatus reconciled 2026-08-14.\n",
+                encoding="utf-8",
+            )
+            errors = MODULE.verify(tmp_root)
+            self.assertTrue(
+                any(
+                    "README.md" in error and "stale project metadata" in error
+                    for error in errors
+                )
+            )
+
+    def test_stale_sitemap_lastmod_is_rejected(self) -> None:
+        root = SCRIPT.parents[1]
+        with tempfile.TemporaryDirectory() as tmp:
+            sitemap = Path(tmp) / "sitemap.xml"
+            shutil.copy(root / MODULE.SITEMAP_PATH, sitemap)
+            sitemap.write_text(
+                sitemap.read_text(encoding="utf-8").replace(
+                    MODULE.LATEST_PROJECT_UPDATE,
+                    MODULE.AUDIT_BASELINE_DATE,
+                    1,
+                ),
+                encoding="utf-8",
+            )
+            self.assertTrue(MODULE.validate_sitemap(sitemap))
 
 
 if __name__ == "__main__":

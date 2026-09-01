@@ -6328,3 +6328,40 @@ false`.
   scoped issue before implementation.
 - Status: `GH-246 COMPLETE / Product and public exact-main PASS / Production
   false`.
+
+### 2026-09-01 - GH-250 public status metadata reconciliation started
+
+- Issue #250 tracks one documentation-only reconciliation from exact main
+  `946f404d772979d07b501497ad9a4c4bd5a05835`.
+- Preserve the immutable 2026-08-14 claim-audit snapshot and its exact evidence,
+  but identify it explicitly as the audit baseline while presenting
+  2026-09-01 as the latest project/public closeout date across Markdown, HTML,
+  `llms.txt`, machine status and Memory.
+- Capability classifications, architecture, KAS/PROM separation, tokenomics,
+  contracts, rollout estimates and production-false status must not change.
+- Scope excludes wallet, chain, deployment, Mainnet, production, IAM, secrets
+  and infrastructure.
+- Status: `GH-250 IN PROGRESS / Documentation only / Production false`.
+
+### 2026-09-01 - GH-250 local reconciliation and review pass
+
+- README, Whitepaper, Roadmap, FAQ, `llms.txt`, Memory, five public HTML pages,
+  JSON-LD, sitemap and canonical machine status now distinguish the immutable
+  2026-08-14 audit baseline from the latest 2026-09-01 project review.
+- The public-claim gate now rejects audit-baseline mutation, malformed latest
+  metadata, stale public wording, missing or mixed-stale JSON-LD update dates,
+  and stale reviewed-page sitemap dates. Its suite passes 43 tests across 13
+  synchronized status surfaces.
+- Memory/project-status/autodidactic, public-document hygiene, H-001 evidence,
+  HTML/JSON/XML parsing, workflow YAML, Black and diff checks pass. Kimi K3
+  independently reviewed twice; final verdict `APPROVE`, with no P0-P3 finding
+  inside GH-250 scope.
+- Desktop and 375px mobile browser checks pass on all five public pages with no
+  page, footer or H1 overflow and no console warning. A pre-existing mobile
+  Economics overflow was fixed by shrinking the content grid and containing
+  wide tables in local scroll regions.
+- Capability claims, 84-88% / 50-55% internal estimates, architecture,
+  tokenomics, contracts and evidence identities are unchanged. No wallet,
+  chain, deployment, Mainnet, production, IAM, secret or infrastructure action
+  occurred.
+- Status: `GH-250 LOCAL PASS / Kimi APPROVE / Protected PR next / Production false`.

@@ -6,10 +6,14 @@ from __future__ import annotations
 import json
 import re
 import sys
+import xml.etree.ElementTree as ET
 from pathlib import Path
 from typing import Any
 
 STATUS_PATH = Path("docs/evidence/public-claim-status-2026-08-14.json")
+SITEMAP_PATH = Path("sitemap.xml")
+AUDIT_BASELINE_DATE = "2026-08-14"
+LATEST_PROJECT_UPDATE = "2026-09-01"
 PUBLIC_FILES = (
     Path("README.md"),
     Path("WHITEPAPER.md"),
@@ -25,6 +29,56 @@ PUBLIC_FILES = (
     Path("modules/client/README.md"),
     Path("modules/guardian-node/README.md"),
 )
+
+LATEST_METADATA_FRAGMENTS = {
+    Path(
+        "README.md"
+    ): "Public project status was reviewed through 2026-09-01. The immutable claim-audit baseline remains 2026-08-14",
+    Path(
+        "WHITEPAPER.md"
+    ): "Project status reviewed through 2026-09-01; immutable public claim-audit baseline: 2026-08-14",
+    Path(
+        "docs/roadmap.md"
+    ): "Project status reviewed through 2026-09-01. The immutable public claim-audit baseline remains 2026-08-14",
+    Path(
+        "docs/faq.md"
+    ): "Project status reviewed through 2026-09-01; immutable public claim-audit baseline: 2026-08-14",
+    Path(
+        "memory/STATUS.md"
+    ): "Latest project/public status review: 2026-09-01. The section date and exact evidence below remain the immutable 2026-08-14 audit baseline",
+    Path(
+        "index.html"
+    ): 'Project status reviewed 2026-09-01 · immutable <a href="docs/claim-audit-2026-08-14.md">claim-audit baseline</a> 2026-08-14',
+    Path(
+        "roadmap.html"
+    ): 'Project status reviewed 2026-09-01 · immutable <a href="docs/claim-audit-2026-08-14.md">claim-audit baseline</a> 2026-08-14',
+    Path(
+        "whitepaper.html"
+    ): 'Project status reviewed 2026-09-01 · immutable <a href="docs/claim-audit-2026-08-14.md">claim-audit baseline</a> 2026-08-14',
+    Path(
+        "faq.html"
+    ): 'Project status reviewed 2026-09-01 · immutable <a href="docs/claim-audit-2026-08-14.md">claim-audit baseline</a> 2026-08-14',
+    Path(
+        "guardian-economics.html"
+    ): 'Project status reviewed 2026-09-01 · immutable <a href="docs/claim-audit-2026-08-14.md">claim-audit baseline</a> 2026-08-14',
+    Path(
+        "llms.txt"
+    ): "project status reviewed through 2026-09-01; immutable dated audit baseline remains 2026-08-14",
+}
+
+STALE_METADATA_PATTERNS = (
+    re.compile(r"Status reconciled 2026-08-14", re.I),
+    re.compile(r"Current repository status refreshed 2026-08-23", re.I),
+    re.compile(r"Last Updated: 2026-08-31", re.I),
+)
+
+CURRENT_PUBLIC_URLS = {
+    "https://neabouli.github.io/prometheus-/",
+    "https://neabouli.github.io/prometheus-/whitepaper.html",
+    "https://neabouli.github.io/prometheus-/faq.html",
+    "https://neabouli.github.io/prometheus-/roadmap.html",
+    "https://neabouli.github.io/prometheus-/guardian-economics.html",
+}
 
 GH234_PUBLIC_FILES = tuple(
     path
@@ -258,6 +312,21 @@ def validate_status(data: dict[str, Any]) -> list[str]:
     performance = classes.get("performance", {})
     light = classes.get("light_client", {})
     economics = classes.get("guardian_economics", {})
+    latest_update_value = data.get("latest_project_update", {})
+    if not isinstance(latest_update_value, dict):
+        errors.append("latest project update must be an object")
+        latest_update: dict[str, Any] = {}
+    else:
+        latest_update = latest_update_value
+    if data.get("as_of") != AUDIT_BASELINE_DATE:
+        errors.append("claim-audit baseline date must remain immutable")
+    if latest_update != {
+        "as_of": LATEST_PROJECT_UPDATE,
+        "audit_baseline_as_of": AUDIT_BASELINE_DATE,
+        "classification": "post_audit_updates_recorded_below",
+        "production_ready": False,
+    }:
+        errors.append("latest project update metadata is invalid")
     gh_234 = data.get("post_audit_updates", {}).get("gh_234", {})
     gh_238 = data.get("post_audit_updates", {}).get("gh_238", {})
     gh_242 = data.get("post_audit_updates", {}).get("gh_242", {})
@@ -460,6 +529,51 @@ def validate_json_ld(text: str) -> list[str]:
     return errors
 
 
+def validate_json_ld_update_date(text: str) -> list[str]:
+    """Require one valid top-level JSON-LD object with the current update date."""
+    bodies = re.findall(
+        r'<script[^>]+type=["\']application/ld\+json["\'][^>]*>(.*?)</script>',
+        text,
+        flags=re.I | re.S,
+    )
+    parsed: list[Any] = []
+    for body in bodies:
+        try:
+            parsed.append(json.loads(body))
+        except json.JSONDecodeError:
+            continue
+    dated_objects = [
+        item for item in parsed if isinstance(item, dict) and "dateModified" in item
+    ]
+    if not any(
+        isinstance(item, dict) and item.get("dateModified") == LATEST_PROJECT_UPDATE
+        for item in dated_objects
+    ):
+        return ["current JSON-LD dateModified missing"]
+    if any(item.get("dateModified") != LATEST_PROJECT_UPDATE for item in dated_objects):
+        return ["stale JSON-LD dateModified present"]
+    return []
+
+
+def validate_sitemap(path: Path) -> list[str]:
+    """Validate current public-page lastmod values with an XML parser."""
+    try:
+        root = ET.parse(path).getroot()
+    except (OSError, ET.ParseError):
+        return ["missing or invalid sitemap"]
+    namespace = {"sm": "http://www.sitemaps.org/schemas/sitemap/0.9"}
+    entries: dict[str, str] = {}
+    for url in root.findall("sm:url", namespace):
+        location = url.findtext("sm:loc", default="", namespaces=namespace)
+        last_modified = url.findtext("sm:lastmod", default="", namespaces=namespace)
+        entries[location] = last_modified
+    return [
+        f"current public URL has stale or missing lastmod: {url}"
+        for url in sorted(CURRENT_PUBLIC_URLS)
+        if entries.get(url) != LATEST_PROJECT_UPDATE
+    ]
+
+
 def verify(root: Path) -> list[str]:
     """Verify canonical status and synchronized public surfaces."""
     errors: list[str] = []
@@ -524,6 +638,17 @@ def verify(root: Path) -> list[str]:
         for fragment in REQUIRED_FRAGMENTS.get(relative, ()):
             if fragment.casefold() not in text.casefold():
                 errors.append(f"{relative}: required status boundary missing")
+        latest_metadata = LATEST_METADATA_FRAGMENTS.get(relative)
+        normalized_metadata = " ".join(text.split()).casefold()
+        if (
+            latest_metadata
+            and " ".join(latest_metadata.split()).casefold() not in normalized_metadata
+        ):
+            errors.append(f"{relative}: latest project/audit metadata missing")
+        if latest_metadata and any(
+            pattern.search(text) for pattern in STALE_METADATA_PATTERNS
+        ):
+            errors.append(f"{relative}: stale project metadata present")
         if relative in GH234_PUBLIC_FILES:
             for fragment in gh_234_evidence_fragments:
                 if not fragment or fragment not in text:
@@ -578,6 +703,12 @@ def verify(root: Path) -> list[str]:
             errors.append(f"{relative}: prohibited claim category {category}")
         if relative.suffix == ".html":
             errors.extend(f"{relative}: {item}" for item in validate_json_ld(text))
+            errors.extend(
+                f"{relative}: {item}" for item in validate_json_ld_update_date(text)
+            )
+    errors.extend(
+        f"{SITEMAP_PATH}: {item}" for item in validate_sitemap(root / SITEMAP_PATH)
+    )
     return errors
 
 

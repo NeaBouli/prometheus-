@@ -5157,3 +5157,27 @@ Rules for all dev agents:
 - Status: `GH-246 COMPLETE / Product and public exact-main PASS / Production
   false`; external authority, key rotation, Sybil, L1, public multi-host and
   production trust remain open.
+
+### 2026-09-01 - GH-250 public status metadata reconciliation started
+
+- Issue #250 opened from exact main
+  `946f404d772979d07b501497ad9a4c4bd5a05835` for a documentation-only audit
+  baseline/latest-update reconciliation.
+- The 2026-08-14 audit remains immutable evidence; public surfaces will state
+  2026-09-01 as the latest project closeout without changing claims, estimates,
+  architecture, tokenomics, contracts or production status.
+- Status: `GH-250 IN PROGRESS / Documentation only / Production false`.
+
+### 2026-09-01 - GH-250 local gates and independent review pass
+
+- Public status metadata is synchronized through 2026-09-01 while preserving
+  the immutable 2026-08-14 audit snapshot, exact evidence and all production-
+  false boundaries. Five public HTML pages also expose current JSON-LD and
+  reviewed-page sitemap dates.
+- Public consistency passes 13 surfaces and 43 tests. Memory, project status,
+  autodidactic, documentation hygiene, H-001 evidence, HTML/JSON/XML, workflow
+  YAML, Black and diff checks pass.
+- Kimi K3 final read-only verdict: `APPROVE`, no P0-P3 in scope. Desktop/mobile
+  browser verification passes all five pages without page, footer or H1
+  overflow; the Economics mobile table overflow is corrected.
+- Status: `GH-250 LOCAL PASS / Normal protected PR next / Production false`.

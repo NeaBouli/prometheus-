@@ -1,6 +1,12 @@
 {
   "schema_version": 1,
   "as_of": "2026-08-14",
+  "latest_project_update": {
+    "as_of": "2026-09-01",
+    "audit_baseline_as_of": "2026-08-14",
+    "classification": "post_audit_updates_recorded_below",
+    "production_ready": false
+  },
   "repository_commit": "5cd13bf6f9c170711e26364263bd0dcd8aad8c09",
   "evidence": {
     "prometheus_ci_run": 31747553871,

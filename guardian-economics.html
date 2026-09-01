@@ -30,7 +30,7 @@
 <meta name="ai-category" content="cybersecurity, blockchain, economics, decentralization, AI-infrastructure">
 <!-- Schema.org -->
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"TechArticle","name":"Prometheus Guardian Economics & Open Problems","description":"Illustrative planning scenarios and unresolved Guardian economics and decentralization assumptions; not active network economics.","url":"https://neabouli.github.io/prometheus-/guardian-economics.html","datePublished":"2026-03-22","dateModified":"2026-08-14","author":{"@type":"Organization","name":"Prometheus Protocol Community","url":"https://github.com/NeaBouli/prometheus-"},"mainEntity":{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Are the Guardian cost and break-even values current facts?","acceptedAnswer":{"@type":"Answer","text":"No. They are illustrative planning scenarios, not quotes, predictions or operating evidence. PROM has no active minting, emission, liquidity or market price."}},{"@type":"Question","name":"Has a real Guardian model or network been evaluated?","acceptedAnswer":{"@type":"Answer","text":"No independently evaluated real 8B or 70B model run and no operated Guardian network are proven. Current evidence covers hardened scaffolding, state machines, non-actionable drafts and synthetic fixtures."}},{"@type":"Question","name":"Is Guardian decentralization solved?","acceptedAnswer":{"@type":"Answer","text":"No. Membership authority, key rotation, Sybil resistance, public multi-host operation and on-chain attestation remain open gates."}}]}}
+{"@context":"https://schema.org","@type":"TechArticle","name":"Prometheus Guardian Economics & Open Problems","description":"Illustrative planning scenarios and unresolved Guardian economics and decentralization assumptions; not active network economics.","url":"https://neabouli.github.io/prometheus-/guardian-economics.html","datePublished":"2026-03-22","dateModified":"2026-09-01","author":{"@type":"Organization","name":"Prometheus Protocol Community","url":"https://github.com/NeaBouli/prometheus-"},"mainEntity":{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Are the Guardian cost and break-even values current facts?","acceptedAnswer":{"@type":"Answer","text":"No. They are illustrative planning scenarios, not quotes, predictions or operating evidence. PROM has no active minting, emission, liquidity or market price."}},{"@type":"Question","name":"Has a real Guardian model or network been evaluated?","acceptedAnswer":{"@type":"Answer","text":"No independently evaluated real 8B or 70B model run and no operated Guardian network are proven. Current evidence covers hardened scaffolding, state machines, non-actionable drafts and synthetic fixtures."}},{"@type":"Question","name":"Is Guardian decentralization solved?","acceptedAnswer":{"@type":"Answer","text":"No. Membership authority, key rotation, Sybil resistance, public multi-host operation and on-chain attestation remain open gates."}}]}}
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -180,7 +180,8 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
   .page-header{padding:120px 24px 60px}
   .wp-layout{grid-template-columns:1fr;padding:0 24px}
   .sidebar{display:none}
-  .wp-content{padding:48px 0 80px}
+  .wp-content{min-width:0;padding:48px 0 80px}
+  .wp-table{display:block;max-width:100%;overflow-x:auto}
   .calc-grid,.solutions-grid{grid-template-columns:1fr}
   footer{grid-template-columns:1fr;gap:16px;padding:24px}
   .f-links{justify-content:flex-start}
@@ -598,7 +599,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
 </div>
 
 <footer>
-  <div class="f-left">Status reconciled 2026-08-14 · base <a href="https://github.com/NeaBouli/prometheus-/commit/5cd13bf6f9c170711e26364263bd0dcd8aad8c09">5cd13bf</a> · <a href="docs/claim-audit-2026-08-14.md">claim audit</a></div>
+  <div class="f-left">Project status reviewed 2026-09-01 · immutable <a href="docs/claim-audit-2026-08-14.md">claim-audit baseline</a> 2026-08-14 · base <a href="https://github.com/NeaBouli/prometheus-/commit/5cd13bf6f9c170711e26364263bd0dcd8aad8c09">5cd13bf</a></div>
   <div class="f-center">PROMETHEUS</div>
   <ul class="f-links">
     <li><a href="faq.html">FAQ</a></li>
