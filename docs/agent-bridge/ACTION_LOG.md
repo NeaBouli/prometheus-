@@ -5181,3 +5181,15 @@ Rules for all dev agents:
   browser verification passes all five pages without page, footer or H1
   overflow; the Economics mobile table overflow is corrected.
 - Status: `GH-250 LOCAL PASS / Normal protected PR next / Production false`.
+
+### 2026-09-01 - GH-250 exact-main and live closeout pass
+
+- PR #251 merged normally as exact main
+  `3d4d344cd57744eba1354a7f4da6fec478d6bb7e`; issue #250 is closed.
+- Exact-main CI `33530094204`, Security Audit `33530094168`, and Pages
+  `33530093729` pass. Cache-busted live Pages, raw README, `llms.txt` and
+  sitemap readback confirms the synchronized metadata and audit-baseline
+  distinction.
+- This final Bridge-only archive adds no product or public-claim change and
+  needs no recursive closeout after normal protected merge.
+- Status: `GH-250 COMPLETE / Exact-main and live PASS / Production false`.
