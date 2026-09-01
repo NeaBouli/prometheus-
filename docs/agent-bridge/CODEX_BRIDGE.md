@@ -6303,3 +6303,28 @@ false`.
   tests, 6 autodidactic tests, Black and diff checks pass.
 - Status: `Review PASS / P3 resolved / Updated protected checks next /
   Production false`.
+
+### 2026-09-01 - GH-246 product and public exact-main closeout complete
+
+- Documentation PR #248 squash-merged normally as exact main
+  `17b917204daa368f6504d8b17b77320ccf455d0e` after all 11 protected checks
+  passed. Exact-main Prometheus CI `33453938725`, Security Audit `33453938739`,
+  and Pages `33453938017` pass on that SHA.
+- Cache-busted live readback confirms raw-main README and public `llms.txt`
+  expose PR #247, full product SHA and all three product run IDs. Landing,
+  Roadmap, Whitepaper and FAQ expose the same evidence on desktop and 375px
+  mobile with no stale GH-246 review wording, horizontal/H1 overflow or console
+  warning.
+- Kimi K3's independent verdict remains `APPROVE`; its sole P3 heuristic note
+  was fixed and covered before merge. Claude Code remained unavailable at its
+  configured local budget and changed no file.
+- GH-246 is complete as owner-local signed membership continuity and public
+  exact-main evidence. It does not prove external/decentralized authority, key
+  ownership/rotation, Sybil resistance, L1 attestation, public multi-host
+  operation, deployment or production trust.
+- Next bounded engineering block should address one externally verifiable
+  membership-authority/key-rotation assumption without adding signer material
+  to the repository; its trust model and operator boundary require a separate
+  scoped issue before implementation.
+- Status: `GH-246 COMPLETE / Product and public exact-main PASS / Production
+  false`.

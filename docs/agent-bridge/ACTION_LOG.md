@@ -5143,3 +5143,17 @@ Rules for all dev agents:
   hygiene, Memory, project-status, autodidactic, Black and diff checks pass.
 - Status: `Review PASS / P3 resolved / Updated protected checks next /
   Production false`.
+
+### 2026-09-01 - GH-246 product and public exact-main closeout complete
+
+- Documentation PR #248 squash-merged normally as exact main
+  `17b917204daa368f6504d8b17b77320ccf455d0e`; exact-main Prometheus CI
+  `33453938725`, Security Audit `33453938739`, and Pages `33453938017` pass.
+- Live raw-main README, `llms.txt`, Landing, Roadmap, Whitepaper and FAQ expose
+  the synchronized PR #247 product evidence. Desktop/mobile checks found no
+  stale review wording, horizontal/H1 overflow or console warning.
+- Kimi's final verdict was `APPROVE`; its sole P3 drift-verb gap was fixed and
+  regression-tested before merge. Claude Code made no change.
+- Status: `GH-246 COMPLETE / Product and public exact-main PASS / Production
+  false`; external authority, key rotation, Sybil, L1, public multi-host and
+  production trust remain open.
