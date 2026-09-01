@@ -314,7 +314,9 @@ ballot sessions use only the current canonical source stored in an owner-only
 ledger, while rollback, same-epoch equivocation and replay fail closed. This
 does not answer who should control the pinned public authority key, prove its
 ownership or rotation, resist Sybil identities, or establish decentralized or
-production operation. Protected review and exact-main evidence are pending.
+production operation. PR #247 squash-merged normally as exact main
+`f12e821bb492caae3b94e5b3c882488eb7f2982d`; CI `33452085421`, Security Audit
+`33452085419`, and Pages `33452084065` pass on that SHA.
 
 **Q: When will the mobile app be available?**
 Desktop and mobile releases are readiness-gated rather than date-gated.

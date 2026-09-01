@@ -2761,3 +2761,16 @@ changed.
   Sybil resistance, L1 attestation, public multi-host operation and production
   authority are not proven.
 - Result: `LOCAL PASS / Protected review pending / Production false`.
+
+### GH-246 product exact-main closeout
+
+- PR #247 merged normally as exact main
+  `f12e821bb492caae3b94e5b3c882488eb7f2982d`; issue #246 is closed.
+- Exact-main Prometheus CI `33452085421`, Security Audit `33452085419`, and
+  Pages `33452084065` pass. README, Whitepaper, Roadmap, FAQ, Landing,
+  `llms.txt`, Guardian README and machine status are reconciled to that exact
+  evidence in the protected documentation closeout candidate.
+- No rollout, wallet, chain, broadcast, deployment, Mainnet or production
+  authority follows from this repository evidence.
+- Result: `PRODUCT EXACT-MAIN PASS / Public closeout review pending /
+  Production false`.

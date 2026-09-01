@@ -5105,3 +5105,41 @@ Rules for all dev agents:
   Memory Integrity and diff checks pass after the fixes.
 - Status: `Review findings resolved / Updated protected checks next /
   Production false`.
+
+### 2026-09-01 - GH-246 product exact-main pass and public closeout started
+
+- PR #247 squash-merged normally as exact main
+  `f12e821bb492caae3b94e5b3c882488eb7f2982d`; issue #246 closed.
+- Exact-main Prometheus CI `33452085421`, Security Audit `33452085419`, and
+  Pages `33452084065` pass.
+- A separate documentation-only closeout updates README, Whitepaper, Roadmap,
+  FAQ, Landing, public HTML, `llms.txt`, Guardian README, machine status,
+  verifier/tests, Memory and Bridge to the same exact evidence. No product or
+  production action is included.
+- Status: `Product exact-main PASS / Public closeout protected review next /
+  Production false`.
+
+### 2026-09-01 - GH-246 public closeout local validation pass
+
+- Public claim consistency passes for 13 surfaces and all 36 verifier tests;
+  documentation hygiene passes 11 tests. Memory, project-status, autodidactic,
+  workflow-YAML, HTML and diff checks also pass.
+- Desktop/mobile browser verification of Landing, Roadmap, Whitepaper and FAQ
+  confirms exact PR/SHA/run evidence and no stale review wording or console
+  warning. A mobile Landing overflow from full SHA strings was corrected with
+  bounded roadmap wrapping and rechecked at 375px without horizontal overflow.
+- Status: `Local closeout PASS / Protected documentation PR next / Production
+  false`.
+
+### 2026-09-01 - PR #248 independent review pass and P3 hardening
+
+- All initial protected checks pass and no review thread exists. Kimi K3
+  independently reviewed the exact diff read-only and returned `APPROVE` with
+  no P0-P2 finding; exact PR #247 SHA/run evidence was rechecked against GitHub.
+- Its one P3 heuristic note was fixed by rejecting `enables`, `authorizes`, and
+  `confers` positive authority/production claims, with external-authority and
+  production-support regression cases.
+- Post-fix public consistency covers 13 surfaces and 37 tests; documentation
+  hygiene, Memory, project-status, autodidactic, Black and diff checks pass.
+- Status: `Review PASS / P3 resolved / Updated protected checks next /
+  Production false`.

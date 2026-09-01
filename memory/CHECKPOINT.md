@@ -1148,3 +1148,13 @@ Leistungsbasierte Emission. Guardians = "Miner" (KI statt GPU).
   live-model cases remain intentionally skipped. Protected review is pending.
 - This is owner-local public verification only, not external authority, key
   ownership/rotation, Sybil resistance, L1, deployment or production trust.
+
+## Checkpoint 2026-09-01: GH-246 exact-main closeout
+
+- PR #247 squash-merged normally as exact main
+  `f12e821bb492caae3b94e5b3c882488eb7f2982d`; issue #246 is closed.
+- Exact-main CI `33452085421`, Security Audit `33452085419`, and Pages
+  `33452084065` pass. Public closeout still requires its own protected review.
+- Product classification remains owner-local public verification only;
+  external authority, key ownership/rotation, Sybil resistance, L1,
+  multi-host operation, deployment and production trust remain open.

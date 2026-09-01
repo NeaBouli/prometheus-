@@ -322,6 +322,26 @@ class PublicClaimConsistencyTests(unittest.TestCase):
                     any("GH-246" in error for error in MODULE.validate_status(changed))
                 )
 
+    def test_incomplete_gh_246_exact_main_evidence_is_rejected(self) -> None:
+        changed = copy.deepcopy(self.status)
+        del changed["post_audit_updates"]["gh_246"]["exact_main_runs"]["pages"]
+        self.assertTrue(
+            any(
+                "GH-246 exact-main run evidence" in error
+                for error in MODULE.validate_status(changed)
+            )
+        )
+
+    def test_malformed_gh_246_merge_commit_is_rejected(self) -> None:
+        changed = copy.deepcopy(self.status)
+        changed["post_audit_updates"]["gh_246"]["merge_commit"] = "f12e821"
+        self.assertTrue(
+            any(
+                "GH-246 merge commit" in error
+                for error in MODULE.validate_status(changed)
+            )
+        )
+
     def test_missing_gh_246_status_is_rejected(self) -> None:
         changed = copy.deepcopy(self.status)
         del changed["post_audit_updates"]["gh_246"]
@@ -393,6 +413,35 @@ class PublicClaimConsistencyTests(unittest.TestCase):
                     for error in errors
                 )
             )
+
+    def test_gh_246_enabling_authority_or_production_claim_is_rejected(self) -> None:
+        root = SCRIPT.parents[1]
+        for claim in (
+            "GH-246 enables external membership authority.",
+            "GH-246 enables production support.",
+        ):
+            with self.subTest(claim=claim), tempfile.TemporaryDirectory() as tmp:
+                tmp_root = Path(tmp)
+                status_target = tmp_root / MODULE.STATUS_PATH
+                status_target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy(root / MODULE.STATUS_PATH, status_target)
+                for relative in MODULE.PUBLIC_FILES:
+                    target = tmp_root / relative
+                    target.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copy(root / relative, target)
+                readme = tmp_root / "README.md"
+                readme.write_text(
+                    readme.read_text(encoding="utf-8") + f"\n{claim}\n",
+                    encoding="utf-8",
+                )
+                errors = MODULE.verify(tmp_root)
+                self.assertTrue(
+                    any(
+                        "README.md" in error
+                        and "authority or production claim drift" in error
+                        for error in errors
+                    )
+                )
 
     def test_banned_claims_return_categories_only(self) -> None:
         self.assertEqual(
