@@ -13,7 +13,7 @@ from typing import Any
 STATUS_PATH = Path("docs/evidence/public-claim-status-2026-08-14.json")
 SITEMAP_PATH = Path("sitemap.xml")
 AUDIT_BASELINE_DATE = "2026-08-14"
-LATEST_PROJECT_UPDATE = "2026-09-01"
+LATEST_PROJECT_UPDATE = "2026-09-06"
 PUBLIC_FILES = (
     Path("README.md"),
     Path("WHITEPAPER.md"),
@@ -33,37 +33,37 @@ PUBLIC_FILES = (
 LATEST_METADATA_FRAGMENTS = {
     Path(
         "README.md"
-    ): "Public project status was reviewed through 2026-09-01. The immutable claim-audit baseline remains 2026-08-14",
+    ): "Public project status was reviewed through 2026-09-06. The immutable claim-audit baseline remains 2026-08-14",
     Path(
         "WHITEPAPER.md"
-    ): "Project status reviewed through 2026-09-01; immutable public claim-audit baseline: 2026-08-14",
+    ): "Project status reviewed through 2026-09-06; immutable public claim-audit baseline: 2026-08-14",
     Path(
         "docs/roadmap.md"
-    ): "Project status reviewed through 2026-09-01. The immutable public claim-audit baseline remains 2026-08-14",
+    ): "Project status reviewed through 2026-09-06. The immutable public claim-audit baseline remains 2026-08-14",
     Path(
         "docs/faq.md"
-    ): "Project status reviewed through 2026-09-01; immutable public claim-audit baseline: 2026-08-14",
+    ): "Project status reviewed through 2026-09-06; immutable public claim-audit baseline: 2026-08-14",
     Path(
         "memory/STATUS.md"
-    ): "Latest project/public status review: 2026-09-01. The section date and exact evidence below remain the immutable 2026-08-14 audit baseline",
+    ): "Latest project/public status review: 2026-09-06. The section date and exact evidence below remain the immutable 2026-08-14 audit baseline",
     Path(
         "index.html"
-    ): 'Project status reviewed 2026-09-01 · immutable <a href="docs/claim-audit-2026-08-14.md">claim-audit baseline</a> 2026-08-14',
+    ): 'Project status reviewed 2026-09-06 · immutable <a href="docs/claim-audit-2026-08-14.md">claim-audit baseline</a> 2026-08-14',
     Path(
         "roadmap.html"
-    ): 'Project status reviewed 2026-09-01 · immutable <a href="docs/claim-audit-2026-08-14.md">claim-audit baseline</a> 2026-08-14',
+    ): 'Project status reviewed 2026-09-06 · immutable <a href="docs/claim-audit-2026-08-14.md">claim-audit baseline</a> 2026-08-14',
     Path(
         "whitepaper.html"
-    ): 'Project status reviewed 2026-09-01 · immutable <a href="docs/claim-audit-2026-08-14.md">claim-audit baseline</a> 2026-08-14',
+    ): 'Project status reviewed 2026-09-06 · immutable <a href="docs/claim-audit-2026-08-14.md">claim-audit baseline</a> 2026-08-14',
     Path(
         "faq.html"
-    ): 'Project status reviewed 2026-09-01 · immutable <a href="docs/claim-audit-2026-08-14.md">claim-audit baseline</a> 2026-08-14',
+    ): 'Project status reviewed 2026-09-06 · immutable <a href="docs/claim-audit-2026-08-14.md">claim-audit baseline</a> 2026-08-14',
     Path(
         "guardian-economics.html"
-    ): 'Project status reviewed 2026-09-01 · immutable <a href="docs/claim-audit-2026-08-14.md">claim-audit baseline</a> 2026-08-14',
+    ): 'Project status reviewed 2026-09-06 · immutable <a href="docs/claim-audit-2026-08-14.md">claim-audit baseline</a> 2026-08-14',
     Path(
         "llms.txt"
-    ): "project status reviewed through 2026-09-01; immutable dated audit baseline remains 2026-08-14",
+    ): "project status reviewed through 2026-09-06; immutable dated audit baseline remains 2026-08-14",
 }
 
 STALE_METADATA_PATTERNS = (
@@ -170,7 +170,7 @@ GH246_REQUIRED_FRAGMENTS = {
     ),
     Path("modules/guardian-node/README.md"): (
         "There is no signing/private-key API",
-        "no external authority",
+        "external or decentralized authority",
         "deployment, or production claim",
     ),
 }
@@ -186,6 +186,28 @@ GH246_PROHIBITED_CLAIMS = (
         r"GH-246[^\n]{0,500}(?:is|provides|establishes|proves|supports|enables|"
         r"authorizes|confers) "
         r"(?:now )?(?:production[- ]ready|production support|production authority)",
+        re.I,
+    ),
+)
+
+GH253_PUBLIC_FILES = GH242_PUBLIC_FILES
+
+GH253_PROHIBITED_CLAIMS = (
+    re.compile(
+        r"GH-253[^\n]{0,600}(?:proves|establishes|provides|confers|authorizes|"
+        r"enables|supports) "
+        r"(?:real-world key ownership|(?:an? )?(?:external|decentralized) "
+        r"(?:membership )?authority|Sybil resistance|L1 attestation)",
+        re.I,
+    ),
+    re.compile(
+        r"GH-253[^\n]{0,600}(?:is|makes Prometheus|provides) "
+        r"(?:production[- ]ready|production authority|production support)",
+        re.I,
+    ),
+    re.compile(
+        r"GH-253[^\n]{0,600}(?:enables|supports) "
+        r"(?:production authority|production support)",
         re.I,
     ),
 )
@@ -336,6 +358,12 @@ def validate_status(data: dict[str, Any]) -> list[str]:
         gh_246: dict[str, Any] = {}
     else:
         gh_246 = gh_246_value
+    gh_253_value = data.get("post_audit_updates", {}).get("gh_253", {})
+    if not isinstance(gh_253_value, dict):
+        errors.append("GH-253 machine status record must be an object")
+        gh_253: dict[str, Any] = {}
+    else:
+        gh_253 = gh_253_value
 
     if (
         validators.get("stake_asset") != "KAS"
@@ -499,6 +527,36 @@ def validate_status(data: dict[str, Any]) -> list[str]:
     ):
         if gh_246.get(field) is not False:
             errors.append(f"GH-246 {field} must remain false")
+    if (
+        gh_253.get("as_of") != LATEST_PROJECT_UPDATE
+        or gh_253.get("issue") != 253
+        or gh_253.get("pull_request") is not None
+        or gh_253.get("status") != "repository_candidate_local_verified"
+        or gh_253.get("classification")
+        != "owner_local_dual_signed_authority_succession"
+        or gh_253.get("merge_commit") is not None
+        or gh_253.get("exact_main_runs") is not None
+    ):
+        errors.append("GH-253 local candidate identity or status is invalid")
+    for field in (
+        "dual_bip340_authorization_and_possession",
+        "durable_current_authority",
+        "schema_v1_to_v2_migration",
+    ):
+        if gh_253.get(field) is not True:
+            errors.append(f"GH-253 {field} must be true")
+    for field in (
+        "membership_transition_formula_changed",
+        "signing_or_private_key_api",
+        "real_world_key_ownership_proven",
+        "external_or_decentralized_authority",
+        "sybil_resistance_proven",
+        "on_chain_attestation",
+        "public_multihost_operation",
+        "deployment_or_production_authority",
+    ):
+        if gh_253.get(field) is not False:
+            errors.append(f"GH-253 {field} must remain false")
     if economics.get("status") != "illustrative_planning_only":
         errors.append("Guardian economics must remain illustrative planning only")
     if economics.get("active_rewards_or_market_price") is not False:
@@ -627,6 +685,13 @@ def verify(root: Path) -> list[str]:
         and gh_246.get("classification") == "owner_local_signed_membership_continuity"
         else {}
     )
+    gh_253_value = status.get("post_audit_updates", {}).get("gh_253", {})
+    gh_253 = gh_253_value if isinstance(gh_253_value, dict) else {}
+    gh_253_candidate = (
+        gh_253.get("status") == "repository_candidate_local_verified"
+        and gh_253.get("classification")
+        == "owner_local_dual_signed_authority_succession"
+    )
 
     for relative in PUBLIC_FILES:
         path = root / relative
@@ -697,6 +762,18 @@ def verify(root: Path) -> list[str]:
                 errors.append(f"{relative}: GH-246 exact-main evidence missing")
             if any(pattern.search(text) for pattern in GH246_PROHIBITED_CLAIMS):
                 errors.append(f"{relative}: GH-246 authority or production claim drift")
+        if relative in GH253_PUBLIC_FILES:
+            normalized_text = " ".join(text.split()).casefold()
+            if gh_253_candidate and (
+                "gh-253" not in normalized_text
+                or "owner-local" not in normalized_text
+                or "production" not in normalized_text
+            ):
+                errors.append(f"{relative}: GH-253 local candidate boundary missing")
+            if any(
+                pattern.search(normalized_text) for pattern in GH253_PROHIBITED_CLAIMS
+            ):
+                errors.append(f"{relative}: GH-253 authority or production claim drift")
         if relative.suffix == ".html" and "5cd13bf" not in text:
             errors.append(f"{relative}: exact reconciliation baseline missing")
         for category in find_banned_claims(text):

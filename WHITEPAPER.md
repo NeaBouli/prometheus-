@@ -1,6 +1,6 @@
 # Prometheus: Decentralized AI-Powered Threat Intelligence on Kaspa
 
-*Project status reviewed through 2026-09-01; immutable public claim-audit baseline: 2026-08-14.*
+*Project status reviewed through 2026-09-06; immutable public claim-audit baseline: 2026-08-14.*
 
 **Whitepaper v4.0 — March 2026**
 
@@ -85,7 +85,7 @@ The deploy capability gate and repository operator both bind the official Silver
 
 ## 1. Abstract
 
-Prometheus is an open protocol project building toward decentralized, AI-assisted threat intelligence on Kaspa. The repository proves development foundations, one non-promotable Testnet-10 canary, and one bounded operator-attested distinct-host Development/Testnet-10 transport demonstration, not a production or fully decentralized network. Current operation relies on owner-controlled policy and membership files and local trust anchors; operated public multi-host networking, trusted key rotation, Sybil resistance, on-chain attestation, and decentralized rule distribution remain unproven target properties.
+Prometheus is an open protocol project building toward decentralized, AI-assisted threat intelligence on Kaspa. The repository proves development foundations, one non-promotable Testnet-10 canary, and one bounded operator-attested distinct-host Development/Testnet-10 transport demonstration, not a production or fully decentralized network. Current operation relies on owner-controlled policy and membership files and local trust anchors. GH-253 adds locally tested dual-signed transition-authority succession, but real-world key ownership, externally trusted decentralized membership authority, operated public multi-host networking, Sybil resistance, on-chain attestation, and decentralized rule distribution remain unproven target properties.
 
 The protocol combines three layers:
 - **On-device AI target** (Phi-3-mini 3.8B, 4-bit quantized) for local anomaly detection; current code is a fail-closed safe-default stub with no ONNX session, loaded-model claim, or quarantine authority
@@ -457,6 +457,20 @@ key ownership or rotation, Sybil resistance, L1 attestation, public multi-host
 operation, deployment, or production trust. PR #247 squash-merged normally as
 exact main `f12e821bb492caae3b94e5b3c882488eb7f2982d`; CI `33452085421`, Security
 Audit `33452085419`, and Pages `33452084065` pass on that SHA.
+
+GH-253 extends that owner-local boundary with a canonical dual-signed authority
+rotation envelope. The durable current key authorizes a gapless successor
+epoch, while the proposed key signs an independent possession digest. Both
+signatures bind the network, current membership epoch/digest, validity window,
+and nonce; replay, historic key reuse, clock rollback, stale membership, and
+concurrent conflicts fail closed in one SQLite transaction. Existing exact
+schema-v1 ledgers migrate transactionally to schema v2 with prior transition
+history assigned to genesis authority epoch zero. Later membership transitions
+load and verify only the durable current key under the same lock. This local
+candidate contains no signing/private-key API and does not establish real-world
+key ownership, external or decentralized authority, Sybil resistance, L1
+attestation, deployment, or production trust. Issue #253 remains pending
+protected merge and exact-main evidence.
 
 ---
 

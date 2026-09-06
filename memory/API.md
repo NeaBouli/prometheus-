@@ -998,3 +998,15 @@ current time. `current_source` accepts only network/epoch restrictions and
 holds the ledger transaction through the caller context. `BallotIngress`
 consumes that context; it accepts no source path, digest, member set or signer
 map. No signing, transport, chain, key-rotation or production API is exposed.
+
+## Guardian Transition-Authority Rotation (GH-253)
+
+`GuardianMembershipAuthority.rotate_authority(wire, now_ms)` is a
+public-verification-only repository API. It accepts exact canonical public
+bytes and separately trusted time. The durable current public key must
+authorize the gapless successor, and the proposed public key must sign a
+separate possession digest. Both bind the current membership identity,
+validity window and nonce. The method returns a nonconstructible,
+nonserializable data-only receipt and atomically advances the owner-only
+authority ledger. It exposes no signing, private-key, transport, chain,
+deployment or production API and grants no external authority.

@@ -6383,3 +6383,76 @@ false`.
 - This append-only Bridge archive changes no public claim and needs no
   recursive GH-250 status update after its normal protected merge.
 - Status: `GH-250 COMPLETE / Exact-main CI-Security-Pages and live PASS / Production false`.
+
+### 2026-09-06 - GH-253 Guardian transition-authority rotation started
+
+- Issue #253 starts from exact main
+  `0f5f54aa90a9459e2392a011aca9cf1acf9304a4` on branch
+  `feat/GH-253-guardian-authority-rotation`.
+- The repository-only scope adds a canonical dual-authorized rotation boundary
+  for the GH-246 membership-transition authority: the active key authorizes
+  succession, the proposed key proves possession, and durable authority epoch,
+  membership identity, validity, nonce, replay, rollback and equivocation state
+  advance atomically in the owner-only ledger.
+- Existing membership transitions must verify against the current durable
+  authority after rotation. Exact schema-v1 ledger migration must preserve
+  existing membership state and transition history or fail closed unchanged.
+- No signer/private-key API, real key material, external/decentralized authority,
+  Sybil resistance, L1 attestation, wallet, chain action, deployment, Mainnet or
+  production trust is in scope. Capability estimates and token/contract
+  invariants remain unchanged.
+- Kimi K3 receives one bounded secret-free architecture/deep-review task; Codex
+  Sol owns implementation review, complete verification, protected delivery and
+  final status.
+- Status: `GH-253 IN PROGRESS / Repository-only security boundary / Production false`.
+
+### 2026-09-06 - GH-253 local implementation and security gates pass
+
+- Owner-local authority succession is implemented as an exact canonical
+  dual-BIP340 envelope: the durable current key authorizes a gapless successor,
+  while the proposed key proves possession under an independent digest domain.
+  Current membership identity, validity, nonce, history and trusted clock move
+  under the same `BEGIN IMMEDIATE` boundary as the current authority.
+- Exact schema-v1 ledgers migrate transactionally to schema v2; malformed or
+  unexpected schemas remain unchanged and rejected. Membership transitions now
+  verify only against the durable current key and record its authority epoch.
+- Focused transition/ingress tests pass `89`; the complete Guardian suite passes
+  `1383` with four intentional live-model skips. The exact model/provenance slice
+  passes `203` with four intentional skips. Black passes 37 CI-scoped files;
+  Guardian Pylint is `9.85/10` and vLLM boundary Pylint is `10.00/10`.
+- Public-claim consistency passes all 13 surfaces and 46 tests; the complete
+  scripts suite passes 192 tests. Memory, project-status, documentation-hygiene,
+  H-001 evidence, Guardian compose-boundary, workflow-YAML, Rust format and
+  workspace Clippy checks pass. `cargo audit` exits zero with nine allowed
+  maintenance/yank warnings; Python dependency audit reports no vulnerability.
+- Kimi K3's independent read-only review found no P0/P1 defect and its requested
+  advanced-membership and chained-rotation positive cases are covered. A legacy
+  unchanged KIP-16 subprocess test timed out only while concurrent full builds
+  saturated the local host; it passed independently and remains subject to an
+  unloaded recheck plus isolated CI.
+- Docker and actionlint are unavailable on this workstation. The unchanged
+  Compose render and workflow lint remain mandatory protected-CI evidence; no
+  local pass is claimed for them. Workspace/release builds, final Kimi verdict,
+  protected PR, exact-main CI and live Pages readback remain in progress.
+- No signer/private-key path, external authority, real-world key proof, Sybil
+  claim, L1, wallet, chain, deployment, Mainnet or production action occurred.
+- Status: `GH-253 LOCAL CORE PASS / Slow release gates in progress / Production false`.
+
+### 2026-09-06 - GH-253 complete local gates and final review pass
+
+- `cargo test --workspace` passes the complete locked workspace. Both required
+  Guardian security binaries build in release mode; the verified ThreatHint
+  package and locked three-package Guardian set pass. The isolated exact release
+  performance test passes `1/1` after the full optimized build.
+- Kimi K3 final read-only verdict is `PASS`: no P0, P1 or P2 finding. Its three
+  useful P3 quality notes were resolved or bounded: the rotation window has a
+  dedicated constant, duplicate module wording was removed while retaining the
+  canonical GH-246 guard, and the GH-253 prohibited-claim scan now normalizes
+  line wraps with a regression test.
+- The earlier unchanged KIP-16 timeout was confirmed as local saturation: with
+  Cargo idle, five consecutive complete file runs each pass `15/15`; Kimi's
+  second full Guardian run also passes `1383/4 skipped`.
+- Remaining evidence is external delivery only: protected PR checks (including
+  locally unavailable Docker/actionlint), normal merge, exact-main checks and
+  cache-busted live Pages/README readback. Production remains false.
+- Status: `GH-253 LOCAL COMPLETE / Kimi PASS / Protected PR next / Production false`.

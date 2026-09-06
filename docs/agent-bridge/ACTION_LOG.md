@@ -5193,3 +5193,42 @@ Rules for all dev agents:
 - This final Bridge-only archive adds no product or public-claim change and
   needs no recursive closeout after normal protected merge.
 - Status: `GH-250 COMPLETE / Exact-main and live PASS / Production false`.
+
+### 2026-09-06 - GH-253 authority-rotation block opened
+
+- Opened issue #253 and isolated branch
+  `feat/GH-253-guardian-authority-rotation` from exact main `0f5f54a`.
+- Accepted scope: dual-authorized BIP340 transition-authority rotation, durable
+  monotonic authority state, migration/adversarial coverage, current-key-only
+  membership transitions, synchronized public status and protected PR delivery.
+- Excluded: signer/private-key paths, real operator material, transport, Sybil or
+  decentralization proof, L1, wallet, chain, deployment, Mainnet and production.
+- Status: `GH-253 IN PROGRESS / Kimi architecture review next`.
+
+### 2026-09-06 - GH-253 local core and documentation gates pass
+
+- Implemented and adversarially tested dual-signed owner-local authority
+  succession, durable current-key enforcement, replay/rollback/key-reuse
+  rejection, exact v1-to-v2 migration and rotation/transition serialization.
+- Synchronized README, Whitepaper, FAQ, Roadmap, five public HTML pages,
+  `llms.txt`, machine status, module docs and Memory with explicit production-
+  false and external-authority boundaries.
+- Real results: focused Guardian `89 passed`; full Guardian `1383 passed, 4
+  skipped`; model slice `203 passed, 4 skipped`; scripts `192 passed`; public
+  surfaces `13` and tests `46` pass; Black, Pylint, Memory/status/hygiene,
+  H-001, Rust fmt/Clippy, Cargo and Python dependency audits pass.
+- Docker/actionlint are not installed locally; protected CI must supply those
+  unchanged workflow gates. Slow Rust workspace/release checks and Kimi final
+  review remain active before the normal protected PR.
+- Status: `GH-253 LOCAL CORE PASS / DELIVERY IN PROGRESS`.
+
+### 2026-09-06 - GH-253 full local release matrix pass
+
+- Complete Rust workspace tests, release security-binary builds, ThreatHint
+  package verification, locked Guardian package set and exact optimized
+  performance budget all pass.
+- Kimi K3 final read-only review: `PASS`, no P0-P2. Its constant naming,
+  duplicate wording and line-wrapped claim-gate P3 notes are resolved and the
+  affected 89 Guardian tests, 46 claim tests, 13 surfaces and 192 scripts pass.
+- Unloaded legacy KIP-16 file repeated five times at `15/15`; no GH-253 flake.
+- Status: `GH-253 LOCAL COMPLETE / NORMAL PROTECTED PR NEXT`.
