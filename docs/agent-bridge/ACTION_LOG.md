@@ -5288,3 +5288,29 @@ Rules for all dev agents:
 - Published final append-only archive commit `3b6dfe0` through protected PR
   #256. No product or public claim changes.
 - Status: `GH-253 COMPLETE / ARCHIVE PR #256 CHECKS PENDING`.
+
+### 2026-09-06 - GH-253 archive exact-main verified; public wording refresh started
+
+- PR #256 merged normally as exact main
+  `c1d37add61bddf6ada89c213483fd83d65d638b5`; CI `34033762057`, Security
+  Audit `34033762063`, and Pages `34033761205` pass.
+- Began a documentation-only README/Landing correction for stale 2026-09-01
+  summary dates and the obsolete `Deploy verification active` badge.
+- No product behavior or production authority changes.
+- Status: `PUBLIC STATUS REFRESH IN PROGRESS`.
+
+### 2026-09-06 - Public README/Landing refresh local gates pass
+
+- Reconciled README review/estimate dates and GH-253 boundary; replaced the
+  stale Landing deployment badge with the confirmed-canary/gated-rollout state.
+- Added two stale-marker regression tests. Public claims pass 13 surfaces and
+  51 tests; all scripts pass 197 tests; hygiene 11 tests and project status 7
+  tests pass. Memory, Python compile, HTML parse and diff checks pass.
+- Kimi K3 verdict: `PASS`, no P0/P1/P2. Production remains false.
+- Status: `LOCAL PASS / NORMAL PROTECTED PR NEXT`.
+
+### 2026-09-06 - Public README/Landing refresh PR #257 opened
+
+- Published documentation commit `373fbd1` through protected PR #257.
+- Required checks, normal merge, exact-main and live readback remain.
+- Status: `PR #257 OPEN / PRODUCTION FALSE`.

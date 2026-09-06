@@ -6544,3 +6544,49 @@ false`.
 - Required checks and normal merge remain; this archive deliberately requires
   no recursive GH-253 status update after merge.
 - Status: `GH-253 COMPLETE / Final archive PR #256 under protected review / Production false`.
+
+### 2026-09-06 - Public README/Landing status refresh started
+
+- PR #256 is confirmed merged normally as exact main
+  `c1d37add61bddf6ada89c213483fd83d65d638b5`; Prometheus CI
+  `34033762057`, Security Audit `34033762063`, and Pages `34033761205` pass.
+- This documentation-only refresh removes two stale public status markers:
+  README review/estimate dates from 2026-09-01 and the Landing claim that
+  deployment verification is active. The replacement states the evidenced
+  boundary: the non-promotable Testnet-10 H-001 canary is confirmed while full
+  rollout remains gated.
+- Product evidence remains PR #254 and exact main `5920cb4`; the closeout and
+  archive PRs are audit-trail evidence, not new protocol capability.
+- No product, architecture, tokenomics, contract, wallet, chain, deployment,
+  Mainnet, production, IAM, or secret action is in scope.
+- Status: `PUBLIC STATUS REFRESH IN PROGRESS / Documentation only / Production false`.
+
+### 2026-09-06 - Public README/Landing status refresh locally approved
+
+- Changed `README.md` to reconcile its stale 2026-09-01 summary and estimate
+  dates with the already canonical 2026-09-06 project review. The summary now
+  includes the GH-253 owner-local boundary and keeps every production gate
+  explicit.
+- Changed the Landing badge from the stale active-deployment wording to the
+  evidence-backed `Testnet-10 H-001 confirmed / Full rollout gated` status.
+- Added fail-closed stale-marker guards plus two regression tests. Public claim
+  consistency passes across 13 surfaces and 51 tests; the complete scripts
+  suite passes 197 tests. Documentation hygiene passes with 11 tests, project
+  status passes with 7 tests, and Memory integrity, Python compilation, HTML
+  parsing, and `git diff --check` pass.
+- The scope-weighted estimates were rechecked against unchanged remaining gates
+  and remain 84-88% for the rollout-capable core and 50-55% for the complete
+  roadmap vision. They remain internal estimates, not rollout evidence.
+- Kimi K3 final read-only review: `PASS`, no P0/P1/P2. Its P3 observations are
+  pre-existing maintenance notes and do not invalidate this bounded change.
+- No browser runtime was available for a local visual claim. Protected HTML
+  checks and post-merge live Pages readback remain mandatory.
+- Status: `PUBLIC STATUS REFRESH LOCAL PASS / Normal protected PR next / Production false`.
+
+### 2026-09-06 - Public README/Landing status refresh PR opened
+
+- Documentation commit `373fbd1` is published through normal protected PR
+  #257 from `docs/GH-253-public-refresh`.
+- Required checks, normal merge, exact-main CI/Security/Pages and cache-busted
+  live README/Landing readback remain. No bypass is authorized.
+- Status: `PUBLIC STATUS REFRESH PR #257 OPEN / Production false`.

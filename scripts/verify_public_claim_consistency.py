@@ -76,6 +76,8 @@ STALE_METADATA_PATTERNS = (
     re.compile(r"Status reconciled 2026-08-14", re.I),
     re.compile(r"Current repository status refreshed 2026-08-23", re.I),
     re.compile(r"Last Updated: 2026-08-31", re.I),
+    re.compile(r"Current public status \(reviewed 2026-09-01", re.I),
+    re.compile(r"Deploy verification active", re.I),
 )
 
 CURRENT_PUBLIC_URLS = {
