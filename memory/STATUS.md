@@ -29,9 +29,10 @@ public multi-host operation, IPFS distribution, PROM issuance/liquidity and
 decentralized membership/attestation.
 Blocked/unproven: production proof approval/review, real-model quality,
 privacy-reviewed semantic authority, six state deployments, metrics successor
-evidence, key rotation, Sybil resistance, availability/replication and private
-operator audit closure. GH-253 locally tests transition-authority succession,
-but not external/decentralized authority or real-world key ownership.
+evidence, externally trusted real-world key governance, Sybil resistance,
+availability/replication and private operator audit closure. GH-253 is merged
+and exact-main verified for owner-local transition-authority succession, but
+does not prove external/decentralized authority or real-world key ownership.
 
 Invariants: validators stake KAS, never PROM. PROM minting, emission,
 liquidity and trading are not implemented, deployed or active. The <60-second
@@ -1817,9 +1818,9 @@ Estimates: unchanged; core 84-88%; complete vision 50-55%; production false
 ## GH-253 GUARDIAN TRANSITION-AUTHORITY ROTATION (2026-09-06)
 
 ```text
-Status: local repository candidate / protected merge and exact-main pending /
+Status: merged and exact-main verified owner-local repository mechanism /
         production false
-Issue: #253
+Issue: #253; PR #254
 Capability: owner-local dual-signed transition-authority succession
 Authorization: durable current BIP340 key authorizes one gapless successor;
                proposed key proves possession under an independent domain
@@ -1831,8 +1832,9 @@ Migration: exact schema v1 to v2 is transactional; historic transitions retain
            genesis authority epoch zero; unexpected state fails closed unchanged
 Enforcement: later membership transitions verify only the durable current key;
              rotation and membership updates serialize on the same ledger lock
-Local evidence: focused adversarial membership/BallotIngress tests pass; full
-                repository gates and independent final review are pending
+Evidence: exact main 5920cb4bb737376977f762beb0d5e3108519c7a0;
+          Prometheus CI 34031999904; Security Audit 34031999907;
+          Pages 34031999575; focused/full local gates and Kimi review pass
 Authority: public verification only; no signer/private-key API, real-world key
            ownership, external/decentralized authority, Sybil resistance, L1,
            public multi-host operation, deployment or production trust

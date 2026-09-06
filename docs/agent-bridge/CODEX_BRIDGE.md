@@ -6456,3 +6456,50 @@ false`.
   locally unavailable Docker/actionlint), normal merge, exact-main checks and
   cache-busted live Pages/README readback. Production remains false.
 - Status: `GH-253 LOCAL COMPLETE / Kimi PASS / Protected PR next / Production false`.
+
+### 2026-09-06 - GH-253 product merge and exact-main verification in progress
+
+- PR #254 squash-merged normally without admin bypass as exact main
+  `5920cb4bb737376977f762beb0d5e3108519c7a0` after all ten required checks
+  and CodeRabbit passed and the only review thread was resolved.
+- Exact-main Pages run `34031999575` passes on the product merge SHA.
+  Prometheus CI `34031999904` and Security Audit `34031999907` are still in
+  progress and are not yet claimed as passing evidence.
+- This isolated documentation closeout will replace every GH-253 local-candidate
+  marker only after both remaining exact-main runs pass. Product behavior,
+  architecture, tokenomics and production status remain unchanged.
+- Status: `GH-253 PRODUCT MERGED / Exact-main CI and Security pending / Production false`.
+
+### 2026-09-06 - GH-253 product exact-main evidence complete
+
+- PR #254 squash-merged normally without admin bypass as exact main
+  `5920cb4bb737376977f762beb0d5e3108519c7a0`; issue #253 is closed.
+- Exact-main Prometheus CI `34031999904`, Security Audit `34031999907`, and
+  Pages `34031999575` all pass on that SHA.
+- README, Whitepaper, Roadmap, FAQ, Landing, public HTML, `llms.txt`, Guardian
+  README, Memory and machine status are being reconciled in one isolated
+  documentation-only protected closeout. No product behavior changes.
+- Owner-local succession is verified repository evidence only. Real-world key
+  ownership, external/decentralized authority, Sybil resistance, L1,
+  deployment, Mainnet and production trust remain unproven or excluded.
+- Status: `GH-253 PRODUCT EXACT-MAIN PASS / Public closeout review next / Production false`.
+
+### 2026-09-06 - GH-253 public closeout local verification pass
+
+- All 13 synchronized public surfaces now expose PR #254, product exact main
+  `5920cb4bb737376977f762beb0d5e3108519c7a0`, CI `34031999904`, Security
+  Audit `34031999907`, and Pages `34031999575`, while retaining the owner-local
+  and production-false boundaries.
+- Public-claim verification passes with 49 tests; the complete scripts suite
+  passes `195/195`. Memory integrity, project-status verification and seven
+  tests, documentation hygiene and eleven tests, JSON/XML/Python parsing,
+  Black and `git diff --check` pass.
+- Kimi K3 independently returned `PASS` with no P0/P1/P2. Its P3 request to
+  cover the edited Guardian Economics surface was implemented: every GH-253
+  public surface now participates in exact-evidence and prohibited-claim drift
+  checks, and the evidence mutation test iterates across all of them. Its
+  historical GH-242 wording note was resolved by preserving that old wording.
+- The in-app browser runtime exposed no available browser in this session. No
+  visual pass is claimed locally; protected HTML checks plus post-merge
+  cache-busted live readback remain mandatory.
+- Status: `GH-253 PUBLIC CLOSEOUT LOCAL PASS / Protected PR next / Production false`.

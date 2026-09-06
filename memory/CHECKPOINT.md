@@ -1175,3 +1175,14 @@ Leistungsbasierte Emission. Guardians = "Miner" (KI statt GPU).
 - This repository candidate contains no signer/private-key path and proves no
   real-world key ownership, external/decentralized authority, Sybil resistance,
   L1 attestation, deployment, Mainnet or production trust.
+
+## Checkpoint 2026-09-06: GH-253 product exact-main verified
+
+- PR #254 squash-merged normally as exact main
+  `5920cb4bb737376977f762beb0d5e3108519c7a0`; issue #253 is closed.
+- Exact-main Prometheus CI `34031999904`, Security Audit `34031999907`, and
+  Pages `34031999575` pass. The public documentation closeout is isolated on a
+  separate protected branch.
+- Classification remains owner-local public verification only. Real-world key
+  ownership, external/decentralized authority, Sybil resistance, L1,
+  deployment, Mainnet and production trust remain open or excluded.

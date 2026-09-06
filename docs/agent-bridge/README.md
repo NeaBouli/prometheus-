@@ -10,6 +10,16 @@ Startpunkt fuer Codex/Claude Code:
 
 Keine Secrets, Tokens, Passwoerter, privaten Keys oder Wallet-Daten in diese Bridge schreiben.
 
+Aktueller Produkt-Handover: GH-253/PR #254 ist normal und ohne Bypass als exact
+main `5920cb4bb737376977f762beb0d5e3108519c7a0` gemergt; Issue #253 ist
+geschlossen. Exact-main Prometheus CI `34031999904`, Security Audit
+`34031999907` und Pages `34031999575` sind gruen. Die owner-lokale
+Transition-Authority-Rotation verlangt aktuelle BIP340-Autorisierung und
+unabhaengigen Besitznachweis des Nachfolgers, migriert exakte v1-Ledger
+transaktional auf v2 und erzwingt danach den aktuellen dauerhaften Public Key.
+Das beweist weder reale Key Ownership noch externe/dezentrale Autoritaet,
+Sybil Resistance, L1-Attestierung, Deployment, Mainnet oder Produktion.
+
 Abgeschlossener Produkt- und Public-Handover: GH-242/PR #243 ist als Produkt
 exact main `5cb132c670d1e7771ccaf6dab2ddf5b1a6fd905a` gemergt; der synchronisierte
 Public-Closeout PR #244 ist als exact main

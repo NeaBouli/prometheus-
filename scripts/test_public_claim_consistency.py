@@ -380,7 +380,7 @@ class PublicClaimConsistencyTests(unittest.TestCase):
                     )
                 )
 
-    def test_gh_253_candidate_boundaries_are_enforced(self) -> None:
+    def test_gh_253_exact_main_boundaries_are_enforced(self) -> None:
         for field in (
             "membership_transition_formula_changed",
             "signing_or_private_key_api",
@@ -394,6 +394,29 @@ class PublicClaimConsistencyTests(unittest.TestCase):
             with self.subTest(field=field):
                 changed = copy.deepcopy(self.status)
                 changed["post_audit_updates"]["gh_253"][field] = True
+                self.assertTrue(
+                    any("GH-253" in error for error in MODULE.validate_status(changed))
+                )
+
+    def test_gh_253_exact_main_identity_and_evidence_are_enforced(self) -> None:
+        mutations = (
+            ("pull_request", 255),
+            ("status", "repository_candidate_local_verified"),
+            ("merge_commit", "0" * 40),
+            ("exact_main_runs", None),
+            (
+                "exact_main_runs",
+                {
+                    "prometheus_ci": 1,
+                    "security_audit": 2,
+                    "pages": 3,
+                },
+            ),
+        )
+        for field, value in mutations:
+            with self.subTest(field=field, value=value):
+                changed = copy.deepcopy(self.status)
+                changed["post_audit_updates"]["gh_253"][field] = value
                 self.assertTrue(
                     any("GH-253" in error for error in MODULE.validate_status(changed))
                 )
@@ -463,6 +486,36 @@ class PublicClaimConsistencyTests(unittest.TestCase):
                     for error in errors
                 )
                 self.assertEqual(detected, rejected)
+
+    def test_gh_253_public_evidence_drift_is_rejected(self) -> None:
+        root = SCRIPT.parents[1]
+        for drifted_relative in MODULE.GH253_PUBLIC_FILES:
+            with self.subTest(
+                relative=drifted_relative
+            ), tempfile.TemporaryDirectory() as tmp:
+                tmp_root = Path(tmp)
+                status_target = tmp_root / MODULE.STATUS_PATH
+                status_target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy(root / MODULE.STATUS_PATH, status_target)
+                for relative in MODULE.PUBLIC_FILES:
+                    target = tmp_root / relative
+                    target.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copy(root / relative, target)
+                drifted = tmp_root / drifted_relative
+                drifted.write_text(
+                    drifted.read_text(encoding="utf-8").replace(
+                        "34031999904", "34031999905"
+                    ),
+                    encoding="utf-8",
+                )
+                errors = MODULE.verify(tmp_root)
+                self.assertTrue(
+                    any(
+                        str(drifted_relative) in error
+                        and "GH-253 exact-main evidence missing" in error
+                        for error in errors
+                    )
+                )
 
     def test_gh_246_public_surface_drift_is_rejected(self) -> None:
         root = SCRIPT.parents[1]

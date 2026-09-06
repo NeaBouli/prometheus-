@@ -16,7 +16,7 @@ Prometheus is an open protocol project targeting a decentralized threat-intellig
 
 See the [2026-08-14 public claim audit](docs/claim-audit-2026-08-14.md) and its [machine-readable status](docs/evidence/public-claim-status-2026-08-14.json). The audit baseline is exact main `5cd13bf`; Prometheus CI `31747553871`, Security Audit `31747553891`, and Pages `31747553216` pass on that commit.
 
-Public project status was reviewed through 2026-09-06. The immutable claim-audit baseline remains 2026-08-14; later exact-main updates and the current GH-253 repository candidate are recorded below and in the machine-readable post-audit ledger.
+Public project status was reviewed through 2026-09-06. The immutable claim-audit baseline remains 2026-08-14; later exact-main updates, including GH-253, are recorded below and in the machine-readable post-audit ledger.
 
 ---
 
@@ -239,7 +239,7 @@ production trust. PR #247 squash-merged normally as exact main
 `f12e821bb492caae3b94e5b3c882488eb7f2982d`; CI `33452085421`, Security Audit
 `33452085419`, and Pages `33452084065` pass on that SHA.
 
-**GH-253 Guardian transition-authority rotation (local repository candidate):**
+**GH-253 Guardian transition-authority rotation (merged and exact-main verified):**
 the owner-only continuity ledger now accepts an exact canonical rotation only
 when the durable current authority authorizes succession and the proposed
 public key independently proves possession under a separate BIP340 digest
@@ -251,8 +251,10 @@ schema-v1 ledgers migrate transactionally to schema v2 or fail closed
 unchanged. The repository exposes no signer/private-key path. This proves
 owner-local cryptographic succession consistency only, not real-world key
 ownership, external or decentralized authority, Sybil resistance, L1
-attestation, deployment, or production trust. Issue #253 remains a locally
-tested candidate until protected merge and exact-main evidence complete.
+attestation, deployment, or production trust. PR #254 squash-merged normally as
+exact main `5920cb4bb737376977f762beb0d5e3108519c7a0`; Prometheus CI
+`34031999904`, Security Audit `34031999907`, and Pages `34031999575` pass on
+that SHA.
 
 **GH-103 merged and exact-main verified — local ELF import extraction:** the Rust Threat Observable boundary can derive one checked `api_import` from exact caller-supplied Linux ELF bytes. It uses the pinned read-only `object` parser, accepts no path, import string, platform, format, or generic observable value, and derives `linux`/`elf` internally. Inputs are capped at 16 MiB and 4096 dynamic symbols; names must match the existing closed ASCII grammar, are byte-sorted and deduplicated, and one checked index is selected. Every result is local-only `review_required_v1`, with shared exact-byte vectors independently parsed by Python. This neither proves external artifact provenance nor authorizes disclosure, transport, proof acceptance, analysis, or publication.
 

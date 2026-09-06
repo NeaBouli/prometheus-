@@ -112,11 +112,15 @@
     "gh_253": {
       "as_of": "2026-09-06",
       "issue": 253,
-      "pull_request": null,
-      "status": "repository_candidate_local_verified",
+      "pull_request": 254,
+      "status": "merged_and_exact_main_verified_owner_local_authority_succession",
       "classification": "owner_local_dual_signed_authority_succession",
-      "merge_commit": null,
-      "exact_main_runs": null,
+      "merge_commit": "5920cb4bb737376977f762beb0d5e3108519c7a0",
+      "exact_main_runs": {
+        "prometheus_ci": 34031999904,
+        "security_audit": 34031999907,
+        "pages": 34031999575
+      },
       "dual_bip340_authorization_and_possession": true,
       "durable_current_authority": true,
       "schema_v1_to_v2_migration": true,
