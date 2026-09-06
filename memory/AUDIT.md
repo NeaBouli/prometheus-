@@ -2774,3 +2774,24 @@ changed.
   authority follows from this repository evidence.
 - Result: `PRODUCT EXACT-MAIN PASS / Public closeout review pending /
   Production false`.
+
+## Audit GH-253: Guardian transition-authority rotation (local candidate)
+
+- Exact canonical rotation bytes carry current-key authorization and
+  proposed-key possession signatures over separate length-prefixed BIP340
+  digest domains. The envelope binds network, gapless authority epochs,
+  current membership epoch/digest, bounded validity and nonce.
+- One `BEGIN IMMEDIATE` transaction validates the exact ledger, durable current
+  key, membership and clock; rejects replay and historic key reuse; then stores
+  rotation/key history and advances current key/clock. Membership transitions
+  verify against that durable key under the same lock.
+- Exact schema-v1 ledgers migrate transactionally to schema v2 with existing
+  transition rows bound to genesis authority epoch zero. Unexpected schema
+  state fails closed before mutation.
+- Focused adversarial and BallotIngress integration tests pass locally. Kimi
+  performs an independent read-only implementation review before delivery.
+- No signer/private-key API, external authority, real-world key-ownership proof,
+  Sybil resistance, L1 attestation, deployment, Mainnet or production authority
+  is added. Protected merge and exact-main evidence remain pending.
+- Result: `LOCAL CANDIDATE / Full gates and protected review pending /
+  Production false`.

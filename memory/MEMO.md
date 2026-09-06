@@ -254,3 +254,14 @@ Core Dev benötigt: Apple Developer Account + Google Play Account (vor Sprint 13
 - This decision proves only owner-local continuity and anti-rollback. External
   authority selection, key ownership/rotation, Sybil resistance, L1
   attestation, public multi-host operation and production trust remain open.
+
+## 2026-09-06 - GH-253 authority-succession decision
+
+- Transition-key succession remains owner-local and uses dual BIP340 proof:
+  current-key authorization plus independent proposed-key possession.
+- Authority epochs are gapless and historic public keys cannot be reused.
+  Rotation and membership transitions serialize on one durable ledger lock.
+- The schema-v1 policy stays the immutable genesis anchor; exact v1 ledgers
+  migrate transactionally to schema v2.
+- This does not choose an external authority, prove real-world key ownership,
+  solve Sybil resistance, attest on L1, or authorize deployment/production.

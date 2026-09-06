@@ -2,7 +2,7 @@
   "schema_version": 1,
   "as_of": "2026-08-14",
   "latest_project_update": {
-    "as_of": "2026-09-01",
+    "as_of": "2026-09-06",
     "audit_baseline_as_of": "2026-08-14",
     "classification": "post_audit_updates_recorded_below",
     "production_ready": false
@@ -108,6 +108,26 @@
       "on_chain_attestation": false,
       "public_multihost_operation": false,
       "production_authority": false
+    },
+    "gh_253": {
+      "as_of": "2026-09-06",
+      "issue": 253,
+      "pull_request": null,
+      "status": "repository_candidate_local_verified",
+      "classification": "owner_local_dual_signed_authority_succession",
+      "merge_commit": null,
+      "exact_main_runs": null,
+      "dual_bip340_authorization_and_possession": true,
+      "durable_current_authority": true,
+      "schema_v1_to_v2_migration": true,
+      "membership_transition_formula_changed": false,
+      "signing_or_private_key_api": false,
+      "real_world_key_ownership_proven": false,
+      "external_or_decentralized_authority": false,
+      "sybil_resistance_proven": false,
+      "on_chain_attestation": false,
+      "public_multihost_operation": false,
+      "deployment_or_production_authority": false
     }
   },
   "classifications": {

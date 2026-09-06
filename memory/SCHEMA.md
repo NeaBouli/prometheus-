@@ -907,7 +907,7 @@ the approved report nonce, and the transient raw candidate digest. Compile statu
 is an exact boolean. Existing canonical v1 wires remain accepted on read and
 completion retry. No rule source or observable value is stored in this result.
 
-### Guardian membership continuity ledger v1 (GH-246)
+### Guardian membership continuity ledger v2 (GH-246 / GH-253)
 
 The owner-only SQLite ledger has exact STRICT singleton tables for immutable
 network/authority/bootstrap anchors, current epoch/digest/canonical source
@@ -916,3 +916,14 @@ transition ID, nonce, and next epoch. Applying a verified transition inserts
 history and replaces current source/epoch/high-water in one `BEGIN IMMEDIATE`
 transaction. The schema stores public source/signature evidence only and no
 private key.
+
+GH-253 preserves the immutable schema-v1 policy/genesis anchor and migrates an
+exact legacy ledger transactionally. Schema v2 adds singleton
+`current_authority`, append-only `authority_key_history`, canonical
+`authority_rotations`, and `authority_epoch` on each membership-transition
+history row. Legacy rows receive authority epoch zero. A rotation stores the
+old/new public keys, gapless epochs, current membership identity, bounded time,
+nonce, canonical dual-signed wire and application time in the same
+`BEGIN IMMEDIATE` transaction that advances current authority and clock.
+Unexpected legacy or current table/index shapes fail closed without migration.
+No private key or signer material is stored.

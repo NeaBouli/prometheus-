@@ -1,6 +1,6 @@
 # Prometheus — Frequently Asked Questions
 
-*Project status reviewed through 2026-09-01; immutable public claim-audit baseline: 2026-08-14.*
+*Project status reviewed through 2026-09-06; immutable public claim-audit baseline: 2026-08-14.*
 
 ---
 
@@ -319,6 +319,15 @@ ownership or rotation, resist Sybil identities, or establish decentralized or
 production operation. PR #247 squash-merged normally as exact main
 `f12e821bb492caae3b94e5b3c882488eb7f2982d`; CI `33452085421`, Security Audit
 `33452085419`, and Pages `33452084065` pass on that SHA.
+GH-253 is a local repository candidate for rotating that transition key: the
+current key authorizes one gapless successor and the new key independently
+proves possession, with current membership, time, nonce and durable replay
+state bound atomically. Later membership transitions use only the durable
+current key. This closes a local key-succession mechanism; it still does not
+prove real-world key ownership, decide who should control the authority,
+decentralize membership, resist Sybil identities, attest state on L1, or
+establish deployment or production operation. Issue #253 awaits protected
+merge and exact-main evidence.
 
 **Q: When will the mobile app be available?**
 Desktop and mobile releases are readiness-gated rather than date-gated.

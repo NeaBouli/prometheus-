@@ -12,11 +12,16 @@ policy pins a network, public BIP340 transition key, bootstrap source, and
 SQLite ledger. Signed transitions advance exact canonical source bytes with
 durable epoch, clock, nonce, and equivocation protection. `BallotIngress`
 establishes new sessions from only that stored current source under the ledger
-lock. There is no signing/private-key API and no external authority, key
-rotation, Sybil-resistance, L1, deployment, or production claim.
+lock. GH-253 adds a local canonical dual-signed succession mechanism: the
+durable current key authorizes a gapless authority epoch, the proposed key
+independently proves possession, and later transitions verify only the current
+durable key. Exact v1 ledgers migrate transactionally to v2. There is no
+signing/private-key API and no real-world key-ownership proof, external or
+decentralized authority, Sybil resistance, L1, deployment, or production claim.
 PR #247 squash-merged normally as exact main
 `f12e821bb492caae3b94e5b3c882488eb7f2982d`; CI `33452085421`, Security Audit
-`33452085419`, and Pages `33452084065` pass.
+`33452085419`, and Pages `33452084065` pass. GH-253 remains a local repository
+candidate under issue #253 until protected merge and exact-main evidence.
 
 ## Target Hardware Requirements
 

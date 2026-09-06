@@ -380,6 +380,60 @@ class PublicClaimConsistencyTests(unittest.TestCase):
                     )
                 )
 
+    def test_gh_253_candidate_boundaries_are_enforced(self) -> None:
+        for field in (
+            "membership_transition_formula_changed",
+            "signing_or_private_key_api",
+            "real_world_key_ownership_proven",
+            "external_or_decentralized_authority",
+            "sybil_resistance_proven",
+            "on_chain_attestation",
+            "public_multihost_operation",
+            "deployment_or_production_authority",
+        ):
+            with self.subTest(field=field):
+                changed = copy.deepcopy(self.status)
+                changed["post_audit_updates"]["gh_253"][field] = True
+                self.assertTrue(
+                    any("GH-253" in error for error in MODULE.validate_status(changed))
+                )
+
+    def test_missing_or_malformed_gh_253_status_is_rejected(self) -> None:
+        values = (None, [], "invalid", 253)
+        for value in values:
+            with self.subTest(value=value):
+                changed = copy.deepcopy(self.status)
+                changed["post_audit_updates"]["gh_253"] = value
+                self.assertTrue(
+                    any("GH-253" in error for error in MODULE.validate_status(changed))
+                )
+
+    def test_gh_253_positive_authority_claim_is_rejected(self) -> None:
+        root = SCRIPT.parents[1]
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_root = Path(tmp)
+            status_target = tmp_root / MODULE.STATUS_PATH
+            status_target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy(root / MODULE.STATUS_PATH, status_target)
+            for relative in MODULE.PUBLIC_FILES:
+                target = tmp_root / relative
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy(root / relative, target)
+            readme = tmp_root / "README.md"
+            readme.write_text(
+                readme.read_text(encoding="utf-8")
+                + "\nGH-253\nproves decentralized membership authority.\n",
+                encoding="utf-8",
+            )
+            errors = MODULE.verify(tmp_root)
+            self.assertTrue(
+                any(
+                    "README.md" in error
+                    and "GH-253 authority or production claim drift" in error
+                    for error in errors
+                )
+            )
+
     def test_gh_246_public_surface_drift_is_rejected(self) -> None:
         root = SCRIPT.parents[1]
         with tempfile.TemporaryDirectory() as tmp:
@@ -489,7 +543,7 @@ class PublicClaimConsistencyTests(unittest.TestCase):
     def test_json_ld_update_date_validation(self) -> None:
         current = (
             '<script type="application/ld+json">'
-            '{"dateModified":"2026-09-01"}</script>'
+            '{"dateModified":"2026-09-06"}</script>'
         )
         stale = (
             '<script type="application/ld+json">'
@@ -521,7 +575,7 @@ class PublicClaimConsistencyTests(unittest.TestCase):
             readme = tmp_root / "README.md"
             readme.write_text(
                 readme.read_text(encoding="utf-8").replace(
-                    "Public project status was reviewed through 2026-09-01.",
+                    "Public project status was reviewed through 2026-09-06.",
                     "Public project status date pending.",
                     1,
                 ),

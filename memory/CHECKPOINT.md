@@ -1,5 +1,5 @@
 # PROMETHEUS — SESSION CHECKPOINT
-# Last updated: 2026-08-31
+# Last updated: 2026-09-06
 # Purpose: Full recovery document. If Claude (Architect) or Claude Code
 # loses context, read this file first. It contains the complete project state.
 
@@ -1158,3 +1158,20 @@ Leistungsbasierte Emission. Guardians = "Miner" (KI statt GPU).
 - Product classification remains owner-local public verification only;
   external authority, key ownership/rotation, Sybil resistance, L1,
   multi-host operation, deployment and production trust remain open.
+
+## Checkpoint 2026-09-06: GH-253 local authority-rotation candidate
+
+- The exact canonical rotation envelope requires two independent BIP340
+  signatures: the durable current key authorizes a gapless successor epoch and
+  the proposed key proves possession under a separate digest domain.
+- Rotation binds the current durable membership identity, validity window and
+  nonce. Replay, historic-key reuse, stale membership, clock rollback, restart
+  and concurrent rotation/transition conflicts fail closed atomically.
+- Existing exact schema-v1 continuity ledgers migrate transactionally to v2;
+  prior transition history is retained under genesis authority epoch zero.
+  Later membership transitions verify only against the durable current key.
+- Focused membership/ballot integration passes locally. Protected merge and
+  exact-main CI/Security/Pages evidence remain pending.
+- This repository candidate contains no signer/private-key path and proves no
+  real-world key ownership, external/decentralized authority, Sybil resistance,
+  L1 attestation, deployment, Mainnet or production trust.

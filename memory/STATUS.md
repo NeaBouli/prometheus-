@@ -1,13 +1,13 @@
 # PROMETHEUS – MODULE STATUS
 # Format: | Module | Status | Progress | Last Update | Audit | Testnet Address |
 # Status: core lifecycle values plus evidence-qualified DEVELOPMENT/STUB/FIXTURE labels; every non-production label must retain its boundary in the row
-# Last Updated: 2026-09-01
+# Last Updated: 2026-09-06
 
 ---
 
 ## PUBLIC CLAIM RECONCILIATION (2026-08-14)
 
-Latest project/public status review: 2026-09-01. The section date and exact
+Latest project/public status review: 2026-09-06. The section date and exact
 evidence below remain the immutable 2026-08-14 audit baseline; later exact-main
 updates are recorded in the dated status sections that follow and in the
 machine-readable post-audit ledger.
@@ -30,7 +30,8 @@ decentralized membership/attestation.
 Blocked/unproven: production proof approval/review, real-model quality,
 privacy-reviewed semantic authority, six state deployments, metrics successor
 evidence, key rotation, Sybil resistance, availability/replication and private
-operator audit closure.
+operator audit closure. GH-253 locally tests transition-authority succession,
+but not external/decentralized authority or real-world key ownership.
 
 Invariants: validators stake KAS, never PROM. PROM minting, emission,
 liquidity and trading are not implemented, deployed or active. The <60-second
@@ -1810,6 +1811,31 @@ Attestation: two distinct controlled hosts operator-attested with one private
 Remaining gates: operated public networking; independent separation evidence;
                  relay/v2; proof/membership/privacy/model/YARA/chain/reward;
                  deployment, Mainnet and production
+Estimates: unchanged; core 84-88%; complete vision 50-55%; production false
+```
+
+## GH-253 GUARDIAN TRANSITION-AUTHORITY ROTATION (2026-09-06)
+
+```text
+Status: local repository candidate / protected merge and exact-main pending /
+        production false
+Issue: #253
+Capability: owner-local dual-signed transition-authority succession
+Authorization: durable current BIP340 key authorizes one gapless successor;
+               proposed key proves possession under an independent domain
+Binding: network, authority epochs/keys, current membership epoch/digest,
+         bounded validity window and unique nonce
+Durability: schema v2 current authority, key/rotation history, clock and
+            membership-transition authority epoch under BEGIN IMMEDIATE
+Migration: exact schema v1 to v2 is transactional; historic transitions retain
+           genesis authority epoch zero; unexpected state fails closed unchanged
+Enforcement: later membership transitions verify only the durable current key;
+             rotation and membership updates serialize on the same ledger lock
+Local evidence: focused adversarial membership/BallotIngress tests pass; full
+                repository gates and independent final review are pending
+Authority: public verification only; no signer/private-key API, real-world key
+           ownership, external/decentralized authority, Sybil resistance, L1,
+           public multi-host operation, deployment or production trust
 Estimates: unchanged; core 84-88%; complete vision 50-55%; production false
 ```
 
