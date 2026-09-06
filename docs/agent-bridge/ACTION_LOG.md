@@ -5270,3 +5270,15 @@ Rules for all dev agents:
 - Next: required checks, review, normal merge, exact-main CI/Security/Pages and
   live public readback. No admin bypass or production action.
 - Status: `PR #255 OPEN / REQUIRED CHECKS PENDING`.
+
+### 2026-09-06 - GH-253 final closeout archive
+
+- PR #255 merged normally as exact main
+  `990d494a23d96eda4302de14062cb49289fd9a90`; CI `34033102064`, Security
+  Audit `34033102058`, and Pages `34033101594` pass.
+- Cache-busted live Landing, Roadmap, Whitepaper, FAQ, Economics, `llms.txt`,
+  sitemap and raw README readback passes. Active GH-253 candidate wording is
+  absent; owner-local/non-production boundaries remain.
+- This append-only archive changes no product or public claim and needs no
+  recursive status update after normal protected merge.
+- Status: `GH-253 COMPLETE / PRODUCT + PUBLIC EXACT-MAIN AND LIVE PASS`.
