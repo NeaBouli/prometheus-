@@ -6511,3 +6511,36 @@ false`.
 - Required PR checks, review, normal merge, closeout exact-main runs and live
   cache-busted README/Pages readback remain pending. No bypass is authorized.
 - Status: `GH-253 PUBLIC CLOSEOUT PR #255 OPEN / Production false`.
+
+### 2026-09-06 - GH-253 product and public exact-main closeout complete
+
+- Product PR #254 squash-merged normally as exact main
+  `5920cb4bb737376977f762beb0d5e3108519c7a0`; product CI `34031999904`,
+  Security Audit `34031999907`, and Pages `34031999575` pass.
+- Documentation/status PR #255 squash-merged normally as exact main
+  `990d494a23d96eda4302de14062cb49289fd9a90`; closeout CI `34033102064`,
+  Security Audit `34033102058`, and Pages `34033101594` pass.
+- Cache-busted live readback passes for Landing, Roadmap, Whitepaper, FAQ,
+  Guardian Economics, `llms.txt`, sitemap and raw-main README. Each relevant
+  surface exposes GH-253/PR #254 product evidence, owner-local scope and
+  production-false boundaries without active candidate/pending wording.
+- Roadmap HTML protected checks pass; its long GH-253 SHA/status line remains
+  contained by the existing `min-width:0` and `overflow-wrap:anywhere` rules.
+  No interactive browser was available locally, so no visual screenshot claim
+  is made.
+- Kimi K3's final verdict is `PASS` with no P0/P1/P2; both P3 notes were fixed.
+  This final append-only archive changes no product or public claim and needs
+  no recursive GH-253 status update after its own normal protected merge.
+- GH-253 proves only owner-local transition-authority succession. Real-world
+  key ownership, external/decentralized authority, Sybil resistance, L1,
+  public multi-host operation, deployment, Mainnet and production remain
+  unproven or excluded.
+- Status: `GH-253 COMPLETE / Product and public exact-main plus live PASS / Production false`.
+
+### 2026-09-06 - GH-253 final archive PR opened
+
+- Final append-only Bridge archive commit `3b6dfe0` is published through
+  normal protected PR #256. It changes no product behavior or public claim.
+- Required checks and normal merge remain; this archive deliberately requires
+  no recursive GH-253 status update after merge.
+- Status: `GH-253 COMPLETE / Final archive PR #256 under protected review / Production false`.
