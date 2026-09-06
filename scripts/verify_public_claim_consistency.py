@@ -194,7 +194,8 @@ GH253_PUBLIC_FILES = GH242_PUBLIC_FILES
 
 GH253_PROHIBITED_CLAIMS = (
     re.compile(
-        r"GH-253[^\n]{0,600}(?:proves|establishes|provides|confers|authorizes) "
+        r"GH-253[^\n]{0,600}(?:proves|establishes|provides|confers|authorizes|"
+        r"enables|supports) "
         r"(?:real-world key ownership|(?:an? )?(?:external|decentralized) "
         r"(?:membership )?authority|Sybil resistance|L1 attestation)",
         re.I,
@@ -202,6 +203,11 @@ GH253_PROHIBITED_CLAIMS = (
     re.compile(
         r"GH-253[^\n]{0,600}(?:is|makes Prometheus|provides) "
         r"(?:production[- ]ready|production authority|production support)",
+        re.I,
+    ),
+    re.compile(
+        r"GH-253[^\n]{0,600}(?:enables|supports) "
+        r"(?:production authority|production support)",
         re.I,
     ),
 )

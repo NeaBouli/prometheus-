@@ -434,6 +434,36 @@ class PublicClaimConsistencyTests(unittest.TestCase):
                 )
             )
 
+    def test_gh_253_enablement_claims_are_phrase_specific(self) -> None:
+        cases = (
+            ("GH-253 enables external membership authority.", True),
+            ("GH-253 enables production support.", True),
+            ("GH-253 enables production-ready.", False),
+        )
+        root = SCRIPT.parents[1]
+        for claim, rejected in cases:
+            with self.subTest(claim=claim), tempfile.TemporaryDirectory() as tmp:
+                tmp_root = Path(tmp)
+                status_target = tmp_root / MODULE.STATUS_PATH
+                status_target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy(root / MODULE.STATUS_PATH, status_target)
+                for relative in MODULE.PUBLIC_FILES:
+                    target = tmp_root / relative
+                    target.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copy(root / relative, target)
+                readme = tmp_root / "README.md"
+                readme.write_text(
+                    readme.read_text(encoding="utf-8") + f"\n{claim}\n",
+                    encoding="utf-8",
+                )
+                errors = MODULE.verify(tmp_root)
+                detected = any(
+                    "README.md" in error
+                    and "GH-253 authority or production claim drift" in error
+                    for error in errors
+                )
+                self.assertEqual(detected, rejected)
+
     def test_gh_246_public_surface_drift_is_rejected(self) -> None:
         root = SCRIPT.parents[1]
         with tempfile.TemporaryDirectory() as tmp:
