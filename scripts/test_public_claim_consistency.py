@@ -698,6 +698,58 @@ class PublicClaimConsistencyTests(unittest.TestCase):
                 )
             )
 
+    def test_stale_landing_deploy_status_is_rejected(self) -> None:
+        root = SCRIPT.parents[1]
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_root = Path(tmp)
+            status_target = tmp_root / MODULE.STATUS_PATH
+            status_target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy(root / MODULE.STATUS_PATH, status_target)
+            for relative in MODULE.PUBLIC_FILES:
+                target = tmp_root / relative
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy(root / relative, target)
+            shutil.copy(root / MODULE.SITEMAP_PATH, tmp_root / MODULE.SITEMAP_PATH)
+            landing = tmp_root / "index.html"
+            landing.write_text(
+                landing.read_text(encoding="utf-8")
+                + "\nDeploy verification active\n",
+                encoding="utf-8",
+            )
+            errors = MODULE.verify(tmp_root)
+            self.assertTrue(
+                any(
+                    "index.html" in error and "stale project metadata" in error
+                    for error in errors
+                )
+            )
+
+    def test_stale_readme_review_date_is_rejected(self) -> None:
+        root = SCRIPT.parents[1]
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_root = Path(tmp)
+            status_target = tmp_root / MODULE.STATUS_PATH
+            status_target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy(root / MODULE.STATUS_PATH, status_target)
+            for relative in MODULE.PUBLIC_FILES:
+                target = tmp_root / relative
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy(root / relative, target)
+            shutil.copy(root / MODULE.SITEMAP_PATH, tmp_root / MODULE.SITEMAP_PATH)
+            readme = tmp_root / "README.md"
+            readme.write_text(
+                readme.read_text(encoding="utf-8")
+                + "\nCurrent public status (reviewed 2026-09-01).\n",
+                encoding="utf-8",
+            )
+            errors = MODULE.verify(tmp_root)
+            self.assertTrue(
+                any(
+                    "README.md" in error and "stale project metadata" in error
+                    for error in errors
+                )
+            )
+
     def test_stale_sitemap_lastmod_is_rejected(self) -> None:
         root = SCRIPT.parents[1]
         with tempfile.TemporaryDirectory() as tmp:
