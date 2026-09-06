@@ -20,8 +20,12 @@ signing/private-key API and no real-world key-ownership proof, external or
 decentralized authority, Sybil resistance, L1, deployment, or production claim.
 PR #247 squash-merged normally as exact main
 `f12e821bb492caae3b94e5b3c882488eb7f2982d`; CI `33452085421`, Security Audit
-`33452085419`, and Pages `33452084065` pass. GH-253 remains a local repository
-candidate under issue #253 until protected merge and exact-main evidence.
+`33452085419`, and Pages `33452084065` pass. GH-253/PR #254 is merged and
+exact-main verified at `5920cb4bb737376977f762beb0d5e3108519c7a0`;
+Prometheus CI `34031999904`, Security Audit `34031999907`, and Pages
+`34031999575` pass. The owner-local boundary still proves no real-world key
+ownership, external/decentralized authority, Sybil resistance, L1,
+deployment, or production trust.
 
 ## Target Hardware Requirements
 

@@ -5232,3 +5232,41 @@ Rules for all dev agents:
   affected 89 Guardian tests, 46 claim tests, 13 surfaces and 192 scripts pass.
 - Unloaded legacy KIP-16 file repeated five times at `15/15`; no GH-253 flake.
 - Status: `GH-253 LOCAL COMPLETE / NORMAL PROTECTED PR NEXT`.
+
+### 2026-09-06 - GH-253 product merged; exact-main closeout opened
+
+- PR #254 merged normally as
+  `5920cb4bb737376977f762beb0d5e3108519c7a0`; all required PR checks passed
+  and no unresolved review thread remains.
+- Exact-main Pages `34031999575` passes. Exact-main Prometheus CI
+  `34031999904` and Security Audit `34031999907` remain in progress, so the
+  public status is not yet promoted from candidate to exact-main verified.
+- Status: `PRODUCT MERGED / EXACT-MAIN VERIFICATION IN PROGRESS`.
+
+### 2026-09-06 - GH-253 product exact-main pass
+
+- Exact-main Prometheus CI `34031999904`, Security Audit `34031999907`, and
+  Pages `34031999575` pass on product SHA
+  `5920cb4bb737376977f762beb0d5e3108519c7a0` from merged PR #254.
+- Started the isolated documentation-only exact-main reconciliation. Public
+  classification remains owner-local and production false.
+- Status: `PRODUCT EXACT-MAIN PASS / PUBLIC CLOSEOUT IN PROGRESS`.
+
+### 2026-09-06 - GH-253 public closeout local gates pass
+
+- Public consistency passes 13 synchronized surfaces and 49 tests; all 195
+  script tests pass. Memory, project status, documentation hygiene, parsing,
+  Black and diff checks pass.
+- Kimi K3 read-only verdict: `PASS`, no P0-P2. Both P3 notes are closed,
+  including GH-253-specific evidence/prohibited-claim coverage for Guardian
+  Economics and preservation of historical GH-242 Bridge wording.
+- Local browser automation was unavailable, so no local visual claim is made.
+  Protected PR/HTML checks and live post-merge readback remain required.
+- Status: `LOCAL CLOSEOUT PASS / NORMAL PROTECTED PR NEXT`.
+
+### 2026-09-06 - GH-253 public closeout PR #255 opened
+
+- Published local closeout commit `23daea1` through protected PR #255.
+- Next: required checks, review, normal merge, exact-main CI/Security/Pages and
+  live public readback. No admin bypass or production action.
+- Status: `PR #255 OPEN / REQUIRED CHECKS PENDING`.

@@ -14,6 +14,12 @@ STATUS_PATH = Path("docs/evidence/public-claim-status-2026-08-14.json")
 SITEMAP_PATH = Path("sitemap.xml")
 AUDIT_BASELINE_DATE = "2026-08-14"
 LATEST_PROJECT_UPDATE = "2026-09-06"
+GH253_MERGE_COMMIT = "5920cb4bb737376977f762beb0d5e3108519c7a0"
+GH253_EXACT_MAIN_RUNS = {
+    "prometheus_ci": 34031999904,
+    "security_audit": 34031999907,
+    "pages": 34031999575,
+}
 PUBLIC_FILES = (
     Path("README.md"),
     Path("WHITEPAPER.md"),
@@ -190,7 +196,16 @@ GH246_PROHIBITED_CLAIMS = (
     ),
 )
 
-GH253_PUBLIC_FILES = GH242_PUBLIC_FILES
+GH253_PUBLIC_FILES = GH242_PUBLIC_FILES + (Path("guardian-economics.html"),)
+
+GH253_REQUIRED_FRAGMENTS = {
+    path: (
+        "owner-local",
+        "real-world key ownership",
+        "production",
+    )
+    for path in GH253_PUBLIC_FILES
+}
 
 GH253_PROHIBITED_CLAIMS = (
     re.compile(
@@ -530,14 +545,33 @@ def validate_status(data: dict[str, Any]) -> list[str]:
     if (
         gh_253.get("as_of") != LATEST_PROJECT_UPDATE
         or gh_253.get("issue") != 253
-        or gh_253.get("pull_request") is not None
-        or gh_253.get("status") != "repository_candidate_local_verified"
+        or gh_253.get("pull_request") != 254
+        or gh_253.get("status")
+        != "merged_and_exact_main_verified_owner_local_authority_succession"
         or gh_253.get("classification")
         != "owner_local_dual_signed_authority_succession"
-        or gh_253.get("merge_commit") is not None
-        or gh_253.get("exact_main_runs") is not None
     ):
-        errors.append("GH-253 local candidate identity or status is invalid")
+        errors.append("GH-253 exact-main identity or status is invalid")
+    gh_253_merge_commit = gh_253.get("merge_commit")
+    if (
+        not isinstance(gh_253_merge_commit, str)
+        or re.fullmatch(r"[0-9a-f]{40}", gh_253_merge_commit) is None
+        or gh_253_merge_commit != GH253_MERGE_COMMIT
+    ):
+        errors.append("GH-253 merge commit evidence is invalid")
+    gh_253_exact_main_runs = gh_253.get("exact_main_runs", {})
+    if not isinstance(gh_253_exact_main_runs, dict) or set(gh_253_exact_main_runs) != {
+        "prometheus_ci",
+        "security_audit",
+        "pages",
+    }:
+        errors.append("GH-253 exact-main run evidence is incomplete")
+    elif not all(
+        type(run_id) is int and run_id > 0 for run_id in gh_253_exact_main_runs.values()
+    ):
+        errors.append("GH-253 exact-main run IDs must be positive integers")
+    elif gh_253_exact_main_runs != GH253_EXACT_MAIN_RUNS:
+        errors.append("GH-253 exact-main run evidence is invalid")
     for field in (
         "dual_bip340_authorization_and_possession",
         "durable_current_authority",
@@ -687,10 +721,25 @@ def verify(root: Path) -> list[str]:
     )
     gh_253_value = status.get("post_audit_updates", {}).get("gh_253", {})
     gh_253 = gh_253_value if isinstance(gh_253_value, dict) else {}
-    gh_253_candidate = (
-        gh_253.get("status") == "repository_candidate_local_verified"
+    gh_253_exact_main = (
+        gh_253.get("status")
+        == "merged_and_exact_main_verified_owner_local_authority_succession"
         and gh_253.get("classification")
         == "owner_local_dual_signed_authority_succession"
+    )
+    gh_253_merge_commit = gh_253.get("merge_commit", "")
+    gh_253_run_ids_value = gh_253.get("exact_main_runs", {})
+    gh_253_run_ids = (
+        gh_253_run_ids_value if isinstance(gh_253_run_ids_value, dict) else {}
+    )
+    gh_253_evidence = (
+        "GH-253",
+        f"PR #{gh_253.get('pull_request', '')}",
+        gh_253_merge_commit if isinstance(gh_253_merge_commit, str) else "",
+        *(
+            str(gh_253_run_ids.get(name, ""))
+            for name in ("prometheus_ci", "security_audit", "pages")
+        ),
     )
 
     for relative in PUBLIC_FILES:
@@ -764,12 +813,18 @@ def verify(root: Path) -> list[str]:
                 errors.append(f"{relative}: GH-246 authority or production claim drift")
         if relative in GH253_PUBLIC_FILES:
             normalized_text = " ".join(text.split()).casefold()
-            if gh_253_candidate and (
-                "gh-253" not in normalized_text
-                or "owner-local" not in normalized_text
-                or "production" not in normalized_text
-            ):
-                errors.append(f"{relative}: GH-253 local candidate boundary missing")
+            if gh_253_exact_main:
+                for fragment in GH253_REQUIRED_FRAGMENTS.get(relative, ()):
+                    if fragment.casefold() not in normalized_text:
+                        errors.append(
+                            f"{relative}: GH-253 owner-local boundary missing"
+                        )
+                        break
+                if not all(
+                    fragment and fragment.casefold() in normalized_text
+                    for fragment in gh_253_evidence
+                ):
+                    errors.append(f"{relative}: GH-253 exact-main evidence missing")
             if any(
                 pattern.search(normalized_text) for pattern in GH253_PROHIBITED_CLAIMS
             ):

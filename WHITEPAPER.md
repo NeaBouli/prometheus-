@@ -466,11 +466,13 @@ and nonce; replay, historic key reuse, clock rollback, stale membership, and
 concurrent conflicts fail closed in one SQLite transaction. Existing exact
 schema-v1 ledgers migrate transactionally to schema v2 with prior transition
 history assigned to genesis authority epoch zero. Later membership transitions
-load and verify only the durable current key under the same lock. This local
-candidate contains no signing/private-key API and does not establish real-world
+load and verify only the durable current key under the same lock. This owner-local
+mechanism contains no signing/private-key API and does not establish real-world
 key ownership, external or decentralized authority, Sybil resistance, L1
-attestation, deployment, or production trust. Issue #253 remains pending
-protected merge and exact-main evidence.
+attestation, deployment, or production trust. PR #254 squash-merged normally as
+exact main `5920cb4bb737376977f762beb0d5e3108519c7a0`; Prometheus CI
+`34031999904`, Security Audit `34031999907`, and Pages `34031999575` pass on
+that SHA.
 
 ---
 

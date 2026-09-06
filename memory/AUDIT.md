@@ -2795,3 +2795,18 @@ changed.
   is added. Protected merge and exact-main evidence remain pending.
 - Result: `LOCAL CANDIDATE / Full gates and protected review pending /
   Production false`.
+
+### GH-253 product exact-main closeout
+
+- Kimi K3's final independent read-only verdict was `PASS` with no P0, P1 or
+  P2 finding. All P3 hardening notes were resolved before protected delivery.
+- PR #254 squash-merged normally without admin bypass as exact main
+  `5920cb4bb737376977f762beb0d5e3108519c7a0`; issue #253 is closed.
+- Exact-main Prometheus CI `34031999904`, Security Audit `34031999907`, and
+  Pages `34031999575` pass on that SHA. The evidence proves the owner-local
+  repository mechanism only.
+- No signer/private-key API, real-world key-ownership proof,
+  external/decentralized authority, Sybil resistance, L1 attestation,
+  deployment, Mainnet or production authority follows.
+- Result: `PRODUCT EXACT-MAIN PASS / Public closeout review next /
+  Production false`.

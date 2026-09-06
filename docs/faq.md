@@ -319,15 +319,17 @@ ownership or rotation, resist Sybil identities, or establish decentralized or
 production operation. PR #247 squash-merged normally as exact main
 `f12e821bb492caae3b94e5b3c882488eb7f2982d`; CI `33452085421`, Security Audit
 `33452085419`, and Pages `33452084065` pass on that SHA.
-GH-253 is a local repository candidate for rotating that transition key: the
+Merged and exact-main-verified GH-253 rotates that transition key through an
+owner-local repository mechanism: the
 current key authorizes one gapless successor and the new key independently
 proves possession, with current membership, time, nonce and durable replay
 state bound atomically. Later membership transitions use only the durable
 current key. This closes a local key-succession mechanism; it still does not
 prove real-world key ownership, decide who should control the authority,
 decentralize membership, resist Sybil identities, attest state on L1, or
-establish deployment or production operation. Issue #253 awaits protected
-merge and exact-main evidence.
+establish deployment or production operation. PR #254 squash-merged normally
+as exact main `5920cb4bb737376977f762beb0d5e3108519c7a0`; Prometheus CI
+`34031999904`, Security Audit `34031999907`, and Pages `34031999575` pass.
 
 **Q: When will the mobile app be available?**
 Desktop and mobile releases are readiness-gated rather than date-gated.
