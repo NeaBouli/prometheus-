@@ -5282,3 +5282,9 @@ Rules for all dev agents:
 - This append-only archive changes no product or public claim and needs no
   recursive status update after normal protected merge.
 - Status: `GH-253 COMPLETE / PRODUCT + PUBLIC EXACT-MAIN AND LIVE PASS`.
+
+### 2026-09-06 - GH-253 archive PR #256 opened
+
+- Published final append-only archive commit `3b6dfe0` through protected PR
+  #256. No product or public claim changes.
+- Status: `GH-253 COMPLETE / ARCHIVE PR #256 CHECKS PENDING`.

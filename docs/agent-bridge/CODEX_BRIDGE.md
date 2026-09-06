@@ -6536,3 +6536,11 @@ false`.
   public multi-host operation, deployment, Mainnet and production remain
   unproven or excluded.
 - Status: `GH-253 COMPLETE / Product and public exact-main plus live PASS / Production false`.
+
+### 2026-09-06 - GH-253 final archive PR opened
+
+- Final append-only Bridge archive commit `3b6dfe0` is published through
+  normal protected PR #256. It changes no product behavior or public claim.
+- Required checks and normal merge remain; this archive deliberately requires
+  no recursive GH-253 status update after merge.
+- Status: `GH-253 COMPLETE / Final archive PR #256 under protected review / Production false`.
