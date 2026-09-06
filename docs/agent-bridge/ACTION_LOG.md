@@ -5263,3 +5263,10 @@ Rules for all dev agents:
 - Local browser automation was unavailable, so no local visual claim is made.
   Protected PR/HTML checks and live post-merge readback remain required.
 - Status: `LOCAL CLOSEOUT PASS / NORMAL PROTECTED PR NEXT`.
+
+### 2026-09-06 - GH-253 public closeout PR #255 opened
+
+- Published local closeout commit `23daea1` through protected PR #255.
+- Next: required checks, review, normal merge, exact-main CI/Security/Pages and
+  live public readback. No admin bypass or production action.
+- Status: `PR #255 OPEN / REQUIRED CHECKS PENDING`.

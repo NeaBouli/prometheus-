@@ -6503,3 +6503,11 @@ false`.
   visual pass is claimed locally; protected HTML checks plus post-merge
   cache-busted live readback remain mandatory.
 - Status: `GH-253 PUBLIC CLOSEOUT LOCAL PASS / Protected PR next / Production false`.
+
+### 2026-09-06 - GH-253 public closeout PR opened
+
+- Documentation-only closeout commit `23daea1` is published through normal
+  protected PR #255 from `docs/GH-253-exact-main-closeout`.
+- Required PR checks, review, normal merge, closeout exact-main runs and live
+  cache-busted README/Pages readback remain pending. No bypass is authorized.
+- Status: `GH-253 PUBLIC CLOSEOUT PR #255 OPEN / Production false`.
