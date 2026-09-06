@@ -6582,3 +6582,11 @@ false`.
 - No browser runtime was available for a local visual claim. Protected HTML
   checks and post-merge live Pages readback remain mandatory.
 - Status: `PUBLIC STATUS REFRESH LOCAL PASS / Normal protected PR next / Production false`.
+
+### 2026-09-06 - Public README/Landing status refresh PR opened
+
+- Documentation commit `373fbd1` is published through normal protected PR
+  #257 from `docs/GH-253-public-refresh`.
+- Required checks, normal merge, exact-main CI/Security/Pages and cache-busted
+  live README/Landing readback remain. No bypass is authorized.
+- Status: `PUBLIC STATUS REFRESH PR #257 OPEN / Production false`.

@@ -5308,3 +5308,9 @@ Rules for all dev agents:
   tests pass. Memory, Python compile, HTML parse and diff checks pass.
 - Kimi K3 verdict: `PASS`, no P0/P1/P2. Production remains false.
 - Status: `LOCAL PASS / NORMAL PROTECTED PR NEXT`.
+
+### 2026-09-06 - Public README/Landing refresh PR #257 opened
+
+- Published documentation commit `373fbd1` through protected PR #257.
+- Required checks, normal merge, exact-main and live readback remain.
+- Status: `PR #257 OPEN / PRODUCTION FALSE`.
