@@ -5402,3 +5402,20 @@ Rules for all dev agents:
   chain, contract, Guardian, Operator-A, firewall, IAM, deployment, Mainnet, or
   production action occurred.
 - Status: `GH-261 LOCAL VERIFIED / NORMAL PROTECTED PR NEXT / Production false`.
+
+### 2026-09-13 - GH-261 exact-main and live closeout
+
+- PR #262 merged normally as exact main
+  `0ca3926540439b0244bddb4d402a91e8bd2d3419`; no admin bypass was used.
+- Exact-main Prometheus CI `34721945306`, Security Audit `34721945320`, and
+  GitHub Pages `34721945050` pass. CodeRabbit reviewed all 21 changed files and
+  generated no actionable comment.
+- Cache-busted live Landing, Roadmap, Whitepaper, FAQ, `llms.txt`, and
+  exact-commit README readback contains the synchronized GH-258/GH-261
+  planning boundary. Live Roadmap verification at 390x844 confirms no
+  horizontal document overflow, the new scope is present, and the stale
+  absolute `unstoppable` wording is absent.
+- No product, endpoint, model/sample, wallet, chain, contract, Guardian,
+  Operator-A, firewall, IAM, deployment, Mainnet, or production action occurred.
+  Rollout estimates remain unchanged.
+- Status: `GH-261 COMPLETE / EXACT-MAIN + LIVE PASS / Planning only / Production false`.

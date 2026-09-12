@@ -6757,3 +6757,25 @@ false`.
   Rollout estimates remain core `84-88%` and full roadmap `50-55%`, both
   internal scope-weighted estimates only.
 - Status: `GH-261 LOCAL VERIFIED / PR PENDING / Planning only / Production false`.
+
+### 2026-09-13 - GH-261 exact-main and live closeout
+
+- PR #262 merged normally as exact main
+  `0ca3926540439b0244bddb4d402a91e8bd2d3419`. Exact-main Prometheus CI
+  `34721945306`, Security Audit `34721945320`, and GitHub Pages `34721945050`
+  pass; CodeRabbit reported no actionable comment.
+- Cache-busted live Landing, Roadmap, Whitepaper, FAQ, `llms.txt`, and
+  exact-commit README readback confirms the synchronized planning-only scope,
+  no reliable AI/AGI/actor attribution, no current endpoint detection or
+  response authority, and disabled/unauthorized automatic endpoint actions.
+- The live Roadmap at `390x844` has no horizontal document overflow, includes
+  the GH-261 resource-conscription scope, and no longer includes the stale
+  absolute `unstoppable` target wording.
+- Kimi K3 and Claude Code did not access or change the repository; their local
+  start blockers are recorded in the prior entry. Terra's only review finding
+  was fixed before PR creation and all local and protected gates passed.
+- No product, endpoint, model/sample, wallet, chain, contract, Guardian,
+  Operator-A, firewall, IAM, deployment, Mainnet, or production action occurred.
+  Internal scope-weighted estimates remain core `84-88%` and full roadmap
+  `50-55%`; this planning clarification does not advance rollout readiness.
+- Status: `GH-261 COMPLETE / EXACT-MAIN + LIVE PASS / Planning only / Production false`.
