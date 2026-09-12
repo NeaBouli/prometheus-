@@ -6683,3 +6683,29 @@ false`.
   tests and 203 complete script tests pass; Ruff format/lint and
   `git diff --check` pass. No product or external behavior changed.
 - Status: `PR #259 REVIEW FIX LOCAL VERIFIED / REPUSH AND RECHECK PENDING / Production false`.
+
+### 2026-09-12 - GH-258 exact-main and live closeout
+
+- PR #259 merged normally as exact main
+  `3390157e9367933ee1a958889e4ec3818fe719fd`. Prometheus CI run
+  `34696951460`, Security Audit run `34696951380`, and GitHub Pages run
+  `34696950810` all completed successfully against that exact commit. The CI
+  result includes Rust workspace and performance gates, Python Guardian,
+  Silverscript contracts, HTML/public-claim checks, current-silverc artifact
+  smoke, and Memory integrity.
+- Cache-busted live readback confirms that the Landing, Roadmap, and FAQ expose
+  the GH-258 planning boundary. The exact-commit README exposes the same
+  behavior-based scope, AI-attribution limitation, disabled automatic actions,
+  and `2026-09-12` status date.
+- Kimi K3 was requested twice through the required secret-free wrapper but did
+  not access the repository because its seven-day quota was exhausted. Claude
+  Code remained read-only; its three documentation findings were integrated.
+  Terra supplied the independent stable-diff review and approved the corrected
+  candidate with no remaining P0-P3 finding. CodeRabbit's sentence-binding
+  finding was fixed, regression-tested, and the review thread was resolved.
+- This task added a public, evidence-gated roadmap and fail-closed claim guards;
+  it did not add an endpoint sensor, response engine, automatic containment,
+  model/sample processing, wallet or chain action, contract change, deployment,
+  IAM, Mainnet, or production authority. Scope-weighted rollout estimates stay
+  unchanged: core `84-88%`, full roadmap `50-55%`, both internal estimates.
+- Status: `GH-258 COMPLETE / EXACT-MAIN + LIVE PASS / Planning only / Production false`.

@@ -5351,3 +5351,19 @@ Rules for all dev agents:
 - Post-fix: 13 claim surfaces, 57 focused tests, 203 full script tests, Ruff and
   diff checks pass.
 - Status: `PR REVIEW FIX VERIFIED / RECHECK PENDING / PRODUCTION FALSE`.
+
+### 2026-09-12 - GH-258 exact-main closeout
+
+- PR #259 merged normally as exact main
+  `3390157e9367933ee1a958889e4ec3818fe719fd`.
+- Exact-main Prometheus CI `34696951460`, Security Audit `34696951380`, and
+  GitHub Pages `34696950810` pass. Cache-busted live Landing, Roadmap, and FAQ
+  readback plus exact-commit README readback confirm the synchronized GH-258
+  planning and safety boundary.
+- Kimi remained quota-blocked before repository access. Claude Code and Terra
+  were read-only; all accepted findings were integrated and verified. The
+  CodeRabbit thread was fixed and resolved.
+- No product behavior, endpoint action, model/sample processing, wallet, chain,
+  contract, deployment, IAM, Mainnet, or production action occurred. Rollout
+  estimates remain unchanged.
+- Status: `GH-258 COMPLETE / EXACT-MAIN + LIVE PASS / PRODUCTION FALSE`.
