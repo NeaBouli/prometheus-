@@ -13,7 +13,7 @@ from typing import Any
 STATUS_PATH = Path("docs/evidence/public-claim-status-2026-08-14.json")
 SITEMAP_PATH = Path("sitemap.xml")
 AUDIT_BASELINE_DATE = "2026-08-14"
-LATEST_PROJECT_UPDATE = "2026-09-12"
+LATEST_PROJECT_UPDATE = "2026-09-13"
 GH253_AS_OF = "2026-09-06"
 GH253_MERGE_COMMIT = "5920cb4bb737376977f762beb0d5e3108519c7a0"
 GH253_EXACT_MAIN_RUNS = {
@@ -40,37 +40,37 @@ PUBLIC_FILES = (
 LATEST_METADATA_FRAGMENTS = {
     Path(
         "README.md"
-    ): "Public project status was reviewed through 2026-09-12. The immutable claim-audit baseline remains 2026-08-14",
+    ): "Public project status was reviewed through 2026-09-13. The immutable claim-audit baseline remains 2026-08-14",
     Path(
         "WHITEPAPER.md"
-    ): "Project status reviewed through 2026-09-12; immutable public claim-audit baseline: 2026-08-14",
+    ): "Project status reviewed through 2026-09-13; immutable public claim-audit baseline: 2026-08-14",
     Path(
         "docs/roadmap.md"
-    ): "Project status reviewed through 2026-09-12. The immutable public claim-audit baseline remains 2026-08-14",
+    ): "Project status reviewed through 2026-09-13. The immutable public claim-audit baseline remains 2026-08-14",
     Path(
         "docs/faq.md"
-    ): "Project status reviewed through 2026-09-12; immutable public claim-audit baseline: 2026-08-14",
+    ): "Project status reviewed through 2026-09-13; immutable public claim-audit baseline: 2026-08-14",
     Path(
         "memory/STATUS.md"
-    ): "Latest project/public status review: 2026-09-12. The section date and exact evidence below remain the immutable 2026-08-14 audit baseline",
+    ): "Latest project/public status review: 2026-09-13. The section date and exact evidence below remain the immutable 2026-08-14 audit baseline",
     Path(
         "index.html"
-    ): 'Project status reviewed 2026-09-12 · immutable <a href="docs/claim-audit-2026-08-14.md">claim-audit baseline</a> 2026-08-14',
+    ): 'Project status reviewed 2026-09-13 · immutable <a href="docs/claim-audit-2026-08-14.md">claim-audit baseline</a> 2026-08-14',
     Path(
         "roadmap.html"
-    ): 'Project status reviewed 2026-09-12 · immutable <a href="docs/claim-audit-2026-08-14.md">claim-audit baseline</a> 2026-08-14',
+    ): 'Project status reviewed 2026-09-13 · immutable <a href="docs/claim-audit-2026-08-14.md">claim-audit baseline</a> 2026-08-14',
     Path(
         "whitepaper.html"
-    ): 'Project status reviewed 2026-09-12 · immutable <a href="docs/claim-audit-2026-08-14.md">claim-audit baseline</a> 2026-08-14',
+    ): 'Project status reviewed 2026-09-13 · immutable <a href="docs/claim-audit-2026-08-14.md">claim-audit baseline</a> 2026-08-14',
     Path(
         "faq.html"
-    ): 'Project status reviewed 2026-09-12 · immutable <a href="docs/claim-audit-2026-08-14.md">claim-audit baseline</a> 2026-08-14',
+    ): 'Project status reviewed 2026-09-13 · immutable <a href="docs/claim-audit-2026-08-14.md">claim-audit baseline</a> 2026-08-14',
     Path(
         "guardian-economics.html"
-    ): 'Project status reviewed 2026-09-12 · immutable <a href="docs/claim-audit-2026-08-14.md">claim-audit baseline</a> 2026-08-14',
+    ): 'Project status reviewed 2026-09-13 · immutable <a href="docs/claim-audit-2026-08-14.md">claim-audit baseline</a> 2026-08-14',
     Path(
         "llms.txt"
-    ): "project status reviewed through 2026-09-12; immutable dated audit baseline remains 2026-08-14",
+    ): "project status reviewed through 2026-09-13; immutable dated audit baseline remains 2026-08-14",
 }
 
 STALE_METADATA_PATTERNS = (
@@ -250,6 +250,8 @@ GH258_PUBLIC_FILES = (
 
 GH258_REQUIRED_FRAGMENTS = (
     "GH-258",
+    "GH-261",
+    "unauthorized compute conscription",
     "reliab",
     "no real-time endpoint sensor",
     "operator-confirmed",
@@ -295,30 +297,42 @@ GH258_AUTOMATIC_ACTION_FIELDS = (
 
 GH258_PROHIBITED_CLAIMS = (
     re.compile(
-        r"GH-258[^\n]{0,600}(?:authorizes|allows|enables|provides|supports|"
+        r"GH-(?:258|261)[^.\n]{0,600}(?:detects|prevents|blocks|stops) "
+        r"[^.\n]{0,160}(?:unauthorized )?(?:distributed )?"
+        r"(?:compute|resource) conscription",
+        re.I,
+    ),
+    re.compile(
+        r"GH-(?:258|261)[^.\n]{0,600}(?:unauthorized )?(?:distributed )?"
+        r"(?:compute|resource) conscription (?:detection )?(?:is|are) "
+        r"(?:now )?(?:active|enabled|implemented|operational|production[- ]ready)",
+        re.I,
+    ),
+    re.compile(
+        r"GH-(?:258|261)[^\n]{0,600}(?:authorizes|allows|enables|provides|supports|"
         r"implements|performs) (?:an? )?(?:automatic(?:ally)? )?"
         + GH258_ACTION_PATTERN,
         re.I,
     ),
     re.compile(
-        r"GH-258[^\n]{0,600}"
+        r"GH-(?:258|261)[^\n]{0,600}"
         + GH258_ACTION_PATTERN
         + r" (?:is|are) (?:now )?(?:active|authorized|enabled|implemented)",
         re.I,
     ),
     re.compile(
-        r"GH-258[^\n]{0,600}(?:is|provides|implements|delivers|includes) "
+        r"GH-(?:258|261)[^\n]{0,600}(?:is|provides|implements|delivers|includes) "
         r"(?:now )?(?:production[- ]ready|production authority|"
         r"an? real-time endpoint sensor|an? response engine)",
         re.I,
     ),
     re.compile(
-        r"GH-258[^\n]{0,600}(?:reliably )?(?:attributes|identifies|proves) "
+        r"GH-(?:258|261)[^\n]{0,600}(?:reliably )?(?:attributes|identifies|proves) "
         r"(?:an? )?(?:AI|AGI|actor|intent)",
         re.I,
     ),
     re.compile(
-        r"GH-258[^\n]{0,600}(?:(?:AI|AGI|actor|intent) attribution|"
+        r"GH-(?:258|261)[^\n]{0,600}(?:(?:AI|AGI|actor|intent) attribution|"
         r"attribution (?:to )?(?:AI|AGI|an? actor|intent)) "
         r"(?:is|are) (?:now )?reliable",
         re.I,
@@ -704,9 +718,12 @@ def validate_status(data: dict[str, Any]) -> list[str]:
     if (
         gh_258.get("as_of") != LATEST_PROJECT_UPDATE
         or gh_258.get("issue") != 258
+        or gh_258.get("follow_up_issue") != 261
         or gh_258.get("status") != "planned_documentation_only"
         or gh_258.get("classification")
         != "behavior_based_endpoint_detection_and_safe_response_target"
+        or gh_258.get("resource_conscription_scope")
+        != ["endpoints", "accelerators", "servers", "data_center_capacity"]
         or gh_258.get("stages")
         != [
             "observe_only",
@@ -719,6 +736,7 @@ def validate_status(data: dict[str, Any]) -> list[str]:
     for field in (
         "real_time_endpoint_sensor",
         "response_engine",
+        "resource_conscription_detection_implemented",
         "ai_or_actor_attribution_proven",
         "automatic_endpoint_actions_authorized",
         *GH258_AUTOMATIC_ACTION_FIELDS,
@@ -730,11 +748,13 @@ def validate_status(data: dict[str, Any]) -> list[str]:
         endpoint.get("status") != "planned_only"
         or endpoint.get("detection_basis")
         != "observable_behavior_not_ai_actor_or_intent_attribution"
+        or endpoint.get("resource_conscription_detection") != "planned_only"
     ):
         errors.append("endpoint detection must remain behavior-based planning only")
     for field in (
         "real_time_sensor_implemented",
         "response_engine_implemented",
+        "resource_conscription_detection_implemented",
         "automatic_endpoint_actions_authorized",
         *GH258_AUTOMATIC_ACTION_FIELDS,
     ):

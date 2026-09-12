@@ -1,6 +1,6 @@
 # PROMETHEUS – SPRINT PLANUNG
 # Detaillierter Sprint-Plan mit Tagesaufgaben für Claude Code
-# Last Updated: 2026-08-14
+# Last Updated: 2026-09-13
 
 ---
 
@@ -281,9 +281,13 @@ Tag 3-4: phi3.rs + detection.rs
 Tag 5:   federated.rs + Tests
 ```
 
-### Cross-cutting GH-258: Endpoint Detection & Safe Response (readiness-gated)
+### Cross-cutting GH-258/GH-261: Endpoint Detection & Safe Response (readiness-gated)
 ```
-Stage 1: Opt-in, least-privileged, resource-bounded endpoint telemetry
+Threat: Unauthorized compute conscription of endpoints, accelerators, servers
+        or data-center capacity into a distributed mesh
+Stage 1: Opt-in, least-privileged, resource-bounded endpoint telemetry for
+         process/resource ownership, CPU/GPU workload, scheduler/orchestrator,
+         workload identity, persistence, credentials and outbound fan-out
 Stage 2: Local evidence and warnings; bounded privacy-reviewed correlation
 Stage 3: Operator-confirmed reversible containment with expiry and rollback
 Stage 4: Separately approved limited automation after independent evaluation

@@ -2,7 +2,7 @@
   "schema_version": 1,
   "as_of": "2026-08-14",
   "latest_project_update": {
-    "as_of": "2026-09-12",
+    "as_of": "2026-09-13",
     "audit_baseline_as_of": "2026-08-14",
     "classification": "post_audit_updates_recorded_below",
     "production_ready": false
@@ -134,10 +134,17 @@
       "deployment_or_production_authority": false
     },
     "gh_258": {
-      "as_of": "2026-09-12",
+      "as_of": "2026-09-13",
       "issue": 258,
+      "follow_up_issue": 261,
       "status": "planned_documentation_only",
       "classification": "behavior_based_endpoint_detection_and_safe_response_target",
+      "resource_conscription_scope": [
+        "endpoints",
+        "accelerators",
+        "servers",
+        "data_center_capacity"
+      ],
       "stages": [
         "observe_only",
         "warn_only",
@@ -146,6 +153,7 @@
       ],
       "real_time_endpoint_sensor": false,
       "response_engine": false,
+      "resource_conscription_detection_implemented": false,
       "ai_or_actor_attribution_proven": false,
       "automatic_endpoint_actions_authorized": false,
       "automatic_process_termination_authorized": false,
@@ -175,8 +183,10 @@
     "endpoint_detection_and_response": {
       "status": "planned_only",
       "detection_basis": "observable_behavior_not_ai_actor_or_intent_attribution",
+      "resource_conscription_detection": "planned_only",
       "real_time_sensor_implemented": false,
       "response_engine_implemented": false,
+      "resource_conscription_detection_implemented": false,
       "automatic_endpoint_actions_authorized": false,
       "automatic_process_termination_authorized": false,
       "automatic_quarantine_authorized": false,

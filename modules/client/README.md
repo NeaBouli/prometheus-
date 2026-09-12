@@ -167,8 +167,12 @@ approved proof artifacts, canonical rule loading, operated public/multi-host P2P
 privacy controls, and multi-host evidence.
 ## Planned Endpoint Safety Track
 
-GH-258 records a future behavior-based endpoint detection and safe-response
-track. It is planning only: the current client has no real-time endpoint sensor
+GH-258 and its GH-261 clarification record a future behavior-based endpoint
+detection and safe-response track, including unauthorized compute conscription
+of endpoints, accelerators, servers, or data-center capacity into a distributed
+mesh. Planned signals include process/resource ownership, unexpected CPU/GPU
+workloads, scheduler/orchestrator drift, workload identity, persistence,
+credentials, and outbound fan-out. It is planning only: the current client has no real-time endpoint sensor
 or response engine and cannot reliably attribute observed activity to AI, AGI,
 a specific actor, or intent. Automatic process termination, quarantine,
 firewall mutation, credential rotation, remote commands, deletion, and host

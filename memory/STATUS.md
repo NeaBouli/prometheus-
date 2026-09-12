@@ -1,13 +1,13 @@
 # PROMETHEUS – MODULE STATUS
 # Format: | Module | Status | Progress | Last Update | Audit | Testnet Address |
 # Status: core lifecycle values plus evidence-qualified DEVELOPMENT/STUB/FIXTURE labels; every non-production label must retain its boundary in the row
-# Last Updated: 2026-09-12
+# Last Updated: 2026-09-13
 
 ---
 
 ## PUBLIC CLAIM RECONCILIATION (2026-08-14)
 
-Latest project/public status review: 2026-09-12. The section date and exact
+Latest project/public status review: 2026-09-13. The section date and exact
 evidence below remain the immutable 2026-08-14 audit baseline; later exact-main
 updates are recorded in the dated status sections that follow and in the
 machine-readable post-audit ledger.
@@ -1815,15 +1815,20 @@ Remaining gates: operated public networking; independent separation evidence;
 Estimates: unchanged; core 84-88%; complete vision 50-55%; production false
 ```
 
-## GH-258 ENDPOINT DETECTION AND SAFE RESPONSE ROADMAP (2026-09-12)
+## GH-258/GH-261 ENDPOINT DETECTION AND SAFE RESPONSE ROADMAP (2026-09-13)
 
 ```text
 Status: planned documentation-only track; no implementation or authority
-Issue: #258
+Issues: #258; #261 clarification
 Threat scope: coordinated endpoint compromise, including activity that may be
-              AI-assisted or highly automated
+              AI-assisted or highly automated; unauthorized compute
+              conscription of endpoints, accelerators, servers or data-center
+              capacity into a distributed compute mesh
 Detection basis: observable behavior and bounded correlation; no reliable
                  AI/AGI/actor/intent attribution
+Resource signals: process/resource ownership; unexpected CPU/GPU or accelerator
+                  workload; scheduler/orchestrator drift; workload identity or
+                  attestation change; persistence; credentials; outbound fan-out
 Stages: observe-only; warn-only; operator-confirmed reversible containment;
         separately approved limited automation
 Current capability: no real-time endpoint sensor; no response engine

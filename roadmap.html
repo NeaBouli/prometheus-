@@ -31,7 +31,7 @@
 <meta name="ai-status" content="post-toccata-verification, active-development">
 <!-- Schema.org -->
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"WebPage","name":"Prometheus Roadmap","description":"Full deployment roadmap for Prometheus decentralized AI threat intelligence protocol.","url":"https://neabouli.github.io/prometheus-/roadmap.html","dateModified":"2026-09-12","isPartOf":{"@type":"WebSite","name":"Prometheus Protocol","url":"https://neabouli.github.io/prometheus-/"}}
+{"@context":"https://schema.org","@type":"WebPage","name":"Prometheus Roadmap","description":"Full deployment roadmap for Prometheus decentralized AI threat intelligence protocol.","url":"https://neabouli.github.io/prometheus-/roadmap.html","dateModified":"2026-09-13","isPartOf":{"@type":"WebSite","name":"Prometheus Protocol","url":"https://neabouli.github.io/prometheus-/"}}
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -157,8 +157,13 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
   .timeline-overview{grid-template-columns:1fr 1fr}
   .sprints-grid{grid-template-columns:1fr}
   .devices-grid{grid-template-columns:1fr 1fr}
-  .hw-section{overflow-x:auto}
-  .hw-table{min-width:620px}
+  .hw-section{overflow-x:hidden}
+  .hw-table,.hw-table tbody,.hw-table tr,.hw-table td{display:block;width:100%}
+  .hw-table thead{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+  .hw-table tr{padding:12px 0;border-bottom:1px solid var(--line)}
+  .hw-table tr:last-child{border-bottom:none}
+  .hw-table td{display:grid;grid-template-columns:minmax(84px,.7fr) minmax(0,1.6fr);gap:12px;padding:6px 0;border-bottom:none;overflow-wrap:anywhere}
+  .hw-table td::before{content:attr(data-label);font-family:'Space Mono',monospace;font-size:8px;letter-spacing:1px;color:var(--muted);text-transform:uppercase;font-weight:400}
   footer{grid-template-columns:minmax(0,1fr);gap:16px;padding:24px}
   .f-left,.f-center,.f-links{min-width:0;width:100%}
   .f-center{text-align:left}
@@ -480,10 +485,11 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
         </ul>
       </div>
       <div class="sprint">
-        <div class="sprint-num">GH-258 · Cross-cutting</div>
+        <div class="sprint-num">GH-258 / GH-261 · Cross-cutting</div>
         <div class="sprint-title">Endpoint Detection &amp; Safe Response</div>
         <ul class="sprint-items">
-          <li>Planned behavior signals: process, file, persistence, network, credential access, model/runtime integrity and agent tool-policy violations</li>
+          <li>Includes unauthorized compute conscription of endpoints, accelerators, servers or data-center capacity into a distributed mesh</li>
+          <li>Planned signals: process/resource ownership, unexpected CPU/GPU workload, scheduler/orchestrator drift, workload identity, persistence, credentials, outbound fan-out, model/runtime integrity and agent tool-policy violations</li>
           <li>Behavior-based detection cannot reliably attribute activity to AI, AGI, a specific actor or intent</li>
           <li>Stages: observe-only → warn-only → operator-confirmed reversible containment → separately approved limited automation</li>
           <li>Requires privacy review, real-sample/adversarial evaluation, measured false positives, multi-host evidence and rollback drills</li>
@@ -629,7 +635,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
           <li>Every AI decision verifiable on-chain</li>
           <li>Every model update tamper-proof and auditable</li>
           <li>Target: federated learning with decentralized operation after privacy, membership, Sybil and multi-host gates</li>
-          <li>Protocol self-governing, self-improving, unstoppable</li>
+          <li>Target: progressively decentralized governance and bounded improvement after authority, Sybil-resistance, recovery, availability and public multi-host gates</li>
         </ul>
       </div>
     </div>
@@ -710,41 +716,41 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
     </thead>
     <tbody>
       <tr>
-        <td>Light Client</td>
-        <td>Any device, 4 GB RAM</td>
-        <td>Production ONNX and platform validation open.</td>
-        <td>Development stub</td>
+        <td data-label="Role">Light Client</td>
+        <td data-label="Target hardware">Any device, 4 GB RAM</td>
+        <td data-label="Evidence boundary">Production ONNX and platform validation open.</td>
+        <td data-label="Status">Development stub</td>
       </tr>
       <tr>
-        <td>Honeypot</td>
-        <td>Any internet-exposed server</td>
-        <td>Requires isolated implementation and threat-model review.</td>
-        <td>Planned</td>
+        <td data-label="Role">Honeypot</td>
+        <td data-label="Target hardware">Any internet-exposed server</td>
+        <td data-label="Evidence boundary">Requires isolated implementation and threat-model review.</td>
+        <td data-label="Status">Planned</td>
       </tr>
       <tr>
-        <td>Validator</td>
-        <td>2 vCPU · 4 GB RAM + 10,000 KAS</td>
-        <td>KAS-only state machines tested; no operated network.</td>
-        <td>Target</td>
+        <td data-label="Role">Validator</td>
+        <td data-label="Target hardware">2 vCPU · 4 GB RAM + 10,000 KAS</td>
+        <td data-label="Evidence boundary">KAS-only state machines tested; no operated network.</td>
+        <td data-label="Status">Target</td>
       </tr>
       <tr>
-        <td>Guardian (8B)</td>
-        <td>NVIDIA GPU · 24 GB VRAM</td>
-        <td>8B-first runtime scaffold; no independently evaluated run.</td>
-        <td>Target</td>
+        <td data-label="Role">Guardian (8B)</td>
+        <td data-label="Target hardware">NVIDIA GPU · 24 GB VRAM</td>
+        <td data-label="Evidence boundary">8B-first runtime scaffold; no independently evaluated run.</td>
+        <td data-label="Status">Target</td>
       </tr>
       <tr>
-        <td>Guardian (70B)</td>
-        <td>4× A100/H100 80 GB · 256 GB RAM</td>
-        <td>Optional escalation tier; no independently evaluated run or reputation authority.</td>
-        <td>Target</td>
+        <td data-label="Role">Guardian (70B)</td>
+        <td data-label="Target hardware">4× A100/H100 80 GB · 256 GB RAM</td>
+        <td data-label="Evidence boundary">Optional escalation tier; no independently evaluated run or reputation authority.</td>
+        <td data-label="Status">Target</td>
       </tr>
     </tbody>
   </table>
 </div>
 
 <footer>
-  <div class="f-left">Project status reviewed 2026-09-12 · immutable <a href="docs/claim-audit-2026-08-14.md">claim-audit baseline</a> 2026-08-14 · base <a href="https://github.com/NeaBouli/prometheus-/commit/5cd13bf6f9c170711e26364263bd0dcd8aad8c09">5cd13bf</a></div>
+  <div class="f-left">Project status reviewed 2026-09-13 · immutable <a href="docs/claim-audit-2026-08-14.md">claim-audit baseline</a> 2026-08-14 · base <a href="https://github.com/NeaBouli/prometheus-/commit/5cd13bf6f9c170711e26364263bd0dcd8aad8c09">5cd13bf</a></div>
   <div class="f-center">PROMETHEUS</div>
   <ul class="f-links">
     <li><a href="faq.html">FAQ</a></li>

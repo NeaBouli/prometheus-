@@ -436,6 +436,7 @@ class PublicClaimConsistencyTests(unittest.TestCase):
         for field in (
             "real_time_endpoint_sensor",
             "response_engine",
+            "resource_conscription_detection_implemented",
             "ai_or_actor_attribution_proven",
             "automatic_endpoint_actions_authorized",
             *MODULE.GH258_AUTOMATIC_ACTION_FIELDS,
@@ -460,6 +461,19 @@ class PublicClaimConsistencyTests(unittest.TestCase):
             any("GH-258" in error for error in MODULE.validate_status(changed))
         )
 
+        for field, value in (
+            ("follow_up_issue", 999),
+            ("resource_conscription_scope", ["endpoints"]),
+        ):
+            with self.subTest(field=field):
+                malformed = copy.deepcopy(self.status)
+                malformed["post_audit_updates"]["gh_258"][field] = value
+                self.assertTrue(
+                    any(
+                        "GH-258" in error for error in MODULE.validate_status(malformed)
+                    )
+                )
+
         for value in (None, [], "invalid", 258):
             with self.subTest(value=value):
                 malformed = copy.deepcopy(self.status)
@@ -474,8 +488,10 @@ class PublicClaimConsistencyTests(unittest.TestCase):
         mutations = (
             ("status", "implemented"),
             ("detection_basis", "ai_actor_attribution"),
+            ("resource_conscription_detection", "implemented"),
             ("real_time_sensor_implemented", True),
             ("response_engine_implemented", True),
+            ("resource_conscription_detection_implemented", True),
             ("automatic_endpoint_actions_authorized", True),
             *((field, True) for field in MODULE.GH258_AUTOMATIC_ACTION_FIELDS),
         )
@@ -503,7 +519,7 @@ class PublicClaimConsistencyTests(unittest.TestCase):
                     )
                 )
 
-    def test_gh_258_positive_authority_claims_are_rejected(self) -> None:
+    def test_gh_258_and_261_positive_authority_claims_are_rejected(self) -> None:
         root = SCRIPT.parents[1]
         claims = (
             "GH-258 authorizes automatic host isolation.",
@@ -517,12 +533,22 @@ class PublicClaimConsistencyTests(unittest.TestCase):
             "GH-258 implements a response engine.",
             "GH-258 reliably attributes AI.",
             "GH-258 states AI attribution is reliable.",
+            "GH-258 detects unauthorized compute conscription.",
+            "GH-261 prevents unauthorized compute conscription.",
+            "GH-261 unauthorized compute conscription detection is implemented.",
+            "GH-261 authorizes automatic host isolation.",
+            "GH-261 provides a real-time endpoint sensor.",
+            "GH-261 implements a response engine.",
+            "GH-261 reliably attributes AI.",
+            "GH-261 states AI attribution is reliable.",
             *(
-                f"GH-258 endpoint response: {action} is enabled."
+                f"GH-{issue} endpoint response: {action} is enabled."
+                for issue in (258, 261)
                 for action, _ in MODULE.GH258_ACTION_PATTERNS
             ),
             *(
-                f"GH-258 endpoint response: {action} is implemented."
+                f"GH-{issue} endpoint response: {action} is implemented."
+                for issue in (258, 261)
                 for action, _ in MODULE.GH258_ACTION_PATTERNS
             ),
         )
@@ -842,7 +868,7 @@ class PublicClaimConsistencyTests(unittest.TestCase):
             readme = tmp_root / "README.md"
             readme.write_text(
                 readme.read_text(encoding="utf-8").replace(
-                    "Public project status was reviewed through 2026-09-12.",
+                    "Public project status was reviewed through 2026-09-13.",
                     "Public project status date pending.",
                     1,
                 ),
