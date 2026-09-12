@@ -5367,3 +5367,38 @@ Rules for all dev agents:
   contract, deployment, IAM, Mainnet, or production action occurred. Rollout
   estimates remain unchanged.
 - Status: `GH-258 COMPLETE / EXACT-MAIN + LIVE PASS / PRODUCTION FALSE`.
+
+### 2026-09-13 - GH-261 resource-conscription clarification locally verified
+
+- Opened issue #261 and isolated branch `docs/GH-258-resource-conscription`
+  from exact main `08e1144da3ce7190e36a8f35082e97b91c3582e8`. The foreign
+  `feat/local-pe-api-import-producer` worktree remains untouched.
+- Synchronized the planned unauthorized-compute-conscription threat class and
+  observable behavior signals across README, Whitepaper, Roadmap, FAQ,
+  Landing/public HTML, `llms.txt`, machine status, Memory, Backlog, and the
+  client README. The text explicitly denies reliable AI/AGI/actor attribution,
+  current endpoint detection, response authority, and automatic endpoint
+  actions. Rollout estimates remain unchanged.
+- Added machine-state and prose guards for GH-261 scope, implementation state,
+  automatic actions, production claims, and attribution. Terra's independent
+  read-only review found that the older action/attribution regexes covered only
+  GH-258; Sol extended them and their negative tests to GH-258 and GH-261.
+- Final local results: public claims pass across 13 synchronized surfaces; 57
+  focused claim tests and 203 complete script tests pass; Memory, project
+  status, and documentation-hygiene checks pass; Ruff lint/format, Python
+  compilation, JSON, five-page HTML, two-workflow YAML, and `git diff --check`
+  pass.
+- Browser verification passes at 390x844 and 1280x720 with no horizontal
+  document overflow. The GH-261 Roadmap block renders legibly, and the target
+  hardware table now stacks semantically on narrow screens. A stale absolute
+  `unstoppable` target claim was replaced with explicit authority, Sybil,
+  recovery, availability, and public multi-host gates.
+- Kimi K3 was requested three times through the required secret-free read-only
+  wrapper and stopped before repository access by the local `EMFILE` watcher
+  failure. Claude Code stopped before repository access on its configured
+  budget. Neither delegate changed files. Terra completed the independent
+  read-only review; its only finding is fixed and locally reverified.
+- No product code, endpoint scan or action, model/sample processing, wallet,
+  chain, contract, Guardian, Operator-A, firewall, IAM, deployment, Mainnet, or
+  production action occurred.
+- Status: `GH-261 LOCAL VERIFIED / NORMAL PROTECTED PR NEXT / Production false`.

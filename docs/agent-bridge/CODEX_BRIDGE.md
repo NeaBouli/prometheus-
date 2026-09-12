@@ -6709,3 +6709,51 @@ false`.
   IAM, Mainnet, or production authority. Scope-weighted rollout estimates stay
   unchanged: core `84-88%`, full roadmap `50-55%`, both internal estimates.
 - Status: `GH-258 COMPLETE / EXACT-MAIN + LIVE PASS / Planning only / Production false`.
+
+### 2026-09-13 - GH-261 distributed resource-conscription clarification started
+
+- Issue #261 is a documentation and claim-guard follow-up to GH-258. It covers
+  coordinated attempts to conscript endpoints, accelerators, servers, or
+  data-center capacity into an unauthorized distributed compute mesh, including
+  activity that may be AI-assisted or highly automated.
+- Prometheus may classify only observable behavior and resource-use anomalies;
+  it cannot reliably identify a superintelligence, AI/AGI involvement, a
+  specific actor, or intent. Existing observe-only, warn-only,
+  operator-confirmed reversible containment, and separately approved limited
+  automation stages remain in that order.
+- Scope starts from exact main
+  `08e1144da3ce7190e36a8f35082e97b91c3582e8` and is limited to synchronized
+  public documentation, machine status, Memory/Backlog, and fail-closed claim
+  tests. The active local PE-import producer branch and every foreign worktree
+  remain untouched.
+- No endpoint sensor, scan, response action, model/sample processing, wallet,
+  chain, contract, deployment, Guardian, Operator-A, firewall, IAM, Mainnet, or
+  production action is authorized. Rollout estimates remain unchanged.
+- Status: `GH-261 IN PROGRESS / Documentation + claim guards only / Production false`.
+
+### 2026-09-13 - GH-261 local verification complete
+
+- The synchronized documentation candidate covers unauthorized compute
+  conscription as a planned GH-258/GH-261 threat class and preserves the
+  observable-behavior-only, no-reliable-attribution, no-current-authority
+  boundary. The machine ledger and fail-closed public-claim guards match it.
+- Terra's independent read-only review found one medium guard gap: existing
+  automatic-action and attribution patterns still named only GH-258. They now
+  cover GH-258 and GH-261, with explicit and generated negative regression
+  cases. Terra found no blocking documentation, secret, KAS/PROM, or responsive
+  issue.
+- Final local evidence: `57` focused public-claim tests and `203` full script
+  tests pass; the 13-surface public claim check, Memory integrity, project
+  status, documentation hygiene, Ruff lint/format, Python compilation, JSON,
+  five-page HTML, two-workflow YAML, and diff checks pass.
+- Local browser checks at `390x844` and `1280x720` show no horizontal document
+  overflow. The GH-261 block is readable, the Roadmap hardware table stacks on
+  narrow screens, and a stale absolute `unstoppable` target claim is removed.
+- Kimi K3 could not start its read-only review because the local watcher hit
+  `EMFILE` before repository access on all three attempts. Claude Code stopped
+  before repository access on its configured budget. Neither changed files.
+- No product, endpoint, model/sample, wallet, chain, contract, Guardian,
+  Operator-A, firewall, IAM, deployment, Mainnet, or production action occurred.
+  Rollout estimates remain core `84-88%` and full roadmap `50-55%`, both
+  internal scope-weighted estimates only.
+- Status: `GH-261 LOCAL VERIFIED / PR PENDING / Planning only / Production false`.

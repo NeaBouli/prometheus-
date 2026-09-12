@@ -1,6 +1,6 @@
 # Prometheus — Full Deployment Roadmap
 *Readiness-gated roadmap; no fixed public-release date is claimed.*
-*Project status reviewed through 2026-09-12. The immutable public claim-audit baseline remains 2026-08-14 at exact main `5cd13bf`; later exact-main updates, including GH-253 and the planned GH-258 safety track, are recorded below and in the machine-readable post-audit ledger.*
+*Project status reviewed through 2026-09-13. The immutable public claim-audit baseline remains 2026-08-14 at exact main `5cd13bf`; later exact-main updates, including GH-253 and the planned GH-258/GH-261 safety track, are recorded below and in the machine-readable post-audit ledger.*
 
 Evidence classes are intentionally separate: implemented/tested development
 foundations, the single demonstrated non-promotable Testnet-10 canary, no proven
@@ -238,12 +238,21 @@ operation, and public release-hardening evidence for the exact rollout commit.
 - Model update mechanism: IPFS distribution + on-chain hash verification
 - Test: does Phi-3 detect known malware samples?
 
-**GH-258 — Endpoint Detection & Safe Response (planned cross-cutting track)**
+**GH-258 / GH-261 - Endpoint Detection & Safe Response (planned cross-cutting track)**
 
 Prometheus may eventually help detect coordinated endpoint takeover attempts,
 including attacks that are AI-assisted or highly automated. It can evaluate
 observable behavior; it cannot reliably prove that AI, AGI, a particular actor,
 or a particular intent caused an event.
+
+GH-261 clarifies one threat class: unauthorized compute conscription, where
+endpoints, accelerators, servers, or data-center capacity are commandeered into
+a distributed compute mesh. Planned evidence includes unexpected CPU/GPU or
+accelerator workloads, process ownership and lineage, scheduler/container/
+orchestrator drift, workload identity or attestation changes, persistence,
+credential access, and anomalous outbound fan-out. These signals may support a
+compromise finding but cannot identify a superintelligence or prove who or what
+directed the activity.
 
 1. **Observe only:** explicit opt-in, least-privileged, resource-bounded endpoint
    adapters for process lineage, executable integrity, persistence changes,

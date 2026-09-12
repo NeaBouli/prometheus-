@@ -1,6 +1,6 @@
 # Prometheus: Decentralized AI-Powered Threat Intelligence on Kaspa
 
-*Project status reviewed through 2026-09-12; immutable public claim-audit baseline: 2026-08-14.*
+*Project status reviewed through 2026-09-13; immutable public claim-audit baseline: 2026-08-14.*
 
 **Whitepaper v4.0 — March 2026**
 
@@ -534,16 +534,22 @@ Running the companion does not automatically earn PROM. The reporter allocation 
 
 ### 8.5 Planned Endpoint Detection and Safe Response
 
-GH-258 defines a future, cross-cutting endpoint-security track for coordinated
-compromise, including attacks that may be AI-assisted or highly automated. The
-protocol can reason about observable behavior and fleet correlation; it cannot
-reliably attribute an event to AI, AGI, a specific actor, or intent.
+GH-258 and the GH-261 clarification define a future, cross-cutting
+endpoint-security track for coordinated compromise, including attacks that may
+be AI-assisted or highly automated. GH-261 explicitly includes unauthorized
+compute conscription: attempts to commandeer endpoints, accelerators, servers,
+or data-center capacity into a distributed compute mesh. The protocol can
+reason about observable behavior and fleet correlation; it cannot reliably
+attribute an event to AI, AGI, a specific actor, or intent.
 
 The target evidence ladder is deliberately asymmetric. First, explicit opt-in
 and least-privileged adapters observe process lineage, executable integrity,
 persistence, network behavior, credential-access indicators, model/runtime
 integrity, and agent tool-policy violations while keeping sensitive raw
-telemetry local by default. Second, the client warns and may correlate only
+telemetry local by default. Resource-conscription evidence may also include
+unexpected CPU/GPU or accelerator workloads, scheduler/container/orchestrator
+drift, workload-identity or attestation changes, and anomalous outbound fan-out.
+Second, the client warns and may correlate only
 bounded, privacy-reviewed, proof-bound ThreatHints. Third, a separately reviewed
 operator-confirmed interface may offer narrow, reversible containment with preview,
 expiry, rollback, tamper-evident audit, and a protected recovery path. Limited
