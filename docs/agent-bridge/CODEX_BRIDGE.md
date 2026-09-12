@@ -6666,3 +6666,20 @@ false`.
   remain mandatory. No product code, endpoint action, model/sample acquisition,
   wallet, chain, contract, deployment, IAM, Mainnet or production action occurred.
 - Status: `GH-258 LOCAL VERIFIED / PR AND PROTECTED CHECKS PENDING / Production false`.
+
+### 2026-09-12 - GH-258 PR #259 review hardening
+
+- PR #259 opened from commit `1cf0ce6`. Its first complete protected run passed
+  Prometheus CI, Security Audit and CodeRabbit, but CodeRabbit also posted one
+  actionable review thread: action names and the shared negative phrase were not
+  yet sentence-bound, so mixed or passive positive prose could evade the guard.
+- Sol verified and fixed the finding. Every listed automatic action must now be
+  bound to `disabled and unauthorized` or `not authorized` within the same
+  sentence, on either side of the action. Active and passive positive action
+  claims plus positive AI/actor attribution are rejected. Regression coverage
+  includes every action, mixed positive/negative text and passive `enabled` or
+  `implemented` variants.
+- Post-fix local results: public claims pass across 13 surfaces; 57 focused claim
+  tests and 203 complete script tests pass; Ruff format/lint and
+  `git diff --check` pass. No product or external behavior changed.
+- Status: `PR #259 REVIEW FIX LOCAL VERIFIED / REPUSH AND RECHECK PENDING / Production false`.

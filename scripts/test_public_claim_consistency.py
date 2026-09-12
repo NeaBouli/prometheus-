@@ -516,6 +516,15 @@ class PublicClaimConsistencyTests(unittest.TestCase):
             "GH-258 provides a real-time endpoint sensor.",
             "GH-258 implements a response engine.",
             "GH-258 reliably attributes AI.",
+            "GH-258 states AI attribution is reliable.",
+            *(
+                f"GH-258 endpoint response: {action} is enabled."
+                for action, _ in MODULE.GH258_ACTION_PATTERNS
+            ),
+            *(
+                f"GH-258 endpoint response: {action} is implemented."
+                for action, _ in MODULE.GH258_ACTION_PATTERNS
+            ),
         )
         for claim in claims:
             with self.subTest(claim=claim), tempfile.TemporaryDirectory() as tmp:
@@ -538,6 +547,38 @@ class PublicClaimConsistencyTests(unittest.TestCase):
                     any(
                         "README.md" in error
                         and "GH-258 authority or attribution claim drift" in error
+                        for error in errors
+                    )
+                )
+
+    def test_gh_258_each_action_requires_a_negative_state(self) -> None:
+        root = SCRIPT.parents[1]
+        for action, action_pattern in MODULE.GH258_ACTION_PATTERNS:
+            with self.subTest(action=action), tempfile.TemporaryDirectory() as tmp:
+                tmp_root = Path(tmp)
+                status_target = tmp_root / MODULE.STATUS_PATH
+                status_target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy(root / MODULE.STATUS_PATH, status_target)
+                for relative in MODULE.PUBLIC_FILES:
+                    target = tmp_root / relative
+                    target.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copy(root / relative, target)
+                shutil.copy(root / MODULE.SITEMAP_PATH, tmp_root / MODULE.SITEMAP_PATH)
+                readme = tmp_root / "README.md"
+                readme.write_text(
+                    re.sub(
+                        action_pattern,
+                        "removed-gh258-action",
+                        readme.read_text(encoding="utf-8"),
+                        flags=re.IGNORECASE,
+                    ),
+                    encoding="utf-8",
+                )
+                errors = MODULE.verify(tmp_root)
+                self.assertTrue(
+                    any(
+                        "README.md" in error
+                        and f"GH-258 {action} negative-state boundary missing" in error
                         for error in errors
                     )
                 )

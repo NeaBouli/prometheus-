@@ -5342,3 +5342,12 @@ Rules for all dev agents:
   console errors. Kimi remained quota-blocked before access; Claude and Terra
   were read-only; Terra's final verdict is `approve` with no P0-P3 findings.
 - Status: `LOCAL VERIFIED / PR PENDING / PRODUCTION FALSE`.
+
+### 2026-09-12 - PR #259 review guard strengthened
+
+- Fixed CodeRabbit's valid mixed/passive-claim finding by binding each GH-258
+  automatic action to a negative state within the same sentence and rejecting
+  positive active/passive action and attribution wording.
+- Post-fix: 13 claim surfaces, 57 focused tests, 203 full script tests, Ruff and
+  diff checks pass.
+- Status: `PR REVIEW FIX VERIFIED / RECHECK PENDING / PRODUCTION FALSE`.

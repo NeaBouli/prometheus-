@@ -255,14 +255,32 @@ GH258_REQUIRED_FRAGMENTS = (
     "operator-confirmed",
     "reversible",
     "limited automation",
-    "process termination",
-    "quarantine",
-    "firewall",
-    "credential rotation",
-    "remote command",
-    "deletion",
-    "host isolation",
-    "disabled and unauthorized",
+)
+
+GH258_ACTION_PATTERNS = (
+    ("process termination", r"process termination"),
+    ("quarantine", r"quarantine"),
+    ("firewall mutation", r"firewall (?:changes?|mutation)"),
+    ("credential rotation", r"credential rotation"),
+    ("remote commands", r"remote commands?(?: execution)?"),
+    ("deletion", r"deletion"),
+    ("host isolation", r"host isolation"),
+)
+
+GH258_ACTION_PATTERN = (
+    "(?:" + "|".join(pattern for _, pattern in GH258_ACTION_PATTERNS) + ")"
+)
+
+GH258_NEGATIVE_ACTION_PATTERNS = tuple(
+    (
+        label,
+        re.compile(
+            rf"(?:{pattern}[^.\n]{{0,240}}(?:disabled and unauthorized|not authorized)|"
+            rf"(?:disabled and unauthorized|not authorized)[^.\n]{{0,240}}{pattern})",
+            re.I,
+        ),
+    )
+    for label, pattern in GH258_ACTION_PATTERNS
 )
 
 GH258_AUTOMATIC_ACTION_FIELDS = (
@@ -279,9 +297,13 @@ GH258_PROHIBITED_CLAIMS = (
     re.compile(
         r"GH-258[^\n]{0,600}(?:authorizes|allows|enables|provides|supports|"
         r"implements|performs) (?:an? )?(?:automatic(?:ally)? )?"
-        r"(?:process termination|quarantine|firewall (?:changes?|mutation)|"
-        r"credential rotation|remote commands?(?: execution)?|deletion|"
-        r"host isolation)",
+        + GH258_ACTION_PATTERN,
+        re.I,
+    ),
+    re.compile(
+        r"GH-258[^\n]{0,600}"
+        + GH258_ACTION_PATTERN
+        + r" (?:is|are) (?:now )?(?:active|authorized|enabled|implemented)",
         re.I,
     ),
     re.compile(
@@ -293,6 +315,12 @@ GH258_PROHIBITED_CLAIMS = (
     re.compile(
         r"GH-258[^\n]{0,600}(?:reliably )?(?:attributes|identifies|proves) "
         r"(?:an? )?(?:AI|AGI|actor|intent)",
+        re.I,
+    ),
+    re.compile(
+        r"GH-258[^\n]{0,600}(?:(?:AI|AGI|actor|intent) attribution|"
+        r"attribution (?:to )?(?:AI|AGI|an? actor|intent)) "
+        r"(?:is|are) (?:now )?reliable",
         re.I,
     ),
 )
@@ -957,6 +985,11 @@ def verify(root: Path) -> list[str]:
                 for fragment in GH258_REQUIRED_FRAGMENTS
             ):
                 errors.append(f"{relative}: GH-258 planned safety boundary missing")
+            for action, pattern in GH258_NEGATIVE_ACTION_PATTERNS:
+                if not pattern.search(normalized_text):
+                    errors.append(
+                        f"{relative}: GH-258 {action} negative-state boundary missing"
+                    )
             if any(
                 pattern.search(normalized_text) for pattern in GH258_PROHIBITED_CLAIMS
             ):
