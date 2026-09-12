@@ -62,6 +62,7 @@
 - PLONK vs Groth16 Evaluation für Light Client ZK-proofs
 - YARA-spezialisiertes 8B Fine-Tuning auf CVE-Datensätzen
 - Guardian Specialization Sharding (attack class registration)
+- GH-258 Endpoint Detection & Safe Response: behavior-based coordinated-compromise detection, agent tool-policy integrity, local warnings, operator-confirmed reversible containment, and only later separately approved limited automation. No reliable AI/AGI attribution or current response authority.
 
 ## ✅ Erledigt (letzte 7 Tage)
 - [x] H-002 PATTERN-010 fix: Arc<Phi3Model> statt Arc<Mutex<Phi3Model>> — `6347b85` (06.04.2026)

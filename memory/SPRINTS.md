@@ -281,6 +281,19 @@ Tag 3-4: phi3.rs + detection.rs
 Tag 5:   federated.rs + Tests
 ```
 
+### Cross-cutting GH-258: Endpoint Detection & Safe Response (readiness-gated)
+```
+Stage 1: Opt-in, least-privileged, resource-bounded endpoint telemetry
+Stage 2: Local evidence and warnings; bounded privacy-reviewed correlation
+Stage 3: Operator-confirmed reversible containment with expiry and rollback
+Stage 4: Separately approved limited automation after independent evaluation
+
+No reliable AI/AGI/actor attribution. No real-time sensor or response engine is
+implemented today. Automatic quarantine, process termination, firewall changes,
+credential rotation, remote commands, deletion and host isolation remain disabled
+and unauthorized until their own reviewed high-risk tasks are approved.
+```
+
 ### Sprint 4: Guardian Node (Woche 6-7)
 ```
 Tag 1-2: Docker-Setup (8B zuerst)

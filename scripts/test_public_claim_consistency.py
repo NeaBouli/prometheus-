@@ -6,6 +6,7 @@ from __future__ import annotations
 import copy
 import importlib.util
 import json
+import re
 import shutil
 import tempfile
 import unittest
@@ -72,9 +73,9 @@ class PublicClaimConsistencyTests(unittest.TestCase):
 
     def test_phi3_stub_authority_is_rejected(self) -> None:
         changed = copy.deepcopy(self.status)
-        changed["classifications"]["light_client"][
-            "phi3_stub_authority"
-        ] = "heuristic_quarantine"
+        changed["classifications"]["light_client"]["phi3_stub_authority"] = (
+            "heuristic_quarantine"
+        )
         self.assertTrue(
             any("Phi-3 stub" in error for error in MODULE.validate_status(changed))
         )
@@ -157,9 +158,9 @@ class PublicClaimConsistencyTests(unittest.TestCase):
 
     def test_gh_238_status_drift_is_rejected(self) -> None:
         changed = copy.deepcopy(self.status)
-        changed["post_audit_updates"]["gh_238"][
-            "status"
-        ] = "repository_preparation_implemented_and_locally_tested"
+        changed["post_audit_updates"]["gh_238"]["status"] = (
+            "repository_preparation_implemented_and_locally_tested"
+        )
         self.assertTrue(
             any(
                 "exact-main verification" in error
@@ -269,9 +270,9 @@ class PublicClaimConsistencyTests(unittest.TestCase):
 
     def test_gh_242_status_drift_is_rejected(self) -> None:
         changed = copy.deepcopy(self.status)
-        changed["post_audit_updates"]["gh_242"][
-            "status"
-        ] = "implemented_and_locally_tested_repository_boundary"
+        changed["post_audit_updates"]["gh_242"]["status"] = (
+            "implemented_and_locally_tested_repository_boundary"
+        )
         self.assertTrue(
             any(
                 "GH-242 repository boundary" in error
@@ -431,6 +432,189 @@ class PublicClaimConsistencyTests(unittest.TestCase):
                     any("GH-253" in error for error in MODULE.validate_status(changed))
                 )
 
+    def test_gh_258_capability_elevation_is_rejected(self) -> None:
+        for field in (
+            "real_time_endpoint_sensor",
+            "response_engine",
+            "ai_or_actor_attribution_proven",
+            "automatic_endpoint_actions_authorized",
+            *MODULE.GH258_AUTOMATIC_ACTION_FIELDS,
+            "production_authority",
+        ):
+            with self.subTest(field=field):
+                changed = copy.deepcopy(self.status)
+                changed["post_audit_updates"]["gh_258"][field] = True
+                self.assertTrue(
+                    any("GH-258" in error for error in MODULE.validate_status(changed))
+                )
+
+    def test_gh_258_stage_order_and_malformed_status_are_rejected(self) -> None:
+        changed = copy.deepcopy(self.status)
+        changed["post_audit_updates"]["gh_258"]["stages"] = [
+            "warn_only",
+            "observe_only",
+            "operator_confirmed_reversible_containment",
+            "separately_approved_limited_automation",
+        ]
+        self.assertTrue(
+            any("GH-258" in error for error in MODULE.validate_status(changed))
+        )
+
+        for value in (None, [], "invalid", 258):
+            with self.subTest(value=value):
+                malformed = copy.deepcopy(self.status)
+                malformed["post_audit_updates"]["gh_258"] = value
+                self.assertTrue(
+                    any(
+                        "GH-258" in error for error in MODULE.validate_status(malformed)
+                    )
+                )
+
+    def test_endpoint_detection_machine_status_drift_is_rejected(self) -> None:
+        mutations = (
+            ("status", "implemented"),
+            ("detection_basis", "ai_actor_attribution"),
+            ("real_time_sensor_implemented", True),
+            ("response_engine_implemented", True),
+            ("automatic_endpoint_actions_authorized", True),
+            *((field, True) for field in MODULE.GH258_AUTOMATIC_ACTION_FIELDS),
+        )
+        for field, value in mutations:
+            with self.subTest(field=field):
+                changed = copy.deepcopy(self.status)
+                changed["classifications"]["endpoint_detection_and_response"][field] = (
+                    value
+                )
+                self.assertTrue(
+                    any(
+                        "endpoint detection" in error
+                        for error in MODULE.validate_status(changed)
+                    )
+                )
+
+        for value in (None, [], "invalid", 258):
+            with self.subTest(value=value):
+                malformed = copy.deepcopy(self.status)
+                malformed["classifications"]["endpoint_detection_and_response"] = value
+                self.assertTrue(
+                    any(
+                        "endpoint detection" in error
+                        for error in MODULE.validate_status(malformed)
+                    )
+                )
+
+    def test_gh_258_positive_authority_claims_are_rejected(self) -> None:
+        root = SCRIPT.parents[1]
+        claims = (
+            "GH-258 authorizes automatic host isolation.",
+            "GH-258 enables automatic process termination.",
+            "GH-258 provides automatic quarantine.",
+            "GH-258 supports automatic firewall changes.",
+            "GH-258 enables automatic credential rotation.",
+            "GH-258 authorizes remote command execution.",
+            "GH-258 enables automatic deletion.",
+            "GH-258 provides a real-time endpoint sensor.",
+            "GH-258 implements a response engine.",
+            "GH-258 reliably attributes AI.",
+            "GH-258 states AI attribution is reliable.",
+            *(
+                f"GH-258 endpoint response: {action} is enabled."
+                for action, _ in MODULE.GH258_ACTION_PATTERNS
+            ),
+            *(
+                f"GH-258 endpoint response: {action} is implemented."
+                for action, _ in MODULE.GH258_ACTION_PATTERNS
+            ),
+        )
+        for claim in claims:
+            with self.subTest(claim=claim), tempfile.TemporaryDirectory() as tmp:
+                tmp_root = Path(tmp)
+                status_target = tmp_root / MODULE.STATUS_PATH
+                status_target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy(root / MODULE.STATUS_PATH, status_target)
+                for relative in MODULE.PUBLIC_FILES:
+                    target = tmp_root / relative
+                    target.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copy(root / relative, target)
+                shutil.copy(root / MODULE.SITEMAP_PATH, tmp_root / MODULE.SITEMAP_PATH)
+                readme = tmp_root / "README.md"
+                readme.write_text(
+                    f"{readme.read_text(encoding='utf-8')}\n{claim}\n",
+                    encoding="utf-8",
+                )
+                errors = MODULE.verify(tmp_root)
+                self.assertTrue(
+                    any(
+                        "README.md" in error
+                        and "GH-258 authority or attribution claim drift" in error
+                        for error in errors
+                    )
+                )
+
+    def test_gh_258_each_action_requires_a_negative_state(self) -> None:
+        root = SCRIPT.parents[1]
+        for action, action_pattern in MODULE.GH258_ACTION_PATTERNS:
+            with self.subTest(action=action), tempfile.TemporaryDirectory() as tmp:
+                tmp_root = Path(tmp)
+                status_target = tmp_root / MODULE.STATUS_PATH
+                status_target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy(root / MODULE.STATUS_PATH, status_target)
+                for relative in MODULE.PUBLIC_FILES:
+                    target = tmp_root / relative
+                    target.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copy(root / relative, target)
+                shutil.copy(root / MODULE.SITEMAP_PATH, tmp_root / MODULE.SITEMAP_PATH)
+                readme = tmp_root / "README.md"
+                readme.write_text(
+                    re.sub(
+                        action_pattern,
+                        "removed-gh258-action",
+                        readme.read_text(encoding="utf-8"),
+                        flags=re.IGNORECASE,
+                    ),
+                    encoding="utf-8",
+                )
+                errors = MODULE.verify(tmp_root)
+                self.assertTrue(
+                    any(
+                        "README.md" in error
+                        and f"GH-258 {action} negative-state boundary missing" in error
+                        for error in errors
+                    )
+                )
+
+    def test_gh_258_public_safety_boundary_drift_is_rejected(self) -> None:
+        root = SCRIPT.parents[1]
+        for fragment in MODULE.GH258_REQUIRED_FRAGMENTS:
+            with self.subTest(fragment=fragment), tempfile.TemporaryDirectory() as tmp:
+                tmp_root = Path(tmp)
+                status_target = tmp_root / MODULE.STATUS_PATH
+                status_target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy(root / MODULE.STATUS_PATH, status_target)
+                for relative in MODULE.PUBLIC_FILES:
+                    target = tmp_root / relative
+                    target.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copy(root / relative, target)
+                shutil.copy(root / MODULE.SITEMAP_PATH, tmp_root / MODULE.SITEMAP_PATH)
+                readme = tmp_root / "README.md"
+                readme.write_text(
+                    re.sub(
+                        re.escape(fragment),
+                        "removed-gh258-boundary",
+                        readme.read_text(encoding="utf-8"),
+                        flags=re.IGNORECASE,
+                    ),
+                    encoding="utf-8",
+                )
+                errors = MODULE.verify(tmp_root)
+                self.assertTrue(
+                    any(
+                        "README.md" in error
+                        and "GH-258 planned safety boundary missing" in error
+                        for error in errors
+                    )
+                )
+
     def test_gh_253_positive_authority_claim_is_rejected(self) -> None:
         root = SCRIPT.parents[1]
         with tempfile.TemporaryDirectory() as tmp:
@@ -490,9 +674,10 @@ class PublicClaimConsistencyTests(unittest.TestCase):
     def test_gh_253_public_evidence_drift_is_rejected(self) -> None:
         root = SCRIPT.parents[1]
         for drifted_relative in MODULE.GH253_PUBLIC_FILES:
-            with self.subTest(
-                relative=drifted_relative
-            ), tempfile.TemporaryDirectory() as tmp:
+            with (
+                self.subTest(relative=drifted_relative),
+                tempfile.TemporaryDirectory() as tmp,
+            ):
                 tmp_root = Path(tmp)
                 status_target = tmp_root / MODULE.STATUS_PATH
                 status_target.parent.mkdir(parents=True, exist_ok=True)
@@ -626,11 +811,10 @@ class PublicClaimConsistencyTests(unittest.TestCase):
     def test_json_ld_update_date_validation(self) -> None:
         current = (
             '<script type="application/ld+json">'
-            '{"dateModified":"2026-09-06"}</script>'
+            f'{{"dateModified":"{MODULE.LATEST_PROJECT_UPDATE}"}}</script>'
         )
         stale = (
-            '<script type="application/ld+json">'
-            '{"dateModified":"2026-08-14"}</script>'
+            '<script type="application/ld+json">{"dateModified":"2026-08-14"}</script>'
         )
         self.assertEqual(MODULE.validate_json_ld_update_date(current), [])
         self.assertEqual(
@@ -658,7 +842,7 @@ class PublicClaimConsistencyTests(unittest.TestCase):
             readme = tmp_root / "README.md"
             readme.write_text(
                 readme.read_text(encoding="utf-8").replace(
-                    "Public project status was reviewed through 2026-09-06.",
+                    "Public project status was reviewed through 2026-09-12.",
                     "Public project status date pending.",
                     1,
                 ),
@@ -712,8 +896,7 @@ class PublicClaimConsistencyTests(unittest.TestCase):
             shutil.copy(root / MODULE.SITEMAP_PATH, tmp_root / MODULE.SITEMAP_PATH)
             landing = tmp_root / "index.html"
             landing.write_text(
-                landing.read_text(encoding="utf-8")
-                + "\nDeploy verification active\n",
+                landing.read_text(encoding="utf-8") + "\nDeploy verification active\n",
                 encoding="utf-8",
             )
             errors = MODULE.verify(tmp_root)

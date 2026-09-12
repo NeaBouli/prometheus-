@@ -26,12 +26,12 @@
 <meta name="twitter:description" content="The H-001 Testnet-10 canary is confirmed and independently evidenced; full rollout remains gated by remaining deployments, production protocol components, and release hardening.">
 <meta name="twitter:image" content="https://neabouli.github.io/prometheus-/logo/Prometheus.png">
 <!-- GEO: AI-readable -->
-<meta name="ai-summary" content="Prometheus deployment roadmap: Phase A post-Toccata verification covers current-Silverscript validator-state runtime transitions, H-001 LE encoding, and contract deploy gates; Phase B LLaMA fine-tuning; Phase C Tauri desktop; Phase D Flutter mobile; Phase E server tooling; Phase F vProgs.">
+<meta name="ai-summary" content="Prometheus deployment roadmap: Phase A post-Toccata verification covers contract and network gates; Phase B covers production AI plus planned behavior-based endpoint detection and safe response; later phases cover desktop, mobile and vProgs. No production protocol is active.">
 <meta name="ai-category" content="cybersecurity, blockchain, roadmap, development-timeline">
 <meta name="ai-status" content="post-toccata-verification, active-development">
 <!-- Schema.org -->
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"WebPage","name":"Prometheus Roadmap","description":"Full deployment roadmap for Prometheus decentralized AI threat intelligence protocol.","url":"https://neabouli.github.io/prometheus-/roadmap.html","dateModified":"2026-09-06","isPartOf":{"@type":"WebSite","name":"Prometheus Protocol","url":"https://neabouli.github.io/prometheus-/"}}
+{"@context":"https://schema.org","@type":"WebPage","name":"Prometheus Roadmap","description":"Full deployment roadmap for Prometheus decentralized AI threat intelligence protocol.","url":"https://neabouli.github.io/prometheus-/roadmap.html","dateModified":"2026-09-12","isPartOf":{"@type":"WebSite","name":"Prometheus Protocol","url":"https://neabouli.github.io/prometheus-/"}}
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -479,6 +479,17 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
           <li>E2E test: FP rate rises → Auto-Tuning responds</li>
         </ul>
       </div>
+      <div class="sprint">
+        <div class="sprint-num">GH-258 · Cross-cutting</div>
+        <div class="sprint-title">Endpoint Detection &amp; Safe Response</div>
+        <ul class="sprint-items">
+          <li>Planned behavior signals: process, file, persistence, network, credential access, model/runtime integrity and agent tool-policy violations</li>
+          <li>Behavior-based detection cannot reliably attribute activity to AI, AGI, a specific actor or intent</li>
+          <li>Stages: observe-only → warn-only → operator-confirmed reversible containment → separately approved limited automation</li>
+          <li>Requires privacy review, real-sample/adversarial evaluation, measured false positives, multi-host evidence and rollback drills</li>
+          <li>No real-time endpoint sensor or response engine exists; automatic quarantine, process termination, firewall changes, credential rotation, remote commands, deletion and host isolation are disabled and unauthorized</li>
+        </ul>
+      </div>
       <div class="sprint" style="background:var(--void)">
         <div class="sprint-num" style="color:var(--mint-dim)">Key milestone</div>
         <div class="sprint-title" style="color:var(--mint)">Network is learning</div>
@@ -660,13 +671,13 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
         <div class="device-icon">05 · Mobile</div>
         <div class="device-name">iPhone / iPad</div>
         <div class="device-when">After mobile security review</div>
-        <div class="device-how">App Store. Phi-3 via Core ML. Background scanning.</div>
+        <div class="device-how">Target: App Store, Phi-3 via Core ML, and reviewed background scanning.</div>
       </div>
       <div class="device-card">
         <div class="device-icon">06 · Mobile</div>
         <div class="device-name">Android</div>
         <div class="device-when">After mobile security review</div>
-        <div class="device-how">Google Play + F-Droid. ONNX Runtime Mobile.</div>
+        <div class="device-how">Target: Google Play + F-Droid with ONNX Runtime Mobile and reviewed background scanning.</div>
       </div>
       <div class="device-card">
         <div class="device-icon">07 · Cloud</div>
@@ -733,7 +744,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
 </div>
 
 <footer>
-  <div class="f-left">Project status reviewed 2026-09-06 · immutable <a href="docs/claim-audit-2026-08-14.md">claim-audit baseline</a> 2026-08-14 · base <a href="https://github.com/NeaBouli/prometheus-/commit/5cd13bf6f9c170711e26364263bd0dcd8aad8c09">5cd13bf</a></div>
+  <div class="f-left">Project status reviewed 2026-09-12 · immutable <a href="docs/claim-audit-2026-08-14.md">claim-audit baseline</a> 2026-08-14 · base <a href="https://github.com/NeaBouli/prometheus-/commit/5cd13bf6f9c170711e26364263bd0dcd8aad8c09">5cd13bf</a></div>
   <div class="f-center">PROMETHEUS</div>
   <ul class="f-links">
     <li><a href="faq.html">FAQ</a></li>

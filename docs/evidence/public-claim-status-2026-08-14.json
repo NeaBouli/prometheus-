@@ -2,7 +2,7 @@
   "schema_version": 1,
   "as_of": "2026-08-14",
   "latest_project_update": {
-    "as_of": "2026-09-06",
+    "as_of": "2026-09-12",
     "audit_baseline_as_of": "2026-08-14",
     "classification": "post_audit_updates_recorded_below",
     "production_ready": false
@@ -132,6 +132,30 @@
       "on_chain_attestation": false,
       "public_multihost_operation": false,
       "deployment_or_production_authority": false
+    },
+    "gh_258": {
+      "as_of": "2026-09-12",
+      "issue": 258,
+      "status": "planned_documentation_only",
+      "classification": "behavior_based_endpoint_detection_and_safe_response_target",
+      "stages": [
+        "observe_only",
+        "warn_only",
+        "operator_confirmed_reversible_containment",
+        "separately_approved_limited_automation"
+      ],
+      "real_time_endpoint_sensor": false,
+      "response_engine": false,
+      "ai_or_actor_attribution_proven": false,
+      "automatic_endpoint_actions_authorized": false,
+      "automatic_process_termination_authorized": false,
+      "automatic_quarantine_authorized": false,
+      "automatic_firewall_mutation_authorized": false,
+      "automatic_credential_rotation_authorized": false,
+      "automatic_remote_commands_authorized": false,
+      "automatic_deletion_authorized": false,
+      "automatic_host_isolation_authorized": false,
+      "production_authority": false
     }
   },
   "classifications": {
@@ -147,6 +171,20 @@
       "p2p_reporting": "not_operated",
       "p2p_v1_submission": "development_only_same_host_loopback_verified",
       "proof_generation": "development_stub_only"
+    },
+    "endpoint_detection_and_response": {
+      "status": "planned_only",
+      "detection_basis": "observable_behavior_not_ai_actor_or_intent_attribution",
+      "real_time_sensor_implemented": false,
+      "response_engine_implemented": false,
+      "automatic_endpoint_actions_authorized": false,
+      "automatic_process_termination_authorized": false,
+      "automatic_quarantine_authorized": false,
+      "automatic_firewall_mutation_authorized": false,
+      "automatic_credential_rotation_authorized": false,
+      "automatic_remote_commands_authorized": false,
+      "automatic_deletion_authorized": false,
+      "automatic_host_isolation_authorized": false
     },
     "guardian_analysis": {
       "status": "implemented_and_tested_non_production_foundation",

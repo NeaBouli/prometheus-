@@ -6590,3 +6590,96 @@ false`.
 - Required checks, normal merge, exact-main CI/Security/Pages and cache-busted
   live README/Landing readback remain. No bypass is authorized.
 - Status: `PUBLIC STATUS REFRESH PR #257 OPEN / Production false`.
+
+### 2026-09-12 - GH-258 endpoint detection and safe response roadmap started
+
+- Issue #258 defines a documentation-only, evidence-gated roadmap for detecting
+  coordinated endpoint compromise, including attacks that may be AI-assisted or
+  highly automated. Prometheus will reason from observable behavior and will not
+  claim reliable AI, AGI, actor or intent attribution.
+- The planned capability ladder is detection-only, local warning, explicitly
+  confirmed reversible containment, and only later independently evaluated,
+  tightly bounded automation. No automatic process termination, quarantine,
+  firewall mutation, credential rotation, remote command, deletion or host
+  isolation is authorized by this issue.
+- Scope is limited to synchronized public roadmap/status documentation and
+  consistency tests from exact main `f270fba94eb4c9dffcdd94b2cff32a0c40345e76`.
+  No product code, model/sample acquisition, scanning, endpoint action, wallet,
+  chain, contract, deployment, IAM, Mainnet, production or secret work is in
+  scope. KAS/PROM, reputation, slash, commit-reveal and no-emergency-stop
+  invariants remain unchanged.
+- Sol owns architecture, safety classification, integration, complete checks
+  and protected delivery. Kimi K3 receives a bounded secret-free independent
+  review; Claude Code may only perform a small read-only consistency check.
+- Status: `GH-258 IN PROGRESS / Documentation planning only / Production false`.
+
+### 2026-09-12 - GH-258 synchronized documentation candidate
+
+- README, Markdown/HTML Roadmap, Markdown/HTML Whitepaper, Markdown/HTML FAQ,
+  Landing, `llms.txt`, client README, machine status, Memory, Backlog and sitemap
+  now classify GH-258 as planned behavior-based endpoint detection and safe
+  response. The four stages are observe-only, warn-only, operator-confirmed
+  reversible containment, and separately approved limited automation.
+- All listed surfaces state that AI/AGI/actor/intent attribution is not reliable,
+  no real-time endpoint sensor or response engine is implemented, and automatic
+  process termination, quarantine, firewall mutation, credential rotation,
+  remote commands, deletion and host isolation are disabled and unauthorized.
+  Scope-weighted rollout estimates remain unchanged.
+- The machine-readable status and public-claim gate now enforce the planning-only
+  classification, ordered stages, prohibited authority booleans, and required
+  safety wording across 11 relevant public surfaces. The first targeted run
+  passes 13 synchronized surfaces and 53 tests; final complete gates remain.
+- Claude Code's bounded read-only inventory found three adjacent stale public
+  claims: an `AI for the unknown` sentence, an unqualified real-time-response
+  assertion, and unqualified mobile background-scanning cards. All were corrected
+  as target-only/unproven wording. Claude changed no file.
+- Kimi K3 was invoked through the required wrapper but returned before repository
+  access because its current seven-day quota is exhausted. No Kimi review is
+  claimed. The read-only Terra fallback reviewed the base and requested the same
+  11-surface safety boundary, machine status and mutation tests; those requests
+  are incorporated. Final stable-diff review is still required.
+- Status: `GH-258 LOCAL CANDIDATE / Targeted claims 13 surfaces + 53 tests PASS / Production false`.
+
+### 2026-09-12 - GH-258 local verification and independent review complete
+
+- Sol closed the independent P2 review finding by adding granular fail-closed
+  machine fields for process termination, quarantine, firewall mutation,
+  credential rotation, remote commands, deletion and host isolation in both the
+  GH-258 ledger and endpoint classification. The verifier rejects altered stage
+  order, malformed records, elevated capability fields and positive public
+  authority, implementation or AI-attribution claims.
+- Final local verification passes: public-claim consistency across 13 surfaces;
+  56 focused claim tests; 202 complete `scripts/test_*.py` tests; Memory integrity;
+  project-status consistency plus 7 tests; public-documentation hygiene plus 11
+  tests; 6 autodidactic tests; Ruff format and lint; Python compilation; 5-page
+  HTML parse; 2-workflow YAML parse; JSON parse; and `git diff --check`.
+- Local browser verification passes for Roadmap and FAQ at desktop and 390x844:
+  no horizontal document overflow, the GH-258 planning boundary is rendered,
+  navigation collapses on mobile, and no browser console errors were observed.
+- Kimi K3 was retried through the required wrapper and again stopped on its
+  seven-day quota before repository access. Claude Code remained read-only and
+  its three findings were fixed. Terra's first read-only stable-diff review found
+  the P2 mutation gap; its second review confirmed the fix, found no remaining
+  P0-P3 issue and returned `approve`. Delegates changed no files.
+- Local Black and actionlint executables are unavailable; Ruff, Python/YAML/HTML
+  parsing and repository tests pass, while protected GitHub CI/Security/Pages
+  remain mandatory. No product code, endpoint action, model/sample acquisition,
+  wallet, chain, contract, deployment, IAM, Mainnet or production action occurred.
+- Status: `GH-258 LOCAL VERIFIED / PR AND PROTECTED CHECKS PENDING / Production false`.
+
+### 2026-09-12 - GH-258 PR #259 review hardening
+
+- PR #259 opened from commit `1cf0ce6`. Its first complete protected run passed
+  Prometheus CI, Security Audit and CodeRabbit, but CodeRabbit also posted one
+  actionable review thread: action names and the shared negative phrase were not
+  yet sentence-bound, so mixed or passive positive prose could evade the guard.
+- Sol verified and fixed the finding. Every listed automatic action must now be
+  bound to `disabled and unauthorized` or `not authorized` within the same
+  sentence, on either side of the action. Active and passive positive action
+  claims plus positive AI/actor attribution are rejected. Regression coverage
+  includes every action, mixed positive/negative text and passive `enabled` or
+  `implemented` variants.
+- Post-fix local results: public claims pass across 13 surfaces; 57 focused claim
+  tests and 203 complete script tests pass; Ruff format/lint and
+  `git diff --check` pass. No product or external behavior changed.
+- Status: `PR #259 REVIEW FIX LOCAL VERIFIED / REPUSH AND RECHECK PENDING / Production false`.

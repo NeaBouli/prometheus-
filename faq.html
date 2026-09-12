@@ -31,7 +31,7 @@
 <meta name="ai-status" content="post-toccata-verification, active-development, audited">
 <!-- Schema.org -->
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"FAQPage","name":"Prometheus FAQ","description":"Frequently asked questions about the Prometheus development-stage threat intelligence protocol.","url":"https://neabouli.github.io/prometheus-/faq.html","dateModified":"2026-09-06","mainEntity":[{"@type":"Question","name":"What is the difference between KAS and PROM?","acceptedAnswer":{"@type":"Answer","text":"Validators stake KAS, never PROM. PROM is a planned reward and governance token; minting, emission, liquidity and trading are not active. Canonical Guardian reputation is separate Kaspa L1 state."}},{"@type":"Question","name":"How does PROM enter the market?","acceptedAnswer":{"@type":"Answer","text":"The specification starts with zero PROM and no pre-mine, ICO, presale, founder or foundation allocation. Contribution issuance and a later KAS/PROM secondary market are planned, not deployed."}},{"@type":"Question","name":"Can Prometheus be shut down?","acceptedAnswer":{"@type":"Answer","text":"The contract design has no repository-controlled emergency-stop entrypoint. No public multi-host Prometheus network is operating; current evidence relies on owner-controlled policies and local trust anchors. Availability is not guaranteed."}}]}
+{"@context":"https://schema.org","@type":"FAQPage","name":"Prometheus FAQ","description":"Frequently asked questions about the Prometheus development-stage threat intelligence protocol.","url":"https://neabouli.github.io/prometheus-/faq.html","dateModified":"2026-09-12","mainEntity":[{"@type":"Question","name":"What is the difference between KAS and PROM?","acceptedAnswer":{"@type":"Answer","text":"Validators stake KAS, never PROM. PROM is a planned reward and governance token; minting, emission, liquidity and trading are not active. Canonical Guardian reputation is separate Kaspa L1 state."}},{"@type":"Question","name":"How does PROM enter the market?","acceptedAnswer":{"@type":"Answer","text":"The specification starts with zero PROM and no pre-mine, ICO, presale, founder or foundation allocation. Contribution issuance and a later KAS/PROM secondary market are planned, not deployed."}},{"@type":"Question","name":"Can Prometheus be shut down?","acceptedAnswer":{"@type":"Answer","text":"The contract design has no repository-controlled emergency-stop entrypoint. No public multi-host Prometheus network is operating; current evidence relies on owner-controlled policies and local trust anchors. Availability is not guaranteed."}}]}
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -448,6 +448,17 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
         </div></div>
       </div>
 
+      <div class="faq-item" id="endpoint-safe-response">
+        <button class="faq-q" onclick="toggle(this)">
+          <span class="faq-q-text">Could Prometheus detect and stop a coordinated AI-assisted takeover?</span>
+          <span class="faq-icon"></span>
+        </button>
+        <div class="faq-a"><div class="faq-a-inner">
+          <p>This is a planned GH-258 use case, not a current capability. Prometheus could classify observable process, file, persistence, network, credential-access, model/runtime-integrity and agent tool-policy signals and correlate bounded privacy-reviewed ThreatHints. It cannot reliably attribute an event to AI, AGI, a specific actor or intent.</p>
+          <p>The target stages are observe-only, warn-only, operator-confirmed reversible containment, and only later separately approved limited automation after independent real-sample, adversarial, privacy, false-positive, multi-host and rollback evidence. No real-time endpoint sensor or response engine is implemented. Automatic process termination, quarantine, firewall mutation, credential rotation, remote commands, deletion and host isolation are disabled and unauthorized.</p>
+        </div></div>
+      </div>
+
       <div class="faq-item" id="fine-tuning">
         <button class="faq-q" onclick="toggle(this)">
           <span class="faq-q-text">How is LLaMA 3 trained for security tasks?</span>
@@ -524,7 +535,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
             <tr><td>Native ZK</td><td>Groth16 on L1</td><td>External circuits</td></tr>
             <tr><td>Smart contracts</td><td>Silverscript (L1)</td><td>Solidity (EVM)</td></tr>
           </table>
-          <p>Real-time threat response requires sub-second finality. Ethereum's 12-second blocks make it unsuitable. Kaspa's DAGKnight consensus also shares the 0% pre-mine philosophy of Prometheus — the alignment of values matters.</p>
+          <p>The target rule lifecycle benefits from fast settlement, but current same-host timing is not production response evidence. Kaspa's planned execution environment and 0% pre-mine history align with the protocol design; chain speed alone does not provide endpoint detection or safe response.</p>
         </div></div>
       </div>
 
@@ -538,7 +549,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
           <p>Prometheus targets <strong>behavioral analysis</strong> and shared rule state but does not currently provide production unknown-threat detection. Canonical state and a CID are targeted for Kaspa while content lives on IPFS; authorized deactivation exists, and anchoring does not guarantee availability, replication, or universal censorship resistance.</p>
           <p>Merged and exact-main-verified GH-197/PR #198 adds a development Testnet-10 consistency check: one separately owner-pin-hashed canonical manifest must match exactly one bounded RuleStorage UTXO observation before the bound constructor JSON is decoded. GH-203/PR #204 adds a development-only live adapter that asks one connected node for exact Testnet-10 virtual DAA and UTXOs for one explicit <code>kaspatest</code> address. GH-205 composes one complete owner-pinned snapshot through that injected/live observation, a credential-free loopback-only local IPFS gateway, exact CID/content binding, and one atomic scanner replacement. GH-207 adds an owner-local POSIX checkpoint ordered by minimum verified virtual DAA, rejects rollback and same-order equivocation across restarts, and supports exact replay recovery. GH-209 adds bounded opt-in development orchestration. GH-211 adds a strict canonical BIP340-authenticated complete-snapshot envelope using a separately owner-pinned x-only key, external nonzero minimum sequence, and separately trusted clock rechecked on every fetch. Merged and exact-main-verified GH-213/PR #214 at <code>bbe7efb</code> adds an operator-invoked Development/Testnet-10 preflight/run CLI with private strict local files, offline non-mutating preflight, loopback-IP-literal RPC/IPFS, redacted status, and signal cancellation; CI <code>31950806131</code>, Security <code>31950806118</code>, and Pages <code>31950805653</code> pass. It authenticates one owner-authorized snapshot envelope only; it adds no signer, key-authority/rotation proof, persistent sequence authority, autonomous authority, wallet, chain write, independent proof of RPC truth or history, consensus finality, canonical manifest authority, IPFS availability or replication, production YARA quality, deployment, Mainnet, or production readiness.</p>
           <p>Merged and exact-main-verified GH-216/PR #217 at <code>13c1812</code> exercises that real CLI binary against test-only ephemeral loopback wRPC/IPFS peers. It covers offline/connected preflight, private checkpoint commit, SIGTERM/SIGINT drain, restart exact replay, rollback/equivocation rejection, and malformed, timeout, or disconnected peers; CI <code>31978132036</code>, Security <code>31978132044</code>, and Pages <code>31978131647</code> pass. This is local Development evidence only, not public Testnet operation, independent RPC/IPFS truth or availability, deployment, Mainnet, or production readiness.</p>
-          <p>Prometheus is designed to <strong>complement</strong> existing tools, not replace them. A device running ClamAV, Wazuh, and the Prometheus Light Client has layered defense — signatures for the known, AI for the unknown.</p>
+          <p>Prometheus is designed to <strong>complement</strong> existing tools, not replace them. Today the Light Client is a development foundation, not a production AI detector; any future layered-defense claim requires real inference, real-sample evaluation, endpoint telemetry, and independently reviewed response behavior.</p>
         </div></div>
       </div>
 
@@ -614,7 +625,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
 </div>
 
 <footer>
-  <div class="f-left">Project status reviewed 2026-09-06 · immutable <a href="docs/claim-audit-2026-08-14.md">claim-audit baseline</a> 2026-08-14 · base <a href="https://github.com/NeaBouli/prometheus-/commit/5cd13bf6f9c170711e26364263bd0dcd8aad8c09">5cd13bf</a></div>
+  <div class="f-left">Project status reviewed 2026-09-12 · immutable <a href="docs/claim-audit-2026-08-14.md">claim-audit baseline</a> 2026-08-14 · base <a href="https://github.com/NeaBouli/prometheus-/commit/5cd13bf6f9c170711e26364263bd0dcd8aad8c09">5cd13bf</a></div>
   <div class="f-center">PROMETHEUS</div>
   <ul class="f-links">
     <li><a href="faq.html">FAQ</a></li>

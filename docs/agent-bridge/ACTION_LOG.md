@@ -5314,3 +5314,40 @@ Rules for all dev agents:
 - Published documentation commit `373fbd1` through protected PR #257.
 - Required checks, normal merge, exact-main and live readback remain.
 - Status: `PR #257 OPEN / PRODUCTION FALSE`.
+
+### 2026-09-12 - GH-258 endpoint safety roadmap candidate
+
+- Opened issue #258 and isolated branch `docs/GH-258-endpoint-safe-response`
+  from exact main `f270fba94eb4c9dffcdd94b2cff32a0c40345e76`.
+- Synchronized the planned behavior-based endpoint detection and four-stage safe
+  response ladder across public Markdown/HTML, Landing, machine status, Memory,
+  Backlog, client README, `llms.txt` and sitemap. No product behavior changed.
+- Added fail-closed GH-258 status/surface checks and mutation coverage. Initial
+  verification: public claims `PASS` across 13 surfaces; 53 unit tests `PASS`;
+  Python compilation and `git diff --check` pass.
+- Claude read-only review found and Sol fixed three adjacent overstatements.
+  Kimi wrapper access failed on quota before repository access; Terra read-only
+  fallback recommendations are incorporated. Final complete validation and
+  stable-diff review remain.
+- Status: `LOCAL CANDIDATE / PRODUCTION FALSE`.
+
+### 2026-09-12 - GH-258 local gates complete
+
+- Closed Terra's P2 mutation-coverage finding with per-action machine gates,
+  malformed/order checks and positive-authority/attribution prose rejection.
+- Final local results: 13 claim surfaces pass; 56 focused and 202 full script
+  tests pass; Memory/status/hygiene/autodidactic gates pass; Ruff format/lint,
+  Python/JSON/HTML/YAML parsing and `git diff --check` pass.
+- Desktop and 390x844 Roadmap/FAQ browser checks show no horizontal overflow or
+  console errors. Kimi remained quota-blocked before access; Claude and Terra
+  were read-only; Terra's final verdict is `approve` with no P0-P3 findings.
+- Status: `LOCAL VERIFIED / PR PENDING / PRODUCTION FALSE`.
+
+### 2026-09-12 - PR #259 review guard strengthened
+
+- Fixed CodeRabbit's valid mixed/passive-claim finding by binding each GH-258
+  automatic action to a negative state within the same sentence and rejecting
+  positive active/passive action and attribution wording.
+- Post-fix: 13 claim surfaces, 57 focused tests, 203 full script tests, Ruff and
+  diff checks pass.
+- Status: `PR REVIEW FIX VERIFIED / RECHECK PENDING / PRODUCTION FALSE`.
