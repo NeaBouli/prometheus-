@@ -1,6 +1,6 @@
 # Prometheus: Decentralized AI-Powered Threat Intelligence on Kaspa
 
-*Project status reviewed through 2026-09-06; immutable public claim-audit baseline: 2026-08-14.*
+*Project status reviewed through 2026-09-12; immutable public claim-audit baseline: 2026-08-14.*
 
 **Whitepaper v4.0 — March 2026**
 
@@ -531,6 +531,33 @@ The first miner-facing integration is an opt-in sidecar in `prometheus-client`. 
 The current companion is a development-only RPC observer. Its strict TOML profile rejects remote endpoints, embedded credentials, scanning, reporting, validator operation, honeypot operation, and unknown reward or wallet fields. It starts no host scan and transmits no miner telemetry. Production scanning/reporting requires real Phi-3 inference, real ZK proofs, canonical rule distribution, a reviewed P2P transport, explicit scan scopes, and resource enforcement.
 
 Running the companion does not automatically earn PROM. The reporter allocation applies only to future protocol-verified security contributions after the corresponding reward path is implemented and audited. Validator participation remains a separate role backed by KAS stake; honeypots require isolated infrastructure and a separate threat model.
+
+### 8.5 Planned Endpoint Detection and Safe Response
+
+GH-258 defines a future, cross-cutting endpoint-security track for coordinated
+compromise, including attacks that may be AI-assisted or highly automated. The
+protocol can reason about observable behavior and fleet correlation; it cannot
+reliably attribute an event to AI, AGI, a specific actor, or intent.
+
+The target evidence ladder is deliberately asymmetric. First, explicit opt-in
+and least-privileged adapters observe process lineage, executable integrity,
+persistence, network behavior, credential-access indicators, model/runtime
+integrity, and agent tool-policy violations while keeping sensitive raw
+telemetry local by default. Second, the client warns and may correlate only
+bounded, privacy-reviewed, proof-bound ThreatHints. Third, a separately reviewed
+operator-confirmed interface may offer narrow, reversible containment with preview,
+expiry, rollback, tamper-evident audit, and a protected recovery path. Limited
+automation is considered only after independent real-sample and adversarial
+evaluation, measured false positives, privacy review, multi-host evidence,
+rollback drills, signed policy/rule provenance, resource controls, and explicit
+per-action authorization.
+
+This is target architecture only. No real-time endpoint sensor or response
+engine is implemented. Automatic process termination, quarantine, firewall
+mutation, credential rotation, remote commands, deletion, and host isolation
+are disabled and unauthorized. The track adds no contract emergency stop and
+does not change KAS/PROM separation, Guardian reputation, slashing, or the
+Commit-Reveal formula.
 
 ---
 

@@ -165,3 +165,13 @@ Beta, mainnet, and production runtime profiles reject these stubs. Production
 use remains blocked on real Phi-3/ONNX inference and real-sample evaluation,
 approved proof artifacts, canonical rule loading, operated public/multi-host P2P reporting,
 privacy controls, and multi-host evidence.
+## Planned Endpoint Safety Track
+
+GH-258 records a future behavior-based endpoint detection and safe-response
+track. It is planning only: the current client has no real-time endpoint sensor
+or response engine and cannot reliably attribute observed activity to AI, AGI,
+a specific actor, or intent. Automatic process termination, quarantine,
+firewall mutation, credential rotation, remote commands, deletion, and host
+isolation are disabled and unauthorized. Any future implementation must proceed
+from observe-only to warn-only, then operator-confirmed reversible containment;
+limited automation requires separate approval and independent evidence.

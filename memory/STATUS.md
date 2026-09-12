@@ -1,13 +1,13 @@
 # PROMETHEUS – MODULE STATUS
 # Format: | Module | Status | Progress | Last Update | Audit | Testnet Address |
 # Status: core lifecycle values plus evidence-qualified DEVELOPMENT/STUB/FIXTURE labels; every non-production label must retain its boundary in the row
-# Last Updated: 2026-09-06
+# Last Updated: 2026-09-12
 
 ---
 
 ## PUBLIC CLAIM RECONCILIATION (2026-08-14)
 
-Latest project/public status review: 2026-09-06. The section date and exact
+Latest project/public status review: 2026-09-12. The section date and exact
 evidence below remain the immutable 2026-08-14 audit baseline; later exact-main
 updates are recorded in the dated status sections that follow and in the
 machine-readable post-audit ledger.
@@ -1812,6 +1812,30 @@ Attestation: two distinct controlled hosts operator-attested with one private
 Remaining gates: operated public networking; independent separation evidence;
                  relay/v2; proof/membership/privacy/model/YARA/chain/reward;
                  deployment, Mainnet and production
+Estimates: unchanged; core 84-88%; complete vision 50-55%; production false
+```
+
+## GH-258 ENDPOINT DETECTION AND SAFE RESPONSE ROADMAP (2026-09-12)
+
+```text
+Status: planned documentation-only track; no implementation or authority
+Issue: #258
+Threat scope: coordinated endpoint compromise, including activity that may be
+              AI-assisted or highly automated
+Detection basis: observable behavior and bounded correlation; no reliable
+                 AI/AGI/actor/intent attribution
+Stages: observe-only; warn-only; operator-confirmed reversible containment;
+        separately approved limited automation
+Current capability: no real-time endpoint sensor; no response engine
+Automatic actions: disabled and unauthorized, including process termination,
+                   quarantine, firewall mutation, credential rotation, remote
+                   commands, deletion and host isolation
+Required evidence: real-sample and adversarial evaluation, measured false
+                   positives, privacy review, multi-host evidence, rollback
+                   drills, signed policy/rule provenance, resource controls,
+                   explicit per-action authorization
+Invariants: no contract emergency stop; KAS/PROM, reputation, slashing and
+            Commit-Reveal behavior unchanged
 Estimates: unchanged; core 84-88%; complete vision 50-55%; production false
 ```
 

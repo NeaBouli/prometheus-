@@ -1,6 +1,6 @@
 # Prometheus — Frequently Asked Questions
 
-*Project status reviewed through 2026-09-06; immutable public claim-audit baseline: 2026-08-14.*
+*Project status reviewed through 2026-09-12; immutable public claim-audit baseline: 2026-08-14.*
 
 ---
 
@@ -383,6 +383,22 @@ independent inspection. The target therefore favors locally operated,
 inspectable models. Open weights alone do not prove quality, privacy,
 provenance, or safe operation. No production model, malware-sample workflow,
 or privacy proof is currently deployed.
+
+**Q: Could Prometheus detect and stop a coordinated AI-assisted takeover of computers?**
+
+That is a planned GH-258 use case, not a current capability. Prometheus could
+look for observable compromise behavior across process, file, persistence,
+network, credential-access, model/runtime, and agent tool-policy signals, then
+correlate bounded privacy-reviewed ThreatHints. Those signals cannot reliably
+prove that AI, AGI, a specific actor, or intent caused the activity.
+
+The planned order is observe-only, warn-only, operator-confirmed reversible
+containment, and only later separately approved limited automation after
+independent real-sample, adversarial, privacy, false-positive, multi-host, and
+rollback evidence. No real-time endpoint sensor or response engine is currently
+implemented. Automatic process termination, quarantine, firewall mutation,
+credential rotation, remote commands, deletion, and host isolation are disabled
+and unauthorized.
 
 **Q: How is LLaMA 3 planned to be specialized?**
 LoRA fine-tuning and security-specific datasets are roadmap targets. No

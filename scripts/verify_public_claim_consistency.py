@@ -13,7 +13,8 @@ from typing import Any
 STATUS_PATH = Path("docs/evidence/public-claim-status-2026-08-14.json")
 SITEMAP_PATH = Path("sitemap.xml")
 AUDIT_BASELINE_DATE = "2026-08-14"
-LATEST_PROJECT_UPDATE = "2026-09-06"
+LATEST_PROJECT_UPDATE = "2026-09-12"
+GH253_AS_OF = "2026-09-06"
 GH253_MERGE_COMMIT = "5920cb4bb737376977f762beb0d5e3108519c7a0"
 GH253_EXACT_MAIN_RUNS = {
     "prometheus_ci": 34031999904,
@@ -39,37 +40,37 @@ PUBLIC_FILES = (
 LATEST_METADATA_FRAGMENTS = {
     Path(
         "README.md"
-    ): "Public project status was reviewed through 2026-09-06. The immutable claim-audit baseline remains 2026-08-14",
+    ): "Public project status was reviewed through 2026-09-12. The immutable claim-audit baseline remains 2026-08-14",
     Path(
         "WHITEPAPER.md"
-    ): "Project status reviewed through 2026-09-06; immutable public claim-audit baseline: 2026-08-14",
+    ): "Project status reviewed through 2026-09-12; immutable public claim-audit baseline: 2026-08-14",
     Path(
         "docs/roadmap.md"
-    ): "Project status reviewed through 2026-09-06. The immutable public claim-audit baseline remains 2026-08-14",
+    ): "Project status reviewed through 2026-09-12. The immutable public claim-audit baseline remains 2026-08-14",
     Path(
         "docs/faq.md"
-    ): "Project status reviewed through 2026-09-06; immutable public claim-audit baseline: 2026-08-14",
+    ): "Project status reviewed through 2026-09-12; immutable public claim-audit baseline: 2026-08-14",
     Path(
         "memory/STATUS.md"
-    ): "Latest project/public status review: 2026-09-06. The section date and exact evidence below remain the immutable 2026-08-14 audit baseline",
+    ): "Latest project/public status review: 2026-09-12. The section date and exact evidence below remain the immutable 2026-08-14 audit baseline",
     Path(
         "index.html"
-    ): 'Project status reviewed 2026-09-06 · immutable <a href="docs/claim-audit-2026-08-14.md">claim-audit baseline</a> 2026-08-14',
+    ): 'Project status reviewed 2026-09-12 · immutable <a href="docs/claim-audit-2026-08-14.md">claim-audit baseline</a> 2026-08-14',
     Path(
         "roadmap.html"
-    ): 'Project status reviewed 2026-09-06 · immutable <a href="docs/claim-audit-2026-08-14.md">claim-audit baseline</a> 2026-08-14',
+    ): 'Project status reviewed 2026-09-12 · immutable <a href="docs/claim-audit-2026-08-14.md">claim-audit baseline</a> 2026-08-14',
     Path(
         "whitepaper.html"
-    ): 'Project status reviewed 2026-09-06 · immutable <a href="docs/claim-audit-2026-08-14.md">claim-audit baseline</a> 2026-08-14',
+    ): 'Project status reviewed 2026-09-12 · immutable <a href="docs/claim-audit-2026-08-14.md">claim-audit baseline</a> 2026-08-14',
     Path(
         "faq.html"
-    ): 'Project status reviewed 2026-09-06 · immutable <a href="docs/claim-audit-2026-08-14.md">claim-audit baseline</a> 2026-08-14',
+    ): 'Project status reviewed 2026-09-12 · immutable <a href="docs/claim-audit-2026-08-14.md">claim-audit baseline</a> 2026-08-14',
     Path(
         "guardian-economics.html"
-    ): 'Project status reviewed 2026-09-06 · immutable <a href="docs/claim-audit-2026-08-14.md">claim-audit baseline</a> 2026-08-14',
+    ): 'Project status reviewed 2026-09-12 · immutable <a href="docs/claim-audit-2026-08-14.md">claim-audit baseline</a> 2026-08-14',
     Path(
         "llms.txt"
-    ): "project status reviewed through 2026-09-06; immutable dated audit baseline remains 2026-08-14",
+    ): "project status reviewed through 2026-09-12; immutable dated audit baseline remains 2026-08-14",
 }
 
 STALE_METADATA_PATTERNS = (
@@ -77,6 +78,10 @@ STALE_METADATA_PATTERNS = (
     re.compile(r"Current repository status refreshed 2026-08-23", re.I),
     re.compile(r"Last Updated: 2026-08-31", re.I),
     re.compile(r"Current public status \(reviewed 2026-09-01", re.I),
+    re.compile(
+        r"(?:Public )?[Pp]roject status (?:was )?reviewed through 2026-09-06", re.I
+    ),
+    re.compile(r"Current public status \(reviewed 2026-09-06", re.I),
     re.compile(r"Deploy verification active", re.I),
 )
 
@@ -225,6 +230,69 @@ GH253_PROHIBITED_CLAIMS = (
     re.compile(
         r"GH-253[^\n]{0,600}(?:enables|supports) "
         r"(?:production authority|production support)",
+        re.I,
+    ),
+)
+
+GH258_PUBLIC_FILES = (
+    Path("README.md"),
+    Path("WHITEPAPER.md"),
+    Path("docs/roadmap.md"),
+    Path("docs/faq.md"),
+    Path("memory/STATUS.md"),
+    Path("index.html"),
+    Path("roadmap.html"),
+    Path("whitepaper.html"),
+    Path("faq.html"),
+    Path("llms.txt"),
+    Path("modules/client/README.md"),
+)
+
+GH258_REQUIRED_FRAGMENTS = (
+    "GH-258",
+    "reliab",
+    "no real-time endpoint sensor",
+    "operator-confirmed",
+    "reversible",
+    "limited automation",
+    "process termination",
+    "quarantine",
+    "firewall",
+    "credential rotation",
+    "remote command",
+    "deletion",
+    "host isolation",
+    "disabled and unauthorized",
+)
+
+GH258_AUTOMATIC_ACTION_FIELDS = (
+    "automatic_process_termination_authorized",
+    "automatic_quarantine_authorized",
+    "automatic_firewall_mutation_authorized",
+    "automatic_credential_rotation_authorized",
+    "automatic_remote_commands_authorized",
+    "automatic_deletion_authorized",
+    "automatic_host_isolation_authorized",
+)
+
+GH258_PROHIBITED_CLAIMS = (
+    re.compile(
+        r"GH-258[^\n]{0,600}(?:authorizes|allows|enables|provides|supports|"
+        r"implements|performs) (?:an? )?(?:automatic(?:ally)? )?"
+        r"(?:process termination|quarantine|firewall (?:changes?|mutation)|"
+        r"credential rotation|remote commands?(?: execution)?|deletion|"
+        r"host isolation)",
+        re.I,
+    ),
+    re.compile(
+        r"GH-258[^\n]{0,600}(?:is|provides|implements|delivers|includes) "
+        r"(?:now )?(?:production[- ]ready|production authority|"
+        r"an? real-time endpoint sensor|an? response engine)",
+        re.I,
+    ),
+    re.compile(
+        r"GH-258[^\n]{0,600}(?:reliably )?(?:attributes|identifies|proves) "
+        r"(?:an? )?(?:AI|AGI|actor|intent)",
         re.I,
     ),
 )
@@ -381,6 +449,18 @@ def validate_status(data: dict[str, Any]) -> list[str]:
         gh_253: dict[str, Any] = {}
     else:
         gh_253 = gh_253_value
+    gh_258_value = data.get("post_audit_updates", {}).get("gh_258", {})
+    if not isinstance(gh_258_value, dict):
+        errors.append("GH-258 machine status record must be an object")
+        gh_258: dict[str, Any] = {}
+    else:
+        gh_258 = gh_258_value
+    endpoint_value = classes.get("endpoint_detection_and_response", {})
+    if not isinstance(endpoint_value, dict):
+        errors.append("endpoint detection status must be an object")
+        endpoint: dict[str, Any] = {}
+    else:
+        endpoint = endpoint_value
 
     if (
         validators.get("stake_asset") != "KAS"
@@ -545,7 +625,7 @@ def validate_status(data: dict[str, Any]) -> list[str]:
         if gh_246.get(field) is not False:
             errors.append(f"GH-246 {field} must remain false")
     if (
-        gh_253.get("as_of") != LATEST_PROJECT_UPDATE
+        gh_253.get("as_of") != GH253_AS_OF
         or gh_253.get("issue") != 253
         or gh_253.get("pull_request") != 254
         or gh_253.get("status")
@@ -593,6 +673,45 @@ def validate_status(data: dict[str, Any]) -> list[str]:
     ):
         if gh_253.get(field) is not False:
             errors.append(f"GH-253 {field} must remain false")
+    if (
+        gh_258.get("as_of") != LATEST_PROJECT_UPDATE
+        or gh_258.get("issue") != 258
+        or gh_258.get("status") != "planned_documentation_only"
+        or gh_258.get("classification")
+        != "behavior_based_endpoint_detection_and_safe_response_target"
+        or gh_258.get("stages")
+        != [
+            "observe_only",
+            "warn_only",
+            "operator_confirmed_reversible_containment",
+            "separately_approved_limited_automation",
+        ]
+    ):
+        errors.append("GH-258 planned status or capability ladder is invalid")
+    for field in (
+        "real_time_endpoint_sensor",
+        "response_engine",
+        "ai_or_actor_attribution_proven",
+        "automatic_endpoint_actions_authorized",
+        *GH258_AUTOMATIC_ACTION_FIELDS,
+        "production_authority",
+    ):
+        if gh_258.get(field) is not False:
+            errors.append(f"GH-258 {field} must remain false")
+    if (
+        endpoint.get("status") != "planned_only"
+        or endpoint.get("detection_basis")
+        != "observable_behavior_not_ai_actor_or_intent_attribution"
+    ):
+        errors.append("endpoint detection must remain behavior-based planning only")
+    for field in (
+        "real_time_sensor_implemented",
+        "response_engine_implemented",
+        "automatic_endpoint_actions_authorized",
+        *GH258_AUTOMATIC_ACTION_FIELDS,
+    ):
+        if endpoint.get(field) is not False:
+            errors.append(f"endpoint detection {field} must remain false")
     if economics.get("status") != "illustrative_planning_only":
         errors.append("Guardian economics must remain illustrative planning only")
     if economics.get("active_rewards_or_market_price") is not False:
@@ -831,6 +950,19 @@ def verify(root: Path) -> list[str]:
                 pattern.search(normalized_text) for pattern in GH253_PROHIBITED_CLAIMS
             ):
                 errors.append(f"{relative}: GH-253 authority or production claim drift")
+        if relative in GH258_PUBLIC_FILES:
+            normalized_text = " ".join(text.split()).casefold()
+            if not all(
+                fragment.casefold() in normalized_text
+                for fragment in GH258_REQUIRED_FRAGMENTS
+            ):
+                errors.append(f"{relative}: GH-258 planned safety boundary missing")
+            if any(
+                pattern.search(normalized_text) for pattern in GH258_PROHIBITED_CLAIMS
+            ):
+                errors.append(
+                    f"{relative}: GH-258 authority or attribution claim drift"
+                )
         if relative.suffix == ".html" and "5cd13bf" not in text:
             errors.append(f"{relative}: exact reconciliation baseline missing")
         for category in find_banned_claims(text):

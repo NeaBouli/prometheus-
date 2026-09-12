@@ -1,6 +1,6 @@
 # Prometheus — Full Deployment Roadmap
 *Readiness-gated roadmap; no fixed public-release date is claimed.*
-*Project status reviewed through 2026-09-06. The immutable public claim-audit baseline remains 2026-08-14 at exact main `5cd13bf`; later exact-main updates, including GH-253, are recorded below and in the machine-readable post-audit ledger.*
+*Project status reviewed through 2026-09-12. The immutable public claim-audit baseline remains 2026-08-14 at exact main `5cd13bf`; later exact-main updates, including GH-253 and the planned GH-258 safety track, are recorded below and in the machine-readable post-audit ledger.*
 
 Evidence classes are intentionally separate: implemented/tested development
 foundations, the single demonstrated non-promotable Testnet-10 canary, no proven
@@ -13,7 +13,7 @@ blocked/unproven gates. See the [public claim audit](claim-audit-2026-08-14.md).
 |-------|-------------------:|--------------------:|--------------|
 | H-001 testnet-10 canary | 100% | 0% | Confirmed and independently evidenced; non-promotable canary complete |
 | Rollout-capable core network | 84–88% | 12–16% | Production v2 relation/key/ceremony approval and independent cryptographic review, real privacy-reviewed semantic/actionable analysis, operated multi-host v2 transport evidence, six state deployments, PROM emission, real metrics-oracle execution/evidence, public multi-host P2P/rule distribution, production node evidence |
-| Complete roadmap vision | 50–55% | 45–50% | Production AI, desktop/mobile clients, installers, operated network, vProgs, plus all core-network gates |
+| Complete roadmap vision | 50–55% | 45–50% | Production AI, endpoint detection and safe response, desktop/mobile clients, installers, operated network, vProgs, plus all core-network gates |
 
 Percentages are scope-weighted engineering estimates. They are not release dates,
 financial forecasts, or evidence that any contract is live.
@@ -237,6 +237,33 @@ operation, and public release-hardening evidence for the exact rollout commit.
 - Implement real reviewed inference in the current fail-closed phi3.rs stub
 - Model update mechanism: IPFS distribution + on-chain hash verification
 - Test: does Phi-3 detect known malware samples?
+
+**GH-258 — Endpoint Detection & Safe Response (planned cross-cutting track)**
+
+Prometheus may eventually help detect coordinated endpoint takeover attempts,
+including attacks that are AI-assisted or highly automated. It can evaluate
+observable behavior; it cannot reliably prove that AI, AGI, a particular actor,
+or a particular intent caused an event.
+
+1. **Observe only:** explicit opt-in, least-privileged, resource-bounded endpoint
+   adapters for process lineage, executable integrity, persistence changes,
+   network behavior, credential-access indicators, model/runtime integrity, and
+   agent tool-policy violations. Keep sensitive raw telemetry local by default.
+2. **Warn only:** locally explain evidence and confidence; correlate only bounded,
+   privacy-reviewed, proof-bound ThreatHints across devices. No endpoint action.
+3. **Confirm and contain:** separately reviewed, operator-confirmed, narrow and
+   reversible actions with preview, expiry, rollback, tamper-evident audit and a
+   protected recovery path.
+4. **Limited automation:** considered only after independent real-sample and
+   adversarial evaluation, measured false positives, privacy review, multi-host
+   evidence, rollback drills, fail-safe resource controls, signed policy/rule
+   provenance, and explicit per-action authorization.
+
+Current status: roadmap only. No real-time endpoint sensor or response engine is
+implemented. Automatic process termination, quarantine, firewall mutation,
+credential rotation, remote command execution, deletion, and host isolation are
+disabled and unauthorized. This track does not introduce a contract emergency
+stop or change KAS/PROM, reputation, slashing, or Commit-Reveal behavior.
 
 ---
 
