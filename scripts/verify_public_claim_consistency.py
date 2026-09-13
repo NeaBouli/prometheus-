@@ -339,6 +339,75 @@ GH258_PROHIBITED_CLAIMS = (
     ),
 )
 
+GH264_PUBLIC_FILES = GH258_PUBLIC_FILES + (
+    Path("docs/endpoint-observation-v1.md"),
+    Path("modules/threat-hint/README.md"),
+    Path("modules/guardian-node/README.md"),
+)
+
+GH264_REQUIRED_FRAGMENTS = (
+    "GH-264",
+    "observe-only",
+    "response",
+    "production",
+)
+
+GH264_CAPABILITY_PATTERN = (
+    r"(?:endpoint (?:data |telemetry )?collection|host telemetry collection|"
+    r"(?:endpoint |OS )?sensor|(?:endpoint )?(?:detection|correlation|warning|"
+    r"transport|response(?: authority| engine)?|containment|automation))\b"
+)
+
+GH264_PROHIBITED_CLAIMS = (
+    re.compile(
+        r"GH-264[^.\n]{0,700}(?:(?:"
+        + GH264_CAPABILITY_PATTERN
+        + r") (?:is|are|was|were|has been|have been) (?:now )?"
+        r"(?:provided|implemented|enabled|authorized|supported|delivered|"
+        r"activated|active|operational)|"
+        r"(?<!not )(?<!never )(?<!cannot )(?<!can't )(?<!doesn't )"
+        r"(?<!not currently )"
+        r"(?:provides?|provided|enables?|enabled|authorizes?|authorized|"
+        r"supports?|supported|implements?|implemented|delivers?|delivered|"
+        r"activates?|activated) (?:now )?(?:an? |the )?"
+        + GH264_CAPABILITY_PATTERN
+        + r")",
+        re.I,
+    ),
+    re.compile(
+        r"(?<!no )(?<!endpoint )(?<!OS )(?:an? |the )?"
+        + GH264_CAPABILITY_PATTERN
+        + r" (?:is|are|was|were|has been|have been) (?:now )?"
+        r"(?:provided|enabled|authorized|supported|implemented|delivered|"
+        r"activated|active|operational) (?:by|through|via) GH-264",
+        re.I,
+    ),
+    re.compile(
+        r"GH-264[^.\n]{0,700}(?:is|makes Prometheus) "
+        r"(?:production[- ]ready|a production endpoint detector)",
+        re.I,
+    ),
+    re.compile(
+        r"GH-264[^.\n]{0,700}(?:proves|detects|attributes) "
+        r"[^.\n]{0,160}(?:maliciousness|AI|AGI|actor|intent)",
+        re.I,
+    ),
+)
+
+
+def has_gh264_boundary(text: str) -> bool:
+    """Require the safety terms in one bounded GH-264 status section."""
+    normalized = " ".join(text.split()).casefold()
+    marker = "gh-264"
+    offset = 0
+    while (position := normalized.find(marker, offset)) >= 0:
+        section = normalized[position : position + 1_800]
+        if all(fragment.casefold() in section for fragment in GH264_REQUIRED_FRAGMENTS):
+            return True
+        offset = position + len(marker)
+    return False
+
+
 REQUIRED_FRAGMENTS = {
     Path("README.md"): (
         "no production Prometheus network",
@@ -497,6 +566,12 @@ def validate_status(data: dict[str, Any]) -> list[str]:
         gh_258: dict[str, Any] = {}
     else:
         gh_258 = gh_258_value
+    gh_264_value = data.get("post_audit_updates", {}).get("gh_264", {})
+    if not isinstance(gh_264_value, dict):
+        errors.append("GH-264 machine status must be an object")
+        gh_264: dict[str, Any] = {}
+    else:
+        gh_264 = gh_264_value
     endpoint_value = classes.get("endpoint_detection_and_response", {})
     if not isinstance(endpoint_value, dict):
         errors.append("endpoint detection status must be an object")
@@ -745,12 +820,43 @@ def validate_status(data: dict[str, Any]) -> list[str]:
         if gh_258.get(field) is not False:
             errors.append(f"GH-258 {field} must remain false")
     if (
-        endpoint.get("status") != "planned_only"
+        gh_264.get("as_of") != LATEST_PROJECT_UPDATE
+        or gh_264.get("issue") != 264
+        or gh_264.get("status") != "repository_candidate_implemented_and_locally_tested"
+        or gh_264.get("classification") != "canonical_observe_only_endpoint_statement"
+        or gh_264.get("schema_version") != 1
+        or gh_264.get("rust_python_shared_vectors") is not True
+        or gh_264.get("closed_domains") != 7
+        or gh_264.get("closed_signals") != 15
+        or gh_264.get("max_canonical_bytes") != 512
+    ):
+        errors.append("GH-264 observe-only schema status is invalid")
+    for field in (
+        "endpoint_collection",
+        "os_sensor",
+        "event_truth_or_maliciousness_proven",
+        "privacy_safety_proven",
+        "ai_actor_or_intent_attribution_proven",
+        "correlation",
+        "warning",
+        "transport",
+        "response_authority",
+        "production_authority",
+    ):
+        if gh_264.get(field) is not False:
+            errors.append(f"GH-264 {field} must remain false")
+    if (
+        endpoint.get("status") != "observe_only_schema_candidate_no_sensor"
         or endpoint.get("detection_basis")
         != "observable_behavior_not_ai_actor_or_intent_attribution"
         or endpoint.get("resource_conscription_detection") != "planned_only"
+        or endpoint.get("canonical_observation_statement")
+        != "implemented_and_locally_tested"
+        or endpoint.get("endpoint_collection") != "not_implemented"
     ):
-        errors.append("endpoint detection must remain behavior-based planning only")
+        errors.append(
+            "endpoint detection must preserve observe-only schema and planned detection boundaries"
+        )
     for field in (
         "real_time_sensor_implemented",
         "response_engine_implemented",
@@ -1016,6 +1122,14 @@ def verify(root: Path) -> list[str]:
                 errors.append(
                     f"{relative}: GH-258 authority or attribution claim drift"
                 )
+        if relative in GH264_PUBLIC_FILES:
+            normalized_text = " ".join(text.split()).casefold()
+            if not has_gh264_boundary(text):
+                errors.append(f"{relative}: GH-264 observe-only boundary missing")
+            if any(
+                pattern.search(normalized_text) for pattern in GH264_PROHIBITED_CLAIMS
+            ):
+                errors.append(f"{relative}: GH-264 capability claim drift")
         if relative.suffix == ".html" and "5cd13bf" not in text:
             errors.append(f"{relative}: exact reconciliation baseline missing")
         for category in find_banned_claims(text):
@@ -1028,6 +1142,17 @@ def verify(root: Path) -> list[str]:
     errors.extend(
         f"{SITEMAP_PATH}: {item}" for item in validate_sitemap(root / SITEMAP_PATH)
     )
+    for relative in set(GH264_PUBLIC_FILES) - set(PUBLIC_FILES):
+        path = root / relative
+        if not path.exists():
+            errors.append(f"{relative}: GH-264 public surface missing")
+            continue
+        text = path.read_text(encoding="utf-8")
+        normalized_text = " ".join(text.split()).casefold()
+        if not has_gh264_boundary(text):
+            errors.append(f"{relative}: GH-264 observe-only boundary missing")
+        if any(pattern.search(normalized_text) for pattern in GH264_PROHIBITED_CLAIMS):
+            errors.append(f"{relative}: GH-264 capability claim drift")
     return errors
 
 

@@ -383,6 +383,20 @@ The returned Python object is data only. This module is not imported by v1
 ingress, proof verification, approval consumption, analyzer, outbox, wallet, or
 chain paths and grants no disclosure, replay, or promotion authority.
 
+## Local Endpoint Observation Statement
+
+jaeger.endpoint_observation independently mirrors the Rust GH-264 canonical
+observe-only parser. Both implementations consume the same 20 valid and 42
+invalid exact-byte vectors, enforce a 512-byte limit, closed domain/signal
+pairing, bounded counts and windows, an opaque nonce, minute-granularity time,
+and equality with a separately trusted network.
+
+The returned object is data only. The module accepts caller-supplied bytes and
+does not read processes, files, networks, credentials, models, accelerators, or
+the OS. It is not imported by ingress, analysis, outbox, transport, wallet, or
+chain paths and provides no event truth, maliciousness, provenance, privacy,
+AI/actor attribution, warning, response, or production authority.
+
 ## Local ThreatHint v2 Proof Binding
 
 `jaeger.threat_hint_v2_proof_envelope`,

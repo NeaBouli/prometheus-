@@ -5,6 +5,7 @@ use thiserror::Error;
 
 mod api_import_producer;
 mod byte_pattern_producer;
+mod endpoint_observation;
 mod file_sha256_producer;
 mod observable_approval;
 pub mod observable_bundle;
@@ -18,6 +19,10 @@ pub use api_import_producer::{
     MAX_ELF_DYNAMIC_SYMBOLS,
 };
 pub use byte_pattern_producer::produce_byte_pattern_bundle;
+pub use endpoint_observation::{
+    EndpointObservationDomain, EndpointObservationError, EndpointObservationSignal,
+    EndpointObservationStatementV1, MAX_CANONICAL_ENDPOINT_OBSERVATION_BYTES,
+};
 pub use file_sha256_producer::produce_file_sha256_bundle;
 pub use observable_approval::{
     verify_observable_approval, ObservableApprovalContext, ObservableApprovalError,

@@ -5419,3 +5419,66 @@ Rules for all dev agents:
   Operator-A, firewall, IAM, deployment, Mainnet, or production action occurred.
   Rollout estimates remain unchanged.
 - Status: `GH-261 COMPLETE / EXACT-MAIN + LIVE PASS / Planning only / Production false`.
+
+### 2026-09-13 - GH-264 observe-only statement locally verified
+
+- Issue #264 now has one strict canonical endpoint-observation statement in
+  Rust and an independent Python counterpart over the same 20 valid and 42
+  invalid exact-byte vectors. Kimi K3 owned the Rust schema/vector/test block;
+  Sol owned architecture, Python parity, claims, integration, and verification.
+- Synchronized README, Whitepaper, Roadmap, FAQ, Landing/public HTML,
+  `llms.txt`, module READMEs, machine status, Memory, and the Bridge. The claim
+  gate now requires a bounded GH-264 safety section and rejects positive sensor,
+  collection, correlation, response, production, maliciousness, and attribution
+  claims.
+- Rust format, warnings-denied Clippy, workspace tests, and package verification
+  pass. Guardian Python reports `1391 passed, 4 skipped`; the GH-264 focused
+  Python tests report `8 passed`; the public claim suite reports `61 passed`.
+  Memory/status, Black, project Ruff, Pylint, YAML, HTML, and diff checks pass.
+- The optional all-script discovery exhausted the nearly full shared disk only
+  while creating temporary files; directly relevant suites pass independently.
+  Kimi final review was watcher-blocked by `EMFILE` and Claude returned no
+  result; neither review attempt changed files. Sol fixed two claim-guard issues
+  found during manual review and reran the gates.
+- No endpoint data, sensor, model/sample, wallet, chain, contract, Guardian,
+  Operator-A, firewall, IAM, deployment, Mainnet, or production action occurred.
+- Status: `GH-264 LOCAL VERIFIED / PROTECTED PR NEXT / PRODUCTION FALSE`.
+
+### 2026-09-13 - GH-264 PR review hardening locally verified
+
+- Resumed existing PR #265 without creating duplicate implementation work.
+  Closed CodeRabbit's valid verb-before-capability gap and additional
+  past/perfect, passive, token-boundary and safe-negative edge cases in the
+  public claim guard and its regression tests.
+- Local PASS: focused `2/2`; public claims `62/62`; all scripts `208/208`;
+  13 synchronized public surfaces; Memory, project status, documentation
+  hygiene, Autodidactic, Python compile, Ruff format/lint, Rustfmt and diff.
+- Kimi K3 remained locally watcher-blocked by `EMFILE` before access on all
+  three bounded attempts; no Kimi contribution is claimed. Terra's final
+  read-only stable-diff verdict is `Approve` with no P0-P2 finding.
+- No product capability, endpoint action, model/sample access, wallet, chain,
+  contract, Guardian, Operator-A, firewall, IAM, deployment, Mainnet or
+  production action occurred.
+- Status: `GH-264 REVIEW FIX LOCAL VERIFIED / HOSTED RECHECK PENDING`.
+
+### 2026-09-13 - GH-264 negative passive claim guard corrected
+
+- Fixed CodeRabbit's second valid review case so leading-`No` passive wording
+  stays allowed while affirmative active/passive capability claims remain
+  rejected. Added two negative regressions.
+- Post-fix PASS: focused `2/2`, public claims `62/62`, all scripts `208/208`,
+  direct 13-surface check, compile, Ruff, Rustfmt and diff checks.
+- Status: `GH-264 SECOND REVIEW FIX LOCAL VERIFIED / RECHECK PENDING`.
+
+### 2026-09-13 - GH-264 passive prefix backtracking edge closed
+
+- Prevented the passive regex from restarting inside endpoint/OS-prefixed
+  capabilities; added four positive and four negative regressions. Focused
+  tests `2/2`, direct 13-surface claims, static checks and Terra final review
+  pass; Terra verdict `Approve`, no P0-P3.
+- The optional parallel full rerun exhausted local temporary space and is
+  recorded as infrastructure-invalid, not green: claim suite 37 `ENOSPC`
+  errors; all-script suite 25 `ENOSPC` errors plus one dependent I/O readiness
+  failure. No cleanup or foreign-process action was taken. Hosted full checks
+  are required before merge.
+- Status: `GH-264 PREFIX FIX FOCUSED PASS / HOSTED FULL RECHECK REQUIRED`.

@@ -164,6 +164,27 @@
       "automatic_deletion_authorized": false,
       "automatic_host_isolation_authorized": false,
       "production_authority": false
+    },
+    "gh_264": {
+      "as_of": "2026-09-13",
+      "issue": 264,
+      "status": "repository_candidate_implemented_and_locally_tested",
+      "classification": "canonical_observe_only_endpoint_statement",
+      "schema_version": 1,
+      "rust_python_shared_vectors": true,
+      "closed_domains": 7,
+      "closed_signals": 15,
+      "max_canonical_bytes": 512,
+      "endpoint_collection": false,
+      "os_sensor": false,
+      "event_truth_or_maliciousness_proven": false,
+      "privacy_safety_proven": false,
+      "ai_actor_or_intent_attribution_proven": false,
+      "correlation": false,
+      "warning": false,
+      "transport": false,
+      "response_authority": false,
+      "production_authority": false
     }
   },
   "classifications": {
@@ -181,9 +202,11 @@
       "proof_generation": "development_stub_only"
     },
     "endpoint_detection_and_response": {
-      "status": "planned_only",
+      "status": "observe_only_schema_candidate_no_sensor",
       "detection_basis": "observable_behavior_not_ai_actor_or_intent_attribution",
       "resource_conscription_detection": "planned_only",
+      "canonical_observation_statement": "implemented_and_locally_tested",
+      "endpoint_collection": "not_implemented",
       "real_time_sensor_implemented": false,
       "response_engine_implemented": false,
       "resource_conscription_detection_implemented": false,

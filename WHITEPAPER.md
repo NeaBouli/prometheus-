@@ -565,6 +565,17 @@ are disabled and unauthorized. The track adds no contract emergency stop and
 does not change KAS/PROM separation, Guardian reputation, slashing, or the
 Commit-Reveal formula.
 
+GH-264 is the first repository implementation beneath that roadmap: a
+512-byte-capped canonical observe-only statement with seven closed behavioral
+domains, 15 domain-bound signals, bounded counts/windows, an opaque nonce,
+minute-granularity time, and a separately trusted network. Rust and Python
+consume one shared exact-byte corpus. No free-text or host-identifying fields
+exist. The parser accepts caller-supplied bytes only; it collects no telemetry
+and proves no event truth, maliciousness, provenance, privacy safety,
+AI/actor/intent attribution, disclosure permission, or response authority. It
+adds no correlation, warning, transport, sensor, containment, automation, or
+production operation.
+
 ---
 
 ## 9. Voting Mechanism

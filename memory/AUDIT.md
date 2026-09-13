@@ -2810,3 +2810,23 @@ changed.
   deployment, Mainnet or production authority follows.
 - Result: `PRODUCT EXACT-MAIN PASS / Public closeout review next /
   Production false`.
+
+## Audit GH-264: canonical observe-only endpoint statement candidate
+
+- Kimi K3's bounded Rust implementation exposes one parse-only authority type;
+  it performs no I/O and offers no generic producer. Sol's line-by-line review
+  found no architecture or security defect in the canonicalization, closed
+  domain/signal mapping, scalar bounds, trusted-network equality, redacted
+  error, or domain-separated digest.
+- An independent Python parser mirrors the same exact shape and binds successful
+  objects to their parse snapshot so valid-shape mutation and forged instances
+  cannot serialize or digest.
+- The shared corpus contains 20 valid cases and 42 invalid cases covering
+  malformed/noncanonical bytes, every scalar boundary, mismatched domains,
+  untrusted networks and forbidden path/process/host/command fields.
+- The schema proves only structural conformance of caller-supplied bytes. It
+  proves no event occurrence, maliciousness, provenance, privacy, AI/actor
+  attribution, disclosure permission or response authority. It reads no host
+  data and has no sensor, correlation, warning, transport or production path.
+- Result: `LOCAL CANDIDATE / Complete verification and protected review
+  pending / Production false`.

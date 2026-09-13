@@ -6779,3 +6779,147 @@ false`.
   Internal scope-weighted estimates remain core `84-88%` and full roadmap
   `50-55%`; this planning clarification does not advance rollout readiness.
 - Status: `GH-261 COMPLETE / EXACT-MAIN + LIVE PASS / Planning only / Production false`.
+
+### 2026-09-13 - GH-264 canonical observe-only endpoint statement started
+
+- Issue #264 implements the first repository-only data-contract slice under
+  GH-258/GH-261 from exact main
+  `39254c1f124724a71a947280f6d6b2d2e4220a38` on isolated branch
+  `feat/GH-264-endpoint-observation`.
+- Kimi K3 owns only the strict canonical Rust schema, shared exact-byte vectors,
+  and focused Rust tests. Sol owns architecture and privacy boundaries, Python
+  parity, public-status integration, security review, complete verification,
+  protected delivery, and closeout. No file is assigned to both concurrently.
+- The statement may carry only closed non-identifying behavioral categories,
+  bounded integer scalars, an opaque report nonce, and trusted network binding.
+  Paths, process names, command lines, addresses, host identifiers, prompts,
+  credentials, file contents, arbitrary labels, and free text are forbidden.
+- This is structural local parsing only. It adds no endpoint collection, OS
+  sensor, scan, correlation, classifier, transport, AI/actor attribution,
+  warning, response action, model execution, wallet, chain, contract, Guardian,
+  Operator-A, firewall, IAM, Mainnet, or production behavior.
+- All KAS/PROM, reputation, slash ACL, Commit-Reveal, and no-emergency-stop
+  invariants remain unchanged. Production remains false.
+- Status: `GH-264 IN PROGRESS / Isolated observe-only schema / Production false`.
+
+### 2026-09-13 - GH-264 local implementation and verification complete
+
+- Kimi K3 implemented only the Rust canonical parser, its public export, the
+  shared exact-byte corpus, and focused Rust tests. Sol reviewed that diff
+  line-by-line, added the independent Python parser and parity/security tests,
+  synchronized public and machine-readable status, and hardened the public
+  claim gate. No overlapping write ownership occurred.
+- The candidate accepts exact caller-supplied bytes only: 512-byte cap, schema
+  v1, seven closed domains, 15 domain-bound signals, bounded count and windows,
+  opaque nonce, minute-aligned positive time, and separately trusted network.
+  It adds no collection, sensor, event truth, correlation, attribution,
+  warning, transport, response, wallet, chain, contract, or production path.
+- Local verification passed: `cargo fmt --all --check`; workspace Clippy with
+  warnings denied; `cargo test --workspace` with all runnable suites passing
+  and two intentional live tests ignored; dirty-source package verification;
+  Guardian Python `1391 passed, 4 skipped`; GH-264 Python `8 passed`; public
+  claim suite `61 passed`; 13-surface direct claim check; Memory and project
+  status checks; Black; project Ruff; Pylint `9.85/10`; two-workflow YAML and
+  five-page HTML parsing; and staged/unstaged diff checks.
+- One broader optional `unittest discover` run reached 207 tests but its final
+  24 cases could not allocate temporary files because the shared local disk had
+  only about 74 MiB free. The complete directly relevant 61-test claim suite
+  passed separately before and after claim-guard hardening; no assertion or
+  product failure was observed in that ancillary run.
+- Kimi's separate final read-only review could not start on three attempts
+  because its global macOS watcher failed with `EMFILE`, including against a
+  four-file review bundle. Claude Code produced no review result before its
+  local execution error. Neither delegate changed files during review. Sol's
+  independent review found and fixed an over-escaped newline class and weak
+  file-wide GH-264 boundary matching; all relevant gates were rerun afterward.
+- Production remains false. Normal protected PR review, remote CI, and
+  exact-main/public closeout remain pending.
+- Status: `GH-264 LOCAL VERIFIED / PROTECTED PR NEXT / Production false`.
+
+### 2026-09-13 - GH-264 protected review resumed
+
+- PR #265 is mergeable and all ten hosted CI/Security/CodeRabbit status contexts
+  pass at head `805de8b42d70bc04a9f9ef885366adf3a9a5ca02`, but one actionable
+  CodeRabbit thread correctly identifies an unguarded verb-before-capability
+  claim form such as `GH-264 enables endpoint collection`.
+- Work resumes on the existing isolated branch and issue; no duplicate feature
+  branch or second implementation is being created. The foreign
+  `feat/local-pe-api-import-producer` checkout remains untouched.
+- Division of work is non-overlapping: Kimi K3 performs only a bounded,
+  secret-free, read-only review of the GH-264 claim verifier and regression
+  tests for equivalent bypass forms. Sol owns the finding decision, minimal
+  edits, complete relevant verification, review-thread resolution, protected
+  delivery, exact-main evidence and final closeout.
+- No endpoint collection, response action, model/sample access, wallet, chain,
+  contract, Guardian, Operator-A, firewall, IAM, deployment, Mainnet or
+  production action is in scope. Production remains false.
+- Status: `GH-264 REVIEW HARDENING ACTIVE / PR #265 OPEN / Production false`.
+
+### 2026-09-13 - GH-264 protected review finding closed locally
+
+- Sol verified CodeRabbit's finding and extended the fail-closed claim guard to
+  reject capability-enabling verbs before a GH-264 capability, capability-first
+  active/status claims, and passive `by`/`through`/`via GH-264` claims. Active,
+  past, perfect and passive affirmative forms are covered; explicit negative
+  wording and token-boundary cases remain allowed.
+- Regression coverage adds 16 affirmative bypass forms and seven safe negative
+  controls. Final local results: focused GH-264 tests `2/2` pass; the complete
+  public-claim suite `62/62` passes; all script tests `208/208` pass; the direct
+  13-surface claim check, Memory integrity, project-status verifier plus `7/7`
+  tests, documentation hygiene plus `11/11` tests, six Autodidactic tests,
+  Python compilation, Ruff format/lint, Rustfmt and diff checks pass.
+- Kimi K3 was invoked three times through the required wrapper: against the
+  repository, with bounded skill discovery, and against a 15-file secret-free
+  review bundle. Every attempt failed with the known local `EMFILE` watcher
+  error before repository or bundle access; Kimi changed no file and no Kimi
+  review contribution is claimed. Claude Code is not installed in this terminal
+  environment and likewise changed no file.
+- The read-only Terra fallback first found missing past/perfect forms, token
+  boundaries and one safe-negative variant. Sol fixed all three classes. Terra's
+  final in-memory re-review reports no P0-P2 finding and `Approve`; its full
+  unittest attempt was expectedly unable to create temporary directories in a
+  read-only sandbox, while Sol's writable run completed `62/62` and `208/208`.
+- Public README, Landing, Roadmap, Whitepaper, FAQ and `llms.txt` wording did not
+  require another content change: their GH-264 observe-only, non-production
+  status remains accurate. Hosted rechecks, review-thread resolution, normal
+  protected merge and exact-main/public evidence remain.
+- Status: `GH-264 REVIEW FIX LOCAL VERIFIED / REPUSH NEXT / Production false`.
+
+### 2026-09-13 - GH-264 negative-passive review edge closed locally
+
+- The second hosted CodeRabbit pass found one valid false-positive: a leading
+  negative passive sentence such as `No endpoint collection is enabled by
+  GH-264` matched the new passive affirmative guard. Sol added a bounded
+  leading-`No` exclusion and regressions for endpoint collection and response
+  engine wording while retaining all affirmative matches.
+- Final post-fix local rerun passes: focused GH-264 tests `2/2`, complete public
+  claim tests `62/62` in 269.155 seconds, all script tests `208/208` in 286.755
+  seconds, 13 synchronized surfaces, Python compilation, Ruff format/lint,
+  Rustfmt and diff checks. No product or public capability claim changed.
+- The second review thread, hosted rechecks, normal protected merge and
+  exact-main/public evidence remain pending. Production remains false.
+- Status: `GH-264 SECOND REVIEW FIX LOCAL VERIFIED / REPUSH NEXT`.
+
+### 2026-09-13 - GH-264 prefixed negative-passive edge hardened
+
+- Terra's review of the second fix found that the passive regex could restart
+  inside `endpoint sensor`, `OS sensor`, `endpoint detection`, or `endpoint
+  response` and thereby misclassify a leading-`No` sentence. Sol made endpoint
+  prefixes explicit capabilities and blocked suffix restarts, then added four
+  affirmative and four negative regressions.
+- Focused GH-264 tests pass `2/2` in 93.629 seconds; the direct 13-surface claim
+  check, Python compilation, Ruff format/lint, Memory/status/hygiene,
+  Autodidactic, Rustfmt and diff checks pass. Terra's final no-write probe
+  reports all four negative cases allowed, all four affirmative counterparts
+  rejected, no P0-P3 finding and `Approve`.
+- A further parallel full local rerun was attempted but is not accepted as a
+  product result: the shared Data volume fell to about 2.5 GiB available and
+  temporary-file creation failed with `ENOSPC` late in both suites. The claim
+  run ended with 37 environment errors; the all-script run ended with 25
+  environment errors and one dependent boundary readiness failure (`io`). No
+  new GH-264 assertion failed. No foreign files, processes or caches were
+  deleted; a fresh hosted full-suite run is mandatory before merge.
+- The immediately preceding exact candidate had completed `62/62` claim and
+  `208/208` all-script tests before this narrow regex/test addition. Production
+  remains false.
+- Status: `GH-264 PREFIX HARDENING FOCUSED PASS / HOSTED FULL SUITE REQUIRED`.

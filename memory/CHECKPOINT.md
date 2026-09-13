@@ -1186,3 +1186,21 @@ Leistungsbasierte Emission. Guardians = "Miner" (KI statt GPU).
 - Classification remains owner-local public verification only. Real-world key
   ownership, external/decentralized authority, Sybil resistance, L1,
   deployment, Mainnet and production trust remain open or excluded.
+
+## Checkpoint 2026-09-13: GH-264 observe-only statement candidate
+
+- Rust and Python independently parse one canonical 512-byte endpoint
+  observation shape against the same 20 valid and 42 invalid exact-byte
+  vectors. Seven closed domains and 15 domain-bound signals admit no free text
+  or host-identifying fields.
+- Counts, fixed windows, opaque nonce, minute-granularity time and trusted
+  network are bound by a distinct length-prefixed SHA-256 digest. Canonical,
+  scalar, trust-context, mutation, forgery and forbidden-field cases fail
+  closed with one redacted error.
+- Kimi K3 implemented only the Rust schema/vectors/tests. Sol reviewed that
+  diff and owns independent Python parity, claims, integration and complete
+  verification.
+- This candidate accepts caller-supplied bytes only. It adds no endpoint
+  collection, sensor, event truth, correlation, AI/actor attribution, warning,
+  transport, response authority or production behavior. Protected review and
+  exact-main evidence remain pending.
