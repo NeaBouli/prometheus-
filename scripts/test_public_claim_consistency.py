@@ -501,6 +501,22 @@ class PublicClaimConsistencyTests(unittest.TestCase):
             "GH-264 sensor is now active.",
             "GH-264 correlation is enabled.",
             "GH-264 response is operational.",
+            "GH-264 enables endpoint collection.",
+            "GH-264 provides an endpoint sensor.",
+            "GH-264 implements detection.",
+            "GH-264 authorizes correlation.",
+            "GH-264 supports warning.",
+            "GH-264 delivers transport.",
+            "GH-264 activates response.",
+            "GH-264 enables containment.",
+            "GH-264 supports automation.",
+            "GH-264 does not enable endpoint collection but enables response.",
+            "GH-264 enabled endpoint collection.",
+            "GH-264 endpoint collection has been enabled.",
+            "Endpoint collection is enabled by GH-264.",
+            "Endpoint collection has been enabled by GH-264.",
+            "A response engine is provided through GH-264.",
+            "Detection is now operational via GH-264.",
             "GH-264 is production-ready.",
             "GH-264 proves maliciousness.",
             "GH-264 attributes AI activity.",
@@ -526,6 +542,26 @@ class PublicClaimConsistencyTests(unittest.TestCase):
                     any(
                         "README.md" in error and "GH-264 capability" in error
                         for error in errors
+                    )
+                )
+
+    def test_gh_264_negative_capability_claims_remain_allowed(self) -> None:
+        claims = (
+            "GH-264 does not enable endpoint collection.",
+            "GH-264 does not currently enable endpoint collection.",
+            "GH-264 cannot enable endpoint collection.",
+            "GH-264 provides no sensor or response authority.",
+            "GH-264 enables detectionism research.",
+            "Endpoint collection is not enabled by GH-264.",
+            "A response engine is not provided through GH-264.",
+        )
+        for claim in claims:
+            with self.subTest(claim=claim):
+                normalized = " ".join(claim.split()).casefold()
+                self.assertFalse(
+                    any(
+                        pattern.search(normalized)
+                        for pattern in MODULE.GH264_PROHIBITED_CLAIMS
                     )
                 )
 

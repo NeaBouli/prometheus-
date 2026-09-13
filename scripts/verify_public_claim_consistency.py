@@ -352,11 +352,34 @@ GH264_REQUIRED_FRAGMENTS = (
     "production",
 )
 
+GH264_CAPABILITY_PATTERN = (
+    r"(?:endpoint (?:data |telemetry )?collection|host telemetry collection|"
+    r"(?:endpoint |OS )?sensor|detection|correlation|warning|transport|"
+    r"response(?: authority| engine)?|containment|automation)\b"
+)
+
 GH264_PROHIBITED_CLAIMS = (
     re.compile(
-        r"GH-264[^.\n]{0,700}(?:endpoint collection|sensor|detection|"
-        r"correlation|warning|transport|response) (?:is|are) "
-        r"(?:now )?(?:implemented|enabled|active|operational)",
+        r"GH-264[^.\n]{0,700}(?:(?:"
+        + GH264_CAPABILITY_PATTERN
+        + r") (?:is|are|was|were|has been|have been) (?:now )?"
+        r"(?:provided|implemented|enabled|authorized|supported|delivered|"
+        r"activated|active|operational)|"
+        r"(?<!not )(?<!never )(?<!cannot )(?<!can't )(?<!doesn't )"
+        r"(?<!not currently )"
+        r"(?:provides?|provided|enables?|enabled|authorizes?|authorized|"
+        r"supports?|supported|implements?|implemented|delivers?|delivered|"
+        r"activates?|activated) (?:now )?(?:an? |the )?"
+        + GH264_CAPABILITY_PATTERN
+        + r")",
+        re.I,
+    ),
+    re.compile(
+        r"(?:an? |the )?"
+        + GH264_CAPABILITY_PATTERN
+        + r" (?:is|are|was|were|has been|have been) (?:now )?"
+        r"(?:provided|enabled|authorized|supported|implemented|delivered|"
+        r"activated|active|operational) (?:by|through|via) GH-264",
         re.I,
     ),
     re.compile(
@@ -383,6 +406,7 @@ def has_gh264_boundary(text: str) -> bool:
             return True
         offset = position + len(marker)
     return False
+
 
 REQUIRED_FRAGMENTS = {
     Path("README.md"): (

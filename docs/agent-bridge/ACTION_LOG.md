@@ -5443,3 +5443,20 @@ Rules for all dev agents:
 - No endpoint data, sensor, model/sample, wallet, chain, contract, Guardian,
   Operator-A, firewall, IAM, deployment, Mainnet, or production action occurred.
 - Status: `GH-264 LOCAL VERIFIED / PROTECTED PR NEXT / PRODUCTION FALSE`.
+
+### 2026-09-13 - GH-264 PR review hardening locally verified
+
+- Resumed existing PR #265 without creating duplicate implementation work.
+  Closed CodeRabbit's valid verb-before-capability gap and additional
+  past/perfect, passive, token-boundary and safe-negative edge cases in the
+  public claim guard and its regression tests.
+- Local PASS: focused `2/2`; public claims `62/62`; all scripts `208/208`;
+  13 synchronized public surfaces; Memory, project status, documentation
+  hygiene, Autodidactic, Python compile, Ruff format/lint, Rustfmt and diff.
+- Kimi K3 remained locally watcher-blocked by `EMFILE` before access on all
+  three bounded attempts; no Kimi contribution is claimed. Terra's final
+  read-only stable-diff verdict is `Approve` with no P0-P2 finding.
+- No product capability, endpoint action, model/sample access, wallet, chain,
+  contract, Guardian, Operator-A, firewall, IAM, deployment, Mainnet or
+  production action occurred.
+- Status: `GH-264 REVIEW FIX LOCAL VERIFIED / HOSTED RECHECK PENDING`.

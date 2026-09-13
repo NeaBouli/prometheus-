@@ -6835,3 +6835,52 @@ false`.
 - Production remains false. Normal protected PR review, remote CI, and
   exact-main/public closeout remain pending.
 - Status: `GH-264 LOCAL VERIFIED / PROTECTED PR NEXT / Production false`.
+
+### 2026-09-13 - GH-264 protected review resumed
+
+- PR #265 is mergeable and all ten hosted CI/Security/CodeRabbit status contexts
+  pass at head `805de8b42d70bc04a9f9ef885366adf3a9a5ca02`, but one actionable
+  CodeRabbit thread correctly identifies an unguarded verb-before-capability
+  claim form such as `GH-264 enables endpoint collection`.
+- Work resumes on the existing isolated branch and issue; no duplicate feature
+  branch or second implementation is being created. The foreign
+  `feat/local-pe-api-import-producer` checkout remains untouched.
+- Division of work is non-overlapping: Kimi K3 performs only a bounded,
+  secret-free, read-only review of the GH-264 claim verifier and regression
+  tests for equivalent bypass forms. Sol owns the finding decision, minimal
+  edits, complete relevant verification, review-thread resolution, protected
+  delivery, exact-main evidence and final closeout.
+- No endpoint collection, response action, model/sample access, wallet, chain,
+  contract, Guardian, Operator-A, firewall, IAM, deployment, Mainnet or
+  production action is in scope. Production remains false.
+- Status: `GH-264 REVIEW HARDENING ACTIVE / PR #265 OPEN / Production false`.
+
+### 2026-09-13 - GH-264 protected review finding closed locally
+
+- Sol verified CodeRabbit's finding and extended the fail-closed claim guard to
+  reject capability-enabling verbs before a GH-264 capability, capability-first
+  active/status claims, and passive `by`/`through`/`via GH-264` claims. Active,
+  past, perfect and passive affirmative forms are covered; explicit negative
+  wording and token-boundary cases remain allowed.
+- Regression coverage adds 16 affirmative bypass forms and seven safe negative
+  controls. Final local results: focused GH-264 tests `2/2` pass; the complete
+  public-claim suite `62/62` passes; all script tests `208/208` pass; the direct
+  13-surface claim check, Memory integrity, project-status verifier plus `7/7`
+  tests, documentation hygiene plus `11/11` tests, six Autodidactic tests,
+  Python compilation, Ruff format/lint, Rustfmt and diff checks pass.
+- Kimi K3 was invoked three times through the required wrapper: against the
+  repository, with bounded skill discovery, and against a 15-file secret-free
+  review bundle. Every attempt failed with the known local `EMFILE` watcher
+  error before repository or bundle access; Kimi changed no file and no Kimi
+  review contribution is claimed. Claude Code is not installed in this terminal
+  environment and likewise changed no file.
+- The read-only Terra fallback first found missing past/perfect forms, token
+  boundaries and one safe-negative variant. Sol fixed all three classes. Terra's
+  final in-memory re-review reports no P0-P2 finding and `Approve`; its full
+  unittest attempt was expectedly unable to create temporary directories in a
+  read-only sandbox, while Sol's writable run completed `62/62` and `208/208`.
+- Public README, Landing, Roadmap, Whitepaper, FAQ and `llms.txt` wording did not
+  require another content change: their GH-264 observe-only, non-production
+  status remains accurate. Hosted rechecks, review-thread resolution, normal
+  protected merge and exact-main/public evidence remain.
+- Status: `GH-264 REVIEW FIX LOCAL VERIFIED / REPUSH NEXT / Production false`.
