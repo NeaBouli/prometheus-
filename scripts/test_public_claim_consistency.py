@@ -553,7 +553,9 @@ class PublicClaimConsistencyTests(unittest.TestCase):
             "GH-264 provides no sensor or response authority.",
             "GH-264 enables detectionism research.",
             "Endpoint collection is not enabled by GH-264.",
+            "No endpoint collection is enabled by GH-264.",
             "A response engine is not provided through GH-264.",
+            "No response engine is provided through GH-264.",
         )
         for claim in claims:
             with self.subTest(claim=claim):

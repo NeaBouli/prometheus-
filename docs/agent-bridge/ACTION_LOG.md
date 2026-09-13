@@ -5460,3 +5460,12 @@ Rules for all dev agents:
   contract, Guardian, Operator-A, firewall, IAM, deployment, Mainnet or
   production action occurred.
 - Status: `GH-264 REVIEW FIX LOCAL VERIFIED / HOSTED RECHECK PENDING`.
+
+### 2026-09-13 - GH-264 negative passive claim guard corrected
+
+- Fixed CodeRabbit's second valid review case so leading-`No` passive wording
+  stays allowed while affirmative active/passive capability claims remain
+  rejected. Added two negative regressions.
+- Post-fix PASS: focused `2/2`, public claims `62/62`, all scripts `208/208`,
+  direct 13-surface check, compile, Ruff, Rustfmt and diff checks.
+- Status: `GH-264 SECOND REVIEW FIX LOCAL VERIFIED / RECHECK PENDING`.

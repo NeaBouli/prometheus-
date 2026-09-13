@@ -6884,3 +6884,18 @@ false`.
   status remains accurate. Hosted rechecks, review-thread resolution, normal
   protected merge and exact-main/public evidence remain.
 - Status: `GH-264 REVIEW FIX LOCAL VERIFIED / REPUSH NEXT / Production false`.
+
+### 2026-09-13 - GH-264 negative-passive review edge closed locally
+
+- The second hosted CodeRabbit pass found one valid false-positive: a leading
+  negative passive sentence such as `No endpoint collection is enabled by
+  GH-264` matched the new passive affirmative guard. Sol added a bounded
+  leading-`No` exclusion and regressions for endpoint collection and response
+  engine wording while retaining all affirmative matches.
+- Final post-fix local rerun passes: focused GH-264 tests `2/2`, complete public
+  claim tests `62/62` in 269.155 seconds, all script tests `208/208` in 286.755
+  seconds, 13 synchronized surfaces, Python compilation, Ruff format/lint,
+  Rustfmt and diff checks. No product or public capability claim changed.
+- The second review thread, hosted rechecks, normal protected merge and
+  exact-main/public evidence remain pending. Production remains false.
+- Status: `GH-264 SECOND REVIEW FIX LOCAL VERIFIED / REPUSH NEXT`.

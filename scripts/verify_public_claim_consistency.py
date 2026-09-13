@@ -375,7 +375,7 @@ GH264_PROHIBITED_CLAIMS = (
         re.I,
     ),
     re.compile(
-        r"(?:an? |the )?"
+        r"(?<!no )(?:an? |the )?"
         + GH264_CAPABILITY_PATTERN
         + r" (?:is|are|was|were|has been|have been) (?:now )?"
         r"(?:provided|enabled|authorized|supported|implemented|delivered|"
