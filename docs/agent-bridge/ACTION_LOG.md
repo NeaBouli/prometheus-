@@ -5482,3 +5482,24 @@ Rules for all dev agents:
   failure. No cleanup or foreign-process action was taken. Hosted full checks
   are required before merge.
 - Status: `GH-264 PREFIX FIX FOCUSED PASS / HOSTED FULL RECHECK REQUIRED`.
+
+### 2026-09-13 - GH-264 exact-main and live closeout
+
+- PR #265 merged normally as exact main
+  `3412a47133d9e5a95f5e45d85033b9179e766045`; issue #264 is closed and both
+  review threads are resolved. No admin bypass was used.
+- Exact-main Prometheus CI `34755934157`, Security Audit `34755934169`, and
+  GitHub Pages `34755933785` pass. These hosted results close the mandatory
+  full-suite gate after the final local temporary-file run was invalidated by
+  `ENOSPC`; no GH-264 assertion had failed locally and no cleanup was performed.
+- Cache-busted live Landing, Roadmap, Whitepaper, FAQ, `llms.txt`, and
+  exact-commit README readback contain the synchronized observe-only,
+  non-production GH-264 boundary.
+- Kimi K3's original Rust write scope and Sol's Python/integration/review scope
+  did not overlap. Kimi's final review remained `EMFILE`-blocked before access;
+  Claude Code was unavailable; Terra's final independent read-only review
+  approved the guard delta with no P0-P3 finding.
+- No endpoint producer or action, model/sample access, wallet, chain, contract,
+  Guardian, Operator-A, firewall, IAM, deployment, Mainnet or production action
+  occurred. Rollout estimates remain unchanged.
+- Status: `GH-264 COMPLETE / EXACT-MAIN + LIVE PASS / PRODUCTION FALSE`.
