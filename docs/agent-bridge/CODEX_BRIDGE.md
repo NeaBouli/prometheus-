@@ -7025,3 +7025,18 @@ false`.
   compile and diff checks PASS. No producer, runtime or external action was
   added. Review threads await resolution after the pushed fix commit.
 - Status: `GH-267 REVIEW FIXES LOCAL PASS / PR #268 UPDATE NEXT / PRODUCTION FALSE`.
+
+### 2026-09-13 - GH-267 updated hosted gates and review resolution passed
+
+- Updated head `66452c8` passed Prometheus CI `34767622164` and Security Audit
+  `34767622150`, including Memory, Rust workspace/performance, Python Guardian,
+  SilverScript, current-silverc artifact, HTML/public-claim, dependency and
+  secret-detection jobs.
+- All five verified CodeRabbit findings are fixed, acknowledged and resolved.
+  CodeRabbit's updated check passed with no new thread; its hourly review rerun
+  was rate-limited after confirming the individual fixes. PR #268 is reported
+  `MERGEABLE` with `CLEAN` merge state and no unresolved review thread.
+- This is still a repository-only privacy drift gate. No producer, endpoint
+  collection, runtime authority, transport, response, wallet, chain,
+  deployment or production behavior was added.
+- Status: `GH-267 PR #268 HOSTED PASS / NORMAL MERGE NEXT / PRODUCTION FALSE`.

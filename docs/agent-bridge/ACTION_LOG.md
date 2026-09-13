@@ -5540,3 +5540,14 @@ Rules for all dev agents:
   `34766601923` had already passed on the original commit; updated hosted checks
   remain mandatory after push.
 - Status: `GH-267 REVIEW FIXES LOCAL PASS / PR #268 UPDATE NEXT / PRODUCTION FALSE`.
+
+### 2026-09-13 - GH-267 updated protected checks passed
+
+- PR #268 head `66452c8` passed Prometheus CI `34767622164` and Security Audit
+  `34767622150`; all reported jobs are green.
+- All five CodeRabbit threads are resolved after bot acknowledgement. The
+  updated CodeRabbit check passed with no new review thread; the aggregate
+  rerun was hourly rate-limited.
+- PR state is `MERGEABLE` / `CLEAN`. No runtime, deployment, chain or
+  production action occurred.
+- Status: `GH-267 PR #268 HOSTED PASS / NORMAL MERGE NEXT / PRODUCTION FALSE`.
