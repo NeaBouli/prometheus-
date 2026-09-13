@@ -7009,3 +7009,19 @@ false`.
   anonymity or absence of hidden collection code. Python 3.11 hosted CI,
   protected review and exact-main evidence remain mandatory.
 - Status: `GH-267 LOCAL PASS / PROTECTED PR NEXT / PRODUCTION FALSE`.
+
+### 2026-09-13 - GH-267 PR #268 review corrections verified
+
+- PR #268 completed Prometheus CI `34766601885` and Security Audit
+  `34766601923` successfully. CodeRabbit reviewed commit `7752ef6` and opened
+  five threads; Sol verified and implemented all five without widening scope.
+- Security Audit now runs both the dedicated artifact gate and the complete
+  public-claim gate. Non-UTF-8 JSON is rejected through a stable category,
+  boolean schema versions cannot satisfy integer version checks, positive
+  claims execute end-to-end through every GH-267 surface, and the public
+  boundary now requires semantic negative privacy/runtime/production wording.
+- Post-fix local results: dedicated verifier PASS; 37/37 privacy-gate tests
+  PASS; public-claim verifier PASS; 69/69 full claim tests PASS; Ruff, Python
+  compile and diff checks PASS. No producer, runtime or external action was
+  added. Review threads await resolution after the pushed fix commit.
+- Status: `GH-267 REVIEW FIXES LOCAL PASS / PR #268 UPDATE NEXT / PRODUCTION FALSE`.

@@ -5529,3 +5529,14 @@ Rules for all dev agents:
 - No secrets, producer, collection, runtime, transport, response, chain,
   deployment or production action occurred.
 - Status: `GH-267 LOCAL PASS / PROTECTED PR NEXT / PRODUCTION FALSE`.
+
+### 2026-09-13 - GH-267 PR #268 review fixes
+
+- Verified and fixed all five CodeRabbit threads: complete Security-Audit
+  chaining, stable encoding failure, strict integer schema versions,
+  end-to-end positive-claim mutations and semantic negative-boundary checks.
+- Post-fix PASS: 37 privacy tests, 69 public-claim tests, both verifiers, Ruff,
+  compile and diff checks. Prometheus CI `34766601885` and Security Audit
+  `34766601923` had already passed on the original commit; updated hosted checks
+  remain mandatory after push.
+- Status: `GH-267 REVIEW FIXES LOCAL PASS / PR #268 UPDATE NEXT / PRODUCTION FALSE`.

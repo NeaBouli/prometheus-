@@ -239,7 +239,7 @@ def load_json(path: Path) -> tuple[Any, str | None]:
     """Load one JSON file or return a stable error category."""
     try:
         text = path.read_text(encoding="utf-8")
-    except OSError:
+    except (OSError, UnicodeDecodeError):
         return None, "missing or unreadable"
     try:
         return json.loads(text), None
@@ -376,6 +376,7 @@ def validate_status(data: Any) -> list[str]:
             != "repository_candidate_implemented_and_locally_tested"
             or gh_264.get("classification")
             != "canonical_observe_only_endpoint_statement"
+            or not is_int(gh_264.get("schema_version"))
             or gh_264.get("schema_version") != 1
         ):
             errors.append("GH-264 must remain an observe-only schema candidate")
@@ -430,7 +431,9 @@ def validate_vectors(data: Any, status: Any) -> list[str]:
     errors: list[str] = []
     if not isinstance(data, dict):
         return ["top-level value must be an object"]
-    if data.get("vector_schema_version") != 1:
+    if not is_int(data.get("vector_schema_version")) or (
+        data.get("vector_schema_version") != 1
+    ):
         errors.append("vector schema version drifted")
     valid_cases = data.get("valid_cases")
     invalid_cases = data.get("invalid_cases")
