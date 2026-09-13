@@ -274,6 +274,16 @@ credential rotation, remote command execution, deletion, and host isolation are
 disabled and unauthorized. This track does not introduce a contract emergency
 stop or change KAS/PROM, reputation, slashing, or Commit-Reveal behavior.
 
+**GH-264 observe-only data contract (repository candidate):** Rust and Python
+now parse one shared exact-byte canonical statement with seven closed behavior
+domains, 15 domain-bound signals, bounded counts and windows, an opaque nonce,
+minute-granularity time, and a separately trusted network. The 512-byte shape
+has no free text or host-identifying fields. It accepts caller-supplied bytes
+only and provides no endpoint collection, sensor, detection truth, correlation,
+AI/actor attribution, warning, transport, response authority, or production
+behavior. Opt-in least-privileged producers and privacy/threat-model review are
+the next separate gate before any host data may be read.
+
 ---
 
 ## Phase B — Guardian + Validator Production

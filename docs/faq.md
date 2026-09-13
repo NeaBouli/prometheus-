@@ -404,6 +404,16 @@ implemented. Automatic process termination, quarantine, firewall mutation,
 credential rotation, remote commands, deletion, and host isolation are disabled
 and unauthorized.
 
+GH-264 adds only the first observe-only data contract: a canonical,
+512-byte-capped statement parsed in Rust and Python with closed behavior
+domains/signals, bounded counts/windows, an opaque nonce, minute-granularity
+time, and a separately trusted network. It contains no free text or
+host-identifying fields and reads no endpoint data. This does not implement a
+sensor, prove an event or its maliciousness, correlate devices, attribute AI or
+an actor, issue a warning, transport data, or authorize a response. Production
+remains false; real opt-in producers require separate privacy and threat-model
+review.
+
 **Q: How is LLaMA 3 planned to be specialized?**
 LoRA fine-tuning and security-specific datasets are roadmap targets. No
 repository evidence proves that an 8B or 70B model has been fine-tuned,

@@ -179,3 +179,11 @@ firewall mutation, credential rotation, remote commands, deletion, and host
 isolation are disabled and unauthorized. Any future implementation must proceed
 from observe-only to warn-only, then operator-confirmed reversible containment;
 limited automation requires separate approval and independent evidence.
+
+GH-264 adds only an isolated canonical observe-only statement parser in the
+shared schema crate plus an independent Python counterpart. The 512-byte shape
+contains closed behavior domains/signals, bounded counts/windows, an opaque
+nonce, minute-granularity time, and a separately trusted network. The client
+does not call it and no producer reads host data. It adds no sensor, detection
+truth, correlation, AI/actor attribution, warning, transport, response
+authority, or production behavior.

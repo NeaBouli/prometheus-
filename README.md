@@ -85,6 +85,18 @@ implemented today. Automatic process termination, quarantine, firewall changes,
 credential rotation, remote commands, deletion, and host isolation remain
 disabled and unauthorized.
 
+**GH-264 repository candidate:** the first observe-only implementation slice is
+a 512-byte-capped canonical endpoint observation statement, parsed
+independently in Rust and Python from one shared exact-byte corpus. It permits
+only seven closed behavior domains, 15 matching closed signals, bounded counts
+and windows, an opaque nonce, minute-granularity time, and a separately trusted
+network. It has no path, process name, command line, address, host identifier,
+prompt, credential, file content, arbitrary label, or free text. This parser
+collects no endpoint data and proves no event truth, maliciousness, provenance,
+privacy safety, AI/actor attribution, or authorization. No correlation,
+warning, transport, response authority, or production behavior is added. See
+the [Endpoint Observation Statement v1 specification](docs/endpoint-observation-v1.md).
+
 ---
 
 ## Tokens

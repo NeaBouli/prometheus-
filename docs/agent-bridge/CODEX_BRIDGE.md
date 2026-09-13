@@ -6779,3 +6779,59 @@ false`.
   Internal scope-weighted estimates remain core `84-88%` and full roadmap
   `50-55%`; this planning clarification does not advance rollout readiness.
 - Status: `GH-261 COMPLETE / EXACT-MAIN + LIVE PASS / Planning only / Production false`.
+
+### 2026-09-13 - GH-264 canonical observe-only endpoint statement started
+
+- Issue #264 implements the first repository-only data-contract slice under
+  GH-258/GH-261 from exact main
+  `39254c1f124724a71a947280f6d6b2d2e4220a38` on isolated branch
+  `feat/GH-264-endpoint-observation`.
+- Kimi K3 owns only the strict canonical Rust schema, shared exact-byte vectors,
+  and focused Rust tests. Sol owns architecture and privacy boundaries, Python
+  parity, public-status integration, security review, complete verification,
+  protected delivery, and closeout. No file is assigned to both concurrently.
+- The statement may carry only closed non-identifying behavioral categories,
+  bounded integer scalars, an opaque report nonce, and trusted network binding.
+  Paths, process names, command lines, addresses, host identifiers, prompts,
+  credentials, file contents, arbitrary labels, and free text are forbidden.
+- This is structural local parsing only. It adds no endpoint collection, OS
+  sensor, scan, correlation, classifier, transport, AI/actor attribution,
+  warning, response action, model execution, wallet, chain, contract, Guardian,
+  Operator-A, firewall, IAM, Mainnet, or production behavior.
+- All KAS/PROM, reputation, slash ACL, Commit-Reveal, and no-emergency-stop
+  invariants remain unchanged. Production remains false.
+- Status: `GH-264 IN PROGRESS / Isolated observe-only schema / Production false`.
+
+### 2026-09-13 - GH-264 local implementation and verification complete
+
+- Kimi K3 implemented only the Rust canonical parser, its public export, the
+  shared exact-byte corpus, and focused Rust tests. Sol reviewed that diff
+  line-by-line, added the independent Python parser and parity/security tests,
+  synchronized public and machine-readable status, and hardened the public
+  claim gate. No overlapping write ownership occurred.
+- The candidate accepts exact caller-supplied bytes only: 512-byte cap, schema
+  v1, seven closed domains, 15 domain-bound signals, bounded count and windows,
+  opaque nonce, minute-aligned positive time, and separately trusted network.
+  It adds no collection, sensor, event truth, correlation, attribution,
+  warning, transport, response, wallet, chain, contract, or production path.
+- Local verification passed: `cargo fmt --all --check`; workspace Clippy with
+  warnings denied; `cargo test --workspace` with all runnable suites passing
+  and two intentional live tests ignored; dirty-source package verification;
+  Guardian Python `1391 passed, 4 skipped`; GH-264 Python `8 passed`; public
+  claim suite `61 passed`; 13-surface direct claim check; Memory and project
+  status checks; Black; project Ruff; Pylint `9.85/10`; two-workflow YAML and
+  five-page HTML parsing; and staged/unstaged diff checks.
+- One broader optional `unittest discover` run reached 207 tests but its final
+  24 cases could not allocate temporary files because the shared local disk had
+  only about 74 MiB free. The complete directly relevant 61-test claim suite
+  passed separately before and after claim-guard hardening; no assertion or
+  product failure was observed in that ancillary run.
+- Kimi's separate final read-only review could not start on three attempts
+  because its global macOS watcher failed with `EMFILE`, including against a
+  four-file review bundle. Claude Code produced no review result before its
+  local execution error. Neither delegate changed files during review. Sol's
+  independent review found and fixed an over-escaped newline class and weak
+  file-wide GH-264 boundary matching; all relevant gates were rerun afterward.
+- Production remains false. Normal protected PR review, remote CI, and
+  exact-main/public closeout remain pending.
+- Status: `GH-264 LOCAL VERIFIED / PROTECTED PR NEXT / Production false`.

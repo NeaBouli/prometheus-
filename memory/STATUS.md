@@ -1844,6 +1844,33 @@ Invariants: no contract emergency stop; KAS/PROM, reputation, slashing and
 Estimates: unchanged; core 84-88%; complete vision 50-55%; production false
 ```
 
+## GH-264 CANONICAL OBSERVE-ONLY ENDPOINT STATEMENT (2026-09-13)
+
+~~~text
+Status: repository candidate implemented and locally tested / no sensor /
+        production false
+Issue: #264
+Scope: one canonical local EndpointObservationStatementV1 parser, implemented
+       independently in Rust and Python against one shared exact-byte corpus
+Shape: 512-byte cap; schema v1; 7 closed domains; 15 domain-bound signals;
+       event count 1..=255; windows 60/300/900/3600 seconds; opaque 32-byte
+       nonce; positive minute-granularity time; separately trusted network
+Privacy: no path, process name, command line, address, host/device identifier,
+         prompt, credential, file content, arbitrary label or free text
+Binding: SHA-256 over a distinct domain, u32be canonical length and exact bytes
+Evidence candidate: 20 valid and 42 invalid shared vectors; Rust/Python parity,
+                    canonicalization, scalar, trust, privacy-field and
+                    mutation/forgery regressions
+Authority: structural parsing only; no event truth, maliciousness, provenance,
+           privacy safety, AI/AGI/actor/intent attribution or disclosure right
+Boundary: no endpoint collection, producer, OS sensor, scan, correlation,
+          warning, proof, transport, response action, wallet, chain, contract,
+          Guardian, firewall, IAM, Mainnet or production behavior
+Next gate: independent privacy/threat-model review before any opt-in,
+           least-privileged platform producer may read host data
+Estimates: unchanged; core 84-88%; complete vision 50-55%; production false
+~~~
+
 ## GH-253 GUARDIAN TRANSITION-AUTHORITY ROTATION (2026-09-06)
 
 ```text

@@ -110,3 +110,21 @@ durable one-time use and a separately reviewed authority and recipient policy.
 The Python return value is data only: object identity is never authorization,
 and a future consumer must invoke verification within its own trusted call
 path rather than accept a caller-supplied result object.
+
+## Endpoint Observation Statement v1 (observe-only parsing)
+
+EndpointObservationStatementV1 is the GH-264 local observe-only data contract
+beneath the GH-258/GH-261 roadmap. It accepts only exact canonical bytes with a
+512-byte cap, seven closed behavior domains, 15 domain-bound signals, an event
+count in 1..=255, a window of 60/300/900/3600 seconds, an opaque 32-byte nonce,
+minute-aligned positive observation time, and a network that must match
+separately trusted local context. A length-prefixed, domain-separated SHA-256
+digest binds every canonical field.
+
+The Rust parser and isolated Python counterpart consume 20 shared valid and 42
+invalid exact-byte vectors. The schema contains no path, process name, command
+line, address, host/device identifier, prompt, credential, file content,
+arbitrary label, or free text. It accepts caller-supplied bytes only and
+performs no endpoint collection, OS access, detection, correlation, AI/actor
+attribution, warning, proof, transport, analysis, response, wallet, chain, or
+production action.

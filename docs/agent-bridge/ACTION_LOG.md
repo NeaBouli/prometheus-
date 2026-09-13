@@ -5419,3 +5419,27 @@ Rules for all dev agents:
   Operator-A, firewall, IAM, deployment, Mainnet, or production action occurred.
   Rollout estimates remain unchanged.
 - Status: `GH-261 COMPLETE / EXACT-MAIN + LIVE PASS / Planning only / Production false`.
+
+### 2026-09-13 - GH-264 observe-only statement locally verified
+
+- Issue #264 now has one strict canonical endpoint-observation statement in
+  Rust and an independent Python counterpart over the same 20 valid and 42
+  invalid exact-byte vectors. Kimi K3 owned the Rust schema/vector/test block;
+  Sol owned architecture, Python parity, claims, integration, and verification.
+- Synchronized README, Whitepaper, Roadmap, FAQ, Landing/public HTML,
+  `llms.txt`, module READMEs, machine status, Memory, and the Bridge. The claim
+  gate now requires a bounded GH-264 safety section and rejects positive sensor,
+  collection, correlation, response, production, maliciousness, and attribution
+  claims.
+- Rust format, warnings-denied Clippy, workspace tests, and package verification
+  pass. Guardian Python reports `1391 passed, 4 skipped`; the GH-264 focused
+  Python tests report `8 passed`; the public claim suite reports `61 passed`.
+  Memory/status, Black, project Ruff, Pylint, YAML, HTML, and diff checks pass.
+- The optional all-script discovery exhausted the nearly full shared disk only
+  while creating temporary files; directly relevant suites pass independently.
+  Kimi final review was watcher-blocked by `EMFILE` and Claude returned no
+  result; neither review attempt changed files. Sol fixed two claim-guard issues
+  found during manual review and reran the gates.
+- No endpoint data, sensor, model/sample, wallet, chain, contract, Guardian,
+  Operator-A, firewall, IAM, deployment, Mainnet, or production action occurred.
+- Status: `GH-264 LOCAL VERIFIED / PROTECTED PR NEXT / PRODUCTION FALSE`.

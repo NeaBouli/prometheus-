@@ -449,6 +449,122 @@ class PublicClaimConsistencyTests(unittest.TestCase):
                     any("GH-258" in error for error in MODULE.validate_status(changed))
                 )
 
+    def test_gh_264_capability_elevation_is_rejected(self) -> None:
+        for field in (
+            "endpoint_collection",
+            "os_sensor",
+            "event_truth_or_maliciousness_proven",
+            "privacy_safety_proven",
+            "ai_actor_or_intent_attribution_proven",
+            "correlation",
+            "warning",
+            "transport",
+            "response_authority",
+            "production_authority",
+        ):
+            with self.subTest(field=field):
+                changed = copy.deepcopy(self.status)
+                changed["post_audit_updates"]["gh_264"][field] = True
+                self.assertTrue(
+                    any("GH-264" in error for error in MODULE.validate_status(changed))
+                )
+
+    def test_gh_264_identity_and_shape_drift_are_rejected(self) -> None:
+        for field, value in (
+            ("issue", 999),
+            ("status", "production"),
+            ("classification", "endpoint_detector"),
+            ("schema_version", 2),
+            ("rust_python_shared_vectors", False),
+            ("closed_domains", 8),
+            ("closed_signals", 16),
+            ("max_canonical_bytes", 4096),
+        ):
+            with self.subTest(field=field):
+                changed = copy.deepcopy(self.status)
+                changed["post_audit_updates"]["gh_264"][field] = value
+                self.assertTrue(
+                    any("GH-264" in error for error in MODULE.validate_status(changed))
+                )
+        for value in (None, [], "invalid", 264):
+            with self.subTest(value=value):
+                changed = copy.deepcopy(self.status)
+                changed["post_audit_updates"]["gh_264"] = value
+                self.assertTrue(
+                    any("GH-264" in error for error in MODULE.validate_status(changed))
+                )
+
+    def test_gh_264_positive_capability_claims_are_rejected(self) -> None:
+        root = SCRIPT.parents[1]
+        claims = (
+            "GH-264 endpoint collection is implemented.",
+            "GH-264 sensor is now active.",
+            "GH-264 correlation is enabled.",
+            "GH-264 response is operational.",
+            "GH-264 is production-ready.",
+            "GH-264 proves maliciousness.",
+            "GH-264 attributes AI activity.",
+        )
+        for claim in claims:
+            with self.subTest(claim=claim), tempfile.TemporaryDirectory() as tmp:
+                tmp_root = Path(tmp)
+                status_target = tmp_root / MODULE.STATUS_PATH
+                status_target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy(root / MODULE.STATUS_PATH, status_target)
+                for relative in MODULE.PUBLIC_FILES:
+                    target = tmp_root / relative
+                    target.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copy(root / relative, target)
+                shutil.copy(root / MODULE.SITEMAP_PATH, tmp_root / MODULE.SITEMAP_PATH)
+                readme = tmp_root / "README.md"
+                readme.write_text(
+                    f"{readme.read_text(encoding='utf-8')}\\n{claim}\\n",
+                    encoding="utf-8",
+                )
+                errors = MODULE.verify(tmp_root)
+                self.assertTrue(
+                    any(
+                        "README.md" in error and "GH-264 capability" in error
+                        for error in errors
+                    )
+                )
+
+    def test_gh_264_public_boundary_marker_is_required(self) -> None:
+        root = SCRIPT.parents[1]
+        for drifted_relative in MODULE.GH264_PUBLIC_FILES:
+            with (
+                self.subTest(path=drifted_relative),
+                tempfile.TemporaryDirectory() as tmp,
+            ):
+                tmp_root = Path(tmp)
+                status_target = tmp_root / MODULE.STATUS_PATH
+                status_target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy(root / MODULE.STATUS_PATH, status_target)
+                for relative in MODULE.PUBLIC_FILES:
+                    target = tmp_root / relative
+                    target.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copy(root / relative, target)
+                for relative in MODULE.GH264_PUBLIC_FILES:
+                    if relative in MODULE.PUBLIC_FILES:
+                        continue
+                    target = tmp_root / relative
+                    target.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copy(root / relative, target)
+                shutil.copy(root / MODULE.SITEMAP_PATH, tmp_root / MODULE.SITEMAP_PATH)
+                drifted = tmp_root / drifted_relative
+                drifted.write_text(
+                    drifted.read_text(encoding="utf-8").replace("GH-264", "GH-265"),
+                    encoding="utf-8",
+                )
+                errors = MODULE.verify(tmp_root)
+                self.assertTrue(
+                    any(
+                        str(drifted_relative) in error
+                        and "GH-264 observe-only boundary" in error
+                        for error in errors
+                    )
+                )
+
     def test_gh_258_stage_order_and_malformed_status_are_rejected(self) -> None:
         changed = copy.deepcopy(self.status)
         changed["post_audit_updates"]["gh_258"]["stages"] = [
