@@ -284,6 +284,16 @@ AI/actor attribution, warning, transport, response authority, or production
 behavior. Opt-in least-privileged producers and privacy/threat-model review are
 the next separate gate before any host data may be read.
 
+**GH-267 pre-producer privacy gate (repository candidate):** the repository now
+contains a machine-readable threat model and fail-closed Security-CI verifier
+that pins default-off per-host opt-in, least privilege, local aggregation and
+redaction, the eight GH-264 output fields, prohibited raw-data classes, no
+current retention/transport, and the reviews required before a producer. It
+does not implement or authorize endpoint collection or runtime behavior, prove
+privacy/anonymity or absence of a hidden sensor, grant response authority, or
+change production status. A separately approved producer remains the next
+implementation task after independent privacy review.
+
 ---
 
 ## Phase B — Guardian + Validator Production

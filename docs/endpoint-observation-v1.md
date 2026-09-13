@@ -59,3 +59,15 @@ producers and complete privacy/threat-model review before any real host data is
 read. Automatic process termination, quarantine, firewall mutation, credential
 rotation, remote commands, deletion, and host isolation remain disabled and
 unauthorized.
+
+## Pre-Producer Privacy Gate
+
+GH-267 is a repository candidate that makes the next review boundary
+executable before any platform producer exists. Its machine-readable
+privacy/threat model and Security-CI verifier pin default-off per-host opt-in,
+least privilege, local aggregation/redaction, the eight fields above,
+prohibited raw-data classes, no current retention or transport, and remaining
+independent review gates. It neither implements nor authorizes endpoint
+collection or runtime behavior, cannot prove privacy/anonymity or absence of a
+hidden sensor, grants no response authority, and does not change production
+status.
