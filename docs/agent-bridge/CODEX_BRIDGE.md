@@ -6923,3 +6923,37 @@ false`.
   `208/208` all-script tests before this narrow regex/test addition. Production
   remains false.
 - Status: `GH-264 PREFIX HARDENING FOCUSED PASS / HOSTED FULL SUITE REQUIRED`.
+
+### 2026-09-13 - GH-264 exact-main and live closeout
+
+- PR #265 squash-merged normally without admin bypass as exact main
+  `3412a47133d9e5a95f5e45d85033b9179e766045`; issue #264 closed
+  automatically. Both CodeRabbit review threads are resolved.
+- Exact-main Prometheus CI `34755934157`, Security Audit `34755934169`, and
+  GitHub Pages `34755933785` pass. The hosted Rust workspace, all-target
+  Clippy, Rust performance, Python Guardian, claim synchronization, Memory,
+  current-Silverc artifact, dependency, secret and HTML gates are green.
+- Cache-busted live Landing, Roadmap, Whitepaper, FAQ, `llms.txt`, and the
+  exact-commit README expose the synchronized GH-264 boundary: a canonical
+  observe-only Rust/Python parser over caller-supplied bytes, with no endpoint
+  collection, sensor, correlation, attribution, warning, transport, response
+  authority or production behavior.
+- The final narrow local regex rerun remained environment-invalid because the
+  shared Data volume could not allocate temporary files. It introduced no
+  failed GH-264 assertion; the focused `2/2` tests, direct 13-surface claim
+  check and static gates passed, and the complete exact candidate had already
+  passed `62/62` claim and `208/208` script tests. Exact-main hosted checks now
+  provide the mandatory clean full-suite evidence. No unapproved cleanup was
+  performed.
+- Agent ownership stayed disjoint. Kimi K3 implemented only the original Rust
+  parser/vector/test block; its requested final review was blocked before
+  repository access by the global `EMFILE` watcher failure. Claude Code was
+  unavailable. Sol owned integration, public claims, review fixes, all test
+  reruns, protected delivery and closeout; Terra supplied read-only independent
+  review and approved the final claim-guard delta with no P0-P3 finding.
+- No endpoint observation producer, endpoint or model/sample access, wallet,
+  chain, contract, Guardian, Operator-A, firewall, IAM, deployment, Mainnet or
+  production action occurred. Internal scope-weighted rollout estimates remain
+  core `84-88%` and full roadmap `50-55%`; this parser boundary does not advance
+  operated-network or production readiness.
+- Status: `GH-264 COMPLETE / EXACT-MAIN + LIVE PASS / Observe-only / Production false`.
