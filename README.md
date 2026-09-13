@@ -97,6 +97,15 @@ privacy safety, AI/actor attribution, or authorization. No correlation,
 warning, transport, response authority, or production behavior is added. See
 the [Endpoint Observation Statement v1 specification](docs/endpoint-observation-v1.md).
 
+**GH-267 repository candidate:** a machine-readable pre-producer privacy and
+threat model plus a fail-closed Security-CI drift gate now pins explicit
+per-host opt-in, least privilege, local aggregation/redaction, the eight
+GH-264 output fields, prohibited raw-data classes, no current retention or
+transport, and the reviews required before any future producer. This
+repository gate does not implement or authorize endpoint collection or any
+runtime behavior, prove privacy/anonymity or the absence of a hidden sensor,
+grant response authority, or change production status.
+
 ---
 
 ## Tokens

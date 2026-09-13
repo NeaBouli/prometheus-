@@ -576,6 +576,15 @@ AI/actor/intent attribution, disclosure permission, or response authority. It
 adds no correlation, warning, transport, sensor, containment, automation, or
 production operation.
 
+GH-267 adds only a repository candidate for the next safety boundary: a
+machine-readable pre-producer privacy/threat model and fail-closed CI verifier.
+It requires default-off per-host opt-in, least-privileged host access, local
+aggregation and redaction, the eight GH-264 output fields, bounded retention,
+separate transport authorization, and independent privacy review before any
+future producer. It implements and authorizes no collection or runtime
+behavior, does not prove privacy, anonymity, or absence of a hidden sensor, and
+adds no response or production authority.
+
 ---
 
 ## 9. Voting Mechanism

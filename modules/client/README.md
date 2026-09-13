@@ -187,3 +187,11 @@ nonce, minute-granularity time, and a separately trusted network. The client
 does not call it and no producer reads host data. It adds no sensor, detection
 truth, correlation, AI/actor attribution, warning, transport, response
 authority, or production behavior.
+
+GH-267 adds a repository-only pre-producer privacy/threat-model candidate and
+Security-CI drift gate. It pins default-off per-host opt-in, least privilege,
+local aggregation/redaction, the eight GH-264 output fields, prohibited raw
+data, no current retention/transport, and independent review before any future
+producer. It implements and authorizes no endpoint collection or runtime
+behavior, cannot prove privacy/anonymity or absence of a hidden sensor, grants
+no response authority, and does not change production status.

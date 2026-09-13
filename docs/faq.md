@@ -414,6 +414,14 @@ an actor, issue a warning, transport data, or authorize a response. Production
 remains false; real opt-in producers require separate privacy and threat-model
 review.
 
+GH-267 formalizes that next boundary as a repository candidate: a
+machine-readable privacy/threat model and Security-CI drift gate require
+default-off per-host opt-in, least privilege, local aggregation/redaction, only
+the eight GH-264 output fields, bounded retention, separate transport approval,
+and independent review. The gate adds no endpoint collection or runtime
+behavior, cannot prove privacy/anonymity or absence of a hidden sensor, grants
+no response authority, and does not change production status.
+
 **Q: How is LLaMA 3 planned to be specialized?**
 LoRA fine-tuning and security-specific datasets are roadmap targets. No
 repository evidence proves that an 8B or 70B model has been fine-tuned,

@@ -611,6 +611,113 @@ class PublicClaimConsistencyTests(unittest.TestCase):
                     )
                 )
 
+    def test_gh_267_capability_elevation_is_rejected(self) -> None:
+        for field in MODULE.GH267_FALSE_FIELDS:
+            with self.subTest(field=field):
+                changed = copy.deepcopy(self.status)
+                changed["post_audit_updates"]["gh_267"][field] = True
+                self.assertTrue(
+                    any("GH-267" in error for error in MODULE.validate_status(changed))
+                )
+
+    def test_gh_267_identity_and_shape_drift_are_rejected(self) -> None:
+        for field, value in (
+            ("issue", 999),
+            ("as_of", "2026-09-12"),
+            ("status", "production"),
+            ("classification", "endpoint_producer"),
+            ("artifact", "docs/evidence/other.json"),
+            ("security_ci_enforced", False),
+        ):
+            with self.subTest(field=field):
+                changed = copy.deepcopy(self.status)
+                changed["post_audit_updates"]["gh_267"][field] = value
+                self.assertTrue(
+                    any("GH-267" in error for error in MODULE.validate_status(changed))
+                )
+        for value in (None, [], "invalid", 267):
+            with self.subTest(value=value):
+                changed = copy.deepcopy(self.status)
+                changed["post_audit_updates"]["gh_267"] = value
+                self.assertTrue(
+                    any("GH-267" in error for error in MODULE.validate_status(changed))
+                )
+
+    def test_gh_267_positive_claims_are_rejected(self) -> None:
+        claims = (
+            "GH-267 proves privacy.",
+            "GH-267 guarantees anonymity.",
+            "GH-267 certifies absence of a hidden sensor.",
+            "GH-267 authorizes endpoint collection.",
+            "GH-267 enables an endpoint producer.",
+            "GH-267 implements runtime collection.",
+            "GH-267 provides response authority.",
+            "GH-267 is production-ready.",
+        )
+        for claim in claims:
+            with self.subTest(claim=claim):
+                normalized = " ".join(claim.split()).casefold()
+                self.assertTrue(
+                    any(
+                        pattern.search(normalized)
+                        for pattern in MODULE.GH267_PROHIBITED_CLAIMS
+                    )
+                )
+
+    def test_gh_267_negative_claims_remain_allowed(self) -> None:
+        claims = (
+            "GH-267 does not prove privacy.",
+            "GH-267 cannot guarantee anonymity.",
+            "GH-267 does not authorize endpoint collection.",
+            "GH-267 does not implement runtime collection.",
+            "GH-267 is not production-ready.",
+        )
+        for claim in claims:
+            with self.subTest(claim=claim):
+                normalized = " ".join(claim.split()).casefold()
+                self.assertFalse(
+                    any(
+                        pattern.search(normalized)
+                        for pattern in MODULE.GH267_PROHIBITED_CLAIMS
+                    )
+                )
+
+    def test_gh_267_public_boundary_marker_is_required(self) -> None:
+        root = SCRIPT.parents[1]
+        for drifted_relative in MODULE.GH267_PUBLIC_FILES:
+            with (
+                self.subTest(path=drifted_relative),
+                tempfile.TemporaryDirectory() as tmp,
+            ):
+                tmp_root = Path(tmp)
+                status_target = tmp_root / MODULE.STATUS_PATH
+                status_target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy(root / MODULE.STATUS_PATH, status_target)
+                for relative in MODULE.PUBLIC_FILES:
+                    target = tmp_root / relative
+                    target.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copy(root / relative, target)
+                for relative in MODULE.GH267_PUBLIC_FILES:
+                    if relative in MODULE.PUBLIC_FILES:
+                        continue
+                    target = tmp_root / relative
+                    target.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copy(root / relative, target)
+                shutil.copy(root / MODULE.SITEMAP_PATH, tmp_root / MODULE.SITEMAP_PATH)
+                drifted = tmp_root / drifted_relative
+                drifted.write_text(
+                    drifted.read_text(encoding="utf-8").replace("GH-267", "GH-268"),
+                    encoding="utf-8",
+                )
+                errors = MODULE.verify(tmp_root)
+                self.assertTrue(
+                    any(
+                        str(drifted_relative) in error
+                        and "GH-267 privacy gate boundary" in error
+                        for error in errors
+                    )
+                )
+
     def test_gh_258_stage_order_and_malformed_status_are_rejected(self) -> None:
         changed = copy.deepcopy(self.status)
         changed["post_audit_updates"]["gh_258"]["stages"] = [

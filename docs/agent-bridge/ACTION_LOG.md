@@ -5503,3 +5503,29 @@ Rules for all dev agents:
   Guardian, Operator-A, firewall, IAM, deployment, Mainnet or production action
   occurred. Rollout estimates remain unchanged.
 - Status: `GH-264 COMPLETE / EXACT-MAIN + LIVE PASS / PRODUCTION FALSE`.
+
+### 2026-09-13 - GH-267 executable privacy gate started
+
+- Opened issue #267 and isolated branch
+  `feat/GH-267-endpoint-privacy-gate` from exact main `8b5da58a`.
+- Kimi K3 completed only the bounded read-only architecture/privacy review;
+  no files were changed. Sol owns the non-overlapping implementation,
+  integration, verification, public claims and delivery scope.
+- Target: canonical machine-readable pre-producer threat model, fail-closed
+  verifier, mutation tests and Security Audit wiring. No producer, collection,
+  sensor, response or production authority is added.
+- Status: `GH-267 IN PROGRESS / REPOSITORY ONLY / PRODUCTION FALSE`.
+
+### 2026-09-13 - GH-267 local implementation/review complete
+
+- Kimi K3 implemented only the three new artifact/verifier/test files. Sol
+  hardened and integrated them with status, claim guards, public documentation
+  and Security Audit CI; no product runtime was added.
+- Local PASS: privacy verifier and 35 tests; public-claim verifier and 67 tests;
+  documentation hygiene 11 tests; project status 7 tests; H-001 evidence 4
+  tests; Memory, Ruff, compile, JSON/HTML and diff checks.
+- Kimi found one P3 non-object-wire error-category issue; Sol fixed it with a
+  regression and Kimi's focused follow-up returned PASS. No P0-P2 remains.
+- No secrets, producer, collection, runtime, transport, response, chain,
+  deployment or production action occurred.
+- Status: `GH-267 LOCAL PASS / PROTECTED PR NEXT / PRODUCTION FALSE`.
