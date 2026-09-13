@@ -5541,6 +5541,17 @@ Rules for all dev agents:
   remain mandatory after push.
 - Status: `GH-267 REVIEW FIXES LOCAL PASS / PR #268 UPDATE NEXT / PRODUCTION FALSE`.
 
+### 2026-09-13 - GH-267 updated protected checks passed
+
+- PR #268 head `66452c8` passed Prometheus CI `34767622164` and Security Audit
+  `34767622150`; all reported jobs are green.
+- All five CodeRabbit threads are resolved after bot acknowledgement. The
+  updated CodeRabbit check passed with no new review thread; the aggregate
+  rerun was hourly rate-limited.
+- PR state is `MERGEABLE` / `CLEAN`. No runtime, deployment, chain or
+  production action occurred.
+- Status: `GH-267 PR #268 HOSTED PASS / NORMAL MERGE NEXT / PRODUCTION FALSE`.
+
 ### 2026-09-19 - GH-272 TLS/QUIC dependency security gate locally verified
 
 - Kimi K3 owned the bounded dependency-graph analysis and initial lockfile
