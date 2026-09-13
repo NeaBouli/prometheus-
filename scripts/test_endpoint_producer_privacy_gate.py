@@ -116,6 +116,11 @@ class EndpointProducerPrivacyGateTests(unittest.TestCase):
                 self.assertTrue(any("malformed JSON" in e for e in errors))
                 shutil.copy2(REPO_ROOT / rel, self.root / rel)
 
+    def test_non_utf8_json_is_categorized(self) -> None:
+        self.artifact_path().write_bytes(b"\xff")
+        errors = self.assert_rejected("non-UTF-8 artifact")
+        self.assertTrue(any("missing or unreadable" in error for error in errors))
+
     def test_artifact_top_level_unknown_key_is_rejected(self) -> None:
         self.mutate_artifact(lambda d: d.update({SENTINEL: True}))
         errors = self.assert_rejected("unknown key")
@@ -336,6 +341,16 @@ class EndpointProducerPrivacyGateTests(unittest.TestCase):
         )
         errors = self.assert_rejected("GH-264 max size weakening")
         self.assertTrue(any("maximum wire size drifted" in e for e in errors))
+
+    def test_boolean_schema_versions_are_rejected(self) -> None:
+        self.mutate_status(
+            lambda d: d["post_audit_updates"]["gh_264"].update({"schema_version": True})
+        )
+        self.assert_rejected("boolean GH-264 schema version")
+
+        self.restore_fixture()
+        self.mutate_vectors(lambda d: d.update({"vector_schema_version": True}))
+        self.assert_rejected("boolean corpus schema version")
 
     def test_valid_corpus_count_drift_is_rejected(self) -> None:
         self.mutate_vectors(lambda d: d["valid_cases"].pop())

@@ -20,6 +20,18 @@ MODULE = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(MODULE)
 
 
+def copy_gh267_verification_fixture(source: Path, destination: Path) -> None:
+    """Copy the complete public/status fixture needed by MODULE.verify."""
+    status_target = destination / MODULE.STATUS_PATH
+    status_target.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy(source / MODULE.STATUS_PATH, status_target)
+    for relative in set(MODULE.PUBLIC_FILES) | set(MODULE.GH267_PUBLIC_FILES):
+        target = destination / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy(source / relative, target)
+    shutil.copy(source / MODULE.SITEMAP_PATH, destination / MODULE.SITEMAP_PATH)
+
+
 class PublicClaimConsistencyTests(unittest.TestCase):
     status: dict[str, Any]
 
@@ -486,6 +498,11 @@ class PublicClaimConsistencyTests(unittest.TestCase):
                 self.assertTrue(
                     any("GH-264" in error for error in MODULE.validate_status(changed))
                 )
+        changed = copy.deepcopy(self.status)
+        changed["post_audit_updates"]["gh_264"]["schema_version"] = True
+        self.assertTrue(
+            any("GH-264" in error for error in MODULE.validate_status(changed))
+        )
         for value in (None, [], "invalid", 264):
             with self.subTest(value=value):
                 changed = copy.deepcopy(self.status)
@@ -664,6 +681,39 @@ class PublicClaimConsistencyTests(unittest.TestCase):
                     )
                 )
 
+    def test_gh_267_positive_claims_are_rejected_end_to_end(self) -> None:
+        root = SCRIPT.parents[1]
+        claims = (
+            "GH-267 proves privacy.",
+            "GH-267 guarantees anonymity.",
+            "GH-267 certifies absence of a hidden sensor.",
+            "GH-267 authorizes endpoint collection.",
+            "GH-267 enables an endpoint producer.",
+            "GH-267 implements runtime collection.",
+            "GH-267 provides response authority.",
+            "GH-267 is production-ready.",
+        )
+        for claim in claims:
+            with self.subTest(claim=claim), tempfile.TemporaryDirectory() as tmp:
+                tmp_root = Path(tmp)
+                copy_gh267_verification_fixture(root, tmp_root)
+                for relative in MODULE.GH267_PUBLIC_FILES:
+                    surface = tmp_root / relative
+                    surface.write_text(
+                        f"{surface.read_text(encoding='utf-8')}\n{claim}\n",
+                        encoding="utf-8",
+                    )
+                errors = MODULE.verify(tmp_root)
+                for relative in MODULE.GH267_PUBLIC_FILES:
+                    self.assertTrue(
+                        any(
+                            str(relative) in error
+                            and "GH-267 authority or privacy claim drift" in error
+                            for error in errors
+                        ),
+                        f"{relative} accepted {claim}",
+                    )
+
     def test_gh_267_negative_claims_remain_allowed(self) -> None:
         claims = (
             "GH-267 does not prove privacy.",
@@ -717,6 +767,26 @@ class PublicClaimConsistencyTests(unittest.TestCase):
                         for error in errors
                     )
                 )
+
+    def test_gh_267_generic_fragments_do_not_satisfy_boundary(self) -> None:
+        root = SCRIPT.parents[1]
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_root = Path(tmp)
+            copy_gh267_verification_fixture(root, tmp_root)
+            readme = tmp_root / "README.md"
+            drifted = readme.read_text(encoding="utf-8").replace("GH-267", "GH-268")
+            readme.write_text(
+                drifted
+                + "\nGH-267 repository privacy runtime production behavior is enabled.\n",
+                encoding="utf-8",
+            )
+            errors = MODULE.verify(tmp_root)
+            self.assertTrue(
+                any(
+                    "README.md" in error and "GH-267 privacy gate boundary" in error
+                    for error in errors
+                )
+            )
 
     def test_gh_258_stage_order_and_malformed_status_are_rejected(self) -> None:
         changed = copy.deepcopy(self.status)

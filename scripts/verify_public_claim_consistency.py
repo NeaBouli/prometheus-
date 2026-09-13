@@ -404,6 +404,27 @@ GH267_REQUIRED_FRAGMENTS = (
     "production",
 )
 
+GH267_NEGATIVE_BOUNDARY_PATTERNS = (
+    re.compile(
+        r"(?:does not|cannot|neither|no)\b[^.]{0,220}\bprivacy\b|"
+        r"\bprivacy(?:/anonymity)?(?: proof| safety)?[^.]{0,120}"
+        r"\b(?:false|not proven|remain false)\b",
+        re.I,
+    ),
+    re.compile(
+        r"(?:does not|cannot|neither|no)\b[^.]{0,220}\bruntime\b|"
+        r"\bruntime(?: collection| behavior)?[^.]{0,120}"
+        r"\b(?:false|not implemented|remain false)\b",
+        re.I,
+    ),
+    re.compile(
+        r"(?:does not|cannot|neither|no)\b[^.]{0,220}\bproduction\b|"
+        r"\bproduction(?: status| authority| behavior)?[^.]{0,120}"
+        r"\b(?:false|not implemented|remain false)\b",
+        re.I,
+    ),
+)
+
 GH267_PROHIBITED_CLAIMS = (
     re.compile(
         r"GH-267[^.\n]{0,240}(?<!not )(?<!never )(?<!cannot )(?<!can't )"
@@ -457,7 +478,11 @@ def has_gh267_boundary(text: str) -> bool:
     offset = 0
     while (position := normalized.find(marker, offset)) >= 0:
         section = normalized[position : position + 2_000]
-        if all(fragment.casefold() in section for fragment in GH267_REQUIRED_FRAGMENTS):
+        if all(
+            fragment.casefold() in section for fragment in GH267_REQUIRED_FRAGMENTS
+        ) and all(
+            pattern.search(section) for pattern in GH267_NEGATIVE_BOUNDARY_PATTERNS
+        ):
             return True
         offset = position + len(marker)
     return False
@@ -885,6 +910,7 @@ def validate_status(data: dict[str, Any]) -> list[str]:
         or gh_264.get("issue") != 264
         or gh_264.get("status") != "repository_candidate_implemented_and_locally_tested"
         or gh_264.get("classification") != "canonical_observe_only_endpoint_statement"
+        or type(gh_264.get("schema_version")) is not int
         or gh_264.get("schema_version") != 1
         or gh_264.get("rust_python_shared_vectors") is not True
         or gh_264.get("closed_domains") != 7
