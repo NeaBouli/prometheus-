@@ -1871,6 +1871,31 @@ Next gate: independent privacy/threat-model review before any opt-in,
 Estimates: unchanged; core 84-88%; complete vision 50-55%; production false
 ~~~
 
+## GH-267 PRE-PRODUCER PRIVACY/THREAT-MODEL GATE (2026-09-13)
+
+~~~text
+Status: repository candidate implemented and locally tested / runtime false /
+        production false
+Issue: #267
+Scope: machine-readable privacy/threat model plus fail-closed repository and
+       Security-CI drift verification before any endpoint producer exists
+Controls: default-off informed per-host opt-in; local revocation; least
+          privilege; local aggregation/redaction; eight GH-264 output fields;
+          prohibited raw-data classes; bounded retention; separately approved
+          transport and recipient; independent privacy review
+Evidence candidate: dedicated verifier plus adversarial mutation suite binds
+                    the artifact, public status and shared GH-264 corpus
+Authority: repository review only; no runtime collection, retention, egress,
+           disclosure, proof, correlation, warning, response or automation
+Limit: cannot prove privacy/anonymity or absence of a hidden sensor and is not
+       independent legal, privacy or security certification
+Boundary: no producer, OS sensor, host access, wallet, chain, contract,
+          Guardian, firewall, IAM, deployment, Mainnet or production behavior
+Next gate: protected review, exact-main evidence and independent privacy review
+           before a separately approved least-privileged producer task
+Estimates: unchanged; core 84-88%; complete vision 50-55%; production false
+~~~
+
 ## GH-253 GUARDIAN TRANSITION-AUTHORITY ROTATION (2026-09-06)
 
 ```text

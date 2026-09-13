@@ -1204,3 +1204,20 @@ Leistungsbasierte Emission. Guardians = "Miner" (KI statt GPU).
   collection, sensor, event truth, correlation, AI/actor attribution, warning,
   transport, response authority or production behavior. Protected review and
   exact-main evidence remain pending.
+
+## Checkpoint 2026-09-13: GH-267 pre-producer privacy gate candidate
+
+- A machine-readable privacy/threat model pins threat actors, abuse cases,
+  protected data, the eight GH-264 output fields, prohibited raw-data classes,
+  trust boundaries, default-off opt-in, local revocation, least privilege,
+  local aggregation/redaction, retention/transport gates and limitations.
+- A dependency-free verifier cross-checks that artifact against public status
+  and the shared GH-264 corpus. Adversarial tests elevate every false
+  capability and mutate identity, fields, status, wire shape and privacy cases.
+- Kimi K3 implemented only the bounded artifact/verifier/test block. Sol owns
+  review corrections, public-claim enforcement, documentation, CI integration
+  and complete verification.
+- This repository candidate adds no producer, runtime collection, retention,
+  transport, response or production authority; it cannot prove privacy,
+  anonymity or absence of a hidden sensor. Protected review and exact-main
+  evidence remain pending.

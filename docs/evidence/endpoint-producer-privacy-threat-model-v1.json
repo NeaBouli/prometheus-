@@ -1,0 +1,131 @@
+{
+  "schema_version": 1,
+  "issue": 267,
+  "as_of": "2026-09-13",
+  "classification": "pre_producer_privacy_threat_model_gate",
+  "scope": "repository_review_and_drift_control_only",
+  "threat_actors": [
+    "remote_attacker_or_resource_conscription_controller",
+    "curious_or_compromised_operator_with_host_access",
+    "malicious_or_compromised_software_supply_chain_dependency",
+    "network_observer_or_interceptor",
+    "data_broker_or_third_party_recipient",
+    "compromised_or_malicious_future_producer_component"
+  ],
+  "abuse_cases": [
+    "default_on_or_coerced_collection_without_informed_per_host_opt_in",
+    "raw_or_high_cardinality_host_data_smuggled_into_an_observation",
+    "cross_window_or_cross_device_linkability_from_counts_time_nonce_or_network_context",
+    "forged_or_poisoned_observations_treated_as_event_truth_or_maliciousness",
+    "covert_retention_or_egress_before_local_aggregation_and_redaction",
+    "repository_or_public_claim_drift_used_to_imply_unearned_authority",
+    "observation_data_reused_for_automatic_response_identity_reputation_or_rewards"
+  ],
+  "protected_data_classes": [
+    "process_names_and_command_lines",
+    "file_paths_and_file_contents",
+    "host_device_and_user_identifiers",
+    "network_addresses_and_peer_identifiers",
+    "credentials_keys_tokens_and_secret_material",
+    "prompts_model_io_and_tool_payloads",
+    "usage_patterns_and_behavioral_timelines",
+    "linkability_from_counts_timestamps_nonces_and_network_context"
+  ],
+  "allowed_statement_fields": [
+    "schema_version",
+    "domain",
+    "signal",
+    "event_count",
+    "window_seconds",
+    "report_nonce",
+    "observed_at",
+    "network_id"
+  ],
+  "prohibited_raw_data_classes": [
+    "process_name",
+    "command_line",
+    "file_path",
+    "file_content",
+    "host_or_device_identifier",
+    "user_account_identifier",
+    "network_address",
+    "credential_or_secret_material",
+    "prompt_or_model_payload",
+    "free_text_or_arbitrary_label"
+  ],
+  "required_privacy_rejection_cases": [
+    {
+      "vector": "privacy_process_name_field",
+      "forbidden_wire_key": "process_name"
+    },
+    {
+      "vector": "privacy_path_field",
+      "forbidden_wire_key": "path"
+    },
+    {
+      "vector": "privacy_host_identifier_field",
+      "forbidden_wire_key": "host_id"
+    },
+    {
+      "vector": "privacy_command_line_field",
+      "forbidden_wire_key": "command_line"
+    }
+  ],
+  "trust_boundaries": [
+    "repository_review_boundary: this gate compares committed artifacts only and trusts nothing at runtime",
+    "producer_host_boundary: any future producer runs on the observed host under local OS permissions only",
+    "aggregation_boundary: any future aggregation or redaction must complete locally before any disclosure",
+    "transport_boundary: no network transport exists today; any future transport is a separately gated trust crossing",
+    "status_boundary: the public claim status and the shared Rust/Python corpus are the canonical cross-check inputs"
+  ],
+  "future_requirements": [
+    "default_off_explicit_informed_per_host_opt_in_before_any_collection",
+    "local_revocation_without_remote_dependency",
+    "least_privilege_os_access_scoped_to_declared_domains",
+    "bounded_aggregate_counts_only_no_raw_event_payload",
+    "local_only_aggregation_and_redaction_before_any_disclosure",
+    "data_minimization_limited_to_the_eight_allowed_statement_fields",
+    "linkability_review_for_count_time_nonce_and_network_context",
+    "explicit_bounded_retention_and_local_erasure_policy_before_collection",
+    "independent_privacy_review_before_any_producer_implementation",
+    "separate_transport_and_recipient_authorization_before_any_network_egress",
+    "no_observation_reuse_for_identity_reputation_rewards_or_automatic_action"
+  ],
+  "current_state": {
+    "endpoint_producer": "not_implemented",
+    "data_retention": "none",
+    "network_transport": "none",
+    "runtime_collection_authorized": false
+  },
+  "promotion_gates": [
+    "gh_264_observe_only_statement_remains_the_canonical_output_boundary",
+    "shared_rust_python_corpus_must_keep_required_privacy_field_rejections",
+    "public_status_capabilities_must_remain_false_until_a_dated_promotion_record",
+    "owner_approved_privacy_threat_model_update_required_before_any_producer",
+    "protected_pr_with_full_ci_required_for_any_change"
+  ],
+  "limitations": [
+    "repository review and drift control only; no runtime authority",
+    "cannot prove arbitrary code lacks a hidden sensor or covert collection path",
+    "does not authorize endpoint collection, transport, or any runtime action",
+    "does not prove event truth, maliciousness, attribution, or privacy safety",
+    "does not constitute independent legal privacy or security certification",
+    "does not inspect secrets, wallets, operator, or infrastructure material"
+  ],
+  "capabilities": {
+    "endpoint_producer_implemented": false,
+    "endpoint_collection": false,
+    "os_sensor": false,
+    "event_truth_or_maliciousness_proven": false,
+    "privacy_safety_proven": false,
+    "ai_actor_or_intent_attribution_proven": false,
+    "disclosure_authority": false,
+    "proof_generation": false,
+    "correlation": false,
+    "warning": false,
+    "transport": false,
+    "response_authority": false,
+    "automation": false,
+    "production_authority": false
+  }
+}

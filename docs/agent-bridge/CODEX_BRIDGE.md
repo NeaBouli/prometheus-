@@ -6957,3 +6957,55 @@ false`.
   core `84-88%` and full roadmap `50-55%`; this parser boundary does not advance
   operated-network or production readiness.
 - Status: `GH-264 COMPLETE / EXACT-MAIN + LIVE PASS / Observe-only / Production false`.
+
+### 2026-09-13 - GH-267 pre-producer privacy gate started
+
+- Issue #267 owns one repository-only, executable privacy/threat-model gate
+  required before any endpoint observation producer may be implemented. The
+  isolated branch `feat/GH-267-endpoint-privacy-gate` starts from exact main
+  `8b5da58a34172062cf644db52ba459385d151562`; no existing task is duplicated.
+- Work allocation is disjoint. Kimi K3 completed a secret-free, read-only
+  architecture/privacy analysis of committed GH-258/GH-261/GH-264 surfaces,
+  current schema/corpus/status guards and CI patterns; Kimi changed no file and
+  started no agent. Sol owns final scope, architecture and security decisions,
+  implementation, tests, claims, protected delivery and closeout.
+- The planned gate will be a versioned machine-readable threat model plus a
+  standard-library verifier, adversarial mutation tests and existing Security
+  Audit integration. It will reconcile the declared GH-264 output boundary,
+  forbidden raw-data classes and must-stay-false collection/action state. It
+  will explicitly remain a repository review/drift gate, not proof that
+  arbitrary code has no hidden sensor and not runtime authorization.
+- No producer, endpoint or model/sample access, telemetry, correlation,
+  warning, transport, response action, wallet, chain, contract, Guardian,
+  Operator-A, infrastructure, deployment, Mainnet or production action is in
+  scope. KAS/PROM, Guardian reputation, slash ACL, Commit-Reveal and the
+  no-emergency-stop rule remain unchanged.
+- Status: `GH-267 IN PROGRESS / REPOSITORY-ONLY PRIVACY GATE / Production false`.
+
+### 2026-09-13 - GH-267 implementation and local review gate passed
+
+- The disjoint allocation remained explicit. Kimi K3 implemented only the new
+  machine artifact, dependency-free verifier and its mutation suite. Sol
+  reviewed and hardened that block, added the public status/claim enforcement,
+  synchronized Markdown/HTML/module surfaces, wired Security Audit, and owns
+  protected delivery. No duplicate product implementation occurred.
+- The artifact pins threat actors, abuse cases, protected data classes, exactly
+  eight GH-264 output fields, prohibited raw-data classes, trust boundaries,
+  default-off informed per-host opt-in, local revocation, least privilege,
+  local aggregation/redaction, bounded retention, separate transport/recipient
+  authorization and independent review before a future producer.
+- Local results: dedicated verifier PASS; 35/35 adversarial privacy-gate tests
+  PASS; public-claim verifier PASS across 13 synchronized surfaces; 67/67
+  claim-regression tests PASS; documentation hygiene 11/11 PASS; project-status
+  7/7 PASS; H-001 evidence 4/4 PASS; Memory integrity, JSON, HTML/public-file,
+  Python compile, Ruff and diff checks PASS.
+- Kimi's independent final review found no P0/P1/P2 and one P3 categorized-error
+  robustness case for a non-object JSON wire. Sol added a structural tuple
+  guard and direct regression; 35/35 reran PASS. Kimi's focused follow-up
+  independently returned PASS with no remaining blocker.
+- The gate remains repository drift control only. It does not implement or
+  authorize a producer, endpoint collection, retention, transport, proof,
+  response, automation or production behavior and cannot prove privacy,
+  anonymity or absence of hidden collection code. Python 3.11 hosted CI,
+  protected review and exact-main evidence remain mandatory.
+- Status: `GH-267 LOCAL PASS / PROTECTED PR NEXT / PRODUCTION FALSE`.
