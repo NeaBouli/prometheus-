@@ -6899,3 +6899,27 @@ false`.
 - The second review thread, hosted rechecks, normal protected merge and
   exact-main/public evidence remain pending. Production remains false.
 - Status: `GH-264 SECOND REVIEW FIX LOCAL VERIFIED / REPUSH NEXT`.
+
+### 2026-09-13 - GH-264 prefixed negative-passive edge hardened
+
+- Terra's review of the second fix found that the passive regex could restart
+  inside `endpoint sensor`, `OS sensor`, `endpoint detection`, or `endpoint
+  response` and thereby misclassify a leading-`No` sentence. Sol made endpoint
+  prefixes explicit capabilities and blocked suffix restarts, then added four
+  affirmative and four negative regressions.
+- Focused GH-264 tests pass `2/2` in 93.629 seconds; the direct 13-surface claim
+  check, Python compilation, Ruff format/lint, Memory/status/hygiene,
+  Autodidactic, Rustfmt and diff checks pass. Terra's final no-write probe
+  reports all four negative cases allowed, all four affirmative counterparts
+  rejected, no P0-P3 finding and `Approve`.
+- A further parallel full local rerun was attempted but is not accepted as a
+  product result: the shared Data volume fell to about 2.5 GiB available and
+  temporary-file creation failed with `ENOSPC` late in both suites. The claim
+  run ended with 37 environment errors; the all-script run ended with 25
+  environment errors and one dependent boundary readiness failure (`io`). No
+  new GH-264 assertion failed. No foreign files, processes or caches were
+  deleted; a fresh hosted full-suite run is mandatory before merge.
+- The immediately preceding exact candidate had completed `62/62` claim and
+  `208/208` all-script tests before this narrow regex/test addition. Production
+  remains false.
+- Status: `GH-264 PREFIX HARDENING FOCUSED PASS / HOSTED FULL SUITE REQUIRED`.

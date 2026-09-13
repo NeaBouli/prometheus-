@@ -5469,3 +5469,16 @@ Rules for all dev agents:
 - Post-fix PASS: focused `2/2`, public claims `62/62`, all scripts `208/208`,
   direct 13-surface check, compile, Ruff, Rustfmt and diff checks.
 - Status: `GH-264 SECOND REVIEW FIX LOCAL VERIFIED / RECHECK PENDING`.
+
+### 2026-09-13 - GH-264 passive prefix backtracking edge closed
+
+- Prevented the passive regex from restarting inside endpoint/OS-prefixed
+  capabilities; added four positive and four negative regressions. Focused
+  tests `2/2`, direct 13-surface claims, static checks and Terra final review
+  pass; Terra verdict `Approve`, no P0-P3.
+- The optional parallel full rerun exhausted local temporary space and is
+  recorded as infrastructure-invalid, not green: claim suite 37 `ENOSPC`
+  errors; all-script suite 25 `ENOSPC` errors plus one dependent I/O readiness
+  failure. No cleanup or foreign-process action was taken. Hosted full checks
+  are required before merge.
+- Status: `GH-264 PREFIX FIX FOCUSED PASS / HOSTED FULL RECHECK REQUIRED`.

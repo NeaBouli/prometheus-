@@ -517,6 +517,10 @@ class PublicClaimConsistencyTests(unittest.TestCase):
             "Endpoint collection has been enabled by GH-264.",
             "A response engine is provided through GH-264.",
             "Detection is now operational via GH-264.",
+            "Endpoint sensor is operational via GH-264.",
+            "OS sensor is operational via GH-264.",
+            "Endpoint detection is enabled by GH-264.",
+            "Endpoint response is enabled by GH-264.",
             "GH-264 is production-ready.",
             "GH-264 proves maliciousness.",
             "GH-264 attributes AI activity.",
@@ -556,6 +560,10 @@ class PublicClaimConsistencyTests(unittest.TestCase):
             "No endpoint collection is enabled by GH-264.",
             "A response engine is not provided through GH-264.",
             "No response engine is provided through GH-264.",
+            "No endpoint sensor is operational via GH-264.",
+            "No OS sensor is operational via GH-264.",
+            "No endpoint detection is enabled by GH-264.",
+            "No endpoint response is enabled by GH-264.",
         )
         for claim in claims:
             with self.subTest(claim=claim):

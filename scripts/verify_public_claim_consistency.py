@@ -354,8 +354,8 @@ GH264_REQUIRED_FRAGMENTS = (
 
 GH264_CAPABILITY_PATTERN = (
     r"(?:endpoint (?:data |telemetry )?collection|host telemetry collection|"
-    r"(?:endpoint |OS )?sensor|detection|correlation|warning|transport|"
-    r"response(?: authority| engine)?|containment|automation)\b"
+    r"(?:endpoint |OS )?sensor|(?:endpoint )?(?:detection|correlation|warning|"
+    r"transport|response(?: authority| engine)?|containment|automation))\b"
 )
 
 GH264_PROHIBITED_CLAIMS = (
@@ -375,7 +375,7 @@ GH264_PROHIBITED_CLAIMS = (
         re.I,
     ),
     re.compile(
-        r"(?<!no )(?:an? |the )?"
+        r"(?<!no )(?<!endpoint )(?<!OS )(?:an? |the )?"
         + GH264_CAPABILITY_PATTERN
         + r" (?:is|are|was|were|has been|have been) (?:now )?"
         r"(?:provided|enabled|authorized|supported|implemented|delivered|"
