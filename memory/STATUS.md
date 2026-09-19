@@ -1997,3 +1997,21 @@ Remaining: external/decentralized authority, key ownership/rotation,
            public multi-host operation and production trust
 Estimates: unchanged; core 84-88%; complete vision 50-55%; production false
 ```
+
+## GH-272 TLS/QUIC DEPENDENCY SECURITY GATE (2026-09-19)
+
+```text
+Status: protected PR #281; local verification and initial hosted head pass;
+        final documentation-fix head and merge remain pending
+Issue: #272; follow-up policy tickets #279 (PRM-09) and #280 (PRM-10)
+Lockfile: rustls 0.23.45; rustls-webpki 0.103.15; quinn 0.11.12;
+          quinn-proto 0.11.18
+Security: RUSTSEC-2026-0285 absent; cargo audit reports zero vulnerabilities
+          and nine separately allowed pre-existing warnings
+Evidence: guardian-p2p 76 library + 5 process tests; relay fallback 10/10;
+          full all-target/all-feature warnings-denied Clippy; all workspace
+          tests pass in hosted CI; release performance passes in hosted CI
+Boundary: lockfile-only source update plus status records; no public-protocol
+          or contract-semantic change found; no broader operational claim
+Production: false; normal protected merge and exact-main verification required
+```

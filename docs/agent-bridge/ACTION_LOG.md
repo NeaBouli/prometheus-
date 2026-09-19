@@ -5513,8 +5513,9 @@ Rules for all dev agents:
   testing, GitHub actions and closure.
 - The minimal `Cargo.lock` delta updates `rustls` `0.23.41 -> 0.23.45`,
   `rustls-webpki` `0.103.13 -> 0.103.15`, `quinn` `0.11.11 -> 0.11.12` and
-  `quinn-proto` `0.11.16 -> 0.11.18`. No manifest, public protocol, product,
-  contract, wallet, chain, deployment, Mainnet or production behavior changed.
+  `quinn-proto` `0.11.16 -> 0.11.18`. The source change is lockfile-only;
+  review and tests found no public-protocol or contract-semantic change.
+  Operational behavior beyond the tested compatibility scope is not claimed.
 - Local PASS: guardian-p2p package tests (`76` library plus `5` process tests),
   the formerly timing-sensitive relay test `10/10`, full workspace Clippy with
   all targets/features and warnings denied, Cargo format, dependency graph and
