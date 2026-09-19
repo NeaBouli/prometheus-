@@ -2830,3 +2830,26 @@ changed.
   data and has no sensor, correlation, warning, transport or production path.
 - Result: `LOCAL CANDIDATE / Complete verification and protected review
   pending / Production false`.
+
+## Audit GH-272: TLS/QUIC dependency security gate
+
+- Kimi K3 analyzed the bounded dependency graph and prepared the initial
+  compatible lockfile update. Sol independently reviewed the complete diff,
+  integrated the matching QUIC patch line and retained security, test and
+  protected-delivery ownership.
+- `Cargo.lock` resolves `rustls 0.23.45`, `rustls-webpki 0.103.15`,
+  `quinn 0.11.12` and `quinn-proto 0.11.18`. `RUSTSEC-2026-0285` is absent;
+  `cargo audit` reports zero vulnerabilities and nine separately allowed
+  pre-existing warnings.
+- Guardian-p2p package/process tests and a 10-run relay fallback sample pass.
+  Full workspace all-target/all-feature Clippy passes with warnings denied.
+  The initial PR #281 hosted head passes Security Audit, full Rust Workspace,
+  Rust Performance, Current Silverc smoke, Python, HTML, Memory and review.
+- The unchanged debug scanner timing probe is contention-sensitive locally but
+  passes twice in isolation; the unchanged hosted full workspace and release
+  performance jobs pass. No test or threshold was weakened.
+- PRM-09 dependency-policy work and PRM-10 container hardening are isolated in
+  #279 and #280. No public-protocol or contract-semantic change was found;
+  broader operational behavior is not claimed.
+- Result: `PR #281 REVIEW FIX / Final hosted recheck and protected merge
+  pending / Production false`.

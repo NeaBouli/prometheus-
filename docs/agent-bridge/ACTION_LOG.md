@@ -5503,3 +5503,29 @@ Rules for all dev agents:
   Guardian, Operator-A, firewall, IAM, deployment, Mainnet or production action
   occurred. Rollout estimates remain unchanged.
 - Status: `GH-264 COMPLETE / EXACT-MAIN + LIVE PASS / PRODUCTION FALSE`.
+
+### 2026-09-19 - GH-272 TLS/QUIC dependency security gate locally verified
+
+- Kimi K3 owned the bounded dependency-graph analysis and initial lockfile
+  remediation. Sol reviewed the complete diff, added the compatible QUIC patch
+  releases after focused relay-test sampling exposed instability in the
+  rustls-only candidate, and retained sole ownership of integration, security,
+  testing, GitHub actions and closure.
+- The minimal `Cargo.lock` delta updates `rustls` `0.23.41 -> 0.23.45`,
+  `rustls-webpki` `0.103.13 -> 0.103.15`, `quinn` `0.11.11 -> 0.11.12` and
+  `quinn-proto` `0.11.16 -> 0.11.18`. The source change is lockfile-only;
+  review and tests found no public-protocol or contract-semantic change.
+  Operational behavior beyond the tested compatibility scope is not claimed.
+- Local PASS: guardian-p2p package tests (`76` library plus `5` process tests),
+  the formerly timing-sensitive relay test `10/10`, full workspace Clippy with
+  all targets/features and warnings denied, Cargo format, dependency graph and
+  metadata checks, and `cargo audit` with zero vulnerabilities. The audit still
+  reports the same nine separately allowed unmaintained/unsound/yanked warnings.
+- All workspace tests other than the existing debug scanner timing probe pass
+  together. That probe failed under suite/build contention (`8.30`, `9.19` and
+  `5.91` seconds against a `5` second bound) but passed twice in isolation
+  without competing work (`2.22` and `2.42` seconds). The unchanged hosted CI
+  run remains the merge gate; no test or threshold was weakened in this patch.
+- Non-mechanical PRM-09 dependency-policy work is tracked in #279 and PRM-10
+  Guardian Compose hardening in #280 rather than widening this security patch.
+- Status: `GH-272 LOCAL VERIFIED / PROTECTED PR + HOSTED CI NEXT / PRODUCTION FALSE`.
