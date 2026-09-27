@@ -1,0 +1,37 @@
+@startuml
+title Prometheus Hauptpfad: ThreatHint v1 Submission (Baseline 32ca5f1, Development/Testnet-10)
+
+actor Operator
+participant "client main.rs\nThreatHintCommand::Submit" as CLI
+participant "client network/p2p.rs\nThreatHintSubmitConfig::submit" as Sender
+participant "guardian-p2p lib.rs\nGuardianP2p\n(/prometheus/threat-hint/1.0.0)" as P2P
+participant "guardian-p2p threat_hint_ingress.rs\nUnixThreatHintIngress::forward" as Ingress
+participant "jaeger/threat_hint_service.py\nThreatHintIngressServer" as Service
+participant "jaeger/threat_hint_ingress.py\nThreatHintIngress" as Verify
+participant "threat-proof main.rs\nCommand::Verify (Subprozess)" as Proof
+database "SQLite (owner-only)\nReplay-Ledger + Outbox" as DB
+participant "jaeger/threat_hint_adapter.py\nThreatHintAnalyzerAdapter::drain_once" as Adapter
+participant "jaeger/analyzer.py\nprocess_verified_threat_hint" as Analyzer
+
+Operator -> CLI : threat-hint submit --config C --hint H
+CLI -> Sender : owner-only TOML + canonical hint (<=2048 B)
+Sender -> Sender : offline preflight; Beta/Mainnet rejected vor Netzaktivitaet
+Sender -> P2P : dial-only QUIC, ein statischer Peer, ThreatHintBytes
+P2P -> Ingress : exact canonical bytes (shared global admission cap)
+Ingress -> Service : 4-byte AF_UNIX frame (owner-only, peer-UID)
+Service -> Verify : schema-v1 reparse, freshness (300 s / 30 s skew)
+Verify -> Proof : groth16_kip16_v1, manifest-pinned, shell-free
+Proof --> Verify : exit 0/1/2/3 (default: unavailable -> fail-closed)
+Verify -> DB : BEGIN IMMEDIATE: replay identities + genau 1 Outbox-Job
+Service --> Ingress : ACK accepted/duplicate/rejected/busy (<=384 B, digest-bound)
+Ingress --> P2P : ThreatHintAckStatus
+P2P --> Sender : remote-local-boundary status
+Sender --> CLI : accepted/duplicate/rejected/busy/transport-failure\n(kein Retry, keine Persistenz)
+
+== separater owner-lokaler Drain (GH-74/GH-77; nicht durch submit ausgeloest) ==
+Operator -> Adapter : drain_once (<=32 Jobs, lease)
+Adapter -> DB : claim pending VerifiedThreatHintJob
+Adapter -> Analyzer : VerifiedThreatHint (Hash-Commitment, keine Indikatoren)
+Analyzer --> Adapter : AnalysisResult (confidence 0.0, keine Regel, should_submit=false)
+Adapter -> DB : mark-delivered (Fehler: Job bleibt pending, spaetere Jobs laufen weiter)
+@enduml

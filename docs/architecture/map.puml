@@ -1,0 +1,116 @@
+@startmindmap
+* Prometheus: dezentrale KI-Threat-Intelligence auf Kaspa
+** modules/client
+*** built: main.rs::Cli (miner-companion, rule-sync, threat-hint, threat-hint-v2)
+*** built: network/p2p.rs::submit / submit_v2 (dial-only QUIC)
+*** built: blockchain/rule_coordinator.rs::RuleCoordinator (dev)
+*** partial: security/scanner.rs::YaraScanner (custom matcher, kein YARA)
+*** partial: ai/phi3.rs, detection.rs, federated.rs (fail-closed Stubs)
+*** open: echte Phi-3/ONNX-Inferenz, Fed-DART, ZK-Prover
+** modules/guardian-p2p
+*** built: lib.rs::GuardianP2p (ballot + hint v1/v2 Kanaele)
+*** built: transport_identity, relay_service, service.rs::run_service
+*** blocked: public multi-host operation
+** modules/guardian-node (jaeger)
+*** built: threat_hint_service.py + threat_hint_ingress.py (reparse, replay, outbox)
+*** built: threat_hint_v2 promotion/acceptance/worker/semantic-draft
+*** built: ballot_ingress.py, ensemble.py, membership source/transition
+*** partial: legacy analyzer/llm/yara (kein Live-Modell-Nachweis)
+*** open: actionable Analyse, Produktions-Autoritaet
+** modules/threat-hint
+*** built: v1/v2 Schemata, Produzenten, Approval, Endpoint-Observation-Parser
+** modules/threat-proof
+*** built: KIP-16 Groth16 verify / verify-v2 (Test-Artefakte)
+*** blocked: Produktions-Relation/Keys/Zeremonie
+** modules/validator-node
+*** built: voting/commit, voting/reveal, slashing (Zustandsautomaten)
+*** open: betriebenes Validator-Netz
+** modules/contracts
+*** built: silverc/*.sil (7 Fixtures, Gates gruen)
+*** built: legacy *.ss (nur Historie)
+*** blocked: sechs State-Deployments + Oracle-Ausfuehrung
+** modules/silverc-deployer
+*** built: keyless Genesis + reportMetrics Operator; H-001 Canary bestaetigt
+*** blocked: verbleibende externe Signaturen/Evidence
+** modules/web + scripts
+*** built: Audit-Dashboard, Release-Tooling
+** target
+*** open: PROM Emission, IPFS Distribution, public Multi-Host
+*** open: Mobile (Flutter), Tauri UI
+*** open: GH-258/261 Endpoint Detection (observe -> warn -> contain)
+@endmindmap
+
+@startuml
+title Prometheus Komponenten (nur verifizierte Hops; Baseline 32ca5f1)
+
+package "modules/client" as Client {
+  [main.rs::Cli\nThreatHintCommand::Submit] as ClientMain
+  [network/p2p.rs\nThreatHintSubmitConfig::submit] as ClientSender
+  [rule_sync_cli.rs +\nblockchain/rule_coordinator.rs] as RuleSync
+  [security/scanner.rs\nYaraScanner (dev)] as Scanner
+}
+
+package "modules/guardian-p2p" as P2P {
+  [lib.rs::GuardianP2p\n/prometheus/threat-hint/1.0.0 + 2.0.0\n/prometheus/guardian-ballot/1.0.0] as Transport
+  [threat_hint_ingress.rs\nUnixThreatHintIngress::forward] as HintIngress
+  [threat_hint_v2_ingress.rs\nUnixThreatHintV2Ingress] as HintV2Ingress
+  [ingress.rs::UnixBallotIngress] as BallotIngress
+}
+
+package "modules/guardian-node (jaeger)" as Guardian {
+  [threat_hint_service.py\nThreatHintIngressServer] as HintService
+  [threat_hint_ingress.py\nThreatHintIngress + Replay-Ledger] as HintVerify
+  [threat_hint_adapter.py\ndrain_once] as Adapter
+  [analyzer.py\nprocess_verified_threat_hint] as Analyzer
+  [threat_hint_v2_promotion.py::promote] as Promotion
+  [threat_hint_v2_acceptance.py::accept] as Acceptance
+  [observable_analysis_worker.py] as Worker
+  [observable_semantic_draft.py] as Draft
+  [ballot_ingress.py + signed_ballots\n+ ensemble.py::EnsembleVoter] as Voting
+}
+
+package "modules/threat-proof" as Proof {
+  [main.rs::Command::Verify / VerifyV2\nKIP-16 Groth16 (manifest-pinned)] as Verifier
+}
+
+package "modules/contracts/silverc" as Contracts {
+  [ValidatorStakingState.sil\nGuardianReputationState.sil\nRuleStorageState.sil\nGovernanceAutoTuningState.sil (+3)] as Fixtures
+}
+
+package "modules/silverc-deployer" as Deployer {
+  [main.rs::Cli\ngenesis + reportMetrics] as Operator
+}
+
+database "SQLite (owner-only)" as DB
+actor "externer BIP340-Signer\n(ausserhalb des Repos)" as Signer
+
+ClientMain --> ClientSender : config + canonical hint (<=2048 B)
+ClientSender --> Transport : dial-only QUIC, ThreatHintBytes
+Transport --> HintIngress : exact canonical bytes
+HintIngress --> HintService : AF_UNIX frame (peer-UID)
+HintService --> HintVerify : reparse + freshness + replay
+HintVerify --> Verifier : groth16_kip16_v1 (exit 0/1/2/3)
+HintVerify --> DB : replay ids + 1 outbox job (atomic)
+Adapter --> DB : claim <=32 jobs (lease)
+Adapter --> Analyzer : VerifiedThreatHint (ohne Indikatoren)
+Analyzer --> Adapter : AnalysisResult (0.0, no rule, should_submit=false)
+Adapter --> DB : mark-delivered
+HintService --> HintIngress : ACK accepted/duplicate/rejected/busy (<=384 B)
+
+ClientSender --> Transport : submit_v2 (/prometheus/threat-hint/2.0.0)
+Transport --> HintV2Ingress : canonical PHT2 frame
+HintV2Ingress --> Promotion : reparse gegen trusted network
+Promotion --> Acceptance : policy vor Verifier-Aufruf
+Acceptance --> Verifier : verify-v2 (Subprozess)
+Acceptance --> DB : durable approval consumption (letzter Schritt)
+Worker --> DB : governed claim/complete
+Worker --> Draft : memory-only YARA draft (compile-only)
+
+Transport --> BallotIngress : /prometheus/guardian-ballot/1.0.0
+BallotIngress --> Voting : owner-only AF_UNIX
+
+RuleSync --> Scanner : atomicer Scanner-Ersatz (checkpoint)
+Operator --> Fixtures : recompile predecessor/successor
+Operator --> Signer : nur 32-byte Digest
+Operator --> DB : intent journal (one-shot broadcast)
+@enduml
