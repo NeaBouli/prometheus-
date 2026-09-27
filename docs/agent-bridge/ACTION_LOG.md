@@ -5659,3 +5659,11 @@ Rules for all dev agents:
 - Existing draft PR #269 was not pushed before the planned Actions reset; its
   update and exact hosted checks remain pending.
 - Status: `A3 LOCAL VERIFIED / PR #269 UPDATE + HOSTED CI PENDING / PRODUCTION FALSE`.
+
+### 2026-09-28 - A4 client runtime gate started
+
+- Scope: PRM-03 only, `modules/client` MAP hop H1, fail-closed runtime checking
+  before ThreatHint network activity plus focused regressions.
+- Kimi remains `token_limited`; Claude is the single writing worker. Independent
+  security review is mandatory before integration acceptance.
+- Status: `A4 IN PROGRESS / PRODUCTION FALSE`.
