@@ -5578,6 +5578,22 @@ Rules for all dev agents:
   Guardian Compose hardening in #280 rather than widening this security patch.
 - Status: `GH-272 LOCAL VERIFIED / PROTECTED PR + HOSTED CI NEXT / PRODUCTION FALSE`.
 
+### 2026-09-28 - A1 GH-267 current-baseline restoration locally verified
+
+- Restored the reviewed PR #268 endpoint pre-producer privacy gate from head
+  `5960f1b` onto the current planning baseline without changing the original PR
+  branch. The only conflict resolutions preserve current GH-272 records.
+- Retained the additive Security Audit verifier/test step; it changes no
+  workflow trigger, permission, secret, deployment action or check governance.
+- Kimi and Grok were unavailable. Fleet fallback produced a fresh Claude
+  candidate and a separate bounded Claude review; the review passed.
+- Integration PASS: verifier, 37 focused tests, 13-surface claim verifier,
+  69 claim tests, documentation hygiene, Memory, project status,
+  Autodidactic, workflow YAML, responsive visual gate and diff check.
+- No endpoint collection, sensor, transport, response, model, wallet, chain,
+  contract, deployment, Mainnet or production capability was added.
+- Status: `A1 LOCAL VERIFIED / HOSTED PR CHECKS PENDING / PRODUCTION FALSE`.
+
 ### 2026-09-27 - Fleet plan synthesis: canonical remaining delivery plan written
 
 - `.fleet/PLAN.md` replaced by the canonical plan synthesized from the accepted

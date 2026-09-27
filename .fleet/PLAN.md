@@ -221,3 +221,19 @@ Both runs require Gio budget approval (plan-level gate).
 - KAS/PROM separation holds; Guardian reputation stays canonical on Kaspa L1.
 - No secrets, tokens, keys, wallet data, or operational topology in fleet files.
   Testnet-only keys for development.
+
+## 10. Milestone progress
+
+### 2026-09-28 — A1 locally integrated
+
+- PR #268 was mechanically ported from `5960f1b` onto the current planning
+  baseline without mutating the original branch.
+- The additive Security Audit workflow step is retained: it changes no trigger,
+  permission, secret, deployment, or required-check governance and keeps the
+  public Security-CI claim truthful.
+- Focused fallback review passed; Kimi and Grok were unavailable, so fresh
+  Claude workers produced the candidate and bounded independent review.
+- Integration gates pass: privacy verifier, 37 privacy tests, public claims,
+  69 claim tests, documentation hygiene, Memory, status, Autodidactic, YAML,
+  visual assertions/screenshots, and diff check.
+- State: `A1 LOCAL VERIFIED / HOSTED PR CHECKS PENDING / PRODUCTION FALSE`.
