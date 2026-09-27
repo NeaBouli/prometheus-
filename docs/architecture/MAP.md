@@ -91,7 +91,7 @@ Sibling built flows (same modules, drawn in `map.puml`):
 | `modules/web` | Static audit dashboard + public site | `modules/web/audit/index.html` | built |
 | `scripts/` | Release tooling: artifacts, requests, receipts, evidence, readiness, hygiene | `scripts/README` n/a — see `scripts/*.py` | built |
 | Target: client AI/inference | Real Phi-3-mini 4-bit ONNX, Fed-DART gradients-only | — | target (open) |
-| Target: endpoint detection (GH-258/261) | Observe-only → warn-only → operator-confirmed containment → separately approved automation | `modules/threat-hint/src/endpoint_observation.rs` (first data contract built) | target; producers require privacy/threat-model review first |
+| Target: endpoint detection (GH-258/261) | Observe-only → warn-only → operator-confirmed containment → separately approved automation | `modules/threat-hint/src/endpoint_observation.rs` (first data contract built); `scripts/verify_endpoint_producer_privacy_gate.py` + `docs/evidence/endpoint-producer-privacy-threat-model-v1.json` (GH-267 pre-producer gate, rebased PR #268 candidate, not on main) | target; producers require independent privacy/threat-model review first |
 | Target: PROM emission, IPFS distribution, public multi-host, mobile (Flutter), Tauri UI | Tokenomics and distribution layers | — | target (open) |
 
 ## 4. Verdrahtung (one sentence per arrow)

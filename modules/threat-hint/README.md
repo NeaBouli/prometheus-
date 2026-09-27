@@ -128,3 +128,11 @@ arbitrary label, or free text. It accepts caller-supplied bytes only and
 performs no endpoint collection, OS access, detection, correlation, AI/actor
 attribution, warning, proof, transport, analysis, response, wallet, chain, or
 production action.
+
+GH-267 adds only a repository candidate privacy/threat-model and Security-CI
+gate around this future producer boundary. It pins default-off per-host opt-in,
+least privilege, local aggregation/redaction, these eight allowed fields,
+prohibited raw-data classes, no current retention/transport, and independent
+review. It adds no endpoint collection or runtime behavior, proves neither
+privacy/anonymity nor absence of a hidden sensor, grants no response authority,
+and does not change production status.
