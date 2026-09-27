@@ -5636,3 +5636,10 @@ Rules for all dev agents:
 - No replacement dashboard, backend, deployment, wallet, chain, contract,
   tokenomics, Mainnet, or production capability was added.
 - Status: `A2 LOCAL VERIFIED / HOSTED PR CHECKS PENDING / PRODUCTION FALSE`.
+
+### 2026-09-28 - A3 public audit correction authorized and started
+
+- Gio authorized the next planned block after the explicit PR #269 consent gate.
+- Scope is limited to rebasing and correcting the six public audit records;
+  no product, contract, CI, deployment, or production change is authorized.
+- Status: `A3 IN PROGRESS / PRODUCTION FALSE`.
