@@ -357,7 +357,6 @@ that SHA.
 ## Links
 
 - [Whitepaper v4](WHITEPAPER.md) — Full technical specification
-- [Audit Dashboard](modules/web/audit/index.html) — Development audit/status interface
 - [Audit Log](memory/AUDIT.md) — Public repository audit history
 - [Architecture Decisions](memory/MEMO.md) — 15 binding decisions
 - [Sprint Planning](memory/SPRINTS.md) — Detailed roadmap
