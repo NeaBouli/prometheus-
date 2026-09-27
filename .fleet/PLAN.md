@@ -237,3 +237,17 @@ Both runs require Gio budget approval (plan-level gate).
   69 claim tests, documentation hygiene, Memory, status, Autodidactic, YAML,
   visual assertions/screenshots, and diff check.
 - State: `A1 LOCAL VERIFIED / HOSTED PR CHECKS PENDING / PRODUCTION FALSE`.
+
+### 2026-09-28 — A2 locally integrated
+
+- Removed the fabricated public audit dashboard and all public links, sitemap
+  entries, architecture pointers, and developer-guide references to it.
+- Kimi completed the bounded implementation after Claude fallback; no second
+  implementation was performed.
+- Integration gates pass: 13-surface claim verifier, 76 claim tests,
+  documentation hygiene plus 11 tests, Memory, status plus 7 tests,
+  Autodidactic plus 6 tests, targeted absence checks, and diff check.
+- Responsive assertions pass at 1440x1000, 1180x820, 820x1180, and 390x844:
+  no page overflow and no audit-dashboard link. Existing contrast and touch
+  target debt remains assigned to A12 and is not represented as fixed here.
+- State: `A2 LOCAL VERIFIED / HOSTED PR CHECKS PENDING / PRODUCTION FALSE`.

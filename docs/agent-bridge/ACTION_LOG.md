@@ -5620,3 +5620,19 @@ Rules for all dev agents:
 - No product code, contract, tokenomics, workflow, deployment, wallet, chain,
   GitHub mutation, or public-claim change occurred in this task.
 - Status: `PLAN SYNTHESIZED / CODEX ADOPTION + MS-A BRIEFS NEXT / PRODUCTION FALSE`.
+
+### 2026-09-28 - A2 fabricated public audit dashboard removed locally
+
+- Kimi implemented the bounded A2 block after Claude fallback: deleted
+  `modules/web/audit/index.html` and removed its public links, sitemap entry,
+  documentation pointers, and architecture-map node. Claim gates now reject
+  any reintroduction on public surfaces.
+- Integration PASS: 13 synchronized surfaces, 76 claim tests, documentation
+  hygiene plus 11 tests, Memory, project status plus 7 tests, Autodidactic plus
+  6 tests, dashboard/public-pointer absence checks, and diff check.
+- Responsive browser assertions across four required viewports found no
+  horizontal overflow or remaining dashboard link. Known pre-existing
+  contrast and touch-target debt remains scheduled for A12.
+- No replacement dashboard, backend, deployment, wallet, chain, contract,
+  tokenomics, Mainnet, or production capability was added.
+- Status: `A2 LOCAL VERIFIED / HOSTED PR CHECKS PENDING / PRODUCTION FALSE`.
