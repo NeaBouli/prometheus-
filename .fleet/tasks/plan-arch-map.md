@@ -19,4 +19,3 @@ Map the current Prometheus architecture and derive the minimum modular completio
 - Architecture-map format is complete and evidence-linked.
 - The next three safe implementation nodes are explicit.
 - Report follows the Fleet report schema with real checks.
-

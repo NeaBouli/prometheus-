@@ -19,4 +19,3 @@ Produce a read-only project control-plane inventory for the remaining Prometheus
 - Critical path to repository-ready, Testnet-ready, and production-ready states.
 - Explicit CI-budget strategy and audit timing decision.
 - Report follows the Fleet report schema.
-
