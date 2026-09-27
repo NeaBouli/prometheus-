@@ -5643,3 +5643,19 @@ Rules for all dev agents:
 - Scope is limited to rebasing and correcting the six public audit records;
   no product, contract, CI, deployment, or production change is authorized.
 - Status: `A3 IN PROGRESS / PRODUCTION FALSE`.
+
+### 2026-09-28 - A3 public audit correction locally verified
+
+- Corrected PR #269's five reports and register README on the integration
+  branch: stable IDs, PRM-01 invalid, PRM-26 tie wording fixed, rustls advisory
+  separated as PRM-A01, totals `0C/7H/15M/20L/5I`, and valid SHA-256 pins.
+- The uncorrected PDF digest `3a9556…ff37` is marked superseded; no replacement
+  PDF or unsupported digest was published.
+- Claude delivered the bounded retry with `status: ok`; the initial Fleet run
+  produced no diff and Kimi's canonical probe reported `token_limited`.
+- Integration PASS: documentation hygiene plus 11 tests, public claims plus 76
+  tests, Memory, project status plus 7 tests, focused correction/hash checks,
+  and diff check.
+- Existing draft PR #269 was not pushed before the planned Actions reset; its
+  update and exact hosted checks remain pending.
+- Status: `A3 LOCAL VERIFIED / PR #269 UPDATE + HOSTED CI PENDING / PRODUCTION FALSE`.

@@ -251,3 +251,19 @@ Both runs require Gio budget approval (plan-level gate).
   no page overflow and no audit-dashboard link. Existing contrast and touch
   target debt remains assigned to A12 and is not represented as fixed here.
 - State: `A2 LOCAL VERIFIED / HOSTED PR CHECKS PENDING / PRODUCTION FALSE`.
+
+### 2026-09-28 — A3 locally integrated
+
+- Imported and corrected the five public reports plus register README from
+  draft PR #269 without changing finding IDs or product behavior.
+- PRM-01 is withdrawn as invalid, PRM-26 states that threshold ties are
+  accepted, and the rustls advisory is separated as addendum PRM-A01.
+- Corrected totals are `0C / 7H / 15M / 20L / 5I`; all five report SHA-256
+  pins match. The old PDF digest `3a9556…ff37` is explicitly superseded and no
+  replacement PDF digest is invented.
+- Claude completed the bounded retry after the first zero-diff Fleet failure;
+  Kimi was token-limited. No duplicate implementation or routine review ran.
+- Integration gates pass: documentation hygiene plus 11 tests, 13-surface
+  claim verifier plus 76 tests, Memory, project status plus 7 tests, targeted
+  correction/hash checks, and diff check.
+- State: `A3 LOCAL VERIFIED / PR #269 UPDATE + HOSTED CI PENDING / PRODUCTION FALSE`.
