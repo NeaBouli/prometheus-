@@ -33,7 +33,8 @@
 *** built: keyless Genesis + reportMetrics Operator; H-001 Canary bestaetigt
 *** blocked: verbleibende externe Signaturen/Evidence
 ** modules/web + scripts
-*** built: Audit-Dashboard, Release-Tooling
+*** built: Public-Site-Seiten (Repo-Root), Release-Tooling
+*** removed: fabriziertes Audit-Dashboard (GH-273)
 ** target
 *** open: PROM Emission, IPFS Distribution, public Multi-Host
 *** open: Mobile (Flutter), Tauri UI

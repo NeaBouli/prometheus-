@@ -118,12 +118,7 @@
 
 ## ═══ SPRINT 7: AUDIT DASHBOARD (Woche 9) ═══
 
-- [ ] [P2] React-App initialisieren (web/audit/) | Claude Code | -
-- [ ] [P2] Live-Feed: On-Chain Events anzeigen | Claude Code | connection.rs
-- [ ] [P2] Netzwerkstatistiken-Seite | Claude Code | React-App
-- [ ] [P2] Dev-Grants-Transparenz-Seite | Claude Code | React-App
-- [ ] [P3] Admin-Panel für Validators | Claude Code | React-App
-- [ ] [P3] Admin-Panel für Guardians | Claude Code | React-App
+- [x] [P1] GH-273 fabricated public audit dashboard removed | Kimi K4 + Codex Sol | The `modules/web` mock page (fabricated validator/guardian/rule/grant stats, truncated Kaspa addresses, 30s Kaspa-L1 refresh and on-chain-verifiability claims) and every public link/pointer (footers, README, llms.txt, sitemap) are removed; the claim-consistency gate now rejects dashboard pointers and fabricated validator/address/grant/rule/refresh/on-chain claims; a real audit dashboard stays unbuilt until separately approved live evidence exists
 
 ---
 

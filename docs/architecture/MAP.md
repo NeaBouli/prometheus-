@@ -88,7 +88,7 @@ Sibling built flows (same modules, drawn in `map.puml`):
 | `modules/contracts` (legacy `.ss`) | Historical Silverscript contracts | `modules/contracts/*.ss` | built (accepted legacy; superseded, do not extend) |
 | `modules/contracts/silverc` | Seven current-Silverc fixtures with compile/ABI/runtime gates | `modules/contracts/silverc/*.sil` | built; six state deployments + oracle execution: blocked |
 | `modules/silverc-deployer` | Keyless Toccata-v1 genesis + reportMetrics operator | `modules/silverc-deployer/src/main.rs::Cli` | built (H-001 canary executed once, non-promotable); remaining real execution: blocked on external signatures |
-| `modules/web` | Static audit dashboard + public site | `modules/web/audit/index.html` | built |
+| `modules/web` | Static public status surface (GitHub Pages root pages); fabricated audit dashboard removed (GH-273) | `index.html` + sibling root pages | built |
 | `scripts/` | Release tooling: artifacts, requests, receipts, evidence, readiness, hygiene | `scripts/README` n/a — see `scripts/*.py` | built |
 | Target: client AI/inference | Real Phi-3-mini 4-bit ONNX, Fed-DART gradients-only | — | target (open) |
 | Target: endpoint detection (GH-258/261) | Observe-only → warn-only → operator-confirmed containment → separately approved automation | `modules/threat-hint/src/endpoint_observation.rs` (first data contract built); `scripts/verify_endpoint_producer_privacy_gate.py` + `docs/evidence/endpoint-producer-privacy-threat-model-v1.json` (GH-267 pre-producer gate, rebased PR #268 candidate, not on main) | target; producers require independent privacy/threat-model review first |
@@ -241,7 +241,8 @@ mindmap
       built: keyless genesis + reportMetrics operator; H-001 canary confirmed
       blocked: remaining external signatures/evidence
     modules/web + scripts
-      built: audit dashboard, release tooling
+      built: public site pages (repo root), release tooling
+      removed: fabricated audit dashboard (GH-273)
     target
       open: PROM emission, IPFS distribution, public multi-host
       open: mobile (Flutter), Tauri UI

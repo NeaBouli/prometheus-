@@ -689,7 +689,7 @@ Whitepaper verification pass. GH-13 is accepted as development-only foundation.
 | tests/security_sybil         | ACCEPTED        | 100%     | 2026-03-22  | ACCEPTED     | 500:1 Sybil resistance |
 | tests/security_fp_flood      | ACCEPTED        | 100%     | 2026-03-22  | ACCEPTED     | 500 flood blocked |
 | **SPRINT 7 – DASHBOARD**     |                 |          |             |              |                 |
-| web/audit/index.html         | ACCEPTED        | 100%     | 2026-03-22  | ACCEPTED     | Dark theme, logo path fixed |
+| web/audit dashboard page     | REMOVED         | -        | 2026-09-28  | REMOVED      | GH-273: mock page fabricated live validator/guardian/rule/grant stats plus Kaspa-L1 refresh/on-chain-verifiability claims; page and every public link/pointer removed, claim gate extended |
 | README.md                    | ACCEPTED        | 100%     | 2026-07-16  | REMOTE PASS  | Experimental miner companion boundary and no-passive-reward wording merged in PR #14; exact-merge Pages pass |
 | WHITEPAPER.md                | ACCEPTED        | 100%     | 2026-07-16  | REMOTE PASS  | Target architecture separated from current stubs; miner companion, Stratum/wRPC, privacy, and reward boundaries merged and live-verified |
 

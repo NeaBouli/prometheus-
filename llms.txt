@@ -70,7 +70,6 @@ policies/membership, local trust anchors, and same-host tests.
 - Whitepaper: https://neabouli.github.io/prometheus-/whitepaper.html
 - FAQ: https://neabouli.github.io/prometheus-/faq.html
 - Roadmap: https://neabouli.github.io/prometheus-/roadmap.html
-- Audit Dashboard: https://neabouli.github.io/prometheus-/modules/web/audit/index.html
 - GitHub: https://github.com/NeaBouli/prometheus-
 
 ## Questions this project answers

@@ -457,6 +457,24 @@ GH267_FALSE_FIELDS = (
     "production_authority",
 )
 
+GH273_DASHBOARD_POINTERS = (
+    re.compile(r"modules/web/audit", re.I),
+    re.compile(r"audit/index\.html", re.I),
+)
+
+GH273_POINTER_FREE_FILES = (
+    SITEMAP_PATH,
+    Path("CLAUDE.md"),
+    Path("docs/developer-guide.md"),
+    Path("docs/architecture/MAP.md"),
+    Path("docs/architecture/map.puml"),
+    Path("memory/CHECKPOINT.md"),
+    Path("memory/STATUS.md"),
+    Path("memory/TODO.md"),
+)
+
+SITEMAP_BASE_URL = "https://neabouli.github.io/prometheus-/"
+
 
 def has_gh264_boundary(text: str) -> bool:
     """Require the safety terms in one bounded GH-264 status section."""
@@ -595,6 +613,42 @@ BANNED_CLAIMS = {
     ),
     "stale-phi3-heuristic": re.compile(
         r"Phi-3(?:-mini)?[^\n]{0,200}(?:placeholder/|development(?:-only)? )?heuristic(?:/stub)?",
+        re.I,
+    ),
+    "fabricated-network-stat": re.compile(
+        r"(?<![\d,.\-–—])\b\d[\d.,]*\s*(?:<[^>]+>\s*){0,5}"
+        r"(?:active|online)\s+(?:validators|guardians)\b",
+        re.I,
+    ),
+    "fabricated-rule-count": re.compile(
+        r"(?<![\d,.\-–—])\b\d+\s*(?:<[^>]+>\s*){0,5}rules?\s+on-?chain\b",
+        re.I,
+    ),
+    "fabricated-fp-rate": re.compile(
+        r"\b\d+(?:\.\d+)?\s*%\s*(?:<[^>]+>\s*){0,5}false[- ]positive\s+rate\b",
+        re.I,
+    ),
+    "fabricated-response-time": re.compile(
+        r"\b\d+(?:\.\d+)?\s*s\s*(?:<[^>]+>\s*){0,5}"
+        r"avg(?:erage)?\s+response\s+time\b",
+        re.I,
+    ),
+    "fabricated-grant-claim": re.compile(
+        r"\bgrant\s*#\s*\d+\b[\s\S]{0,300}\bPROM\b", re.I
+    ),
+    "fabricated-grant-transparency": re.compile(
+        r"\bdev[- ]?grants?\s+transparency\b", re.I
+    ),
+    "fabricated-rule-id": re.compile(r"\bPROM-RULE-\d{4}-\d{4}\b"),
+    "fabricated-address": re.compile(r"\bkaspa:[a-z0-9]{2,}\.\.\.[a-z0-9]{2,}\b"),
+    "fabricated-refresh-claim": re.compile(
+        r"\bupdates\s+every\s+\d+\s*(?:s|sec(?:onds?)?|m|min(?:utes?)?)\b"
+        r"[\s\S]{0,100}\b(?:kaspa|l1|on-?chain)",
+        re.I,
+    ),
+    "fabricated-onchain-verifiability": re.compile(
+        r"\b(?:all|every)\s+(?:data|metrics?|stats?|statistics)\b"
+        r"[^\n]{0,60}\bverifiable\s+on-?chain",
         re.I,
     ),
 }
@@ -1026,23 +1080,34 @@ def validate_json_ld_update_date(text: str) -> list[str]:
     return []
 
 
-def validate_sitemap(path: Path) -> list[str]:
-    """Validate current public-page lastmod values with an XML parser."""
+def validate_sitemap(path: Path, root: Path) -> list[str]:
+    """Validate lastmod values and repository targets with an XML parser."""
     try:
-        root = ET.parse(path).getroot()
+        document = ET.parse(path).getroot()
     except (OSError, ET.ParseError):
         return ["missing or invalid sitemap"]
     namespace = {"sm": "http://www.sitemaps.org/schemas/sitemap/0.9"}
     entries: dict[str, str] = {}
-    for url in root.findall("sm:url", namespace):
+    for url in document.findall("sm:url", namespace):
         location = url.findtext("sm:loc", default="", namespaces=namespace)
         last_modified = url.findtext("sm:lastmod", default="", namespaces=namespace)
         entries[location] = last_modified
-    return [
+    errors = [
         f"current public URL has stale or missing lastmod: {url}"
         for url in sorted(CURRENT_PUBLIC_URLS)
         if entries.get(url) != LATEST_PROJECT_UPDATE
     ]
+    for location in sorted(entries):
+        if not location.startswith(SITEMAP_BASE_URL):
+            errors.append(f"sitemap URL outside the public site root: {location}")
+            continue
+        target = location.removeprefix(SITEMAP_BASE_URL) or "index.html"
+        if ".." in target.split("/"):
+            errors.append(f"sitemap URL escapes the public site root: {location}")
+            continue
+        if not (root / target).is_file():
+            errors.append(f"sitemap URL has no repository target: {location}")
+    return errors
 
 
 def verify(root: Path) -> list[str]:
@@ -1246,14 +1311,24 @@ def verify(root: Path) -> list[str]:
             errors.append(f"{relative}: exact reconciliation baseline missing")
         for category in find_banned_claims(text):
             errors.append(f"{relative}: prohibited claim category {category}")
+        if any(pattern.search(text) for pattern in GH273_DASHBOARD_POINTERS):
+            errors.append(f"{relative}: fabricated audit dashboard pointer present")
         if relative.suffix == ".html":
             errors.extend(f"{relative}: {item}" for item in validate_json_ld(text))
             errors.extend(
                 f"{relative}: {item}" for item in validate_json_ld_update_date(text)
             )
     errors.extend(
-        f"{SITEMAP_PATH}: {item}" for item in validate_sitemap(root / SITEMAP_PATH)
+        f"{SITEMAP_PATH}: {item}"
+        for item in validate_sitemap(root / SITEMAP_PATH, root)
     )
+    for relative in GH273_POINTER_FREE_FILES:
+        path = root / relative
+        if not path.is_file():
+            continue
+        text = path.read_text(encoding="utf-8")
+        if any(pattern.search(text) for pattern in GH273_DASHBOARD_POINTERS):
+            errors.append(f"{relative}: fabricated audit dashboard pointer present")
     for relative in set(GH264_PUBLIC_FILES) - set(PUBLIC_FILES):
         path = root / relative
         if not path.exists():

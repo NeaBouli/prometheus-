@@ -914,7 +914,6 @@ Post-Toccata Integrations- und Rollout-Gates. Das fruehere Mainnet-Zieldatum ist
 - **Guardian Tests:** `modules/guardian-node/tests/`
 - **Scripts:** `scripts/` (audit_trigger.py, autodidactic.py, check_memory_integrity.py)
 - **Website:** `index.html`, `whitepaper.html`, `faq.html`, `roadmap.html`, `guardian-economics.html`
-- **Audit Dashboard:** `modules/web/audit/`
 - **Whitepaper:** `WHITEPAPER.md`
 - **Memory/Docs:** `memory/` (AUDIT.md, MEMO.md, SPRINTS.md, STATUS.md, etc.)
 

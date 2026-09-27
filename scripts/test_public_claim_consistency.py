@@ -1301,8 +1301,9 @@ class PublicClaimConsistencyTests(unittest.TestCase):
     def test_stale_sitemap_lastmod_is_rejected(self) -> None:
         root = SCRIPT.parents[1]
         with tempfile.TemporaryDirectory() as tmp:
-            sitemap = Path(tmp) / "sitemap.xml"
-            shutil.copy(root / MODULE.SITEMAP_PATH, sitemap)
+            tmp_root = Path(tmp)
+            copy_gh267_verification_fixture(root, tmp_root)
+            sitemap = tmp_root / MODULE.SITEMAP_PATH
             sitemap.write_text(
                 sitemap.read_text(encoding="utf-8").replace(
                     MODULE.LATEST_PROJECT_UPDATE,
@@ -1311,7 +1312,134 @@ class PublicClaimConsistencyTests(unittest.TestCase):
                 ),
                 encoding="utf-8",
             )
-            self.assertTrue(MODULE.validate_sitemap(sitemap))
+            errors = MODULE.validate_sitemap(sitemap, tmp_root)
+            self.assertTrue(
+                any("stale or missing lastmod" in error for error in errors)
+            )
+
+    def test_current_sitemap_targets_exist(self) -> None:
+        root = SCRIPT.parents[1]
+        self.assertEqual(
+            MODULE.validate_sitemap(root / MODULE.SITEMAP_PATH, root), []
+        )
+
+    def test_sitemap_url_without_repository_target_is_rejected(self) -> None:
+        root = SCRIPT.parents[1]
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_root = Path(tmp)
+            copy_gh267_verification_fixture(root, tmp_root)
+            sitemap = tmp_root / MODULE.SITEMAP_PATH
+            sitemap.write_text(
+                sitemap.read_text(encoding="utf-8").replace(
+                    "</urlset>",
+                    "  <url><loc>https://neabouli.github.io/prometheus-/"
+                    "modules/web/audit/index.html</loc>"
+                    f"<lastmod>{MODULE.LATEST_PROJECT_UPDATE}</lastmod></url>\n"
+                    "</urlset>",
+                ),
+                encoding="utf-8",
+            )
+            errors = MODULE.validate_sitemap(sitemap, tmp_root)
+            self.assertTrue(
+                any("no repository target" in error for error in errors)
+            )
+
+    def test_sitemap_url_outside_site_root_is_rejected(self) -> None:
+        root = SCRIPT.parents[1]
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_root = Path(tmp)
+            copy_gh267_verification_fixture(root, tmp_root)
+            sitemap = tmp_root / MODULE.SITEMAP_PATH
+            sitemap.write_text(
+                sitemap.read_text(encoding="utf-8").replace(
+                    "</urlset>",
+                    "  <url><loc>https://example.invalid/audit</loc>"
+                    f"<lastmod>{MODULE.LATEST_PROJECT_UPDATE}</lastmod></url>\n"
+                    "</urlset>",
+                ),
+                encoding="utf-8",
+            )
+            errors = MODULE.validate_sitemap(sitemap, tmp_root)
+            self.assertTrue(
+                any("outside the public site root" in error for error in errors)
+            )
+
+    def test_audit_dashboard_pointer_in_public_surface_is_rejected(self) -> None:
+        root = SCRIPT.parents[1]
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_root = Path(tmp)
+            copy_gh267_verification_fixture(root, tmp_root)
+            faq = tmp_root / "faq.html"
+            faq.write_text(
+                faq.read_text(encoding="utf-8")
+                + '\n<li><a href="modules/web/audit/index.html">Audit</a></li>\n',
+                encoding="utf-8",
+            )
+            errors = MODULE.verify(tmp_root)
+            self.assertTrue(
+                any(
+                    "faq.html" in error and "audit dashboard pointer" in error
+                    for error in errors
+                )
+            )
+
+    def test_audit_dashboard_pointer_in_doc_surface_is_rejected(self) -> None:
+        root = SCRIPT.parents[1]
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_root = Path(tmp)
+            copy_gh267_verification_fixture(root, tmp_root)
+            (tmp_root / "CLAUDE.md").write_text(
+                "- **Audit Dashboard:** `modules/web/audit/`\n",
+                encoding="utf-8",
+            )
+            errors = MODULE.verify(tmp_root)
+            self.assertTrue(
+                any(
+                    "CLAUDE.md" in error and "audit dashboard pointer" in error
+                    for error in errors
+                )
+            )
+
+    def test_fabricated_dashboard_claims_are_rejected(self) -> None:
+        cases = {
+            "fabricated-network-stat": (
+                '<div class="value">12</div>'
+                '<div class="label">Active Validators</div>'
+            ),
+            "fabricated-rule-count": (
+                '<div class="value">3</div>'
+                '<div class="label">Rules On-Chain</div>'
+            ),
+            "fabricated-fp-rate": (
+                '<div class="value">0.12%</div>'
+                '<div class="label">False Positive Rate</div>'
+            ),
+            "fabricated-response-time": (
+                '<div class="value">4.2s</div>'
+                '<div class="label">Avg Response Time</div>'
+            ),
+            "fabricated-grant-claim": (
+                "Grant #2 — Guardian YARA Generator Improvements "
+                "Developer: kaspa:qr4d...7b1e | 3,200 PROM"
+            ),
+            "fabricated-grant-transparency": "Dev Grants Transparency",
+            "fabricated-rule-id": "PROM-RULE-2026-0001",
+            "fabricated-address": "kaspa:qz8f...3a2c",
+            "fabricated-refresh-claim": "Updates every 30s from Kaspa L1",
+            "fabricated-onchain-verifiability": "All data verifiable on-chain",
+        }
+        for category, text in cases.items():
+            with self.subTest(category=category):
+                self.assertIn(category, MODULE.find_banned_claims(text))
+
+    def test_legitimate_boundary_wording_is_not_flagged(self) -> None:
+        safe = (
+            "There is no operated validator network; validators stake KAS, "
+            "never PROM. MIN_STAKE_KAS 10,000 targets 50-200 active validators "
+            "and MIN_GUARDIAN_REP targets 200-1,000 active guardians as "
+            "planning ranges. Target ID format: PROM-RULE-2026-XXXX."
+        )
+        self.assertEqual(MODULE.find_banned_claims(safe), [])
 
 
 if __name__ == "__main__":

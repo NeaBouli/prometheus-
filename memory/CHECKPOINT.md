@@ -77,14 +77,13 @@
 | roadmap.html | af1a06a+ | Phases A-F, Sprints 9-19, Device + Hardware Tables |
 | whitepaper.html | 8c950f6 | Full v4 Whitepaper in HTML, 16 Sections |
 | guardian-economics.html | 40cde25+ | Hardware-Kosten, Break-Even, 5 Lösungsansätze |
-| modules/web/audit/ | dc20deb | Open Audit Dashboard mit Mock-Daten |
 
 ### Infrastruktur
 | File | Beschreibung |
 |------|-------------|
 | llms.txt | AI-Crawler Standard (GPTBot, Claude-Web, Perplexity) |
 | robots.txt | Alle Bots erlaubt |
-| sitemap.xml | 6 URLs mit Priority + Lastmod |
+| sitemap.xml | 5 URLs mit Priority + Lastmod |
 | manifest.json | PWA-Support, 2 Icons (Prometheus + PROM coin) |
 | sw.js | Service Worker für Offline-Caching |
 | SECURITY.md | Bug Bounty + Disclosure Policy (GitHub only, no email) |
