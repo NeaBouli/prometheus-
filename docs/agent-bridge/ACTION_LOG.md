@@ -5529,3 +5529,30 @@ Rules for all dev agents:
 - Non-mechanical PRM-09 dependency-policy work is tracked in #279 and PRM-10
   Guardian Compose hardening in #280 rather than widening this security patch.
 - Status: `GH-272 LOCAL VERIFIED / PROTECTED PR + HOSTED CI NEXT / PRODUCTION FALSE`.
+
+### 2026-09-27 - Fleet plan synthesis: canonical remaining delivery plan written
+
+- `.fleet/PLAN.md` replaced by the canonical plan synthesized from the accepted
+  architecture map (`docs/architecture/MAP.md`, baseline exact main `32ca5f1`,
+  hops H1-H8) and the control-plane inventory (`.fleet/reports/
+  plan-arch-map.md`, `.fleet/reports/plan-state-inventory.md`). Truthful status
+  recorded: production false, one non-promotable H-001 canary, fabricated audit
+  dashboard still live (HIGH, #273), register #267-#280 verified open read-only.
+- Ordered gates: MS-A repository/public-integrity repair (A1-A12 = R4 -> R3 ->
+  R1 -> R5a-d/R6/R7 -> R8 -> R9 -> R10, each with architecture node, files and
+  owner), MS-B owner contract decisions (#276, seven decisions), MS-C Testnet
+  (scoped audit, six deployments + receipts, oracle transition, two-host
+  evidence), MS-D production (MAP M2-M6, full deep audit, release hardening).
+  Non-overlapping lanes: Kimi Rust/deps/design, Claude public
+  surfaces/Python/frontend, Grok small bounded tasks, Codex orchestration and
+  release gate.
+- CI strategy: quota reset 2026-10-01 not evidenced for this repo; verify once
+  read-only. Pre-reset local gates only if binding, PRs at final head, batched
+  docs PR; post-reset hosted CI/Security/Pages green on exact main mandatory per
+  merge. Cloudflare security-audit runs twice (scoped standard after R5/R6/R7,
+  full deep incl. contracts before any state deployment), both pending Gio
+  budget approval. Gio blockers and the bound not-to-build list are explicit in
+  the plan.
+- No product code, contract, tokenomics, workflow, deployment, wallet, chain,
+  GitHub mutation, or public-claim change occurred in this task.
+- Status: `PLAN SYNTHESIZED / CODEX ADOPTION + MS-A BRIEFS NEXT / PRODUCTION FALSE`.
