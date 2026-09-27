@@ -6,6 +6,7 @@
 - **Scope:** README, WHITEPAPER (+HTML), faq/roadmap/guardian-economics pages, llms.txt, SECURITY.md, docs/ + memory/ corpus, BACKLOG, CLAUDE.md, prior internal claim audit (2026-08-14) re-baseline
 - **Method:** deep-recon agent claim-drift sweep + lead verification of every finding; sample-based independent re-verification of the internal claim audit's corrections
 - **Register:** PRM-34 … PRM-42 (this report) — **0 Critical / 0 High / 3 Medium / 5 Low / 1 Info**
+- **Correction (2026-09-28):** malformed Markdown code/emphasis span in PRM-36 repaired; no wording, severity or ID changed
 
 ---
 
@@ -50,7 +51,7 @@ The internal 2026-08-14 claim audit was real work, not theater: its corrections 
 - `memory/CHECKPOINT.md` ("Last updated: 2026-09-06") states "GH-220 is in progress … not yet merged" — GH-220 is long merged (`BACKLOG.md:5`, `llms.txt:15`); its baseline `c243b69` predates GH-253.
 - `BACKLOG.md` footer "Zuletzt aktualisiert: 2026-08-09" (5 weeks stale); its STARTFLOW names `db33f56` as last green baseline, contradicting its own header (`c243b69`) and HEAD (`8b5da58a`); GH-253–GH-266 absent.
 - `memory/TODO.md` 2026-08-31, `MEMO.md` 2026-08-23, `AUDIT.md` 2026-08-31 all lag STATUS.md (2026-09-13).
-- Why it matters beyond hygiene: `README.md:352-354` links `AUDIT.md`/`MEMO.md`/`SPRINTS.md** publicly** as project documentation — the staleness is externally visible, and this project's entire brand is freshness-of-record.
+- Why it matters beyond hygiene: `README.md:352-354` links `AUDIT.md`/`MEMO.md`/`SPRINTS.md` **publicly** as project documentation — the staleness is externally visible, and this project's entire brand is freshness-of-record.
 
 **Recommendation:** regenerate or supersede-banner the stale files; consider a CI freshness gate for memory files (the project already has `check_memory_integrity.py` — extend it with recency checks).
 

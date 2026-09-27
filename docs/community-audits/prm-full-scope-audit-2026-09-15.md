@@ -5,13 +5,14 @@
 - **Target:** NeaBouli/prometheus- @ `8b5da58a34172062cf644db52ba459385d151562` + live `neabouli.github.io/prometheus-/`
 - **Scope:** Rust workspace (silverc-deployer, guardian-p2p, client, threat-hint, threat-proof, validator-node), Python guardian-node (77 files), operator scripts, CI/CD, container configs
 - **Method:** 3 deep-recon agents + lead verification of every finding at exact file:line; read-only; no binaries executed against any network; no secrets read; `Prometheus-1.png` untouched (repo AGENTS.md)
-- **Register:** PRM-01 … PRM-12 (this report) — **0 Critical / 1 High / 2 Medium / 8 Low / 1 Info**
+- **Register:** PRM-01 … PRM-12 (this report) — **0 Critical / 0 High / 2 Medium / 8 Low / 1 Info** (PRM-01 invalid, ID retained; see correction)
+- **Correction (2026-09-28):** PRM-01 withdrawn as invalid after re-verification at the audit baseline; no other finding in this report changed
 
 ---
 
 ## Executive summary
 
-The Rust workspace is hardened to a degree this series has not seen before: **zero `unsafe` blocks**, only 13 non-test panic-capable sites workspace-wide (all proven input-unreachable), constant-time compares exactly where secrets are compared, fail-closed boundaries with redacted errors throughout, and a keyless deployer that re-verifies every signature and re-executes every script input locally before broadcast. The Python guardian-node matches that discipline (descriptor-identity file loading, BEGIN IMMEDIATE transactions, non-constructible receipts) — with **one real defect**: its SQLite operational-error helper silently falls through for non-lock errors, turning durable failures into false success receipts at the replay boundary (PRM-01). That function is the single highest-priority fix of this entire audit series.
+The Rust workspace is hardened to a degree this series has not seen before: **zero `unsafe` blocks**, only 13 non-test panic-capable sites workspace-wide (all proven input-unreachable), constant-time compares exactly where secrets are compared, fail-closed boundaries with redacted errors throughout, and a keyless deployer that re-verifies every signature and re-executes every script input locally before broadcast. The Python guardian-node matches that discipline (descriptor-identity file loading, BEGIN IMMEDIATE transactions, non-constructible receipts). *Corrected 2026-09-28:* the originally reported SQLite operational-error fall-through (PRM-01) is invalid — the helper raises terminally for every non-lock error at the baseline — and is withdrawn without renumbering.
 
 Deployment context that calibrates severity: only the stateless H-001 canary verifier is on-chain (Testnet-10, holds no state or value); nothing in this report describes a live exploitable condition on a production system, because the project itself states none exists.
 
@@ -19,7 +20,7 @@ Deployment context that calibrates severity: only the stateless H-001 canary ver
 
 | ID | Severity | Title |
 |----|----------|-------|
-| PRM-01 | High | SQLite `_raise_operational_error` falls through for non-lock errors → false success receipts at the replay boundary |
+| PRM-01 | Invalid (withdrawn) | ~~SQLite `_raise_operational_error` falls through for non-lock errors~~ — not reproducible at baseline; excluded from totals |
 | PRM-02 | Medium | Membership epoch monotonicity is uniqueness-based, not strictly increasing; bootstrap epochs re-usable as targets |
 | PRM-03 | Medium | Runtime-mode gate defaults to stub-permissive "development" when env is unset/misspelled |
 | PRM-04 | Low | `parse_simple_yara_rule` silently degrades declared YARA semantics (`all of them` → any-of) |
@@ -34,20 +35,24 @@ Deployment context that calibrates severity: only the stateless H-001 canary ver
 
 ---
 
-## PRM-01 — High — SQLite `_raise_operational_error` falls through for non-lock errors
+## PRM-01 — Invalid (withdrawn) — SQLite `_raise_operational_error` falls through for non-lock errors
 
-**Evidence (lead-verified):** `modules/guardian-node/jaeger/observable_approval_consumption.py:2456-2462` — the helper is annotated `NoReturn` but only raises for `SQLITE_BUSY`/`SQLITE_LOCKED`; for every other `OperationalError` (SQLITE_FULL, IOERR, CORRUPT, READONLY, CANTOPEN…) it **returns normally**. All six callers then continue into success paths:
+**Correction (2026-09-28):** this finding is **invalid**. At the audit baseline `8b5da58a34172062cf644db52ba459385d151562`, `modules/guardian-node/jaeger/observable_approval_consumption.py:2456-2463` raises `ObservableApprovalBusyError` for `SQLITE_BUSY`/`SQLITE_LOCKED` and ends with an unconditional `raise ObservableApprovalConsumptionError() from None` for every other `OperationalError`. The helper therefore never returns normally, and the described false success receipts cannot occur. The original evidence cited the line range `2456-2462` and missed the terminal raise on line 2463. The ID is kept and not renumbered; PRM-01 counts in no severity total. The original text is retained below for the record only.
 
-- `_consume` (`:703-712`): after a failed INSERT, `except sqlite3.OperationalError as exc: _raise_operational_error(exc)` falls through to `return ObservableApprovalConsumptionReceipt(...)` — **a success receipt for an approval that was never durably consumed**. The replay boundary's core guarantee ("consume exactly once") silently breaks under transient I/O faults, and the approval remains replayable.
-- `claim` (`:1507-1511`): returns an outbox claim whose lease was never persisted (double-processing across workers), or `NameError` when the failure hit before `row` was bound.
-- `complete` (`:1672-1676`), `result` (`:1735-1739`): fabricated completion/result objects or `NameError`.
-- `assert_authority_snapshot` (`:590`) and `__init__` (`:309`): silent pass despite failed reads/migrations.
-
-Corroboration: the sibling module implements the same helper **with** a terminal raise — `guardian_membership_transition.py:1468-1485` (`raise GuardianMembershipTransitionError() from None`) — proving the intended pattern; the only test of the consumption helper (`tests/test_observable_approval_consumption.py:329-338`) parametrizes BUSY/LOCKED exclusively, so the fall-through is untested.
-
-**Impact:** under disk-full/IO-error/corruption conditions the guardian emits success receipts for state transitions that never happened — replay protection, outbox leasing, and authority assertions all degrade silently exactly when the system is under fault stress. Conditional on an I/O fault occurring, but that is precisely the moment a durable ledger must not lie.
-
-**Recommendation:** add the terminal `raise ObservableApprovalConsumptionError() from None` (two lines, mirroring the sibling); add a non-BUSY parametrized test. Small fix, highest priority of this series.
+> **Withdrawn original text:**
+>
+> **Evidence (lead-verified):** `modules/guardian-node/jaeger/observable_approval_consumption.py:2456-2462` — the helper is annotated `NoReturn` but only raises for `SQLITE_BUSY`/`SQLITE_LOCKED`; for every other `OperationalError` (SQLITE_FULL, IOERR, CORRUPT, READONLY, CANTOPEN…) it **returns normally**. All six callers then continue into success paths:
+>
+> - `_consume` (`:703-712`): after a failed INSERT, `except sqlite3.OperationalError as exc: _raise_operational_error(exc)` falls through to `return ObservableApprovalConsumptionReceipt(...)` — **a success receipt for an approval that was never durably consumed**. The replay boundary's core guarantee ("consume exactly once") silently breaks under transient I/O faults, and the approval remains replayable.
+> - `claim` (`:1507-1511`): returns an outbox claim whose lease was never persisted (double-processing across workers), or `NameError` when the failure hit before `row` was bound.
+> - `complete` (`:1672-1676`), `result` (`:1735-1739`): fabricated completion/result objects or `NameError`.
+> - `assert_authority_snapshot` (`:590`) and `__init__` (`:309`): silent pass despite failed reads/migrations.
+>
+> Corroboration: the sibling module implements the same helper **with** a terminal raise — `guardian_membership_transition.py:1468-1485` (`raise GuardianMembershipTransitionError() from None`) — proving the intended pattern; the only test of the consumption helper (`tests/test_observable_approval_consumption.py:329-338`) parametrizes BUSY/LOCKED exclusively, so the fall-through is untested.
+>
+> **Impact:** under disk-full/IO-error/corruption conditions the guardian emits success receipts for state transitions that never happened — replay protection, outbox leasing, and authority assertions all degrade silently exactly when the system is under fault stress. Conditional on an I/O fault occurring, but that is precisely the moment a durable ledger must not lie.
+>
+> **Recommendation:** add the terminal `raise ObservableApprovalConsumptionError() from None` (two lines, mirroring the sibling); add a non-BUSY parametrized test. Small fix, highest priority of this series.
 
 ## PRM-02 — Medium — Membership epoch monotonicity is uniqueness-based, not strictly increasing
 

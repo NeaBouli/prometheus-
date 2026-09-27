@@ -7,6 +7,7 @@
 - **Method:** full read by a contracts deep-recon agent + lead verification of every finding at file:line; all four commit-reveal vectors independently recomputed by the agent and spot-recomputed by the lead; no chain calls
 - **Repo boundaries respected (AGENTS.md):** no emergency-stop proposal, no `slash()` access-control redesign, no commit-reveal formula change — every contract recommendation is framed as **owner decision**
 - **Register:** PRM-13 … PRM-27 (this report) — **0 Critical / 6 High / 6 Medium / 2 Low / 1 Info**
+- **Correction (2026-09-28):** PRM-26 wording on the `VALIDATOR_QUORUM` comparison clarified (ties at the threshold are accepted); no severity or ID changed
 
 ---
 
@@ -115,7 +116,7 @@ The cryptography that *is* live-adjacent is excellent: the commit-reveal formula
 - Commit phase lacks proposal binding and timing windows (`ValidatorStaking.ss:81-139`): no proposal-exists/window check at commit, no reveal deadline, same-block commit+reveal allowed, no forfeit path for never-reveal (moot given PRM-16).
 - Overflow-semantics divergence: `.ss` `penalty = stake*percent*multiplier/100` plain uint64 (`:158-161`) vs Rust `saturating_mul` (`slashing/mod.rs:30`) — the "bit-for-bit identical" claim (`mod.rs:8-9`) is falsifiable at the boundary (needs ~6.1e16 sompi — economically unreachable, but the equivalence claim should be precise). `commit.rs:73`/`reveal.rs:62` also non-saturating.
 - `GuardianReputation.ss:89` voting-power computes `(rep/100)² * compute/1000` — truncation makes the documented quadratic formula stepped (rep=1999 → 361 vs true ≈399).
-- `RuleStorage.ss:100` window reset `>` vs `>=` off-by-one; `CommunityDonations.ss:146-154` O(n) donor scan + uncapped `purpose`; `DevIncentivePool.ss:52-85` no proposer bond (grant spam); mixed time sources (`block.height` vs `block.timestamp`) across contracts; `VALIDATOR_QUORUM = 6700` documented as "2/3 majority" (is 67%, tie accepts); implicit `sha256(proposal_id || msg.sender)` concatenation (`:60,117`) — same ambiguity class as the flagged H-001 TODO.
+- `RuleStorage.ss:100` window reset `>` vs `>=` off-by-one; `CommunityDonations.ss:146-154` O(n) donor scan + uncapped `purpose`; `DevIncentivePool.ss:52-85` no proposer bond (grant spam); mixed time sources (`block.height` vs `block.timestamp`) across contracts; `VALIDATOR_QUORUM = 6700` documented as "2/3 majority" (is 67%, not 2/3; the check is `approval >= VALIDATOR_QUORUM`, so ties at the 6700 threshold are accepted); implicit `sha256(proposal_id || msg.sender)` concatenation (`:60,117`) — same ambiguity class as the flagged H-001 TODO.
 
 ## PRM-27 — Info — Deployed H-001 canary clean; salt-entropy assumption
 
