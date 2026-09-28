@@ -287,3 +287,16 @@ Both runs require Gio budget approval (plan-level gate).
   loopback regression, complete client tests, client Clippy with `-D warnings`,
   and diff check.
 - State: `A4 LOCAL VERIFIED / HOSTED CI PENDING / PRODUCTION FALSE`.
+
+### 2026-09-28 — A4H paused after three zero-diff worker failures
+
+- The external README honesty handoff and evidence were catalogued; temporary
+  Fleet files were checksum-backed up outside `/private/tmp`.
+- One full and two reduced Claude tasks produced no report and no diff. Kimi
+  and Grok probes reported `token_limited`; Solo mode is not justified because
+  Claude remains generally available.
+- No public file was changed. Issues #282 and #283 remain separate; #282 maps
+  to locally verified A4 and #283 remains open CI work.
+- A4H stays a public-activity gate and resumes with a restored independent
+  worker. Safe non-public A5 work may continue without weakening this gate.
+- State: `A4H OPEN / WORKER DELIVERY BLOCKED / PRODUCTION FALSE`.

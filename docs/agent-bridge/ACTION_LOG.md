@@ -5690,3 +5690,12 @@ Rules for all dev agents:
 - A4H is a documentation-only reconciliation at the public-claims/web node;
   A5 resumes afterward.
 - Status: `A4H IN PROGRESS / PRODUCTION FALSE`.
+
+### 2026-09-28 - A4H stopped after third zero-diff delivery failure
+
+- Full, Markdown-only, and README-only Claude assignments returned no valid
+  report and no file change. Kimi and Grok are currently token-limited.
+- No README, landing, runtime, CI, issue, or public claim was changed. The
+  handoff remains catalogued and blocks Prometheus public promotion activity.
+- Per-task stop applies only to A4H; independent A5 backend work can continue.
+- Status: `A4H OPEN / WORKER DELIVERY BLOCKED / PRODUCTION FALSE`.
