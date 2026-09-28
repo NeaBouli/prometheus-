@@ -247,6 +247,10 @@ jobs:
             echo "ERROR: Silverc deployer CLI exposes forbidden signing or secret input"
             exit 1
           fi
+      - name: Test SilverC checkout pin, locked build, and manifest pin gates
+        run: |
+          python3 -m unittest scripts.test_verify_silverc_h001_checkout
+          python3 -m unittest scripts.test_silverc_manifest_build_pin
       - name: Verify H-001 vectors and validator state fixture against pinned silverc
         run: python3 scripts/verify_silverc_h001.py
       - name: Build current-silverc release bundle archive

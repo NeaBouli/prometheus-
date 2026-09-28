@@ -37,6 +37,7 @@ from verify_silverc_h001 import (
     DEFAULT_SILVERSCRIPT_REF,
     DEFAULT_SILVERSCRIPT_REPO,
     ensure_silverscript_repo,
+    workspace_silverscript_rev,
 )
 
 NETWORKS = ("sandbox", "testnet", "mainnet")
@@ -174,8 +175,12 @@ def validate_manifest(bundle_dir: Path, expected_silverscript_ref: str) -> dict[
     actual_names = [entry.get("contract_name") for entry in fixtures]
     if actual_names != expected_names:
         raise ValueError(f"{manifest_path}: fixture order/name mismatch")
+    if expected_silverscript_ref != workspace_silverscript_rev():
+        raise ValueError(f"{manifest_path}: expected silverscript ref does not match the workspace pin")
     if manifest.get("silverscript_ref") != expected_silverscript_ref:
         raise ValueError(f"{manifest_path}: unexpected silverscript_ref")
+    if manifest.get("silverscript_commit") != expected_silverscript_ref:
+        raise ValueError(f"{manifest_path}: unexpected silverscript_commit")
 
     for entry in fixtures:
         fixture = fixtures_by_name[entry["contract_name"]]
@@ -275,11 +280,10 @@ def validate_deploy_rpc_url(rpc_url: str, network: str) -> None:
 
 def inspect_silverc(silverscript_repo: Path, silverscript_ref: str) -> ToolingStatus:
     ensure_silverscript_repo(silverscript_repo, silverscript_ref)
+    run(["cargo", "build", "--locked", "-p", "silverscript-lang", "--bin", "silverc"], silverscript_repo)
     silverc = silverscript_repo / "target" / "debug" / "silverc"
-    if not silverc.exists():
-        run(["cargo", "build", "-p", "silverscript-lang", "--bin", "silverc"], silverscript_repo)
-    if not silverc.exists():
-        raise FileNotFoundError(f"silverc binary was not built: {silverc}")
+    if not silverc.is_file():
+        raise FileNotFoundError("silverc binary was not built from the verified checkout")
 
     help_text = run([str(silverc), "--help"], ROOT).stdout
     deploy_tokens = {"deploy", "publish", "broadcast", "submit"}

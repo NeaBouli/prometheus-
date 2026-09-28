@@ -3604,6 +3604,7 @@ def main() -> int:
                 [
                     "cargo",
                     "test",
+                    "--locked",
                     "-p",
                     "silverscript-lang",
                     "--test",
