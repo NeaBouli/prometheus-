@@ -5820,3 +5820,6 @@ Rules for all dev agents:
 
 - A8b1r is verified (`27` focused passes, Ruff, Mypy). A8b2 now owns compiler
   rebuild, manifest binding, locked Cargo calls, and CI registration only.
+
+- A8b2 is integrated but not closed: an ignored default Cargo target could be
+  reused. A8b2r requires a fresh isolated target and regression proof.
