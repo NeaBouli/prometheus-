@@ -37,5 +37,4 @@ risks: |
 security: no new finding. PRM-11 (Low) fixed in code, pending the test run.
 next: |
   Gio/Codex: free disk space (e.g. stale target/ in finished worktrees a4/a6a/a6b, ~10 GB), then `cargo test -p prometheus-client --lib blockchain::krc20` and `cargo test -p prometheus-client`
-  on 13029c2. If green -> status ok, review/integration. Optional follow-up: make rule_ingest::validate_rule_id
-  pub(crate) and reuse it in krc20.rs.
+  on 13029c2. If green -> status ok, review/integration. Optional follow-up: make rule_ingest::validate_rule_id pub(crate) and reuse it.
