@@ -205,34 +205,71 @@ fn memchr_single(needle: u8, haystack: &[u8]) -> Option<usize> {
     haystack.iter().position(|&b| b == needle)
 }
 
-/// Parse a simple YARA-like rule string into patterns.
-/// Supports format: rule Name { strings: $a = "pattern" condition: $a }
+/// Parse a minimal YARA-like rule string into patterns.
+///
+/// This is a bounded development grammar, not a YARA engine. Anything the
+/// matcher does not implement is rejected instead of being approximated:
+///
+/// ```text
+/// rule <name> {
+/// strings:
+/// $id = "literal"        (1+ lines, nonempty printable ASCII, no escapes)
+/// condition:
+/// any of them | $id | $a or $b or ...
+/// }
+/// ```
+///
+/// A `$id` or `or`-chain condition is accepted only if it references every
+/// declared string exactly once, i.e. it is exactly any-of semantics.
 pub fn parse_simple_yara_rule(name: &str, rule_text: &str) -> Result<CompiledRule> {
-    let mut patterns = Vec::new();
+    // 0 = header, 1 = strings marker, 2 = string lines, 3 = condition value,
+    // 4 = closing brace, 5 = closed.
+    let mut stage = 0u8;
+    let mut ids: Vec<&str> = Vec::new();
+    let mut patterns: Vec<Vec<u8>> = Vec::new();
 
-    // Extract quoted string patterns
-    let mut in_strings = false;
-    for line in rule_text.lines() {
-        let trimmed = line.trim();
-        if trimmed.starts_with("strings:") || trimmed.contains("strings:") {
-            in_strings = true;
+    for raw_line in rule_text.lines() {
+        let line = raw_line.trim();
+        if line.is_empty() {
+            continue;
         }
-        if trimmed.starts_with("condition:") {
-            in_strings = false;
-        }
-        if in_strings {
-            // Find quoted patterns like $a = "EICAR"
-            if let Some(start) = trimmed.find('"') {
-                if let Some(end) = trimmed[start + 1..].find('"') {
-                    let pattern = &trimmed[start + 1..start + 1 + end];
-                    patterns.push(pattern.as_bytes().to_vec());
+        match stage {
+            0 => {
+                let tokens: Vec<&str> = line.split_whitespace().collect();
+                if tokens.len() != 3 || tokens[0] != "rule" || tokens[1] != name || tokens[2] != "{"
+                {
+                    anyhow::bail!("unsupported rule header");
                 }
+                stage = 1;
             }
+            1 if line == "strings:" => stage = 2,
+            2 if line == "condition:" => {
+                if patterns.is_empty() {
+                    anyhow::bail!("rule must contain nonempty patterns");
+                }
+                stage = 3;
+            }
+            2 => {
+                let (id, literal) = parse_string_line(line)?;
+                if ids.contains(&id) || patterns.iter().any(|p| p == literal) {
+                    anyhow::bail!("duplicate string identifier or literal");
+                }
+                ids.push(id);
+                patterns.push(literal.to_vec());
+            }
+            3 => {
+                if !is_any_of_condition(line, &ids) {
+                    anyhow::bail!("unsupported rule condition");
+                }
+                stage = 4;
+            }
+            4 if line == "}" => stage = 5,
+            _ => anyhow::bail!("malformed rule"),
         }
     }
 
-    if patterns.is_empty() || patterns.iter().any(Vec::is_empty) {
-        anyhow::bail!("rule must contain nonempty patterns");
+    if stage != 5 {
+        anyhow::bail!("malformed rule");
     }
 
     Ok(CompiledRule {
@@ -240,6 +277,63 @@ pub fn parse_simple_yara_rule(name: &str, rule_text: &str) -> Result<CompiledRul
         patterns,
         required_matches: 1,
     })
+}
+
+/// Parse one `$id = "literal"` line. The identifier is 1..=32 ASCII
+/// alphanumerics or underscore; the literal is nonempty printable ASCII
+/// without `"` or `\`. Hex strings, regexes and modifiers are rejected.
+fn parse_string_line(line: &str) -> Result<(&str, &[u8])> {
+    let malformed = || anyhow::anyhow!("unsupported string definition");
+    let rest = line.strip_prefix('$').ok_or_else(malformed)?;
+    let (id, rest) = rest.split_once('=').ok_or_else(malformed)?;
+    let id = id.trim_end();
+    if !is_identifier(id) {
+        return Err(malformed());
+    }
+    let literal = rest
+        .trim_start()
+        .strip_prefix('"')
+        .and_then(|r| r.strip_suffix('"'))
+        .ok_or_else(malformed)?;
+    if literal.is_empty()
+        || !literal
+            .bytes()
+            .all(|b| (0x20..=0x7e).contains(&b) && b != b'"' && b != b'\\')
+    {
+        return Err(malformed());
+    }
+    Ok((id, literal.as_bytes()))
+}
+
+fn is_identifier(id: &str) -> bool {
+    !id.is_empty() && id.len() <= 32 && id.bytes().all(|b| b.is_ascii_alphanumeric() || b == b'_')
+}
+
+/// True only for conditions whose semantics are exactly any-of over all
+/// declared strings: `any of them`, or `$x` / `$x or $y ...` naming every
+/// declared identifier exactly once.
+fn is_any_of_condition(condition: &str, ids: &[&str]) -> bool {
+    let tokens: Vec<&str> = condition.split_whitespace().collect();
+    if tokens == ["any", "of", "them"] {
+        return true;
+    }
+    if tokens.len() != ids.len() * 2 - 1 {
+        return false;
+    }
+    let mut referenced: Vec<&str> = Vec::with_capacity(ids.len());
+    for (i, token) in tokens.iter().enumerate() {
+        if i % 2 == 1 {
+            if *token != "or" {
+                return false;
+            }
+            continue;
+        }
+        match token.strip_prefix('$') {
+            Some(id) if ids.contains(&id) && !referenced.contains(&id) => referenced.push(id),
+            _ => return false,
+        }
+    }
+    referenced.len() == ids.len()
 }
 
 #[cfg(test)]
@@ -382,6 +476,132 @@ mod tests {
         assert!(parse_simple_yara_rule("Empty", empty).is_err());
         assert!(parse_simple_yara_rule("Missing", "rule Missing { condition: true }").is_err());
         assert_eq!(count_pattern_matches(&[Vec::new()], b"anything"), 0);
+    }
+
+    fn rule_with(strings: &str, condition: &str) -> String {
+        format!("rule R {{\nstrings:\n{strings}\ncondition:\n{condition}\n}}\n")
+    }
+
+    #[test]
+    fn test_parse_rejects_all_of_them_instead_of_degrading_to_any_of() {
+        let text = rule_with("$a = \"AAA\"\n$b = \"BBB\"", "all of them");
+        assert!(parse_simple_yara_rule("R", &text).is_err());
+
+        // The same strings under the supported condition still load, and
+        // they match on a single pattern (any-of), which is exactly why
+        // `all of them` must not be accepted as the same rule.
+        let any = rule_with("$a = \"AAA\"\n$b = \"BBB\"", "any of them");
+        let compiled = parse_simple_yara_rule("R", &any).unwrap();
+        let mut scanner = YaraScanner::new().unwrap();
+        scanner.add_rule(compiled).unwrap();
+        assert_eq!(
+            scanner.scan_bytes(b"only AAA").unwrap().matched_rules,
+            vec!["R"]
+        );
+        assert!(!scanner.scan_bytes(b"neither").unwrap().is_threat);
+    }
+
+    #[test]
+    fn test_parse_rejects_unsupported_conditions() {
+        let strings = "$a = \"AAA\"\n$b = \"BBB\"";
+        for condition in [
+            "all of them",
+            "2 of them",
+            "any of ($a*)",
+            "$a and $b",
+            "$a or $b and $a",
+            "($a or $b)",
+            "$a",
+            "$a or $a",
+            "$a or $c",
+            "not $a or $b",
+            "true",
+            "any of them or $a",
+            "",
+        ] {
+            let text = rule_with(strings, condition);
+            assert!(
+                parse_simple_yara_rule("R", &text).is_err(),
+                "condition {condition:?} must be rejected"
+            );
+        }
+    }
+
+    #[test]
+    fn test_parse_rejects_unsupported_string_definitions() {
+        for strings in [
+            "$a = { 4D 5A }",
+            "$a = /evil[0-9]+/",
+            "$a = \"es\\x41cape\"",
+            "$a = \"quo\\\"te\"",
+            "$a = \"AAA\" nocase",
+            "$a = \"AAA\" wide ascii",
+            "$a = \"\"",
+            "$ = \"AAA\"",
+            "a = \"AAA\"",
+            "$a-b = \"AAA\"",
+            "$a = \"AAA\"\n$a = \"BBB\"",
+            "$a = \"AAA\"\n$b = \"AAA\"",
+            "$a = \"tab\there\"",
+            "// comment",
+        ] {
+            let text = rule_with(strings, "any of them");
+            assert!(
+                parse_simple_yara_rule("R", &text).is_err(),
+                "strings {strings:?} must be rejected"
+            );
+        }
+    }
+
+    #[test]
+    fn test_parse_rejects_malformed_sections() {
+        let cases = [
+            // Header mismatch / missing.
+            "rule Other {\nstrings:\n$a = \"AAA\"\ncondition:\nany of them\n}",
+            "rule R : tag {\nstrings:\n$a = \"AAA\"\ncondition:\nany of them\n}",
+            "strings:\n$a = \"AAA\"\ncondition:\nany of them\n}",
+            // Inline sections, missing sections, extra content.
+            "rule R { strings: $a = \"AAA\" condition: any of them }",
+            "rule R {\nstrings: $a = \"AAA\"\ncondition:\nany of them\n}",
+            "rule R {\nstrings:\n$a = \"AAA\"\ncondition: any of them\n}",
+            "rule R {\ncondition:\nany of them\n}",
+            "rule R {\nstrings:\n$a = \"AAA\"\n}",
+            "rule R {\nstrings:\n$a = \"AAA\"\ncondition:\nany of them",
+            "rule R {\nstrings:\n$a = \"AAA\"\ncondition:\nany of them\n}\nextra",
+            "rule R {\nstrings:\n$a = \"AAA\"\ncondition:\nany of them\n$b\n}",
+            "rule R {\nmeta:\nx = \"y\"\nstrings:\n$a = \"AAA\"\ncondition:\nany of them\n}",
+            "rule R {\nstrings:\nstrings:\n$a = \"AAA\"\ncondition:\nany of them\n}",
+            "",
+        ];
+        for text in cases {
+            assert!(
+                parse_simple_yara_rule("R", text).is_err(),
+                "rule {text:?} must be rejected"
+            );
+        }
+    }
+
+    #[test]
+    fn test_parse_accepts_supported_minimal_rules() {
+        let single = rule_with("$a = \"EICAR\"", "$a");
+        let chain = rule_with("$a = \"AAA\"\n$b = \"BBB\"\n$c = \"CCC\"", "$c or $a or $b");
+        let any = rule_with("$x_1 = \"X Y!\"", "any of them");
+        for text in [&single, &chain, &any] {
+            let compiled = parse_simple_yara_rule("R", text).unwrap();
+            assert_eq!(compiled.required_matches, 1);
+            let mut scanner = YaraScanner::new().unwrap();
+            scanner.add_rule(compiled).unwrap();
+            assert_eq!(scanner.rule_count(), 1);
+        }
+        let compiled = parse_simple_yara_rule("R", &chain).unwrap();
+        assert_eq!(
+            compiled.patterns,
+            vec![b"AAA".to_vec(), b"BBB".to_vec(), b"CCC".to_vec()]
+        );
+        let mut scanner = YaraScanner::new().unwrap();
+        scanner.add_rule(compiled).unwrap();
+        assert!(scanner.scan_bytes(b"xx CCC xx").unwrap().is_threat);
+        assert!(!scanner.scan_bytes(b"xx DDD xx").unwrap().is_threat);
     }
 
     #[test]
