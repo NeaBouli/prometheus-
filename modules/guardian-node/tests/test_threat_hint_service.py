@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import os
 import shutil
+import stat
 import tempfile
 from pathlib import Path
 
@@ -207,4 +208,158 @@ def test_config_rejects_unknown_fields_and_unsafe_mode() -> None:
         with pytest.raises(ThreatHintIngressError, match="owner-only"):
             load_service_config(directory / "service.toml")
     finally:
+        shutil.rmtree(directory)
+
+
+def pad_config_to(path: Path, size: int) -> None:
+    text = path.read_text(encoding="ascii")
+    path.write_text(text + "#" * (size - len(text) - 1) + "\n", encoding="ascii")
+    os.chmod(path, 0o600)
+
+
+def forbid_config_parse(monkeypatch: pytest.MonkeyPatch) -> None:
+    def forbidden(_text: str) -> dict[str, object]:
+        raise AssertionError("rejected config bytes must not be parsed")
+
+    monkeypatch.setattr(threat_hint_service.tomllib, "loads", forbidden)
+
+
+def assert_config_rejected(path: Path, match: str, *sensitive: str) -> None:
+    with pytest.raises(ThreatHintIngressError, match=match) as exc:
+        load_service_config(path)
+    assert_redacted(exc, str(path), path.name, *sensitive)
+
+
+def test_config_is_read_once_through_one_no_follow_descriptor(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    directory = owner_only_directory()
+    try:
+        path = write_config(directory, 'mode = "unavailable"')
+        opened: list[tuple[object, int]] = []
+        real_open = os.open
+
+        def recording_open(target: object, flags: int, *args: int) -> int:
+            opened.append((target, flags))
+            return real_open(target, flags, *args)
+
+        def forbidden_path_read(*_args: object, **_kwargs: object) -> str:
+            raise AssertionError("config must not be reopened by path")
+
+        monkeypatch.setattr(threat_hint_service.os, "open", recording_open)
+        monkeypatch.setattr(Path, "read_text", forbidden_path_read)
+        monkeypatch.setattr(Path, "read_bytes", forbidden_path_read)
+        assert load_service_config(path).verifier_mode == "unavailable"
+        assert opened == [(path, os.O_RDONLY | os.O_NOFOLLOW)]
+    finally:
+        monkeypatch.undo()
+        shutil.rmtree(directory)
+
+
+def test_config_exact_limit_loads_and_over_limit_is_rejected_unparsed(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    directory = owner_only_directory()
+    try:
+        path = write_config(directory, 'mode = "unavailable"')
+        pad_config_to(path, threat_hint_service.MAX_CONFIG_BYTES)
+        assert path.stat().st_size == threat_hint_service.MAX_CONFIG_BYTES
+        assert load_service_config(path).verifier_mode == "unavailable"
+        pad_config_to(path, threat_hint_service.MAX_CONFIG_BYTES + 1)
+        forbid_config_parse(monkeypatch)
+        assert_config_rejected(path, "owner-only")
+    finally:
+        monkeypatch.undo()
+        shutil.rmtree(directory)
+
+
+def test_config_rejects_invalid_utf8_and_symlink_redacted() -> None:
+    directory = owner_only_directory()
+    try:
+        path = write_config(directory, 'mode = "unavailable"')
+        path.write_bytes(path.read_bytes() + b"# \xc3\x28\n")
+        assert_config_rejected(path, "config is invalid")
+        target = write_config(directory, 'mode = "unavailable"')
+        link = directory / "service-link.toml"
+        link.symlink_to(target)
+        assert_config_rejected(link, "owner-only")
+    finally:
+        shutil.rmtree(directory)
+
+
+@pytest.mark.parametrize("swap", ["replace", "symlink"])
+def test_config_swapped_between_check_and_open_is_rejected_unparsed(
+    monkeypatch: pytest.MonkeyPatch, swap: str
+) -> None:
+    directory = owner_only_directory()
+    try:
+        path = write_config(directory, 'mode = "unavailable"')
+        attacker = directory / "evil.toml"
+        attacker.write_text("# attacker-marker\n", encoding="ascii")
+        os.chmod(attacker, 0o600)
+        real_open = os.open
+
+        def swapping_open(target: object, flags: int, *args: int) -> int:
+            if target == path:
+                path.unlink()
+                if swap == "replace":
+                    os.link(attacker, path)
+                else:
+                    path.symlink_to(attacker)
+            return real_open(target, flags, *args)
+
+        monkeypatch.setattr(threat_hint_service.os, "open", swapping_open)
+        forbid_config_parse(monkeypatch)
+        assert_config_rejected(path, "config is invalid", "attacker-marker")
+    finally:
+        monkeypatch.undo()
+        shutil.rmtree(directory)
+
+
+@pytest.mark.parametrize("change", ["grow", "shrink"])
+def test_config_size_change_during_read_is_rejected_unparsed(
+    monkeypatch: pytest.MonkeyPatch, change: str
+) -> None:
+    directory = owner_only_directory()
+    try:
+        path = write_config(directory, 'mode = "unavailable"')
+        original_size = path.stat().st_size
+        real_read = os.read
+
+        def mutating_read(descriptor: int, size: int) -> bytes:
+            if change == "grow":
+                with path.open("ab") as handle:
+                    handle.write(b"# grown\n")
+            else:
+                os.truncate(path, original_size - 1)
+            monkeypatch.setattr(threat_hint_service.os, "read", real_read)
+            return real_read(descriptor, size)
+
+        monkeypatch.setattr(threat_hint_service.os, "read", mutating_read)
+        forbid_config_parse(monkeypatch)
+        assert_config_rejected(path, "config is invalid", "testnet-10")
+    finally:
+        monkeypatch.undo()
+        shutil.rmtree(directory)
+
+
+def test_config_inode_change_after_open_is_rejected_unparsed(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    directory = owner_only_directory()
+    try:
+        path = write_config(directory, 'mode = "unavailable"')
+        real_fstat = os.fstat
+
+        def other_inode_fstat(descriptor: int) -> os.stat_result:
+            current = real_fstat(descriptor)
+            fields = list(current)
+            fields[stat.ST_INO] = current.st_ino + 1
+            return os.stat_result(fields)
+
+        monkeypatch.setattr(threat_hint_service.os, "fstat", other_inode_fstat)
+        forbid_config_parse(monkeypatch)
+        assert_config_rejected(path, "config is invalid", "testnet-10")
+    finally:
+        monkeypatch.undo()
         shutil.rmtree(directory)

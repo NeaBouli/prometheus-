@@ -21,8 +21,9 @@ from an exact policy-derived context, verified commitment/network equality,
 and a final binding/statement digest assertion.
 """
 
-# Exact built-in types are protocol requirements.
-# pylint: disable=unidiomatic-typecheck
+# Exact built-in types are protocol requirements; the descriptor-bound owner
+# file read intentionally stays local to this module.
+# pylint: disable=duplicate-code,unidiomatic-typecheck
 
 from __future__ import annotations
 
@@ -273,12 +274,13 @@ class ThreatHintV2PreflightService:  # pylint: disable=too-few-public-methods
 def _load_preflight_policy(path: Path) -> ThreatHintV2PreflightPolicy:
     """Load one exact-schema policy from an owner-only regular TOML file.
 
-    Loading performs no writes: the file is only read as ASCII and parsed.
+    Loading performs no writes: the file is read once through one no-follow
+    descriptor, decoded as strict ASCII, and parsed.
     """
-    policy_path = _validate_owner_policy_path(path)
+    contents = _read_owner_policy_file(path)
     try:
-        data = tomllib.loads(policy_path.read_text(encoding="ascii"))
-    except (OSError, UnicodeError, tomllib.TOMLDecodeError, RecursionError):
+        data = tomllib.loads(contents.decode("ascii"))
+    except (UnicodeError, tomllib.TOMLDecodeError, RecursionError):
         raise ThreatHintV2PreflightError() from None
     if not isinstance(data, dict) or set(data) != _POLICY_FIELDS:
         raise ThreatHintV2PreflightError()
@@ -308,23 +310,60 @@ def _load_preflight_policy(path: Path) -> ThreatHintV2PreflightPolicy:
     )
 
 
-def _validate_owner_policy_path(path: Path) -> Path:
+def _read_owner_policy_file(path: Path) -> bytes:
+    if not hasattr(os, "O_NOFOLLOW"):
+        raise ThreatHintV2PreflightError()
     if not isinstance(path, Path) or not path.is_absolute():
         raise ThreatHintV2PreflightError()
     try:
         parent = path.parent.resolve(strict=True)
         parent_stat = parent.stat()
-        current = path.lstat()
-    except OSError:
+        before = path.lstat()
+        candidate = parent / path.name
+        if (
+            candidate != path
+            or not _is_safe_policy_parent(parent_stat)
+            or not _is_safe_policy_file(before)
+        ):
+            raise ThreatHintV2PreflightError()
+        descriptor = os.open(candidate, os.O_RDONLY | os.O_NOFOLLOW)
+        try:
+            opened = os.fstat(descriptor)
+            if not _is_same_policy_file(before, opened):
+                raise ThreatHintV2PreflightError()
+            contents = _read_policy_descriptor(descriptor)
+            after = os.fstat(descriptor)
+        finally:
+            os.close(descriptor)
+    except (OSError, ValueError):
         raise ThreatHintV2PreflightError() from None
-    candidate = parent / path.name
-    if (
-        candidate != path
-        or not _is_safe_policy_parent(parent_stat)
-        or not _is_safe_policy_file(current)
-    ):
+    if len(contents) != before.st_size or not _is_same_policy_file(before, after):
         raise ThreatHintV2PreflightError()
-    return candidate
+    return contents
+
+
+def _read_policy_descriptor(descriptor: int) -> bytes:
+    chunks: list[bytes] = []
+    remaining = MAX_PREFLIGHT_POLICY_BYTES + 1
+    while remaining:
+        chunk = os.read(descriptor, remaining)
+        if not chunk:
+            break
+        chunks.append(chunk)
+        remaining -= len(chunk)
+    contents = b"".join(chunks)
+    if len(contents) > MAX_PREFLIGHT_POLICY_BYTES:
+        raise ThreatHintV2PreflightError()
+    return contents
+
+
+def _is_same_policy_file(before: os.stat_result, current: os.stat_result) -> bool:
+    return (
+        before.st_dev == current.st_dev
+        and before.st_ino == current.st_ino
+        and before.st_size == current.st_size
+        and _is_safe_policy_file(current)
+    )
 
 
 def _is_safe_policy_parent(current: os.stat_result) -> bool:
