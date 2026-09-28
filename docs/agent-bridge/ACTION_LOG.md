@@ -5728,3 +5728,22 @@ Rules for all dev agents:
 - Claude is the single writer while Kimi remains token-limited; every slice
   receives focused tests and the combined block receives security review.
 - Status: `A6 IN PROGRESS / PRODUCTION FALSE`.
+
+### 2026-09-28 - A6 scanner boundaries locally verified
+
+- PRM-04: unsupported YARA semantics now fail closed; the documented minimal
+  any-of development subset remains supported.
+- PRM-05: scanner and detector file APIs cap actual reads at 16 MiB plus one
+  byte and reject empty/oversized input without exposing local contents.
+- PRM-11: the development KRC20 cache validates rule IDs, canonical raw CIDs,
+  and consensus, caps distinct entries at 256, and rejects conflicts/capacity
+  overflow without mutation or eviction.
+- Claude delivered three serial code slices. Codex reviewed the security diffs
+  and reran the combined gates. A6c initially hit `errno=28`; only regenerable
+  Cargo targets from completed A6 workers were cleaned, raising free space from
+  41 MiB before the successful verification.
+- PASS: format; focused scanner/file tests; focused KRC20 `12 passed, 1
+  ignored`; complete client `347 passed, 2 ignored`; Clippy `-D warnings`;
+  diff check.
+- No network, deploy, wallet, chain, contract, tokenomics, or production action.
+- Status: `A6 LOCAL VERIFIED / HOSTED CI PENDING / PRODUCTION FALSE`.

@@ -1,5 +1,5 @@
 id: a6c-dev-rule-cache-bounds
-status: partial
+status: ok
 worker: claude
 branch: agent/claude/a6c-dev-rule-cache-bounds (commit 13029c2)
 summary: |
@@ -20,21 +20,17 @@ files:
 tests: |
   cargo fmt --all -- --check: OK.
   cargo clippy -p prometheus-client --all-targets -- -D warnings: OK (0 warnings).
-  cargo test -p prometheus-client --lib blockchain::krc20: NOT RUN. The lib test compiled; only the link step
-  failed with "ld: write() failed, errno=28" (volume /System/Volumes/Data 100% full, 38-52 MiB free).
-  The full client test suite is also NOT RUN, for the same reason.
-  The build used CARGO_TARGET_DIR=../claude-a6b-scanner-file-bounds/target (warm dep cache); only this worktree's own
-  target/ (194 MB) was deleted; nothing outside this worktree was deleted.
+  Initial test link failed with errno=28 at 41 MiB free. Codex removed only the completed A6a/A6b
+  Cargo target artifacts, then reran with the warm A6b target: focused KRC20 12 passed, 1 ignored;
+  complete client suite 347 passed, 2 ignored, 0 failed.
   New tests: normal insert, idempotent duplicate, conflicting duplicate (type/CID/active), rule_id exact 128 vs 129
   plus empty/space/slash/NL/NUL/non-ASCII, CID (empty, dag-pb, truncated, too long, uppercase, CIDv0),
   consensus 0.0/1.0 vs out-of-range/NaN/Inf, capacity boundary 256/257 incl. idempotent re-add
   and validation-before-capacity, generic Display. Every rejection asserts an unchanged cache snapshot.
 risks: |
-  Tests unverified until disk space is available. Semantic change: add_cached_rule is now fallible
-  and rejects the previously used dag-pb fixture CID (intended: same CID rule as ingest).
+  Semantic change: add_cached_rule is now fallible and rejects the previously used dag-pb fixture CID
+  (intended: same CID rule as ingest).
   The rule_id charset check duplicates the private rule_ingest::validate_rule_id (not
   shareable because rule_ingest.rs was out of scope); the constant itself is reused.
-security: no new finding. PRM-11 (Low) fixed in code, pending the test run.
-next: |
-  Gio/Codex: free disk space (e.g. stale target/ in finished worktrees a4/a6a/a6b, ~10 GB), then `cargo test -p prometheus-client --lib blockchain::krc20` and `cargo test -p prometheus-client`
-  on 13029c2. If green -> status ok, review/integration. Optional follow-up: make rule_ingest::validate_rule_id pub(crate) and reuse it.
+security: no new finding. PRM-11 (Low) is locally fixed and verified; hosted CI and merge remain pending.
+next: Codex records A6 evidence and opens the normal PR/hosted-CI gate; no production promotion.

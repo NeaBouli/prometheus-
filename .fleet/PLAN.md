@@ -315,3 +315,21 @@ Both runs require Gio budget approval (plan-level gate).
 - Documentation hygiene (11 tests), 13-surface verifier (76 tests), hash pins,
   security diff review, and diff check pass.
 - State: `A5 LOCAL VERIFIED / HOSTED CI PENDING / PRODUCTION FALSE`.
+
+### 2026-09-28 — A6 locally verified
+
+- PRM-04 is fixed fail-closed: the development scanner accepts only its
+  explicit any-of subset and rejects unsupported YARA syntax instead of
+  changing semantics.
+- PRM-05 is fixed with capped `limit + 1` reads for scanner and detector file
+  APIs; empty and oversized input fail before unbounded allocation.
+- PRM-11 is fixed in the development KRC20 cache with validated rule identity,
+  canonical CID and consensus, 256-entry capacity, deterministic duplicate
+  handling, and no mutation on rejection.
+- Claude implemented three serial slices; Codex performed the security diffs
+  and combined verification. Initial A6c linking hit a full disk; only
+  regenerable A6a/A6b Cargo targets were cleaned before successful reruns.
+- Gates pass: format, focused scanner/file/cache regressions, complete client
+  suite `347 passed, 2 ignored`, client Clippy with `-D warnings`, and diff
+  check. No network, deploy, wallet, chain, contract, or production action.
+- State: `A6 LOCAL VERIFIED / HOSTED CI PENDING / PRODUCTION FALSE`.
