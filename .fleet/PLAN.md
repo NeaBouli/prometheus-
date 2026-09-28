@@ -442,3 +442,16 @@ Both runs require Gio budget approval (plan-level gate).
   secret, or production action. The under-60-second lifecycle remains an
   unproven public multi-host target.
 - State: `A8 LOCAL VERIFIED / HOSTED CI PENDING / PRODUCTION FALSE`.
+
+### 2026-09-28 — A8 hosted verification green; PR opened
+
+- PR `#284` opened from the integration branch at `e0f96c6`. The first hosted
+  verification completed successfully: Toolchain Pin Policy, Rust Workspace,
+  Rust Performance, Current Silverc Runtime + Artifact Smoke, Python Guardian,
+  HTML Pages, Memory Integrity, Silverscript Contracts, Secret Detection,
+  Dependency Audit, and Security Summary all passed.
+- Hosted runs: Prometheus CI `36443057946`; Security Audit `36443057571`.
+  CodeRabbit skipped review because the accumulated milestone PR contains 132
+  files; this is not recorded as an independent review. Codex's required
+  security review and local integration verification remain the review basis.
+- State: `A8 VERIFIED / PR #284 OPEN / REVIEW REQUIRED / PRODUCTION FALSE`.

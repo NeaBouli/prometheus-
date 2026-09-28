@@ -5854,3 +5854,16 @@ Rules for all dev agents:
   migration, or production change. Under 60 seconds remains a target pending
   real public multi-host evidence.
 - Status: `A8 LOCAL VERIFIED / HOSTED CI PENDING / PRODUCTION FALSE`.
+
+### 2026-09-28 - A8 hosted verification green; PR #284 open
+
+- Opened normal PR `#284` at commit `e0f96c6`; no admin merge or main push.
+- PASS in Prometheus CI run `36443057946`: Toolchain Pin Policy, Rust
+  Workspace, Rust Performance, Current Silverc Runtime + Artifact Smoke,
+  Python Guardian, HTML Pages, Memory Integrity, and Silverscript Contracts.
+- PASS in Security Audit run `36443057571`: Secret Detection, Dependency Audit,
+  and Security Summary.
+- CodeRabbit skipped because the accumulated A1-A8 milestone changes 132 files;
+  it did not supply an independent review. Required security source review and
+  combined local verification were completed by Codex before the PR.
+- Status: `A8 VERIFIED / PR #284 OPEN / REVIEW REQUIRED / PRODUCTION FALSE`.
