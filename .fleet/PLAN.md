@@ -390,3 +390,6 @@ Both runs require Gio budget approval (plan-level gate).
 
 - A8a2 also produced no report or diff. The broad inventory is replaced, not
   repeated, by serial bounded slices: A8a3 SilverC/CI, then A8a4 Cargo/Kaspa.
+
+- A8a3 is independently source-verified: medium fail-open SilverC pinning debt
+  confirmed; H-001 evidence stays immutable. A8a4 now maps Cargo/Kaspa only.

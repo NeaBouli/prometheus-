@@ -5805,3 +5805,6 @@ Rules for all dev agents:
 
 - A8a2 also returned no report/diff. Broad inventory is stopped and replaced
   by serial SilverC/CI and Cargo/Kaspa slices; implementation remains closed.
+
+- A8a3 confirms medium SilverC compiler pinning debt. Codex source-reviewed the
+  finding; no hardening or version migration has started. A8a4 maps Cargo/Kaspa.
