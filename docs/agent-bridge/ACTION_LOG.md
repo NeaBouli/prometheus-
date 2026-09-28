@@ -5699,3 +5699,11 @@ Rules for all dev agents:
   handoff remains catalogued and blocks Prometheus public promotion activity.
 - Per-task stop applies only to A4H; independent A5 backend work can continue.
 - Status: `A4H OPEN / WORKER DELIVERY BLOCKED / PRODUCTION FALSE`.
+
+### 2026-09-28 - A5 Guardian membership epoch gate started
+
+- Scope is PRM-02 only at the owner-local membership transition boundary:
+  strict durable epoch monotonicity and no-mutation regressions.
+- Claude is the single writer; security review remains mandatory. No external
+  membership authority, network, L1, deploy, or production action is included.
+- Status: `A5 IN PROGRESS / PRODUCTION FALSE`.
