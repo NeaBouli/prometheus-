@@ -414,3 +414,31 @@ Both runs require Gio budget approval (plan-level gate).
 
 - A8c integrated with 45 focused tests, but Codex review requires A8c1 to bind
   the same immutable relation identity in the Python Guardian parser.
+
+### 2026-09-28 — A8 compatibility and pinning gate locally verified
+
+- A8 now enforces one machine-readable policy for the active Rusty Kaspa
+  dependency graph, SilverScript compiler revision, release-manifest compiler
+  identity, and immutable Rust/Python threat-proof identity. Direct dependency
+  drift, split lock graphs, tags/branches in place of the exact SilverScript
+  revision, dirty or symlinked compiler checkouts, and reusable default build
+  targets fail closed.
+- Active pins remain intentionally unchanged: Rusty Kaspa
+  `v2.0.1@cfafeb4c093fa37a303f1b9f19c58f986b870ce3` and SilverScript
+  `d25bd3427a093c17327ca3d6b9e1aa5f7688c863`. Rusty Kaspa v2.1.0 and
+  SilverScript v1.0.0 are observed candidates only; no upgrade was performed.
+- Kimi was canonically `token_limited`. Claude delivered bounded serial slices;
+  Codex integrated them and closed three security-review findings without
+  duplicating accepted worker work.
+- PASS: 55 toolchain-policy tests; 42 SilverC pin/build tests; Ruff; strict
+  Mypy; workflow YAML parse; locked offline Cargo tree; 102 Rust tests plus 2
+  compile-fail doc-tests; 55 pinned upstream SilverC tests; seven-artifact
+  release build; isolated full-profile preflight; H-001 canary-profile
+  regression; 7 status-consistency tests; diff check.
+- Local `actionlint` and Black were unavailable. The workflow was structurally
+  parsed, and its existing Black gate does not target the changed A8 scripts.
+  Hosted CI remains the authoritative remote workflow result.
+- No deployment, broadcast, wallet, chain, contract, proof artifact, migration,
+  secret, or production action. The under-60-second lifecycle remains an
+  unproven public multi-host target.
+- State: `A8 LOCAL VERIFIED / HOSTED CI PENDING / PRODUCTION FALSE`.

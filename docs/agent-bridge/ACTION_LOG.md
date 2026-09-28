@@ -5829,3 +5829,28 @@ Rules for all dev agents:
 
 - A8c is integrated but not closed: Rust proof identity is gated, while the
   matching Python Guardian constants still need A8c1 cross-language checks.
+
+### 2026-09-28 - A8 compatibility and pinning gate locally verified
+
+- Added an offline, fail-closed policy gate for the exact active Rusty Kaspa
+  graph, SilverScript revision, compiler checkout/build, release manifest, and
+  immutable Rust/Python threat-proof identity.
+- Active versions did not change: Rusty Kaspa remains
+  `v2.0.1@cfafeb4c093fa37a303f1b9f19c58f986b870ce3`; SilverScript remains
+  `d25bd3427a093c17327ca3d6b9e1aa5f7688c863`. Newer upstream releases are
+  candidates for a separate compatibility task, not rollout evidence.
+- Kimi was canonically `token_limited`; Claude supplied bounded serial slices.
+  Codex reviewed the security boundary and fixed symlink-checkout acceptance,
+  default-target reuse, and missing Python proof-identity enforcement.
+- PASS: 55 toolchain-policy tests; 42 SilverC pin/build tests; Ruff; strict
+  Mypy; workflow YAML parse; locked offline Cargo tree; 102 Rust tests and 2
+  compile-fail doc-tests; 55 pinned upstream SilverC tests; seven compiled
+  artifacts; isolated preflight with no blockers; H-001 canary regression; 7
+  project-status checks; diff check.
+- `actionlint` and Black were unavailable locally. A8 scripts pass Ruff lint;
+  the current CI Black gate covers unchanged Guardian files. Hosted CI remains
+  pending.
+- No secrets, deployment, broadcast, wallet, chain, contract, proof artifact,
+  migration, or production change. Under 60 seconds remains a target pending
+  real public multi-host evidence.
+- Status: `A8 LOCAL VERIFIED / HOSTED CI PENDING / PRODUCTION FALSE`.
