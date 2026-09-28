@@ -59,13 +59,20 @@ class CargoLockedTest(TempDirTest):
         self.assertEqual(calls, [["cargo", "build", "--locked", "-p", "silverscript-lang", "--bin", "silverc"]])
 
     def test_preflight_rebuilds_even_when_binary_exists(self) -> None:
-        self.make_silverc()
+        stale_silverc = self.make_silverc()
         order: list[str] = []
         calls: list[list[str]] = []
+        isolated_target: Path | None = None
 
         def fake_run(cmd: list[str], cwd: Path) -> subprocess.CompletedProcess[str]:
+            nonlocal isolated_target
             calls.append(cmd)
             order.append(cmd[0] if cmd[0] == "cargo" else "silverc")
+            if cmd[:2] == ["cargo", "build"]:
+                isolated_target = Path(cmd[cmd.index("--target-dir") + 1])
+                binary = isolated_target / "debug" / "silverc"
+                binary.parent.mkdir(parents=True)
+                binary.write_text("isolated\n")
             if cmd[:2] == ["cargo", "metadata"]:
                 return completed(cmd, json.dumps({"packages": []}))
             return completed(cmd, "Usage: silverc [OPTIONS]\n")
@@ -76,9 +83,14 @@ class CargoLockedTest(TempDirTest):
         ):
             status = pf.inspect_silverc(self.tmp, PIN)
 
-        self.assertEqual(calls[0], ["cargo", "build", "--locked", "-p", "silverscript-lang", "--bin", "silverc"])
+        self.assertEqual(calls[0][:4], ["cargo", "build", "--locked", "--target-dir"])
+        self.assertIsNotNone(isolated_target)
+        assert isolated_target is not None
+        self.assertNotEqual(Path(calls[1][0]), stale_silverc)
+        self.assertFalse(isolated_target.exists())
         self.assertEqual(order[:2], ["verify", "cargo"])
         self.assertFalse(status.has_deploy_command)
+        self.assertEqual(status.silverc_path, "<isolated-target>/debug/silverc")
 
     def test_preflight_does_not_build_when_checkout_verification_fails(self) -> None:
         with (

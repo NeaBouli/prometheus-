@@ -280,12 +280,26 @@ def validate_deploy_rpc_url(rpc_url: str, network: str) -> None:
 
 def inspect_silverc(silverscript_repo: Path, silverscript_ref: str) -> ToolingStatus:
     ensure_silverscript_repo(silverscript_repo, silverscript_ref)
-    run(["cargo", "build", "--locked", "-p", "silverscript-lang", "--bin", "silverc"], silverscript_repo)
-    silverc = silverscript_repo / "target" / "debug" / "silverc"
-    if not silverc.is_file():
-        raise FileNotFoundError("silverc binary was not built from the verified checkout")
-
-    help_text = run([str(silverc), "--help"], ROOT).stdout
+    with tempfile.TemporaryDirectory(prefix="prom-silverc-preflight-") as build_dir:
+        target_dir = Path(build_dir)
+        run(
+            [
+                "cargo",
+                "build",
+                "--locked",
+                "--target-dir",
+                str(target_dir),
+                "-p",
+                "silverscript-lang",
+                "--bin",
+                "silverc",
+            ],
+            silverscript_repo,
+        )
+        silverc = target_dir / "debug" / "silverc"
+        if not silverc.is_file():
+            raise FileNotFoundError("silverc binary was not built from the verified checkout")
+        help_text = run([str(silverc), "--help"], ROOT).stdout
     deploy_tokens = {"deploy", "publish", "broadcast", "submit"}
     commands = {token.strip(" ,;:.").lower() for token in help_text.split()}
     has_deploy = bool(deploy_tokens & commands)
@@ -314,7 +328,7 @@ def inspect_silverc(silverscript_repo: Path, silverscript_ref: str) -> ToolingSt
             )
         )
     return ToolingStatus(
-        silverc_path=str(silverc),
+        silverc_path="<isolated-target>/debug/silverc",
         has_deploy_command=has_deploy,
         repository_operator_manifest=str(operator_manifest),
         has_repository_genesis_operator=has_repository_operator,
