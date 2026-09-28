@@ -5667,3 +5667,16 @@ Rules for all dev agents:
 - Kimi remains `token_limited`; Claude is the single writing worker. Independent
   security review is mandatory before integration acceptance.
 - Status: `A4 IN PROGRESS / PRODUCTION FALSE`.
+
+### 2026-09-28 - A4 fail-closed client runtime gate locally verified
+
+- Fixed PRM-03 at MAP hop H1: ThreatHint v1/v2 preflight and submission require
+  explicit process runtime `development` before hint, identity, or network work.
+- Missing, empty, malformed, beta, mainnet, and mode disagreement reject; wire
+  formats, KAS/PROM, contracts, wallets, chain, deployment, and public claims
+  are unchanged.
+- Claude implemented the bounded retry. Grok review fell back to a fresh Claude
+  thread with `verdict: ok`; Codex completed the mandatory security diff review.
+- PASS: format, 4 focused runtime tests, real-binary pre-network regression,
+  complete client tests, Clippy `-D warnings`, and diff check.
+- Status: `A4 LOCAL VERIFIED / HOSTED CI PENDING / PRODUCTION FALSE`.

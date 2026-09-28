@@ -267,3 +267,19 @@ Both runs require Gio budget approval (plan-level gate).
   claim verifier plus 76 tests, Memory, project status plus 7 tests, targeted
   correction/hash checks, and diff check.
 - State: `A3 LOCAL VERIFIED / PR #269 UPDATE + HOSTED CI PENDING / PRODUCTION FALSE`.
+
+### 2026-09-28 — A4 locally integrated
+
+- PRM-03 is confirmed and fixed at `modules/client` MAP hop H1. ThreatHint v1
+  and v2 preflight/submit now require an explicit `PROMETHEUS_RUNTIME=development`
+  before hint, identity, or transport activity.
+- Missing, empty, malformed, beta, and mainnet process modes fail closed; the
+  validated mode must also agree. No wire format, retry, CLI flag, or new path
+  was introduced.
+- Claude delivered the bounded retry. Grok review fell back to a fresh Claude
+  reviewer (`verdict: ok`); Codex therefore performed the focused security diff
+  review before integration and found no remaining issue.
+- Gates pass: `cargo fmt --all -- --check`, 4 runtime tests, real-binary H1
+  loopback regression, complete client tests, client Clippy with `-D warnings`,
+  and diff check.
+- State: `A4 LOCAL VERIFIED / HOSTED CI PENDING / PRODUCTION FALSE`.

@@ -1,0 +1,9 @@
+verdict: ok
+Fallback-Review (claude) for grok; reviewed agent/claude/a4-client-runtime-gate-r2 @ 33acd38 against a4-client-runtime-gate(-r2) briefs.
+Scope: only modules/client runtime.rs, network/p2p.rs, tests/threat_hint_p2p_loopback.rs plus the report; no new module, flag, protocol or map change.
+Correctness: try_parse is the single strict parser; lenient parse delegates to it, so the other components behave the same as before ("development" now matches explicitly, and the fallback stays Development).
+H1 gate: require_development -> require_explicit_development(explicit_from_env(), mode). Missing, empty or unknown env gives None and fails; beta or mainnet fails; the process mode must agree with the validated mode. It runs in validate() and at both v1/v2 call sites, before any file, identity or network step.
+cfg(test) seam (process_runtime_mode -> Some(Development)) is limited to lib unit tests. Integration and binary tests link the non-test lib, so the real env path is covered by the loopback test (None, "", "dev", beta, mainnet x preflight/submit).
+Tests (re-run by reviewer in the branch worktree): cargo fmt --check OK; cargo test -p prometheus-client passed with 0 failures (lib 173 passed, 2 ignored; v1/v2 loopback 3+3 passed); cargo clippy -p prometheus-client --all-targets -D warnings is clean.
+Security: fails closed for PRM-03 on H1. No secrets, network, deploy or chain activity. KAS/PROM, wallet and commit-reveal are untouched. Errors stay generic and redacted.
+Non-blocking: (1) threat_hint_v2_p2p_loopback has no missing-env/malformed case. It shares the gate, so coverage is indirect. (2) Operator docs/runbooks should state that PROMETHEUS_RUNTIME=development is now mandatory for threat-hint preflight/submit. (3) Rule-sync and AI/ZK stubs keep the lenient default, as the report notes. That needs a separate decision.
