@@ -383,3 +383,7 @@ Both runs require Gio budget approval (plan-level gate).
 - JEV routing produced no value after one corrected retry; deterministic serial
   inventory then implementation therefore governs.
 - State: `A8 INVENTORY IN PROGRESS / PRODUCTION FALSE`.
+
+- A8a produced no report or diff. Canonical probes: Kimi `token_limited`,
+  Claude `available`, Grok `available`. A8a2 assigns the same inventory to
+  Claude; Grok remains unused because the scope exceeds its role boundary.

@@ -5798,3 +5798,7 @@ Rules for all dev agents:
 - JEV returned no routing value after one corrected retry; no JEV result
   influenced architecture or security decisions.
 - Status: `A8 INVENTORY IN PROGRESS / PRODUCTION FALSE`.
+
+- Worker update: A8a returned no report/diff. Kimi is canonically
+  `token_limited`; Claude and Grok probes passed. Claude owns non-duplicated
+  A8a2 inventory; no implementation has started.
