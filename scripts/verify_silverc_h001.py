@@ -4,11 +4,14 @@
 from __future__ import annotations
 
 import os
+import re
 import subprocess
 import sys
+import tomllib
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+WORKSPACE_CARGO_TOML = ROOT / "Cargo.toml"
 H001_CONTRACT = ROOT / "modules" / "contracts" / "silverc" / "ValidatorStakingH001.sil"
 VALIDATOR_STATE_CONTRACT = (
     ROOT / "modules" / "contracts" / "silverc" / "ValidatorStakingState.sil"
@@ -31,6 +34,17 @@ GOVERNANCE_AUTO_TUNING_STATE_CONTRACT = (
 DEFAULT_SILVERSCRIPT_REPO = Path("/tmp/prom-silverscript")
 SILVERSCRIPT_GIT = "https://github.com/kaspanet/silverscript.git"
 DEFAULT_SILVERSCRIPT_REF = "d25bd3427a093c17327ca3d6b9e1aa5f7688c863"
+SILVERSCRIPT_REF_RE = re.compile(r"[0-9a-f]{40}")
+PROBE_TEST_NAME = "prometheus_h001_probe"
+# Neutralise repository-local hooks and fsmonitor commands of a pre-existing checkout.
+GIT_SAFE_CONFIG = (
+    "-c",
+    "core.hooksPath=/dev/null",
+    "-c",
+    "core.fsmonitor=false",
+    "-c",
+    "advice.detachedHead=false",
+)
 
 RUST_TEST = r"""
 use kaspa_consensus_core::hashing::sighash::{SigHashReusedValuesUnsync, calc_schnorr_signature_hash};
@@ -3434,13 +3448,110 @@ def run(cmd: list[str], cwd: Path, env: dict[str, str] | None = None) -> None:
     subprocess.run(cmd, cwd=cwd, env=env, check=True)
 
 
+class SilverscriptCheckoutError(RuntimeError):
+    """Fail-closed error for the silverscript checkout trust boundary.
+
+    Messages never include local paths, git output, or file content.
+    """
+
+
+def workspace_silverscript_rev(cargo_toml: Path | None = None) -> str:
+    try:
+        with (cargo_toml or WORKSPACE_CARGO_TOML).open("rb") as handle:
+            manifest = tomllib.load(handle)
+    except (OSError, tomllib.TOMLDecodeError):
+        raise SilverscriptCheckoutError("cannot parse workspace Cargo.toml") from None
+    workspace = manifest.get("workspace")
+    dependencies = workspace.get("dependencies") if isinstance(workspace, dict) else None
+    entry = dependencies.get("silverscript-lang") if isinstance(dependencies, dict) else None
+    if not isinstance(entry, dict):
+        raise SilverscriptCheckoutError("workspace silverscript-lang dependency is missing")
+    if entry.get("git") != SILVERSCRIPT_GIT or "branch" in entry or "tag" in entry:
+        raise SilverscriptCheckoutError("workspace silverscript-lang must be a canonical git rev pin")
+    rev = entry.get("rev")
+    if not isinstance(rev, str) or not SILVERSCRIPT_REF_RE.fullmatch(rev):
+        raise SilverscriptCheckoutError("workspace silverscript-lang rev must be a lowercase 40-hex commit id")
+    return rev
+
+
+def require_pinned_silverscript_ref(ref: str, cargo_toml: Path | None = None) -> None:
+    if not isinstance(ref, str) or not SILVERSCRIPT_REF_RE.fullmatch(ref):
+        raise SilverscriptCheckoutError("requested silverscript ref must be a lowercase 40-hex commit id")
+    if ref != workspace_silverscript_rev(cargo_toml):
+        raise SilverscriptCheckoutError("requested silverscript ref does not match the workspace silverscript-lang rev")
+
+
+def git_output(args: list[str], cwd: Path) -> str:
+    env = os.environ.copy()
+    env["GIT_TERMINAL_PROMPT"] = "0"
+    try:
+        proc = subprocess.run(
+            ["git", *GIT_SAFE_CONFIG, *args],
+            cwd=cwd,
+            env=env,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+    except OSError:
+        raise SilverscriptCheckoutError("git is not available") from None
+    if proc.returncode != 0:
+        raise SilverscriptCheckoutError(f"silverscript checkout: git {args[0]} failed")
+    return proc.stdout
+
+
+def require_canonical_origin(path: Path) -> None:
+    urls = git_output(["config", "--get-all", "remote.origin.url"], path).splitlines()
+    if urls != [SILVERSCRIPT_GIT]:
+        raise SilverscriptCheckoutError("silverscript checkout origin is not the canonical upstream")
+    if git_output(["remote", "get-url", "origin"], path).strip() != SILVERSCRIPT_GIT:
+        raise SilverscriptCheckoutError("silverscript checkout origin is rewritten away from the canonical upstream")
+
+
+def require_clean_tree(path: Path) -> None:
+    status = git_output(["status", "--porcelain=v1", "--untracked-files=all", "--ignore-submodules=none"], path)
+    if status.strip():
+        raise SilverscriptCheckoutError("silverscript checkout has local modifications")
+
+
+def require_checkout_root(path: Path) -> None:
+    if not path.is_dir():
+        raise SilverscriptCheckoutError("silverscript checkout path is not a directory")
+    toplevel = git_output(["rev-parse", "--show-toplevel"], path).strip()
+    if Path(toplevel).resolve() != path.resolve():
+        raise SilverscriptCheckoutError("silverscript checkout path is not a repository root")
+
+
 def ensure_silverscript_repo(path: Path, ref: str) -> None:
-    if path.exists():
-        run(["git", "fetch", "--quiet", "--tags", "origin"], path)
+    require_pinned_silverscript_ref(ref)
+    if path.exists() or path.is_symlink():
+        require_checkout_root(path)
+        require_canonical_origin(path)
+        require_clean_tree(path)
+        print("+ git fetch --quiet --tags origin", flush=True)
+        git_output(["fetch", "--quiet", "--tags", "origin"], path)
     else:
         path.parent.mkdir(parents=True, exist_ok=True)
-        run(["git", "clone", SILVERSCRIPT_GIT, str(path)], ROOT)
-    run(["git", "-c", "advice.detachedHead=false", "checkout", "--quiet", ref], path)
+        print(f"+ git clone --quiet {SILVERSCRIPT_GIT} <checkout>", flush=True)
+        git_output(["clone", "--quiet", "--", SILVERSCRIPT_GIT, str(path)], path.parent)
+        require_checkout_root(path)
+        require_canonical_origin(path)
+    print(f"+ git checkout --quiet --detach {ref}", flush=True)
+    git_output(["checkout", "--quiet", "--detach", ref], path)
+    head = git_output(["rev-parse", "--verify", "HEAD^{commit}"], path).strip()
+    if head != ref:
+        raise SilverscriptCheckoutError("silverscript checkout HEAD does not equal the pinned rev")
+    require_clean_tree(path)
+
+
+def remove_probe_and_require_clean_tree(repo: Path, probe: Path) -> None:
+    try:
+        probe.unlink()
+    except FileNotFoundError:
+        pass
+    except OSError:
+        raise SilverscriptCheckoutError("cannot remove temporary silverscript probe") from None
+    require_clean_tree(repo)
 
 
 def main() -> int:
@@ -3463,15 +3574,18 @@ def main() -> int:
         .resolve()
     )
     silver_ref = os.environ.get("SILVERSCRIPT_REF", DEFAULT_SILVERSCRIPT_REF)
-    ensure_silverscript_repo(silver_repo, silver_ref)
+    try:
+        ensure_silverscript_repo(silver_repo, silver_ref)
+    except SilverscriptCheckoutError as err:
+        print(f"silverscript checkout rejected: {err}", file=sys.stderr)
+        return 1
 
     test_dir = silver_repo / "silverscript-lang" / "tests"
     if not test_dir.is_dir():
-        print(f"not a silverscript repo: {silver_repo}", file=sys.stderr)
+        print("not a silverscript repo: missing silverscript-lang/tests", file=sys.stderr)
         return 1
 
-    test_file = test_dir / "prometheus_h001_probe.rs"
-    test_file.write_text(RUST_TEST, encoding="utf-8")
+    test_file = test_dir / f"{PROBE_TEST_NAME}.rs"
 
     env = os.environ.copy()
     env["PROMETHEUS_H001_CONTRACT"] = str(H001_CONTRACT)
@@ -3482,25 +3596,27 @@ def main() -> int:
     env["PROMETHEUS_DEV_INCENTIVE_POOL_STATE_CONTRACT"] = str(DEV_INCENTIVE_POOL_STATE_CONTRACT)
     env["PROMETHEUS_GOVERNANCE_AUTO_TUNING_STATE_CONTRACT"] = str(GOVERNANCE_AUTO_TUNING_STATE_CONTRACT)
     try:
-        run(
-            [
-                "cargo",
-                "test",
-                "-p",
-                "silverscript-lang",
-                "--test",
-                "prometheus_h001_probe",
-                "--",
-                "--nocapture",
-            ],
-            silver_repo,
-            env,
-        )
-    finally:
         try:
-            test_file.unlink()
-        except FileNotFoundError:
-            pass
+            test_file.write_text(RUST_TEST, encoding="utf-8")
+            run(
+                [
+                    "cargo",
+                    "test",
+                    "-p",
+                    "silverscript-lang",
+                    "--test",
+                    PROBE_TEST_NAME,
+                    "--",
+                    "--nocapture",
+                ],
+                silver_repo,
+                env,
+            )
+        finally:
+            remove_probe_and_require_clean_tree(silver_repo, test_file)
+    except SilverscriptCheckoutError as err:
+        print(f"silverscript checkout rejected: {err}", file=sys.stderr)
+        return 1
 
     print("H-001, ValidatorStakingState, GuardianReputationState, RuleStorageState, CommunityDonationsState, DevIncentivePoolState, and GovernanceAutoTuningState silverc fixture verification passed.")
     print(f"Silverscript ref: {silver_ref}")
