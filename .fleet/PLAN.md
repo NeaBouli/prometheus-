@@ -411,3 +411,6 @@ Both runs require Gio budget approval (plan-level gate).
 
 - A8b2r closes default-target reuse with 42 focused passes. A8c starts the
   machine-readable Cargo/SilverScript/immutable-proof pin policy and CI gate.
+
+- A8c integrated with 45 focused tests, but Codex review requires A8c1 to bind
+  the same immutable relation identity in the Python Guardian parser.

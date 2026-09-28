@@ -5826,3 +5826,6 @@ Rules for all dev agents:
 
 - A8b2r is verified (`42` focused passes, Ruff, Mypy). A8c now creates the
   active toolchain pin policy and CI verifier; no migration is included.
+
+- A8c is integrated but not closed: Rust proof identity is gated, while the
+  matching Python Guardian constants still need A8c1 cross-language checks.
