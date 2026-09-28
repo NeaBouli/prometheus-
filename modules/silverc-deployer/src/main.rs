@@ -17,8 +17,8 @@ use prometheus_silverc_deployer::{
     create_public_json, finalize_broadcast_journal, import_external_signature_files, load_artifact,
     load_broadcast_journal, load_broadcast_result, load_deploy_request, load_funding_spec,
     load_signature_response, load_signing_request, observe_deployed_utxo, preflight_deploy_node,
-    preflight_node, prepare_broadcast_journal, prepare_genesis, verify_signature_response,
-    write_public_json,
+    preflight_node, prepare_broadcast_journal, prepare_genesis, reject_import_output_collisions,
+    verify_signature_response, write_public_json,
 };
 
 #[derive(Debug, Clone, Copy, ValueEnum)]
@@ -272,6 +272,10 @@ async fn main() -> Result<()> {
             encoding,
             evidence_out,
         } => {
+            reject_import_output_collisions(
+                &[("request input", &request), ("funding input", &funding)],
+                &[("preflight evidence output", &evidence_out)],
+            )?;
             let request = load_deploy_request(&request)?;
             let funding = load_funding_spec(&funding)?;
             let evidence = preflight_deploy_node(&request, &funding, encoding.into()).await?;
@@ -284,6 +288,14 @@ async fn main() -> Result<()> {
             funding,
             signing_request_out,
         } => {
+            reject_import_output_collisions(
+                &[
+                    ("request input", &request),
+                    ("artifact input", &artifact),
+                    ("funding input", &funding),
+                ],
+                &[("signing-request output", &signing_request_out)],
+            )?;
             let request = load_deploy_request(&request)?;
             let artifact = load_artifact(&artifact, &request)?;
             let funding = load_funding_spec(&funding)?;
@@ -322,6 +334,16 @@ async fn main() -> Result<()> {
             signature_response,
             verification_out,
         } => {
+            reject_import_output_collisions(
+                &[
+                    ("request input", &request),
+                    ("artifact input", &artifact),
+                    ("funding input", &funding),
+                    ("signing-request input", &signing_request),
+                    ("signature-response input", &signature_response),
+                ],
+                &[("verification output", &verification_out)],
+            )?;
             let (verified, _) = rebuild_and_verify(
                 &request,
                 &artifact,
@@ -342,6 +364,20 @@ async fn main() -> Result<()> {
             encoding,
             result_out,
         } => {
+            let journal_path = broadcast_journal_path(&result_out);
+            reject_import_output_collisions(
+                &[
+                    ("request input", &request),
+                    ("artifact input", &artifact),
+                    ("funding input", &funding),
+                    ("signing-request input", &signing_request),
+                    ("signature-response input", &signature_response),
+                ],
+                &[
+                    ("broadcast result output", &result_out),
+                    ("broadcast journal output", &journal_path),
+                ],
+            )?;
             let (verified, signing_request) = rebuild_and_verify(
                 &request,
                 &artifact,
@@ -355,7 +391,6 @@ async fn main() -> Result<()> {
                 &acknowledge_signing_request_sha256,
             )?;
             let _broadcast_lock = acquire_broadcast_lock(&result_out)?;
-            let journal_path = broadcast_journal_path(&result_out);
             let mut journal = if create_public_json(&journal_path, &expected_journal)? {
                 expected_journal
             } else {
@@ -406,6 +441,16 @@ async fn main() -> Result<()> {
             encoding,
             evidence_out,
         } => {
+            reject_import_output_collisions(
+                &[
+                    ("request input", &request),
+                    ("artifact input", &artifact),
+                    ("funding input", &funding),
+                    ("signing-request input", &signing_request),
+                    ("signature-response input", &signature_response),
+                ],
+                &[("observation evidence output", &evidence_out)],
+            )?;
             let (verified, signing_request) = rebuild_and_verify(
                 &request,
                 &artifact,
