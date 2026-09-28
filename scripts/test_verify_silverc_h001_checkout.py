@@ -189,6 +189,14 @@ class CheckoutPinTest(unittest.TestCase):
         vh.ensure_silverscript_repo(self.checkout, self.rev)
         self.assertEqual(git(self.checkout, "rev-parse", "HEAD"), self.rev)
 
+    def test_existing_checkout_rejects_symlink_path(self) -> None:
+        self.fresh_checkout()
+        linked_checkout = self.tmp / "linked-checkout"
+        linked_checkout.symlink_to(self.checkout, target_is_directory=True)
+        with self.assertRaises(vh.SilverscriptCheckoutError) as caught:
+            vh.ensure_silverscript_repo(linked_checkout, self.rev)
+        self.assertNotIn(str(self.tmp), str(caught.exception))
+
     def test_existing_checkout_requires_canonical_origin(self) -> None:
         self.fresh_checkout()
         git(

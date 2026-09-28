@@ -3515,6 +3515,8 @@ def require_clean_tree(path: Path) -> None:
 
 
 def require_checkout_root(path: Path) -> None:
+    if path.is_symlink():
+        raise SilverscriptCheckoutError("silverscript checkout path must not be a symlink")
     if not path.is_dir():
         raise SilverscriptCheckoutError("silverscript checkout path is not a directory")
     toplevel = git_output(["rev-parse", "--show-toplevel"], path).strip()
