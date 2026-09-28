@@ -5,8 +5,8 @@
 - **Target:** NeaBouli/prometheus- @ `8b5da58a34172062cf644db52ba459385d151562` + live `neabouli.github.io/prometheus-/`
 - **Scope:** Rust workspace (silverc-deployer, guardian-p2p, client, threat-hint, threat-proof, validator-node), Python guardian-node (77 files), operator scripts, CI/CD, container configs
 - **Method:** 3 deep-recon agents + lead verification of every finding at exact file:line; read-only; no binaries executed against any network; no secrets read; `Prometheus-1.png` untouched (repo AGENTS.md)
-- **Register:** PRM-01 … PRM-12 (this report) — **0 Critical / 0 High / 2 Medium / 8 Low / 1 Info** (PRM-01 invalid, ID retained; see correction)
-- **Correction (2026-09-28):** PRM-01 withdrawn as invalid after re-verification at the audit baseline; no other finding in this report changed
+- **Register:** PRM-01 … PRM-12 (this report) — **0 Critical / 0 High / 1 Medium / 8 Low / 1 Info** (PRM-01 and PRM-02 invalid, IDs retained; see corrections)
+- **Correction (2026-09-28):** PRM-01 and PRM-02 withdrawn as invalid after re-verification at the audit baseline; no other finding in this report changed
 
 ---
 
@@ -21,7 +21,7 @@ Deployment context that calibrates severity: only the stateless H-001 canary ver
 | ID | Severity | Title |
 |----|----------|-------|
 | PRM-01 | Invalid (withdrawn) | ~~SQLite `_raise_operational_error` falls through for non-lock errors~~ — not reproducible at baseline; excluded from totals |
-| PRM-02 | Medium | Membership epoch monotonicity is uniqueness-based, not strictly increasing; bootstrap epochs re-usable as targets |
+| PRM-02 | Invalid (withdrawn) | ~~Membership epoch monotonicity is uniqueness-based, not strictly increasing~~ — strict parser and durable-state binding reject rollback; excluded from totals |
 | PRM-03 | Medium | Runtime-mode gate defaults to stub-permissive "development" when env is unset/misspelled |
 | PRM-04 | Low | `parse_simple_yara_rule` silently degrades declared YARA semantics (`all of them` → any-of) |
 | PRM-05 | Low | Unbounded whole-file reads in scanner/detector file APIs (latent; no production caller) |
@@ -54,13 +54,11 @@ Deployment context that calibrates severity: only the stateless H-001 canary ver
 >
 > **Recommendation:** add the terminal `raise ObservableApprovalConsumptionError() from None` (two lines, mirroring the sibling); add a non-BUSY parametrized test. Small fix, highest priority of this series.
 
-## PRM-02 — Medium — Membership epoch monotonicity is uniqueness-based, not strictly increasing
+## PRM-02 — Invalid (withdrawn) — Membership epoch monotonicity
 
-**Evidence:** `modules/guardian-node/jaeger/guardian_membership_transition.py:318-328,447-464` — `apply_transition` replay-checks `(transition_id, nonce, next_epoch)` and requires `previous_epoch == current`, but the **bootstrap epoch is never recorded as a transition output**, so an authority can sign a transition whose `next_epoch` equals the bootstrap epoch (rollback to a different source digest); `rotate_authority` likewise enforces uniqueness, not `next_authority_epoch > previous_authority_epoch`.
+**Correction (2026-09-28):** this finding is **invalid**. At baseline and current code, `_parse_transition` rejects `next_epoch <= previous_epoch`, while `apply_transition` requires `previous_epoch` and its digest to equal durable current state. Authority rotation requires exact `+1` and binds the previous epoch to durable authority state. Rollback/restart regressions and the complete Guardian suite confirm rejection without mutation. The ID is retained and excluded from totals.
 
-**Impact:** exploitation needs a valid authority signature (the trust anchor itself, i.e. compromised/coerced key), and every transition is durably logged — bounded blast radius. But "gapless/monotonic epochs" is a stated GH-246/GH-253 property that the code does not fully enforce.
-
-**Recommendation (owner decision):** explicit `next_epoch > current_epoch` / `next_authority_epoch > authority_epoch` checks + recording bootstrap epochs at init.
+> **Withdrawn original text:** The bootstrap epoch was alleged to be reusable as a rollback target because it was not a prior transition output, and authority rotation was alleged to enforce uniqueness rather than increasing epochs. The recommendation was to add increasing-epoch checks and record bootstrap epochs.
 
 ## PRM-03 — Medium — Runtime-mode gate defaults to stub-permissive "development"
 

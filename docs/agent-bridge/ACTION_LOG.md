@@ -5707,3 +5707,16 @@ Rules for all dev agents:
 - Claude is the single writer; security review remains mandatory. No external
   membership authority, network, L1, deploy, or production action is included.
 - Status: `A5 IN PROGRESS / PRODUCTION FALSE`.
+
+### 2026-09-28 - A5 PRM-02 invalid; regressions and audit correction verified
+
+- No production defect was found: parser and durable-state checks already make
+  membership and authority epochs strictly monotonic.
+- Added test-only rollback, stale/equal epoch, restart, and no-mutation coverage.
+  PASS: 58 focused tests; full Guardian `1393 passed, 4 skipped`.
+- Public audit now retains PRM-02 as invalid, reports
+  `0C/7H/14M/20L/5I`, and pins the corrected full-scope report to
+  `aff6382e741278e1a83cc6d0ce4188549453354f2bdbecd364ad6621e6138417`.
+- Documentation hygiene plus 11 tests and public claims plus 76 tests pass.
+- No network, migration, L1, deploy, wallet, contract, or production action.
+- Status: `A5 LOCAL VERIFIED / HOSTED CI PENDING / PRODUCTION FALSE`.

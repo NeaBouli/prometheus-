@@ -300,3 +300,18 @@ Both runs require Gio budget approval (plan-level gate).
 - A4H stays a public-activity gate and resumes with a restored independent
   worker. Safe non-public A5 work may continue without weakening this gate.
 - State: `A4H OPEN / WORKER DELIVERY BLOCKED / PRODUCTION FALSE`.
+
+### 2026-09-28 — A5 locally verified; PRM-02 invalid
+
+- Re-verification proved that strict parser monotonicity plus durable current
+  epoch/digest binding already rejects equal, lower, stale, bootstrap rollback,
+  and skipped authority epochs. Production code was not changed.
+- Added committed rollback/restart/no-mutation regressions. Focused membership
+  tests pass `58/58`; the complete Guardian suite passes `1393`, with `4`
+  intentional skips, outside the filesystem sandbox required by socket/mode tests.
+- Corrected the public audit without renumbering: PRM-02 is withdrawn, totals
+  are `0C/7H/14M/20L/5I`, and the full-scope SHA-256 pin is
+  `aff6382e741278e1a83cc6d0ce4188549453354f2bdbecd364ad6621e6138417`.
+- Documentation hygiene (11 tests), 13-surface verifier (76 tests), hash pins,
+  security diff review, and diff check pass.
+- State: `A5 LOCAL VERIFIED / HOSTED CI PENDING / PRODUCTION FALSE`.
