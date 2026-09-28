@@ -11,8 +11,9 @@
 use std::path::Path;
 use std::sync::Arc;
 
-use anyhow::{Context, Result};
+use anyhow::{bail, Context, Result};
 use sha2::{Digest, Sha256};
+use tokio::io::AsyncReadExt;
 use tokio::sync::Mutex; // only for YaraScanner (&mut self)
 
 use super::phi3::{AiAnalysis, Phi3Model, MIN_CONFIDENCE_KI};
@@ -20,6 +21,9 @@ use crate::security::scanner::{ScanResult, YaraScanner};
 
 /// Confidence threshold for classifying as Suspicious
 const SUSPICIOUS_THRESHOLD: f64 = 0.5;
+
+/// Maximum file size accepted by [`AnomalyDetector::analyze_file`] (16 MiB, development client).
+pub const MAX_ANALYSIS_FILE_BYTES: u64 = 16 * 1024 * 1024;
 
 /// Final detection result combining YARA and AI analysis.
 #[derive(Debug, Clone)]
@@ -62,10 +66,23 @@ impl AnomalyDetector {
     }
 
     /// Analyze a file at the given path using both YARA and AI.
+    /// Rejects empty files and files larger than [`MAX_ANALYSIS_FILE_BYTES`]; the read
+    /// itself is capped, so file growth or special files cannot bypass the limit.
     pub async fn analyze_file(&self, path: &Path) -> Result<DetectionResult> {
-        let data = tokio::fs::read(path)
+        let file = tokio::fs::File::open(path)
             .await
             .context("Failed to read file for analysis")?;
+        let mut data = Vec::new();
+        file.take(MAX_ANALYSIS_FILE_BYTES + 1)
+            .read_to_end(&mut data)
+            .await
+            .context("Failed to read file for analysis")?;
+        if data.is_empty() {
+            bail!("File for analysis is empty");
+        }
+        if data.len() as u64 > MAX_ANALYSIS_FILE_BYTES {
+            bail!("File for analysis exceeds size limit");
+        }
         self.analyze_bytes(&data).await
     }
 
@@ -205,6 +222,72 @@ mod tests {
         let data = b"test data";
         let result = detector.analyze_bytes(data).await.unwrap();
         assert_eq!(result.file_hash, compute_hash(data));
+    }
+
+    fn sized_file_with_tail(len: u64, tail: &[u8]) -> tempfile::NamedTempFile {
+        use std::io::{Seek, SeekFrom, Write};
+        let tmp = tempfile::NamedTempFile::new().unwrap();
+        tmp.as_file().set_len(len - tail.len() as u64).unwrap();
+        let mut f = tmp.reopen().unwrap();
+        f.seek(SeekFrom::End(0)).unwrap();
+        f.write_all(tail).unwrap();
+        tmp
+    }
+
+    #[tokio::test]
+    async fn test_analyze_file_normal() {
+        let detector = make_detector(vec![eicar_rule()]).await;
+        let tmp = sized_file_with_tail(24, b"file contains EICAR test");
+        let result = detector.analyze_file(tmp.path()).await.unwrap();
+        assert_eq!(result.final_verdict, Verdict::Suspicious);
+        assert_eq!(result.file_hash, compute_hash(b"file contains EICAR test"));
+        assert!(!result.should_report);
+    }
+
+    #[tokio::test]
+    async fn test_analyze_file_rejects_empty() {
+        let detector = make_detector(vec![eicar_rule()]).await;
+        let tmp = tempfile::NamedTempFile::new().unwrap();
+        let err = detector.analyze_file(tmp.path()).await.unwrap_err();
+        assert_eq!(err.to_string(), "File for analysis is empty");
+    }
+
+    #[tokio::test]
+    async fn test_analyze_file_accepts_exact_limit() {
+        let detector = make_detector(vec![eicar_rule()]).await;
+        let tmp = sized_file_with_tail(MAX_ANALYSIS_FILE_BYTES, b"EICAR");
+        let result = detector.analyze_file(tmp.path()).await.unwrap();
+        assert!(result.yara_result.is_threat);
+        assert_eq!(result.final_verdict, Verdict::Suspicious);
+    }
+
+    #[tokio::test]
+    async fn test_analyze_file_rejects_over_limit() {
+        let detector = make_detector(vec![eicar_rule()]).await;
+        let tmp = sized_file_with_tail(MAX_ANALYSIS_FILE_BYTES + 1, b"EICAR");
+        let err = detector.analyze_file(tmp.path()).await.unwrap_err();
+        assert_eq!(err.to_string(), "File for analysis exceeds size limit");
+    }
+
+    #[cfg(unix)]
+    #[tokio::test]
+    async fn test_analyze_file_caps_unbounded_special_file() {
+        let detector = make_detector(vec![]).await;
+        let err = detector
+            .analyze_file(Path::new("/dev/zero"))
+            .await
+            .unwrap_err();
+        assert_eq!(err.to_string(), "File for analysis exceeds size limit");
+    }
+
+    #[tokio::test]
+    async fn test_analyze_file_missing_error_is_generic() {
+        let detector = make_detector(vec![]).await;
+        let err = detector
+            .analyze_file(Path::new("/nonexistent/prometheus-analysis-target"))
+            .await
+            .unwrap_err();
+        assert_eq!(err.to_string(), "Failed to read file for analysis");
     }
 
     #[test]

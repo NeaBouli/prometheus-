@@ -4,12 +4,16 @@
 //! Uses pattern matching for YARA-style rules.
 //! ScanResult contains matched rules, threat status, and confidence.
 
-use std::fs;
+use std::fs::File;
+use std::io::Read;
 use std::path::Path;
 
-use anyhow::{Context, Result};
+use anyhow::{bail, Context, Result};
 use log::info;
 use sha2::{Digest, Sha256};
+
+/// Maximum file size accepted by [`YaraScanner::scan_file`] (16 MiB, development client).
+pub const MAX_SCAN_FILE_BYTES: u64 = 16 * 1024 * 1024;
 
 /// Result of scanning a file or byte buffer.
 #[derive(Debug, Clone)]
@@ -91,8 +95,20 @@ impl YaraScanner {
     }
 
     /// Scan a file at the given path against all loaded rules.
+    /// Rejects empty files and files larger than [`MAX_SCAN_FILE_BYTES`]; the read
+    /// itself is capped, so file growth or special files cannot bypass the limit.
     pub fn scan_file(&self, path: &Path) -> Result<ScanResult> {
-        let data = fs::read(path).context("Failed to read file for scanning")?;
+        let file = File::open(path).context("Failed to read file for scanning")?;
+        let mut data = Vec::new();
+        file.take(MAX_SCAN_FILE_BYTES + 1)
+            .read_to_end(&mut data)
+            .context("Failed to read file for scanning")?;
+        if data.is_empty() {
+            bail!("File for scanning is empty");
+        }
+        if data.len() as u64 > MAX_SCAN_FILE_BYTES {
+            bail!("File for scanning exceeds size limit");
+        }
         self.scan_bytes(&data)
     }
 
@@ -409,6 +425,66 @@ mod tests {
         let result = scanner.scan_file(tmp.path()).unwrap();
         assert!(result.is_threat);
         assert_eq!(result.matched_rules, vec!["EicarTest"]);
+    }
+
+    fn eicar_scanner() -> YaraScanner {
+        let mut scanner = YaraScanner::new().unwrap();
+        scanner
+            .add_rule(CompiledRule {
+                name: "EicarTest".to_string(),
+                patterns: vec![b"EICAR".to_vec()],
+                required_matches: 1,
+            })
+            .unwrap();
+        scanner
+    }
+
+    fn sized_file_with_tail(len: u64, tail: &[u8]) -> NamedTempFile {
+        let tmp = NamedTempFile::new().unwrap();
+        tmp.as_file().set_len(len - tail.len() as u64).unwrap();
+        let mut f = tmp.reopen().unwrap();
+        std::io::Seek::seek(&mut f, std::io::SeekFrom::End(0)).unwrap();
+        f.write_all(tail).unwrap();
+        tmp
+    }
+
+    #[test]
+    fn test_scan_file_rejects_empty() {
+        let tmp = NamedTempFile::new().unwrap();
+        let err = eicar_scanner().scan_file(tmp.path()).unwrap_err();
+        assert_eq!(err.to_string(), "File for scanning is empty");
+    }
+
+    #[test]
+    fn test_scan_file_accepts_exact_limit() {
+        let tmp = sized_file_with_tail(MAX_SCAN_FILE_BYTES, b"EICAR");
+        let result = eicar_scanner().scan_file(tmp.path()).unwrap();
+        assert!(result.is_threat);
+        assert_eq!(result.matched_rules, vec!["EicarTest"]);
+    }
+
+    #[test]
+    fn test_scan_file_rejects_over_limit() {
+        let tmp = sized_file_with_tail(MAX_SCAN_FILE_BYTES + 1, b"EICAR");
+        let err = eicar_scanner().scan_file(tmp.path()).unwrap_err();
+        assert_eq!(err.to_string(), "File for scanning exceeds size limit");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_scan_file_caps_unbounded_special_file() {
+        let err = eicar_scanner()
+            .scan_file(Path::new("/dev/zero"))
+            .unwrap_err();
+        assert_eq!(err.to_string(), "File for scanning exceeds size limit");
+    }
+
+    #[test]
+    fn test_scan_file_missing_error_is_generic() {
+        let err = eicar_scanner()
+            .scan_file(Path::new("/nonexistent/prometheus-scan-target"))
+            .unwrap_err();
+        assert_eq!(err.to_string(), "Failed to read file for scanning");
     }
 
     #[test]
