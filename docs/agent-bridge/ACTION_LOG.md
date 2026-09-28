@@ -5788,3 +5788,13 @@ Rules for all dev agents:
 - No network, deployment, wallet, chain, contract, migration, secret, or
   production action was performed.
 - Status: `A7 LOCAL VERIFIED / HOSTED CI PENDING / PRODUCTION FALSE`.
+
+### 2026-09-28 - A8 compatibility and pinning gate started
+
+- A8 is isolated at the Kaspa/SilverScript build-toolchain boundary. It does
+  not alter contracts, proof manifests, H-001 evidence, or runtime behavior.
+- Kimi owns the read-only A8a inventory; implementation waits for its exact
+  version, consumer, test, risk, and rollback map.
+- JEV returned no routing value after one corrected retry; no JEV result
+  influenced architecture or security decisions.
+- Status: `A8 INVENTORY IN PROGRESS / PRODUCTION FALSE`.

@@ -373,3 +373,13 @@ Both runs require Gio budget approval (plan-level gate).
   Rusty Kaspa v2.1.0/Silverscript v1.0.0 reconciliation and real public
   multi-host under-60-second evidence remain separate rollout gates.
 - State: `A7 LOCAL VERIFIED / HOSTED CI PENDING / PRODUCTION FALSE`.
+
+### 2026-09-28 — A8 compatibility and pinning gate started
+
+- Boundary: build/toolchain trust before `contracts/silverc` and
+  `silverc-deployer`; no runtime, contract, proof, or security-fix scope.
+- A8a assigns Kimi a read-only exact-pin and compatibility inventory. A8b will
+  be written only from that report, with one writer and a rollback point.
+- JEV routing produced no value after one corrected retry; deterministic serial
+  inventory then implementation therefore governs.
+- State: `A8 INVENTORY IN PROGRESS / PRODUCTION FALSE`.
