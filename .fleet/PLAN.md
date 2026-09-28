@@ -77,9 +77,11 @@ under one writer; the Rust lane (A1, A4, A6, A7, A8) may proceed in parallel.
   semantic-verification task. Owner: Claude; visual gate required.
 - **A6 = R5c, PRM-04/05/11.** Node: `modules/client` dev scanner. File:
   `src/security/scanner.rs::YaraScanner` — bounds. Owner: Kimi.
-- **A7 = R5d, PRM-06/07/08.** Node: `modules/silverc-deployer` operator. File:
-  `src/main.rs::Cli` — TOCTOU. Owner: Kimi. (PRM-12 items fold into A4–A7 where
-  touched.)
+- **A7 = R5d, PRM-06/07/08.** Three serial boundaries: A7a
+  `modules/silverc-deployer/src/main.rs::Cli` output collisions (Kimi); A7b
+  Guardian v1 verifier/ledger safety; A7c Guardian policy-file descriptor
+  reads (Claude). Security review is mandatory; PRM-12 folds in only where a
+  touched format can be hardened without widening an interface.
 - **A8 = R6, #279 (GH-279, PRM-09).** Node: `modules/guardian-node`
   Compose/dependency boundary + docs; no code-authority change. Decide +
   lock: httpx floor, yara-x 1.4.0, coincurve. pytest + pip reproducibility.
@@ -333,3 +335,13 @@ Both runs require Gio budget approval (plan-level gate).
   suite `347 passed, 2 ignored`, client Clippy with `-D warnings`, and diff
   check. No network, deploy, wallet, chain, contract, or production action.
 - State: `A6 LOCAL VERIFIED / HOSTED CI PENDING / PRODUCTION FALSE`.
+
+### 2026-09-28 — A7 started; upstream reconciliation recorded
+
+- JEV routing choice was `single_claude_brief`; deterministic architecture
+  boundaries override it because PRM-06/07/08 span Rust deployer and Python
+  Guardian hops. A7 therefore uses three serial, non-overlapping briefs.
+- Official upstream has moved to Rusty Kaspa v2.1.0 and Silverscript v1.0.0;
+  this repo still builds Rusty Kaspa v2.0.1. Version reconciliation is a
+  separate pre-rollout gate, not bundled into the A7 security fixes.
+- State: `A7 IN PROGRESS / PRODUCTION FALSE`.

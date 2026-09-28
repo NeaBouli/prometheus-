@@ -5747,3 +5747,18 @@ Rules for all dev agents:
   diff check.
 - No network, deploy, wallet, chain, contract, tokenomics, or production action.
 - Status: `A6 LOCAL VERIFIED / HOSTED CI PENDING / PRODUCTION FALSE`.
+
+### 2026-09-28 - A7 security hardening started
+
+- A7 is split by architecture boundary: deployer output collisions (PRM-06),
+  Guardian v1 verifier/ledger safety (PRM-07), and descriptor-safe policy reads
+  (PRM-08). Work is serial with one writer per slice.
+- One secret-free JEV routing call selected `single_claude_brief`; the result
+  was recorded but did not override the deterministic module split or the A7
+  Rust ownership already pinned in the plan.
+- Upstream watch: Toccata is live; Rusty Kaspa v2.1.0 and Silverscript v1.0.0
+  are released, while Prometheus currently compiles Rusty Kaspa v2.0.1. A
+  separate compatibility/pin gate is required before rollout.
+- The under-60-second lifecycle remains a target until reproduced on a real
+  public multi-host network; local stub timing is not production evidence.
+- Status: `A7 IN PROGRESS / PRODUCTION FALSE`.
