@@ -71,6 +71,10 @@ under one writer; the Rust lane (A1, A4, A6, A7, A8) may proceed in parallel.
 - **A5 = R5b, PRM-02.** Node: `modules/guardian-node` owner-local membership
   authority. File: `jaeger/guardian_membership_transition.py` — epoch
   monotonicity. pytest Guardian. Owner: Claude.
+- **A4H = public honesty handoff, inserted before A5.** Node: public claims +
+  `modules/web`. Reconcile README/landing/whitepaper/roadmap/FAQ against current
+  code; #282 is the separate A4 runtime fix and #283 remains a separate CI
+  semantic-verification task. Owner: Claude; visual gate required.
 - **A6 = R5c, PRM-04/05/11.** Node: `modules/client` dev scanner. File:
   `src/security/scanner.rs::YaraScanner` — bounds. Owner: Kimi.
 - **A7 = R5d, PRM-06/07/08.** Node: `modules/silverc-deployer` operator. File:

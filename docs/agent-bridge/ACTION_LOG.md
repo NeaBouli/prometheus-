@@ -5680,3 +5680,13 @@ Rules for all dev agents:
 - PASS: format, 4 focused runtime tests, real-binary pre-network regression,
   complete client tests, Clippy `-D warnings`, and diff check.
 - Status: `A4 LOCAL VERIFIED / HOSTED CI PENDING / PRODUCTION FALSE`.
+
+### 2026-09-28 - Public honesty handoff accepted; A4H started
+
+- Read the external handoff and evidence. Issues #282/#283 remain separate;
+  #282 maps to locally verified A4, while #283 is not part of this docs block.
+- The temporary worktree contains no product diff. Its two untracked Fleet
+  files were copied to a durable local backup with SHA-256 verification.
+- A4H is a documentation-only reconciliation at the public-claims/web node;
+  A5 resumes afterward.
+- Status: `A4H IN PROGRESS / PRODUCTION FALSE`.
