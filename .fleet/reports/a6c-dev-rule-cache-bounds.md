@@ -24,7 +24,7 @@ tests: |
   failed with "ld: write() failed, errno=28" (volume /System/Volumes/Data 100% full, 38-52 MiB free).
   The full client test suite is also NOT RUN, for the same reason.
   The build used CARGO_TARGET_DIR=../claude-a6b-scanner-file-bounds/target (warm dep cache); only this worktree's own
-  target/ (194 MB) was deleted. No files outside this worktree were deleted.
+  target/ (194 MB) was deleted; nothing outside this worktree was deleted.
   New tests: normal insert, idempotent duplicate, conflicting duplicate (type/CID/active), rule_id exact 128 vs 129
   plus empty/space/slash/NL/NUL/non-ASCII, CID (empty, dag-pb, truncated, too long, uppercase, CIDv0),
   consensus 0.0/1.0 vs out-of-range/NaN/Inf, capacity boundary 256/257 incl. idempotent re-add
@@ -36,7 +36,6 @@ risks: |
   shareable because rule_ingest.rs was out of scope); the constant itself is reused.
 security: no new finding. PRM-11 (Low) fixed in code, pending the test run.
 next: |
-  Gio/Codex: free disk space (e.g. stale target/ in finished worktrees a4/a6a/a6b, ~10 GB), then
-  `cargo test -p prometheus-client --lib blockchain::krc20` and `cargo test -p prometheus-client`
+  Gio/Codex: free disk space (e.g. stale target/ in finished worktrees a4/a6a/a6b, ~10 GB), then `cargo test -p prometheus-client --lib blockchain::krc20` and `cargo test -p prometheus-client`
   on 13029c2. If green -> status ok, review/integration. Optional follow-up: make rule_ingest::validate_rule_id
   pub(crate) and reuse it in krc20.rs.
