@@ -5817,3 +5817,6 @@ Rules for all dev agents:
 
 - A8b1 is integrated but not closed: Codex found symlink-path acceptance and
   assigned A8b1r plus a regression. Active pins and evidence remain unchanged.
+
+- A8b1r is verified (`27` focused passes, Ruff, Mypy). A8b2 now owns compiler
+  rebuild, manifest binding, locked Cargo calls, and CI registration only.

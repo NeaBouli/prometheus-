@@ -402,3 +402,6 @@ Both runs require Gio budget approval (plan-level gate).
 
 - A8b1 integrated with 26 focused passes. Codex review requires A8b1r to reject
   a symlink checkout path before A8b1 can close.
+
+- A8b1r closes the review finding; A8b1 now passes 27 focused tests, Ruff, and
+  Mypy. A8b2 starts manifest/rebuild/locked-Cargo/CI enforcement.
