@@ -399,3 +399,6 @@ Both runs require Gio budget approval (plan-level gate).
 
 - A8b returned no report/diff. It is reduced to A8b1 checkout/pin enforcement,
   followed serially by A8b2 manifest/rebuild/locked-Cargo/CI wiring.
+
+- A8b1 integrated with 26 focused passes. Codex review requires A8b1r to reject
+  a symlink checkout path before A8b1 can close.

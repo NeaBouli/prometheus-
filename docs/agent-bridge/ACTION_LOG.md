@@ -5814,3 +5814,6 @@ Rules for all dev agents:
 
 - A8b returned no report/diff. A8b1 now owns only checkout and exact-pin
   enforcement plus focused tests; no version or evidence change occurred.
+
+- A8b1 is integrated but not closed: Codex found symlink-path acceptance and
+  assigned A8b1r plus a regression. Active pins and evidence remain unchanged.
