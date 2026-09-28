@@ -526,3 +526,147 @@ def test_ack_context_and_paths_are_strict() -> None:
             )
     finally:
         shutil.rmtree(directory)
+
+
+def test_kip16_adapter_rejects_executable_replaced_after_preflight() -> None:
+    directory = owner_only_directory().resolve()
+    try:
+        binary, manifest = verifier_fixture(directory, 0)
+        verifier = Kip16Groth16Verifier(binary, manifest, "11" * 32)
+        hint = make_hint()
+        assert verifier.verify(hint, hint.to_wire(), CONTEXT) is True
+        marker = directory / "replacement-ran"
+        replacement = directory / "replacement"
+        replacement.write_text(f"#!/bin/sh\n/usr/bin/touch {marker}\nexit 0\n")
+        os.chmod(replacement, 0o700)
+        os.replace(replacement, binary)
+        with pytest.raises(ThreatProofVerifierUnavailable) as renamed:
+            verifier.verify(hint, hint.to_wire(), CONTEXT)
+        binary.write_text(f"#!/bin/sh\n/usr/bin/touch {marker}\nexit 1\n")
+        os.chmod(binary, 0o700)
+        with pytest.raises(ThreatProofVerifierUnavailable) as rewritten:
+            verifier.verify(hint, hint.to_wire(), CONTEXT)
+        assert not marker.exists()
+        for failure in (renamed.value, rewritten.value):
+            assert str(failure) == "approved Groth16 verifier unavailable"
+            assert str(directory) not in str(failure.__cause__)
+    finally:
+        shutil.rmtree(directory)
+
+
+@pytest.mark.asyncio
+async def test_replaced_executable_is_busy_without_ledger_mutation() -> None:
+    directory = owner_only_directory().resolve()
+    try:
+        binary, manifest = verifier_fixture(directory, 0)
+        verifier = Kip16Groth16Verifier(binary, manifest, "11" * 32)
+        ledger_path = directory / "replay.sqlite3"
+        ledger = ThreatHintReplayLedger(ledger_path)
+        before = ledger_path.read_bytes()
+        binary.write_text("#!/bin/sh\n/bin/cat >/dev/null\nexit 0 \n")
+        os.chmod(binary, 0o700)
+        ack = await ThreatHintIngress(ledger, verifier, CONTEXT).process(
+            make_hint().to_wire(), NOW_SECONDS
+        )
+        assert ack == ThreatHintIngressAck("busy", "")
+        assert ledger.pending_jobs(1) == []
+        assert ledger_path.read_bytes() == before
+    finally:
+        shutil.rmtree(directory)
+
+
+@pytest.mark.parametrize("race", [PermissionError, ProcessLookupError])
+def test_kip16_adapter_reaps_child_when_process_group_kill_races(
+    monkeypatch: pytest.MonkeyPatch, race: type[OSError]
+) -> None:
+    import subprocess  # pylint: disable=import-outside-toplevel
+
+    import jaeger.threat_hint_ingress as ingress  # pylint: disable=import-outside-toplevel
+
+    directory = owner_only_directory().resolve()
+    started: list[subprocess.Popen[bytes]] = []
+    original_popen = subprocess.Popen
+
+    def recording_popen(*args: object, **kwargs: object) -> subprocess.Popen[bytes]:
+        process = original_popen(*args, **kwargs)  # type: ignore[call-overload]
+        started.append(process)
+        return process
+
+    def racing_killpg(_pgid: int, _signal: int) -> None:
+        raise race()
+
+    try:
+        binary, manifest = verifier_fixture(directory, 0, delay=True)
+        verifier = Kip16Groth16Verifier(
+            binary, manifest, "11" * 32, timeout_seconds=0.05
+        )
+        monkeypatch.setattr(ingress.subprocess, "Popen", recording_popen)
+        monkeypatch.setattr(ingress.os, "killpg", racing_killpg)
+        hint = make_hint()
+        with pytest.raises(ThreatProofVerifierUnavailable) as failure:
+            verifier.verify(hint, hint.to_wire(), CONTEXT)
+        assert str(failure.value) == "approved Groth16 verifier unavailable"
+        assert len(started) == 1
+        assert started[0].poll() is not None
+    finally:
+        shutil.rmtree(directory)
+
+
+def test_replay_ledger_rejects_symlink_and_unsafe_existing_files() -> None:
+    directory = owner_only_directory()
+    try:
+        target = directory / "target.sqlite3"
+        target.write_bytes(b"do not open")
+        os.chmod(target, 0o600)
+        link = directory / "link.sqlite3"
+        link.symlink_to(target)
+        with pytest.raises(ThreatHintIngressError) as symlinked:
+            ThreatHintReplayLedger(link)
+        assert str(symlinked.value) == "ThreatHint ledger must not be a symlink"
+        dangling = directory / "dangling.sqlite3"
+        dangling.symlink_to(directory / "missing.sqlite3")
+        with pytest.raises(ThreatHintIngressError, match="must not be a symlink"):
+            ThreatHintReplayLedger(dangling)
+        assert not (directory / "missing.sqlite3").exists()
+        assert target.read_bytes() == b"do not open"
+        assert stat.S_IMODE(target.lstat().st_mode) == 0o600
+
+        for mode in (0o400, 0o640, 0o604, 0o700, 0o2600):
+            unsafe = directory / f"unsafe-{mode:o}.sqlite3"
+            unsafe.write_bytes(b"unchanged")
+            os.chmod(unsafe, mode)
+            actual_mode = stat.S_IMODE(unsafe.lstat().st_mode)
+            with pytest.raises(ThreatHintIngressError) as rejected:
+                ThreatHintReplayLedger(unsafe)
+            assert str(rejected.value) == "ThreatHint ledger must be owner-only"
+            assert str(directory) not in str(rejected.value)
+            os.chmod(unsafe, 0o600)
+            assert unsafe.read_bytes() == b"unchanged"
+            assert actual_mode != 0o600
+        not_regular = directory / "directory.sqlite3"
+        not_regular.mkdir(mode=0o700)
+        with pytest.raises(ThreatHintIngressError, match="owner-only"):
+            ThreatHintReplayLedger(not_regular)
+        fifo = directory / "fifo.sqlite3"
+        os.mkfifo(fifo, 0o600)
+        with pytest.raises(ThreatHintIngressError, match="owner-only"):
+            ThreatHintReplayLedger(fifo)
+    finally:
+        shutil.rmtree(directory)
+
+
+def test_replay_ledger_requires_exact_owner_only_mode() -> None:
+    directory = owner_only_directory()
+    previous_umask = os.umask(0)
+    try:
+        created = directory / "created.sqlite3"
+        ThreatHintReplayLedger(created)
+        assert stat.S_IMODE(created.lstat().st_mode) == 0o600
+        existing = directory / "existing.sqlite3"
+        existing.touch(mode=0o600)
+        os.chmod(existing, 0o600)
+        ThreatHintReplayLedger(existing)
+        assert stat.S_IMODE(existing.lstat().st_mode) == 0o600
+    finally:
+        os.umask(previous_umask)
+        shutil.rmtree(directory)
