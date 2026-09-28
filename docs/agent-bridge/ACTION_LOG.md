@@ -5802,3 +5802,6 @@ Rules for all dev agents:
 - Worker update: A8a returned no report/diff. Kimi is canonically
   `token_limited`; Claude and Grok probes passed. Claude owns non-duplicated
   A8a2 inventory; no implementation has started.
+
+- A8a2 also returned no report/diff. Broad inventory is stopped and replaced
+  by serial SilverC/CI and Cargo/Kaspa slices; implementation remains closed.

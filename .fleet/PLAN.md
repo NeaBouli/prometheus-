@@ -387,3 +387,6 @@ Both runs require Gio budget approval (plan-level gate).
 - A8a produced no report or diff. Canonical probes: Kimi `token_limited`,
   Claude `available`, Grok `available`. A8a2 assigns the same inventory to
   Claude; Grok remains unused because the scope exceeds its role boundary.
+
+- A8a2 also produced no report or diff. The broad inventory is replaced, not
+  repeated, by serial bounded slices: A8a3 SilverC/CI, then A8a4 Cargo/Kaspa.
