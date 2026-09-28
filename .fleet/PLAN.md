@@ -408,3 +408,6 @@ Both runs require Gio budget approval (plan-level gate).
 
 - A8b2 integrated, but Codex review rejects incremental default-target reuse.
   A8b2r must build and execute from a fresh isolated target directory.
+
+- A8b2r closes default-target reuse with 42 focused passes. A8c starts the
+  machine-readable Cargo/SilverScript/immutable-proof pin policy and CI gate.

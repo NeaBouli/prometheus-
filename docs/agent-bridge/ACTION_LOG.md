@@ -5823,3 +5823,6 @@ Rules for all dev agents:
 
 - A8b2 is integrated but not closed: an ignored default Cargo target could be
   reused. A8b2r requires a fresh isolated target and regression proof.
+
+- A8b2r is verified (`42` focused passes, Ruff, Mypy). A8c now creates the
+  active toolchain pin policy and CI verifier; no migration is included.
