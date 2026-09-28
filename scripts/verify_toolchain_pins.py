@@ -2,13 +2,14 @@
 """Fail-closed Rusty Kaspa / SilverScript pin gate for the Rust workspace.
 
 Structurally parses the workspace Cargo.toml, member manifests, Cargo.lock and
-the threat-proof artifact-identity constants, and compares them with the
-active-pin policy in docs/architecture/toolchain-pins.json. Offline only.
+the threat-proof artifact-identity constants (Rust verifier and Python Guardian
+relation parser), and compares them with the active-pin policy in docs/architecture/toolchain-pins.json. Offline only.
 """
 
 from __future__ import annotations
 
 import argparse
+import ast
 import json
 import re
 import sys
@@ -21,6 +22,7 @@ from urllib.parse import parse_qsl, urlsplit, urlunsplit
 REPO_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_POLICY = Path("docs/architecture/toolchain-pins.json")
 THREAT_PROOF_LIB = Path("modules/threat-proof/src/lib.rs")
+RELATION_MANIFEST_PY = Path("modules/guardian-node/jaeger/relation_manifest_v2.py")
 
 POLICY_SCHEMA_VERSION = 1
 POLICY_ID = "prometheus-toolchain-pins-v1"
@@ -434,6 +436,62 @@ def _check_proof_identity(root: Path, policy: Policy, errors: list[str]) -> None
             )
 
 
+def _py_bindings(tree: ast.Module, name: str) -> int:
+    count = 0
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Name) and isinstance(node.ctx, ast.Store):
+            count += node.id == name
+        elif isinstance(node, ast.alias):
+            count += (node.asname or node.name) == name
+        elif isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+            count += node.name == name
+        elif isinstance(node, ast.arg):
+            count += node.arg == name
+    return count
+
+
+def _py_str_const(tree: ast.Module, name: str) -> str | None:
+    for stmt in tree.body:
+        if (
+            isinstance(stmt, ast.Assign)
+            and len(stmt.targets) == 1
+            and isinstance(stmt.targets[0], ast.Name)
+            and stmt.targets[0].id == name
+            and isinstance(stmt.value, ast.Constant)
+            and type(stmt.value.value) is str
+        ):
+            return stmt.value.value
+    return None
+
+
+def _check_relation_identity(root: Path, policy: Policy, errors: list[str]) -> None:
+    label = RELATION_MANIFEST_PY.as_posix()
+    try:
+        text = (root / RELATION_MANIFEST_PY).read_text(encoding="utf-8")
+    except FileNotFoundError:
+        errors.append(f"{label}: file missing")
+        return
+    try:
+        tree = ast.parse(text, filename=label)
+    except (SyntaxError, ValueError):
+        errors.append(f"{label}: invalid Python source")
+        return
+    for const, expected in (
+        ("RUSTY_KASPA_TAG", policy.proof_kaspa_tag),
+        ("RUSTY_KASPA_COMMIT", policy.proof_kaspa_commit),
+    ):
+        bindings = _py_bindings(tree, const)
+        value = _py_str_const(tree, const)
+        if bindings != 1:
+            errors.append(f"{label}: expected exactly one {const}, found {bindings}")
+        elif value is None:
+            errors.append(
+                f"{label}: {const} must be a single module-level string assignment"
+            )
+        elif value != expected:
+            errors.append(f"{label}: {const} does not match artifact-identity pin")
+
+
 def verify(root: Path, policy: Policy) -> tuple[list[str], str]:
     """Return (sorted unique errors, success summary) for the given checkout."""
     errors: list[str] = []
@@ -447,6 +505,7 @@ def verify(root: Path, policy: Policy) -> tuple[list[str], str]:
     if lock is not None:
         counts = _check_lock(lock, policy, errors)
     _check_proof_identity(root, policy, errors)
+    _check_relation_identity(root, policy, errors)
     summary = (
         f"rusty-kaspa {policy.kaspa_tag}@{policy.kaspa_commit} "
         f"({len(policy.kaspa_direct)} direct, {counts[0]} locked); "

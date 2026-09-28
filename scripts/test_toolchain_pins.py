@@ -59,6 +59,7 @@ class Fixture(unittest.TestCase):
             Path("Cargo.toml"),
             Path("Cargo.lock"),
             vtp.THREAT_PROOF_LIB,
+            vtp.RELATION_MANIFEST_PY,
             vtp.DEFAULT_POLICY,
             *(Path(m) / "Cargo.toml" for m in members),
         ]
@@ -354,6 +355,99 @@ class ProofIdentityTest(Fixture):
         )
 
 
+class RelationIdentityTest(Fixture):
+    PY = vtp.RELATION_MANIFEST_PY
+    TAG_LINE = f'RUSTY_KASPA_TAG = "{POLICY.proof_kaspa_tag}"'
+    COMMIT_LINE = f'RUSTY_KASPA_COMMIT = "{POLICY.proof_kaspa_commit}"'
+
+    def assert_only_relation_errors(self, *expected: str) -> None:
+        errors = self.errors()
+        self.assertEqual(errors, sorted(errors))
+        self.assertEqual(errors, sorted(f"{self.PY.as_posix()}: {e}" for e in expected))
+
+    def test_python_tag_drift(self) -> None:
+        self.edit(self.PY, self.TAG_LINE, 'RUSTY_KASPA_TAG = "v2.0.2"')
+        self.assert_only_relation_errors(
+            "RUSTY_KASPA_TAG does not match artifact-identity pin"
+        )
+
+    def test_python_commit_drift(self) -> None:
+        self.edit(self.PY, self.COMMIT_LINE, f'RUSTY_KASPA_COMMIT = "{OTHER_COMMIT}"')
+        errors = self.errors()
+        self.assertNotIn(OTHER_COMMIT, "\n".join(errors))
+        self.assertIn(
+            f"{self.PY.as_posix()}: RUSTY_KASPA_COMMIT does not match "
+            "artifact-identity pin",
+            errors,
+        )
+
+    def test_python_both_drift_sorted(self) -> None:
+        self.edit(self.PY, self.TAG_LINE, 'RUSTY_KASPA_TAG = "v9.9.9"')
+        self.edit(self.PY, self.COMMIT_LINE, f'RUSTY_KASPA_COMMIT = "{OTHER_COMMIT}"')
+        self.assert_only_relation_errors(
+            "RUSTY_KASPA_COMMIT does not match artifact-identity pin",
+            "RUSTY_KASPA_TAG does not match artifact-identity pin",
+        )
+
+    def test_python_missing_constant(self) -> None:
+        self.edit(self.PY, self.TAG_LINE + "\n", "")
+        self.assert_only_relation_errors(
+            "expected exactly one RUSTY_KASPA_TAG, found 0"
+        )
+
+    def test_python_duplicate_constant(self) -> None:
+        self.append(self.PY, f"\n{self.COMMIT_LINE}\n")
+        self.assert_only_relation_errors(
+            "expected exactly one RUSTY_KASPA_COMMIT, found 2"
+        )
+
+    def test_python_shadowing_binding_counts_as_duplicate(self) -> None:
+        self.append(self.PY, "\ndef _f(RUSTY_KASPA_TAG: str) -> None:\n    pass\n")
+        self.assert_only_relation_errors(
+            "expected exactly one RUSTY_KASPA_TAG, found 2"
+        )
+
+    def test_python_malformed_assignment_forms(self) -> None:
+        pin = POLICY.proof_kaspa_tag
+        for form in (
+            f'RUSTY_KASPA_TAG: str = "{pin}"',
+            f'RUSTY_KASPA_TAG = b"{pin}"',
+            f'RUSTY_KASPA_TAG = "{pin}".strip()',
+            f'RUSTY_KASPA_TAG = X = "{pin}"',
+            f'RUSTY_KASPA_TAG, X = "{pin}", 1',
+            f'if True:\n    RUSTY_KASPA_TAG = "{pin}"',
+        ):
+            with self.subTest(form=form):
+                shutil.copyfile(REPO / self.PY, self.root / self.PY)
+                self.edit(self.PY, self.TAG_LINE, form)
+                self.assert_only_relation_errors(
+                    "RUSTY_KASPA_TAG must be a single module-level string assignment"
+                )
+
+    def test_python_invalid_source(self) -> None:
+        self.append(self.PY, "\ndef (:\n")
+        self.assert_only_relation_errors("invalid Python source")
+
+    def test_python_file_missing(self) -> None:
+        (self.root / self.PY).unlink()
+        self.assert_only_relation_errors("file missing")
+
+    def test_identity_move_flags_both_sources(self) -> None:
+        data = self.policy_data()
+        data["threat_proof_artifact_identity"]["rusty_kaspa_tag"] = "v2.0.2"
+        self.write_policy(data)
+        errors = self.errors()
+        self.assertEqual(errors, sorted(errors))
+        self.assertIn(
+            f"{self.PY.as_posix()}: RUSTY_KASPA_TAG does not match "
+            "artifact-identity pin",
+            errors,
+        )
+        self.assertTrue(
+            any(e.startswith(vtp.THREAT_PROOF_LIB.as_posix()) for e in errors)
+        )
+
+
 class PolicyValidationTest(Fixture):
     def assert_policy_error(self, text: str, fragment: str) -> None:
         with self.assertRaises(vtp.PolicyError) as ctx:
@@ -474,6 +568,7 @@ class NoClaimLanguageTest(unittest.TestCase):
             CargoLockDriftTest,
             SilverScriptDriftTest,
             ProofIdentityTest,
+            RelationIdentityTest,
             PolicyValidationTest,
         ):
             suite.addTests(loader.loadTestsFromTestCase(case))
