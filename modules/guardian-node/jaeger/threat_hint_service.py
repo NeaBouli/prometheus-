@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import asyncio
 import os
+import re
 import signal
 import stat
 import sys
@@ -29,6 +30,7 @@ from jaeger.threat_hint_ingress import (
 CONFIG_SCHEMA_VERSION: Final[int] = 1
 MAX_CONFIG_BYTES: Final[int] = 8_192
 MAX_SERVICE_CONNECTIONS: Final[int] = 1_024
+_LOWER_HEX_SHA256 = re.compile(r"[0-9a-f]{64}")
 _ROOT_FIELDS = {
     "schema_version",
     "network_id",
@@ -43,6 +45,7 @@ _KIP16_FIELDS = {
     "binary_path",
     "manifest_path",
     "expected_manifest_sha256",
+    "expected_executable_sha256",
     "timeout_seconds",
 }
 
@@ -60,6 +63,7 @@ class ThreatHintServiceConfig:
     verifier_binary_path: Path | None = None
     verifier_manifest_path: Path | None = None
     verifier_manifest_sha256: str | None = None
+    verifier_executable_sha256: str | None = None
     verifier_timeout_seconds: float = DEFAULT_VERIFIER_TIMEOUT_SECONDS
 
 
@@ -85,7 +89,10 @@ def load_service_config(path: Path) -> ThreatHintServiceConfig:
     if mode == "unavailable":
         if set(verifier) != {"mode"}:
             raise ThreatHintIngressError("unavailable verifier config is not closed")
-        verifier_values: tuple[Path | None, Path | None, str | None, float] = (
+        verifier_values: tuple[
+            Path | None, Path | None, str | None, str | None, float
+        ] = (
+            None,
             None,
             None,
             None,
@@ -99,6 +106,7 @@ def load_service_config(path: Path) -> ThreatHintServiceConfig:
             _path(verifier["binary_path"], "verifier binary path"),
             _path(verifier["manifest_path"], "verifier manifest path"),
             _string(verifier["expected_manifest_sha256"], "manifest anchor"),
+            _sha256(verifier["expected_executable_sha256"], "executable anchor"),
             timeout,
         )
     else:
@@ -120,7 +128,8 @@ def load_service_config(path: Path) -> ThreatHintServiceConfig:
         verifier_binary_path=verifier_values[0],
         verifier_manifest_path=verifier_values[1],
         verifier_manifest_sha256=verifier_values[2],
-        verifier_timeout_seconds=verifier_values[3],
+        verifier_executable_sha256=verifier_values[3],
+        verifier_timeout_seconds=verifier_values[4],
     )
 
 
@@ -138,11 +147,13 @@ def build_service(
         and config.verifier_binary_path is not None
         and config.verifier_manifest_path is not None
         and config.verifier_manifest_sha256 is not None
+        and config.verifier_executable_sha256 is not None
     ):
         verifier = Kip16Groth16Verifier(
             config.verifier_binary_path,
             config.verifier_manifest_path,
             config.verifier_manifest_sha256,
+            expected_executable_sha256=config.verifier_executable_sha256,
             timeout_seconds=config.verifier_timeout_seconds,
         )
     else:
@@ -221,6 +232,12 @@ def _validate_owner_config(path: Path) -> Path:
 def _string(value: object, label: str) -> str:
     if not isinstance(value, str) or not value:
         raise ThreatHintIngressError(f"{label} must be a non-empty string")
+    return value
+
+
+def _sha256(value: object, label: str) -> str:
+    if not isinstance(value, str) or not _LOWER_HEX_SHA256.fullmatch(value):
+        raise ThreatHintIngressError(f"{label} must be lowercase 64-hex")
     return value
 
 
