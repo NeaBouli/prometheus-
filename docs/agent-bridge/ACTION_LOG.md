@@ -5762,3 +5762,29 @@ Rules for all dev agents:
 - The under-60-second lifecycle remains a target until reproduced on a real
   public multi-host network; local stub timing is not production evidence.
 - Status: `A7 IN PROGRESS / PRODUCTION FALSE`.
+
+### 2026-09-28 - A7 deployer and Guardian TOCTOU hardening locally verified
+
+- PRM-06: genesis deployer commands reject input/output collisions before any
+  write; broadcast also protects the derived intent journal.
+- PRM-07: the Guardian v1 verifier requires an exact configured executable
+  SHA-256, rechecks it before every spawn, handles kill/reap races fail-closed,
+  and opens the replay ledger without following links and with exact `0600`
+  mode. The earlier partial A7b/A7b2 slices are completed by A7b3's required
+  service-config wiring.
+- PRM-08: Guardian service and v2 policy files use bounded, single-descriptor,
+  no-follow reads with file identity checks before and after reading.
+- Kimi's A7a dispatch fell back automatically to Claude. Claude delivered the
+  serial implementation slices; Codex reviewed each security diff and executed
+  the combined gate. The single JEV routing result was advisory only and did
+  not override architecture/security ownership.
+- PASS: Rust format; deployer `50` unit plus `6` integration tests; deployer
+  Clippy `-D warnings`; Guardian `1426 passed, 4 skipped`; Black; Ruff;
+  CI-equivalent Pylint `9.86/10` (`--fail-under=7.0`); diff check.
+- Residual gates: hosted CI; pathname-to-exec residual race shared with the v2
+  verifier; Rusty Kaspa v2.1.0/Silverscript v1.0.0 compatibility and pinning;
+  real public multi-host lifecycle evidence. The under-60-second claim remains
+  a target, not measured production performance.
+- No network, deployment, wallet, chain, contract, migration, secret, or
+  production action was performed.
+- Status: `A7 LOCAL VERIFIED / HOSTED CI PENDING / PRODUCTION FALSE`.

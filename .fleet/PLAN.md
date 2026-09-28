@@ -345,3 +345,31 @@ Both runs require Gio budget approval (plan-level gate).
   this repo still builds Rusty Kaspa v2.0.1. Version reconciliation is a
   separate pre-rollout gate, not bundled into the A7 security fixes.
 - State: `A7 IN PROGRESS / PRODUCTION FALSE`.
+
+### 2026-09-28 — A7 locally verified
+
+- PRM-06 now rejects deployer import/output collisions before preflight,
+  prepare, signature verification, broadcast, or observation writes. Broadcast
+  also protects its derived intent journal. The residual pathname race after
+  validation remains explicit and is not represented as eliminated.
+- PRM-07 now binds the Guardian v1 verifier to a required, canonical SHA-256
+  configured through the exact TOML schema, rechecks the executable before
+  every spawn, hardens process-group cleanup, and opens the replay ledger with
+  no-follow and exact owner-only mode checks. A7b/A7b2 partial reports are
+  completed by A7b3 service wiring; no TOFU, environment fallback, or default
+  digest was introduced.
+- PRM-08 now reads Guardian service and v2 policy configuration once through a
+  no-follow descriptor with bounded reads plus pre/post identity checks. No
+  pathname reopen remains at these two boundaries.
+- Kimi received A7a but the dispatcher fell back to Claude. Claude implemented
+  the non-overlapping slices; Codex reviewed each security diff and ran the
+  combined integration gate. No duplicate implementation was performed.
+- PASS: Rust format; silverc-deployer `50` unit and `6` collision integration
+  tests; silverc-deployer Clippy with `-D warnings`; Guardian `1426 passed, 4
+  skipped`; Black; Ruff; CI-equivalent full-package Pylint `9.86/10` with
+  `--fail-under=7.0`; and diff check. Sandbox-only Unix-socket and mode failures
+  were reproduced and then excluded by the unrestricted canonical test run.
+- No network, deploy, wallet, chain, contract, migration, or production action.
+  Rusty Kaspa v2.1.0/Silverscript v1.0.0 reconciliation and real public
+  multi-host under-60-second evidence remain separate rollout gates.
+- State: `A7 LOCAL VERIFIED / HOSTED CI PENDING / PRODUCTION FALSE`.
