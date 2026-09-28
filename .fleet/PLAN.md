@@ -393,3 +393,6 @@ Both runs require Gio budget approval (plan-level gate).
 
 - A8a3 is independently source-verified: medium fail-open SilverC pinning debt
   confirmed; H-001 evidence stays immutable. A8a4 now maps Cargo/Kaspa only.
+
+- A8a4 independently confirms the Cargo source-policy gap and immutable proof
+  identity pins. A8b starts SilverC hardening with the active pin unchanged.

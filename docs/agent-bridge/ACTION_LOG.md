@@ -5808,3 +5808,6 @@ Rules for all dev agents:
 
 - A8a3 confirms medium SilverC compiler pinning debt. Codex source-reviewed the
   finding; no hardening or version migration has started. A8a4 maps Cargo/Kaspa.
+
+- A8a4 confirms the Cargo source-policy gap. A8b now hardens SilverC pin
+  enforcement only; v1.0.0/v2.1.0 migration remains out of scope.
