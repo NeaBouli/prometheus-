@@ -5811,3 +5811,6 @@ Rules for all dev agents:
 
 - A8a4 confirms the Cargo source-policy gap. A8b now hardens SilverC pin
   enforcement only; v1.0.0/v2.1.0 migration remains out of scope.
+
+- A8b returned no report/diff. A8b1 now owns only checkout and exact-pin
+  enforcement plus focused tests; no version or evidence change occurred.

@@ -396,3 +396,6 @@ Both runs require Gio budget approval (plan-level gate).
 
 - A8a4 independently confirms the Cargo source-policy gap and immutable proof
   identity pins. A8b starts SilverC hardening with the active pin unchanged.
+
+- A8b returned no report/diff. It is reduced to A8b1 checkout/pin enforcement,
+  followed serially by A8b2 manifest/rebuild/locked-Cargo/CI wiring.
