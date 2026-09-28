@@ -30,12 +30,29 @@ impl RuntimeMode {
         Self::parse(&env::var(RUNTIME_MODE_ENV).unwrap_or_default())
     }
 
-    /// Parse a runtime mode string.
+    /// Read `PROMETHEUS_RUNTIME` without any fallback.
+    ///
+    /// Missing, empty, or unrecognised values return `None` so fail-closed
+    /// gates can reject them instead of defaulting to development.
+    pub fn explicit_from_env() -> Option<Self> {
+        env::var(RUNTIME_MODE_ENV)
+            .ok()
+            .as_deref()
+            .and_then(Self::try_parse)
+    }
+
+    /// Parse a runtime mode string, falling back to development.
     pub fn parse(value: &str) -> Self {
+        Self::try_parse(value).unwrap_or(Self::Development)
+    }
+
+    /// Strictly parse a runtime mode string; empty or unknown values are `None`.
+    pub fn try_parse(value: &str) -> Option<Self> {
         match value.to_ascii_lowercase().as_str() {
-            "beta" => Self::Beta,
-            "mainnet" | "production" | "prod" => Self::Mainnet,
-            _ => Self::Development,
+            "development" => Some(Self::Development),
+            "beta" => Some(Self::Beta),
+            "mainnet" | "production" | "prod" => Some(Self::Mainnet),
+            _ => None,
         }
     }
 
@@ -72,6 +89,29 @@ mod tests {
     fn test_parse_default_mode_as_development() {
         assert_eq!(RuntimeMode::parse(""), RuntimeMode::Development);
         assert_eq!(RuntimeMode::parse("development"), RuntimeMode::Development);
+    }
+
+    #[test]
+    fn test_try_parse_rejects_missing_and_malformed_modes() {
+        assert_eq!(
+            RuntimeMode::try_parse("development"),
+            Some(RuntimeMode::Development)
+        );
+        assert_eq!(RuntimeMode::try_parse("beta"), Some(RuntimeMode::Beta));
+        assert_eq!(
+            RuntimeMode::try_parse("mainnet"),
+            Some(RuntimeMode::Mainnet)
+        );
+        for malformed in [
+            "",
+            "dev",
+            " development",
+            "development\n",
+            "testnet",
+            "unknown",
+        ] {
+            assert_eq!(RuntimeMode::try_parse(malformed), None, "{malformed:?}");
+        }
     }
 
     #[test]
