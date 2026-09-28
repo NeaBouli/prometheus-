@@ -321,14 +321,17 @@ async fn beta_and_mainnet_reject_before_network_activity() {
     drop(guardian);
     write_config(&fixture, &peer, &route, 2);
 
-    for mode in ["beta", "mainnet"] {
+    for mode in [None, Some(""), Some("dev"), Some("beta"), Some("mainnet")] {
         for verb in ["preflight", "submit"] {
             let mut command = cli(&fixture, verb);
-            command.env("PROMETHEUS_RUNTIME", mode);
+            match mode {
+                Some(mode) => command.env("PROMETHEUS_RUNTIME", mode),
+                None => command.env_remove("PROMETHEUS_RUNTIME"),
+            };
             let output = run_to_output(command).await;
             assert!(
                 !output.status.success(),
-                "{mode} {verb} must reject before network activity"
+                "{mode:?} {verb} must reject before network activity"
             );
             assert_redacted(&fixture, &peer, &output);
         }
