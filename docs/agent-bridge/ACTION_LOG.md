@@ -5720,3 +5720,11 @@ Rules for all dev agents:
 - Documentation hygiene plus 11 tests and public claims plus 76 tests pass.
 - No network, migration, L1, deploy, wallet, contract, or production action.
 - Status: `A5 LOCAL VERIFIED / HOSTED CI PENDING / PRODUCTION FALSE`.
+
+### 2026-09-28 - A6 scanner hardening started
+
+- A6 is split serially into semantics (PRM-04), file/resource bounds (PRM-05),
+  and dev-cache bounds (PRM-11), all within the existing client scanner node.
+- Claude is the single writer while Kimi remains token-limited; every slice
+  receives focused tests and the combined block receives security review.
+- Status: `A6 IN PROGRESS / PRODUCTION FALSE`.
