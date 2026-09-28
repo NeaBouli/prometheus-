@@ -196,17 +196,25 @@ class Kip16Groth16Verifier:  # pylint: disable=too-few-public-methods
         manifest_path: Path,
         expected_manifest_sha256: str,
         *,
+        expected_executable_sha256: str,
         timeout_seconds: float = DEFAULT_VERIFIER_TIMEOUT_SECONDS,
     ) -> None:
         if not isinstance(expected_manifest_sha256, str) or not _is_hex_32(
             expected_manifest_sha256
         ):
             raise ThreatHintIngressError("verifier manifest anchor is invalid")
+        if not isinstance(expected_executable_sha256, str) or not _is_hex_32(
+            expected_executable_sha256
+        ):
+            raise ThreatHintIngressError("verifier executable anchor is invalid")
         if not 0 < timeout_seconds <= 60:
             raise ThreatHintIngressError("verifier timeout must be in (0, 60] seconds")
-        # No external executable digest anchor exists for v1; bind the bytes
-        # observed at preflight and require them again before every invocation.
-        self._binary_path, self._binary_sha256 = _validate_verifier_binary(binary_path)
+        # The caller-supplied digest is the trust anchor; the descriptor-read
+        # bytes must match it now and again before every invocation.
+        self._binary_path, observed_sha256 = _validate_verifier_binary(binary_path)
+        if not hmac.compare_digest(observed_sha256, expected_executable_sha256):
+            raise ThreatHintIngressError("verifier binary is not trusted")
+        self._binary_sha256 = expected_executable_sha256
         self._manifest_path = _validate_owner_input_file(manifest_path)
         self._manifest_sha256 = expected_manifest_sha256
         self._timeout_seconds = timeout_seconds

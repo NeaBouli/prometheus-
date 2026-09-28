@@ -104,6 +104,10 @@ def verifier_fixture(
     return binary, manifest
 
 
+def _sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
 def test_canonical_schema_rejects_noncanonical_and_duplicate_fields() -> None:
     hint = make_hint()
     wire = hint.to_wire()
@@ -143,12 +147,16 @@ def test_kip16_adapter_maps_closed_exit_codes() -> None:
     try:
         for exit_code, expected in ((0, True), (1, False)):
             binary, manifest = verifier_fixture(directory, exit_code)
-            verifier = Kip16Groth16Verifier(binary, manifest, "11" * 32)
+            verifier = Kip16Groth16Verifier(
+                binary, manifest, "11" * 32, expected_executable_sha256=_sha256(binary)
+            )
             hint = make_hint()
             assert verifier.verify(hint, hint.to_wire(), CONTEXT) is expected
             binary.unlink()
         binary, manifest = verifier_fixture(directory, 3)
-        verifier = Kip16Groth16Verifier(binary, manifest, "11" * 32)
+        verifier = Kip16Groth16Verifier(
+            binary, manifest, "11" * 32, expected_executable_sha256=_sha256(binary)
+        )
         with pytest.raises(ThreatProofVerifierUnavailable):
             verifier.verify(make_hint(), make_hint().to_wire(), CONTEXT)
     finally:
@@ -160,7 +168,11 @@ def test_kip16_adapter_timeout_and_permissions_fail_closed() -> None:
     try:
         binary, manifest = verifier_fixture(directory, 0, delay=True)
         verifier = Kip16Groth16Verifier(
-            binary, manifest, "11" * 32, timeout_seconds=0.01
+            binary,
+            manifest,
+            "11" * 32,
+            expected_executable_sha256=_sha256(binary),
+            timeout_seconds=0.01,
         )
         hint = make_hint()
         with pytest.raises(ThreatProofVerifierUnavailable):
@@ -169,11 +181,15 @@ def test_kip16_adapter_timeout_and_permissions_fail_closed() -> None:
         with pytest.raises(ThreatProofVerifierUnavailable):
             verifier.verify(hint, hint.to_wire(), CONTEXT)
         with pytest.raises(ThreatHintIngressError, match="not trusted"):
-            Kip16Groth16Verifier(binary, manifest, "11" * 32)
+            Kip16Groth16Verifier(
+                binary, manifest, "11" * 32, expected_executable_sha256=_sha256(binary)
+            )
         os.chmod(binary, 0o700)
         os.chmod(manifest, 0o644)
         with pytest.raises(ThreatHintIngressError, match="owner-only"):
-            Kip16Groth16Verifier(binary, manifest, "11" * 32)
+            Kip16Groth16Verifier(
+                binary, manifest, "11" * 32, expected_executable_sha256=_sha256(binary)
+            )
     finally:
         shutil.rmtree(directory)
 
@@ -197,7 +213,9 @@ def test_kip16_adapter_rejects_untrusted_binary_ancestor(
 
         monkeypatch.setattr(Path, "stat", stat_with_untrusted_owner)
         with pytest.raises(ThreatHintIngressError, match="parent is not trusted"):
-            Kip16Groth16Verifier(binary, manifest, "11" * 32)
+            Kip16Groth16Verifier(
+                binary, manifest, "11" * 32, expected_executable_sha256=_sha256(binary)
+            )
     finally:
         shutil.rmtree(directory)
 
@@ -532,7 +550,10 @@ def test_kip16_adapter_rejects_executable_replaced_after_preflight() -> None:
     directory = owner_only_directory().resolve()
     try:
         binary, manifest = verifier_fixture(directory, 0)
-        verifier = Kip16Groth16Verifier(binary, manifest, "11" * 32)
+        expected_sha256 = _sha256(binary)
+        verifier = Kip16Groth16Verifier(
+            binary, manifest, "11" * 32, expected_executable_sha256=expected_sha256
+        )
         hint = make_hint()
         assert verifier.verify(hint, hint.to_wire(), CONTEXT) is True
         marker = directory / "replacement-ran"
@@ -550,6 +571,60 @@ def test_kip16_adapter_rejects_executable_replaced_after_preflight() -> None:
         for failure in (renamed.value, rewritten.value):
             assert str(failure) == "approved Groth16 verifier unavailable"
             assert str(directory) not in str(failure.__cause__)
+            for digest in (expected_sha256, _sha256(binary)):
+                assert digest not in str(failure)
+                assert digest not in str(failure.__cause__)
+    finally:
+        shutil.rmtree(directory)
+
+
+def test_kip16_adapter_requires_trusted_executable_digest() -> None:
+    directory = owner_only_directory().resolve()
+    try:
+        marker = directory / "verifier-ran"
+        binary, manifest = verifier_fixture(directory, 0)
+        binary.write_text(f"#!/bin/sh\n/usr/bin/touch {marker}\nexit 0\n")
+        os.chmod(binary, 0o700)
+        observed = _sha256(binary)
+        with pytest.raises(TypeError):
+            Kip16Groth16Verifier(  # type: ignore[call-arg]  # pylint: disable=missing-kwoa
+                binary, manifest, "11" * 32
+            )
+        malformed: tuple[object, ...] = (
+            "",
+            observed.upper(),
+            observed[:-1],
+            observed + "0",
+            observed + "\n",
+            " " + observed,
+            "g" * 64,
+            observed.encode("ascii"),
+            None,
+        )
+        for candidate in malformed:
+            with pytest.raises(ThreatHintIngressError) as invalid:
+                Kip16Groth16Verifier(
+                    binary,
+                    manifest,
+                    "11" * 32,
+                    expected_executable_sha256=candidate,  # type: ignore[arg-type]
+                )
+            assert str(invalid.value) == "verifier executable anchor is invalid"
+        wrong = hashlib.sha256(b"not the approved verifier").hexdigest()
+        with pytest.raises(ThreatHintIngressError) as mismatched:
+            Kip16Groth16Verifier(
+                binary, manifest, "11" * 32, expected_executable_sha256=wrong
+            )
+        assert str(mismatched.value) == "verifier binary is not trusted"
+        for secret in (str(directory), wrong, observed):
+            assert secret not in str(mismatched.value)
+        assert not marker.exists()
+        verifier = Kip16Groth16Verifier(
+            binary, manifest, "11" * 32, expected_executable_sha256=observed
+        )
+        hint = make_hint()
+        assert verifier.verify(hint, hint.to_wire(), CONTEXT) is True
+        assert marker.exists()
     finally:
         shutil.rmtree(directory)
 
@@ -559,7 +634,9 @@ async def test_replaced_executable_is_busy_without_ledger_mutation() -> None:
     directory = owner_only_directory().resolve()
     try:
         binary, manifest = verifier_fixture(directory, 0)
-        verifier = Kip16Groth16Verifier(binary, manifest, "11" * 32)
+        verifier = Kip16Groth16Verifier(
+            binary, manifest, "11" * 32, expected_executable_sha256=_sha256(binary)
+        )
         ledger_path = directory / "replay.sqlite3"
         ledger = ThreatHintReplayLedger(ledger_path)
         before = ledger_path.read_bytes()
@@ -598,7 +675,11 @@ def test_kip16_adapter_reaps_child_when_process_group_kill_races(
     try:
         binary, manifest = verifier_fixture(directory, 0, delay=True)
         verifier = Kip16Groth16Verifier(
-            binary, manifest, "11" * 32, timeout_seconds=0.05
+            binary,
+            manifest,
+            "11" * 32,
+            expected_executable_sha256=_sha256(binary),
+            timeout_seconds=0.05,
         )
         monkeypatch.setattr(ingress.subprocess, "Popen", recording_popen)
         monkeypatch.setattr(ingress.os, "killpg", racing_killpg)
