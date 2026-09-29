@@ -25,7 +25,7 @@ Public project status was reviewed through 2026-09-13. The immutable claim-audit
 | Development component | Target hardware | Command |
 |-----------|----------|---------|
 | **Light Client foundation** | Development host | `cargo run -p prometheus-client` |
-| **Validator state-machine foundation** | Development host; target stake is 10,000 KAS | `cargo run -p prometheus-validator` |
+| **Validator state-machine foundation** | Development host; library crate only (no validator binary or network node yet); target stake is 10,000 KAS | `cargo test -p prometheus-validator` |
 | **Guardian 8B runtime scaffold** | Target: NVIDIA GPU with 24 GB VRAM | See [Guardian runtime preflight](modules/guardian-node/README.md) |
 | **Guardian 70B runtime scaffold** | Target: 4x A100/H100 80 GB, 256 GB system RAM | Opt-in Compose profile `70b`; no completed real-model evaluation is claimed |
 
@@ -112,7 +112,7 @@ grant response authority, or change production status.
 
 | Token | Role | Details |
 |-------|------|---------|
-| **KAS** | Validator Staking | Kaspa native token. Validators stake KAS (min 10,000). Slashed on misbehavior. |
+| **KAS** | Validator Staking | Kaspa native token. Specified: validators stake KAS (min 10,000) and are slashed on misbehavior. Staking and slashing are tested state machines; no operated network locks or slashes KAS today. |
 | **PROM** | Planned Rewards & Governance | Tokenomics specify 0% pre-mine and 20M Year-1 emission; minting, emission, liquidity, and trading are not implemented, deployed, or active. |
 
 **Important:** Validators stake KAS, never PROM. Planned primary PROM issuance rewards verified contributions; a planned KAS/PROM pool would permit secondary-market purchases after issuance. No ICO, presale, founder allocation, foundation allocation, or pre-mine exists in the specification. The predefined Year-1 split is Validators 40%, Guardians 30%, Reporters 20%, Dev Pool 5%, and Community 5%.
@@ -122,10 +122,12 @@ Guardian reputation is a separate canonical Kaspa L1 state in `GuardianReputatio
 
 ## Project Status
 
+Sprint status labels are review-process labels: ACCEPTED means the sprint's scoped deliverable passed review, not that the component is production-ready. The descriptions state what each component actually is.
+
 | Sprint | Status | Description |
 |--------|--------|-------------|
 | 0 — Setup | DONE | Kaspa testnet-10 node, repo structure, CI/CD |
-| 1 — Contracts | ACCEPTED | 6 Silverscript contracts, 54 tests |
+| 1 — Contracts | ACCEPTED | 6 legacy Silverscript (`.ss`) contracts; the Sprint-1 review (2026-03-21) recorded 54 tests. The current-silverc `.sil` fixtures are compiled and gated separately |
 | 2 — Client | DEVELOPMENT FOUNDATION | Kaspa RPC foundation, cache-only rule reader, custom YARA-style matcher, bounded deterministic byte triage, owner-local exact-byte vault, and ZK stub. The triage has no API/process monitoring or malware authority; the vault never moves/deletes source files or automatically isolates content. GH-190 through GH-216 add exact-byte RuleStorage ingestion, owner-pinned observation/snapshot checks, local IPFS acquisition, durable anti-downgrade state, bounded orchestration, signed owner-authorized snapshots, an opt-in Development/Testnet-10 CLI and same-host real-binary loopback evidence. GH-226 adds one Development-only, dial-only v1 ThreatHint submission path to a single static loopback Guardian peer. Independent RPC truth, finality, canonical key/manifest authority, IPFS availability/replication, production YARA/Phi-3/proofs, public multi-host reporting and operated P2P remain open |
 | 3 — AI | DEVELOPMENT FOUNDATION | Phi-3 is a fail-closed safe-default stub with no ONNX Runtime session; file existence never reports a loaded model and the stub emits no suspicious or quarantine authority. Fed-DART is also a stub |
 | 4 — Guardian | CORE ACCEPTED / MEMBERSHIP SOURCE MERGED | YARA/analyzer foundation; GH-144 hardens local vLLM operation and GH-147 binds canonical local membership/key assignments without production trust |

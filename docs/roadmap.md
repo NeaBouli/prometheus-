@@ -31,7 +31,7 @@ real network operation are tracked in the later phases below.
 | Sprint | Deliverable | Status |
 |--------|-------------|--------|
 | 0 | Kaspa Testnet-10, repo structure, CI/CD | ACCEPTED |
-| 1 | 6 Silverscript contracts, 54 tests | ACCEPTED |
+| 1 | 6 legacy Silverscript (`.ss`) contracts; Sprint-1 review recorded 54 tests | ACCEPTED |
 | 2 | Rust client: RPC foundation, custom YARA-style matcher, bounded deterministic byte triage, owner-local byte vault, ZK stub, cache-only reader and bounded Raw-CIDv1/exact-byte ingestion | DEVELOPMENT FOUNDATION; NO MALWARE AUTHORITY OR AUTOMATIC SOURCE ISOLATION |
 | 3 | Phi-3 fail-closed safe-default stub and Fed-DART placeholder | DEVELOPMENT FOUNDATION; NO ONNX INFERENCE OR QUARANTINE AUTHORITY |
 | 4 | Guardian interfaces, hardened local vLLM scaffold, and canonical owner-loaded membership source | TESTED FOUNDATION; NO EVALUATED REAL MODEL OR PRODUCTION TRUST |
