@@ -455,3 +455,17 @@ Both runs require Gio budget approval (plan-level gate).
   files; this is not recorded as an independent review. Codex's required
   security review and local integration verification remain the review basis.
 - State: `A8 VERIFIED / PR #284 OPEN / REVIEW REQUIRED / PRODUCTION FALSE`.
+
+### 2026-09-30 — Claude stand-in starts (Codex token-limited)
+
+- Claude Code continues this thread per `codex-standin` on
+  `agent/claude/prometheus-standin-20260930` (stacked on `60ee6db`); handover
+  `.fleet/HANDOVER-CLAUDE-20260930.md`. No merge, release gate, or pinned-contract
+  change by the stand-in.
+- A8u1 (upgrade inventory) closed: Rusty Kaspa v2.1.0 + SilverScript v1.0.0
+  cannot form one lock graph yet (SilverScript pins v2.0.1 resp. untagged
+  `a41a333b`); only `silverc-deployer` breaks on v2.1.0 and its signing-request
+  schema binds `toccata_activation_daa_score`. Active pins stay unchanged;
+  A8u2 waits for an upstream SilverScript release on a rusty-kaspa tag.
+- PLAN's original A8 content (R6, GH-279, PRM-09) is still open and is next.
+- State: `A8u1 DONE / UPGRADE BLOCKED UPSTREAM / PRODUCTION FALSE`.
