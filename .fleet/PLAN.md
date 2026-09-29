@@ -490,3 +490,11 @@ Both runs require Gio budget approval (plan-level gate).
   linted literal are rejected. Boundary documented in the silverc README.
 - Archive SHA-256 `4989f076…` reproduces the August H-001 evidence value.
 - Review owed to Codex. State: `GH-283 LOCAL VERIFIED / PRODUCTION FALSE`.
+
+### 2026-09-30 — A4H public honesty closed on the stand-in branch (Claude)
+
+- Re-verified the 2026-09-28 findings; most were already fixed. Corrected the
+  remaining confirmed items: non-working validator run command, present-tense
+  KAS staking/slashing, Sprint-1 legacy contract label, ACCEPTED label meaning.
+  No HTML change (visual gate not triggered). Claim/status/hygiene gates pass.
+- Review owed to Codex before any public activity. State: `A4H LOCAL VERIFIED`.
