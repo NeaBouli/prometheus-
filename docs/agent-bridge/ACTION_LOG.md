@@ -5867,3 +5867,18 @@ Rules for all dev agents:
   it did not supply an independent review. Required security source review and
   combined local verification were completed by Codex before the PR.
 - Status: `A8 VERIFIED / PR #284 OPEN / REVIEW REQUIRED / PRODUCTION FALSE`.
+
+### 2026-09-30 - [AUTOR: CC] DECISION: Claude stand-in for Codex; A8u1 upgrade inventory
+
+- TYPE: DECISION — Claude stand-in. Codex is token-limited; Claude Code continues
+  the master-plan thread on `agent/claude/prometheus-standin-20260930` (stacked on
+  `60ee6db`). Handover: `.fleet/HANDOVER-CLAUDE-20260930.md`. No merge to main.
+- A8u1: candidate upgrade Rusty Kaspa v2.1.0 / SilverScript v1.0.0 inventoried.
+  Blocked upstream: SilverScript `d25bd34` depends on rusty-kaspa v2.0.1 and
+  SilverScript v1.0.0 on untagged rev `a41a333b`; the A8 pin gate correctly
+  rejects the resulting split graph. On v2.1.0 only `silverc-deployer` fails
+  (removed `toccata_activation`, `mempool_block_mass_cofactors`,
+  `EngineFlags::covenants_enabled`); its signing-request schema binds the Toccata
+  activation score, so a port needs a versioned schema. Active pins unchanged.
+- Report: `.fleet/reports/a8u1-kaspa-silverscript-upgrade-inventory.md`.
+- Status: `A8u1 DONE / UPGRADE BLOCKED UPSTREAM / PRODUCTION FALSE`.
