@@ -83,7 +83,7 @@ docker compose config
 #    then run the fail-closed structural validator:
 python3 -m venv .venv
 . .venv/bin/activate
-python -m pip install -r requirements.txt
+python -m pip install --require-hashes --only-binary :all: -r requirements-lock.txt
 python ../../scripts/verify_guardian_vllm_compose.py
 ```
 
@@ -104,9 +104,13 @@ curl http://127.0.0.1:8001/health
 ## Running the Analyzer
 
 ```bash
-pip install -r requirements.txt
+python -m pip install --require-hashes --only-binary :all: -r requirements-lock.txt
 python -m jaeger.analyzer
 ```
+
+Dependencies are exact pins (`requirements.txt`) plus a hash-pinned lock
+(`requirements-lock.txt`); only prebuilt wheels are supported. See
+[`docs/dependency-policy.md`](../../docs/dependency-policy.md).
 
 ## Hybrid Routing
 
