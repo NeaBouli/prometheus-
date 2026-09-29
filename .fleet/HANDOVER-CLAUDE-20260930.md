@@ -24,6 +24,7 @@ Goal: continue exactly from the hand-back point without re-research.
 | UTC | Ticket | What | Result / evidence |
 | --- | --- | --- | --- |
 | 2026-09-30 | A8u1 | Kaspa v2.1.0 / SilverScript v1.0.0 compatibility inventory | Upgrade blocked upstream (SilverScript pins rusty-kaspa v2.0.1 resp. untagged a41a333b); deployer API/schema break mapped. Report `.fleet/reports/a8u1-kaspa-silverscript-upgrade-inventory.md`. No product change. |
+| 2026-09-30 | GH-279 / PRM-09 | Guardian Python deps exact pins + sha256 lock + CI gate + public policy | Guardian 1426/4 skipped, 374 script tests, pip-audit clean. Report `.fleet/reports/a8r6-guardian-python-deps.md`. |
 
 ## Current state
 - Branch/worktree: `agent/claude/prometheus-standin-20260930` in
@@ -36,10 +37,10 @@ Goal: continue exactly from the hand-back point without re-research.
 - See A8u1 F3/F4 (deployer binds `toccata_activation_daa_score` into signing request/receipt schema).
 
 ## Review owed to Codex
-- (filled per block)
+- GH-279: dependency/CI supply-chain change (ci.yml python-check install + gate). Solo by Claude.
 
 ## Next step (exact)
-1. GH-279 / PRM-09 (PLAN original A8): Guardian Python dependency reproducibility.
+1. (see latest row; next block chosen in PLAN tail)
 
 ## Open decisions for Gio
 - MS-B #276 seven contract decisions; A9/GH-280 defaults; A10/#275 service worker; A11/PRM-34 bug bounty;

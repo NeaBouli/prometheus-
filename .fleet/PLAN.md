@@ -469,3 +469,15 @@ Both runs require Gio budget approval (plan-level gate).
   A8u2 waits for an upstream SilverScript release on a rusty-kaspa tag.
 - PLAN's original A8 content (R6, GH-279, PRM-09) is still open and is next.
 - State: `A8u1 DONE / UPGRADE BLOCKED UPSTREAM / PRODUCTION FALSE`.
+
+### 2026-09-30 — GH-279 / PRM-09 locally verified (Claude stand-in)
+
+- Guardian Python dependencies are exact pins plus a generated, universal,
+  sha256 hash lock for Python 3.11; CI installs wheels-only with
+  `--require-hashes` and runs the new offline gate
+  `scripts/verify_guardian_python_deps.py` (binds yara-x to the runtime pin).
+  Public policy: `docs/dependency-policy.md`. yara-x 1.4.0 kept deliberately.
+- PASS: Guardian 1426 passed / 4 skipped in the locked 3.11 venv; Black,
+  Pylint 9.86; pip-audit clean; 18 gate tests; 374 script tests; ruff/mypy.
+- Review owed to Codex (supply-chain/CI surface). Hosted CI pending.
+- State: `GH-279 LOCAL VERIFIED / REVIEW OWED / PRODUCTION FALSE`.
