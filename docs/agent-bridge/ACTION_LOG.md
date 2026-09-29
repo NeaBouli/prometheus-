@@ -5894,3 +5894,13 @@ Rules for all dev agents:
   pip-audit clean; 374 script tests; ruff; mypy strict.
 - Report `.fleet/reports/a8r6-guardian-python-deps.md`. Review owed to Codex.
 - Status: `GH-279 LOCAL VERIFIED / HOSTED CI PENDING / PRODUCTION FALSE`.
+
+### 2026-09-30 - [AUTOR: CC] GH-283 compiled-contract semantic gate
+
+- New `scripts/verify_silverc_compiled_semantics.py` + reviewed
+  `modules/contracts/silverc/expected-compiled-artifacts.json`; negative
+  regression `scripts/test_silverc_semantic_mutation.py` (2 literal-preserving
+  mutants rejected); 13 unit tests; CI wired; README assurance boundary.
+- Pinned bundle archive SHA-256 reproduces `4989f076…` from the H-001 evidence.
+- Report `.fleet/reports/gh283-silverc-semantic-gate.md`. Review owed to Codex.
+- Status: `GH-283 LOCAL VERIFIED / HOSTED CI PENDING / PRODUCTION FALSE`.
