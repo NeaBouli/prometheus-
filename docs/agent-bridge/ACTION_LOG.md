@@ -5882,3 +5882,15 @@ Rules for all dev agents:
   activation score, so a port needs a versioned schema. Active pins unchanged.
 - Report: `.fleet/reports/a8u1-kaspa-silverscript-upgrade-inventory.md`.
 - Status: `A8u1 DONE / UPGRADE BLOCKED UPSTREAM / PRODUCTION FALSE`.
+
+### 2026-09-30 - [AUTOR: CC] GH-279 / PRM-09 Guardian dependency reproducibility
+
+- Exact direct pins (httpx floor removed), generated universal sha256 lock
+  `modules/guardian-node/requirements-lock.txt` (29 packages, Python 3.11),
+  wheels-only hash-checked CI install, offline gate
+  `scripts/verify_guardian_python_deps.py` (+18 tests), public
+  `docs/dependency-policy.md`. yara-x 1.4.0 kept as documented pin.
+- PASS: Guardian 1426 passed / 4 skipped (locked venv); Black; Pylint 9.86;
+  pip-audit clean; 374 script tests; ruff; mypy strict.
+- Report `.fleet/reports/a8r6-guardian-python-deps.md`. Review owed to Codex.
+- Status: `GH-279 LOCAL VERIFIED / HOSTED CI PENDING / PRODUCTION FALSE`.
