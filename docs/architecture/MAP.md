@@ -135,7 +135,7 @@ Sibling built flows (same modules, drawn in `map.puml`):
   consistent only as dev-foundation vs. target — canonical PROM-RULES KRC-20
   orchestration stays target architecture.
 - `docs/agent-bridge/CODEX_BRIDGE.md` §1 startflow references
-  `/Users/gio/Desktop/repos/prometheus`; the fleet works in
+  `$HOME/Desktop/repos/prometheus`; the fleet works in
   `prometheus-master-plan-20260927-wt/*` worktrees — operational doc drift, no code impact.
 - Gap: no client-side proof generation exists anywhere (stub only); no automatic rule
   update loop (canonical manifest authority missing); GH-177 quality gate is merged but

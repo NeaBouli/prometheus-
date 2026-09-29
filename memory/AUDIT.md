@@ -6,6 +6,11 @@
 
 ---
 
+> **Record status (2026-09-30):** historical working record, not the current
+> project status. Current sources: `README.md` (Project Status), `docs/roadmap.md`,
+> `memory/STATUS.md`, and the delivery plan `.fleet/PLAN.md`. Entries below are
+> retained unchanged as audit history.
+
 ## AUDIT CRITERIA (Claude Code must fulfill ALL)
 
 Every module is checked against these 7 criteria:
@@ -738,7 +743,7 @@ reconfirmed the public funding output unspent/non-coinbase through a synced,
 UTXO-indexed `rusty-kaspa 2.0.1` node at DAA `517950805`, above activation.
 Two prepare runs were byte-identical to each other and the earlier `9477fab`
 baseline; signing-request hash and sighash remain unchanged. The owner-only
-handoff at `/Users/gio/Desktop/repos/prometheus-handoffs/205e1ca` passed 0700/
+handoff at `$HOME/Desktop/repos/prometheus-handoffs/205e1ca` passed 0700/
 0600 mode checks and a full-directory Gitleaks scan. No wallet, private key,
 signature, raw transaction, or broadcast was accessed or produced. External
 BIP340 signing, complete import verification, separately approved broadcast,
