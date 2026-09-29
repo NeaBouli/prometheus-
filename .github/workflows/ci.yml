@@ -48,6 +48,8 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v7
+      - name: Test compiled-artifact semantic gate (GH-283)
+        run: python3 -m unittest scripts.test_silverc_compiled_semantics
       - name: Verify KAS/PROM separation (PATTERN-001)
         run: |
           echo "Checking contracts for KAS/PROM separation..."
@@ -276,6 +278,13 @@ jobs:
             --archive /tmp/prometheus-silverc-artifacts.tar.gz
           test -s /tmp/prometheus-silverc-artifacts.tar.gz
           tar -tzf /tmp/prometheus-silverc-artifacts.tar.gz | grep -q 'prometheus-silverc-artifacts/manifest.json'
+      - name: Verify compiled contract semantics against reviewed expectation (GH-283)
+        run: |
+          python3 scripts/verify_silverc_compiled_semantics.py \
+            --built-manifest /tmp/prometheus-silverc-artifacts/manifest.json
+          python3 scripts/test_silverc_semantic_mutation.py \
+            --silverc /tmp/prom-silverscript/target/debug/silverc \
+            --built-manifest /tmp/prometheus-silverc-artifacts/manifest.json
       - name: Preflight current-silverc release bundle
         run: |
           python3 scripts/preflight_silverc_deploy.py \
