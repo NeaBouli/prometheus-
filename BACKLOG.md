@@ -1,5 +1,10 @@
 # prometheus — Backlog
 
+> **Record status (2026-09-30):** historical working record, not the current
+> project status. Current sources: `README.md` (Project Status), `docs/roadmap.md`,
+> `memory/STATUS.md`, and the delivery plan `.fleet/PLAN.md`. Entries below are
+> retained unchanged as audit history; the baselines below predate GH-253..GH-283.
+
 ## 🔴 Aktiv (diese Session)
 - Latest documented green baseline is exact main `c243b69b2877413c80650c4c3662c4b0f2a50f39`; run `git log --oneline -1` for the current working HEAD.
 - Prometheus CI `31979118045`, Security Audit `31979117981`, and GitHub Pages `31979117415` are green for exact main. GH-220 is a repository-only status/client-safety slice and is not rollout evidence.
@@ -28,7 +33,7 @@
 ## 🟡 Nächste Session — STARTFLOW
 
 ### Pflicht VOR neuem Code:
-1. `cd /Users/gio/Desktop/repos/prometheus`
+1. `cd $HOME/Desktop/repos/prometheus`
 2. `git log --oneline -5` — aktuellen HEAD prüfen; letzter dokumentierter grüner Baseline-Commit ist `db33f56`
 3. Lies `memory/CHECKPOINT.md` — vollständiger Projektstatus
 4. Lies `memory/AUDIT.md` ab Zeile 337 — Pre-Hardfork-Audit-Ergebnisse

@@ -318,7 +318,7 @@ Rules for all dev agents:
 - Do not use the Anthropic API, Anthropic SDK, `ANTHROPIC_API_KEY`, or direct HTTP calls for Codex -> Claude Code handoff.
 - Do not use `claude --bare`; bare mode does not read the local claude.ai OAuth/keychain session and will report not logged in.
 - Do not use `cc` for Claude Code; on this machine `cc` is the C compiler.
-- The Claude Code CLI command is `claude`; the stable wrapper is `/Users/gio/.local/bin/claude-code-terminal`.
+- The Claude Code CLI command is `claude`; the stable wrapper is `$HOME/.local/bin/claude-code-terminal`.
 - If a probe returns `401 Invalid authentication credentials`, the integration is using the wrong path: API instead of terminal.
 - Keep secrets, tokens, passwords, private keys, and keychain material out of bridge files.
 <!-- /CODEX_CLAUDE_CODE_TERMINAL_BRIDGE_V1 -->
@@ -354,7 +354,7 @@ Rules for all dev agents:
 - Rebuilt all seven release artifacts and the one-request non-promotable H-001 profile from exact main. The live keyless preflight revalidated the public funding outpoint as unspent/non-coinbase against a synced `rusty-kaspa 2.0.1` node above Toccata activation.
 - Prepared deterministic signing-request schema v2 outside the repository. Signing-request hash is `6b8e65065ca5ae2ca561ddd3fcb9659c384496fd31db32c137fcc9d811fa5323`; sighash is `174ccbe80d1d37e62d2bbabfbfba48245372df2bcf9e6724ac79ebc16b4e0bcd`. A second prepare was byte-identical and the public handoff directory passed Gitleaks.
 - No signature, wallet access, raw signed transaction, or broadcast occurred. External BIP340 signing now requires explicit approval; full operator verification remains mandatory before any one-shot broadcast.
-- Preserved the reproducible public handoff outside Git at `/Users/gio/Desktop/repos/prometheus-handoffs/9477fab` with owner-only permissions; the repository still contains no signing response, wallet material, or raw transaction.
+- Preserved the reproducible public handoff outside Git at `$HOME/Desktop/repos/prometheus-handoffs/9477fab` with owner-only permissions; the repository still contains no signing response, wallet material, or raw transaction.
 
 - Remote verification update:
   - `181cde2 ci: reject raw deploy receipt payloads`
@@ -440,7 +440,7 @@ Rules for all dev agents:
 - Exact-main Prometheus CI `29454591518`, Security Audit `29454591555`, and Pages `29454590793` passed before the rebuild.
 - Live read-only preflight revalidated public outpoint `24e81339f3656689643ca86e3c53c4c5336e4273bb127d25bdaf328e5da241c7:0` as unspent/non-coinbase through a synced, UTXO-indexed `rusty-kaspa 2.0.1` node at DAA `517950805`, above Toccata activation.
 - Two prepare runs were byte-identical to each other and the prior `9477fab` request. Signing-request hash remains `6b8e65065ca5ae2ca561ddd3fcb9659c384496fd31db32c137fcc9d811fa5323`; sighash remains `174ccbe80d1d37e62d2bbabfbfba48245372df2bcf9e6724ac79ebc16b4e0bcd`.
-- Preserved the public handoff outside Git at `/Users/gio/Desktop/repos/prometheus-handoffs/205e1ca` with 0700 directories and 0600 files. Full-directory Gitleaks v8.30.1 scanned about 1.27 MB and found no leaks.
+- Preserved the public handoff outside Git at `$HOME/Desktop/repos/prometheus-handoffs/205e1ca` with 0700 directories and 0600 files. Full-directory Gitleaks v8.30.1 scanned about 1.27 MB and found no leaks.
 - No wallet file, private key, secret, signature, raw transaction, or broadcast was accessed or produced. The next gate is an explicitly approved external BIP340 signature response, not repository-side signing.
 - PR #28 merged normally without admin bypass as `e9a970a9d3dbaa98cd754a4149075c0cca866001`; exact-main Prometheus CI `29455597727`, Security Audit `29455597677`, and Pages `29455597066` passed.
 - Live GitHub README, index, roadmap, and whitepaper contain the merged `205e1ca` handoff/live-preflight status and the synchronized 68-72% core-network estimate. Issue #9 was updated with the public evidence and unchanged signature/broadcast gates.
@@ -1079,7 +1079,7 @@ Rules for all dev agents:
 ## 2026-07-26 - GIO-PROM-20260726-005 local v2 proof binding started
 
 - Created isolated branch `feat/local-v2-proof-binding` and worktree
-  `/Users/gio/Desktop/repos/prometheus-v2-proof-binding` from exact public main
+  `$HOME/Desktop/repos/prometheus-v2-proof-binding` from exact public main
   `b556fbbae428e7f6eef07c6d502b32e13e759813`.
 - Scope is one local data-only Rust/Python binding between the separately
   review-ready canonical ThreatHint-v2 proof envelope and RelationManifest-v2.

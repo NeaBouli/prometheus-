@@ -397,7 +397,7 @@ Boundary: structural/public-key assignment consistency only; no source trust,
 ```text
 Historical ticket-close state: local review-ready; superseded by GH-117 merged status
 Ticket: GIO-PROM-20260726-006
-Worktree: /Users/gio/Desktop/repos/prometheus-v2-proof-binding
+Worktree: $HOME/Desktop/repos/prometheus-v2-proof-binding
 Policy: owner-only read-only exact schema pins network, BIP340 approver,
         opaque recipient scope, and nonzero raw-manifest SHA-256
 Composition: bind envelope/manifest; derive statement only from envelope;
@@ -1203,7 +1203,7 @@ Remaining: reviewed relation/artifacts, privacy/pairing, transport, actionable
 Historical ticket-close state: local review-ready; superseded by GH-117 merged status
 Baseline: b556fbbae428e7f6eef07c6d502b32e13e759813
 Branch: feat/local-v2-proof-binding
-Worktree: /Users/gio/Desktop/repos/prometheus-v2-proof-binding
+Worktree: $HOME/Desktop/repos/prometheus-v2-proof-binding
 Implemented: canonical Rust/Python v2 proof envelope, strict 19-field
              RelationManifest-v2, and one atomic data-only binding
 Trust: separately trusted network plus nonzero lowercase raw-manifest SHA-256

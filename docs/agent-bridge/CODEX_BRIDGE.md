@@ -29,7 +29,7 @@ Historical GH-117 product/public snapshot: exact product main `cb3d076d0e698361c
 Historical GH-117 completion: issue https://github.com/NeaBouli/prometheus-/issues/117 closed after PR https://github.com/NeaBouli/prometheus-/pull/118 merged by the repository-allowed squash method. The local ThreatHint v2 binding, test-artifact verifier, preflight, atomic consumption, governance, recoverable outbox, and deterministic non-actionable worker were merged/exact-main green. No production artifact approval, real semantic/actionable analyzer, v2 transport, wallet, signing, chain, KAS/PROM, slash ACL, commit-reveal, reputation, or emergency-stop boundary changed.
 
 Historical local task `GIO-PROM-20260729-015` used isolated worktree
-`/Users/gio/Desktop/repos/prometheus-v2-proof-binding` on
+`$HOME/Desktop/repos/prometheus-v2-proof-binding` on
 `docs/GH-117-merge-closeout`, based on exact product/public main
 `cb3d076d0e698361ce410e993de3edb869c0770e`. It is limited to synchronizing
 public status docs, Memory, and Bridge after the protected GH-117 merge.
@@ -55,7 +55,7 @@ Latest public-docs note: README, `WHITEPAPER.md`, `whitepaper.html`, `docs/roadm
 Current GH-1 note: PR https://github.com/NeaBouli/prometheus-/pull/2 merged normally as `9d74c0c` without an admin bypass. The deploy procedure now requires external capability records to attest transaction version 1, `pay_to_script_hash_script` over the compiled contract script, official covenant-ID derivation from the funding outpoint and unbound outputs, and funding-input binding after ID derivation. Main runs passed: Prometheus CI https://github.com/NeaBouli/prometheus-/actions/runs/29184186551, Security Audit https://github.com/NeaBouli/prometheus-/actions/runs/29184186538, and Pages https://github.com/NeaBouli/prometheus-/actions/runs/29184186085.
 Current GH-4 note: `modules/silverc-deployer` implements the repository-owned keyless genesis path with official pinned `rusty-kaspa` v2.0.1 APIs. It builds transaction version 1 with compute budget 10 and exact contextual `storage_mass`, derives the official covenant ID, applies the funding-input binding after derivation, validates the exact live unspent funding UTXO during preflight and immediately before broadcast, exports only the 32-byte `SIG_HASH_ALL` digest, verifies an external BIP340 signature plus the complete transaction, enforces minimum/maximum fee bounds, and requires exact signing-request hash acknowledgement. Before submission it acquires an OS-managed process lock and exclusively persists/syncs a public intent journal. The journal changes to `submission_in_progress` immediately before the first RPC submission; every later run may only reconcile the known transaction ID against the covenant UTXO and mempool and fails closed when node visibility is ambiguous, so automatic resubmission is forbidden. All wRPC requests have 20-second deadlines, Silverc artifacts reject secret-like fields, and observation rebuilds and verifies the full source/signature handoff before querying chain evidence. The CLI accepts no private key, seed, wallet, keystore, password, or raw transaction. Twenty-seven unit/security tests include fixed public interoperability values, secret-boundary and journal-recovery coverage, and a file-based Python-request/Rust-operator signing handoff. Deploy-request safety fields are explicitly scoped as `deploy_request_builder_only`. PR #5 merged without admin bypass as `ea67b93b155afcf822821304593ab0fe9f815492`; issue #4 closed, and main Prometheus CI `29404986657`, Security Audit `29404986665`, and Pages `29404985747` passed. GH-4 software/CI is complete. Real testnet-10 funding/signatures/receipts, independent public chain evidence, the metrics-oracle transaction, and exact-commit release evidence remain open. Official PSKT/PSKB is deliberately not used because audited v2.0.1/current code creates legacy sigop-count commitments for v1 inputs instead of required compute-budget commitments.
 Current GH-7 note: the exact public target `kaspa-resolver://public` resolves through the pinned official `rusty-kaspa` resolver with mandatory TLS and testnet-10-only enforcement. The operator independently validates the resolved endpoint as credential-free `wss://` before any node RPC. The funding-free `probe` command validates network identity, sync, UTXO index, and Toccata activation and records the resolved endpoint; it does not accept funding, signing material, or broadcast. Python builders/verifiers share network-aware target validation and reject resolver use outside testnet, HTTP(S), credentials, queries, fragments, resolver lookalikes, and secret-like text. Rust rejects non-testnet-10 resolver requests before signing-request generation. A final live read-only probe on 2026-07-15 confirmed `rusty-kaspa 2.0.1`, sync, UTXO index, and virtual DAA `517522160` above activation `467579632`. The deterministic seven-contract resolver request set independently verifies as `f9b4838d116ff931ec5fd02ed3e119b1570b62c6836684e4d822c73166e82e2d`. All 30 operator tests, 135 workspace tests, warning-free workspace Clippy, Python/Memory/CI syntax checks, checksum-verified Actionlint, and an independent final review pass; two intentional live tests remain ignored. PR https://github.com/NeaBouli/prometheus-/pull/8 merged normally as `288ea18`; main CI, Security Audit, and Pages pass. The official resolver is best-effort infrastructure and the probe is not funding or chain-deployment evidence. GH-7 software/CI is complete; funded signing/receipt/evidence gates continue in issue https://github.com/NeaBouli/prometheus-/issues/9.
-Current GH-9 note: PR #11 merged two closed deployment profiles bound to the exact deterministic release manifest. `full` retains all seven release fixtures and the public metrics-oracle key. `testnet-10-validator-staking-h001` selects only `ValidatorStakingH001`, requires exact `kaspa-resolver://public`, forbids the oracle key, and cannot promote full or metrics readiness. From clean exact main `205e1ca`, all seven artifacts, the one-request canary set, funding spec, live preflight, and schema-v2 request were rebuilt outside Git under owner-only `/Users/gio/Desktop/repos/prometheus-handoffs/205e1ca`. The public funding output remained unspent/non-coinbase; the resolver reached a synced, UTXO-indexed `rusty-kaspa 2.0.1` node at virtual DAA `517950805`, above activation `467579632`. Request `c0cad33f23acfee4114092e0211dd642cb97c44891cc8f8826f4656f406f42fa`, signing-request hash `6b8e65065ca5ae2ca561ddd3fcb9659c384496fd31db32c137fcc9d811fa5323`, sighash `174ccbe80d1d37e62d2bbabfbfba48245372df2bcf9e6724ac79ebc16b4e0bcd`, unsigned transaction ID `c85fd1e79607370ff63faabbc3158e011158d2bde1af40d4eecd642189d8c22f`, and covenant ID `8cdb49adc2511ed5fa11f71317b66f203f37ce376a2603cd9b118236c1f8219f` remain byte-identical across two new builds and to the earlier `9477fab` baseline. The complete 1.27-MB public handoff passed Gitleaks and 0700/0600 mode checks. No wallet, private key, signature, raw transaction, or broadcast was accessed or produced. Remaining canary gates are an explicitly approved external BIP340 signature response, full operator verification, separately approved one-shot broadcast, confirmation, receipt, and independent public evidence.
+Current GH-9 note: PR #11 merged two closed deployment profiles bound to the exact deterministic release manifest. `full` retains all seven release fixtures and the public metrics-oracle key. `testnet-10-validator-staking-h001` selects only `ValidatorStakingH001`, requires exact `kaspa-resolver://public`, forbids the oracle key, and cannot promote full or metrics readiness. From clean exact main `205e1ca`, all seven artifacts, the one-request canary set, funding spec, live preflight, and schema-v2 request were rebuilt outside Git under owner-only `$HOME/Desktop/repos/prometheus-handoffs/205e1ca`. The public funding output remained unspent/non-coinbase; the resolver reached a synced, UTXO-indexed `rusty-kaspa 2.0.1` node at virtual DAA `517950805`, above activation `467579632`. Request `c0cad33f23acfee4114092e0211dd642cb97c44891cc8f8826f4656f406f42fa`, signing-request hash `6b8e65065ca5ae2ca561ddd3fcb9659c384496fd31db32c137fcc9d811fa5323`, sighash `174ccbe80d1d37e62d2bbabfbfba48245372df2bcf9e6724ac79ebc16b4e0bcd`, unsigned transaction ID `c85fd1e79607370ff63faabbc3158e011158d2bde1af40d4eecd642189d8c22f`, and covenant ID `8cdb49adc2511ed5fa11f71317b66f203f37ce376a2603cd9b118236c1f8219f` remain byte-identical across two new builds and to the earlier `9477fab` baseline. The complete 1.27-MB public handoff passed Gitleaks and 0700/0600 mode checks. No wallet, private key, signature, raw transaction, or broadcast was accessed or produced. Remaining canary gates are an explicitly approved external BIP340 signature response, full operator verification, separately approved one-shot broadcast, confirmation, receipt, and independent public evidence.
 Current GH-17 note: PR #18 merged the signed-shape fee/mass hardening normally as exact main commit `9477fabb8a9abb41e0ee82f7e240a99436452d2c`. Signing-request schema v2 models the final 66-byte Schnorr script, binds every relevant mass and pinned fee floor, rejects unknown fields and underpriced transactions, and passes 35 focused tests. PR CI, CodeRabbit review, exact-main Prometheus CI, Security Audit, and Pages all pass. The pre-merge candidate was discarded; only the exact-main GH-9 handoff above is current.
 Current GH-9 signature-import hardening note: PR #23 merged `import-signature` as exact main `f79150d77ebbf8c71ec8051dc22c7a126d4f38c0`. It accepts only a public 64-byte BIP340 signature as 128 lowercase hex characters with at most one trailing line ending, derives every response field from the validated schema-v2 request, resolves paths before I/O, rejects output collisions with any input or other output, and writes response/verification files only after BIP340 plus full Kaspa transaction verification. The standard Kaspa wallet `message sign` command is explicitly forbidden for this digest because its personal-message domain hash is incompatible. Thirty-eight focused tests, warning-free Clippy, CLI smoke, workspace tests, all PR contexts, exact-main CI/Security/Pages, live Whitepaper verification, and an independent Terra review pass. No wallet, private material, signature, raw signed transaction, or broadcast was used.
 Current CI hardening note: Prometheus CI now declares workflow-level `contents: read` permissions and pins both Rust jobs to toolchain `1.95.0` with explicit `rustfmt` and `clippy` components, matching the locally verified compiler. Fixture CI cannot replace the real funded testnet-10/signature/receipt/public-evidence rollout gate.
@@ -76,7 +76,7 @@ Security rule: Do not write secrets, tokens, passwords, private keys, keystore m
 Before any task:
 
 ```bash
-cd /Users/gio/Desktop/repos/prometheus
+cd $HOME/Desktop/repos/prometheus
 git status --short
 git log --oneline -5
 sed -n '1,260p' docs/agent-bridge/CODEX_BRIDGE.md
@@ -124,7 +124,7 @@ Public repository rules:
 | Project | Prometheus |
 | Mission | Decentralized AI-powered threat intelligence on Kaspa |
 | GitHub | github.com/NeaBouli/prometheus- |
-| Local repo | /Users/gio/Desktop/repos/prometheus |
+| Local repo | $HOME/Desktop/repos/prometheus |
 | Core Dev / Product Owner | NeaBouli / Gio / Kaspartisan |
 | Architect / Auditor | Claude |
 | Implementer | Codex / Claude Code |
@@ -551,7 +551,7 @@ Sources consolidated into this file:
 - Local bridge files in `docs/agent-bridge/`
 - Memory layer files under `memory/`
 - User-provided project synthesis on 2026-07-07
-- Local file `/Users/gio/Downloads/PROMETHEUS_CODEX_HANDOVER.md` as historical handover
+- Local file `$HOME/Downloads/PROMETHEUS_CODEX_HANDOVER.md` as historical handover
 - Private operator access verification on 2026-07-07 (details intentionally omitted)
 
 Staleness warning:
@@ -622,7 +622,7 @@ Rules for all dev agents:
 - Do not use the Anthropic API, Anthropic SDK, `ANTHROPIC_API_KEY`, or direct HTTP calls for Codex -> Claude Code handoff.
 - Do not use `claude --bare`; bare mode does not read the local claude.ai OAuth/keychain session and will report not logged in.
 - Do not use `cc` for Claude Code; on this machine `cc` is the C compiler.
-- The Claude Code CLI command is `claude`; the stable wrapper is `/Users/gio/.local/bin/claude-code-terminal`.
+- The Claude Code CLI command is `claude`; the stable wrapper is `$HOME/.local/bin/claude-code-terminal`.
 - If a probe returns `401 Invalid authentication credentials`, the integration is using the wrong path: API instead of terminal.
 - Keep secrets, tokens, passwords, private keys, and keychain material out of bridge files.
 <!-- /CODEX_CLAUDE_CODE_TERMINAL_BRIDGE_V1 -->
@@ -630,7 +630,7 @@ Rules for all dev agents:
 ## 2026-07-26 - Current local ticket checkpoint
 
 Ticket `GIO-PROM-20260726-005` in
-`/Users/gio/Desktop/repos/prometheus-v2-proof-binding` is implemented and
+`$HOME/Desktop/repos/prometheus-v2-proof-binding` is implemented and
 independently reviewed, but remains local and uncommitted. It adds strict
 canonical Rust/Python ThreatHint-v2 proof-envelope and RelationManifest-v2
 parsers plus one data-only atomic binding with a separately trusted network
@@ -673,7 +673,7 @@ chain evidence still open.
 Status: `In Progress` / local repository only / no external write.
 
 Codex Sol continues in the existing isolated worktree
-`/Users/gio/Desktop/repos/prometheus-v2-proof-binding` on exact public baseline
+`$HOME/Desktop/repos/prometheus-v2-proof-binding` on exact public baseline
 `b556fbbae428e7f6eef07c6d502b32e13e759813`. The next bounded block is a
 non-authoritative ThreatHint-v2 privacy/proof preflight that closes two
 cross-candidate confusion gaps: the relation-manifest SHA-256 must come from

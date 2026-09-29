@@ -1,8 +1,15 @@
 # Prometheus Guardian Guide
 
+> **Status (reviewed 2026-09-30):** this guide describes the **target** Guardian
+> role. The repository contains a Guardian runtime scaffold, local vLLM
+> preflight, YARA-X compile-only validation, and a non-actionable analysis
+> pipeline, but no independently evaluated real 8B/70B model run, no operated
+> multi-host Guardian network, and no PROM emission. See [README](../README.md)
+> and [Guardian node README](../modules/guardian-node/README.md) for current status.
+
 ## What Do Guardians Do?
 
-Guardians run LLaMA 3 AI models to analyze threats reported by Light Clients and generate YARA detection rules. They earn PROM rewards and build reputation through accepted proposals.
+In the target design, Guardians run LLaMA 3 AI models to analyze threats reported by Light Clients and generate YARA detection rules. They would earn PROM rewards once emission exists and build reputation through accepted proposals.
 
 ## Hardware Requirements
 
@@ -109,7 +116,7 @@ describe the target flow, not current production readiness.
 2. Guardian receives the hint via the P2P network
 3. LLaMA 3 analyzes the threat indicators
 4. YARA rule is generated from the analysis
-5. Rule is validated (must contain `rule`, `strings:`, `condition:`)
+5. Rule is validated by the pinned compile-only YARA-X boundary (`yara-x==1.4.0`, one bounded rule, no includes/imports)
 6. If confidence >= 85%, the proposal is submitted to validators
 7. Validators vote via Commit-Reveal
 8. Accepted rule metadata and CIDv1 references target `RuleStorage`; this path
@@ -125,4 +132,4 @@ describe the target flow, not current production readiness.
 
 ## Rewards
 
-Guardians receive 30% of PROM emission (6,000,000 PROM/year).
+Planned: Guardians would receive 30% of Year-1 PROM emission (6,000,000 PROM). PROM minting and emission are not implemented, deployed, or active.

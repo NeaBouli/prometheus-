@@ -6,6 +6,11 @@
 
 ---
 
+> **Record status (2026-09-30):** historical working record, not the current
+> project status. Current sources: `README.md` (Project Status), `docs/roadmap.md`,
+> `memory/STATUS.md`, and the delivery plan `.fleet/PLAN.md`. Entries below are
+> retained unchanged as audit history.
+
 - [x] [P1] GH-170 substring-only Guardian YARA check durch bounded compile-only YARA-X ersetzen | Codex Sol | PR #171 merged as exact main `8d8e29c`; CI `31650123073`, Security `31650123055`, Pages `31650122593`, review and live readback pass
 - [x] [P1] GH-173 deterministic non-actionable semantic draft in governed v2 worker | Codex Sol + Kimi K3 | PR #174 merged as exact main `1107b11`; CI `31654308969`, Security `31654308964`, Pages `31654308875`, review and v1/restart/binding evidence pass
 - [x] [P1] GH-197 manifest-bound Testnet-10 RuleStorage UTXO observation | Codex Sol + Kimi K3 | PR #198 merged as exact main `28da2d4`; CI `31904377606`, Security `31904377632`, Pages `31904376972`, independent review and live public-page readback pass; production authority remains false
@@ -280,6 +285,6 @@
 
 ## CURRENT SECURITY GATES (September 2026)
 
-- [~] [P0] GH-272 remediate `RUSTSEC-2026-0285` | Kimi K3 + Codex Sol | PR #281 updates the compatible rustls/QUIC lockfile graph; local gates and the initial hosted CI/Security/Performance head pass; review-fix recheck, protected merge and exact-main verification remain
-- [ ] [P2] GH-279 decide Guardian dependency reproducibility and ownership policy | Core Dev | Separate PRM-09 follow-up; do not widen GH-272
+- [x] [P0] GH-272 remediate `RUSTSEC-2026-0285` (PR #281 merged 2026-09-19 as main `32ca5f1`) | Kimi K3 + Codex Sol | PR #281 updates the compatible rustls/QUIC lockfile graph; local gates and the initial hosted CI/Security/Performance head pass; review-fix recheck, protected merge and exact-main verification remain
+- [~] [P2] GH-279 decide Guardian dependency reproducibility and ownership policy | Claude (Codex stand-in) | implemented on `agent/claude/prometheus-standin-20260930`, pending Codex review; Separate PRM-09 follow-up; do not widen GH-272
 - [ ] [P2] GH-280 harden Guardian Compose runtime boundaries | Core Dev | Separate PRM-10 follow-up; requires reviewed identity, tmpfs, resource and local-vLLM trust decisions
