@@ -5904,3 +5904,12 @@ Rules for all dev agents:
 - Pinned bundle archive SHA-256 reproduces `4989f076…` from the H-001 evidence.
 - Report `.fleet/reports/gh283-silverc-semantic-gate.md`. Review owed to Codex.
 - Status: `GH-283 LOCAL VERIFIED / HOSTED CI PENDING / PRODUCTION FALSE`.
+
+### 2026-09-30 - [AUTOR: CC] A4H public honesty (remaining confirmed items)
+
+- README quick start now uses `cargo test -p prometheus-validator` (the crate
+  has no binary); KAS staking/slashing stated as specified + tested, not
+  operated (README, WHITEPAPER, llms.txt); Sprint-1 contracts labelled legacy
+  `.ss`; ACCEPTED explained as review label. Other findings already fixed.
+- PASS: public-claim, project-status, memory, documentation-hygiene gates +
+  tests. Report `.fleet/reports/a4h-readme-honesty.md`. Review owed to Codex.
