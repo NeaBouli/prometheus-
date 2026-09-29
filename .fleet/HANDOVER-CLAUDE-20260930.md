@@ -25,6 +25,7 @@ Goal: continue exactly from the hand-back point without re-research.
 | --- | --- | --- | --- |
 | 2026-09-30 | A8u1 | Kaspa v2.1.0 / SilverScript v1.0.0 compatibility inventory | Upgrade blocked upstream (SilverScript pins rusty-kaspa v2.0.1 resp. untagged a41a333b); deployer API/schema break mapped. Report `.fleet/reports/a8u1-kaspa-silverscript-upgrade-inventory.md`. No product change. |
 | 2026-09-30 | GH-279 / PRM-09 | Guardian Python deps exact pins + sha256 lock + CI gate + public policy | Guardian 1426/4 skipped, 374 script tests, pip-audit clean. Report `.fleet/reports/a8r6-guardian-python-deps.md`. |
+| 2026-09-30 | GH-283 | Compiled silverc semantic gate + mutation regression | 2 literal-preserving mutants rejected; archive hash reproduces H-001 evidence. Report `.fleet/reports/gh283-silverc-semantic-gate.md`. |
 
 ## Current state
 - Branch/worktree: `agent/claude/prometheus-standin-20260930` in
@@ -38,6 +39,7 @@ Goal: continue exactly from the hand-back point without re-research.
 
 ## Review owed to Codex
 - GH-279: dependency/CI supply-chain change (ci.yml python-check install + gate). Solo by Claude.
+- GH-283: CI contract-assurance gate + expectation file. Solo by Claude.
 
 ## Next step (exact)
 1. (see latest row; next block chosen in PLAN tail)

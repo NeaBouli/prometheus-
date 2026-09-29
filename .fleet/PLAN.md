@@ -481,3 +481,12 @@ Both runs require Gio budget approval (plan-level gate).
   Pylint 9.86; pip-audit clean; 18 gate tests; 374 script tests; ruff/mypy.
 - Review owed to Codex (supply-chain/CI surface). Hosted CI pending.
 - State: `GH-279 LOCAL VERIFIED / REVIEW OWED / PRODUCTION FALSE`.
+
+### 2026-09-30 — GH-283 compiled-contract semantic gate locally verified (Claude stand-in)
+
+- CI now compares the pinned-silverc smoke manifest with a reviewed compiled
+  expectation (script bytes, ABI, state layout, ctor args, compiler pin); a
+  negative regression proves two behavior-changing mutants that keep every
+  linted literal are rejected. Boundary documented in the silverc README.
+- Archive SHA-256 `4989f076…` reproduces the August H-001 evidence value.
+- Review owed to Codex. State: `GH-283 LOCAL VERIFIED / PRODUCTION FALSE`.
