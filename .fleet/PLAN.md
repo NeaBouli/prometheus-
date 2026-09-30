@@ -599,3 +599,7 @@ Both runs require Gio budget approval (plan-level gate).
   payouts; failed disbursement votes now end REJECTED. 72 runtime tests pass.
   Finding: pinned silverc misaddresses the stack after `byte[](v, 8)` inside a
   hashed concatenation (runtime InvalidPubkey); `byte[8](v)` works.
+- Bundle v2 draft steps 5–6 (`4f39515`, `47b712c`): GovernanceAutoTuning
+  autoTune bound to tx.time; DevIncentivePool gets a governance key and
+  attested grant finalization with REJECTED path. All five state contracts now
+  carry their MS-B draft changes; 73 runtime tests pass.

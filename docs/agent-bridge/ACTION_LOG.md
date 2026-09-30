@@ -6018,3 +6018,5 @@ Rules for all dev agents:
 - Bundle v2 draft steps 3–4: RuleStorage + CommunityDonations attested
   tallies/quorum/time/value (72 runtime tests). Upstream compiler finding
   (`byte[](v, 8)` stack misaddressing in d25bd34) recorded in the draft report.
+- Bundle v2 draft steps 5–6: autoTune chain-time bound; DevIncentivePool
+  governance-attested finalization. 73 runtime tests.
