@@ -27,6 +27,7 @@ Goal: continue exactly from the hand-back point without re-research.
 | 2026-09-30 | GH-279 / PRM-09 | Guardian Python deps exact pins + sha256 lock + CI gate + public policy | Guardian 1426/4 skipped, 374 script tests, pip-audit clean. Report `.fleet/reports/a8r6-guardian-python-deps.md`. |
 | 2026-09-30 | GH-283 | Compiled silverc semantic gate + mutation regression | 2 literal-preserving mutants rejected; archive hash reproduces H-001 evidence. Report `.fleet/reports/gh283-silverc-semantic-gate.md`. |
 | 2026-09-30 | A4H | Public claim corrections (validator command, KAS staking, sprint labels) | Claim/hygiene gates pass. Report `.fleet/reports/a4h-readme-honesty.md`. |
+| 2026-09-30 | A11 / GH-277 | Public records: bounty label, memory banners, guides, paths, CLAUDE.md, robots, landing wording | Gates + 4-viewport visual gate pass. Report `.fleet/reports/a11-public-records.md`. |
 
 ## Current state
 - Branch/worktree: `agent/claude/prometheus-standin-20260930` in
@@ -41,6 +42,7 @@ Goal: continue exactly from the hand-back point without re-research.
 ## Review owed to Codex
 - GH-279: dependency/CI supply-chain change (ci.yml python-check install + gate). Solo by Claude.
 - GH-283: CI contract-assurance gate + expectation file. Solo by Claude.
+- A11: visible HTML changes (index/guardian-economics) — post-deploy visual recheck owed after merge.
 - A4H: public-claim wording; was meant as independent-worker gate before Reddit activity.
 
 ## Next step (exact)

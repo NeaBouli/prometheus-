@@ -5913,3 +5913,10 @@ Rules for all dev agents:
   `.ss`; ACCEPTED explained as review label. Other findings already fixed.
 - PASS: public-claim, project-status, memory, documentation-hygiene gates +
   tests. Report `.fleet/reports/a4h-readme-honesty.md`. Review owed to Codex.
+
+### 2026-09-30 - [AUTOR: CC] A11 / GH-277 public records reconciliation
+
+- PRM-34/36/37/38/39/40/41/46 addressed (see report
+  `.fleet/reports/a11-public-records.md`); visual gate evidence under
+  `.fleet/artifacts/a11-public-records/`. PRM-34 funding decision remains Gio's.
+- PASS: claim/status/hygiene/memory gates and 94 tests; 8/8 visual views clean.
