@@ -5920,3 +5920,10 @@ Rules for all dev agents:
   `.fleet/reports/a11-public-records.md`); visual gate evidence under
   `.fleet/artifacts/a11-public-records/`. PRM-34 funding decision remains Gio's.
 - PASS: claim/status/hygiene/memory gates and 94 tests; 8/8 visual views clean.
+
+### 2026-09-30 - [AUTOR: CC] A12a public-site contrast (PRM-43)
+
+- Pasted-over CSS removed in index.html (pixel-identical proof), AA text
+  tokens on all pages, link color, decorative glyphs aria-hidden; rendered
+  audit 796 → 0 failing text nodes; CI gate `scripts/verify_site_css.py`.
+- Report `.fleet/reports/a12a-contrast.md`; evidence `.fleet/artifacts/a12a-contrast/`.

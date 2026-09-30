@@ -507,3 +507,10 @@ Both runs require Gio budget approval (plan-level gate).
   PRM-41 project-specific CLAUDE.md, PRM-46 robots.txt (security.txt
   intentionally not added on a project page).
 - State: `A11 LOCAL VERIFIED (PARTIAL: PRM-34 DECISION) / PRODUCTION FALSE`.
+
+### 2026-09-30 — A12a contrast (PRM-43) locally verified (Claude stand-in)
+
+- index.html duplicate-selector dead code removed (pixel-identical), text
+  tokens raised to WCAG AA on all five pages, unstyled links fixed; rendered
+  audit 796 → 0 failing text nodes; new CI gate `verify_site_css.py`.
+- State: `A12a LOCAL VERIFIED / POST-DEPLOY RECHECK OWED`.
