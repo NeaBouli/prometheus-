@@ -6005,3 +6005,11 @@ Rules for all dev agents:
 - Dispatched once at `40dfd89` (includes action SHA pins, deployer strictness,
   bond math): Prometheus CI `36702356697` success (8/8), Security Audit
   `36702361053` success (3/3). SHA-pinned actions work on hosted runners.
+
+### 2026-09-30 - [AUTOR: CC] bundle-v2-review-repair (draft lane)
+
+- Resumed the timed-out dispatch on `agent/claude/bundle-v2-review-repair`; reviewed and completed
+  the three Codex findings (versioned instance/content/replay attestation binding, consensus-time
+  windows via OpTxInputDaaScore + CLTV incl. settleTuning, terminal rejected tallies). 105 pinned
+  runtime tests, semantic/mutation/lint/public gates pass; v1 canary gate still fails by design.
+  Report `.fleet/reports/bundle-v2-review-repair.md`. D1–D7 stay proposed; security review owed.

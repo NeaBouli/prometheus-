@@ -260,6 +260,7 @@ FIXTURES = (
         abi=(
             "__covenant_entrypoint_auth_reportMetrics",
             "__covenant_entrypoint_auth_autoTune",
+            "__covenant_entrypoint_auth_settleTuning",
         ),
     ),
 )

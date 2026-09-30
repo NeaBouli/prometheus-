@@ -69,11 +69,11 @@
       "confirmations": 10,
       "deployer_address": "kaspatest:qptestpreflight000000000000000000000000000000000",
       "deployed_at": "2026-07-11T00:00:04Z",
-      "source_sha256": "8cda4b562cb4e7e3bc8dc7eacb5509cf20a9c867896fe2bf9ad4c2284a5d2e72",
+      "source_sha256": "75396518000185db291217524ebea2ed72d9ea984eeeb96da9f35638c522ee55",
       "constructor_args_sha256": "993a21a585568f7befae6caa700b6188a607c23ddcd58705da2d78dbb37946c1",
-      "artifact_sha256": "354dc8f9b45b9201042ed803cb84bc64b4a0ca2112bc3211878977c2b0997a2f",
-      "script_sha256": "366759d9db75dd1c4d8edb4277450f98bd3cea47db7e32235322718ec4985597",
-      "script_len": 1582
+      "artifact_sha256": "347c7f67e5dc9703ea817d587ae56bf27aa5d61ae307f199275cac33887bdeb1",
+      "script_sha256": "19ec233d2a2c3f5e267b7bb3ba1c08298ab661ce02303765aa82bd108f741074",
+      "script_len": 1671
     },
     {
       "contract_name": "CommunityDonationsState",
@@ -85,11 +85,11 @@
       "confirmations": 10,
       "deployer_address": "kaspatest:qptestpreflight000000000000000000000000000000000",
       "deployed_at": "2026-07-11T00:00:05Z",
-      "source_sha256": "47bf489b0ccbd570bfc3cd5df82c46078075c9427b57c6b18d1c6fe182925cfb",
+      "source_sha256": "96be8f9102595d72860cec778f88e4aee185502f0fadde1276ddf569f6918f78",
       "constructor_args_sha256": "491d910c11701e62b172b73e83120f77e8b8b1c0dc4c994841e8d329a302f903",
-      "artifact_sha256": "329554de44fe5eeb26f5d66a1558dfdf5c889e1afda30dd308ceff7230d4ee28",
-      "script_sha256": "b8ae6ccf486f8e8cc73bbb10c55cd7be53797abbb98d67f723ae7825a9dc15de",
-      "script_len": 1629
+      "artifact_sha256": "f4b47318e0173eb9615610e82bff4bc1d7aba47c3f9dbd1c1b7d1cce2c7c52a8",
+      "script_sha256": "826b9737066b2d424a3dc2457b2ef40df9aa6373275152c0aaa86ae1bf090c13",
+      "script_len": 1827
     },
     {
       "contract_name": "DevIncentivePoolState",
@@ -101,11 +101,11 @@
       "confirmations": 10,
       "deployer_address": "kaspatest:qptestpreflight000000000000000000000000000000000",
       "deployed_at": "2026-07-11T00:00:06Z",
-      "source_sha256": "cb015fcfe64df9d14741467f53e77aea1345bb4bc05bcb8cea9d4d586d470bc1",
+      "source_sha256": "cd1c4ff15404ebb7c7440fe6be0c2429cfd372a7a6c339d995068dd48f99d933",
       "constructor_args_sha256": "7d1af9ac6ef1951b0a923c42a7ed4b9d5a51133105ae6abfacff7957164b6291",
-      "artifact_sha256": "98b01f30d7bd37517e9fc20f39717670513af8fc1bdf65191322274d4e987ffe",
-      "script_sha256": "ed590dbd593c2b23059273b73fd4fdd65fb73ecf2295396c78f08c5acdf0f5da",
-      "script_len": 1084
+      "artifact_sha256": "67c19fdd9726de2b7fc4ff75ddffe462a5b9ee8a281a85a395701f5f41ab90a3",
+      "script_sha256": "9a412b89cb0d6ed3619db305b1d807fd78bfef3a0ce40dd668a48034b205549c",
+      "script_len": 1228
     },
     {
       "contract_name": "GovernanceAutoTuningState",
@@ -117,11 +117,11 @@
       "confirmations": 10,
       "deployer_address": "kaspatest:qptestpreflight000000000000000000000000000000000",
       "deployed_at": "2026-07-11T00:00:07Z",
-      "source_sha256": "bd0c1d8e021921e36d8264b22c917aec2314465c9669ea8814d156b2b2c721c6",
+      "source_sha256": "974114e3ea375207b53d484ee6fd56bfe83936a0a68d15f953a5645ac0b9215a",
       "constructor_args_sha256": "0c42df19e3acdee17020feb459c98298f27d4795f724a827c9665bff23b416bd",
-      "artifact_sha256": "12ec4d6ce69ac7daf1310fa6494fb0377b956a2215d07aa6aae97d5aa6607444",
-      "script_sha256": "6e2dafe1f6a862835d96be1d0b468e4e62f8231e27beb2d4689edfa5df58a312",
-      "script_len": 908
+      "artifact_sha256": "f759f7dc9ca5e282f2374fca117109c44368f099e2958c43d2ec6d2711f7de6a",
+      "script_sha256": "65d3cc36e3ee3a72ec5d8c434122d2863d77f9a6a6f88ce1314bf21e94c8d1aa",
+      "script_len": 1117
     }
   ]
 }

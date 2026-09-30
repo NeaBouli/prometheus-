@@ -126,6 +126,36 @@ by Codex):
    time bounds, quorum edges (ties, 50 % participation), overflow, and
    cross-contract binding, per #276 acceptance.
 
+## Review repair (2026-09-30, draft branch `agent/claude/bundle-v2-review-repair`)
+
+Codex's review of the first draft (verdict: changes) found three gaps; the draft now implements:
+
+- **Attestation binding (D1/D4):** every attestation digest is versioned (`…-v2` domains) and
+  binds the deployment instance (`OpInputCovenantId` of the spent covenant input), the per-
+  contract proposal id as replay nonce, and the complete proposal content (RuleStorage: guardian
+  key, threat hash, rule type, CID, confidence; CommunityDonations: recipient, amount, purpose,
+  proposer; DevIncentivePool: developer, contribution/description hashes, lines, complexity,
+  amount, proposer). Tallies additionally bind the consensus session start/end. A proposal id
+  finalizes exactly once because the status leaves PENDING; it is the replay nonce D1 promised,
+  so no extra nonce field is needed. Cross-instance, substituted-content, other-session and
+  replayed attestations are rejected by runtime tests.
+- **Consensus time (D2):** no voting window or tuning interval depends on a caller-chosen height.
+  Windows start at the DAA score of the covenant UTXO created by the proposal
+  (`OpTxInputDaaScore`), and finalization requires `tx.time >= start + window` (CLTV against the
+  transaction lock time, which consensus only accepts once the chain has reached it). Exact
+  semantics: the start is the DAA score of the block that accepted the proposal transaction;
+  intermediate donations in CommunityDonations record that value instead of moving it.
+  GovernanceAutoTuning: `autoTune` stores an "anchor pending" marker and the permissionless
+  `settleTuning` records the exact inclusion DAA score while the tuning output is unspent. Until
+  settled, the next tuning is measured from the spent UTXO's DAA score, an upper bound of the
+  tuning time: tuning can be delayed by intervening metric reports but never happens faster than
+  one interval of consensus time, and historical catch-up is impossible.
+- **Terminal rejection (D4):** every attested tally is terminal. Zero or low participation, or
+  approval below 6,700 bps, ends REJECTED in RuleStorage, CommunityDonations and DevIncentivePool,
+  so the single proposal slot is released; a new submission after rejection is tested.
+
+Status: still **proposed** until Codex's security review of the repair.
+
 ## Open risks
 
 - The attestation key in D1/D4 is a single owner-controlled trust point until

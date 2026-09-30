@@ -485,6 +485,11 @@ fabricated future height can no longer ratchet parameters in consecutive transit
 happens at most once per real `TUNING_INTERVAL_BLOCKS`. `reportMetrics` is unchanged because the
 keyless operator builds it with lock time 0; binding it to `tx.time` needs a deployer change.
 
+Review repair (2026-09-30): windows and intervals are anchored at consensus DAA scores of the
+spent covenant UTXO (`OpTxInputDaaScore`) and enforced with `tx.time`; attestation digests are
+versioned (`-v2`) and bind the covenant instance, proposal id and complete content; every attested
+tally is terminal (REJECTED on zero/low participation). Details: `docs/architecture/ms-b-contract-decisions.md`.
+
 ## Metrics-oracle report preflight
 
 `scripts/preflight_metrics_oracle_report.py` validates the public metrics report
@@ -742,6 +747,11 @@ Bundle v2 draft (MS-B D1, D4): the contract gains a `governance_pk` constructor 
 and 6,700 bps approval; otherwise the grant ends REJECTED. The pool remains PROM accounting only
 (no value moves; PROM emission is not implemented).
 
+Review repair (2026-09-30): windows and intervals are anchored at consensus DAA scores of the
+spent covenant UTXO (`OpTxInputDaaScore`) and enforced with `tx.time`; attestation digests are
+versioned (`-v2`) and bind the covenant instance, proposal id and complete content; every attested
+tally is terminal (REJECTED on zero/low participation). Details: `docs/architecture/ms-b-contract-decisions.md`.
+
 ## CommunityDonationsState.sil
 
 `CommunityDonationsState.sil` is the current-`silverc` port fixture for the
@@ -780,6 +790,11 @@ unchanged (previously a failed vote left the slot PENDING forever). The covenant
 equal `pool_balance_kas * 100000000` sompi, and `donateKas` must add exactly the donated value.
 `DISBURSEMENT_QUORUM` is kept for reference but superseded by the participation rule.
 
+Review repair (2026-09-30): windows and intervals are anchored at consensus DAA scores of the
+spent covenant UTXO (`OpTxInputDaaScore`) and enforced with `tx.time`; attestation digests are
+versioned (`-v2`) and bind the covenant instance, proposal id and complete content; every attested
+tally is terminal (REJECTED on zero/low participation). Details: `docs/architecture/ms-b-contract-decisions.md`.
+
 Verified rejection paths include zero donation amount, disbursement amount
 above pool balance, voting at `voting_end_block`, and execution below
 `DISBURSEMENT_QUORUM`.
@@ -814,6 +829,11 @@ Bundle v2 draft (MS-B D1, D2, D4): the free per-vote transition `voteOnProposal`
 (any key could vote, repeatedly) is removed. Ballots are collected off chain by
 the canonical membership source and signed-ballot replay ledger; the contract
 accepts:
+
+Review repair (2026-09-30): windows and intervals are anchored at consensus DAA scores of the
+spent covenant UTXO (`OpTxInputDaaScore`) and enforced with `tx.time`; attestation digests are
+versioned (`-v2`) and bind the covenant instance, proposal id and complete content; every attested
+tally is terminal (REJECTED on zero/low participation). Details: `docs/architecture/ms-b-contract-decisions.md`.
 
 - `submitProposal` only with a `membership_attestation` (`checkSigFromStack` by the
   governance/attestation key over `sha256("prometheus-rule-submission-v1" ||
