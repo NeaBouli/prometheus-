@@ -42,6 +42,7 @@ Goal: continue exactly from the hand-back point without re-research.
 | 2026-09-30 | PRM-12 (part) | Actions pinned to commit SHAs | YAML/tests OK; hosted run on f737c7b owed. Report `.fleet/reports/prm12-actions-sha-pin.md`. |
 | 2026-09-30 | PRM-12 (part) | deny_unknown_fields on operator-authored deployer formats | Deployer tests + clippy + full local silverc CI job pass. |
 | 2026-09-30 | PRM-12 (part) | Saturating bond math + clock high-water runbook | validator 34 tests, clippy, doc gates pass. |
+| 2026-09-30 | MS-B / #276 (proposal) | Contract decision record D1–D7 + bundle v2 child plan | Doc gates pass. `docs/architecture/ms-b-contract-decisions.md`. |
 
 ## Current state
 - Branch/worktree: `agent/claude/prometheus-standin-20260930` in
@@ -62,6 +63,7 @@ Goal: continue exactly from the hand-back point without re-research.
 - A4H: public-claim wording; was meant as independent-worker gate before Reddit activity.
 
 ## Next step (exact)
+- Codex (architect profile): review `docs/architecture/ms-b-contract-decisions.md`; if accepted, open the 7 child issues and plan contract bundle v2.
 - Codex: plan "contract bundle v2" (all MS-B contract outcomes in one revision, new profile pin next to frozen H-001).
 1. (see latest row; next block chosen in PLAN tail)
 

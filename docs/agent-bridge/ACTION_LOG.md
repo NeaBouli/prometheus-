@@ -5993,3 +5993,9 @@ Rules for all dev agents:
 - PRM-12 (cont.): saturating bond math in validator-node (regression test) and
   a runbook entry for the replay-ledger clock high-water. Remaining: CI
   governance self-attestation (needs admin-token decision), upstream lock dupes.
+
+### 2026-09-30 - [AUTOR: CC] MS-B contract decision record (proposal)
+
+- `docs/architecture/ms-b-contract-decisions.md` (D1–D7, capability baseline,
+  child-issue plan, open risks). Proposal only; Codex architecture review
+  required before it is binding. No code.
