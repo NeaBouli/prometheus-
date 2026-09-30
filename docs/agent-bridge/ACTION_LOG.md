@@ -5961,3 +5961,12 @@ Rules for all dev agents:
 - `assets/site.css` (tokens + chrome) linked by all five pages; pixel-identical
   proof; `verify_site_css.py` checks shared+page cascade and the link.
   Report `.fleet/reports/a12c-shared-css.md`. GH-278 complete on the branch.
+
+### 2026-09-30 - [AUTOR: CC] Records refresh + H-001 evidence fallback check
+
+- memory/TODO.md and memory/STATUS.md updated to the 2026-09-30 state (all
+  stand-in items marked in progress / pending Codex review; PRM-35 and the
+  Kaspa/SilverScript upgrade marked blocked with reasons).
+- H-001 re-verification: kaspa.org TN10 explorer 402; API indexer healthy but
+  404 for the canary tx/block (pruned). README states archival history is now
+  required; captured observation stays in the evidence file.
