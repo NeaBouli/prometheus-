@@ -2,7 +2,7 @@
 # Format: - [ ] [PRIO] Beschreibung | Verantwortlich | Dependencies
 # PRIO: P0=Kritisch, P1=Hoch, P2=Mittel, P3=Niedrig
 # Status: [ ]=offen, [~]=in Arbeit, [x]=erledigt, [!]=blockiert
-# Last Updated: 2026-08-31
+# Last Updated: 2026-09-30
 
 ---
 
@@ -287,4 +287,10 @@
 
 - [x] [P0] GH-272 remediate `RUSTSEC-2026-0285` (PR #281 merged 2026-09-19 as main `32ca5f1`) | Kimi K3 + Codex Sol | PR #281 updates the compatible rustls/QUIC lockfile graph; local gates and the initial hosted CI/Security/Performance head pass; review-fix recheck, protected merge and exact-main verification remain
 - [~] [P2] GH-279 decide Guardian dependency reproducibility and ownership policy | Claude (Codex stand-in) | implemented on `agent/claude/prometheus-standin-20260930`, pending Codex review; Separate PRM-09 follow-up; do not widen GH-272
-- [ ] [P2] GH-280 harden Guardian Compose runtime boundaries | Core Dev | Separate PRM-10 follow-up; requires reviewed identity, tmpfs, resource and local-vLLM trust decisions
+- [~] [P2] GH-280 harden Guardian Compose runtime boundaries | Claude (Codex stand-in) | Decided (delegated by Gio 2026-09-30): UID:GID 2000:2000, CPU caps 16/64, /tmp stays exec for JIT kernels, loopback vLLM documented as single-operator trust boundary; on stand-in branch, pending Codex review
+- [~] [P2] GH-283 compiled-contract semantic CI gate | Claude (Codex stand-in) | Reviewed compiled expectation + literal-preserving mutation regression; on stand-in branch, pending Codex review
+- [~] [P2] GH-275 Pages integration resilience | Claude (Codex stand-in) | Service worker removed (never installed), dead GSC meta removed, TN10 explorer outage/pruning documented; archival evidence mirror not provided
+- [~] [P2] GH-277 public records reconciliation | Claude (Codex stand-in) | PRM-34 (Gio: no bug bounty), 36, 37, 38, 39, 40, 41, 46 done on stand-in branch
+- [~] [P2] GH-278 frontend system and accessibility | Claude (Codex stand-in) | A12a contrast, A12b a11y, A12c shared stylesheet, A12d image weights done on stand-in branch; post-deploy recheck owed
+- [!] [P1] PRM-35 validator cooldown | Contract bundle v2 (Codex) | Decided target 7 days = 6,048,000 blocks; fixture change blocked until a reviewed bundle revision because the deployer pins the H-001 bundle manifest
+- [!] [P2] Rusty Kaspa v2.1.0 / SilverScript v1.0.0 upgrade | Watch | Blocked upstream: no SilverScript release on a rusty-kaspa tag >= v2.1.0 (see .fleet/reports/a8u1-*)

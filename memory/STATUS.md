@@ -1,9 +1,22 @@
 # PROMETHEUS – MODULE STATUS
 # Format: | Module | Status | Progress | Last Update | Audit | Testnet Address |
 # Status: core lifecycle values plus evidence-qualified DEVELOPMENT/STUB/FIXTURE labels; every non-production label must retain its boundary in the row
-# Last Updated: 2026-09-13
+# Last Updated: 2026-09-30
 
 ---
+
+## AUDIT REMEDIATION STATUS (2026-09-30, not yet on main)
+
+A1-A8 are integrated on the Codex milestone branch (PR #284, hosted CI green,
+review required). A Claude stand-in continued on
+`agent/claude/prometheus-standin-20260930`: GH-279 dependency lock, GH-283
+compiled-contract gate, public-claim corrections (A4H), public records (GH-277),
+public-site contrast/accessibility/shared stylesheet/image weights (GH-278),
+service-worker removal (GH-275) and Guardian Compose hardening (GH-280).
+None of this is merged or deployed; production status is unchanged: no
+Prometheus protocol component is production-deployed. Validator cooldown
+target is 7 days; the current fixture keeps 100,800 blocks until a reviewed
+contract-bundle revision.
 
 ## PUBLIC CLAIM RECONCILIATION (2026-08-14)
 
