@@ -5990,3 +5990,6 @@ Rules for all dev agents:
   response, broadcast journal/result) reject unknown fields; DeployRequest stays
   a hash-bound projection. Deployer tests, clippy and the full local
   h001-silverc-runtime job pass. Security review owed to Codex.
+- PRM-12 (cont.): saturating bond math in validator-node (regression test) and
+  a runbook entry for the replay-ledger clock high-water. Remaining: CI
+  governance self-attestation (needs admin-token decision), upstream lock dupes.
