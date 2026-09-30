@@ -5955,3 +5955,9 @@ Rules for all dev agents:
 - PRM-35 cooldown (delegated decision): 7 days target; fixture unchanged until a
   reviewed contract-bundle revision because `FULL_BUNDLE_MANIFEST_SHA256` pins
   the H-001 canary bundle. Public text corrected to decided-vs-current.
+
+### 2026-09-30 - [AUTOR: CC] A12c shared stylesheet (PRM-44)
+
+- `assets/site.css` (tokens + chrome) linked by all five pages; pixel-identical
+  proof; `verify_site_css.py` checks shared+page cascade and the link.
+  Report `.fleet/reports/a12c-shared-css.md`. GH-278 complete on the branch.

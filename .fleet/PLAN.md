@@ -547,3 +547,10 @@ Both runs require Gio budget approval (plan-level gate).
   "contract bundle v2" (the deployer pins the H-001 bundle manifest); public
   text states decided target vs current fixture. Report
   `.fleet/reports/prm35-cooldown-decision.md`.
+
+### 2026-09-30 — A12c shared stylesheet (PRM-44) locally verified (Claude stand-in)
+
+- `assets/site.css` holds tokens + shared chrome; all pages pixel-identical
+  before/after (incl. menu and focus states); gate checks the combined
+  cascade. GH-278 (A12a–d) is complete on the stand-in branch.
+- State: `A12 LOCAL VERIFIED / POST-DEPLOY RECHECK OWED / PRODUCTION FALSE`.
