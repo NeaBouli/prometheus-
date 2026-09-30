@@ -138,10 +138,11 @@ by Codex):
 
 - The attestation key in D1/D4 is a single owner-controlled trust point until
   M4; this must be stated publicly wherever voting is described.
-- Burning slashed KAS is irreversible by design. Child issue 1 must first
-  verify that Kaspa relay/standardness rules accept the chosen unspendable
-  output form and its storage mass; if not, the fallback is a covenant-locked
-  output that no key can spend, reviewed the same way.
+- Burning slashed KAS is irreversible by design. Verified 2026-09-30: Kaspa
+  mempool standardness accepts only PubKey, PubKeyECDSA and ScriptHash outputs,
+  so the burn uses a P2SH of the always-failing script `OP_RETURN` (0x6a):
+  standard, and anyone can check it is unspendable from the published preimage.
+  Implemented and runtime-tested in the bundle v2 draft branch.
 - SilverScript v1.0.0 adds stricter resource and initial-state validation; the
   bundle v2 port should target it once upstream aligns on a rusty-kaspa release
   (`.fleet/reports/a8u1-kaspa-silverscript-upgrade-inventory.md`).

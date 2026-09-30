@@ -44,6 +44,7 @@ Goal: continue exactly from the hand-back point without re-research.
 | 2026-09-30 | PRM-12 (part) | Saturating bond math + clock high-water runbook | validator 34 tests, clippy, doc gates pass. |
 | 2026-09-30 | MS-B / #276 (proposal) | Contract decision record D1–D7 + bundle v2 child plan | Doc gates pass. `docs/architecture/ms-b-contract-decisions.md`. |
 | 2026-09-30 | Bundle v2 DRAFT (branch `agent/claude/contract-bundle-v2-draft`) | On-chain 7-day cooldown via this.age, PRM-13 exit, zero-marker fix | 58 runtime tests; local contract CI 16/17 (canary-profile pin). Report on that branch. |
+| 2026-09-30 | Bundle v2 DRAFT step 2 | Stake-backed value conservation + burned slashing (P2SH of OP_RETURN) | 63 runtime tests. Report on draft branch. |
 
 ## Current state
 - Branch/worktree: `agent/claude/prometheus-standin-20260930` in

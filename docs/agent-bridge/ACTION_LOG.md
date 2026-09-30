@@ -6012,3 +6012,6 @@ Rules for all dev agents:
   (`this.age`), PRM-13 exit, zero-marker rejection; 58 runtime tests pass;
   local contract CI fails only at the H-001 canary profile (v1 manifest pin).
   Not integrable before Codex designs the profile split.
+- Bundle v2 draft step 2 (`f3e6735` on `agent/claude/contract-bundle-v2-draft`):
+  stake-backed value conservation and burned slashing (P2SH of OP_RETURN, the
+  only unspendable standard form) for ValidatorStakingState; 63 runtime tests.
