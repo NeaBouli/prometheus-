@@ -46,7 +46,7 @@ Goal: continue exactly from the hand-back point without re-research.
   `~/Desktop/repos/prometheus-master-plan-20260927-wt/claude-a8u-toolchain-upgrade`, stacked on `60ee6db`.
   One commit series per block; integrate by merging this branch into the integration branch after PR #284.
 - Live changes: none (repo-local only).
-- Tests: see per-block reports.
+- Tests: see per-block reports. Hosted: CI `36698349293` + Security `36698357152` all green at `bff7fc1` (workflow_dispatch, no PR). `f737c7b` (action SHA pins) needs one hosted run.
 
 ## Findings in existing code
 - See A8u1 F3/F4 (deployer binds `toccata_activation_daa_score` into signing request/receipt schema).

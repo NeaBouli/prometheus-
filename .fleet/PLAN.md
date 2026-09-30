@@ -560,3 +560,15 @@ Both runs require Gio budget approval (plan-level gate).
 - `docs/endpoint-producer-design-v1.md`: design-only resource-utilization
   producer candidate mapped to all GH-267 requirements; no code, no status
   change. Next: independent privacy review + owner approval before any brief.
+
+### 2026-09-30 — Stand-in branch hosted verification green
+
+- `workflow_dispatch` on `agent/claude/prometheus-standin-20260930` at
+  `bff7fc1`: Prometheus CI `36698349293` success (Memory Integrity,
+  Silverscript Contracts, Python Guardian, HTML Pages, Toolchain Pin Policy,
+  Current Silverc Runtime + Artifact Smoke, Rust Workspace, Rust Performance);
+  Security Audit `36698357152` success (Dependency Audit, Secret Detection,
+  Security Summary). This proves GH-279 wheels-only hash install on Ubuntu,
+  Compose rendering with the A9 CPU caps, the GH-283 gate + mutation regression,
+  and the site CSS gate on hosted runners. Later head `f737c7b` (action SHA
+  pins) still needs one hosted run.
