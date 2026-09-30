@@ -1,0 +1,16 @@
+1440 index.html firstTab=skip-link:Skip to content visible=true size=146x44 after=#main focus=main
+1440 roadmap.html firstTab=skip-link:Skip to content visible=true size=146x44 after=#main focus=main
+1440 faq.html firstTab=skip-link:Skip to content visible=true size=146x44 after=#main focus=main
+1440 whitepaper.html firstTab=skip-link:Skip to content visible=true size=146x44 after=#main focus=main
+1440 guardian-economics.html firstTab=skip-link:Skip to content visible=true size=146x44 after=#main focus=main
+390 index.html firstTab=skip-link:Skip to content visible=true size=146x44 after=#main focus=main
+390 roadmap.html firstTab=skip-link:Skip to content visible=true size=146x44 after=#main focus=main
+390 faq.html firstTab=skip-link:Skip to content visible=true size=146x44 after=#main focus=main
+390 whitepaper.html firstTab=skip-link:Skip to content visible=true size=146x44 after=#main focus=main
+390 guardian-economics.html firstTab=skip-link:Skip to content visible=true size=146x44 after=#main focus=main
+reduced-motion hero opacity at 150ms 1,1,1
+noJS index.html hidden .r = 0
+noJS roadmap.html hidden .r = 0
+noJS faq.html hidden .r = 0
+noJS whitepaper.html hidden .r = 0
+noJS guardian-economics.html hidden .r = 0

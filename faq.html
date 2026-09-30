@@ -174,9 +174,14 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
 .mobile-menu a:hover{color:var(--mint)}
 .mobile-menu.open{display:flex}
 @media(max-width:900px){.nav-links,.nav-gh{display:none}.nav-burger{display:flex}}
+
+.skip-link{position:absolute;left:-9999px;top:0;z-index:1000;background:var(--mint);color:#050505;padding:0 18px;min-height:44px;display:inline-flex;align-items:center;font-family:'Space Mono',monospace;font-size:12px;text-decoration:none}.skip-link:focus{left:16px;top:16px}#main:focus{outline:none}
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-delay:0s!important;transition:none!important;scroll-behavior:auto!important}.r{opacity:1;transform:none}}
 </style>
 </head>
 <body>
+<a class="skip-link" href="#main">Skip to content</a>
+<noscript><style>.r{opacity:1;transform:none}</style></noscript>
 
 <nav>
   <a href="index.html" class="nav-id">
@@ -192,7 +197,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
       <li><a href="whitepaper.html">Whitepaper</a></li>
       <li><a href="guardian-economics.html">Economics</a></li>
     </ul>
-  <a href="https://github.com/NeaBouli/prometheus-" class="nav-gh" target="_blank">GitHub ↗</a>
+  <a href="https://github.com/NeaBouli/prometheus-" class="nav-gh" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
 <button class="nav-burger" id="burger" onclick="toggleMenu()" aria-label="Menu"><span></span><span></span><span></span></button>
 </nav>
 <div class="mobile-menu" id="mobile-menu">
@@ -204,7 +209,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
       <a href="faq.html">FAQ</a>
       <a href="whitepaper.html">Whitepaper</a>
       <a href="guardian-economics.html">Economics</a>
-      <a href="https://github.com/NeaBouli/prometheus-" target="_blank">GitHub ↗</a>
+      <a href="https://github.com/NeaBouli/prometheus-" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
     </div>
 
 <div class="page-header">
@@ -267,7 +272,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
   </aside>
 
   <!-- CONTENT -->
-  <main class="faq-content">
+  <main id="main" tabindex="-1" class="faq-content">
 
     <!-- TOKENOMICS -->
     <div class="faq-group r" id="tokenomics">
@@ -635,7 +640,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
     <li><a href="roadmap.html">Roadmap</a></li>
     <li><a href="whitepaper.html">Whitepaper</a></li>
     <li><a href="CONTRIBUTING.md">Contributing</a></li>
-    <li><a href="https://github.com/NeaBouli/prometheus-" target="_blank">GitHub</a></li>
+    <li><a href="https://github.com/NeaBouli/prometheus-" target="_blank" rel="noopener noreferrer">GitHub</a></li>
   </ul>
 </footer>
 

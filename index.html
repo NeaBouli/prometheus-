@@ -251,12 +251,17 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
 .mobile-menu a:hover{color:var(--mint)}
 .mobile-menu.open{display:flex}
 @media(max-width:900px){.nav-links,.nav-gh{display:none}.nav-burger{display:flex}}
+
+.skip-link{position:absolute;left:-9999px;top:0;z-index:1000;background:var(--mint);color:#050505;padding:0 18px;min-height:44px;display:inline-flex;align-items:center;font-family:'Space Mono',monospace;font-size:12px;text-decoration:none}.skip-link:focus{left:16px;top:16px}#main:focus{outline:none}
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-delay:0s!important;transition:none!important;scroll-behavior:auto!important}.r{opacity:1;transform:none}}
 </style>
 </head>
 <body>
+<a class="skip-link" href="#main">Skip to content</a>
+<noscript><style>.r{opacity:1;transform:none}</style></noscript>
 
 <nav id="nav">
-  <a href="#" class="nav-id">
+  <a href="./" class="nav-id">
     <img src="logo/Prometheus.png" alt="Prometheus" onerror="this.style.display='none'">
     <span class="nav-wordmark">Prometheus</span>
   </a>
@@ -269,9 +274,10 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
       <li><a href="whitepaper.html">Whitepaper</a></li>
       <li><a href="guardian-economics.html">Economics</a></li>
     </ul>
-  <a href="https://github.com/NeaBouli/prometheus-" class="nav-gh" target="_blank">GitHub ↗</a>
+  <a href="https://github.com/NeaBouli/prometheus-" class="nav-gh" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
 <button class="nav-burger" id="burger" onclick="toggleMenu()" aria-label="Menu"><span></span><span></span><span></span></button>
 </nav>
+<span id="main" tabindex="-1"></span>
 <div class="mobile-menu" id="mobile-menu">
       <a href="index.html">Home</a>
       <a href="index.html#lifecycle">Protocol</a>
@@ -281,7 +287,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
       <a href="faq.html">FAQ</a>
       <a href="whitepaper.html">Whitepaper</a>
       <a href="guardian-economics.html">Economics</a>
-      <a href="https://github.com/NeaBouli/prometheus-" target="_blank">GitHub ↗</a>
+      <a href="https://github.com/NeaBouli/prometheus-" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
     </div>
 
 <section id="hero">
@@ -299,7 +305,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
     <div class="hero-actions">
       <a href="whitepaper.html" class="btn-solid">Read the Whitepaper</a>
       <a href="faq.html" class="btn-outline">FAQ &amp; Docs</a>
-      <a href="https://github.com/NeaBouli/prometheus-" class="btn-outline" target="_blank">GitHub</a>
+      <a href="https://github.com/NeaBouli/prometheus-" class="btn-outline" target="_blank" rel="noopener noreferrer">GitHub</a>
     </div>
   </div>
   <div class="hero-footnote">
@@ -544,7 +550,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
   <h2 class="cta-h r">to <span>humanity</span>,<br>not to corporations.</h2>
   <p class="cta-p r d1">The contract design has no repository-controlled emergency-stop entrypoint. Current policy and membership inputs remain owner-controlled, and no public multi-host protocol network is operating. Availability and decentralized control are target properties, not current guarantees.</p>
   <div class="cta-btns r d2">
-    <a href="https://github.com/NeaBouli/prometheus-" class="btn-solid" target="_blank">Join on GitHub</a>
+    <a href="https://github.com/NeaBouli/prometheus-" class="btn-solid" target="_blank" rel="noopener noreferrer">Join on GitHub</a>
     <a href="whitepaper.html" class="btn-outline">Read the Whitepaper</a>
   </div>
   <div class="cta-meta r d3">MIT License &nbsp;·&nbsp; 0% Pre-mine specified &nbsp;·&nbsp; Public repository &nbsp;·&nbsp; Operation not decentralized yet</div>
@@ -558,7 +564,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
     <li><a href="roadmap.html">Roadmap</a></li>
     <li><a href="whitepaper.html">Whitepaper</a></li>
     <li><a href="CONTRIBUTING.md">Contributing</a></li>
-    <li><a href="https://github.com/NeaBouli/prometheus-" target="_blank">GitHub</a></li>
+    <li><a href="https://github.com/NeaBouli/prometheus-" target="_blank" rel="noopener noreferrer">GitHub</a></li>
   </ul>
 </footer>
 
