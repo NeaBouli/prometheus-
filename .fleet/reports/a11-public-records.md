@@ -1,5 +1,5 @@
 id: a11-public-records (R9, GH-277)
-status: partial (PRM-34 funding decision stays with Gio; PRM-35 belongs to the contract epic #276)
+status: ok (PRM-34 resolved by owner decision 2026-09-30: bounty removed; PRM-35 belongs to the contract epic #276)
 worker: claude (Codex stand-in, solo)
 branch: agent/claude/prometheus-standin-20260930
 summary:
