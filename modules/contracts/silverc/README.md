@@ -63,7 +63,10 @@ legacy invariants:
 - validators stake KAS, never PROM
 - minimum stake is `MIN_STAKE_KAS = 10000`
 - commit bond is `BOND_PERCENT = 10`
-- withdrawal cooldown is `COOLDOWN_BLOCKS = 100800`
+- withdrawal cooldown is `COOLDOWN_BLOCKS = 6048000` (7 days at 10 BPS), enforced by
+  `completeWithdraw` as `this.age >= COOLDOWN_BLOCKS` (OP_CHECKSEQUENCEVERIFY on the
+  withdrawal UTXO); `requestWithdraw` also opens an exit for a validator slashed below
+  `MIN_STAKE_KAS` and rejects a zero marker (PRM-13, PRM-35; bundle v2 draft)
 - reveal verification uses the same H-001 canonical preimage as
   `ValidatorStakingH001.sil`
 

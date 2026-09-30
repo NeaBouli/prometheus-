@@ -79,7 +79,7 @@ jobs:
           test -f "$fixture" || (echo "ERROR: missing $fixture" && exit 1)
           grep -q 'MIN_STAKE_KAS = 10000' "$fixture"
           grep -q 'BOND_PERCENT = 10' "$fixture"
-          grep -q 'COOLDOWN_BLOCKS = 100800' "$fixture"
+          grep -q 'COOLDOWN_BLOCKS = 6048000' "$fixture"
           grep -q 'commitmentHash(vote, salt, prev_state.committed_at_block)' "$fixture"
           if grep -q 'PROM' "$fixture"; then
             echo "ERROR: Validator staking fixture must not introduce PROM staking."

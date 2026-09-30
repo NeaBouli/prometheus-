@@ -42,7 +42,7 @@ class Mutation:
 VALIDATOR_LITERALS = (
     "MIN_STAKE_KAS = 10000",
     "BOND_PERCENT = 10",
-    "COOLDOWN_BLOCKS = 100800",
+    "COOLDOWN_BLOCKS = 6048000",
     "commitmentHash(vote, salt, prev_state.committed_at_block)",
 )
 MUTATIONS = (

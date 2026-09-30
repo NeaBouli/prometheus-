@@ -15,7 +15,7 @@ contract ValidatorStakingState(
 ) {
     int constant MIN_STAKE_KAS = 10000;
     int constant BOND_PERCENT = 10;
-    int constant COOLDOWN_BLOCKS = 100800;
+    int constant COOLDOWN_BLOCKS = 6048000;
 
     pubkey validator_pk = init_validator_pk;
     int stake_kas = init_stake_kas;
@@ -138,8 +138,7 @@ contract ValidatorStakingState(
     #[covenant.singleton(mode = transition)]
     function requestWithdraw(State prev_state, int block_height, sig validator_sig) : State {
         require(prev_state.stake_kas > 0);
-        require(prev_state.active);
-        require(block_height >= 0);
+        require(block_height > 0);
         require(prev_state.withdraw_request_block == 0);
         require(isEmptyCommitment(prev_state.commitment));
         require(checkSig(validator_sig, prev_state.validator_pk));
@@ -160,11 +159,11 @@ contract ValidatorStakingState(
     }
 
     #[covenant.singleton(mode = transition, termination = allowed)]
-    function completeWithdraw(State prev_state, State[] next_states, int block_height, sig validator_sig) : State[] {
+    function completeWithdraw(State prev_state, State[] next_states, sig validator_sig) : State[] {
         require(prev_state.stake_kas > 0);
         require(!prev_state.active);
         require(prev_state.withdraw_request_block > 0);
-        require(block_height >= prev_state.withdraw_request_block + COOLDOWN_BLOCKS);
+        require(this.age >= COOLDOWN_BLOCKS);
         require(next_states.length == 0);
         require(checkSig(validator_sig, prev_state.validator_pk));
 

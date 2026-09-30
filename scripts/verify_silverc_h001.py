@@ -531,7 +531,7 @@ fn prometheus_validator_state_fixture_compiles_against_current_silverc() {
     build_covenant_sigscript(
         &withdraw,
         "completeWithdraw",
-        vec![Vec::<Expr>::new().into(), Expr::int(101_300), Expr::bytes(sig)],
+        vec![Vec::<Expr>::new().into(), Expr::bytes(sig)],
     );
 }
 
@@ -3361,7 +3361,7 @@ fn prometheus_validator_state_complete_withdraw_runtime_accepts_after_cooldown()
     let placeholder_sigscript = validator_state_entry_sigscript(
         &withdrawal_requested,
         "completeWithdraw",
-        vec![Vec::<Expr>::new().into(), Expr::int(102_800), Expr::bytes(dummy_signature())],
+        vec![Vec::<Expr>::new().into(), Expr::bytes(dummy_signature())],
     );
     let outputs = vec![];
     let entries = vec![covenant_utxo(&withdrawal_requested, COV_A)];
@@ -3374,11 +3374,12 @@ fn prometheus_validator_state_complete_withdraw_runtime_accepts_after_cooldown()
         0,
         vec![],
     );
+    tx.inputs[0].sequence = 6_048_000;
     let sig = sign_tx_input(&tx, &entries, 0, &keypair);
     tx.inputs[0].signature_script = validator_state_entry_sigscript(
         &withdrawal_requested,
         "completeWithdraw",
-        vec![Vec::<Expr>::new().into(), Expr::int(102_800), Expr::bytes(sig)],
+        vec![Vec::<Expr>::new().into(), Expr::bytes(sig)],
     );
 
     let result = execute_input_with_covenants(tx, entries, 0);
@@ -3417,7 +3418,7 @@ fn prometheus_validator_state_complete_withdraw_runtime_rejects_before_cooldown(
     let placeholder_sigscript = validator_state_entry_sigscript(
         &withdrawal_requested,
         "completeWithdraw",
-        vec![Vec::<Expr>::new().into(), Expr::int(102_799), Expr::bytes(dummy_signature())],
+        vec![Vec::<Expr>::new().into(), Expr::bytes(dummy_signature())],
     );
     let outputs = vec![];
     let entries = vec![covenant_utxo(&withdrawal_requested, COV_A)];
@@ -3430,14 +3431,133 @@ fn prometheus_validator_state_complete_withdraw_runtime_rejects_before_cooldown(
         0,
         vec![],
     );
+    tx.inputs[0].sequence = 6_047_999;
     let sig = sign_tx_input(&tx, &entries, 0, &keypair);
     tx.inputs[0].signature_script = validator_state_entry_sigscript(
         &withdrawal_requested,
         "completeWithdraw",
-        vec![Vec::<Expr>::new().into(), Expr::int(102_799), Expr::bytes(sig)],
+        vec![Vec::<Expr>::new().into(), Expr::bytes(sig)],
     );
 
     let err = execute_input_with_covenants(tx, entries, 0).expect_err("completeWithdraw must reject before cooldown expires");
+    assert!(matches!(err, kaspa_txscript_errors::TxScriptError::UnsatisfiedLockTime(_)), "expected relative-lock failure, got {err:?}");
+}
+
+#[test]
+fn prometheus_validator_state_complete_withdraw_runtime_rejects_disabled_sequence_lock() {
+    let contract_path = std::env::var("PROMETHEUS_VALIDATOR_STATE_CONTRACT")
+        .expect("PROMETHEUS_VALIDATOR_STATE_CONTRACT is set");
+    let source = std::fs::read_to_string(contract_path).expect("read Prometheus validator state contract fixture");
+    let keypair = keypair_from_seed(7);
+    let validator_pk = keypair.x_only_public_key().0.serialize().to_vec();
+    let withdrawal_requested = compile_validator_state(
+        &source,
+        validator_state_args(validator_pk, 20_000, false, 1_000, 10_000, 0, 1_200, zero32(), 0, 0, 2_000),
+    );
+    let placeholder_sigscript = validator_state_entry_sigscript(
+        &withdrawal_requested,
+        "completeWithdraw",
+        vec![Vec::<Expr>::new().into(), Expr::bytes(dummy_signature())],
+    );
+    let entries = vec![covenant_utxo(&withdrawal_requested, COV_A)];
+    let mut tx = Transaction::new(
+        1,
+        vec![tx_input_with_sigops(0, placeholder_sigscript, 1)],
+        vec![],
+        0,
+        Default::default(),
+        0,
+        vec![],
+    );
+    // Relative lock disabled (bit 63) even though the masked value is large enough.
+    tx.inputs[0].sequence = (1u64 << 63) | 6_048_000;
+    let sig = sign_tx_input(&tx, &entries, 0, &keypair);
+    tx.inputs[0].signature_script = validator_state_entry_sigscript(
+        &withdrawal_requested,
+        "completeWithdraw",
+        vec![Vec::<Expr>::new().into(), Expr::bytes(sig)],
+    );
+    let err = execute_input_with_covenants(tx, entries, 0)
+        .expect_err("completeWithdraw must reject a disabled relative lock");
+    assert!(matches!(err, kaspa_txscript_errors::TxScriptError::UnsatisfiedLockTime(_)), "expected relative-lock failure, got {err:?}");
+}
+
+#[test]
+fn prometheus_validator_state_request_withdraw_runtime_accepts_inactive_slashed_validator() {
+    // PRM-13: a validator slashed below MIN_STAKE (active = false, no withdrawal
+    // requested) must still be able to start the cooldown instead of being locked.
+    let contract_path = std::env::var("PROMETHEUS_VALIDATOR_STATE_CONTRACT")
+        .expect("PROMETHEUS_VALIDATOR_STATE_CONTRACT is set");
+    let source = std::fs::read_to_string(contract_path).expect("read Prometheus validator state contract fixture");
+    let keypair = keypair_from_seed(7);
+    let validator_pk = keypair.x_only_public_key().0.serialize().to_vec();
+    let slashed_inactive = compile_validator_state(
+        &source,
+        validator_state_args(validator_pk.clone(), 8_000, false, 1_000, 10_000, 1, 1_200, zero32(), 0, 0, 0),
+    );
+    let withdrawal_requested = compile_validator_state(
+        &source,
+        validator_state_args(validator_pk, 8_000, false, 1_000, 10_000, 1, 1_200, zero32(), 0, 0, 3_000),
+    );
+    let placeholder_sigscript = validator_state_entry_sigscript(
+        &slashed_inactive,
+        "requestWithdraw",
+        vec![Expr::int(3_000), Expr::bytes(dummy_signature())],
+    );
+    let outputs = vec![covenant_output(&withdrawal_requested, 0, COV_A)];
+    let entries = vec![covenant_utxo(&slashed_inactive, COV_A)];
+    let mut tx = Transaction::new(
+        1,
+        vec![tx_input_with_sigops(0, placeholder_sigscript, 1)],
+        outputs,
+        0,
+        Default::default(),
+        0,
+        vec![],
+    );
+    let sig = sign_tx_input(&tx, &entries, 0, &keypair);
+    tx.inputs[0].signature_script = validator_state_entry_sigscript(
+        &slashed_inactive,
+        "requestWithdraw",
+        vec![Expr::int(3_000), Expr::bytes(sig)],
+    );
+    let result = execute_input_with_covenants(tx, entries, 0);
+    assert!(result.is_ok(), "requestWithdraw must open an exit for an inactive slashed validator: {:?}", result.err());
+}
+
+#[test]
+fn prometheus_validator_state_request_withdraw_runtime_rejects_zero_marker() {
+    let contract_path = std::env::var("PROMETHEUS_VALIDATOR_STATE_CONTRACT")
+        .expect("PROMETHEUS_VALIDATOR_STATE_CONTRACT is set");
+    let source = std::fs::read_to_string(contract_path).expect("read Prometheus validator state contract fixture");
+    let keypair = keypair_from_seed(7);
+    let validator_pk = keypair.x_only_public_key().0.serialize().to_vec();
+    let active = compile_validator_state(
+        &source,
+        validator_state_args(validator_pk.clone(), 20_000, true, 1_000, 10_000, 0, 1_200, zero32(), 0, 0, 0),
+    );
+    // A zero marker would create an unreachable state (inactive without a request).
+    let bricked = compile_validator_state(
+        &source,
+        validator_state_args(validator_pk, 20_000, false, 1_000, 10_000, 0, 1_200, zero32(), 0, 0, 0),
+    );
+    let placeholder_sigscript =
+        validator_state_entry_sigscript(&active, "requestWithdraw", vec![Expr::int(0), Expr::bytes(dummy_signature())]);
+    let outputs = vec![covenant_output(&bricked, 0, COV_A)];
+    let entries = vec![covenant_utxo(&active, COV_A)];
+    let mut tx = Transaction::new(
+        1,
+        vec![tx_input_with_sigops(0, placeholder_sigscript, 1)],
+        outputs,
+        0,
+        Default::default(),
+        0,
+        vec![],
+    );
+    let sig = sign_tx_input(&tx, &entries, 0, &keypair);
+    tx.inputs[0].signature_script =
+        validator_state_entry_sigscript(&active, "requestWithdraw", vec![Expr::int(0), Expr::bytes(sig)]);
+    let err = execute_input_with_covenants(tx, entries, 0).expect_err("requestWithdraw must reject a zero marker");
     common::assert_verify_like_error(err);
 }
 """
