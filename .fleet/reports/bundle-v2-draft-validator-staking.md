@@ -12,4 +12,10 @@ open design (for Codex, release-gate owner):
   1. Split constants: H001_CANARY_BUNDLE_MANIFEST_SHA256 = e6cec2aa… (frozen, canary profile only) and FULL_BUNDLE_MANIFEST_SHA256 = v2 hash (full profile).
   2. The canary profile then cannot be regenerated from the current (v2) archive. Options: (a) CI verifies the committed H-001 evidence/request set instead of regenerating; (b) keep a reproducible v1 bundle build from pinned historical sources; (c) retire the canary profile in the deployer (evidence stays verifiable by the evidence verifiers). Recommendation: (a) — the canary is executed and non-promotable, so only its evidence needs to stay verifiable.
   3. Operator tooling must set input sequence >= 6,048,000 for completeWithdraw transactions (new requirement for the future transition operator; no such operator exists yet).
-not in this draft: D1–D5 changes to the other contracts, value conservation/burn (D3), tx.time bounds for other transitions (D2).
+step 2 (value conservation + burn, MS-B D3), same branch:
+  - requireStakeBacked(): covenant input value == stake_kas * 100,000,000 sompi; commitVote/revealVote/requestWithdraw require tx.outputs[0].value == input value.
+  - slashInvalidReveal: output 0 = input − bond·10^8, output 1 = bond·10^8 to scriptPubKey 0x0000 aa20 blake2b(0x6a) 87 (P2SH of OP_RETURN). Kaspa mempool standardness allows only PubKey/PubKeyECDSA/ScriptHash outputs (mining/src/mempool/check_transaction_standard.rs), so an OP_RETURN output is not an option; the P2SH-of-OP_RETURN form is standard and anyone can verify it is unspendable from the published preimage.
+  - tests: 63 passed (all 15 validator runtime tests moved to real stake-backed values; new: missing burn → InvalidOutputIndex, burn to spendable script, keeping slashed value, value leak on commit, unbacked stake).
+  - new deployer requirement: genesis output value for ValidatorStakingState must equal the initial stake in sompi (today operator-chosen) — part of the profile/deployer v2 work.
+  - storage mass: the burn output carries ≥ 1,000 KAS (10% bond of ≥ 10,000 KAS stake), far above storage-mass limits for small outputs.
+not in this draft: D1/D4 tally certificates and quorum for RuleStorage/DevIncentivePool/CommunityDonations, D2 tx.time bounds for other transitions, D5 manifest/genesis binding.

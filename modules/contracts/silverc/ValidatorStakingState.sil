@@ -16,6 +16,7 @@ contract ValidatorStakingState(
     int constant MIN_STAKE_KAS = 10000;
     int constant BOND_PERCENT = 10;
     int constant COOLDOWN_BLOCKS = 6048000;
+    int constant SOMPI_PER_KAS = 100000000;
 
     pubkey validator_pk = init_validator_pk;
     int stake_kas = init_stake_kas;
@@ -41,6 +42,12 @@ contract ValidatorStakingState(
         byte[] vote_byte = vote ? byte[](0x01) : byte[](0x00);
         byte[] preimage = vote_byte + byte[8](salt) + byte[8](block_height);
         return(sha256(preimage));
+    }
+
+    function requireStakeBacked(State prev_state) : int {
+        int covenant_value = tx.inputs[this.activeInputIndex].value;
+        require(covenant_value == prev_state.stake_kas * SOMPI_PER_KAS);
+        return(covenant_value);
     }
 
     function carryForward(State prev_state) : State {
@@ -69,6 +76,8 @@ contract ValidatorStakingState(
         require(new_bond_kas >= prev_state.stake_kas * BOND_PERCENT / 100);
         require(new_bond_kas <= prev_state.stake_kas);
         require(checkSig(validator_sig, prev_state.validator_pk));
+        int covenant_value = requireStakeBacked(prev_state);
+        require(tx.outputs[0].value == covenant_value);
 
         return({
             validator_pk: prev_state.validator_pk,
@@ -93,6 +102,8 @@ contract ValidatorStakingState(
         require(!isEmptyCommitment(prev_state.commitment));
         require(commitmentHash(vote, salt, prev_state.committed_at_block) == prev_state.commitment);
         require(checkSig(validator_sig, prev_state.validator_pk));
+        int covenant_value = requireStakeBacked(prev_state);
+        require(tx.outputs[0].value == covenant_value);
 
         return({
             validator_pk: prev_state.validator_pk,
@@ -118,6 +129,13 @@ contract ValidatorStakingState(
         require(commitmentHash(vote, salt, prev_state.committed_at_block) != prev_state.commitment);
         require(checkSig(validator_sig, prev_state.validator_pk));
 
+        int covenant_value = requireStakeBacked(prev_state);
+        int slashed_sompi = prev_state.bond_kas * SOMPI_PER_KAS;
+        byte[] burn_script_public_key = 0x0000aa20d379e50f3e2203f9a92584916335bb7cd014b237ceaa8b36f1d3d80d0cc88b3287;
+        require(tx.outputs[0].value == covenant_value - slashed_sompi);
+        require(tx.outputs[1].value == slashed_sompi);
+        require(tx.outputs[1].scriptPubKey == burn_script_public_key);
+
         int remaining_stake_kas = prev_state.stake_kas - prev_state.bond_kas;
 
         return({
@@ -142,6 +160,8 @@ contract ValidatorStakingState(
         require(prev_state.withdraw_request_block == 0);
         require(isEmptyCommitment(prev_state.commitment));
         require(checkSig(validator_sig, prev_state.validator_pk));
+        int covenant_value = requireStakeBacked(prev_state);
+        require(tx.outputs[0].value == covenant_value);
 
         return({
             validator_pk: prev_state.validator_pk,

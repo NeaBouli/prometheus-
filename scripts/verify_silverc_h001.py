@@ -66,6 +66,29 @@ use common::{covenant_output, covenant_utxo, execute_input_with_covenants};
 
 const COV_A: Hash = Hash::from_bytes(*b"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
 
+const SOMPI_PER_KAS: u64 = 100_000_000;
+
+fn kas(amount: u64) -> u64 {
+    amount * SOMPI_PER_KAS
+}
+
+fn valued_covenant_utxo(compiled: &CompiledContract<'_>, value: u64) -> UtxoEntry {
+    let mut entry = covenant_utxo(compiled, COV_A);
+    entry.amount = value;
+    entry
+}
+
+fn valued_covenant_output(compiled: &CompiledContract<'_>, value: u64) -> TransactionOutput {
+    let mut output = covenant_output(compiled, 0, COV_A);
+    output.value = value;
+    output
+}
+
+fn burn_output(value: u64) -> TransactionOutput {
+    // P2SH of the always-failing script OP_RETURN (0x6a): standard and provably unspendable.
+    TransactionOutput { value, script_public_key: kaspa_txscript::pay_to_script_hash_script(&[0x6a]), covenant: None }
+}
+
 fn run_script(script: Vec<u8>, sigscript: Vec<u8>) -> Result<(), kaspa_txscript_errors::TxScriptError> {
     let reused_values = SigHashReusedValuesUnsync::new();
     let sig_cache = Cache::new(10_000);
@@ -2657,8 +2680,8 @@ fn prometheus_validator_state_commit_vote_runtime_accepts_valid_transition() {
         "commitVote",
         vec![Expr::bytes(commitment.clone()), Expr::int(2_000), Expr::int(42), Expr::bytes(dummy_signature())],
     );
-    let outputs = vec![covenant_output(&committed, 0, COV_A)];
-    let entries = vec![covenant_utxo(&active, COV_A)];
+    let outputs = vec![valued_covenant_output(&committed, kas(20_000))];
+    let entries = vec![valued_covenant_utxo(&active, kas(20_000))];
     let mut tx = Transaction::new(
         1,
         vec![tx_input_with_sigops(0, placeholder_sigscript, 1)],
@@ -2730,8 +2753,8 @@ fn prometheus_validator_state_commit_vote_runtime_rejects_low_bond() {
         "commitVote",
         vec![Expr::bytes(commitment.clone()), Expr::int(1_999), Expr::int(42), Expr::bytes(dummy_signature())],
     );
-    let outputs = vec![covenant_output(&low_bond_state, 0, COV_A)];
-    let entries = vec![covenant_utxo(&active, COV_A)];
+    let outputs = vec![valued_covenant_output(&low_bond_state, kas(20_000))];
+    let entries = vec![valued_covenant_utxo(&active, kas(20_000))];
     let mut tx = Transaction::new(
         1,
         vec![tx_input_with_sigops(0, placeholder_sigscript, 1)],
@@ -2799,8 +2822,8 @@ fn prometheus_validator_state_commit_vote_runtime_rejects_negative_block_height(
         "commitVote",
         vec![Expr::bytes(commitment.clone()), Expr::int(2_000), Expr::int(-1), Expr::bytes(dummy_signature())],
     );
-    let outputs = vec![covenant_output(&committed, 0, COV_A)];
-    let entries = vec![covenant_utxo(&active, COV_A)];
+    let outputs = vec![valued_covenant_output(&committed, kas(20_000))];
+    let entries = vec![valued_covenant_utxo(&active, kas(20_000))];
     let mut tx = Transaction::new(
         1,
         vec![tx_input_with_sigops(0, placeholder_sigscript, 1)],
@@ -2868,8 +2891,8 @@ fn prometheus_validator_state_reveal_vote_runtime_accepts_valid_transition() {
         "revealVote",
         vec![Expr::bool(true), Expr::int(42), Expr::int(1_200), Expr::bytes(dummy_signature())],
     );
-    let outputs = vec![covenant_output(&revealed, 0, COV_A)];
-    let entries = vec![covenant_utxo(&committed, COV_A)];
+    let outputs = vec![valued_covenant_output(&revealed, kas(20_000))];
+    let entries = vec![valued_covenant_utxo(&committed, kas(20_000))];
     let mut tx = Transaction::new(
         1,
         vec![tx_input_with_sigops(0, placeholder_sigscript, 1)],
@@ -2959,8 +2982,8 @@ fn prometheus_validator_state_reveal_vote_runtime_rejects_negative_salt() {
         "revealVote",
         vec![Expr::bool(true), Expr::int(-1), Expr::int(1_200), Expr::bytes(dummy_signature())],
     );
-    let outputs = vec![covenant_output(&revealed, 0, COV_A)];
-    let entries = vec![covenant_utxo(&committed, COV_A)];
+    let outputs = vec![valued_covenant_output(&revealed, kas(20_000))];
+    let entries = vec![valued_covenant_utxo(&committed, kas(20_000))];
     let mut tx = Transaction::new(
         1,
         vec![tx_input_with_sigops(0, placeholder_sigscript, 1)],
@@ -3028,8 +3051,8 @@ fn prometheus_validator_state_reveal_vote_runtime_rejects_wrong_salt() {
         "revealVote",
         vec![Expr::bool(true), Expr::int(43), Expr::int(1_200), Expr::bytes(dummy_signature())],
     );
-    let outputs = vec![covenant_output(&revealed, 0, COV_A)];
-    let entries = vec![covenant_utxo(&committed, COV_A)];
+    let outputs = vec![valued_covenant_output(&revealed, kas(20_000))];
+    let entries = vec![valued_covenant_utxo(&committed, kas(20_000))];
     let mut tx = Transaction::new(
         1,
         vec![tx_input_with_sigops(0, placeholder_sigscript, 1)],
@@ -3097,8 +3120,8 @@ fn prometheus_validator_state_slash_invalid_reveal_runtime_accepts_invalid_revea
         "slashInvalidReveal",
         vec![Expr::bool(true), Expr::int(43), Expr::bytes(dummy_signature())],
     );
-    let outputs = vec![covenant_output(&slashed, 0, COV_A)];
-    let entries = vec![covenant_utxo(&committed, COV_A)];
+    let outputs = vec![valued_covenant_output(&slashed, kas(18_000)), burn_output(kas(2000))];
+    let entries = vec![valued_covenant_utxo(&committed, kas(20_000))];
     let mut tx = Transaction::new(
         1,
         vec![tx_input_with_sigops(0, placeholder_sigscript, 1)],
@@ -3170,8 +3193,8 @@ fn prometheus_validator_state_slash_invalid_reveal_runtime_rejects_valid_reveal(
         "slashInvalidReveal",
         vec![Expr::bool(true), Expr::int(42), Expr::bytes(dummy_signature())],
     );
-    let outputs = vec![covenant_output(&slashed, 0, COV_A)];
-    let entries = vec![covenant_utxo(&committed, COV_A)];
+    let outputs = vec![valued_covenant_output(&slashed, kas(18_000)), burn_output(kas(2000))];
+    let entries = vec![valued_covenant_utxo(&committed, kas(20_000))];
     let mut tx = Transaction::new(
         1,
         vec![tx_input_with_sigops(0, placeholder_sigscript, 1)],
@@ -3238,8 +3261,8 @@ fn prometheus_validator_state_request_withdraw_runtime_accepts_active_uncommitte
         "requestWithdraw",
         vec![Expr::int(2_000), Expr::bytes(dummy_signature())],
     );
-    let outputs = vec![covenant_output(&withdrawal_requested, 0, COV_A)];
-    let entries = vec![covenant_utxo(&active, COV_A)];
+    let outputs = vec![valued_covenant_output(&withdrawal_requested, kas(20_000))];
+    let entries = vec![valued_covenant_utxo(&active, kas(20_000))];
     let mut tx = Transaction::new(
         1,
         vec![tx_input_with_sigops(0, placeholder_sigscript, 1)],
@@ -3311,8 +3334,8 @@ fn prometheus_validator_state_request_withdraw_runtime_rejects_open_commitment()
         "requestWithdraw",
         vec![Expr::int(2_000), Expr::bytes(dummy_signature())],
     );
-    let outputs = vec![covenant_output(&withdrawal_requested, 0, COV_A)];
-    let entries = vec![covenant_utxo(&committed, COV_A)];
+    let outputs = vec![valued_covenant_output(&withdrawal_requested, kas(20_000))];
+    let entries = vec![valued_covenant_utxo(&committed, kas(20_000))];
     let mut tx = Transaction::new(
         1,
         vec![tx_input_with_sigops(0, placeholder_sigscript, 1)],
@@ -3364,7 +3387,7 @@ fn prometheus_validator_state_complete_withdraw_runtime_accepts_after_cooldown()
         vec![Vec::<Expr>::new().into(), Expr::bytes(dummy_signature())],
     );
     let outputs = vec![];
-    let entries = vec![covenant_utxo(&withdrawal_requested, COV_A)];
+    let entries = vec![valued_covenant_utxo(&withdrawal_requested, kas(20_000))];
     let mut tx = Transaction::new(
         1,
         vec![tx_input_with_sigops(0, placeholder_sigscript, 1)],
@@ -3421,7 +3444,7 @@ fn prometheus_validator_state_complete_withdraw_runtime_rejects_before_cooldown(
         vec![Vec::<Expr>::new().into(), Expr::bytes(dummy_signature())],
     );
     let outputs = vec![];
-    let entries = vec![covenant_utxo(&withdrawal_requested, COV_A)];
+    let entries = vec![valued_covenant_utxo(&withdrawal_requested, kas(20_000))];
     let mut tx = Transaction::new(
         1,
         vec![tx_input_with_sigops(0, placeholder_sigscript, 1)],
@@ -3459,7 +3482,7 @@ fn prometheus_validator_state_complete_withdraw_runtime_rejects_disabled_sequenc
         "completeWithdraw",
         vec![Vec::<Expr>::new().into(), Expr::bytes(dummy_signature())],
     );
-    let entries = vec![covenant_utxo(&withdrawal_requested, COV_A)];
+    let entries = vec![valued_covenant_utxo(&withdrawal_requested, kas(20_000))];
     let mut tx = Transaction::new(
         1,
         vec![tx_input_with_sigops(0, placeholder_sigscript, 1)],
@@ -3504,8 +3527,8 @@ fn prometheus_validator_state_request_withdraw_runtime_accepts_inactive_slashed_
         "requestWithdraw",
         vec![Expr::int(3_000), Expr::bytes(dummy_signature())],
     );
-    let outputs = vec![covenant_output(&withdrawal_requested, 0, COV_A)];
-    let entries = vec![covenant_utxo(&slashed_inactive, COV_A)];
+    let outputs = vec![valued_covenant_output(&withdrawal_requested, kas(8_000))];
+    let entries = vec![valued_covenant_utxo(&slashed_inactive, kas(8_000))];
     let mut tx = Transaction::new(
         1,
         vec![tx_input_with_sigops(0, placeholder_sigscript, 1)],
@@ -3543,8 +3566,8 @@ fn prometheus_validator_state_request_withdraw_runtime_rejects_zero_marker() {
     );
     let placeholder_sigscript =
         validator_state_entry_sigscript(&active, "requestWithdraw", vec![Expr::int(0), Expr::bytes(dummy_signature())]);
-    let outputs = vec![covenant_output(&bricked, 0, COV_A)];
-    let entries = vec![covenant_utxo(&active, COV_A)];
+    let outputs = vec![valued_covenant_output(&bricked, kas(20_000))];
+    let entries = vec![valued_covenant_utxo(&active, kas(20_000))];
     let mut tx = Transaction::new(
         1,
         vec![tx_input_with_sigops(0, placeholder_sigscript, 1)],
@@ -3558,6 +3581,351 @@ fn prometheus_validator_state_request_withdraw_runtime_rejects_zero_marker() {
     tx.inputs[0].signature_script =
         validator_state_entry_sigscript(&active, "requestWithdraw", vec![Expr::int(0), Expr::bytes(sig)]);
     let err = execute_input_with_covenants(tx, entries, 0).expect_err("requestWithdraw must reject a zero marker");
+    common::assert_verify_like_error(err);
+}
+
+#[test]
+fn prometheus_validator_state_slash_invalid_reveal_runtime_rejects_missing_burn() {
+    let contract_path = std::env::var("PROMETHEUS_VALIDATOR_STATE_CONTRACT")
+        .expect("PROMETHEUS_VALIDATOR_STATE_CONTRACT is set");
+    let source = std::fs::read_to_string(contract_path).expect("read Prometheus validator state contract fixture");
+    let keypair = keypair_from_seed(7);
+    let validator_pk = keypair.x_only_public_key().0.serialize().to_vec();
+    let commitment = hex32("cda9cc6bb51d36be5db27eb6e86bfc6b6173d5918f24f81939af5411bff90ffb");
+
+    let committed = compile_validator_state(
+        &source,
+        validator_state_args(
+            validator_pk.clone(),
+            20_000,
+            true,
+            1_000,
+            10_000,
+            0,
+            0,
+            commitment,
+            2_000,
+            1_000,
+            0,
+        ),
+    );
+    let slashed = compile_validator_state(
+        &source,
+        validator_state_args(
+            validator_pk,
+            18_000,
+            true,
+            1_000,
+            10_000,
+            1,
+            0,
+            zero32(),
+            0,
+            0,
+            0,
+        ),
+    );
+
+    let placeholder_sigscript = validator_state_entry_sigscript(
+        &committed,
+        "slashInvalidReveal",
+        vec![Expr::bool(true), Expr::int(43), Expr::bytes(dummy_signature())],
+    );
+    let outputs = vec![valued_covenant_output(&slashed, kas(18_000))];
+    let entries = vec![valued_covenant_utxo(&committed, kas(20_000))];
+    let mut tx = Transaction::new(
+        1,
+        vec![tx_input_with_sigops(0, placeholder_sigscript, 1)],
+        outputs,
+        0,
+        Default::default(),
+        0,
+        vec![],
+    );
+    let sig = sign_tx_input(&tx, &entries, 0, &keypair);
+    tx.inputs[0].signature_script = validator_state_entry_sigscript(
+        &committed,
+        "slashInvalidReveal",
+        vec![Expr::bool(true), Expr::int(43), Expr::bytes(sig)],
+    );
+
+    let err = execute_input_with_covenants(tx, entries, 0).expect_err("slashing without a burn output must fail");
+    assert!(matches!(err, kaspa_txscript_errors::TxScriptError::InvalidOutputIndex(..)), "expected missing burn output, got {err:?}");
+}
+
+#[test]
+fn prometheus_validator_state_slash_invalid_reveal_runtime_rejects_burn_to_spendable_script() {
+    let contract_path = std::env::var("PROMETHEUS_VALIDATOR_STATE_CONTRACT")
+        .expect("PROMETHEUS_VALIDATOR_STATE_CONTRACT is set");
+    let source = std::fs::read_to_string(contract_path).expect("read Prometheus validator state contract fixture");
+    let keypair = keypair_from_seed(7);
+    let validator_pk = keypair.x_only_public_key().0.serialize().to_vec();
+    let commitment = hex32("cda9cc6bb51d36be5db27eb6e86bfc6b6173d5918f24f81939af5411bff90ffb");
+
+    let committed = compile_validator_state(
+        &source,
+        validator_state_args(
+            validator_pk.clone(),
+            20_000,
+            true,
+            1_000,
+            10_000,
+            0,
+            0,
+            commitment,
+            2_000,
+            1_000,
+            0,
+        ),
+    );
+    let slashed = compile_validator_state(
+        &source,
+        validator_state_args(
+            validator_pk,
+            18_000,
+            true,
+            1_000,
+            10_000,
+            1,
+            0,
+            zero32(),
+            0,
+            0,
+            0,
+        ),
+    );
+
+    let placeholder_sigscript = validator_state_entry_sigscript(
+        &committed,
+        "slashInvalidReveal",
+        vec![Expr::bool(true), Expr::int(43), Expr::bytes(dummy_signature())],
+    );
+    let outputs = vec![valued_covenant_output(&slashed, kas(18_000)), TransactionOutput { value: kas(2000), script_public_key: kaspa_txscript::pay_to_script_hash_script(&[0x51]), covenant: None }];
+    let entries = vec![valued_covenant_utxo(&committed, kas(20_000))];
+    let mut tx = Transaction::new(
+        1,
+        vec![tx_input_with_sigops(0, placeholder_sigscript, 1)],
+        outputs,
+        0,
+        Default::default(),
+        0,
+        vec![],
+    );
+    let sig = sign_tx_input(&tx, &entries, 0, &keypair);
+    tx.inputs[0].signature_script = validator_state_entry_sigscript(
+        &committed,
+        "slashInvalidReveal",
+        vec![Expr::bool(true), Expr::int(43), Expr::bytes(sig)],
+    );
+
+    let err = execute_input_with_covenants(tx, entries, 0).expect_err("slashed KAS must not go to a spendable script");
+    common::assert_verify_like_error(err);
+}
+
+#[test]
+fn prometheus_validator_state_slash_invalid_reveal_runtime_rejects_keeping_slashed_value() {
+    let contract_path = std::env::var("PROMETHEUS_VALIDATOR_STATE_CONTRACT")
+        .expect("PROMETHEUS_VALIDATOR_STATE_CONTRACT is set");
+    let source = std::fs::read_to_string(contract_path).expect("read Prometheus validator state contract fixture");
+    let keypair = keypair_from_seed(7);
+    let validator_pk = keypair.x_only_public_key().0.serialize().to_vec();
+    let commitment = hex32("cda9cc6bb51d36be5db27eb6e86bfc6b6173d5918f24f81939af5411bff90ffb");
+
+    let committed = compile_validator_state(
+        &source,
+        validator_state_args(
+            validator_pk.clone(),
+            20_000,
+            true,
+            1_000,
+            10_000,
+            0,
+            0,
+            commitment,
+            2_000,
+            1_000,
+            0,
+        ),
+    );
+    let slashed = compile_validator_state(
+        &source,
+        validator_state_args(
+            validator_pk,
+            18_000,
+            true,
+            1_000,
+            10_000,
+            1,
+            0,
+            zero32(),
+            0,
+            0,
+            0,
+        ),
+    );
+
+    let placeholder_sigscript = validator_state_entry_sigscript(
+        &committed,
+        "slashInvalidReveal",
+        vec![Expr::bool(true), Expr::int(43), Expr::bytes(dummy_signature())],
+    );
+    let outputs = vec![valued_covenant_output(&slashed, kas(20_000)), burn_output(0)];
+    let entries = vec![valued_covenant_utxo(&committed, kas(20_000))];
+    let mut tx = Transaction::new(
+        1,
+        vec![tx_input_with_sigops(0, placeholder_sigscript, 1)],
+        outputs,
+        0,
+        Default::default(),
+        0,
+        vec![],
+    );
+    let sig = sign_tx_input(&tx, &entries, 0, &keypair);
+    tx.inputs[0].signature_script = validator_state_entry_sigscript(
+        &committed,
+        "slashInvalidReveal",
+        vec![Expr::bool(true), Expr::int(43), Expr::bytes(sig)],
+    );
+
+    let err = execute_input_with_covenants(tx, entries, 0).expect_err("slashing must remove the bond value from the covenant");
+    common::assert_verify_like_error(err);
+}
+
+#[test]
+fn prometheus_validator_state_commit_vote_runtime_rejects_value_leak() {
+    let contract_path = std::env::var("PROMETHEUS_VALIDATOR_STATE_CONTRACT")
+        .expect("PROMETHEUS_VALIDATOR_STATE_CONTRACT is set");
+    let source = std::fs::read_to_string(contract_path).expect("read Prometheus validator state contract fixture");
+    let keypair = keypair_from_seed(7);
+    let validator_pk = keypair.x_only_public_key().0.serialize().to_vec();
+    let commitment = hex32("cda9cc6bb51d36be5db27eb6e86bfc6b6173d5918f24f81939af5411bff90ffb");
+
+    let active = compile_validator_state(
+        &source,
+        validator_state_args(
+            validator_pk.clone(),
+            20_000,
+            true,
+            1_000,
+            10_000,
+            0,
+            0,
+            zero32(),
+            0,
+            0,
+            0,
+        ),
+    );
+    let committed = compile_validator_state(
+        &source,
+        validator_state_args(
+            validator_pk,
+            20_000,
+            true,
+            1_000,
+            10_000,
+            0,
+            0,
+            commitment.clone(),
+            2_000,
+            42,
+            0,
+        ),
+    );
+
+    let placeholder_sigscript = validator_state_entry_sigscript(
+        &active,
+        "commitVote",
+        vec![Expr::bytes(commitment.clone()), Expr::int(2_000), Expr::int(42), Expr::bytes(dummy_signature())],
+    );
+    let outputs = vec![valued_covenant_output(&committed, kas(19_999))];
+    let entries = vec![valued_covenant_utxo(&active, kas(20_000))];
+    let mut tx = Transaction::new(
+        1,
+        vec![tx_input_with_sigops(0, placeholder_sigscript, 1)],
+        outputs,
+        0,
+        Default::default(),
+        0,
+        vec![],
+    );
+    let sig = sign_tx_input(&tx, &entries, 0, &keypair);
+    tx.inputs[0].signature_script = validator_state_entry_sigscript(
+        &active,
+        "commitVote",
+        vec![Expr::bytes(commitment), Expr::int(2_000), Expr::int(42), Expr::bytes(sig)],
+    );
+
+    let err = execute_input_with_covenants(tx, entries, 0).expect_err("a transition must not leak covenant value");
+    common::assert_verify_like_error(err);
+}
+
+#[test]
+fn prometheus_validator_state_commit_vote_runtime_rejects_unbacked_stake() {
+    let contract_path = std::env::var("PROMETHEUS_VALIDATOR_STATE_CONTRACT")
+        .expect("PROMETHEUS_VALIDATOR_STATE_CONTRACT is set");
+    let source = std::fs::read_to_string(contract_path).expect("read Prometheus validator state contract fixture");
+    let keypair = keypair_from_seed(7);
+    let validator_pk = keypair.x_only_public_key().0.serialize().to_vec();
+    let commitment = hex32("cda9cc6bb51d36be5db27eb6e86bfc6b6173d5918f24f81939af5411bff90ffb");
+
+    let active = compile_validator_state(
+        &source,
+        validator_state_args(
+            validator_pk.clone(),
+            20_000,
+            true,
+            1_000,
+            10_000,
+            0,
+            0,
+            zero32(),
+            0,
+            0,
+            0,
+        ),
+    );
+    let committed = compile_validator_state(
+        &source,
+        validator_state_args(
+            validator_pk,
+            20_000,
+            true,
+            1_000,
+            10_000,
+            0,
+            0,
+            commitment.clone(),
+            2_000,
+            42,
+            0,
+        ),
+    );
+
+    let placeholder_sigscript = validator_state_entry_sigscript(
+        &active,
+        "commitVote",
+        vec![Expr::bytes(commitment.clone()), Expr::int(2_000), Expr::int(42), Expr::bytes(dummy_signature())],
+    );
+    let outputs = vec![valued_covenant_output(&committed, kas(10_000))];
+    let entries = vec![valued_covenant_utxo(&active, kas(10_000))];
+    let mut tx = Transaction::new(
+        1,
+        vec![tx_input_with_sigops(0, placeholder_sigscript, 1)],
+        outputs,
+        0,
+        Default::default(),
+        0,
+        vec![],
+    );
+    let sig = sign_tx_input(&tx, &entries, 0, &keypair);
+    tx.inputs[0].signature_script = validator_state_entry_sigscript(
+        &active,
+        "commitVote",
+        vec![Expr::bytes(commitment), Expr::int(2_000), Expr::int(42), Expr::bytes(sig)],
+    );
+
+    let err = execute_input_with_covenants(tx, entries, 0).expect_err("state stake must be backed by the covenant value");
     common::assert_verify_like_error(err);
 }
 """

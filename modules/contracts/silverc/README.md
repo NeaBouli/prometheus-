@@ -67,6 +67,11 @@ legacy invariants:
   `completeWithdraw` as `this.age >= COOLDOWN_BLOCKS` (OP_CHECKSEQUENCEVERIFY on the
   withdrawal UTXO); `requestWithdraw` also opens an exit for a validator slashed below
   `MIN_STAKE_KAS` and rejects a zero marker (PRM-13, PRM-35; bundle v2 draft)
+- value conservation (bundle v2 draft, MS-B D3): the covenant UTXO value must equal
+  `stake_kas * 100000000` sompi; commit/reveal/requestWithdraw keep that value in output 0;
+  `slashInvalidReveal` moves exactly `bond_kas * 100000000` sompi to output 1, a P2SH of the
+  always-failing script `OP_RETURN` (standard and provably unspendable), and keeps the rest in
+  output 0. The genesis output value must therefore equal the initial stake in sompi.
 - reveal verification uses the same H-001 canonical preimage as
   `ValidatorStakingH001.sil`
 
