@@ -630,3 +630,14 @@ Both runs require Gio budget approval (plan-level gate).
 - Retired worker cleanup scoped to the exact legacy cache `prometheus-v1`;
   unrelated origin caches preserved. Browser regression green, fails on the old
   worker. Report: `.fleet/reports/handback-sw-scope-fix.md`. No merge or deploy.
+
+### 2026-09-30 - Handback integrated; Claude continues in the draft lane
+
+- PR #285 merged as `e6d5464`; required hosted checks passed; Pages deployment
+  `36769371268` and post-deployment hashes/layout/accessibility checks passed.
+- Claude stand-in accepted with scoped cache correction. Codex owns integration
+  and release gates; Claude remains implementation owner, without duplicate work.
+- Draft repair dispatch timed out without a valid report. Preserve its five
+  modified files on `agent/claude/bundle-v2-review-repair`; next block resumes
+  this checkout, completes tests/report, then receives security review.
+- Draft acceptance, H-001/v2 profile split and rollout gates remain OPEN.

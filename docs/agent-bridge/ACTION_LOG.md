@@ -6047,3 +6047,22 @@ Rules for all dev agents:
   (Chromium via Playwright): owned cache removed, `other-project-v1`,
   `prometheus-v2`, `workbox-precache-v2` preserved, 0 registrations; fails on the
   previous `sw.js`. Site CSS, claim, status, hygiene, memory gates and tests pass.
+
+### 2026-09-30 - Codex handback integration and live verification
+
+- PR #284 merged as `3a79bfe`; reviewed stand-in integration PR #285 merged
+  normally as `e6d5464a8535a9a3095507501af7f8706c336258`. No protection bypass.
+- `python3 -m unittest discover -s scripts`: 399 tests passed; focused gates:
+  98 passed. Scoped service-worker browser regression passed independently.
+- Hosted CI `36768281084` and Security Audit `36768281098`: required checks
+  passed. Optional CodeRabbit remained pending at merge; no review was waived.
+- Pages deployment `36769371268` succeeded. Five HTML pages, canonical CSS and
+  retired worker SHA-256 matched merged source. Live checks: five pages across
+  four viewports, zero overflow/clipping/duplicate IDs/page errors; keyboard,
+  reduced-motion and no-JavaScript checks passed. Screenshots reviewed locally.
+- Claude remains primary implementation worker. `bundle-v2-review-repair`
+  timed out without a valid report; five modified files remain preserved on
+  its isolated worker branch, unaccepted and not integrated. Resume and test
+  that existing work before profile integration; do not restart it.
+- Kimi dispatch and canonical probe were token-limited. Contract-v2, upstream
+  upgrade compatibility and existing rollout/security gates remain OPEN.
