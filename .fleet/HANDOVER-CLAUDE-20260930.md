@@ -49,7 +49,7 @@ Goal: continue exactly from the hand-back point without re-research.
   `~/Desktop/repos/prometheus-master-plan-20260927-wt/claude-a8u-toolchain-upgrade`, stacked on `60ee6db`.
   One commit series per block; integrate by merging this branch into the integration branch after PR #284.
 - Live changes: none (repo-local only).
-- Tests: see per-block reports. Hosted: CI `36698349293` + Security `36698357152` all green at `bff7fc1` (workflow_dispatch, no PR). `f737c7b` (action SHA pins) needs one hosted run.
+- Tests: see per-block reports. Hosted: CI `36698349293` + Security `36698357152` all green at `bff7fc1` (workflow_dispatch, no PR). Second dispatch at `40dfd89` (incl. action SHA pins): CI `36702356697` + Security `36702361053` all green.
 
 ## Findings in existing code
 - `modules/silverc-deployer/src/lib.rs` binds `toccata_activation_daa_score` into the signing
@@ -79,8 +79,8 @@ Goal: continue exactly from the hand-back point without re-research.
   not moved since, so it can be fast-forwarded or merged after PR #284.
 - Every block is a code commit followed by a `docs:` report commit; reports live in
   `.fleet/reports/`, evidence in `.fleet/artifacts/`.
-- Hosted verification: CI `36698349293` + Security `36698357152` green at `bff7fc1`; a second
-  dispatch on `40dfd89` covers the later commits (see the last ACTION_LOG entry for its result).
+- Hosted verification: CI `36698349293` + Security `36698357152` green at `bff7fc1`; second
+  dispatch at `40dfd89`: CI `36702356697` + Security `36702361053` all green (8/8 + 3/3).
 
 ## Where I used less ceremony than Codex
 - All blocks were implemented and self-reviewed by Claude alone; no worker dispatch, no second

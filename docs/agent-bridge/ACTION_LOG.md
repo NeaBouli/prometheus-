@@ -5999,3 +5999,9 @@ Rules for all dev agents:
 - `docs/architecture/ms-b-contract-decisions.md` (D1–D7, capability baseline,
   child-issue plan, open risks). Proposal only; Codex architecture review
   required before it is binding. No code.
+
+### 2026-09-30 - [AUTOR: CC] Second hosted verification (current head)
+
+- Dispatched once at `40dfd89` (includes action SHA pins, deployer strictness,
+  bond math): Prometheus CI `36702356697` success (8/8), Security Audit
+  `36702361053` success (3/3). SHA-pinned actions work on hosted runners.
