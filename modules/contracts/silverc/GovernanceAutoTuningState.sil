@@ -81,6 +81,7 @@ contract GovernanceAutoTuningState(
     #[covenant.singleton(mode = transition)]
     function autoTune(State prev_state, int block_height) : State {
         require(block_height >= prev_state.last_tuning_block + TUNING_INTERVAL_BLOCKS);
+        require(tx.time >= block_height);
         require(prev_state.min_stake_kas >= MIN_STAKE_KAS_FLOOR);
         require(prev_state.min_stake_kas <= MIN_STAKE_KAS_CEILING);
         require(prev_state.min_confidence_ki >= CONFIDENCE_FLOOR);

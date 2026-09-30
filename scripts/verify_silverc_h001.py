@@ -1218,7 +1218,7 @@ fn prometheus_governance_auto_tuning_auto_tune_runtime_accepts_high_fp_adjustmen
         1,
         vec![tx_input_with_sigops(0, sigscript, 1)],
         outputs,
-        0,
+        604_800,
         Default::default(),
         0,
         vec![],
@@ -1230,6 +1230,40 @@ fn prometheus_governance_auto_tuning_auto_tune_runtime_accepts_high_fp_adjustmen
         "GovernanceAutoTuning autoTune runtime should accept deterministic high-FP adjustment: {:?}",
         result.err()
     );
+}
+
+#[test]
+fn prometheus_governance_auto_tuning_auto_tune_runtime_rejects_future_height() {
+    let contract_path = std::env::var("PROMETHEUS_GOVERNANCE_AUTO_TUNING_STATE_CONTRACT")
+        .expect("PROMETHEUS_GOVERNANCE_AUTO_TUNING_STATE_CONTRACT is set");
+    let source = std::fs::read_to_string(contract_path).expect("read Prometheus governance auto tuning contract fixture");
+    let oracle_pk = keypair_from_seed(8).x_only_public_key().0.serialize().to_vec();
+
+    let current = compile_governance_auto_tuning_state(
+        &source,
+        governance_auto_tuning_state_args(oracle_pk.clone(), 10_000, 1_000, 8_500, 6_700, 100, 0, 30, 500, 50, 100, 1_000),
+    );
+    let tuned = compile_governance_auto_tuning_state(
+        &source,
+        governance_auto_tuning_state_args(oracle_pk, 9_500, 1_000, 8_600, 6_700, 110, 604_800, 30, 500, 50, 100, 1_000),
+    );
+
+    let sigscript = governance_auto_tuning_state_entry_sigscript(&current, "autoTune", vec![Expr::int(604_800)]);
+    let outputs = vec![covenant_output(&tuned, 0, COV_A)];
+    let entries = vec![covenant_utxo(&current, COV_A)];
+    let tx = Transaction::new(
+        1,
+        vec![tx_input_with_sigops(0, sigscript, 1)],
+        outputs,
+        604_799,
+        Default::default(),
+        0,
+        vec![],
+    );
+
+    // PRM-15: a claimed height above the chain lock time cannot trigger tuning early.
+    let err = execute_input_with_covenants(tx, entries, 0).expect_err("autoTune must reject a height above the lock time");
+    assert!(matches!(err, kaspa_txscript_errors::TxScriptError::UnsatisfiedLockTime(_)), "expected lock-time failure, got {err:?}");
 }
 
 #[test]
@@ -1255,7 +1289,7 @@ fn prometheus_governance_auto_tuning_auto_tune_runtime_rejects_early_execution()
         1,
         vec![tx_input_with_sigops(0, sigscript, 1)],
         outputs,
-        0,
+        604_799,
         Default::default(),
         0,
         vec![],
@@ -1288,7 +1322,7 @@ fn prometheus_governance_auto_tuning_auto_tune_runtime_lowers_confidence_on_zero
         1,
         vec![tx_input_with_sigops(0, sigscript, 1)],
         outputs,
-        0,
+        604_800,
         Default::default(),
         0,
         vec![],

@@ -480,6 +480,11 @@ upstream Silverscript ref and runtime-tests covenant transitions for:
 Verified rejection paths include `fp_rate` above `MAX_FP_RATE` and auto-tuning
 before `TUNING_INTERVAL_BLOCKS`.
 
+Bundle v2 draft (MS-B D2): `autoTune` additionally requires `tx.time >= block_height`, so a
+fabricated future height can no longer ratchet parameters in consecutive transitions; tuning
+happens at most once per real `TUNING_INTERVAL_BLOCKS`. `reportMetrics` is unchanged because the
+keyless operator builds it with lock time 0; binding it to `tx.time` needs a deployer change.
+
 ## Metrics-oracle report preflight
 
 `scripts/preflight_metrics_oracle_report.py` validates the public metrics report

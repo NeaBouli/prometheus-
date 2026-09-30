@@ -86,8 +86,8 @@
       "compiler_version": "0.1.0",
       "constructor_args_sha256": "0c42df19e3acdee17020feb459c98298f27d4795f724a827c9665bff23b416bd",
       "contract_name": "GovernanceAutoTuningState",
-      "script_len": 906,
-      "script_sha256": "bbe2bd56b2085e7d4ee47aab0b5af66f8d64a485a1e967b8d547cd8c530e7004",
+      "script_len": 908,
+      "script_sha256": "6e2dafe1f6a862835d96be1d0b468e4e62f8231e27beb2d4689edfa5df58a312",
       "state_layout_sha256": "17bfd978a610c7914bcd109e99497c25a176460682795f2f1e0fbdf2186c5d97"
     }
   ],
