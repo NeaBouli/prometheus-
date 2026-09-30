@@ -5976,3 +5976,8 @@ Rules for all dev agents:
 - `docs/endpoint-producer-design-v1.md` (resource-utilization producer
   candidate, GH-267 mapping, risks, gates). Hygiene, claim and GH-267 gates pass.
   Report `.fleet/reports/da1-endpoint-producer-design.md`.
+
+### 2026-09-30 - [AUTOR: CC] PRM-12: GitHub Actions pinned to commit SHAs
+
+- All 22 action references pinned to resolved commit SHAs (ref as comment).
+  Report `.fleet/reports/prm12-actions-sha-pin.md`. Hosted run on the new head owed.
