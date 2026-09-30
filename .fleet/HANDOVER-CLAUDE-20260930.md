@@ -52,21 +52,55 @@ Goal: continue exactly from the hand-back point without re-research.
 - Tests: see per-block reports. Hosted: CI `36698349293` + Security `36698357152` all green at `bff7fc1` (workflow_dispatch, no PR). `f737c7b` (action SHA pins) needs one hosted run.
 
 ## Findings in existing code
-- See A8u1 F3/F4 (deployer binds `toccata_activation_daa_score` into signing request/receipt schema).
+- `modules/silverc-deployer/src/lib.rs` binds `toccata_activation_daa_score` into the signing
+  request/receipt schema and uses Params APIs removed in rusty-kaspa v2.1.0 (A8u1 F3/F4).
+- `modules/silverc-deployer/src/lib.rs:54` `FULL_BUNDLE_MANIFEST_SHA256` couples every contract
+  fixture change to the frozen H-001 canary profile → any contract change needs "bundle v2".
+- The legacy `.ss` cooldown comment (100,800 ≈ "7 days") was wrong by 60× (PRM-35); `.sil` still
+  carries 100,800 until bundle v2.
+- `scripts/verify_site_css.py` (my A12a gate) initially misread a CSS comment before `@media` as a
+  selector; fixed in A12c by stripping comments (regression test added).
+- H-001 public re-verification: kaspa.org TN10 explorer 402; api-tn10 indexer healthy but pruned
+  (404 for tx/block). Only an archival node/indexer can re-verify now.
 
 ## Review owed to Codex
-- PRM-12: silverc-deployer deny_unknown_fields (Rust, security surface).
-- A9: container identity/resources (security surface); A10 cleanup worker.
-- GH-279: dependency/CI supply-chain change (ci.yml python-check install + gate). Solo by Claude.
-- GH-283: CI contract-assurance gate + expectation file. Solo by Claude.
-- A11: visible HTML changes (index/guardian-economics) — post-deploy visual recheck owed after merge.
-- A4H: public-claim wording; was meant as independent-worker gate before Reddit activity.
+- PRM-12: silverc-deployer `deny_unknown_fields` (Rust, security surface) and saturating bond math.
+- A9: container identity/resources (security surface); A10 cleanup service worker.
+- GH-279: dependency/CI supply-chain change (python-check install + gate).
+- GH-283: CI contract-assurance gate + expectation file.
+- PRM-12: GitHub Actions SHA pins (verify the resolved SHAs if desired).
+- A11/A12: visible HTML changes — post-deploy visual recheck owed after merge (screenshots under
+  `.fleet/artifacts/`).
+- A4H: public-claim wording; was meant as independent-worker gate before any Reddit activity.
+- MS-B decision record: architecture review (architect profile) before it becomes binding.
+
+## How to integrate
+- The branch is stacked linearly on `60ee6db` (= PR #284 head); the Codex integration branch has
+  not moved since, so it can be fast-forwarded or merged after PR #284.
+- Every block is a code commit followed by a `docs:` report commit; reports live in
+  `.fleet/reports/`, evidence in `.fleet/artifacts/`.
+- Hosted verification: CI `36698349293` + Security `36698357152` green at `bff7fc1`; a second
+  dispatch on `40dfd89` covers the later commits (see the last ACTION_LOG entry for its result).
+
+## Where I used less ceremony than Codex
+- All blocks were implemented and self-reviewed by Claude alone; no worker dispatch, no second
+  reviewer. Kimi/Grok availability was not probed.
+- Owner decisions PRM-35, A9 and A10 were taken by Claude under Gio's explicit delegation
+  ("entscheide du, ich kenne mich hier nicht aus"); PRM-34 was Gio's own decision (no bounty).
 
 ## Next step (exact)
-- Codex (architect profile): review `docs/architecture/ms-b-contract-decisions.md`; if accepted, open the 7 child issues and plan contract bundle v2.
-- Codex: plan "contract bundle v2" (all MS-B contract outcomes in one revision, new profile pin next to frozen H-001).
-1. (see latest row; next block chosen in PLAN tail)
+1. Codex: review and merge PR #284, then integrate `agent/claude/prometheus-standin-20260930`
+   (review items above first).
+2. Codex (architect profile): review `docs/architecture/ms-b-contract-decisions.md`; if accepted,
+   open the 7 child issues and plan "contract bundle v2" (new profile pin next to frozen H-001).
+3. After merge: Pages post-deploy check (site.css 200, screenshots at 4 viewports, contrast).
+4. Close/update issues after hosted green on main: #274 (PRM-12 parts), #275, #277, #278, #279,
+   #280, #283; umbrella #270 totals.
+5. Watch upstream: SilverScript release on a rusty-kaspa tag ≥ v2.1.0 unblocks A8u2.
 
 ## Open decisions for Gio
-- MS-B #276 seven contract decisions; A9/GH-280 defaults (DECIDED by Claude, delegated); A10/#275 service worker (DECIDED: removed); A11/PRM-34 bug bounty (DECIDED 2026-09-30: removed);
-  A3 consent; audit budget. (Unchanged from PLAN §6.)
+- A3 consent for edits to the external-auditor PR #269 (unchanged).
+- Budget for the scoped/deep security audits (unchanged, PLAN §5).
+- MS-B #276: technical decisions proposed by Claude under delegation; Gio only needs to know that
+  slashed KAS would be burned (D3) and that voting relies on one owner-controlled attestation key
+  until Guardian decentralization (D1).
