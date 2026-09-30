@@ -580,3 +580,5 @@ Both runs require Gio budget approval (plan-level gate).
   input/output amount introspection, checkSig/checkSigFromStack, no runtime
   cross-contract calls). Binding only after Codex architecture review; child
   issues listed for Codex to open; all outcomes ship as one "contract bundle v2".
+- Second hosted verification at `40dfd89`: CI `36702356697` + Security
+  `36702361053` all green (covers action SHA pins and PRM-12 code changes).
