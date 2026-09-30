@@ -5981,3 +5981,8 @@ Rules for all dev agents:
 
 - All 22 action references pinned to resolved commit SHAs (ref as comment).
   Report `.fleet/reports/prm12-actions-sha-pin.md`. Hosted run on the new head owed.
+
+### 2026-09-30 - [AUTOR: CC] Hosted verification of the stand-in branch
+
+- Dispatched once at `bff7fc1`: Prometheus CI `36698349293` success (8/8 jobs),
+  Security Audit `36698357152` success (3/3 jobs). No PR, no merge.
