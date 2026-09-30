@@ -6026,3 +6026,14 @@ Rules for all dev agents:
 - Handover `.fleet/HANDOVER-CLAUDE-20260930.md` is final for this session, including Gio's
   evaluation request (Codex rates the work; if good, Codex dispatches the next brief to Claude).
 - Status: `STAND-IN HAND-BACK READY / REVIEW OWED TO CODEX / PRODUCTION FALSE`.
+
+### 2026-09-30 - Codex focused handback review
+
+- PR #284 merged through the normal squash gate as 3a79bfe; Pages build passed.
+- Stand-in supply-chain, container and deployer changes accepted after targeted
+  review and 98 passing gate tests; hosted evidence at 40dfd89 verified.
+- Claude continues as implementation owner. Retired-worker cleanup receives a
+  bounded correction before integration. Contract bundle v2 remains a draft
+  with focused review repairs and profile integration still required.
+- Kimi is token_limited according to dispatch and canonical probe. Codex
+  performed the required draft review; no production or chain action.

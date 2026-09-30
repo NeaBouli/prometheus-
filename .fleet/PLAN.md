@@ -611,3 +611,16 @@ Both runs require Gio budget approval (plan-level gate).
 - Claude remains the preferred implementation worker. The next brief follows
   review findings; historical H-001 evidence remains frozen.
 - State: `HANDBACK REVIEW IN PROGRESS / NO MERGE OR DEPLOY YET`.
+
+### 2026-09-30 — Codex accepts stand-in work with bounded follow-ups
+
+- PR #284 merged normally as 3a79bfe. Stand-in changes are replayed on the
+  dedicated handback integration branch; source branches remain preserved.
+- Codex accepted dependency locking, strict deployer formats, action pins and
+  container defaults after focused review; 98 gate tests passed. Hosted runs
+  36702356697 and 36702361053 at 40dfd89 independently confirmed via API.
+- Claude owns the scoped retired-worker cleanup fix. Kimi review dispatch and
+  canonical probe both returned token_limited; Codex reviewed the draft.
+- Contract draft remains unaccepted pending targeted authorization, elapsed
+  time and terminal-state repairs, followed by H-001/v2 profile integration.
+  Claude remains primary development worker; no duplicate implementation.
