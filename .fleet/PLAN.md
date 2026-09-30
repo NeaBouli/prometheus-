@@ -582,3 +582,14 @@ Both runs require Gio budget approval (plan-level gate).
   issues listed for Codex to open; all outcomes ship as one "contract bundle v2".
 - Second hosted verification at `40dfd89`: CI `36702356697` + Security
   `36702361053` all green (covers action SHA pins and PRM-12 code changes).
+
+### 2026-09-30 — Contract bundle v2 draft started (Claude stand-in)
+
+- Branch `agent/claude/contract-bundle-v2-draft` (on top of the stand-in
+  branch, head `2f132e4`): ValidatorStakingState enforces the 7-day cooldown on
+  chain via `this.age` (CSV, semantics verified in pinned rusty-kaspa), opens
+  the PRM-13 exit and rejects a zero withdrawal marker; 58 runtime tests pass.
+  Local contract CI 16/17: only the H-001 canary-profile step fails because
+  the deployer pins the v1 bundle manifest. The profile split (recommendation:
+  verify committed H-001 evidence instead of regenerating) is left to Codex.
+  Report `.fleet/reports/bundle-v2-draft-validator-staking.md` (on that branch).
