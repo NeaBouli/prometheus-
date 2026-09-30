@@ -6013,3 +6013,12 @@ Rules for all dev agents:
   windows via OpTxInputDaaScore + CLTV incl. settleTuning, terminal rejected tallies). 105 pinned
   runtime tests, semantic/mutation/lint/public gates pass; v1 canary gate still fails by design.
   Report `.fleet/reports/bundle-v2-review-repair.md`. D1–D7 stay proposed; security review owed.
+
+### 2026-10-01 - Codex receives draft repair and assigns profile separation
+
+- Received `a58320a`; the reported 105-test evidence is recorded, not promoted
+  to independent acceptance. Security review and hosted exact-head CI pending.
+- Next Claude brief: `.fleet/tasks/bundle-v2-profile-separation.md`.
+  Frozen historical H-001 evidence stays unchanged; v2 stays non-promotable.
+- No duplicate CI dispatch, contract integration, signing or deployment.
+  Operator implementation is a subsequent separately reviewed block.

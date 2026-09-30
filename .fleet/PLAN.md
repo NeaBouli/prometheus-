@@ -573,6 +573,17 @@ Both runs require Gio budget approval (plan-level gate).
   and the site CSS gate on hosted runners. Later head `f737c7b` (action SHA
   pins) still needs one hosted run.
 
+### 2026-10-01 - Delivered draft repairs; bounded next assignment
+
+- Claude delivered `a58320a`, preserving interrupted work as `204fc91`.
+  Reported evidence: 105 runtime tests, semantic/mutation and public gates
+  passed; contract CI 16/17, frozen v1 profile mismatch still fails.
+- Codex read the report and inspected the authorization/time/rejection diff.
+  Final security acceptance and exact-head hosted evidence remain pending.
+- Claude owns `bundle-v2-profile-separation` next. Operator integration follows
+  only after profile separation and review; no duplicate implementation.
+- Claude's scheduled 03:31 CI/Security dispatch must not be duplicated.
+
 ### 2026-09-30 — MS-B decision record proposed (Claude stand-in, delegated)
 
 - `docs/architecture/ms-b-contract-decisions.md`: D1–D7 for #276 with a
