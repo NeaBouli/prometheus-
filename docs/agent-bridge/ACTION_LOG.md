@@ -6005,3 +6005,10 @@ Rules for all dev agents:
 - Dispatched once at `40dfd89` (includes action SHA pins, deployer strictness,
   bond math): Prometheus CI `36702356697` success (8/8), Security Audit
   `36702361053` success (3/3). SHA-pinned actions work on hosted runners.
+
+### 2026-09-30 - [AUTOR: CC] Contract bundle v2 DRAFT (separate branch)
+
+- `agent/claude/contract-bundle-v2-draft` @ `2f132e4`: on-chain 7-day cooldown
+  (`this.age`), PRM-13 exit, zero-marker rejection; 58 runtime tests pass;
+  local contract CI fails only at the H-001 canary profile (v1 manifest pin).
+  Not integrable before Codex designs the profile split.

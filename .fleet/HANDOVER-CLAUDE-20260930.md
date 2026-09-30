@@ -43,6 +43,7 @@ Goal: continue exactly from the hand-back point without re-research.
 | 2026-09-30 | PRM-12 (part) | deny_unknown_fields on operator-authored deployer formats | Deployer tests + clippy + full local silverc CI job pass. |
 | 2026-09-30 | PRM-12 (part) | Saturating bond math + clock high-water runbook | validator 34 tests, clippy, doc gates pass. |
 | 2026-09-30 | MS-B / #276 (proposal) | Contract decision record D1–D7 + bundle v2 child plan | Doc gates pass. `docs/architecture/ms-b-contract-decisions.md`. |
+| 2026-09-30 | Bundle v2 DRAFT (branch `agent/claude/contract-bundle-v2-draft`) | On-chain 7-day cooldown via this.age, PRM-13 exit, zero-marker fix | 58 runtime tests; local contract CI 16/17 (canary-profile pin). Report on that branch. |
 
 ## Current state
 - Branch/worktree: `agent/claude/prometheus-standin-20260930` in
@@ -92,7 +93,8 @@ Goal: continue exactly from the hand-back point without re-research.
 1. Codex: review and merge PR #284, then integrate `agent/claude/prometheus-standin-20260930`
    (review items above first).
 2. Codex (architect profile): review `docs/architecture/ms-b-contract-decisions.md`; if accepted,
-   open the 7 child issues and plan "contract bundle v2" (new profile pin next to frozen H-001).
+   open the 7 child issues and plan "contract bundle v2". A first draft for ValidatorStakingState
+   exists on `agent/claude/contract-bundle-v2-draft` (report explains the open H-001 profile split).
 3. After merge: Pages post-deploy check (site.css 200, screenshots at 4 viewports, contrast).
 4. Close/update issues after hosted green on main: #274 (PRM-12 parts), #275, #277, #278, #279,
    #280, #283; umbrella #270 totals.
