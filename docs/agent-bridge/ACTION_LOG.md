@@ -5970,3 +5970,9 @@ Rules for all dev agents:
 - H-001 re-verification: kaspa.org TN10 explorer 402; API indexer healthy but
   404 for the canary tx/block (pruned). README states archival history is now
   required; captured observation stays in the evidence file.
+
+### 2026-09-30 - [AUTOR: CC] DA1 endpoint producer design (design only)
+
+- `docs/endpoint-producer-design-v1.md` (resource-utilization producer
+  candidate, GH-267 mapping, risks, gates). Hygiene, claim and GH-267 gates pass.
+  Report `.fleet/reports/da1-endpoint-producer-design.md`.
