@@ -56,6 +56,37 @@ class SiteCssGateTest(unittest.TestCase):
             vsc.check_page("p", "<html></html>"), ["p: embedded stylesheet missing"]
         )
 
+    def test_comment_before_media_block_is_not_a_selector(self) -> None:
+        css = ".nav-burger{display:none}/* RESPONSIVE */@media(max-width:900px){.nav-burger{display:flex}}"
+        self.assertEqual(vsc.check_page("p", page(css)), [])
+
+    def test_page_overriding_shared_rule_rejected(self) -> None:
+        shared = ".f-links a{color:var(--dim)}"
+        errors = vsc.check_page("p", page(".f-links a{color:#333}"), shared)
+        self.assertEqual(errors, ["p: '.f-links a' declares color 2 times"])
+
+    def test_tokens_from_shared_stylesheet_are_checked(self) -> None:
+        shared = ":root{--void:#050505;--dim:#333333}"
+        errors = vsc.check_page("p", "<style>.a{color:red}</style>", shared)
+        self.assertTrue(any("--dim on --void" in e for e in errors), errors)
+
+    def test_missing_shared_link_rejected(self) -> None:
+        import shutil
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "assets").mkdir()
+            shutil.copy(vsc.REPO_ROOT / vsc.SHARED_CSS, root / vsc.SHARED_CSS)
+            for name in vsc.PAGES:
+                html = (vsc.REPO_ROOT / name).read_text(encoding="utf-8")
+                if name == "faq.html":
+                    html = vsc.SHARED_LINK_RE.sub("", html)
+                (root / name).write_text(html, encoding="utf-8")
+            self.assertEqual(
+                vsc.verify(root), ["faq.html: shared stylesheet link missing"]
+            )
+
 
 if __name__ == "__main__":
     unittest.main()

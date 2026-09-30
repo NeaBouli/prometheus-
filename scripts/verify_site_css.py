@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """Static regression gate for the public pages' embedded stylesheets (PRM-43).
 
-Fails when a page stylesheet re-declares a property for an identical top-level
-selector (the paste-over pattern that silently overrode readable colors), or
-when a text color token does not reach WCAG AA (4.5:1) against every page
-background token. Offline; reads only the listed HTML files.
+Each page is checked as the shared stylesheet (assets/site.css) followed by its
+embedded stylesheet. Fails when a property is re-declared for an identical
+top-level selector (the paste-over pattern that silently overrode readable
+colors, including a page overriding a shared rule), when a page does not link
+the shared stylesheet, or when a text color token does not reach WCAG AA
+(4.5:1) against every background token. Offline; reads only repository files.
 """
 
 from __future__ import annotations
@@ -26,6 +28,10 @@ TEXT_TOKENS = ("--text", "--silver", "--silver-dim", "--muted", "--dim", "--mint
 BACKGROUND_TOKENS = ("--void", "--deep", "--surface", "--panel")
 AA_NORMAL = 4.5
 STYLE_RE = re.compile(r"<style>(.*?)</style>", re.S)
+SHARED_CSS = Path("assets/site.css")
+SHARED_LINK_RE = re.compile(
+    r'<link rel="stylesheet" href="assets/site\.css\?v=[0-9]+">'
+)
 AT_BLOCK_RE = re.compile(r"\s*@[a-zA-Z-]+[^{;]*\{")
 TOKEN_RE = re.compile(r"(--[a-z0-9-]+)\s*:\s*(#[0-9a-fA-F]{6})\b")
 
@@ -48,6 +54,7 @@ def contrast(first: str, second: str) -> float:
 def top_level_rules(css: str) -> list[tuple[str, str]]:
     """Return (selector, body) for top-level style rules; @-blocks are skipped."""
     rules: list[tuple[str, str]] = []
+    css = re.sub(r"/\*.*?\*/", "", css, flags=re.S)
     index = 0
     while index < len(css):
         at_block = AT_BLOCK_RE.match(css, index)
@@ -76,12 +83,12 @@ def top_level_rules(css: str) -> list[tuple[str, str]]:
     return rules
 
 
-def check_page(name: str, html: str) -> list[str]:
+def check_page(name: str, html: str, shared_css: str = "") -> list[str]:
     errors: list[str] = []
     match = STYLE_RE.search(html)
     if match is None:
         return [f"{name}: embedded stylesheet missing"]
-    css = match.group(1)
+    css = shared_css + "\n" + match.group(1)
     declared: dict[tuple[str, str], int] = {}
     for selector, body in top_level_rules(css):
         for declaration in body.split(";"):
@@ -114,6 +121,10 @@ def check_page(name: str, html: str) -> list[str]:
 
 def verify(root: Path) -> list[str]:
     errors: list[str] = []
+    try:
+        shared = (root / SHARED_CSS).read_text(encoding="utf-8")
+    except OSError:
+        return [f"{SHARED_CSS}: unreadable"]
     for page in PAGES:
         path = root / page
         try:
@@ -121,7 +132,9 @@ def verify(root: Path) -> list[str]:
         except OSError:
             errors.append(f"{page}: unreadable")
             continue
-        errors.extend(check_page(page, html))
+        if SHARED_LINK_RE.search(html) is None:
+            errors.append(f"{page}: shared stylesheet link missing")
+        errors.extend(check_page(page, html, shared))
     return errors
 
 
