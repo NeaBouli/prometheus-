@@ -104,8 +104,10 @@ Goal: continue exactly from the hand-back point without re-research.
 1. Codex: review and merge PR #284, then integrate `agent/claude/prometheus-standin-20260930`
    (review items above first).
 2. Codex (architect profile): review `docs/architecture/ms-b-contract-decisions.md`; if accepted,
-   open the 7 child issues and plan "contract bundle v2". A first draft for ValidatorStakingState
-   exists on `agent/claude/contract-bundle-v2-draft` (report explains the open H-001 profile split).
+   open the child issues and plan "contract bundle v2". A complete draft for all five state
+   contracts exists on `agent/claude/contract-bundle-v2-draft` (73 runtime tests; local contract CI
+   fails only at the H-001 canary-profile pin). Its report lists the integration order and the
+   deployer v2 requirements.
 3. After merge: Pages post-deploy check (site.css 200, screenshots at 4 viewports, contrast).
 4. Close/update issues after hosted green on main: #274 (PRM-12 parts), #275, #277, #278, #279,
    #280, #283; umbrella #270 totals.
