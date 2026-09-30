@@ -48,10 +48,22 @@ boundary: the exact official image
 `vllm/vllm-openai:v0.26.0@sha256:ffb2d59b1c059a5bd8d781320c9f5189de8293693b7d95da54befddaa54abf52`,
 `pull_policy: never`, host ports bound to literal `127.0.0.1`, an internal
 Docker network with no outbound path, read-only local model mounts, forced
-`HF_HUB_OFFLINE`/`TRANSFORMERS_OFFLINE`, non-root UID:GID `2000:0`, all
+`HF_HUB_OFFLINE`/`TRANSFORMERS_OFFLINE`, non-root UID:GID `2000:2000` (no
+root group; `./models` must be readable by UID or GID 2000), all
 capabilities dropped, `no-new-privileges`, a read-only root filesystem,
-bounded tmpfs/pids/memory/shm, and no host IPC. The Compose file accepts and
-requires no `HF_TOKEN` or any other secret.
+bounded tmpfs/pids/CPU/memory/shm (`cpus` 16 for 8B, 64 for 70B), and no host
+IPC. The Compose file accepts and requires no `HF_TOKEN` or any other secret.
+
+`/tmp` is intentionally not mounted `noexec`: vLLM, Triton, and PyTorch
+JIT-compile kernels into the cache under `HOME=/tmp` and load them as shared
+objects, so `noexec` would break inference. The mount stays `nosuid`, `nodev`,
+and size-bounded.
+
+**Local trust boundary:** the vLLM API is unauthenticated. It is reachable only
+through the host loopback interface, which means every process and user on the
+host can send prompts to it and read its answers. Run it only on a
+single-operator host that you control. No API key is configured because this
+Compose file must require no secret.
 
 vLLM listens on `0.0.0.0` only inside that isolated container network so
 Docker can forward the published port. The host-side binding remains literal
