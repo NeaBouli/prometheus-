@@ -7040,3 +7040,16 @@ false`.
   collection, runtime authority, transport, response, wallet, chain,
   deployment or production behavior was added.
 - Status: `GH-267 PR #268 HOSTED PASS / NORMAL MERGE NEXT / PRODUCTION FALSE`.
+
+### 2026-09-30 - [AUTOR: CC] Claude stand-in for Codex — read this first on return
+
+- Codex was token-limited; Claude Code continued thread `019f3d96` per skill
+  `codex-standin` on branch `agent/claude/prometheus-standin-20260930`
+  (stacked on PR #284 head `60ee6db`). Nothing merged to main, nothing deployed.
+- Entry points: `.fleet/HANDOVER-CLAUDE-20260930.md` (done / open / next,
+  review owed), per-block reports under `.fleet/reports/`, progress entries in
+  `.fleet/PLAN.md` §10 and `docs/agent-bridge/ACTION_LOG.md` (2026-09-30).
+- Blocks: A8u1 upgrade inventory (blocked upstream), GH-279, GH-283, A4H, A11,
+  A12a/b/d, A10, A9; owner decisions PRM-34 (Gio: no bounty), PRM-35 / A9 /
+  A10 (delegated to Claude by Gio). Contract bundle v2 is proposed for Codex.
+- Status: `STAND-IN ACTIVE / REVIEW OWED TO CODEX / PRODUCTION FALSE`.
