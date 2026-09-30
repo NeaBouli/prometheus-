@@ -18,6 +18,7 @@ from typing import Any, Dict, Iterable
 import pytest
 from coincurve import PrivateKey, PublicKeyXOnly
 
+from jaeger import threat_hint_v2_preflight as preflight_module
 from jaeger.observable_approval import APPROVAL_SIGNING_DOMAIN
 from jaeger.threat_hint_v2_preflight import (
     MAX_PREFLIGHT_POLICY_BYTES,
@@ -682,3 +683,130 @@ def test_direct_and_forged_receipts_grant_no_authority(tmp_path: Path) -> None:
         "observables",
     ):
         assert not hasattr(receipt, surface)
+
+
+def _pad_policy_to(policy_path: Path, size: int) -> None:
+    text = policy_path.read_text(encoding="ascii")
+    policy_path.write_text(text + "#" * (size - len(text) - 1) + "\n", encoding="ascii")
+    policy_path.chmod(0o600)
+
+
+def _forbid_policy_parse(monkeypatch: pytest.MonkeyPatch) -> None:
+    def forbidden(_text: str) -> dict:
+        raise AssertionError("rejected policy bytes must not be parsed")
+
+    monkeypatch.setattr(preflight_module.tomllib, "loads", forbidden)
+
+
+def _assert_rejected_redacted(policy_path: Path, *sensitive: str) -> None:
+    with pytest.raises(ThreatHintV2PreflightError) as error:
+        ThreatHintV2PreflightService(policy_path)
+    message = str(error.value)
+    assert message == "invalid threat-hint v2 preflight"
+    for value in (str(policy_path), policy_path.name, *sensitive):
+        assert value not in message
+
+
+def test_policy_is_read_once_through_one_no_follow_descriptor(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    scenario = _Scenario(tmp_path)
+    opened: list[tuple[object, int]] = []
+    real_open = os.open
+
+    def recording_open(path: object, flags: int, *args: int) -> int:
+        opened.append((path, flags))
+        return real_open(path, flags, *args)
+
+    def forbidden_read_text(*_args: object, **_kwargs: object) -> str:
+        raise AssertionError("policy must not be reopened by path")
+
+    monkeypatch.setattr(preflight_module.os, "open", recording_open)
+    monkeypatch.setattr(Path, "read_text", forbidden_read_text)
+    monkeypatch.setattr(Path, "read_bytes", forbidden_read_text)
+    service = ThreatHintV2PreflightService(scenario.policy_path)
+    assert service.trusted_relation_manifest_sha256_hex == scenario.anchor_hex
+    assert opened == [(scenario.policy_path, os.O_RDONLY | os.O_NOFOLLOW)]
+
+
+def test_policy_exact_limit_loads_and_over_limit_is_rejected_unparsed(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    scenario = _Scenario(tmp_path)
+    _pad_policy_to(scenario.policy_path, MAX_PREFLIGHT_POLICY_BYTES)
+    assert scenario.policy_path.stat().st_size == MAX_PREFLIGHT_POLICY_BYTES
+    ThreatHintV2PreflightService(scenario.policy_path)
+
+    _pad_policy_to(scenario.policy_path, MAX_PREFLIGHT_POLICY_BYTES + 1)
+    _forbid_policy_parse(monkeypatch)
+    _assert_rejected_redacted(scenario.policy_path, scenario.anchor_hex)
+
+
+def test_policy_invalid_utf8_is_rejected_redacted(tmp_path: Path) -> None:
+    scenario = _Scenario(tmp_path)
+    original = scenario.policy_path.read_bytes()
+    scenario.policy_path.write_bytes(original + b"# \xc3\x28\n")
+    _assert_rejected_redacted(scenario.policy_path, scenario.anchor_hex)
+
+
+@pytest.mark.parametrize("swap", ["replace", "symlink"])
+def test_policy_swapped_between_check_and_open_is_rejected_unparsed(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, swap: str
+) -> None:
+    scenario = _Scenario(tmp_path)
+    attacker = _write_raw_policy(
+        scenario.directory, "schema_version = 1\n# attacker-marker\n", "evil.toml"
+    )
+    real_open = os.open
+
+    def swapping_open(path: object, flags: int, *args: int) -> int:
+        if path == scenario.policy_path:
+            scenario.policy_path.unlink()
+            if swap == "replace":
+                os.link(attacker, scenario.policy_path)
+            else:
+                scenario.policy_path.symlink_to(attacker)
+        return real_open(path, flags, *args)
+
+    monkeypatch.setattr(preflight_module.os, "open", swapping_open)
+    _forbid_policy_parse(monkeypatch)
+    _assert_rejected_redacted(scenario.policy_path, "attacker-marker")
+
+
+@pytest.mark.parametrize("change", ["grow", "shrink"])
+def test_policy_size_change_during_read_is_rejected_unparsed(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, change: str
+) -> None:
+    scenario = _Scenario(tmp_path)
+    real_read = os.read
+    original = scenario.policy_path.read_bytes()
+
+    def mutating_read(descriptor: int, size: int) -> bytes:
+        if change == "grow":
+            with scenario.policy_path.open("ab") as handle:
+                handle.write(b"# grown\n")
+        else:
+            os.truncate(scenario.policy_path, len(original) - 1)
+        monkeypatch.setattr(preflight_module.os, "read", real_read)
+        return real_read(descriptor, size)
+
+    monkeypatch.setattr(preflight_module.os, "read", mutating_read)
+    _forbid_policy_parse(monkeypatch)
+    _assert_rejected_redacted(scenario.policy_path, scenario.anchor_hex)
+
+
+def test_policy_inode_change_after_open_is_rejected_unparsed(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    scenario = _Scenario(tmp_path)
+    real_fstat = os.fstat
+
+    def other_inode_fstat(descriptor: int) -> os.stat_result:
+        current = real_fstat(descriptor)
+        fields = list(current)
+        fields[stat.ST_INO] = current.st_ino + 1
+        return os.stat_result(fields)
+
+    monkeypatch.setattr(preflight_module.os, "fstat", other_inode_fstat)
+    _forbid_policy_parse(monkeypatch)
+    _assert_rejected_redacted(scenario.policy_path, scenario.anchor_hex)

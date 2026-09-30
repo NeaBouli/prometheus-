@@ -13,9 +13,17 @@ use tokio::sync::Mutex;
 use crate::runtime::require_stub_allowed;
 
 use super::connection::KaspaConnection;
+use super::rule_fetch::validate_canonical_raw_cid;
+use super::rule_ingest::{MAX_RULES_PER_SNAPSHOT, MAX_RULE_ID_BYTES};
 
 /// KRC-20 tick identifier for Prometheus rules
 pub const KRC20_RULES_TICK: &str = "PROM-RULES";
+
+/// Maximum number of distinct rules held by the development cache.
+///
+/// Reuses the authoritative CID-bound snapshot limit so the dev cache can
+/// never hold more rules than one validated snapshot may carry.
+pub const MAX_CACHED_RULES: usize = MAX_RULES_PER_SNAPSHOT;
 
 /// Threat rule type enumeration (from SCHEMA.md 2.3)
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
@@ -27,7 +35,7 @@ pub enum RuleType {
 }
 
 /// On-chain threat rule read from KRC-20 assets (from SCHEMA.md 2.3).
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, PartialEq)]
 pub struct ThreatRule {
     /// Rule identifier, e.g. "PROM-RULE-2026-0001"
     pub rule_id: String,
@@ -43,6 +51,61 @@ pub struct ThreatRule {
     pub timestamp: u64,
     /// Whether the rule is currently active
     pub active: bool,
+}
+
+/// Rejection reasons for the development rule cache.
+///
+/// Display never contains rule IDs, CIDs, or other caller-supplied values.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Krc20CacheError {
+    /// `rule_id` is empty, too long, or outside `[A-Za-z0-9_-]`.
+    InvalidRuleId,
+    /// `ipfs_cid` is not a canonical lowercase base32 CIDv1 raw sha2-256.
+    InvalidCid,
+    /// `validator_consensus` is not a finite value in `0.0..=1.0`.
+    InvalidConsensus,
+    /// A different rule is already cached under the same `rule_id`.
+    ConflictingDuplicate,
+    /// The cache already holds `MAX_CACHED_RULES` distinct rules.
+    CapacityExceeded,
+}
+
+impl std::fmt::Display for Krc20CacheError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let reason = match self {
+            Self::InvalidRuleId => "invalid rule id",
+            Self::InvalidCid => "invalid rule CID",
+            Self::InvalidConsensus => "invalid validator consensus",
+            Self::ConflictingDuplicate => "conflicting duplicate rule id",
+            Self::CapacityExceeded => "rule cache capacity exceeded",
+        };
+        write!(f, "development rule cache rejected rule: {reason}")
+    }
+}
+
+impl std::error::Error for Krc20CacheError {}
+
+/// Validate every caller-owned field before the rule touches the cache.
+///
+/// Rule IDs follow the CID-bound ingest grammar: 1..=`MAX_RULE_ID_BYTES`
+/// bytes of ASCII alphanumerics, hyphen, or underscore. `guardian_id` and
+/// `timestamp` are fixed-size and need no further bound.
+fn validate_rule(rule: &ThreatRule) -> Result<(), Krc20CacheError> {
+    let id = &rule.rule_id;
+    if id.is_empty()
+        || id.len() > MAX_RULE_ID_BYTES
+        || !id
+            .bytes()
+            .all(|b| b.is_ascii_alphanumeric() || b == b'-' || b == b'_')
+    {
+        return Err(Krc20CacheError::InvalidRuleId);
+    }
+    validate_canonical_raw_cid(&rule.ipfs_cid).map_err(|_| Krc20CacheError::InvalidCid)?;
+    let consensus = rule.validator_consensus;
+    if !consensus.is_finite() || !(0.0..=1.0).contains(&consensus) {
+        return Err(Krc20CacheError::InvalidConsensus);
+    }
+    Ok(())
 }
 
 /// Reads KRC-20 threat rules from the Kaspa blockchain.
@@ -91,10 +154,29 @@ impl Krc20RuleReader {
         Ok(rules.into_iter().find(|r| r.rule_id == rule_id))
     }
 
-    /// Manually add a rule to the cache (for testing or pre-Covenant use).
-    pub async fn add_cached_rule(&self, rule: ThreatRule) {
+    /// Manually add a rule to the development cache (testing or pre-Covenant use).
+    ///
+    /// The rule is fully validated before the cache lock is taken. One
+    /// `rule_id` maps to at most one entry: re-adding an identical rule is an
+    /// idempotent no-op, a different rule under a cached ID is rejected, and a
+    /// new ID is rejected once `MAX_CACHED_RULES` is reached. Existing entries
+    /// are never replaced or evicted, and every rejection leaves the cache
+    /// unchanged.
+    pub async fn add_cached_rule(&self, rule: ThreatRule) -> Result<(), Krc20CacheError> {
+        validate_rule(&rule)?;
         let mut cache = self.cached_rules.lock().await;
+        if let Some(existing) = cache.iter().find(|r| r.rule_id == rule.rule_id) {
+            return if *existing == rule {
+                Ok(())
+            } else {
+                Err(Krc20CacheError::ConflictingDuplicate)
+            };
+        }
+        if cache.len() >= MAX_CACHED_RULES {
+            return Err(Krc20CacheError::CapacityExceeded);
+        }
         cache.push(rule);
+        Ok(())
     }
 
     /// Get the number of cached rules.
@@ -108,11 +190,36 @@ mod tests {
     use super::*;
     use crate::blockchain::connection::KaspaConnection;
 
+    /// Canonical base32 CIDv1 raw sha2-256 of b"a".
+    const TEST_CID: &str = "bafkreigks6arfsq3xxfpvqrrwonchxcnu6do76auprhhfomao6c273sixm";
+    /// Canonical base32 CIDv1 raw sha2-256 of b"b".
+    const OTHER_CID: &str = "bafkreib6epubmabzlffdhckpmvsodmjuro6xuaei2qwevs3t52xnlhaatu";
+
+    fn make_reader() -> Krc20RuleReader {
+        let conn = KaspaConnection::new("ws://127.0.0.1:17210").unwrap();
+        Krc20RuleReader::new(Arc::new(Mutex::new(conn)))
+    }
+
+    async fn snapshot(reader: &Krc20RuleReader) -> Vec<ThreatRule> {
+        reader.cached_rules.lock().await.clone()
+    }
+
+    /// Assert the rule is rejected with `expected` and the cache is unchanged.
+    async fn assert_rejected(
+        reader: &Krc20RuleReader,
+        rule: ThreatRule,
+        expected: Krc20CacheError,
+    ) {
+        let before = snapshot(reader).await;
+        assert_eq!(reader.add_cached_rule(rule).await, Err(expected));
+        assert_eq!(snapshot(reader).await, before);
+    }
+
     fn make_test_rule(id: &str, rule_type: RuleType) -> ThreatRule {
         ThreatRule {
             rule_id: id.to_string(),
             rule_type,
-            ipfs_cid: "bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi".to_string(),
+            ipfs_cid: TEST_CID.to_string(),
             guardian_id: [0u8; 32],
             validator_consensus: 0.89,
             timestamp: 1762531235,
@@ -133,8 +240,9 @@ mod tests {
         let reader = Krc20RuleReader::new(Arc::new(Mutex::new(conn)));
 
         let rule = make_test_rule("PROM-RULE-2026-0001", RuleType::Yara);
-        reader.add_cached_rule(rule).await;
+        reader.add_cached_rule(rule.clone()).await.unwrap();
         assert_eq!(reader.cached_count().await, 1);
+        assert_eq!(snapshot(&reader).await, vec![rule]);
     }
 
     #[tokio::test]
@@ -144,10 +252,12 @@ mod tests {
 
         reader
             .add_cached_rule(make_test_rule("PROM-RULE-2026-0001", RuleType::Yara))
-            .await;
+            .await
+            .unwrap();
         reader
             .add_cached_rule(make_test_rule("PROM-RULE-2026-0002", RuleType::Sigma))
-            .await;
+            .await
+            .unwrap();
 
         // This test bypasses the live connection by reading from cache
         let rules = reader.cached_rules.lock().await;
@@ -163,7 +273,8 @@ mod tests {
 
         reader
             .add_cached_rule(make_test_rule("PROM-RULE-2026-0001", RuleType::Yara))
-            .await;
+            .await
+            .unwrap();
 
         let rules = reader.cached_rules.lock().await;
         let found = rules.iter().find(|r| r.rule_id == "PROM-RULE-9999-0000");
@@ -181,6 +292,172 @@ mod tests {
         let result = reader.get_rule_by_id("PROM-RULE-2026-0001").await;
         // Should succeed but return None (no rules cached, no live node)
         assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_identical_duplicate_is_idempotent() {
+        let reader = make_reader();
+        let rule = make_test_rule("PROM-RULE-2026-0001", RuleType::Yara);
+        reader.add_cached_rule(rule.clone()).await.unwrap();
+        reader.add_cached_rule(rule.clone()).await.unwrap();
+        assert_eq!(snapshot(&reader).await, vec![rule]);
+    }
+
+    #[tokio::test]
+    async fn test_conflicting_duplicate_rejected_without_overwrite() {
+        let reader = make_reader();
+        reader
+            .add_cached_rule(make_test_rule("PROM-RULE-2026-0001", RuleType::Yara))
+            .await
+            .unwrap();
+
+        let mut other_type = make_test_rule("PROM-RULE-2026-0001", RuleType::Sigma);
+        assert_rejected(
+            &reader,
+            other_type.clone(),
+            Krc20CacheError::ConflictingDuplicate,
+        )
+        .await;
+        other_type.rule_type = RuleType::Yara;
+        other_type.ipfs_cid = OTHER_CID.to_string();
+        assert_rejected(
+            &reader,
+            other_type.clone(),
+            Krc20CacheError::ConflictingDuplicate,
+        )
+        .await;
+        other_type.ipfs_cid = TEST_CID.to_string();
+        other_type.active = false;
+        assert_rejected(&reader, other_type, Krc20CacheError::ConflictingDuplicate).await;
+        assert_eq!(reader.cached_count().await, 1);
+    }
+
+    #[tokio::test]
+    async fn test_rule_id_bounds() {
+        let reader = make_reader();
+        let exact = "R".repeat(MAX_RULE_ID_BYTES);
+        reader
+            .add_cached_rule(make_test_rule(&exact, RuleType::Yara))
+            .await
+            .unwrap();
+        reader
+            .add_cached_rule(make_test_rule("a", RuleType::Yara))
+            .await
+            .unwrap();
+        reader
+            .add_cached_rule(make_test_rule("Az09_-", RuleType::Yara))
+            .await
+            .unwrap();
+
+        let over = "R".repeat(MAX_RULE_ID_BYTES + 1);
+        for bad in [
+            "",
+            over.as_str(),
+            "PROM RULE",
+            "PROM/RULE",
+            "PROM-RULE\n",
+            "PROM-RULE\0",
+            "PR\u{00d6}M",
+        ] {
+            assert_rejected(
+                &reader,
+                make_test_rule(bad, RuleType::Yara),
+                Krc20CacheError::InvalidRuleId,
+            )
+            .await;
+        }
+        assert_eq!(reader.cached_count().await, 3);
+    }
+
+    #[tokio::test]
+    async fn test_cid_must_be_canonical_raw_sha256() {
+        let reader = make_reader();
+        let mut rule = make_test_rule("PROM-RULE-2026-0001", RuleType::Yara);
+        let long = format!("{TEST_CID}a");
+        let upper = TEST_CID.to_ascii_uppercase();
+        for bad in [
+            "",
+            // dag-pb CIDv1 (not the raw codec).
+            "bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi",
+            &TEST_CID[..TEST_CID.len() - 1],
+            long.as_str(),
+            upper.as_str(),
+            "QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG",
+        ] {
+            rule.ipfs_cid = bad.to_string();
+            assert_rejected(&reader, rule.clone(), Krc20CacheError::InvalidCid).await;
+        }
+        assert_eq!(reader.cached_count().await, 0);
+    }
+
+    #[tokio::test]
+    async fn test_consensus_bounds() {
+        let reader = make_reader();
+        for (i, ok) in [0.0, 1.0].into_iter().enumerate() {
+            let mut rule = make_test_rule(&format!("PROM-RULE-OK-{i}"), RuleType::Yara);
+            rule.validator_consensus = ok;
+            reader.add_cached_rule(rule).await.unwrap();
+        }
+        for bad in [
+            -0.000_001,
+            1.000_001,
+            f64::NAN,
+            f64::INFINITY,
+            f64::NEG_INFINITY,
+        ] {
+            let mut rule = make_test_rule("PROM-RULE-BAD", RuleType::Yara);
+            rule.validator_consensus = bad;
+            assert_rejected(&reader, rule, Krc20CacheError::InvalidConsensus).await;
+        }
+        assert_eq!(reader.cached_count().await, 2);
+    }
+
+    #[tokio::test]
+    async fn test_capacity_boundary() {
+        let reader = make_reader();
+        for i in 0..MAX_CACHED_RULES {
+            reader
+                .add_cached_rule(make_test_rule(&format!("PROM-RULE-{i}"), RuleType::Yara))
+                .await
+                .unwrap();
+        }
+        assert_eq!(reader.cached_count().await, MAX_CACHED_RULES);
+
+        // A new identity at capacity is rejected; nothing is evicted.
+        assert_rejected(
+            &reader,
+            make_test_rule("PROM-RULE-NEW", RuleType::Yara),
+            Krc20CacheError::CapacityExceeded,
+        )
+        .await;
+        // Identical re-add at capacity stays an idempotent no-op.
+        reader
+            .add_cached_rule(make_test_rule("PROM-RULE-0", RuleType::Yara))
+            .await
+            .unwrap();
+        // Validation still runs before the capacity check.
+        assert_rejected(
+            &reader,
+            make_test_rule("", RuleType::Yara),
+            Krc20CacheError::InvalidRuleId,
+        )
+        .await;
+        assert_eq!(reader.cached_count().await, MAX_CACHED_RULES);
+    }
+
+    #[test]
+    fn test_cache_error_display_is_generic() {
+        for err in [
+            Krc20CacheError::InvalidRuleId,
+            Krc20CacheError::InvalidCid,
+            Krc20CacheError::InvalidConsensus,
+            Krc20CacheError::ConflictingDuplicate,
+            Krc20CacheError::CapacityExceeded,
+        ] {
+            let text = err.to_string();
+            assert!(text.starts_with("development rule cache rejected rule: "));
+            assert!(!text.contains("PROM-RULE"));
+        }
     }
 
     #[test]

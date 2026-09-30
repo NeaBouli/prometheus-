@@ -22,6 +22,7 @@ from verify_silverc_h001 import (
     DEFAULT_SILVERSCRIPT_REF,
     DEFAULT_SILVERSCRIPT_REPO,
     ensure_silverscript_repo,
+    workspace_silverscript_rev,
 )
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -279,7 +280,7 @@ def run(cmd: list[str], cwd: Path) -> subprocess.CompletedProcess[str]:
 
 
 def build_silverc(silver_repo: Path) -> Path:
-    run(["cargo", "build", "-p", "silverscript-lang", "--bin", "silverc"], silver_repo)
+    run(["cargo", "build", "--locked", "-p", "silverscript-lang", "--bin", "silverc"], silver_repo)
     silverc = silver_repo / "target" / "debug" / "silverc"
     if not silverc.exists():
         raise FileNotFoundError(f"silverc binary was not built: {silverc}")
@@ -422,6 +423,11 @@ def validate_manifest(manifest_path: Path, output_dir: Path) -> None:
     actual_names = [entry.get("contract_name") for entry in entries]
     if actual_names != expected_names:
         raise ValueError(f"{manifest_path}: fixture order/name mismatch")
+    pin = workspace_silverscript_rev()
+    if manifest.get("silverscript_ref") != pin:
+        raise ValueError(f"{manifest_path}: silverscript_ref does not match the workspace pin")
+    if manifest.get("silverscript_commit") != pin:
+        raise ValueError(f"{manifest_path}: silverscript_commit does not match the workspace pin")
 
     for entry in entries:
         artifact = output_dir / entry["artifact_file"]

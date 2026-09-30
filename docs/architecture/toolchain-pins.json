@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "policy_id": "prometheus-toolchain-pins-v1",
+  "rusty_kaspa": {
+    "url": "https://github.com/kaspanet/rusty-kaspa.git",
+    "tag": "v2.0.1",
+    "commit": "cfafeb4c093fa37a303f1b9f19c58f986b870ce3",
+    "direct_dependencies": [
+      "kaspa-addresses",
+      "kaspa-bip32",
+      "kaspa-consensus-core",
+      "kaspa-hashes",
+      "kaspa-rpc-core",
+      "kaspa-txscript",
+      "kaspa-txscript-errors",
+      "kaspa-wrpc-client"
+    ]
+  },
+  "silverscript": {
+    "package": "silverscript-lang",
+    "url": "https://github.com/kaspanet/silverscript.git",
+    "commit": "d25bd3427a093c17327ca3d6b9e1aa5f7688c863"
+  },
+  "threat_proof_artifact_identity": {
+    "rusty_kaspa_tag": "v2.0.1",
+    "rusty_kaspa_commit": "cfafeb4c093fa37a303f1b9f19c58f986b870ce3"
+  }
+}

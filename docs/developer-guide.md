@@ -18,11 +18,9 @@ prometheus/
 │   │   └── src/
 │   │       ├── voting/     # Commit-Reveal protocol
 │   │       └── slashing/   # Penalty calculation
-│   ├── guardian-node/      # Python Guardian Node
-│   │   ├── jaeger/         # LLM server, YARA generator, analyzer
-│   │   └── tests/
-│   └── web/
-│       └── audit/          # Open audit dashboard (HTML)
+│   └── guardian-node/      # Python Guardian Node
+│       ├── jaeger/         # LLM server, YARA generator, analyzer
+│       └── tests/
 ├── memory/                 # Persistent project memory (MEMO, TODO, STATUS, etc.)
 ├── scripts/                # Automation scripts
 ├── docs/                   # Documentation wiki

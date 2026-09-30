@@ -394,6 +394,87 @@ GH264_PROHIBITED_CLAIMS = (
     ),
 )
 
+GH267_PUBLIC_FILES = GH264_PUBLIC_FILES
+
+GH267_REQUIRED_FRAGMENTS = (
+    "GH-267",
+    "repository",
+    "privacy",
+    "runtime",
+    "production",
+)
+
+GH267_NEGATIVE_BOUNDARY_PATTERNS = (
+    re.compile(
+        r"(?:does not|cannot|neither|no)\b[^.]{0,220}\bprivacy\b|"
+        r"\bprivacy(?:/anonymity)?(?: proof| safety)?[^.]{0,120}"
+        r"\b(?:false|not proven|remain false)\b",
+        re.I,
+    ),
+    re.compile(
+        r"(?:does not|cannot|neither|no)\b[^.]{0,220}\bruntime\b|"
+        r"\bruntime(?: collection| behavior)?[^.]{0,120}"
+        r"\b(?:false|not implemented|remain false)\b",
+        re.I,
+    ),
+    re.compile(
+        r"(?:does not|cannot|neither|no)\b[^.]{0,220}\bproduction\b|"
+        r"\bproduction(?: status| authority| behavior)?[^.]{0,120}"
+        r"\b(?:false|not implemented|remain false)\b",
+        re.I,
+    ),
+)
+
+GH267_PROHIBITED_CLAIMS = (
+    re.compile(
+        r"GH-267[^.\n]{0,240}(?<!not )(?<!never )(?<!cannot )(?<!can't )"
+        r"(?:proves|guarantees|ensures|certifies) [^.\n]{0,120}"
+        r"(?:privacy|anonymity|absence of (?:a )?hidden sensor|no hidden sensor)",
+        re.I,
+    ),
+    re.compile(
+        r"GH-267[^.\n]{0,240}(?<!not )(?<!never )(?<!cannot )(?<!can't )"
+        r"(?:authorizes|enables|permits|implements|provides) (?:an? )?"
+        r"(?:endpoint (?:producer|collection|sensor)|runtime collection|"
+        r"transport|response authority|automation)",
+        re.I,
+    ),
+    re.compile(
+        r"GH-267[^.\n]{0,240}(?:is|makes Prometheus) (?:now )?"
+        r"(?:privacy[- ]safe|production[- ]ready)",
+        re.I,
+    ),
+)
+
+GH267_FALSE_FIELDS = (
+    "endpoint_producer_implemented",
+    "endpoint_collection",
+    "runtime_collection_authorized",
+    "privacy_safety_proven",
+    "hidden_sensor_absence_proven",
+    "transport",
+    "response_authority",
+    "production_authority",
+)
+
+GH273_DASHBOARD_POINTERS = (
+    re.compile(r"modules/web/audit", re.I),
+    re.compile(r"audit/index\.html", re.I),
+)
+
+GH273_POINTER_FREE_FILES = (
+    SITEMAP_PATH,
+    Path("CLAUDE.md"),
+    Path("docs/developer-guide.md"),
+    Path("docs/architecture/MAP.md"),
+    Path("docs/architecture/map.puml"),
+    Path("memory/CHECKPOINT.md"),
+    Path("memory/STATUS.md"),
+    Path("memory/TODO.md"),
+)
+
+SITEMAP_BASE_URL = "https://neabouli.github.io/prometheus-/"
+
 
 def has_gh264_boundary(text: str) -> bool:
     """Require the safety terms in one bounded GH-264 status section."""
@@ -403,6 +484,23 @@ def has_gh264_boundary(text: str) -> bool:
     while (position := normalized.find(marker, offset)) >= 0:
         section = normalized[position : position + 1_800]
         if all(fragment.casefold() in section for fragment in GH264_REQUIRED_FRAGMENTS):
+            return True
+        offset = position + len(marker)
+    return False
+
+
+def has_gh267_boundary(text: str) -> bool:
+    """Require the GH-267 repository/privacy limitation in one local section."""
+    normalized = " ".join(text.split()).casefold()
+    marker = "gh-267"
+    offset = 0
+    while (position := normalized.find(marker, offset)) >= 0:
+        section = normalized[position : position + 2_000]
+        if all(
+            fragment.casefold() in section for fragment in GH267_REQUIRED_FRAGMENTS
+        ) and all(
+            pattern.search(section) for pattern in GH267_NEGATIVE_BOUNDARY_PATTERNS
+        ):
             return True
         offset = position + len(marker)
     return False
@@ -517,6 +615,42 @@ BANNED_CLAIMS = {
         r"Phi-3(?:-mini)?[^\n]{0,200}(?:placeholder/|development(?:-only)? )?heuristic(?:/stub)?",
         re.I,
     ),
+    "fabricated-network-stat": re.compile(
+        r"(?<![\d,.\-–—])\b\d[\d.,]*\s*(?:<[^>]+>\s*){0,5}"
+        r"(?:active|online)\s+(?:validators|guardians)\b",
+        re.I,
+    ),
+    "fabricated-rule-count": re.compile(
+        r"(?<![\d,.\-–—])\b\d+\s*(?:<[^>]+>\s*){0,5}rules?\s+on-?chain\b",
+        re.I,
+    ),
+    "fabricated-fp-rate": re.compile(
+        r"\b\d+(?:\.\d+)?\s*%\s*(?:<[^>]+>\s*){0,5}false[- ]positive\s+rate\b",
+        re.I,
+    ),
+    "fabricated-response-time": re.compile(
+        r"\b\d+(?:\.\d+)?\s*s\s*(?:<[^>]+>\s*){0,5}"
+        r"avg(?:erage)?\s+response\s+time\b",
+        re.I,
+    ),
+    "fabricated-grant-claim": re.compile(
+        r"\bgrant\s*#\s*\d+\b[\s\S]{0,300}\bPROM\b", re.I
+    ),
+    "fabricated-grant-transparency": re.compile(
+        r"\bdev[- ]?grants?\s+transparency\b", re.I
+    ),
+    "fabricated-rule-id": re.compile(r"\bPROM-RULE-\d{4}-\d{4}\b"),
+    "fabricated-address": re.compile(r"\bkaspa:[a-z0-9]{2,}\.\.\.[a-z0-9]{2,}\b"),
+    "fabricated-refresh-claim": re.compile(
+        r"\bupdates\s+every\s+\d+\s*(?:s|sec(?:onds?)?|m|min(?:utes?)?)\b"
+        r"[\s\S]{0,100}\b(?:kaspa|l1|on-?chain)",
+        re.I,
+    ),
+    "fabricated-onchain-verifiability": re.compile(
+        r"\b(?:all|every)\s+(?:data|metrics?|stats?|statistics)\b"
+        r"[^\n]{0,60}\bverifiable\s+on-?chain",
+        re.I,
+    ),
 }
 
 
@@ -572,6 +706,12 @@ def validate_status(data: dict[str, Any]) -> list[str]:
         gh_264: dict[str, Any] = {}
     else:
         gh_264 = gh_264_value
+    gh_267_value = data.get("post_audit_updates", {}).get("gh_267", {})
+    if not isinstance(gh_267_value, dict):
+        errors.append("GH-267 machine status must be an object")
+        gh_267: dict[str, Any] = {}
+    else:
+        gh_267 = gh_267_value
     endpoint_value = classes.get("endpoint_detection_and_response", {})
     if not isinstance(endpoint_value, dict):
         errors.append("endpoint detection status must be an object")
@@ -824,6 +964,7 @@ def validate_status(data: dict[str, Any]) -> list[str]:
         or gh_264.get("issue") != 264
         or gh_264.get("status") != "repository_candidate_implemented_and_locally_tested"
         or gh_264.get("classification") != "canonical_observe_only_endpoint_statement"
+        or type(gh_264.get("schema_version")) is not int
         or gh_264.get("schema_version") != 1
         or gh_264.get("rust_python_shared_vectors") is not True
         or gh_264.get("closed_domains") != 7
@@ -846,12 +987,27 @@ def validate_status(data: dict[str, Any]) -> list[str]:
         if gh_264.get(field) is not False:
             errors.append(f"GH-264 {field} must remain false")
     if (
+        gh_267.get("as_of") != LATEST_PROJECT_UPDATE
+        or gh_267.get("issue") != 267
+        or gh_267.get("status") != "repository_candidate_implemented_and_locally_tested"
+        or gh_267.get("classification") != "pre_producer_privacy_threat_model_gate"
+        or gh_267.get("artifact")
+        != "docs/evidence/endpoint-producer-privacy-threat-model-v1.json"
+        or gh_267.get("security_ci_enforced") is not True
+    ):
+        errors.append("GH-267 repository privacy gate status is invalid")
+    for field in GH267_FALSE_FIELDS:
+        if gh_267.get(field) is not False:
+            errors.append(f"GH-267 {field} must remain false")
+    if (
         endpoint.get("status") != "observe_only_schema_candidate_no_sensor"
         or endpoint.get("detection_basis")
         != "observable_behavior_not_ai_actor_or_intent_attribution"
         or endpoint.get("resource_conscription_detection") != "planned_only"
         or endpoint.get("canonical_observation_statement")
         != "implemented_and_locally_tested"
+        or endpoint.get("pre_producer_privacy_gate")
+        != "repository_candidate_implemented_and_locally_tested"
         or endpoint.get("endpoint_collection") != "not_implemented"
     ):
         errors.append(
@@ -862,6 +1018,8 @@ def validate_status(data: dict[str, Any]) -> list[str]:
         "response_engine_implemented",
         "resource_conscription_detection_implemented",
         "automatic_endpoint_actions_authorized",
+        "runtime_collection_authorized",
+        "hidden_sensor_absence_proven",
         *GH258_AUTOMATIC_ACTION_FIELDS,
     ):
         if endpoint.get(field) is not False:
@@ -922,23 +1080,34 @@ def validate_json_ld_update_date(text: str) -> list[str]:
     return []
 
 
-def validate_sitemap(path: Path) -> list[str]:
-    """Validate current public-page lastmod values with an XML parser."""
+def validate_sitemap(path: Path, root: Path) -> list[str]:
+    """Validate lastmod values and repository targets with an XML parser."""
     try:
-        root = ET.parse(path).getroot()
+        document = ET.parse(path).getroot()
     except (OSError, ET.ParseError):
         return ["missing or invalid sitemap"]
     namespace = {"sm": "http://www.sitemaps.org/schemas/sitemap/0.9"}
     entries: dict[str, str] = {}
-    for url in root.findall("sm:url", namespace):
+    for url in document.findall("sm:url", namespace):
         location = url.findtext("sm:loc", default="", namespaces=namespace)
         last_modified = url.findtext("sm:lastmod", default="", namespaces=namespace)
         entries[location] = last_modified
-    return [
+    errors = [
         f"current public URL has stale or missing lastmod: {url}"
         for url in sorted(CURRENT_PUBLIC_URLS)
         if entries.get(url) != LATEST_PROJECT_UPDATE
     ]
+    for location in sorted(entries):
+        if not location.startswith(SITEMAP_BASE_URL):
+            errors.append(f"sitemap URL outside the public site root: {location}")
+            continue
+        target = location.removeprefix(SITEMAP_BASE_URL) or "index.html"
+        if ".." in target.split("/"):
+            errors.append(f"sitemap URL escapes the public site root: {location}")
+            continue
+        if not (root / target).is_file():
+            errors.append(f"sitemap URL has no repository target: {location}")
+    return errors
 
 
 def verify(root: Path) -> list[str]:
@@ -1130,18 +1299,36 @@ def verify(root: Path) -> list[str]:
                 pattern.search(normalized_text) for pattern in GH264_PROHIBITED_CLAIMS
             ):
                 errors.append(f"{relative}: GH-264 capability claim drift")
+        if relative in GH267_PUBLIC_FILES:
+            normalized_text = " ".join(text.split()).casefold()
+            if not has_gh267_boundary(text):
+                errors.append(f"{relative}: GH-267 privacy gate boundary missing")
+            if any(
+                pattern.search(normalized_text) for pattern in GH267_PROHIBITED_CLAIMS
+            ):
+                errors.append(f"{relative}: GH-267 authority or privacy claim drift")
         if relative.suffix == ".html" and "5cd13bf" not in text:
             errors.append(f"{relative}: exact reconciliation baseline missing")
         for category in find_banned_claims(text):
             errors.append(f"{relative}: prohibited claim category {category}")
+        if any(pattern.search(text) for pattern in GH273_DASHBOARD_POINTERS):
+            errors.append(f"{relative}: fabricated audit dashboard pointer present")
         if relative.suffix == ".html":
             errors.extend(f"{relative}: {item}" for item in validate_json_ld(text))
             errors.extend(
                 f"{relative}: {item}" for item in validate_json_ld_update_date(text)
             )
     errors.extend(
-        f"{SITEMAP_PATH}: {item}" for item in validate_sitemap(root / SITEMAP_PATH)
+        f"{SITEMAP_PATH}: {item}"
+        for item in validate_sitemap(root / SITEMAP_PATH, root)
     )
+    for relative in GH273_POINTER_FREE_FILES:
+        path = root / relative
+        if not path.is_file():
+            continue
+        text = path.read_text(encoding="utf-8")
+        if any(pattern.search(text) for pattern in GH273_DASHBOARD_POINTERS):
+            errors.append(f"{relative}: fabricated audit dashboard pointer present")
     for relative in set(GH264_PUBLIC_FILES) - set(PUBLIC_FILES):
         path = root / relative
         if not path.exists():
@@ -1153,6 +1340,10 @@ def verify(root: Path) -> list[str]:
             errors.append(f"{relative}: GH-264 observe-only boundary missing")
         if any(pattern.search(normalized_text) for pattern in GH264_PROHIBITED_CLAIMS):
             errors.append(f"{relative}: GH-264 capability claim drift")
+        if not has_gh267_boundary(text):
+            errors.append(f"{relative}: GH-267 privacy gate boundary missing")
+        if any(pattern.search(normalized_text) for pattern in GH267_PROHIBITED_CLAIMS):
+            errors.append(f"{relative}: GH-267 authority or privacy claim drift")
     return errors
 
 

@@ -5504,6 +5504,54 @@ Rules for all dev agents:
   occurred. Rollout estimates remain unchanged.
 - Status: `GH-264 COMPLETE / EXACT-MAIN + LIVE PASS / PRODUCTION FALSE`.
 
+### 2026-09-13 - GH-267 executable privacy gate started
+
+- Opened issue #267 and isolated branch
+  `feat/GH-267-endpoint-privacy-gate` from exact main `8b5da58a`.
+- Kimi K3 completed only the bounded read-only architecture/privacy review;
+  no files were changed. Sol owns the non-overlapping implementation,
+  integration, verification, public claims and delivery scope.
+- Target: canonical machine-readable pre-producer threat model, fail-closed
+  verifier, mutation tests and Security Audit wiring. No producer, collection,
+  sensor, response or production authority is added.
+- Status: `GH-267 IN PROGRESS / REPOSITORY ONLY / PRODUCTION FALSE`.
+
+### 2026-09-13 - GH-267 local implementation/review complete
+
+- Kimi K3 implemented only the three new artifact/verifier/test files. Sol
+  hardened and integrated them with status, claim guards, public documentation
+  and Security Audit CI; no product runtime was added.
+- Local PASS: privacy verifier and 35 tests; public-claim verifier and 67 tests;
+  documentation hygiene 11 tests; project status 7 tests; H-001 evidence 4
+  tests; Memory, Ruff, compile, JSON/HTML and diff checks.
+- Kimi found one P3 non-object-wire error-category issue; Sol fixed it with a
+  regression and Kimi's focused follow-up returned PASS. No P0-P2 remains.
+- No secrets, producer, collection, runtime, transport, response, chain,
+  deployment or production action occurred.
+- Status: `GH-267 LOCAL PASS / PROTECTED PR NEXT / PRODUCTION FALSE`.
+
+### 2026-09-13 - GH-267 PR #268 review fixes
+
+- Verified and fixed all five CodeRabbit threads: complete Security-Audit
+  chaining, stable encoding failure, strict integer schema versions,
+  end-to-end positive-claim mutations and semantic negative-boundary checks.
+- Post-fix PASS: 37 privacy tests, 69 public-claim tests, both verifiers, Ruff,
+  compile and diff checks. Prometheus CI `34766601885` and Security Audit
+  `34766601923` had already passed on the original commit; updated hosted checks
+  remain mandatory after push.
+- Status: `GH-267 REVIEW FIXES LOCAL PASS / PR #268 UPDATE NEXT / PRODUCTION FALSE`.
+
+### 2026-09-13 - GH-267 updated protected checks passed
+
+- PR #268 head `66452c8` passed Prometheus CI `34767622164` and Security Audit
+  `34767622150`; all reported jobs are green.
+- All five CodeRabbit threads are resolved after bot acknowledgement. The
+  updated CodeRabbit check passed with no new review thread; the aggregate
+  rerun was hourly rate-limited.
+- PR state is `MERGEABLE` / `CLEAN`. No runtime, deployment, chain or
+  production action occurred.
+- Status: `GH-267 PR #268 HOSTED PASS / NORMAL MERGE NEXT / PRODUCTION FALSE`.
+
 ### 2026-09-19 - GH-272 TLS/QUIC dependency security gate locally verified
 
 - Kimi K3 owned the bounded dependency-graph analysis and initial lockfile
@@ -5529,3 +5577,293 @@ Rules for all dev agents:
 - Non-mechanical PRM-09 dependency-policy work is tracked in #279 and PRM-10
   Guardian Compose hardening in #280 rather than widening this security patch.
 - Status: `GH-272 LOCAL VERIFIED / PROTECTED PR + HOSTED CI NEXT / PRODUCTION FALSE`.
+
+### 2026-09-28 - A1 GH-267 current-baseline restoration locally verified
+
+- Restored the reviewed PR #268 endpoint pre-producer privacy gate from head
+  `5960f1b` onto the current planning baseline without changing the original PR
+  branch. The only conflict resolutions preserve current GH-272 records.
+- Retained the additive Security Audit verifier/test step; it changes no
+  workflow trigger, permission, secret, deployment action or check governance.
+- Kimi and Grok were unavailable. Fleet fallback produced a fresh Claude
+  candidate and a separate bounded Claude review; the review passed.
+- Integration PASS: verifier, 37 focused tests, 13-surface claim verifier,
+  69 claim tests, documentation hygiene, Memory, project status,
+  Autodidactic, workflow YAML, responsive visual gate and diff check.
+- No endpoint collection, sensor, transport, response, model, wallet, chain,
+  contract, deployment, Mainnet or production capability was added.
+- Status: `A1 LOCAL VERIFIED / HOSTED PR CHECKS PENDING / PRODUCTION FALSE`.
+
+### 2026-09-27 - Fleet plan synthesis: canonical remaining delivery plan written
+
+- `.fleet/PLAN.md` replaced by the canonical plan synthesized from the accepted
+  architecture map (`docs/architecture/MAP.md`, baseline exact main `32ca5f1`,
+  hops H1-H8) and the control-plane inventory (`.fleet/reports/
+  plan-arch-map.md`, `.fleet/reports/plan-state-inventory.md`). Truthful status
+  recorded: production false, one non-promotable H-001 canary, fabricated audit
+  dashboard still live (HIGH, #273), register #267-#280 verified open read-only.
+- Ordered gates: MS-A repository/public-integrity repair (A1-A12 = R4 -> R3 ->
+  R1 -> R5a-d/R6/R7 -> R8 -> R9 -> R10, each with architecture node, files and
+  owner), MS-B owner contract decisions (#276, seven decisions), MS-C Testnet
+  (scoped audit, six deployments + receipts, oracle transition, two-host
+  evidence), MS-D production (MAP M2-M6, full deep audit, release hardening).
+  Non-overlapping lanes: Kimi Rust/deps/design, Claude public
+  surfaces/Python/frontend, Grok small bounded tasks, Codex orchestration and
+  release gate.
+- CI strategy: quota reset 2026-10-01 not evidenced for this repo; verify once
+  read-only. Pre-reset local gates only if binding, PRs at final head, batched
+  docs PR; post-reset hosted CI/Security/Pages green on exact main mandatory per
+  merge. Cloudflare security-audit runs twice (scoped standard after R5/R6/R7,
+  full deep incl. contracts before any state deployment), both pending Gio
+  budget approval. Gio blockers and the bound not-to-build list are explicit in
+  the plan.
+- No product code, contract, tokenomics, workflow, deployment, wallet, chain,
+  GitHub mutation, or public-claim change occurred in this task.
+- Status: `PLAN SYNTHESIZED / CODEX ADOPTION + MS-A BRIEFS NEXT / PRODUCTION FALSE`.
+
+### 2026-09-28 - A2 fabricated public audit dashboard removed locally
+
+- Kimi implemented the bounded A2 block after Claude fallback: deleted
+  `modules/web/audit/index.html` and removed its public links, sitemap entry,
+  documentation pointers, and architecture-map node. Claim gates now reject
+  any reintroduction on public surfaces.
+- Integration PASS: 13 synchronized surfaces, 76 claim tests, documentation
+  hygiene plus 11 tests, Memory, project status plus 7 tests, Autodidactic plus
+  6 tests, dashboard/public-pointer absence checks, and diff check.
+- Responsive browser assertions across four required viewports found no
+  horizontal overflow or remaining dashboard link. Known pre-existing
+  contrast and touch-target debt remains scheduled for A12.
+- No replacement dashboard, backend, deployment, wallet, chain, contract,
+  tokenomics, Mainnet, or production capability was added.
+- Status: `A2 LOCAL VERIFIED / HOSTED PR CHECKS PENDING / PRODUCTION FALSE`.
+
+### 2026-09-28 - A3 public audit correction authorized and started
+
+- Gio authorized the next planned block after the explicit PR #269 consent gate.
+- Scope is limited to rebasing and correcting the six public audit records;
+  no product, contract, CI, deployment, or production change is authorized.
+- Status: `A3 IN PROGRESS / PRODUCTION FALSE`.
+
+### 2026-09-28 - A3 public audit correction locally verified
+
+- Corrected PR #269's five reports and register README on the integration
+  branch: stable IDs, PRM-01 invalid, PRM-26 tie wording fixed, rustls advisory
+  separated as PRM-A01, totals `0C/7H/15M/20L/5I`, and valid SHA-256 pins.
+- The uncorrected PDF digest `3a9556…ff37` is marked superseded; no replacement
+  PDF or unsupported digest was published.
+- Claude delivered the bounded retry with `status: ok`; the initial Fleet run
+  produced no diff and Kimi's canonical probe reported `token_limited`.
+- Integration PASS: documentation hygiene plus 11 tests, public claims plus 76
+  tests, Memory, project status plus 7 tests, focused correction/hash checks,
+  and diff check.
+- Existing draft PR #269 was not pushed before the planned Actions reset; its
+  update and exact hosted checks remain pending.
+- Status: `A3 LOCAL VERIFIED / PR #269 UPDATE + HOSTED CI PENDING / PRODUCTION FALSE`.
+
+### 2026-09-28 - A4 client runtime gate started
+
+- Scope: PRM-03 only, `modules/client` MAP hop H1, fail-closed runtime checking
+  before ThreatHint network activity plus focused regressions.
+- Kimi remains `token_limited`; Claude is the single writing worker. Independent
+  security review is mandatory before integration acceptance.
+- Status: `A4 IN PROGRESS / PRODUCTION FALSE`.
+
+### 2026-09-28 - A4 fail-closed client runtime gate locally verified
+
+- Fixed PRM-03 at MAP hop H1: ThreatHint v1/v2 preflight and submission require
+  explicit process runtime `development` before hint, identity, or network work.
+- Missing, empty, malformed, beta, mainnet, and mode disagreement reject; wire
+  formats, KAS/PROM, contracts, wallets, chain, deployment, and public claims
+  are unchanged.
+- Claude implemented the bounded retry. Grok review fell back to a fresh Claude
+  thread with `verdict: ok`; Codex completed the mandatory security diff review.
+- PASS: format, 4 focused runtime tests, real-binary pre-network regression,
+  complete client tests, Clippy `-D warnings`, and diff check.
+- Status: `A4 LOCAL VERIFIED / HOSTED CI PENDING / PRODUCTION FALSE`.
+
+### 2026-09-28 - Public honesty handoff accepted; A4H started
+
+- Read the external handoff and evidence. Issues #282/#283 remain separate;
+  #282 maps to locally verified A4, while #283 is not part of this docs block.
+- The temporary worktree contains no product diff. Its two untracked Fleet
+  files were copied to a durable local backup with SHA-256 verification.
+- A4H is a documentation-only reconciliation at the public-claims/web node;
+  A5 resumes afterward.
+- Status: `A4H IN PROGRESS / PRODUCTION FALSE`.
+
+### 2026-09-28 - A4H stopped after third zero-diff delivery failure
+
+- Full, Markdown-only, and README-only Claude assignments returned no valid
+  report and no file change. Kimi and Grok are currently token-limited.
+- No README, landing, runtime, CI, issue, or public claim was changed. The
+  handoff remains catalogued and blocks Prometheus public promotion activity.
+- Per-task stop applies only to A4H; independent A5 backend work can continue.
+- Status: `A4H OPEN / WORKER DELIVERY BLOCKED / PRODUCTION FALSE`.
+
+### 2026-09-28 - A5 Guardian membership epoch gate started
+
+- Scope is PRM-02 only at the owner-local membership transition boundary:
+  strict durable epoch monotonicity and no-mutation regressions.
+- Claude is the single writer; security review remains mandatory. No external
+  membership authority, network, L1, deploy, or production action is included.
+- Status: `A5 IN PROGRESS / PRODUCTION FALSE`.
+
+### 2026-09-28 - A5 PRM-02 invalid; regressions and audit correction verified
+
+- No production defect was found: parser and durable-state checks already make
+  membership and authority epochs strictly monotonic.
+- Added test-only rollback, stale/equal epoch, restart, and no-mutation coverage.
+  PASS: 58 focused tests; full Guardian `1393 passed, 4 skipped`.
+- Public audit now retains PRM-02 as invalid, reports
+  `0C/7H/14M/20L/5I`, and pins the corrected full-scope report to
+  `aff6382e741278e1a83cc6d0ce4188549453354f2bdbecd364ad6621e6138417`.
+- Documentation hygiene plus 11 tests and public claims plus 76 tests pass.
+- No network, migration, L1, deploy, wallet, contract, or production action.
+- Status: `A5 LOCAL VERIFIED / HOSTED CI PENDING / PRODUCTION FALSE`.
+
+### 2026-09-28 - A6 scanner hardening started
+
+- A6 is split serially into semantics (PRM-04), file/resource bounds (PRM-05),
+  and dev-cache bounds (PRM-11), all within the existing client scanner node.
+- Claude is the single writer while Kimi remains token-limited; every slice
+  receives focused tests and the combined block receives security review.
+- Status: `A6 IN PROGRESS / PRODUCTION FALSE`.
+
+### 2026-09-28 - A6 scanner boundaries locally verified
+
+- PRM-04: unsupported YARA semantics now fail closed; the documented minimal
+  any-of development subset remains supported.
+- PRM-05: scanner and detector file APIs cap actual reads at 16 MiB plus one
+  byte and reject empty/oversized input without exposing local contents.
+- PRM-11: the development KRC20 cache validates rule IDs, canonical raw CIDs,
+  and consensus, caps distinct entries at 256, and rejects conflicts/capacity
+  overflow without mutation or eviction.
+- Claude delivered three serial code slices. Codex reviewed the security diffs
+  and reran the combined gates. A6c initially hit `errno=28`; only regenerable
+  Cargo targets from completed A6 workers were cleaned, raising free space from
+  41 MiB before the successful verification.
+- PASS: format; focused scanner/file tests; focused KRC20 `12 passed, 1
+  ignored`; complete client `347 passed, 2 ignored`; Clippy `-D warnings`;
+  diff check.
+- No network, deploy, wallet, chain, contract, tokenomics, or production action.
+- Status: `A6 LOCAL VERIFIED / HOSTED CI PENDING / PRODUCTION FALSE`.
+
+### 2026-09-28 - A7 security hardening started
+
+- A7 is split by architecture boundary: deployer output collisions (PRM-06),
+  Guardian v1 verifier/ledger safety (PRM-07), and descriptor-safe policy reads
+  (PRM-08). Work is serial with one writer per slice.
+- One secret-free JEV routing call selected `single_claude_brief`; the result
+  was recorded but did not override the deterministic module split or the A7
+  Rust ownership already pinned in the plan.
+- Upstream watch: Toccata is live; Rusty Kaspa v2.1.0 and Silverscript v1.0.0
+  are released, while Prometheus currently compiles Rusty Kaspa v2.0.1. A
+  separate compatibility/pin gate is required before rollout.
+- The under-60-second lifecycle remains a target until reproduced on a real
+  public multi-host network; local stub timing is not production evidence.
+- Status: `A7 IN PROGRESS / PRODUCTION FALSE`.
+
+### 2026-09-28 - A7 deployer and Guardian TOCTOU hardening locally verified
+
+- PRM-06: genesis deployer commands reject input/output collisions before any
+  write; broadcast also protects the derived intent journal.
+- PRM-07: the Guardian v1 verifier requires an exact configured executable
+  SHA-256, rechecks it before every spawn, handles kill/reap races fail-closed,
+  and opens the replay ledger without following links and with exact `0600`
+  mode. The earlier partial A7b/A7b2 slices are completed by A7b3's required
+  service-config wiring.
+- PRM-08: Guardian service and v2 policy files use bounded, single-descriptor,
+  no-follow reads with file identity checks before and after reading.
+- Kimi's A7a dispatch fell back automatically to Claude. Claude delivered the
+  serial implementation slices; Codex reviewed each security diff and executed
+  the combined gate. The single JEV routing result was advisory only and did
+  not override architecture/security ownership.
+- PASS: Rust format; deployer `50` unit plus `6` integration tests; deployer
+  Clippy `-D warnings`; Guardian `1426 passed, 4 skipped`; Black; Ruff;
+  CI-equivalent Pylint `9.86/10` (`--fail-under=7.0`); diff check.
+- Residual gates: hosted CI; pathname-to-exec residual race shared with the v2
+  verifier; Rusty Kaspa v2.1.0/Silverscript v1.0.0 compatibility and pinning;
+  real public multi-host lifecycle evidence. The under-60-second claim remains
+  a target, not measured production performance.
+- No network, deployment, wallet, chain, contract, migration, secret, or
+  production action was performed.
+- Status: `A7 LOCAL VERIFIED / HOSTED CI PENDING / PRODUCTION FALSE`.
+
+### 2026-09-28 - A8 compatibility and pinning gate started
+
+- A8 is isolated at the Kaspa/SilverScript build-toolchain boundary. It does
+  not alter contracts, proof manifests, H-001 evidence, or runtime behavior.
+- Kimi owns the read-only A8a inventory; implementation waits for its exact
+  version, consumer, test, risk, and rollback map.
+- JEV returned no routing value after one corrected retry; no JEV result
+  influenced architecture or security decisions.
+- Status: `A8 INVENTORY IN PROGRESS / PRODUCTION FALSE`.
+
+- Worker update: A8a returned no report/diff. Kimi is canonically
+  `token_limited`; Claude and Grok probes passed. Claude owns non-duplicated
+  A8a2 inventory; no implementation has started.
+
+- A8a2 also returned no report/diff. Broad inventory is stopped and replaced
+  by serial SilverC/CI and Cargo/Kaspa slices; implementation remains closed.
+
+- A8a3 confirms medium SilverC compiler pinning debt. Codex source-reviewed the
+  finding; no hardening or version migration has started. A8a4 maps Cargo/Kaspa.
+
+- A8a4 confirms the Cargo source-policy gap. A8b now hardens SilverC pin
+  enforcement only; v1.0.0/v2.1.0 migration remains out of scope.
+
+- A8b returned no report/diff. A8b1 now owns only checkout and exact-pin
+  enforcement plus focused tests; no version or evidence change occurred.
+
+- A8b1 is integrated but not closed: Codex found symlink-path acceptance and
+  assigned A8b1r plus a regression. Active pins and evidence remain unchanged.
+
+- A8b1r is verified (`27` focused passes, Ruff, Mypy). A8b2 now owns compiler
+  rebuild, manifest binding, locked Cargo calls, and CI registration only.
+
+- A8b2 is integrated but not closed: an ignored default Cargo target could be
+  reused. A8b2r requires a fresh isolated target and regression proof.
+
+- A8b2r is verified (`42` focused passes, Ruff, Mypy). A8c now creates the
+  active toolchain pin policy and CI verifier; no migration is included.
+
+- A8c is integrated but not closed: Rust proof identity is gated, while the
+  matching Python Guardian constants still need A8c1 cross-language checks.
+
+### 2026-09-28 - A8 compatibility and pinning gate locally verified
+
+- Added an offline, fail-closed policy gate for the exact active Rusty Kaspa
+  graph, SilverScript revision, compiler checkout/build, release manifest, and
+  immutable Rust/Python threat-proof identity.
+- Active versions did not change: Rusty Kaspa remains
+  `v2.0.1@cfafeb4c093fa37a303f1b9f19c58f986b870ce3`; SilverScript remains
+  `d25bd3427a093c17327ca3d6b9e1aa5f7688c863`. Newer upstream releases are
+  candidates for a separate compatibility task, not rollout evidence.
+- Kimi was canonically `token_limited`; Claude supplied bounded serial slices.
+  Codex reviewed the security boundary and fixed symlink-checkout acceptance,
+  default-target reuse, and missing Python proof-identity enforcement.
+- PASS: 55 toolchain-policy tests; 42 SilverC pin/build tests; Ruff; strict
+  Mypy; workflow YAML parse; locked offline Cargo tree; 102 Rust tests and 2
+  compile-fail doc-tests; 55 pinned upstream SilverC tests; seven compiled
+  artifacts; isolated preflight with no blockers; H-001 canary regression; 7
+  project-status checks; diff check.
+- `actionlint` and Black were unavailable locally. A8 scripts pass Ruff lint;
+  the current CI Black gate covers unchanged Guardian files. Hosted CI remains
+  pending.
+- No secrets, deployment, broadcast, wallet, chain, contract, proof artifact,
+  migration, or production change. Under 60 seconds remains a target pending
+  real public multi-host evidence.
+- Status: `A8 LOCAL VERIFIED / HOSTED CI PENDING / PRODUCTION FALSE`.
+
+### 2026-09-28 - A8 hosted verification green; PR #284 open
+
+- Opened normal PR `#284` at commit `e0f96c6`; no admin merge or main push.
+- PASS in Prometheus CI run `36443057946`: Toolchain Pin Policy, Rust
+  Workspace, Rust Performance, Current Silverc Runtime + Artifact Smoke,
+  Python Guardian, HTML Pages, Memory Integrity, and Silverscript Contracts.
+- PASS in Security Audit run `36443057571`: Secret Detection, Dependency Audit,
+  and Security Summary.
+- CodeRabbit skipped because the accumulated A1-A8 milestone changes 132 files;
+  it did not supply an independent review. Required security source review and
+  combined local verification were completed by Codex before the PR.
+- Status: `A8 VERIFIED / PR #284 OPEN / REVIEW REQUIRED / PRODUCTION FALSE`.

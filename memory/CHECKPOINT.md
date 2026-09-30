@@ -77,14 +77,13 @@
 | roadmap.html | af1a06a+ | Phases A-F, Sprints 9-19, Device + Hardware Tables |
 | whitepaper.html | 8c950f6 | Full v4 Whitepaper in HTML, 16 Sections |
 | guardian-economics.html | 40cde25+ | Hardware-Kosten, Break-Even, 5 Lösungsansätze |
-| modules/web/audit/ | dc20deb | Open Audit Dashboard mit Mock-Daten |
 
 ### Infrastruktur
 | File | Beschreibung |
 |------|-------------|
 | llms.txt | AI-Crawler Standard (GPTBot, Claude-Web, Perplexity) |
 | robots.txt | Alle Bots erlaubt |
-| sitemap.xml | 6 URLs mit Priority + Lastmod |
+| sitemap.xml | 5 URLs mit Priority + Lastmod |
 | manifest.json | PWA-Support, 2 Icons (Prometheus + PROM coin) |
 | sw.js | Service Worker für Offline-Caching |
 | SECURITY.md | Bug Bounty + Disclosure Policy (GitHub only, no email) |
@@ -1204,3 +1203,20 @@ Leistungsbasierte Emission. Guardians = "Miner" (KI statt GPU).
   collection, sensor, event truth, correlation, AI/actor attribution, warning,
   transport, response authority or production behavior. Protected review and
   exact-main evidence remain pending.
+
+## Checkpoint 2026-09-13: GH-267 pre-producer privacy gate candidate
+
+- A machine-readable privacy/threat model pins threat actors, abuse cases,
+  protected data, the eight GH-264 output fields, prohibited raw-data classes,
+  trust boundaries, default-off opt-in, local revocation, least privilege,
+  local aggregation/redaction, retention/transport gates and limitations.
+- A dependency-free verifier cross-checks that artifact against public status
+  and the shared GH-264 corpus. Adversarial tests elevate every false
+  capability and mutate identity, fields, status, wire shape and privacy cases.
+- Kimi K3 implemented only the bounded artifact/verifier/test block. Sol owns
+  review corrections, public-claim enforcement, documentation, CI integration
+  and complete verification.
+- This repository candidate adds no producer, runtime collection, retention,
+  transport, response or production authority; it cannot prove privacy,
+  anonymity or absence of a hidden sensor. Protected review and exact-main
+  evidence remain pending.

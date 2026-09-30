@@ -1298,7 +1298,7 @@ fn normalized_import_path(path: &Path) -> Result<PathBuf> {
         .join(filename))
 }
 
-fn reject_import_output_collisions(
+pub fn reject_import_output_collisions(
     inputs: &[(&str, &Path)],
     outputs: &[(&str, &Path)],
 ) -> Result<()> {

@@ -689,7 +689,7 @@ Whitepaper verification pass. GH-13 is accepted as development-only foundation.
 | tests/security_sybil         | ACCEPTED        | 100%     | 2026-03-22  | ACCEPTED     | 500:1 Sybil resistance |
 | tests/security_fp_flood      | ACCEPTED        | 100%     | 2026-03-22  | ACCEPTED     | 500 flood blocked |
 | **SPRINT 7 – DASHBOARD**     |                 |          |             |              |                 |
-| web/audit/index.html         | ACCEPTED        | 100%     | 2026-03-22  | ACCEPTED     | Dark theme, logo path fixed |
+| web/audit dashboard page     | REMOVED         | -        | 2026-09-28  | REMOVED      | GH-273: mock page fabricated live validator/guardian/rule/grant stats plus Kaspa-L1 refresh/on-chain-verifiability claims; page and every public link/pointer removed, claim gate extended |
 | README.md                    | ACCEPTED        | 100%     | 2026-07-16  | REMOTE PASS  | Experimental miner companion boundary and no-passive-reward wording merged in PR #14; exact-merge Pages pass |
 | WHITEPAPER.md                | ACCEPTED        | 100%     | 2026-07-16  | REMOTE PASS  | Target architecture separated from current stubs; miner companion, Stratum/wRPC, privacy, and reward boundaries merged and live-verified |
 
@@ -1868,6 +1868,31 @@ Boundary: no endpoint collection, producer, OS sensor, scan, correlation,
           Guardian, firewall, IAM, Mainnet or production behavior
 Next gate: independent privacy/threat-model review before any opt-in,
            least-privileged platform producer may read host data
+Estimates: unchanged; core 84-88%; complete vision 50-55%; production false
+~~~
+
+## GH-267 PRE-PRODUCER PRIVACY/THREAT-MODEL GATE (2026-09-13)
+
+~~~text
+Status: repository candidate implemented and locally tested / runtime false /
+        production false
+Issue: #267
+Scope: machine-readable privacy/threat model plus fail-closed repository and
+       Security-CI drift verification before any endpoint producer exists
+Controls: default-off informed per-host opt-in; local revocation; least
+          privilege; local aggregation/redaction; eight GH-264 output fields;
+          prohibited raw-data classes; bounded retention; separately approved
+          transport and recipient; independent privacy review
+Evidence candidate: dedicated verifier plus adversarial mutation suite binds
+                    the artifact, public status and shared GH-264 corpus
+Authority: repository review only; no runtime collection, retention, egress,
+           disclosure, proof, correlation, warning, response or automation
+Limit: cannot prove privacy/anonymity or absence of a hidden sensor and is not
+       independent legal, privacy or security certification
+Boundary: no producer, OS sensor, host access, wallet, chain, contract,
+          Guardian, firewall, IAM, deployment, Mainnet or production behavior
+Next gate: protected review, exact-main evidence and independent privacy review
+           before a separately approved least-privileged producer task
 Estimates: unchanged; core 84-88%; complete vision 50-55%; production false
 ~~~
 

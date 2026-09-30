@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import asyncio
 import hashlib
+import hmac
 import json
 import os
 import re
@@ -36,6 +37,7 @@ DEFAULT_VERIFIER_TIMEOUT_SECONDS: Final[float] = 3.0
 _FRAME_PREFIX_BYTES = 4
 _SQLITE_SCHEMA_VERSION = 1
 _MAX_SQLITE_INT = (1 << 63) - 1
+_MAX_VERIFIER_EXECUTABLE_BYTES = 64 * 1_024 * 1_024
 _LOWER_HEX_32 = re.compile(r"[0-9a-f]{64}")
 _LOWER_HEX_PROOF = re.compile(r"(?:[0-9a-f]{2}){1,1024}")
 _INDICATOR_TYPES = {"file_hash", "behavior", "network", "api_call"}
@@ -194,15 +196,25 @@ class Kip16Groth16Verifier:  # pylint: disable=too-few-public-methods
         manifest_path: Path,
         expected_manifest_sha256: str,
         *,
+        expected_executable_sha256: str,
         timeout_seconds: float = DEFAULT_VERIFIER_TIMEOUT_SECONDS,
     ) -> None:
         if not isinstance(expected_manifest_sha256, str) or not _is_hex_32(
             expected_manifest_sha256
         ):
             raise ThreatHintIngressError("verifier manifest anchor is invalid")
+        if not isinstance(expected_executable_sha256, str) or not _is_hex_32(
+            expected_executable_sha256
+        ):
+            raise ThreatHintIngressError("verifier executable anchor is invalid")
         if not 0 < timeout_seconds <= 60:
             raise ThreatHintIngressError("verifier timeout must be in (0, 60] seconds")
-        self._binary_path = _validate_verifier_binary(binary_path)
+        # The caller-supplied digest is the trust anchor; the descriptor-read
+        # bytes must match it now and again before every invocation.
+        self._binary_path, observed_sha256 = _validate_verifier_binary(binary_path)
+        if not hmac.compare_digest(observed_sha256, expected_executable_sha256):
+            raise ThreatHintIngressError("verifier binary is not trusted")
+        self._binary_sha256 = expected_executable_sha256
         self._manifest_path = _validate_owner_input_file(manifest_path)
         self._manifest_sha256 = expected_manifest_sha256
         self._timeout_seconds = timeout_seconds
@@ -221,7 +233,9 @@ class Kip16Groth16Verifier:  # pylint: disable=too-few-public-methods
             return False
         process: subprocess.Popen[bytes] | None = None
         try:
-            binary_path = _validate_verifier_binary(self._binary_path)
+            binary_path, binary_sha256 = _validate_verifier_binary(self._binary_path)
+            if not hmac.compare_digest(binary_sha256, self._binary_sha256):
+                raise ThreatHintIngressError("verifier binary changed")
             manifest_path = _validate_owner_input_file(self._manifest_path)
             process = subprocess.Popen(  # noqa: S603 - fixed trusted binary and args
                 [
@@ -731,28 +745,28 @@ def _prepare_ledger_path(path: Path) -> Path:
     ):
         raise ThreatHintIngressError("ThreatHint ledger parent must be owner-only")
     candidate = parent / path.name
-    if candidate.is_symlink():
-        raise ThreatHintIngressError("ThreatHint ledger must not be a symlink")
-    if candidate.exists():
-        current = candidate.stat()
-        if (
-            not stat.S_ISREG(current.st_mode)
-            or current.st_uid != os.getuid()
-            or current.st_mode & 0o177
-            or current.st_mode & 0o600 != 0o600
-        ):
-            raise ThreatHintIngressError("ThreatHint ledger must be owner-only")
-    else:
-        descriptor = os.open(
-            candidate,
-            os.O_CREAT | os.O_EXCL | os.O_WRONLY,
-            0o600,
-        )
+    try:
+        current = candidate.lstat()
+    except FileNotFoundError:
+        flags = os.O_CREAT | os.O_EXCL | os.O_WRONLY | getattr(os, "O_NOFOLLOW", 0)
+        try:
+            descriptor = os.open(candidate, flags, 0o600)
+        except OSError as exc:
+            raise ThreatHintIngressError("ThreatHint ledger is unavailable") from exc
         os.close(descriptor)
+        current = candidate.lstat()
+    if stat.S_ISLNK(current.st_mode):
+        raise ThreatHintIngressError("ThreatHint ledger must not be a symlink")
+    if (
+        not stat.S_ISREG(current.st_mode)
+        or current.st_uid != os.getuid()
+        or stat.S_IMODE(current.st_mode) != 0o600
+    ):
+        raise ThreatHintIngressError("ThreatHint ledger must be owner-only")
     return candidate
 
 
-def _validate_verifier_binary(path: Path) -> Path:
+def _validate_verifier_binary(path: Path) -> tuple[Path, str]:
     if not path.is_absolute() or path.name in {"", ".", ".."}:
         raise ThreatHintIngressError("verifier binary path must be absolute")
     try:
@@ -777,18 +791,51 @@ def _validate_verifier_binary(path: Path) -> Path:
             or parent_stat.st_uid not in {0, os.getuid()}
         ):
             raise ThreatHintIngressError("verifier binary parent is not trusted")
-    return resolved
+    if not 0 < current.st_size <= _MAX_VERIFIER_EXECUTABLE_BYTES:
+        raise ThreatHintIngressError("verifier binary is not trusted")
+    try:
+        descriptor = os.open(path, os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0))
+        try:
+            opened = os.fstat(descriptor)
+            if (opened.st_dev, opened.st_ino, opened.st_size) != (
+                current.st_dev,
+                current.st_ino,
+                current.st_size,
+            ) or not stat.S_ISREG(opened.st_mode):
+                raise ThreatHintIngressError("verifier binary is not trusted")
+            digest = hashlib.sha256()
+            remaining = current.st_size + 1
+            while remaining:
+                chunk = os.read(descriptor, min(remaining, 64 * 1_024))
+                if not chunk:
+                    break
+                digest.update(chunk)
+                remaining -= len(chunk)
+        finally:
+            os.close(descriptor)
+    except OSError as exc:
+        raise ThreatHintIngressError("verifier binary is unavailable") from exc
+    if remaining != 1:
+        raise ThreatHintIngressError("verifier binary is not trusted")
+    return resolved, digest.hexdigest()
 
 
 def _kill_process_group(process: subprocess.Popen[bytes]) -> None:
     try:
         os.killpg(process.pid, signal.SIGKILL)
-    except ProcessLookupError:
-        pass
+    except (ProcessLookupError, PermissionError):
+        try:
+            process.kill()
+        except OSError:
+            pass
     try:
         process.wait(timeout=1)
     except (OSError, subprocess.SubprocessError):
-        pass
+        try:
+            process.kill()
+            process.wait(timeout=1)
+        except (OSError, subprocess.SubprocessError):
+            pass
 
 
 def _validate_owner_input_file(path: Path) -> Path:

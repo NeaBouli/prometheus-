@@ -1094,3 +1094,241 @@ def test_rotation_busy_error_is_distinct(tmp_path: Path) -> None:
     with first.current_source(expected_network_id=_NETWORK, expected_epoch=0):
         with pytest.raises(GuardianAuthorityRotationBusyError):
             second.rotate_authority(wire, _NOW)
+
+
+def _ledger_snapshot(ledger: Path) -> dict[str, object]:
+    with sqlite3.connect(ledger) as connection:
+        tables = [
+            row[0]
+            for row in connection.execute(
+                "SELECT name FROM sqlite_master WHERE type = 'table' ORDER BY name"
+            )
+        ]
+        snapshot: dict[str, object] = {
+            table: sorted(connection.execute(f'SELECT * FROM "{table}"').fetchall())
+            for table in tables
+        }
+        snapshot["user_version"] = connection.execute("PRAGMA user_version").fetchone()
+    return snapshot
+
+
+def _assert_current_epoch(policy: Path, epoch: int, source: Path) -> None:
+    with GuardianMembershipAuthority(policy).current_source(
+        expected_network_id=_NETWORK, expected_epoch=epoch
+    ) as src:
+        assert src.canonical_bytes == source.read_bytes()
+
+
+def test_forward_transition_rejects_rollback_equal_and_stale_across_restart(
+    tmp_path: Path,
+) -> None:
+    key, bootstrap, ledger, policy = _setup(tmp_path)
+    authority = GuardianMembershipAuthority(policy)
+    source3 = _next_source(tmp_path, 3)
+    source5 = _next_source(tmp_path, 5)
+    _apply(authority, key, bootstrap, source3, 0, 3)
+    _apply(authority, key, source3, source5, 3, 5)
+
+    lower = _next_source(tmp_path, 4)
+    equal = _write_private(
+        tmp_path / "membership-5-alt.json", _source_bytes(5, offset=77)
+    )
+    later = _next_source(tmp_path, 6)
+    digest = {
+        path: hashlib.sha256(path.read_bytes()).hexdigest()
+        for path in (bootstrap, source3, source5, lower, equal, later)
+    }
+
+    def nonce(label: str) -> str:
+        return hashlib.sha256(f"a5t-{label}".encode("ascii")).hexdigest()
+
+    rejected = (
+        # Rollback to the bootstrap source and epoch.
+        (
+            _wire(key, 5, digest[source5], 0, digest[bootstrap], nonce=nonce("boot")),
+            bootstrap,
+        ),
+        # Rollback to an unused lower epoch with a valid source.
+        (_wire(key, 5, digest[source5], 4, digest[lower], nonce=nonce("lower")), lower),
+        # Rollback to an already applied lower epoch.
+        (
+            _wire(key, 5, digest[source5], 3, digest[source3], nonce=nonce("three")),
+            source3,
+        ),
+        # Equal epoch with a different, validly signed source.
+        (_wire(key, 5, digest[source5], 5, digest[equal], nonce=nonce("equal")), equal),
+        # Stale previous epoch/digest pairs that are no longer current.
+        (
+            _wire(key, 3, digest[source3], 6, digest[later], nonce=nonce("stale3")),
+            later,
+        ),
+        (
+            _wire(key, 0, digest[bootstrap], 6, digest[later], nonce=nonce("stale0")),
+            later,
+        ),
+        # Current epoch claimed with a stale source digest.
+        (_wire(key, 5, digest[source3], 6, digest[later], nonce=nonce("mixed")), later),
+    )
+
+    baseline = _ledger_snapshot(ledger)
+    for instance in (authority, GuardianMembershipAuthority(policy)):
+        for wire, source in rejected:
+            with pytest.raises(GuardianMembershipTransitionError):
+                instance.apply_transition(wire, source, _NOW)
+            assert _ledger_snapshot(ledger) == baseline
+    _assert_current_epoch(policy, 5, source5)
+    for stale_epoch in (0, 3, 4):
+        with pytest.raises(GuardianMembershipTransitionError):
+            with GuardianMembershipAuthority(policy).current_source(
+                expected_network_id=_NETWORK, expected_epoch=stale_epoch
+            ):
+                pass
+
+    restarted = GuardianMembershipAuthority(policy)
+    restarted.apply_transition(
+        _wire(key, 5, digest[source5], 6, digest[later]), later, _NOW
+    )
+    _assert_current_epoch(policy, 6, later)
+    for wire, source in rejected:
+        with pytest.raises(GuardianMembershipTransitionError):
+            restarted.apply_transition(wire, source, _NOW)
+    with sqlite3.connect(ledger) as connection:
+        assert connection.execute(
+            "SELECT next_epoch FROM membership_transitions ORDER BY next_epoch"
+        ).fetchall() == [(3,), (5,), (6,)]
+
+
+def test_rotation_replay_skip_and_stale_bindings_leave_state_across_restart(
+    tmp_path: Path,
+) -> None:
+    key0, bootstrap, ledger, policy = _setup(tmp_path)
+    key1 = PrivateKey((920).to_bytes(32, "big"))
+    key2 = PrivateKey((921).to_bytes(32, "big"))
+    authority = GuardianMembershipAuthority(policy)
+    source1 = _next_source(tmp_path, 1)
+    _apply(authority, key0, bootstrap, source1, 0, 1)
+    rotation1 = _rotation_wire(key0, key1, source1, membership_epoch=1)
+    authority.rotate_authority(rotation1, _NOW)
+
+    source2 = _next_source(tmp_path, 2)
+    digest0 = hashlib.sha256(bootstrap.read_bytes()).hexdigest()
+    digest1 = hashlib.sha256(source1.read_bytes()).hexdigest()
+    digest2 = hashlib.sha256(source2.read_bytes()).hexdigest()
+
+    rotation_rejections = (
+        (GuardianAuthorityRotationReplayError, rotation1),
+        # Skip authority epoch 2.
+        (
+            GuardianAuthorityRotationError,
+            _rotation_wire(
+                key1,
+                key2,
+                source1,
+                previous_authority_epoch=1,
+                next_authority_epoch=3,
+                membership_epoch=1,
+            ),
+        ),
+        # Authority epoch rollback and equal epoch.
+        (
+            GuardianAuthorityRotationError,
+            _rotation_wire(
+                key1,
+                key2,
+                source1,
+                previous_authority_epoch=1,
+                next_authority_epoch=1,
+                membership_epoch=1,
+                nonce=hashlib.sha256(b"a5t-rotation-equal").hexdigest(),
+            ),
+        ),
+        (
+            GuardianAuthorityRotationError,
+            _rotation_wire(
+                key1,
+                key2,
+                source1,
+                previous_authority_epoch=1,
+                next_authority_epoch=0,
+                membership_epoch=1,
+                nonce=hashlib.sha256(b"a5t-rotation-lower").hexdigest(),
+            ),
+        ),
+        # Stale authority epoch signed by the retired key.
+        (
+            GuardianAuthorityRotationError,
+            _rotation_wire(
+                key0,
+                key2,
+                source1,
+                next_authority_epoch=2,
+                membership_epoch=1,
+            ),
+        ),
+        # Stale membership binding to the bootstrap source.
+        (
+            GuardianAuthorityRotationError,
+            _rotation_wire(
+                key1,
+                key2,
+                bootstrap,
+                previous_authority_epoch=1,
+                next_authority_epoch=2,
+                membership_epoch=0,
+            ),
+        ),
+    )
+    membership_rejections = (
+        # Retired authority key cannot advance membership.
+        (_wire(key0, 1, digest1, 2, digest2), source2),
+        # Current authority key cannot roll membership back or replay epoch 1.
+        (
+            _wire(
+                key1,
+                1,
+                digest1,
+                0,
+                digest0,
+                nonce=hashlib.sha256(b"a5t-member-boot").hexdigest(),
+            ),
+            bootstrap,
+        ),
+        (
+            _wire(
+                key1,
+                0,
+                digest0,
+                1,
+                digest1,
+                nonce=hashlib.sha256(b"a5t-member-replay").hexdigest(),
+            ),
+            source1,
+        ),
+    )
+
+    baseline = _ledger_snapshot(ledger)
+    for instance in (authority, GuardianMembershipAuthority(policy)):
+        for error, wire in rotation_rejections:
+            with pytest.raises(error):
+                instance.rotate_authority(wire, _NOW)
+            assert _ledger_snapshot(ledger) == baseline
+        for wire, source in membership_rejections:
+            with pytest.raises(GuardianMembershipTransitionError):
+                instance.apply_transition(wire, source, _NOW)
+            assert _ledger_snapshot(ledger) == baseline
+    _assert_current_epoch(policy, 1, source1)
+
+    restarted = GuardianMembershipAuthority(policy)
+    restarted.apply_transition(_wire(key1, 1, digest1, 2, digest2), source2, _NOW)
+    _assert_current_epoch(policy, 2, source2)
+    with sqlite3.connect(ledger) as connection:
+        assert connection.execute(
+            "SELECT authority_epoch FROM current_authority"
+        ).fetchone() == (1,)
+        assert connection.execute(
+            "SELECT COUNT(*) FROM authority_rotations"
+        ).fetchone() == (1,)
+        assert connection.execute(
+            "SELECT next_epoch, authority_epoch FROM membership_transitions "
+            "ORDER BY next_epoch"
+        ).fetchall() == [(1, 0), (2, 1)]

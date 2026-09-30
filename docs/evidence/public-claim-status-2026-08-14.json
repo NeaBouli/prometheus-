@@ -185,6 +185,22 @@
       "transport": false,
       "response_authority": false,
       "production_authority": false
+    },
+    "gh_267": {
+      "as_of": "2026-09-13",
+      "issue": 267,
+      "status": "repository_candidate_implemented_and_locally_tested",
+      "classification": "pre_producer_privacy_threat_model_gate",
+      "artifact": "docs/evidence/endpoint-producer-privacy-threat-model-v1.json",
+      "security_ci_enforced": true,
+      "endpoint_producer_implemented": false,
+      "endpoint_collection": false,
+      "runtime_collection_authorized": false,
+      "privacy_safety_proven": false,
+      "hidden_sensor_absence_proven": false,
+      "transport": false,
+      "response_authority": false,
+      "production_authority": false
     }
   },
   "classifications": {
@@ -206,7 +222,10 @@
       "detection_basis": "observable_behavior_not_ai_actor_or_intent_attribution",
       "resource_conscription_detection": "planned_only",
       "canonical_observation_statement": "implemented_and_locally_tested",
+      "pre_producer_privacy_gate": "repository_candidate_implemented_and_locally_tested",
       "endpoint_collection": "not_implemented",
+      "runtime_collection_authorized": false,
+      "hidden_sensor_absence_proven": false,
       "real_time_sensor_implemented": false,
       "response_engine_implemented": false,
       "resource_conscription_detection_implemented": false,

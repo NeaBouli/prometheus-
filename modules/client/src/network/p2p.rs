@@ -43,7 +43,7 @@ use rustix::process;
 use serde::{Deserialize, Serialize};
 use tokio::time;
 
-use crate::runtime::{require_stub_allowed, require_stub_allowed_for, RuntimeMode};
+use crate::runtime::{require_stub_allowed_for, RuntimeMode};
 
 const MAX_CONFIG_BYTES: usize = 16 * 1024;
 /// Mirrors the guardian-p2p transport-identity bound for read-only preflight
@@ -326,12 +326,36 @@ impl ValidatedThreatHintConfig {
 }
 
 fn require_development(mode: RuntimeMode) -> Result<(), ThreatHintP2pError> {
-    require_stub_allowed(COMPONENT).map_err(|_| ThreatHintP2pError)?;
+    require_explicit_development(process_runtime_mode(), mode)
+}
+
+/// Fail-closed H1 gate. The process runtime must be explicitly `development`
+/// and agree with the validated mode; missing, empty, malformed, beta, and
+/// mainnet values reject before any file, identity, or network activity.
+fn require_explicit_development(
+    process_mode: Option<RuntimeMode>,
+    mode: RuntimeMode,
+) -> Result<(), ThreatHintP2pError> {
+    let process_mode = process_mode.ok_or(ThreatHintP2pError)?;
+    require_stub_allowed_for(process_mode, COMPONENT).map_err(|_| ThreatHintP2pError)?;
     require_stub_allowed_for(mode, COMPONENT).map_err(|_| ThreatHintP2pError)?;
-    if mode != RuntimeMode::Development {
+    if process_mode != RuntimeMode::Development || mode != RuntimeMode::Development {
         return Err(ThreatHintP2pError);
     }
     Ok(())
+}
+
+#[cfg(not(test))]
+fn process_runtime_mode() -> Option<RuntimeMode> {
+    RuntimeMode::explicit_from_env()
+}
+
+// Unit tests drive the explicit `mode` argument; the process-environment path
+// is covered by `require_explicit_development` tests and the binary loopback
+// tests, which are built without `cfg(test)`.
+#[cfg(test)]
+fn process_runtime_mode() -> Option<RuntimeMode> {
+    Some(RuntimeMode::Development)
 }
 
 /// Parse exactly one canonical static Guardian peer route: a canonical peer id
@@ -942,6 +966,39 @@ mod tests {
         for mode in [RuntimeMode::Beta, RuntimeMode::Mainnet] {
             assert!(config.validate(mode).is_err());
         }
+    }
+
+    #[test]
+    fn process_runtime_gate_fails_closed_unless_explicit_development() {
+        // Missing, empty, or malformed PROMETHEUS_RUNTIME values parse to None.
+        for raw in [
+            None,
+            Some(""),
+            Some("dev"),
+            Some("Development "),
+            Some("testnet"),
+        ] {
+            let process_mode = raw.and_then(RuntimeMode::try_parse);
+            assert!(
+                require_explicit_development(process_mode, RuntimeMode::Development).is_err(),
+                "{raw:?} must not permit development-only submission"
+            );
+        }
+        for process_mode in [RuntimeMode::Beta, RuntimeMode::Mainnet] {
+            for mode in [
+                RuntimeMode::Development,
+                RuntimeMode::Beta,
+                RuntimeMode::Mainnet,
+            ] {
+                assert!(require_explicit_development(Some(process_mode), mode).is_err());
+            }
+        }
+        // Explicit development still requires the validated mode to agree.
+        for mode in [RuntimeMode::Beta, RuntimeMode::Mainnet] {
+            assert!(require_explicit_development(Some(RuntimeMode::Development), mode).is_err());
+        }
+        let explicit = RuntimeMode::try_parse("development");
+        assert!(require_explicit_development(explicit, RuntimeMode::Development).is_ok());
     }
 
     #[test]

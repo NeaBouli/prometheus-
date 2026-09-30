@@ -20,6 +20,18 @@ MODULE = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(MODULE)
 
 
+def copy_gh267_verification_fixture(source: Path, destination: Path) -> None:
+    """Copy the complete public/status fixture needed by MODULE.verify."""
+    status_target = destination / MODULE.STATUS_PATH
+    status_target.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy(source / MODULE.STATUS_PATH, status_target)
+    for relative in set(MODULE.PUBLIC_FILES) | set(MODULE.GH267_PUBLIC_FILES):
+        target = destination / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy(source / relative, target)
+    shutil.copy(source / MODULE.SITEMAP_PATH, destination / MODULE.SITEMAP_PATH)
+
+
 class PublicClaimConsistencyTests(unittest.TestCase):
     status: dict[str, Any]
 
@@ -486,6 +498,11 @@ class PublicClaimConsistencyTests(unittest.TestCase):
                 self.assertTrue(
                     any("GH-264" in error for error in MODULE.validate_status(changed))
                 )
+        changed = copy.deepcopy(self.status)
+        changed["post_audit_updates"]["gh_264"]["schema_version"] = True
+        self.assertTrue(
+            any("GH-264" in error for error in MODULE.validate_status(changed))
+        )
         for value in (None, [], "invalid", 264):
             with self.subTest(value=value):
                 changed = copy.deepcopy(self.status)
@@ -610,6 +627,166 @@ class PublicClaimConsistencyTests(unittest.TestCase):
                         for error in errors
                     )
                 )
+
+    def test_gh_267_capability_elevation_is_rejected(self) -> None:
+        for field in MODULE.GH267_FALSE_FIELDS:
+            with self.subTest(field=field):
+                changed = copy.deepcopy(self.status)
+                changed["post_audit_updates"]["gh_267"][field] = True
+                self.assertTrue(
+                    any("GH-267" in error for error in MODULE.validate_status(changed))
+                )
+
+    def test_gh_267_identity_and_shape_drift_are_rejected(self) -> None:
+        for field, value in (
+            ("issue", 999),
+            ("as_of", "2026-09-12"),
+            ("status", "production"),
+            ("classification", "endpoint_producer"),
+            ("artifact", "docs/evidence/other.json"),
+            ("security_ci_enforced", False),
+        ):
+            with self.subTest(field=field):
+                changed = copy.deepcopy(self.status)
+                changed["post_audit_updates"]["gh_267"][field] = value
+                self.assertTrue(
+                    any("GH-267" in error for error in MODULE.validate_status(changed))
+                )
+        for value in (None, [], "invalid", 267):
+            with self.subTest(value=value):
+                changed = copy.deepcopy(self.status)
+                changed["post_audit_updates"]["gh_267"] = value
+                self.assertTrue(
+                    any("GH-267" in error for error in MODULE.validate_status(changed))
+                )
+
+    def test_gh_267_positive_claims_are_rejected(self) -> None:
+        claims = (
+            "GH-267 proves privacy.",
+            "GH-267 guarantees anonymity.",
+            "GH-267 certifies absence of a hidden sensor.",
+            "GH-267 authorizes endpoint collection.",
+            "GH-267 enables an endpoint producer.",
+            "GH-267 implements runtime collection.",
+            "GH-267 provides response authority.",
+            "GH-267 is production-ready.",
+        )
+        for claim in claims:
+            with self.subTest(claim=claim):
+                normalized = " ".join(claim.split()).casefold()
+                self.assertTrue(
+                    any(
+                        pattern.search(normalized)
+                        for pattern in MODULE.GH267_PROHIBITED_CLAIMS
+                    )
+                )
+
+    def test_gh_267_positive_claims_are_rejected_end_to_end(self) -> None:
+        root = SCRIPT.parents[1]
+        claims = (
+            "GH-267 proves privacy.",
+            "GH-267 guarantees anonymity.",
+            "GH-267 certifies absence of a hidden sensor.",
+            "GH-267 authorizes endpoint collection.",
+            "GH-267 enables an endpoint producer.",
+            "GH-267 implements runtime collection.",
+            "GH-267 provides response authority.",
+            "GH-267 is production-ready.",
+        )
+        for claim in claims:
+            with self.subTest(claim=claim), tempfile.TemporaryDirectory() as tmp:
+                tmp_root = Path(tmp)
+                copy_gh267_verification_fixture(root, tmp_root)
+                for relative in MODULE.GH267_PUBLIC_FILES:
+                    surface = tmp_root / relative
+                    surface.write_text(
+                        f"{surface.read_text(encoding='utf-8')}\n{claim}\n",
+                        encoding="utf-8",
+                    )
+                errors = MODULE.verify(tmp_root)
+                for relative in MODULE.GH267_PUBLIC_FILES:
+                    self.assertTrue(
+                        any(
+                            str(relative) in error
+                            and "GH-267 authority or privacy claim drift" in error
+                            for error in errors
+                        ),
+                        f"{relative} accepted {claim}",
+                    )
+
+    def test_gh_267_negative_claims_remain_allowed(self) -> None:
+        claims = (
+            "GH-267 does not prove privacy.",
+            "GH-267 cannot guarantee anonymity.",
+            "GH-267 does not authorize endpoint collection.",
+            "GH-267 does not implement runtime collection.",
+            "GH-267 is not production-ready.",
+        )
+        for claim in claims:
+            with self.subTest(claim=claim):
+                normalized = " ".join(claim.split()).casefold()
+                self.assertFalse(
+                    any(
+                        pattern.search(normalized)
+                        for pattern in MODULE.GH267_PROHIBITED_CLAIMS
+                    )
+                )
+
+    def test_gh_267_public_boundary_marker_is_required(self) -> None:
+        root = SCRIPT.parents[1]
+        for drifted_relative in MODULE.GH267_PUBLIC_FILES:
+            with (
+                self.subTest(path=drifted_relative),
+                tempfile.TemporaryDirectory() as tmp,
+            ):
+                tmp_root = Path(tmp)
+                status_target = tmp_root / MODULE.STATUS_PATH
+                status_target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy(root / MODULE.STATUS_PATH, status_target)
+                for relative in MODULE.PUBLIC_FILES:
+                    target = tmp_root / relative
+                    target.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copy(root / relative, target)
+                for relative in MODULE.GH267_PUBLIC_FILES:
+                    if relative in MODULE.PUBLIC_FILES:
+                        continue
+                    target = tmp_root / relative
+                    target.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copy(root / relative, target)
+                shutil.copy(root / MODULE.SITEMAP_PATH, tmp_root / MODULE.SITEMAP_PATH)
+                drifted = tmp_root / drifted_relative
+                drifted.write_text(
+                    drifted.read_text(encoding="utf-8").replace("GH-267", "GH-268"),
+                    encoding="utf-8",
+                )
+                errors = MODULE.verify(tmp_root)
+                self.assertTrue(
+                    any(
+                        str(drifted_relative) in error
+                        and "GH-267 privacy gate boundary" in error
+                        for error in errors
+                    )
+                )
+
+    def test_gh_267_generic_fragments_do_not_satisfy_boundary(self) -> None:
+        root = SCRIPT.parents[1]
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_root = Path(tmp)
+            copy_gh267_verification_fixture(root, tmp_root)
+            readme = tmp_root / "README.md"
+            drifted = readme.read_text(encoding="utf-8").replace("GH-267", "GH-268")
+            readme.write_text(
+                drifted
+                + "\nGH-267 repository privacy runtime production behavior is enabled.\n",
+                encoding="utf-8",
+            )
+            errors = MODULE.verify(tmp_root)
+            self.assertTrue(
+                any(
+                    "README.md" in error and "GH-267 privacy gate boundary" in error
+                    for error in errors
+                )
+            )
 
     def test_gh_258_stage_order_and_malformed_status_are_rejected(self) -> None:
         changed = copy.deepcopy(self.status)
@@ -1124,8 +1301,9 @@ class PublicClaimConsistencyTests(unittest.TestCase):
     def test_stale_sitemap_lastmod_is_rejected(self) -> None:
         root = SCRIPT.parents[1]
         with tempfile.TemporaryDirectory() as tmp:
-            sitemap = Path(tmp) / "sitemap.xml"
-            shutil.copy(root / MODULE.SITEMAP_PATH, sitemap)
+            tmp_root = Path(tmp)
+            copy_gh267_verification_fixture(root, tmp_root)
+            sitemap = tmp_root / MODULE.SITEMAP_PATH
             sitemap.write_text(
                 sitemap.read_text(encoding="utf-8").replace(
                     MODULE.LATEST_PROJECT_UPDATE,
@@ -1134,7 +1312,134 @@ class PublicClaimConsistencyTests(unittest.TestCase):
                 ),
                 encoding="utf-8",
             )
-            self.assertTrue(MODULE.validate_sitemap(sitemap))
+            errors = MODULE.validate_sitemap(sitemap, tmp_root)
+            self.assertTrue(
+                any("stale or missing lastmod" in error for error in errors)
+            )
+
+    def test_current_sitemap_targets_exist(self) -> None:
+        root = SCRIPT.parents[1]
+        self.assertEqual(
+            MODULE.validate_sitemap(root / MODULE.SITEMAP_PATH, root), []
+        )
+
+    def test_sitemap_url_without_repository_target_is_rejected(self) -> None:
+        root = SCRIPT.parents[1]
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_root = Path(tmp)
+            copy_gh267_verification_fixture(root, tmp_root)
+            sitemap = tmp_root / MODULE.SITEMAP_PATH
+            sitemap.write_text(
+                sitemap.read_text(encoding="utf-8").replace(
+                    "</urlset>",
+                    "  <url><loc>https://neabouli.github.io/prometheus-/"
+                    "modules/web/audit/index.html</loc>"
+                    f"<lastmod>{MODULE.LATEST_PROJECT_UPDATE}</lastmod></url>\n"
+                    "</urlset>",
+                ),
+                encoding="utf-8",
+            )
+            errors = MODULE.validate_sitemap(sitemap, tmp_root)
+            self.assertTrue(
+                any("no repository target" in error for error in errors)
+            )
+
+    def test_sitemap_url_outside_site_root_is_rejected(self) -> None:
+        root = SCRIPT.parents[1]
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_root = Path(tmp)
+            copy_gh267_verification_fixture(root, tmp_root)
+            sitemap = tmp_root / MODULE.SITEMAP_PATH
+            sitemap.write_text(
+                sitemap.read_text(encoding="utf-8").replace(
+                    "</urlset>",
+                    "  <url><loc>https://example.invalid/audit</loc>"
+                    f"<lastmod>{MODULE.LATEST_PROJECT_UPDATE}</lastmod></url>\n"
+                    "</urlset>",
+                ),
+                encoding="utf-8",
+            )
+            errors = MODULE.validate_sitemap(sitemap, tmp_root)
+            self.assertTrue(
+                any("outside the public site root" in error for error in errors)
+            )
+
+    def test_audit_dashboard_pointer_in_public_surface_is_rejected(self) -> None:
+        root = SCRIPT.parents[1]
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_root = Path(tmp)
+            copy_gh267_verification_fixture(root, tmp_root)
+            faq = tmp_root / "faq.html"
+            faq.write_text(
+                faq.read_text(encoding="utf-8")
+                + '\n<li><a href="modules/web/audit/index.html">Audit</a></li>\n',
+                encoding="utf-8",
+            )
+            errors = MODULE.verify(tmp_root)
+            self.assertTrue(
+                any(
+                    "faq.html" in error and "audit dashboard pointer" in error
+                    for error in errors
+                )
+            )
+
+    def test_audit_dashboard_pointer_in_doc_surface_is_rejected(self) -> None:
+        root = SCRIPT.parents[1]
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_root = Path(tmp)
+            copy_gh267_verification_fixture(root, tmp_root)
+            (tmp_root / "CLAUDE.md").write_text(
+                "- **Audit Dashboard:** `modules/web/audit/`\n",
+                encoding="utf-8",
+            )
+            errors = MODULE.verify(tmp_root)
+            self.assertTrue(
+                any(
+                    "CLAUDE.md" in error and "audit dashboard pointer" in error
+                    for error in errors
+                )
+            )
+
+    def test_fabricated_dashboard_claims_are_rejected(self) -> None:
+        cases = {
+            "fabricated-network-stat": (
+                '<div class="value">12</div>'
+                '<div class="label">Active Validators</div>'
+            ),
+            "fabricated-rule-count": (
+                '<div class="value">3</div>'
+                '<div class="label">Rules On-Chain</div>'
+            ),
+            "fabricated-fp-rate": (
+                '<div class="value">0.12%</div>'
+                '<div class="label">False Positive Rate</div>'
+            ),
+            "fabricated-response-time": (
+                '<div class="value">4.2s</div>'
+                '<div class="label">Avg Response Time</div>'
+            ),
+            "fabricated-grant-claim": (
+                "Grant #2 — Guardian YARA Generator Improvements "
+                "Developer: kaspa:qr4d...7b1e | 3,200 PROM"
+            ),
+            "fabricated-grant-transparency": "Dev Grants Transparency",
+            "fabricated-rule-id": "PROM-RULE-2026-0001",
+            "fabricated-address": "kaspa:qz8f...3a2c",
+            "fabricated-refresh-claim": "Updates every 30s from Kaspa L1",
+            "fabricated-onchain-verifiability": "All data verifiable on-chain",
+        }
+        for category, text in cases.items():
+            with self.subTest(category=category):
+                self.assertIn(category, MODULE.find_banned_claims(text))
+
+    def test_legitimate_boundary_wording_is_not_flagged(self) -> None:
+        safe = (
+            "There is no operated validator network; validators stake KAS, "
+            "never PROM. MIN_STAKE_KAS 10,000 targets 50-200 active validators "
+            "and MIN_GUARDIAN_REP targets 200-1,000 active guardians as "
+            "planning ranges. Target ID format: PROM-RULE-2026-XXXX."
+        )
+        self.assertEqual(MODULE.find_banned_claims(safe), [])
 
 
 if __name__ == "__main__":
