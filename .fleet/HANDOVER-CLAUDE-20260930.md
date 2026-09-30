@@ -41,6 +41,7 @@ Goal: continue exactly from the hand-back point without re-research.
 | 2026-09-30 | DA1 | Endpoint producer design (design only) | Hygiene/claim/GH-267 gates pass. Report `.fleet/reports/da1-endpoint-producer-design.md`. |
 | 2026-09-30 | PRM-12 (part) | Actions pinned to commit SHAs | YAML/tests OK; hosted run on f737c7b owed. Report `.fleet/reports/prm12-actions-sha-pin.md`. |
 | 2026-09-30 | PRM-12 (part) | deny_unknown_fields on operator-authored deployer formats | Deployer tests + clippy + full local silverc CI job pass. |
+| 2026-09-30 | PRM-12 (part) | Saturating bond math + clock high-water runbook | validator 34 tests, clippy, doc gates pass. |
 
 ## Current state
 - Branch/worktree: `agent/claude/prometheus-standin-20260930` in
