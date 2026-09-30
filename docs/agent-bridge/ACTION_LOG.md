@@ -5927,3 +5927,8 @@ Rules for all dev agents:
   tokens on all pages, link color, decorative glyphs aria-hidden; rendered
   audit 796 → 0 failing text nodes; CI gate `scripts/verify_site_css.py`.
 - Report `.fleet/reports/a12a-contrast.md`; evidence `.fleet/artifacts/a12a-contrast/`.
+
+### 2026-09-30 - [AUTOR: CC] A12b public-site accessibility (PRM-47/48)
+
+- noopener, logo href, skip link, reduced-motion + no-JS fallbacks on all five
+  pages; keyboard/reduced-motion/no-JS checks pass. Report `.fleet/reports/a12b-a11y.md`.

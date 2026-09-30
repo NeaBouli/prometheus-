@@ -514,3 +514,8 @@ Both runs require Gio budget approval (plan-level gate).
   tokens raised to WCAG AA on all five pages, unstyled links fixed; rendered
   audit 796 → 0 failing text nodes; new CI gate `verify_site_css.py`.
 - State: `A12a LOCAL VERIFIED / POST-DEPLOY RECHECK OWED`.
+
+### 2026-09-30 — A12b accessibility/validity locally verified (Claude stand-in)
+
+- noopener on external links, logo href, skip link to focusable main,
+  reduced-motion and no-JS fallbacks. State: `A12b LOCAL VERIFIED`.
