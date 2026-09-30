@@ -68,7 +68,7 @@ contract DevIncentivePoolState(
         int lines,
         int requested_complexity,
         int amount,
-        int block_height,
+        datasig proposal_attestation,
         sig proposer_sig,
         pubkey proposer_pk
     ) : State {
@@ -81,9 +81,23 @@ contract DevIncentivePoolState(
         require(amount > 0);
         require(amount <= MAX_GRANT_PROM);
         require(amount <= prev_state.pool_balance_prom);
-        require(block_height >= 0);
-        require(tx.time >= block_height);
         require(checkSig(proposer_sig, proposer_pk));
+
+        // Versioned attestation context: domain, deployment (covenant id), replay nonce (grant id), full content.
+        byte[32] instance_id = OpInputCovenantId(this.activeInputIndex);
+        byte[32] proposal_digest = sha256(
+            0x70726f6d6574686575732d6772616e742d70726f706f73616c2d7632
+            + instance_id
+            + byte[8](prev_state.next_grant_id)
+            + byte[32](new_developer_pk)
+            + new_contribution_hash
+            + new_description_hash
+            + byte[8](lines)
+            + byte[8](requested_complexity)
+            + byte[8](amount)
+            + byte[32](proposer_pk)
+        );
+        require(checkSigFromStack(proposal_attestation, proposal_digest, prev_state.governance_pk));
 
         return({
             governance_pk: prev_state.governance_pk,
@@ -98,7 +112,7 @@ contract DevIncentivePoolState(
             requested_amount_prom: amount,
             votes_for: 0,
             votes_against: 0,
-            voting_end_block: block_height + GRANT_VOTING_BLOCKS,
+            voting_end_block: 0,
             executed: false,
             paid: false,
             status: STATUS_PENDING,
@@ -109,7 +123,6 @@ contract DevIncentivePoolState(
     #[covenant.singleton(mode = transition)]
     function finalizeGrant(
         State prev_state,
-        int block_height,
         int tally_for,
         int tally_against,
         int active_set_size,
@@ -120,19 +133,37 @@ contract DevIncentivePoolState(
         require(prev_state.status == STATUS_PENDING);
         require(!prev_state.executed);
         require(!prev_state.paid);
-        require(block_height >= prev_state.voting_end_block);
-        require(tx.time >= prev_state.voting_end_block);
         require(checkSig(governance_sig, prev_state.governance_pk));
         require(tally_for >= 0);
         require(tally_against >= 0);
         require(active_set_size > 0);
 
+        // Nothing but finalizeGrant can spend a PENDING state, so the spent UTXO was created by
+        // proposeGrant: its DAA score is the consensus proposal time and opens the voting session.
+        int session_start = OpTxInputDaaScore(this.activeInputIndex);
+        require(session_start > 0);
+        int voting_end = session_start + GRANT_VOTING_BLOCKS;
+        require(tx.time >= voting_end);
+
         int total_votes = tally_for + tally_against;
         require(total_votes <= active_set_size);
 
+        byte[32] instance_id = OpInputCovenantId(this.activeInputIndex);
+        byte[32] content_hash = sha256(
+            byte[32](prev_state.developer_pk)
+            + prev_state.contribution_hash
+            + prev_state.description_hash
+            + byte[8](prev_state.lines_of_code)
+            + byte[8](prev_state.complexity)
+            + byte[8](prev_state.requested_amount_prom)
+            + byte[32](prev_state.last_proposer_pk)
+        );
         byte[32] tally_digest = sha256(
-            0x70726f6d6574686575732d6772616e742d74616c6c792d7631
+            0x70726f6d6574686575732d6772616e742d74616c6c792d7632
+            + instance_id
             + byte[8](prev_state.grant_id)
+            + content_hash
+            + byte[8](voting_end)
             + byte[8](tally_for)
             + byte[8](tally_against)
             + byte[8](active_set_size)
@@ -170,7 +201,7 @@ contract DevIncentivePoolState(
             requested_amount_prom: prev_state.requested_amount_prom,
             votes_for: tally_for,
             votes_against: tally_against,
-            voting_end_block: prev_state.voting_end_block,
+            voting_end_block: voting_end,
             executed: next_executed,
             paid: next_executed,
             status: next_status,

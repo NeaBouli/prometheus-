@@ -79,9 +79,19 @@ contract GovernanceAutoTuningState(
     }
 
     #[covenant.singleton(mode = transition)]
-    function autoTune(State prev_state, int block_height) : State {
-        require(block_height >= prev_state.last_tuning_block + TUNING_INTERVAL_BLOCKS);
-        require(tx.time >= block_height);
+    function autoTune(State prev_state) : State {
+        // last_tuning_block == 0 means "anchor pending": the last tuning's inclusion DAA score is not yet
+        // recorded. The spent UTXO descends from that tuning, so its DAA score is an upper bound of the
+        // tuning time (exact if autoTune's own output is spent). Requiring the lock time to reach
+        // anchor + interval therefore proves at least one full interval of consensus time since the
+        // last tuning; historical catch-up is impossible because no caller-chosen height is accepted.
+        int spent_utxo_daa_score = OpTxInputDaaScore(this.activeInputIndex);
+        require(spent_utxo_daa_score > 0);
+        int tuning_anchor = prev_state.last_tuning_block;
+        if (prev_state.last_tuning_block == 0) {
+            tuning_anchor = spent_utxo_daa_score;
+        }
+        require(tx.time >= tuning_anchor + TUNING_INTERVAL_BLOCKS);
         require(prev_state.min_stake_kas >= MIN_STAKE_KAS_FLOOR);
         require(prev_state.min_stake_kas <= MIN_STAKE_KAS_CEILING);
         require(prev_state.min_confidence_ki >= CONFIDENCE_FLOOR);
@@ -128,7 +138,31 @@ contract GovernanceAutoTuningState(
             min_confidence_ki: next_min_confidence_ki,
             validator_consensus: prev_state.validator_consensus,
             reward_base: next_reward_base,
-            last_tuning_block: block_height,
+            last_tuning_block: 0,
+            active_validators: prev_state.active_validators,
+            active_guardians: prev_state.active_guardians,
+            proposals_per_day: prev_state.proposals_per_day,
+            fp_rate: prev_state.fp_rate,
+            last_metrics_block: prev_state.last_metrics_block
+        });
+    }
+
+    // Permissionless: records the exact inclusion DAA score of the last autoTune while its output is
+    // still unspent, so later metrics reports do not push the tuning anchor forward.
+    #[covenant.singleton(mode = transition)]
+    function settleTuning(State prev_state) : State {
+        require(prev_state.last_tuning_block == 0);
+        int spent_utxo_daa_score = OpTxInputDaaScore(this.activeInputIndex);
+        require(spent_utxo_daa_score > 0);
+
+        return({
+            metrics_oracle_pk: prev_state.metrics_oracle_pk,
+            min_stake_kas: prev_state.min_stake_kas,
+            min_guardian_rep: prev_state.min_guardian_rep,
+            min_confidence_ki: prev_state.min_confidence_ki,
+            validator_consensus: prev_state.validator_consensus,
+            reward_base: prev_state.reward_base,
+            last_tuning_block: spent_utxo_daa_score,
             active_validators: prev_state.active_validators,
             active_guardians: prev_state.active_guardians,
             proposals_per_day: prev_state.proposals_per_day,

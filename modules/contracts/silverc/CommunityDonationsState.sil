@@ -53,13 +53,28 @@ contract CommunityDonationsState(
         return(covenant_value);
     }
 
+    // Consensus DAA score at which the pending disbursement's voting session ends. A proposal stores 0;
+    // the first later transition spends the proposal UTXO, whose DAA score is the exact proposal time.
+    function resolvedVotingEnd(State prev_state, int spent_utxo_daa_score) : int {
+        int voting_end = prev_state.voting_end_block;
+        if (prev_state.status == STATUS_PENDING) {
+            if (prev_state.voting_end_block == 0) {
+                voting_end = spent_utxo_daa_score + DISBURSEMENT_VOTING_BLOCKS;
+            }
+        }
+        return(voting_end);
+    }
+
     #[covenant.singleton(mode = transition)]
     function donateKas(State prev_state, pubkey donor_pk, int amount, byte[32] message_hash, int block_height, sig donor_sig) : State {
         require(amount >= MIN_DONATION_KAS);
-        require(block_height >= 0);
         require(prev_state.donation_count >= 0);
         require(prev_state.total_donated_kas >= 0);
         require(prev_state.pool_balance_kas >= 0);
+        // Donor-declared label bounded to [previous transition DAA score, lock time]; no window depends on it.
+        int spent_utxo_daa_score = OpTxInputDaaScore(this.activeInputIndex);
+        require(spent_utxo_daa_score > 0);
+        require(block_height >= spent_utxo_daa_score);
         require(tx.time >= block_height);
         require(checkSig(donor_sig, donor_pk));
         int covenant_value = requirePoolBacked(prev_state);
@@ -77,7 +92,7 @@ contract CommunityDonationsState(
             purpose_hash: prev_state.purpose_hash,
             votes_for: prev_state.votes_for,
             votes_against: prev_state.votes_against,
-            voting_end_block: prev_state.voting_end_block,
+            voting_end_block: resolvedVotingEnd(prev_state, spent_utxo_daa_score),
             status: prev_state.status,
             executed: prev_state.executed,
             last_donor_pk: donor_pk,
@@ -92,19 +107,30 @@ contract CommunityDonationsState(
         pubkey new_recipient_pk,
         int amount,
         byte[32] new_purpose_hash,
-        int block_height,
+        datasig proposal_attestation,
         sig proposer_sig,
         pubkey proposer_pk
     ) : State {
         require(prev_state.status != STATUS_PENDING);
         require(amount > 0);
         require(amount <= prev_state.pool_balance_kas);
-        require(block_height >= 0);
         require(prev_state.next_disbursement_id >= 0);
-        require(tx.time >= block_height);
         require(checkSig(proposer_sig, proposer_pk));
         int covenant_value = requirePoolBacked(prev_state);
         require(tx.outputs[0].value == covenant_value);
+
+        // Versioned attestation context: domain, deployment (covenant id), replay nonce (disbursement id), full content.
+        byte[32] instance_id = OpInputCovenantId(this.activeInputIndex);
+        byte[32] proposal_digest = sha256(
+            0x70726f6d6574686575732d64697362757273656d656e742d70726f706f73616c2d7632
+            + instance_id
+            + byte[8](prev_state.next_disbursement_id)
+            + byte[32](new_recipient_pk)
+            + byte[8](amount)
+            + new_purpose_hash
+            + byte[32](proposer_pk)
+        );
+        require(checkSigFromStack(proposal_attestation, proposal_digest, prev_state.governance_pk));
 
         return({
             governance_pk: prev_state.governance_pk,
@@ -118,7 +144,7 @@ contract CommunityDonationsState(
             purpose_hash: new_purpose_hash,
             votes_for: 0,
             votes_against: 0,
-            voting_end_block: block_height + DISBURSEMENT_VOTING_BLOCKS,
+            voting_end_block: 0,
             status: STATUS_PENDING,
             executed: false,
             last_donor_pk: prev_state.last_donor_pk,
@@ -130,7 +156,6 @@ contract CommunityDonationsState(
     #[covenant.singleton(mode = transition)]
     function finalizeDisbursement(
         State prev_state,
-        int block_height,
         int tally_for,
         int tally_against,
         int active_set_size,
@@ -140,19 +165,28 @@ contract CommunityDonationsState(
     ) : State {
         require(prev_state.status == STATUS_PENDING);
         require(!prev_state.executed);
-        require(block_height >= prev_state.voting_end_block);
-        require(tx.time >= prev_state.voting_end_block);
         require(checkSig(governance_sig, prev_state.governance_pk));
         require(tally_for >= 0);
         require(tally_against >= 0);
         require(active_set_size > 0);
 
+        int spent_utxo_daa_score = OpTxInputDaaScore(this.activeInputIndex);
+        require(spent_utxo_daa_score > 0);
+        int voting_end = resolvedVotingEnd(prev_state, spent_utxo_daa_score);
+        require(tx.time >= voting_end);
+
         int total_votes = tally_for + tally_against;
         require(total_votes <= active_set_size);
 
+        byte[32] instance_id = OpInputCovenantId(this.activeInputIndex);
         byte[32] tally_digest = sha256(
-            0x70726f6d6574686575732d64697362757273656d656e742d74616c6c792d7631
+            0x70726f6d6574686575732d64697362757273656d656e742d74616c6c792d7632
+            + instance_id
             + byte[8](prev_state.disbursement_id)
+            + byte[32](prev_state.recipient_pk)
+            + byte[8](prev_state.amount_kas)
+            + prev_state.purpose_hash
+            + byte[8](voting_end)
             + byte[8](tally_for)
             + byte[8](tally_against)
             + byte[8](active_set_size)
@@ -165,7 +199,9 @@ contract CommunityDonationsState(
         bool approved = false;
         if (total_votes * 2 >= active_set_size) {
             if (tally_for * 10000 >= VALIDATOR_QUORUM * total_votes) {
-                approved = true;
+                if (total_votes > 0) {
+                    approved = true;
+                }
             }
         }
 
@@ -197,7 +233,7 @@ contract CommunityDonationsState(
             purpose_hash: prev_state.purpose_hash,
             votes_for: tally_for,
             votes_against: tally_against,
-            voting_end_block: prev_state.voting_end_block,
+            voting_end_block: voting_end,
             status: next_status,
             executed: next_executed,
             last_donor_pk: prev_state.last_donor_pk,
