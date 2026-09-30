@@ -554,3 +554,9 @@ Both runs require Gio budget approval (plan-level gate).
   before/after (incl. menu and focus states); gate checks the combined
   cascade. GH-278 (A12a–d) is complete on the stand-in branch.
 - State: `A12 LOCAL VERIFIED / POST-DEPLOY RECHECK OWED / PRODUCTION FALSE`.
+
+### 2026-09-30 — DA1 endpoint producer design delivered (Claude stand-in)
+
+- `docs/endpoint-producer-design-v1.md`: design-only resource-utilization
+  producer candidate mapped to all GH-267 requirements; no code, no status
+  change. Next: independent privacy review + owner approval before any brief.

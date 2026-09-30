@@ -36,6 +36,9 @@ Goal: continue exactly from the hand-back point without re-research.
 | 2026-09-30 | A9 / GH-280 (delegated decision) | Compose 2000:2000, CPU caps, tmpfs rationale, vLLM trust boundary | Guardian 1428/4 skipped. Report `.fleet/reports/a9-guardian-compose.md`. |
 | 2026-09-30 | PRM-35 (delegated decision) | Cooldown target 7 days; code deferred to contract bundle v2 (H-001 manifest pin) | Docs corrected; full contract job run documented. Report `.fleet/reports/prm35-cooldown-decision.md`. |
 | 2026-09-30 | A12c / PRM-44 | Shared stylesheet assets/site.css (tokens + chrome) | 5 pages × 2 viewports + states pixel-identical. Report `.fleet/reports/a12c-shared-css.md`. |
+| 2026-09-30 | GH-275 rest | H-001 evidence fallback investigated (API pruned, explorer 402); README wording | Claims/evidence verifier pass. |
+| 2026-09-30 | Records | memory/TODO + STATUS refreshed to 2026-09-30 | Memory/status/claim gates pass. |
+| 2026-09-30 | DA1 | Endpoint producer design (design only) | Hygiene/claim/GH-267 gates pass. Report `.fleet/reports/da1-endpoint-producer-design.md`. |
 
 ## Current state
 - Branch/worktree: `agent/claude/prometheus-standin-20260930` in
