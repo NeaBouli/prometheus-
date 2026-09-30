@@ -6015,3 +6015,6 @@ Rules for all dev agents:
 - Bundle v2 draft step 2 (`f3e6735` on `agent/claude/contract-bundle-v2-draft`):
   stake-backed value conservation and burned slashing (P2SH of OP_RETURN, the
   only unspendable standard form) for ValidatorStakingState; 63 runtime tests.
+- Bundle v2 draft steps 3–4: RuleStorage + CommunityDonations attested
+  tallies/quorum/time/value (72 runtime tests). Upstream compiler finding
+  (`byte[](v, 8)` stack misaddressing in d25bd34) recorded in the draft report.

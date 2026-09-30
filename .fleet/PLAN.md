@@ -593,3 +593,9 @@ Both runs require Gio budget approval (plan-level gate).
   the deployer pins the v1 bundle manifest. The profile split (recommendation:
   verify committed H-001 evidence instead of regenerating) is left to Codex.
   Report `.fleet/reports/bundle-v2-draft-validator-staking.md` (on that branch).
+- Bundle v2 draft steps 3–4 (`4a13fa3`, `581f6a0`): RuleStorageState and
+  CommunityDonationsState use attested submissions/tallies with ≥50 %
+  participation, chain-bound times, value-backed donations and exact recipient
+  payouts; failed disbursement votes now end REJECTED. 72 runtime tests pass.
+  Finding: pinned silverc misaddresses the stack after `byte[](v, 8)` inside a
+  hashed concatenation (runtime InvalidPubkey); `byte[8](v)` works.

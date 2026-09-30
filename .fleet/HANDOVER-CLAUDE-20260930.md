@@ -45,6 +45,8 @@ Goal: continue exactly from the hand-back point without re-research.
 | 2026-09-30 | MS-B / #276 (proposal) | Contract decision record D1–D7 + bundle v2 child plan | Doc gates pass. `docs/architecture/ms-b-contract-decisions.md`. |
 | 2026-09-30 | Bundle v2 DRAFT (branch `agent/claude/contract-bundle-v2-draft`) | On-chain 7-day cooldown via this.age, PRM-13 exit, zero-marker fix | 58 runtime tests; local contract CI 16/17 (canary-profile pin). Report on that branch. |
 | 2026-09-30 | Bundle v2 DRAFT step 2 | Stake-backed value conservation + burned slashing (P2SH of OP_RETURN) | 63 runtime tests. Report on draft branch. |
+| 2026-09-30 | Bundle v2 DRAFT step 3 | RuleStorage: attested submission + tally, 50 % participation, tx.time | 67 runtime tests; silverc `byte[](v,8)` finding. |
+| 2026-09-30 | Bundle v2 DRAFT step 4 | CommunityDonations: attested finalize, exact P2PK payout, REJECTED path, value-backed donations | 72 runtime tests. |
 
 ## Current state
 - Branch/worktree: `agent/claude/prometheus-standin-20260930` in
@@ -54,6 +56,12 @@ Goal: continue exactly from the hand-back point without re-research.
 - Tests: see per-block reports. Hosted: CI `36698349293` + Security `36698357152` all green at `bff7fc1` (workflow_dispatch, no PR). Second dispatch at `40dfd89` (incl. action SHA pins): CI `36702356697` + Security `36702361053` all green.
 
 ## Findings in existing code
+- `CommunityDonationsState.sil` (pre-draft): a failed disbursement vote left the single proposal
+  slot PENDING forever (no reject path) → permanent disbursement DoS; fixed in the bundle v2 draft.
+- `ValidatorStakingState.sil` (pre-draft): `requestWithdraw` with `block_height = 0` created an
+  unreachable inactive state (second dead-state path next to PRM-13); fixed in the draft.
+- Pinned silverc `d25bd34`: `byte[](value, 8)` inside a hashed concatenation makes a later
+  `checkSigFromStack` read a wrong stack slot (runtime InvalidPubkey); use `byte[8](value)`.
 - `modules/silverc-deployer/src/lib.rs` binds `toccata_activation_daa_score` into the signing
   request/receipt schema and uses Params APIs removed in rusty-kaspa v2.1.0 (A8u1 F3/F4).
 - `modules/silverc-deployer/src/lib.rs:54` `FULL_BUNDLE_MANIFEST_SHA256` couples every contract
