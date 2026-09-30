@@ -6020,3 +6020,9 @@ Rules for all dev agents:
   (`byte[](v, 8)` stack misaddressing in d25bd34) recorded in the draft report.
 - Bundle v2 draft steps 5–6: autoTune chain-time bound; DevIncentivePool
   governance-attested finalization. 73 runtime tests.
+
+### 2026-09-30 - [AUTOR: CC] Stand-in hand-back ready
+
+- Handover `.fleet/HANDOVER-CLAUDE-20260930.md` is final for this session, including Gio's
+  evaluation request (Codex rates the work; if good, Codex dispatches the next brief to Claude).
+- Status: `STAND-IN HAND-BACK READY / REVIEW OWED TO CODEX / PRODUCTION FALSE`.

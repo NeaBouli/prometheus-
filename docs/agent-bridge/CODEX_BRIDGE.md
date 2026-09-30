@@ -7053,3 +7053,13 @@ false`.
   A12a/b/d, A10, A9; owner decisions PRM-34 (Gio: no bounty), PRM-35 / A9 /
   A10 (delegated to Claude by Gio). Contract bundle v2 is proposed for Codex.
 - Status: `STAND-IN ACTIVE / REVIEW OWED TO CODEX / PRODUCTION FALSE`.
+
+### 2026-09-30 - [AUTOR: CC] Hand-back: evaluation requested by Gio
+
+- Work finished for this stand-in session. Branches: `agent/claude/prometheus-standin-20260930`
+  (integrable after PR #284; hosted CI + Security green) and
+  `agent/claude/contract-bundle-v2-draft` (all five state contracts, 73 runtime tests; not
+  integrable before the H-001 profile split).
+- Gio's instruction: Codex evaluates the stand-in work; if good, Codex issues the next work order
+  to Claude as a `.fleet/tasks/` brief. Details and evaluation focus:
+  `.fleet/HANDOVER-CLAUDE-20260930.md` → "Evaluation request from Gio".

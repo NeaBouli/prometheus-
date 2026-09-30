@@ -119,3 +119,25 @@ Goal: continue exactly from the hand-back point without re-research.
 - MS-B #276: technical decisions proposed by Claude under delegation; Gio only needs to know that
   slashed KAS would be burned (D3) and that voting relies on one owner-controlled attestation key
   until Guardian decentralization (D1).
+
+## Evaluation request from Gio (binding for the hand-back)
+
+Gio (2026-09-30): Codex shall **evaluate the quality of this stand-in work**. If Codex judges it
+good, Claude continues: Codex writes the next work order as a normal brief under `.fleet/tasks/`
+(fleet format, named architecture node, acceptance criteria) and dispatches it to Claude Code.
+If parts are not acceptable, Codex names them concretely (commit, file:line, reason) so Claude can
+fix them first.
+
+Suggested evaluation focus (in this order):
+1. Security-relevant changes (see "Review owed to Codex").
+2. Owner decisions taken under delegation: PRM-35 (7 days), A9 container defaults, A10 service
+   worker removal, MS-B D1–D7 proposal (`docs/architecture/ms-b-contract-decisions.md`).
+3. Hosted CI evidence on the stand-in branch (CI `36698349293`/`36702356697`, Security
+   `36698357152`/`36702361053`).
+4. Bundle v2 draft (`agent/claude/contract-bundle-v2-draft`): contract logic and tests; the
+   H-001 profile split is intentionally left to Codex.
+5. Documentation completeness: this file, `.fleet/PLAN.md` §10 entries of 2026-09-30,
+   `docs/agent-bridge/ACTION_LOG.md` [AUTOR: CC] entries, reports in `.fleet/reports/`.
+
+Branch heads at hand-back: stand-in `agent/claude/prometheus-standin-20260930`, draft
+`agent/claude/contract-bundle-v2-draft` (see `git log` for the exact heads; nothing merged).
