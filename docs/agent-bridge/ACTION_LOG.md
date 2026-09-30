@@ -5952,3 +5952,6 @@ Rules for all dev agents:
 - A9/#280: Guardian Compose UID:GID 2000:2000, CPU caps 16/64, /tmp exec kept
   for JIT kernels (documented), unauthenticated loopback vLLM documented as a
   single-operator trust boundary. Guardian 1428 passed / 4 skipped.
+- PRM-35 cooldown (delegated decision): 7 days target; fixture unchanged until a
+  reviewed contract-bundle revision because `FULL_BUNDLE_MANIFEST_SHA256` pins
+  the H-001 canary bundle. Public text corrected to decided-vs-current.

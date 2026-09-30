@@ -542,3 +542,8 @@ Both runs require Gio budget approval (plan-level gate).
 - A9/#280 DECIDED: 2000:2000, CPU caps 16/64, /tmp stays exec (JIT), loopback
   vLLM documented as single-operator trust boundary. Report
   `.fleet/reports/a9-guardian-compose.md`.
+- PRM-35 / #276 cooldown DECIDED: 7 days (6,048,000 blocks), because the 1-day
+  voting period must settle before exit. Implementation deferred to a reviewed
+  "contract bundle v2" (the deployer pins the H-001 bundle manifest); public
+  text states decided target vs current fixture. Report
+  `.fleet/reports/prm35-cooldown-decision.md`.
