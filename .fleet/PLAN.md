@@ -572,3 +572,11 @@ Both runs require Gio budget approval (plan-level gate).
   Compose rendering with the A9 CPU caps, the GH-283 gate + mutation regression,
   and the site CSS gate on hosted runners. Later head `f737c7b` (action SHA
   pins) still needs one hosted run.
+
+### 2026-09-30 — MS-B decision record proposed (Claude stand-in, delegated)
+
+- `docs/architecture/ms-b-contract-decisions.md`: D1–D7 for #276 with a
+  verified pinned-silverc capability baseline (tx.time→CLTV, this.age→CSV,
+  input/output amount introspection, checkSig/checkSigFromStack, no runtime
+  cross-contract calls). Binding only after Codex architecture review; child
+  issues listed for Codex to open; all outcomes ship as one "contract bundle v2".
