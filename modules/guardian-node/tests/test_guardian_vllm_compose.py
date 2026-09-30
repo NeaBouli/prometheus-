@@ -226,6 +226,23 @@ def test_root_user_rejected() -> None:
     _assert_rejected(lambda doc: _service(doc).pop("user"), "user")
 
 
+def test_root_group_rejected() -> None:
+    _assert_rejected(lambda doc: _service(doc).update(user="2000:0"), "user")
+    _assert_rejected(
+        lambda doc: _service(doc, "guardian-70b").update(user="2000:0"), "user"
+    )
+
+
+def test_tmpfs_policy_drift_rejected() -> None:
+    _assert_rejected(
+        lambda doc: _service(doc).update(tmpfs=["/tmp:rw,nodev,size=4g"]), "tmpfs"
+    )
+    _assert_rejected(
+        lambda doc: _service(doc).update(tmpfs=["/tmp:rw,nosuid,nodev,size=64g"]),
+        "tmpfs",
+    )
+
+
 def test_capability_regressions_rejected() -> None:
     _assert_rejected(lambda doc: _service(doc).pop("cap_drop"), "cap_drop")
     _assert_rejected(lambda doc: _service(doc).update(cap_drop=["NET_RAW"]), "cap_drop")
@@ -247,6 +264,10 @@ def test_writable_root_filesystem_rejected() -> None:
 def test_unbounded_resources_rejected() -> None:
     _assert_rejected(lambda doc: _service(doc).pop("pids_limit"), "pids_limit")
     _assert_rejected(lambda doc: _service(doc).pop("mem_limit"), "mem_limit")
+    _assert_rejected(lambda doc: _service(doc).pop("cpus"), "cpus")
+    _assert_rejected(
+        lambda doc: _service(doc, "guardian-70b").update(cpus="128"), "cpus"
+    )
     _assert_rejected(lambda doc: _service(doc).pop("shm_size"), "shm_size")
     _assert_rejected(lambda doc: _service(doc).pop("tmpfs"), "tmpfs")
 
