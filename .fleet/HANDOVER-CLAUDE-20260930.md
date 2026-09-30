@@ -39,6 +39,7 @@ Goal: continue exactly from the hand-back point without re-research.
 | 2026-09-30 | GH-275 rest | H-001 evidence fallback investigated (API pruned, explorer 402); README wording | Claims/evidence verifier pass. |
 | 2026-09-30 | Records | memory/TODO + STATUS refreshed to 2026-09-30 | Memory/status/claim gates pass. |
 | 2026-09-30 | DA1 | Endpoint producer design (design only) | Hygiene/claim/GH-267 gates pass. Report `.fleet/reports/da1-endpoint-producer-design.md`. |
+| 2026-09-30 | PRM-12 (part) | Actions pinned to commit SHAs | YAML/tests OK; hosted run on f737c7b owed. Report `.fleet/reports/prm12-actions-sha-pin.md`. |
 
 ## Current state
 - Branch/worktree: `agent/claude/prometheus-standin-20260930` in
