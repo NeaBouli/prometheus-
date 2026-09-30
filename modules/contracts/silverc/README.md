@@ -755,8 +755,18 @@ upstream Silverscript ref and runtime-tests covenant transitions for:
 
 - `donateKas`
 - `proposeDisbursement`
-- `voteDisbursement`
-- `executeDisbursement`
+- `finalizeDisbursement`
+
+Bundle v2 draft (MS-B D1–D4): the free `voteDisbursement` transition is removed and
+`executeDisbursement` is replaced by `finalizeDisbursement`, which takes an attested tally
+(`sha256("prometheus-disbursement-tally-v1" || u64le(disbursement_id) || u64le(for) ||
+u64le(against) || u64le(active_set_size) || validator_set_root)`, `checkSigFromStack` by the
+governance key) after `tx.time >= voting_end_block`. With at least 50 % participation and
+6,700 bps approval it pays exactly `amount_kas` sompi-scaled to the recipient's P2PK output
+and keeps the rest in the covenant; otherwise the proposal ends REJECTED with the value
+unchanged (previously a failed vote left the slot PENDING forever). The covenant value must
+equal `pool_balance_kas * 100000000` sompi, and `donateKas` must add exactly the donated value.
+`DISBURSEMENT_QUORUM` is kept for reference but superseded by the participation rule.
 
 Verified rejection paths include zero donation amount, disbursement amount
 above pool balance, voting at `voting_end_block`, and execution below

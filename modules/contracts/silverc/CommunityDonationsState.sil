@@ -27,6 +27,7 @@ contract CommunityDonationsState(
     int constant STATUS_PENDING = 1;
     int constant STATUS_EXECUTED = 2;
     int constant STATUS_REJECTED = 3;
+    int constant SOMPI_PER_KAS = 100000000;
 
     pubkey governance_pk = init_governance_pk;
     int donation_count = init_donation_count;
@@ -46,6 +47,12 @@ contract CommunityDonationsState(
     byte[32] last_message_hash = init_last_message_hash;
     int last_donation_block = init_last_donation_block;
 
+    function requirePoolBacked(State prev_state) : int {
+        int covenant_value = tx.inputs[this.activeInputIndex].value;
+        require(covenant_value == prev_state.pool_balance_kas * SOMPI_PER_KAS);
+        return(covenant_value);
+    }
+
     #[covenant.singleton(mode = transition)]
     function donateKas(State prev_state, pubkey donor_pk, int amount, byte[32] message_hash, int block_height, sig donor_sig) : State {
         require(amount >= MIN_DONATION_KAS);
@@ -53,7 +60,10 @@ contract CommunityDonationsState(
         require(prev_state.donation_count >= 0);
         require(prev_state.total_donated_kas >= 0);
         require(prev_state.pool_balance_kas >= 0);
+        require(tx.time >= block_height);
         require(checkSig(donor_sig, donor_pk));
+        int covenant_value = requirePoolBacked(prev_state);
+        require(tx.outputs[0].value == covenant_value + amount * SOMPI_PER_KAS);
 
         return({
             governance_pk: prev_state.governance_pk,
@@ -91,7 +101,10 @@ contract CommunityDonationsState(
         require(amount <= prev_state.pool_balance_kas);
         require(block_height >= 0);
         require(prev_state.next_disbursement_id >= 0);
+        require(tx.time >= block_height);
         require(checkSig(proposer_sig, proposer_pk));
+        int covenant_value = requirePoolBacked(prev_state);
+        require(tx.outputs[0].value == covenant_value);
 
         return({
             governance_pk: prev_state.governance_pk,
@@ -115,71 +128,78 @@ contract CommunityDonationsState(
     }
 
     #[covenant.singleton(mode = transition)]
-    function voteDisbursement(State prev_state, bool support, int block_height, sig validator_sig, pubkey validator_pk) : State {
+    function finalizeDisbursement(
+        State prev_state,
+        int block_height,
+        int tally_for,
+        int tally_against,
+        int active_set_size,
+        byte[32] validator_set_root,
+        datasig tally_attestation,
+        sig governance_sig
+    ) : State {
         require(prev_state.status == STATUS_PENDING);
         require(!prev_state.executed);
-        require(block_height >= 0);
-        require(block_height < prev_state.voting_end_block);
-        require(checkSig(validator_sig, validator_pk));
+        require(block_height >= prev_state.voting_end_block);
+        require(tx.time >= prev_state.voting_end_block);
+        require(checkSig(governance_sig, prev_state.governance_pk));
+        require(tally_for >= 0);
+        require(tally_against >= 0);
+        require(active_set_size > 0);
 
-        int next_votes_for = prev_state.votes_for;
-        int next_votes_against = prev_state.votes_against;
-        if (support) {
-            next_votes_for = next_votes_for + 1;
+        int total_votes = tally_for + tally_against;
+        require(total_votes <= active_set_size);
+
+        byte[32] tally_digest = sha256(
+            0x70726f6d6574686575732d64697362757273656d656e742d74616c6c792d7631
+            + byte[8](prev_state.disbursement_id)
+            + byte[8](tally_for)
+            + byte[8](tally_against)
+            + byte[8](active_set_size)
+            + validator_set_root
+        );
+        require(checkSigFromStack(tally_attestation, tally_digest, prev_state.governance_pk));
+
+        int covenant_value = requirePoolBacked(prev_state);
+        int payout_sompi = prev_state.amount_kas * SOMPI_PER_KAS;
+        bool approved = false;
+        if (total_votes * 2 >= active_set_size) {
+            if (tally_for * 10000 >= VALIDATOR_QUORUM * total_votes) {
+                approved = true;
+            }
+        }
+
+        int next_status = STATUS_REJECTED;
+        int next_pool_balance = prev_state.pool_balance_kas;
+        bool next_executed = false;
+        if (approved) {
+            require(prev_state.pool_balance_kas >= prev_state.amount_kas);
+            byte[] recipient_script_public_key = 0x000020 + byte[32](prev_state.recipient_pk) + 0xac;
+            require(tx.outputs[0].value == covenant_value - payout_sompi);
+            require(tx.outputs[1].value == payout_sompi);
+            require(tx.outputs[1].scriptPubKey == recipient_script_public_key);
+            next_status = STATUS_EXECUTED;
+            next_pool_balance = prev_state.pool_balance_kas - prev_state.amount_kas;
+            next_executed = true;
         } else {
-            next_votes_against = next_votes_against + 1;
+            require(tx.outputs[0].value == covenant_value);
         }
 
         return({
             governance_pk: prev_state.governance_pk,
             donation_count: prev_state.donation_count,
             total_donated_kas: prev_state.total_donated_kas,
-            pool_balance_kas: prev_state.pool_balance_kas,
+            pool_balance_kas: next_pool_balance,
             next_disbursement_id: prev_state.next_disbursement_id,
             disbursement_id: prev_state.disbursement_id,
             recipient_pk: prev_state.recipient_pk,
             amount_kas: prev_state.amount_kas,
             purpose_hash: prev_state.purpose_hash,
-            votes_for: next_votes_for,
-            votes_against: next_votes_against,
+            votes_for: tally_for,
+            votes_against: tally_against,
             voting_end_block: prev_state.voting_end_block,
-            status: prev_state.status,
-            executed: prev_state.executed,
-            last_donor_pk: prev_state.last_donor_pk,
-            last_message_hash: prev_state.last_message_hash,
-            last_donation_block: prev_state.last_donation_block
-        });
-    }
-
-    #[covenant.singleton(mode = transition)]
-    function executeDisbursement(State prev_state, int block_height, sig governance_sig) : State {
-        require(prev_state.status == STATUS_PENDING);
-        require(!prev_state.executed);
-        require(block_height >= prev_state.voting_end_block);
-        require(checkSig(governance_sig, prev_state.governance_pk));
-
-        int total_votes = prev_state.votes_for + prev_state.votes_against;
-        require(total_votes >= DISBURSEMENT_QUORUM);
-
-        int approval = prev_state.votes_for * 10000 / total_votes;
-        require(approval >= VALIDATOR_QUORUM);
-        require(prev_state.pool_balance_kas >= prev_state.amount_kas);
-
-        return({
-            governance_pk: prev_state.governance_pk,
-            donation_count: prev_state.donation_count,
-            total_donated_kas: prev_state.total_donated_kas,
-            pool_balance_kas: prev_state.pool_balance_kas - prev_state.amount_kas,
-            next_disbursement_id: prev_state.next_disbursement_id,
-            disbursement_id: prev_state.disbursement_id,
-            recipient_pk: prev_state.recipient_pk,
-            amount_kas: prev_state.amount_kas,
-            purpose_hash: prev_state.purpose_hash,
-            votes_for: prev_state.votes_for,
-            votes_against: prev_state.votes_against,
-            voting_end_block: prev_state.voting_end_block,
-            status: STATUS_EXECUTED,
-            executed: true,
+            status: next_status,
+            executed: next_executed,
             last_donor_pk: prev_state.last_donor_pk,
             last_message_hash: prev_state.last_message_hash,
             last_donation_block: prev_state.last_donation_block

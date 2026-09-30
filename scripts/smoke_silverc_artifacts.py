@@ -210,8 +210,7 @@ FIXTURES = (
         abi=(
             "__covenant_entrypoint_auth_donateKas",
             "__covenant_entrypoint_auth_proposeDisbursement",
-            "__covenant_entrypoint_auth_voteDisbursement",
-            "__covenant_entrypoint_auth_executeDisbursement",
+            "__covenant_entrypoint_auth_finalizeDisbursement",
         ),
     ),
     Fixture(

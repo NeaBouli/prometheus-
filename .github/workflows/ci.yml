@@ -124,7 +124,7 @@ jobs:
           grep -q 'VALIDATOR_QUORUM = 6700' "$fixture"
           grep -q 'pool_balance_kas' "$fixture"
           grep -q 'donateKas' "$fixture"
-          grep -q 'executeDisbursement' "$fixture"
+          grep -q 'finalizeDisbursement' "$fixture"
           if grep -q 'transfer(' "$fixture"; then
             echo "ERROR: CommunityDonationsState fixture must not pretend to transfer KAS in current Silverc."
             exit 1
