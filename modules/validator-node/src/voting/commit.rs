@@ -70,7 +70,9 @@ impl CommitmentBuilder {
         stake_kas: u64,
     ) -> VoteCommitment {
         let commitment_hash = compute_commitment_hash(vote, salt, block_height);
-        let bond_kas = stake_kas * BOND_PERCENT / 100;
+        // Saturating like the slashing formula; stakes near u64::MAX are unreachable
+        // but must not panic or wrap (audit PRM-12).
+        let bond_kas = stake_kas.saturating_mul(BOND_PERCENT) / 100;
 
         VoteCommitment {
             commitment_hash,
