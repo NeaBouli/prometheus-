@@ -47,6 +47,8 @@ Goal: continue exactly from the hand-back point without re-research.
 | 2026-09-30 | Bundle v2 DRAFT step 2 | Stake-backed value conservation + burned slashing (P2SH of OP_RETURN) | 63 runtime tests. Report on draft branch. |
 | 2026-09-30 | Bundle v2 DRAFT step 3 | RuleStorage: attested submission + tally, 50 % participation, tx.time | 67 runtime tests; silverc `byte[](v,8)` finding. |
 | 2026-09-30 | Bundle v2 DRAFT step 4 | CommunityDonations: attested finalize, exact P2PK payout, REJECTED path, value-backed donations | 72 runtime tests. |
+| 2026-09-30 | Bundle v2 DRAFT step 5 | GovernanceAutoTuning autoTune bound to tx.time | 73 runtime tests. |
+| 2026-09-30 | Bundle v2 DRAFT step 6 | DevIncentivePool governance key + attested finalizeGrant, REJECTED path | 73 runtime tests. |
 
 ## Current state
 - Branch/worktree: `agent/claude/prometheus-standin-20260930` in
