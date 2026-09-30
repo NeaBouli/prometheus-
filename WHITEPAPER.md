@@ -269,7 +269,7 @@ if remaining_stake < MIN_STAKE_KAS: deactivate validator
 
 ### 6.3 Withdrawal
 
-7-day cooldown enforced via `COOLDOWN_BLOCKS = 100,800` (~7 days at 10 BPS).
+The decided target is a 7-day cooldown (`6,048,000` blocks at 10 BPS), longer than the 1-day rule voting period so a validator cannot exit before its votes are settled. The current contract fixture still uses `COOLDOWN_BLOCKS = 100,800` (about 2.8 hours at 10 BPS); it changes only in the next reviewed contract-bundle revision, because the H-001 canary profile pins the current bundle manifest (audit PRM-35).
 
 ---
 
