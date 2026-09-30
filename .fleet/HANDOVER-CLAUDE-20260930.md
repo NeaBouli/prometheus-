@@ -31,6 +31,7 @@ Goal: continue exactly from the hand-back point without re-research.
 | 2026-09-30 | A12a / PRM-43 | WCAG AA contrast on all public pages + CSS dedupe + CI gate | 796→0 failing text nodes; 5 pages × 4 viewports clean. Report `.fleet/reports/a12a-contrast.md`. |
 | 2026-09-30 | A12b / PRM-47/48 | noopener, skip link, reduced-motion/no-JS fallbacks | Keyboard + reduced-motion + no-JS checks pass. Report `.fleet/reports/a12b-a11y.md`. |
 | 2026-09-30 | A12d | Display-sized images (index ≈3.1 MB → ≈208 KB) | Images load at 1440/390; layout gate clean. Report `.fleet/reports/a12d-images.md`. |
+| 2026-09-30 | PRM-34 (Gio decision) | PROM bug bounty removed from SECURITY.md | Gates pass. |
 
 ## Current state
 - Branch/worktree: `agent/claude/prometheus-standin-20260930` in
@@ -52,5 +53,5 @@ Goal: continue exactly from the hand-back point without re-research.
 1. (see latest row; next block chosen in PLAN tail)
 
 ## Open decisions for Gio
-- MS-B #276 seven contract decisions; A9/GH-280 defaults; A10/#275 service worker; A11/PRM-34 bug bounty;
+- MS-B #276 seven contract decisions; A9/GH-280 defaults; A10/#275 service worker; A11/PRM-34 bug bounty (DECIDED 2026-09-30: removed);
   A3 consent; audit budget. (Unchanged from PLAN §6.)

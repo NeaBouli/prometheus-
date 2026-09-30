@@ -524,3 +524,10 @@ Both runs require Gio budget approval (plan-level gate).
 
 - Display-sized logo/coin variants; index images ≈3.1 MB → ≈208 KB.
   PRM-35 cooldown text on the token card noted for #276. State: `A12d LOCAL VERIFIED`.
+
+### 2026-09-30 — Owner decision PRM-34: no bug bounty (Gio)
+
+- Gio: PROM would first have to be minted and there is no pool, so a PROM
+  bounty is not a sound approach — remove it. SECURITY.md now states there is
+  no bug bounty program (no PROM reward offered or planned); disclosure via
+  GitHub Security Advisories unchanged. A11 PRM-34 is thereby closed.

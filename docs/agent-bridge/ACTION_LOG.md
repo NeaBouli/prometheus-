@@ -5937,3 +5937,9 @@ Rules for all dev agents:
 
 - Display-sized logo/coin images on five pages (≈3.1 MB → ≈208 KB on index).
   Report `.fleet/reports/a12d-images.md`.
+
+### 2026-09-30 - [AUTOR: CC] DECISION (Gio): PRM-34 bug bounty removed
+
+- Owner decision: no PROM bug bounty (PROM not minted, no pool). SECURITY.md
+  "Rewards" section: no bug bounty program; reports carry no payment
+  entitlement. Claim/hygiene/memory/status gates pass.
