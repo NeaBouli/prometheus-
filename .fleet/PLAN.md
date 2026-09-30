@@ -603,3 +603,11 @@ Both runs require Gio budget approval (plan-level gate).
   autoTune bound to tx.time; DevIncentivePool gets a governance key and
   attested grant finalization with REJECTED path. All five state contracts now
   carry their MS-B draft changes; 73 runtime tests pass.
+
+### 2026-09-30 — Codex handback review started
+
+- Codex reviews stand-in security changes and hosted evidence; Kimi owns the
+  independent read-only contract-draft review (handback-contract-review).
+- Claude remains the preferred implementation worker. The next brief follows
+  review findings; historical H-001 evidence remains frozen.
+- State: `HANDBACK REVIEW IN PROGRESS / NO MERGE OR DEPLOY YET`.
