@@ -64,6 +64,14 @@ output that pays exactly the slashed amount to a provably unspendable script
 output must carry `previous amount - slashed amount`. Donation and withdrawal
 transitions get the same value-conservation checks.
 
+Feasibility (pinned silverc tutorial and compiler): `tx.inputs[this.activeInputIndex].value`,
+`tx.outputs[i].value` and `tx.outputs[i].scriptPubKey` compile to `OpTxInputAmount` /
+`OpTxOutputAmount` / output-script introspection, so a transition can require
+`tx.outputs[0].value == tx.inputs[this.activeInputIndex].value - slashed_sompi` and pin the burn
+output script. Prerequisite: the state field `stake_kas` must equal the covenant UTXO value
+(1 KAS = 100,000,000 sompi) from genesis on, so the deployer's genesis output value has to be
+derived from the initial stake instead of an operator-chosen amount.
+
 Why burn: routing slashed KAS to a governance- or treasury-controlled pool would
 let the parties who trigger slashing profit from it. Burning removes that
 conflict of interest and keeps KAS/PROM separation untouched.
