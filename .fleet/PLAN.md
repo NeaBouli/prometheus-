@@ -531,3 +531,14 @@ Both runs require Gio budget approval (plan-level gate).
   bounty is not a sound approach — remove it. SECURITY.md now states there is
   no bug bounty program (no PROM reward offered or planned); disclosure via
   GitHub Security Advisories unchanged. A11 PRM-34 is thereby closed.
+
+### 2026-09-30 — Gio delegates technical owner decisions to Claude
+
+- Gio: "entscheide du, ich kenne mich hier nicht aus" (service worker, cooldown,
+  container defaults). Decisions and rationale below; review owed to Codex.
+- A10/#275 DECIDED remove: service worker never installed (root paths 404);
+  cleanup worker + registrations removed; dead GSC meta removed; explorer
+  outage wording. Report `.fleet/reports/a10-service-worker.md`.
+- A9/#280 DECIDED: 2000:2000, CPU caps 16/64, /tmp stays exec (JIT), loopback
+  vLLM documented as single-operator trust boundary. Report
+  `.fleet/reports/a9-guardian-compose.md`.

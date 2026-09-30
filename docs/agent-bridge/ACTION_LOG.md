@@ -5943,3 +5943,12 @@ Rules for all dev agents:
 - Owner decision: no PROM bug bounty (PROM not minted, no pool). SECURITY.md
   "Rewards" section: no bug bounty program; reports carry no payment
   entitlement. Claim/hygiene/memory/status gates pass.
+
+### 2026-09-30 - [AUTOR: CC] DECISION (delegated by Gio): A10 service worker, A9 Compose
+
+- A10/#275: service worker removed (never installed: root-absolute precache,
+  root index 404); self-unregistering cleanup sw.js; dead GSC meta removed;
+  README notes third-party TN10 explorer outage. Browser-verified.
+- A9/#280: Guardian Compose UID:GID 2000:2000, CPU caps 16/64, /tmp exec kept
+  for JIT kernels (documented), unauthenticated loopback vLLM documented as a
+  single-operator trust boundary. Guardian 1428 passed / 4 skipped.

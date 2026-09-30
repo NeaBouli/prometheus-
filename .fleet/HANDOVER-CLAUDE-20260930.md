@@ -32,6 +32,8 @@ Goal: continue exactly from the hand-back point without re-research.
 | 2026-09-30 | A12b / PRM-47/48 | noopener, skip link, reduced-motion/no-JS fallbacks | Keyboard + reduced-motion + no-JS checks pass. Report `.fleet/reports/a12b-a11y.md`. |
 | 2026-09-30 | A12d | Display-sized images (index ≈3.1 MB → ≈208 KB) | Images load at 1440/390; layout gate clean. Report `.fleet/reports/a12d-images.md`. |
 | 2026-09-30 | PRM-34 (Gio decision) | PROM bug bounty removed from SECURITY.md | Gates pass. |
+| 2026-09-30 | A10 / GH-275 (delegated decision) | Service worker removed, GSC meta, explorer wording | Browser-verified. Report `.fleet/reports/a10-service-worker.md`. |
+| 2026-09-30 | A9 / GH-280 (delegated decision) | Compose 2000:2000, CPU caps, tmpfs rationale, vLLM trust boundary | Guardian 1428/4 skipped. Report `.fleet/reports/a9-guardian-compose.md`. |
 
 ## Current state
 - Branch/worktree: `agent/claude/prometheus-standin-20260930` in
@@ -44,6 +46,7 @@ Goal: continue exactly from the hand-back point without re-research.
 - See A8u1 F3/F4 (deployer binds `toccata_activation_daa_score` into signing request/receipt schema).
 
 ## Review owed to Codex
+- A9: container identity/resources (security surface); A10 cleanup worker.
 - GH-279: dependency/CI supply-chain change (ci.yml python-check install + gate). Solo by Claude.
 - GH-283: CI contract-assurance gate + expectation file. Solo by Claude.
 - A11: visible HTML changes (index/guardian-economics) — post-deploy visual recheck owed after merge.
@@ -53,5 +56,5 @@ Goal: continue exactly from the hand-back point without re-research.
 1. (see latest row; next block chosen in PLAN tail)
 
 ## Open decisions for Gio
-- MS-B #276 seven contract decisions; A9/GH-280 defaults; A10/#275 service worker; A11/PRM-34 bug bounty (DECIDED 2026-09-30: removed);
+- MS-B #276 seven contract decisions; A9/GH-280 defaults (DECIDED by Claude, delegated); A10/#275 service worker (DECIDED: removed); A11/PRM-34 bug bounty (DECIDED 2026-09-30: removed);
   A3 consent; audit budget. (Unchanged from PLAN §6.)
