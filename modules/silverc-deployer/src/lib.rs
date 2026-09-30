@@ -84,6 +84,7 @@ const DEPLOY_REQUEST_SAFETY_FIELDS: &[&str] = &[
 const DEPLOY_REQUEST_SAFETY_SCOPE: &str = "deploy_request_builder_only";
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
 pub struct ScriptSpec {
     pub version: u16,
     pub script_hex: String,
@@ -107,6 +108,7 @@ impl ScriptSpec {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
 pub struct OutpointSpec {
     pub transaction_id: String,
     pub index: u32,
@@ -130,6 +132,7 @@ impl OutpointSpec {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct FundingUtxoSpec {
     pub amount: u64,
     pub script_public_key: ScriptSpec,
@@ -138,12 +141,14 @@ pub struct FundingUtxoSpec {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ChangeOutputSpec {
     pub value: u64,
     pub script_public_key: ScriptSpec,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct GenesisFundingSpec {
     pub schema_version: u32,
     pub kind: String,
@@ -176,6 +181,9 @@ pub struct DeploymentProfile {
     pub full_bundle_manifest_sha256: String,
 }
 
+/// Rust projection of the hash-bound deploy request. The Python builder adds
+/// descriptive fields (Silverscript ref, ABI, constructor args, ...) that are
+/// covered by `request_sha256`, so unknown fields are ignored here by design.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DeployRequest {
     pub schema_version: u32,
@@ -247,6 +255,7 @@ pub struct SigningRequest {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct SignatureResponse {
     pub schema_version: u32,
     pub kind: String,
@@ -283,6 +292,7 @@ fn legacy_broadcast_record_source() -> String {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
 pub struct BroadcastResult {
     pub schema_version: u32,
     pub result_type: String,
@@ -303,6 +313,7 @@ pub struct BroadcastResult {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
 pub struct BroadcastJournal {
     pub schema_version: u32,
     pub journal_type: String,
@@ -3206,6 +3217,35 @@ mod tests {
         let signature_response_path = temp_dir.join("signature-response.json");
         write_public_json(&signing_request_path, &prepared.signing_request).unwrap();
         write_public_json(&signature_response_path, &response).unwrap();
+
+        // PRM-12: operator-authored formats reject unknown (e.g. misspelled) fields.
+        let mut typo_funding: Value =
+            serde_json::from_slice(&fs::read(&funding_path).unwrap()).unwrap();
+        let change = typo_funding
+            .as_object_mut()
+            .unwrap()
+            .remove("change_output")
+            .unwrap();
+        typo_funding
+            .as_object_mut()
+            .unwrap()
+            .insert("change_ouput".to_string(), change);
+        let typo_funding_path = temp_dir.join("typo-funding.json");
+        write_public_json(&typo_funding_path, &typo_funding).unwrap();
+        let error = load_funding_spec(&typo_funding_path)
+            .expect_err("misspelled change_output must not be silently dropped");
+        assert!(error.to_string().contains("unknown field"));
+
+        let mut extra_response = serde_json::to_value(&response).unwrap();
+        extra_response
+            .as_object_mut()
+            .unwrap()
+            .insert("note".to_string(), Value::String("x".to_string()));
+        let extra_response_path = temp_dir.join("extra-signature-response.json");
+        write_public_json(&extra_response_path, &extra_response).unwrap();
+        let error = load_signature_response(&extra_response_path)
+            .expect_err("signature response with unknown field must fail");
+        assert!(error.to_string().contains("unknown field"));
 
         let signing_request = load_signing_request(&signing_request_path).unwrap();
         let signature_response = load_signature_response(&signature_response_path).unwrap();
