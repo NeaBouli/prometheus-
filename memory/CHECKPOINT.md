@@ -5,6 +5,11 @@
 
 ---
 
+> **Record status (2026-09-30):** historical working record, not the current
+> project status. Current sources: `README.md` (Project Status), `docs/roadmap.md`,
+> `memory/STATUS.md`, and the delivery plan `.fleet/PLAN.md`. Entries below are
+> retained unchanged as audit history; its GH-220 "in progress" note is superseded (GH-220 is merged).
+
 ## IDENTITÄT
 
 | Feld | Wert |
@@ -86,7 +91,7 @@
 | sitemap.xml | 5 URLs mit Priority + Lastmod |
 | manifest.json | PWA-Support, 2 Icons (Prometheus + PROM coin) |
 | sw.js | Service Worker für Offline-Caching |
-| SECURITY.md | Bug Bounty + Disclosure Policy (GitHub only, no email) |
+| SECURITY.md | Disclosure Policy (GitHub only, no email; no bug bounty program) |
 | docs/repository-security.md | Branch Protection Anleitung für Core Dev |
 | googleaa2902079481c7a8.html | Google Search Console Verification |
 
@@ -130,7 +135,7 @@
 
 **STARTFLOW — Lies dies zuerst:**
 ```
-1. cd /Users/gio/Desktop/repos/prometheus
+1. cd $HOME/Desktop/repos/prometheus
 2. git log --oneline -5              → aktuellen HEAD prüfen; letzter dokumentierter grün verifizierter Produkt-/Tooling-Commit = 42acbca
 3. git tag -l                        → Rollback: pre-session-20260413
 4. cargo test 2>&1 | tail -5         → Muss grün sein
@@ -355,7 +360,7 @@ Leistungsbasierte Emission. Guardians = "Miner" (KI statt GPU).
 ## Checkpoint 2026-07-26: local v2 proof binding review-ready
 
 - Ticket `GIO-PROM-20260726-005` is implemented in isolated worktree
-  `/Users/gio/Desktop/repos/prometheus-v2-proof-binding` on
+  `$HOME/Desktop/repos/prometheus-v2-proof-binding` on
   `feat/local-v2-proof-binding`, based on exact public main
   `b556fbbae428e7f6eef07c6d502b32e13e759813`.
 - Rust/Python canonical proof-envelope and RelationManifest-v2 parsers feed one

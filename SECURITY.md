@@ -10,16 +10,12 @@ https://github.com/NeaBouli/prometheus-/security/advisories/new
 We will respond within 90 days (responsible disclosure period).
 No legal action will be taken against ethical security researchers.
 
-## Bug Bounty
+## Rewards
 
-Active from Testnet launch. Rewards paid in PROM from the Dev Pool.
-
-| Severity | Description | Reward |
-|----------|-------------|--------|
-| CRITICAL | Funds at risk (staking contract exploitable) | 50,000-100,000 PROM |
-| HIGH | Protocol integrity (rules manipulable) | 10,000-50,000 PROM |
-| MEDIUM | Denial of service | 2,000-10,000 PROM |
-| LOW | Information leak or logic errors | 500-2,000 PROM |
+Prometheus has **no bug bounty program**. Security reports are welcome and are
+handled through the disclosure channel above, but they carry no reward or
+payment entitlement. PROM does not exist (no minting, no emission, no pool), so
+no PROM-denominated reward is offered or planned in this policy.
 
 ## Contact
 

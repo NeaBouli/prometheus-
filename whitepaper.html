@@ -9,7 +9,6 @@
 <meta name="keywords" content="Prometheus whitepaper, Kaspa Silverscript, PROM tokenomics, LLaMA 3 security, decentralized threat intelligence, Groth16 ZK-proof">
 <meta name="author" content="Prometheus Protocol">
 <meta name="robots" content="index, follow">
-<meta name="google-site-verification" content="googleaa2902079481c7a8">
 <link rel="manifest" href="/prometheus-/manifest.json">
 <meta name="theme-color" content="#00E5A0">
 <link rel="canonical" href="https://neabouli.github.io/prometheus-/whitepaper.html">
@@ -35,30 +34,13 @@
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css?v=20260930">
 <style>
-:root {
-  --void: #050505;--deep: #0a0a0a;--surface: #0f0f0f;--panel: #141414;
-  --line: rgba(255,255,255,0.07);--line-bright: rgba(255,255,255,0.14);
-  --mint: #00E5A0;--mint-dim: #00B880;--mint-faint: rgba(0,229,160,0.06);
-  --silver: #C8C8C8;--silver-dim: #787878;--gold: #C8A060;
-  --text: #E2E2E2;--muted: #666666;--dim: #333333;
-}
-*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{font-family:'Space Grotesk',sans-serif;background:var(--void);color:var(--text);overflow-x:hidden;-webkit-font-smoothing:antialiased}
-body::before{content:'';position:fixed;inset:0;z-index:9999;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,0) 0px,rgba(0,0,0,0) 1px,rgba(0,0,0,0.03) 1px,rgba(0,0,0,0.03) 2px)}
-
 /* NAV */
 nav{position:fixed;top:0;left:0;right:0;z-index:500;padding:0 48px;height:56px;display:flex;align-items:center;justify-content:space-between;background:rgba(5,5,5,.97);border-bottom:1px solid var(--line);backdrop-filter:blur(8px)}
-.nav-id{display:flex;align-items:center;gap:14px;text-decoration:none}
-.nav-id img{height:26px;width:26px;object-fit:contain;filter:brightness(0) invert(1) brightness(.7)}
-.nav-wordmark{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;letter-spacing:4px;color:var(--silver);text-transform:uppercase}
-.nav-links{display:flex;gap:36px;list-style:none}
-.nav-links a{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color .2s}
 .nav-links a:hover,.nav-links a.active{color:var(--mint)}
 .nav-gh{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--mint);text-decoration:none;border:1px solid rgba(0,229,160,.3);padding:7px 18px;transition:background .2s}
 .nav-gh:hover{background:rgba(0,229,160,.08)}
-
 /* PAGE HEADER */
 .page-header{padding:140px 48px 80px;border-bottom:1px solid var(--line);position:relative;overflow:hidden}
 .page-header::before{content:'';position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:80px 80px;mask-image:radial-gradient(ellipse 60% 100% at 20% 50%,black 30%,transparent 100%)}
@@ -70,10 +52,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:500;padding:0 48px;height:56px;d
 .page-meta{display:flex;gap:24px;flex-wrap:wrap;margin-top:24px}
 .page-meta-item{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--muted);border:1px solid var(--line);padding:5px 12px}
 .page-meta-item span{color:var(--mint)}
-
 /* LAYOUT */
 .wp-layout{display:grid;grid-template-columns:260px 1fr;gap:0;max-width:1280px;margin:0 auto;padding:0 48px}
-
 /* SIDEBAR */
 .sidebar{padding:48px 32px 48px 0;border-right:1px solid var(--line);position:sticky;top:56px;height:calc(100vh - 56px);overflow-y:auto}
 .sidebar::-webkit-scrollbar{width:2px}
@@ -85,25 +65,20 @@ nav{position:fixed;top:0;left:0;right:0;z-index:500;padding:0 48px;height:56px;d
 .sb-links li a{font-size:12px;font-weight:300;color:var(--muted);text-decoration:none;display:block;padding:4px 0;transition:color .2s;line-height:1.4}
 .sb-links li a:hover{color:var(--silver)}
 .sb-links li a.active{color:var(--mint)}
-
 /* CONTENT */
 .wp-content{min-width:0;max-width:100%;overflow-x:clip;padding:64px 0 120px 64px}
-
 /* SECTION */
 .wp-section{margin-bottom:80px;padding-bottom:80px;border-bottom:1px solid var(--line)}
 .wp-section:last-child{border-bottom:none}
-
 .sec-label{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--mint);text-transform:uppercase;margin-bottom:12px;display:block}
 .sec-title{font-size:clamp(24px,3vw,40px);font-weight:300;color:var(--text);letter-spacing:-.5px;margin-bottom:32px;line-height:1.1}
 .sec-sub{font-size:18px;font-weight:300;color:var(--silver);margin-bottom:16px;margin-top:40px;padding-top:40px;border-top:1px solid var(--line)}
 .sec-sub:first-of-type{border-top:none;padding-top:0;margin-top:0}
-
 /* PROSE */
 p{font-size:14px;font-weight:300;color:var(--silver-dim);line-height:1.85;margin-bottom:16px}
 p:last-child{margin-bottom:0}
 strong{color:var(--silver);font-weight:500}
 em{color:var(--mint-dim);font-style:normal}
-
 /* TABLE */
 .wp-table{width:100%;border-collapse:collapse;margin:24px 0;font-size:12px}
 .wp-table th{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;padding:10px 14px;border-bottom:1px solid var(--line);text-align:left;font-weight:400;background:var(--deep)}
@@ -111,45 +86,30 @@ em{color:var(--mint-dim);font-style:normal}
 .wp-table td:first-child{font-family:'Space Mono',monospace;font-size:11px;color:var(--gold);white-space:nowrap}
 .wp-table tr:last-child td{border-bottom:none}
 .wp-table tr:hover td{background:rgba(255,255,255,.01)}
-
 /* CALLOUT */
 .callout{border-left:1px solid var(--mint);padding:16px 20px;background:var(--mint-faint);margin:20px 0}
 .callout p{color:var(--silver-dim);font-size:13px;line-height:1.7;margin:0}
 .callout strong{color:var(--mint)}
-
 .callout-gold{border-left:1px solid var(--gold);padding:16px 20px;background:rgba(200,160,96,.05);margin:20px 0}
 .callout-gold p{color:var(--silver-dim);font-size:13px;line-height:1.7;margin:0}
 .callout-gold strong{color:var(--gold)}
-
 /* CODE */
 pre{font-family:'Space Mono',monospace;font-size:11px;color:#5ABB90;line-height:1.8;padding:20px 24px;background:var(--deep);border:1px solid var(--line);margin:20px 0;overflow-x:auto;white-space:pre-wrap}
 code{font-family:'Space Mono',monospace;font-size:11px;color:var(--mint);background:rgba(0,229,160,.06);padding:2px 6px}
-
 /* LIST */
 ul.wp-list{list-style:none;margin:16px 0}
 ul.wp-list li{font-size:14px;font-weight:300;color:var(--silver-dim);padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04);display:flex;gap:12px;align-items:flex-start;line-height:1.5}
 ul.wp-list li:last-child{border-bottom:none}
 ul.wp-list li::before{content:'';flex-shrink:0;width:1px;height:14px;background:var(--mint);margin-top:4px;opacity:.5}
-
 /* TIMELINE */
 .timeline{display:grid;grid-template-columns:80px 1fr;gap:0;margin:24px 0}
 .tl-row{display:contents}
 .tl-time{font-family:'Space Mono',monospace;font-size:10px;color:var(--gold);padding:14px 16px 14px 0;border-bottom:1px solid rgba(255,255,255,.04);white-space:nowrap}
 .tl-content{font-size:13px;font-weight:300;color:var(--silver-dim);padding:14px 0;border-bottom:1px solid rgba(255,255,255,.04);line-height:1.5}
 .tl-content strong{color:var(--silver);font-weight:400}
-
 /* FOOTER */
-footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:24px}
-.f-left{font-family:'Space Mono',monospace;font-size:11px;color:var(--dim);letter-spacing:1px}
-.f-center{font-family:'Space Mono',monospace;font-size:12px;letter-spacing:3px;color:var(--silver-dim);text-align:center}
-.f-links{display:flex;justify-content:flex-end;gap:24px;list-style:none}
-.f-links a{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1px;color:var(--dim);text-decoration:none;transition:color .2s}
-.f-links a:hover{color:var(--mint)}
-
 .r{opacity:0;transform:translateY(20px);transition:opacity .5s ease,transform .5s ease}
-.r.on{opacity:1;transform:translateY(0)}
 .d1{transition-delay:.08s}
-
 @media(max-width:900px){
   nav{padding:0 24px}
   .nav-links{display:none}
@@ -162,24 +122,17 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
   .f-links{justify-content:flex-start}
 }
 /* MOBILE NAV */
-.nav-burger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:8px;z-index:600}
-.nav-burger span{display:block;width:22px;height:1px;background:var(--silver);transition:all .3s ease}
-.nav-burger.open span:nth-child(1){transform:translateY(6px) rotate(45deg)}
-.nav-burger.open span:nth-child(2){opacity:0}
-.nav-burger.open span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
-.mobile-menu{display:none;position:fixed;inset:56px 0 0 0;background:rgba(5,5,5,.98);backdrop-filter:blur(12px);z-index:490;flex-direction:column;padding:40px 32px;border-top:1px solid var(--line);overflow-y:auto}
-.mobile-menu a{font-family:'Space Mono',monospace;font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--silver-dim,#787878);text-decoration:none;padding:16px 0;border-bottom:1px solid var(--line);transition:color .2s}
-.mobile-menu a:last-child{border-bottom:none}
-.mobile-menu a:hover{color:var(--mint)}
-.mobile-menu.open{display:flex}
 @media(max-width:900px){.nav-links,.nav-gh{display:none}.nav-burger{display:flex}}
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-delay:0s!important;transition:none!important;scroll-behavior:auto!important}.r{opacity:1;transform:none}}
 </style>
 </head>
 <body>
+<a class="skip-link" href="#main">Skip to content</a>
+<noscript><style>.r{opacity:1;transform:none}</style></noscript>
 
 <nav>
   <a href="index.html" class="nav-id">
-    <img src="logo/Prometheus.png" alt="Prometheus" onerror="this.style.display='none'">
+    <img src="logo/Prometheus-96.png" width="26" height="26" alt="Prometheus" onerror="this.style.display='none'">
     <span class="nav-wordmark">Prometheus</span>
   </a>
       <ul class="nav-links">
@@ -191,7 +144,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
       <li><a href="whitepaper.html">Whitepaper</a></li>
       <li><a href="guardian-economics.html">Economics</a></li>
     </ul>
-  <a href="https://github.com/NeaBouli/prometheus-" class="nav-gh" target="_blank">GitHub ↗</a>
+  <a href="https://github.com/NeaBouli/prometheus-" class="nav-gh" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
 <button class="nav-burger" id="burger" onclick="toggleMenu()" aria-label="Menu"><span></span><span></span><span></span></button>
 </nav>
 <div class="mobile-menu" id="mobile-menu">
@@ -203,7 +156,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
       <a href="faq.html">FAQ</a>
       <a href="whitepaper.html">Whitepaper</a>
       <a href="guardian-economics.html">Economics</a>
-      <a href="https://github.com/NeaBouli/prometheus-" target="_blank">GitHub ↗</a>
+      <a href="https://github.com/NeaBouli/prometheus-" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
     </div>
 
 <div class="page-header">
@@ -258,7 +211,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
     </ul>
   </aside>
 
-  <main class="wp-content">
+  <main id="main" tabindex="-1" class="wp-content">
 
     <!-- ABSTRACT -->
     <div class="wp-section r" id="abstract">
@@ -522,7 +475,7 @@ lora_config = LoraConfig(
         <tr><td>Slashing — double vote</td><td>10% KAS loss</td></tr>
         <tr><td>Slashing — collusion</td><td>20% KAS loss</td></tr>
         <tr><td>Escalation</td><td>multiplier = min(3, slashing_count / 3 + 1)</td></tr>
-        <tr><td>Cooldown</td><td>7 days (100,800 blocks at 10 BPS)</td></tr>
+        <tr><td>Cooldown</td><td>Target 7 days (6,048,000 blocks at 10 BPS); current fixture 100,800 blocks (about 2.8 hours) until the next reviewed contract revision</td></tr>
         <tr><td>Bond per vote</td><td>10% of current stake</td></tr>
         <tr><td>Access control on slash()</td><td>Only GOVERNANCE_CONTRACT or RULE_STORAGE_CONTRACT</td></tr>
       </table>
@@ -693,7 +646,7 @@ async def training_round(self):
     <li><a href="faq.html">FAQ</a></li>
     <li><a href="roadmap.html">Roadmap</a></li>
     <li><a href="CONTRIBUTING.md">Contributing</a></li>
-    <li><a href="https://github.com/NeaBouli/prometheus-" target="_blank">GitHub</a></li>
+    <li><a href="https://github.com/NeaBouli/prometheus-" target="_blank" rel="noopener noreferrer">GitHub</a></li>
   </ul>
 </footer>
 
@@ -710,13 +663,6 @@ window.addEventListener('scroll', () => {
   secs.forEach(s => { if (s.getBoundingClientRect().top < 100) cur = s.id; });
   sbLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + cur));
 }, {passive:true});
-</script>
-<script>
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/prometheus-/sw.js')
-    .then(() => console.log('SW registered'))
-    .catch(() => {});
-}
 </script>
 <script>function toggleMenu(){const burger=document.getElementById("burger");const menu=document.getElementById("mobile-menu");burger.classList.toggle("open");menu.classList.toggle("open");document.body.style.overflow=menu.classList.contains("open")?"hidden":""}document.querySelectorAll(".mobile-menu a").forEach(a=>{a.addEventListener("click",()=>{document.getElementById("burger").classList.remove("open");document.getElementById("mobile-menu").classList.remove("open");document.body.style.overflow=""})});</script>
 </body>

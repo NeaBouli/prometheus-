@@ -9,7 +9,6 @@
 <meta name="keywords" content="decentralized security, AI threat intelligence, Kaspa blockchain, PROM token, Silverscript, LLaMA 3, zero-day detection, federated learning, cybersecurity protocol">
 <meta name="author" content="Prometheus Protocol">
 <meta name="robots" content="index, follow">
-<meta name="google-site-verification" content="googleaa2902079481c7a8">
 <link rel="manifest" href="/prometheus-/manifest.json">
 <meta name="theme-color" content="#00E5A0">
 <link rel="canonical" href="https://neabouli.github.io/prometheus-/">
@@ -35,52 +34,23 @@
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css?v=20260930">
 <style>
-:root {
-  --void: #050505;
-  --deep: #0a0a0a;
-  --surface: #0f0f0f;
-  --panel: #141414;
-  --line: rgba(255,255,255,0.07);
-  --line-bright: rgba(255,255,255,0.14);
-  --mint: #00E5A0;
-  --mint-dim: #00B880;
-  --mint-faint: rgba(0,229,160,0.06);
-  --mint-faint2: rgba(0,229,160,0.12);
-  --silver: #C8C8C8;
-  --silver-dim: #787878;
-  --silver-ghost: rgba(200,200,200,0.35);
-  --text: #E2E2E2;
-  --muted: #666666;
-  --dim: #333333;
-}
-*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{font-family:'Space Grotesk',sans-serif;background:var(--void);color:var(--text);overflow-x:hidden;-webkit-font-smoothing:antialiased}
-body::before{content:'';position:fixed;inset:0;z-index:9999;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,0) 0px,rgba(0,0,0,0) 1px,rgba(0,0,0,0.03) 1px,rgba(0,0,0,0.03) 2px)}
-
 nav{position:fixed;top:0;left:0;right:0;z-index:500;padding:0 48px;height:56px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid transparent;transition:border-color .4s,background .4s}
 nav.scrolled{background:rgba(5,5,5,.97);border-color:var(--line);backdrop-filter:blur(8px)}
-.nav-id{display:flex;align-items:center;gap:14px;text-decoration:none}
-.nav-id img{height:26px;width:26px;object-fit:contain;filter:brightness(0) invert(1) brightness(.7)}
-.nav-wordmark{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;letter-spacing:4px;color:var(--silver);text-transform:uppercase}
-.nav-links{display:flex;gap:36px;list-style:none}
-.nav-links a{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color .2s}
 .nav-links a:hover{color:var(--mint)}
 .nav-gh{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--mint);text-decoration:none;border:1px solid rgba(0,229,160,.3);padding:7px 18px;transition:background .2s,border-color .2s}
 .nav-gh:hover{background:var(--mint-faint2);border-color:var(--mint)}
-
 #hero{min-height:100vh;display:grid;grid-template-rows:1fr auto;padding:0 48px;position:relative;overflow:hidden}
 #hero::before{content:'';position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:80px 80px;mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 40%,transparent 100%)}
 #hero::after{content:'';position:absolute;top:30%;left:50%;transform:translate(-50%,-50%);width:600px;height:300px;background:radial-gradient(ellipse,rgba(0,229,160,.04) 0%,transparent 70%);pointer-events:none}
 /* Ambient logo — large, right side, dimmed */
 .hero-logo-ambient{position:absolute;right:4%;top:42%;transform:translateY(-50%);z-index:0;pointer-events:none;width:clamp(280px,28vw,440px);height:clamp(280px,28vw,440px);opacity:.14;filter:grayscale(1) brightness(1.6);object-fit:contain}
-
 .hero-body{align-self:center;padding-top:120px;max-width:960px;position:relative;z-index:1}
 .hero-status{display:inline-flex;align-items:center;gap:10px;border:1px solid var(--line-bright);padding:6px 14px;margin-bottom:48px;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--muted);opacity:0;animation:rise .6s ease .1s forwards}
 .hero-status-dot{width:6px;height:6px;border-radius:50%;background:var(--mint);box-shadow:0 0 8px var(--mint);animation:breathe 3s ease infinite}
 .hero-h1{font-family:'Space Grotesk',sans-serif;font-size:clamp(52px,8vw,96px);font-weight:300;line-height:1.05;color:var(--text);letter-spacing:-1px;margin-bottom:32px;opacity:0;animation:rise .7s ease .25s forwards}
-.hero-h1 em{font-style:normal;color:transparent;-webkit-text-stroke:1px rgba(200,200,200,.4)}
+.hero-h1 em{font-style:normal;color:transparent;-webkit-text-stroke:1px rgba(200,200,200,.75)}
 .hero-h1 strong{font-weight:300;color:var(--mint)}
 .hero-sub{font-size:16px;font-weight:300;line-height:1.75;color:var(--silver-dim);max-width:560px;margin-bottom:56px;opacity:0;animation:rise .7s ease .4s forwards}
 .hero-actions{display:flex;align-items:center;gap:16px;opacity:0;animation:rise .7s ease .55s forwards}
@@ -88,19 +58,14 @@ nav.scrolled{background:rgba(5,5,5,.97);border-color:var(--line);backdrop-filter
 .btn-solid:hover{opacity:.85}
 .btn-outline{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;background:transparent;color:var(--silver-dim);border:1px solid var(--line-bright);padding:13px 28px;text-decoration:none;transition:border-color .2s,color .2s}
 .btn-outline:hover{border-color:var(--silver-ghost);color:var(--silver)}
-
 .hero-footnote{align-self:end;padding:28px 0;display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border-top:1px solid var(--line);position:relative;z-index:1;opacity:0;animation:rise .7s ease .8s forwards}
 .hero-stat{background:var(--void);padding:20px 24px}
 .hero-stat-val{font-family:'Space Mono',monospace;font-size:22px;color:var(--silver);margin-bottom:4px}
 .hero-stat-val span{color:var(--mint)}
-.hero-stat-key{font-size:11px;color:var(--muted);letter-spacing:.5px}
-
 .section{padding:120px 48px;max-width:1280px;margin:0 auto}
 .sep{border:none;border-top:1px solid var(--line);margin:0 48px}
-.lbl{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--mint);margin-bottom:16px;display:block}
 .hdg{font-size:clamp(32px,5vw,52px);font-weight:300;color:var(--text);line-height:1.1;letter-spacing:-.5px;margin-bottom:20px}
 .sub{font-size:15px;font-weight:300;color:var(--silver-dim);line-height:1.7;max-width:540px}
-
 #lifecycle{background:var(--deep);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
 .lc-hdr{padding:80px 48px 56px;max-width:1280px;margin:0 auto}
 .lc-track{padding:0 48px 80px;max-width:1280px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr);gap:0;position:relative}
@@ -113,26 +78,7 @@ nav.scrolled{background:rgba(5,5,5,.97);border-color:var(--line);backdrop-filter
 .lbl{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--mint);margin-bottom:16px;display:block}
 .lc-time{font-family:'Space Mono',monospace;font-size:10px;color:#C8A060;letter-spacing:1px;margin-bottom:8px}
 .lc-tech{margin-top:14px;padding-top:12px;border-top:1px solid var(--line);font-family:'Space Mono',monospace;font-size:9px;color:#7A9A80;letter-spacing:.5px;line-height:1.6}
-.layer-tag{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--mint);text-transform:uppercase;margin-bottom:20px;display:block}
-.n-glyph{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:3px;color:var(--mint-dim);margin-bottom:20px;text-transform:uppercase}
-.n-spec{font-family:'Space Mono',monospace;font-size:10px;color:#3A8060;letter-spacing:.5px;border-top:1px solid var(--line);padding-top:14px;line-height:1.7}
-.tok-lbl{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;color:#C8A060;text-transform:uppercase;margin-bottom:28px}
-.tok-k{font-family:'Space Mono',monospace;font-size:10px;color:#7A9A80;min-width:110px;flex-shrink:0;padding-top:1px}
-.metric-k{font-size:11px;font-weight:300;color:#9A9870;letter-spacing:.5px}
-.rm-date{padding:20px 0;font-family:'Space Mono',monospace;font-size:10px;color:#C8A060;letter-spacing:1px}
-.rm-desc{font-size:12px;font-weight:300;color:#787060}
-.rm-badge{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:4px 10px;white-space:nowrap}
-.b-done{color:#00E5A0;border:1px solid rgba(0,229,160,.2)}
-.b-active{color:#C8C8A0;border:1px solid rgba(200,200,160,.15);animation:blink 3s ease infinite}
-.b-plan{color:#555048;border:1px solid var(--line)}
-.hero-stat-key{font-size:11px;color:#6A7860;letter-spacing:.5px}
-.f-left{font-family:'Space Mono',monospace;font-size:11px;color:#4A5040;letter-spacing:1px}
-.f-links a{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1px;color:#4A5040;text-decoration:none;transition:color .2s}
-.f-links a:hover{color:var(--mint)}
-.cta-meta{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;color:#6A7060}
-.layer-idx{position:absolute;right:28px;top:20px;font-family:'Space Mono',monospace;font-size:72px;font-weight:700;color:rgba(0,229,160,.08);line-height:1;transition:color .3s}
-.layer:hover .layer-idx{color:rgba(0,229,160,.15)}
-
+.hero-stat-key{font-size:11px;color:#8A9A80;letter-spacing:.5px}
 .layers-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);margin-top:56px}
 .layer{background:var(--void);padding:48px 36px;position:relative;overflow:hidden;transition:background .3s}
 .layer:hover{background:var(--surface)}
@@ -144,7 +90,6 @@ nav.scrolled{background:rgba(5,5,5,.97);border-color:var(--line);backdrop-filter
 .layer-items li{display:flex;gap:12px;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--line);font-size:12px;font-weight:300;color:var(--muted);line-height:1.5}
 .layer-items li:last-child{border-bottom:none}
 .layer-items li::before{content:'';flex-shrink:0;width:1px;height:14px;background:var(--mint);margin-top:2px;opacity:.5}
-
 .nodes-bg{background:var(--deep);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
 .nodes-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);margin-top:56px}
 .n-card{background:var(--deep);padding:36px 28px;transition:background .3s}
@@ -152,8 +97,7 @@ nav.scrolled{background:rgba(5,5,5,.97);border-color:var(--line);backdrop-filter
 .n-glyph{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:3px;color:var(--mint-dim);margin-bottom:20px;text-transform:uppercase}
 .n-name{font-size:18px;font-weight:400;color:var(--silver);margin-bottom:12px}
 .n-desc{font-size:12px;font-weight:300;color:#5ABB90;line-height:1.65;margin-bottom:20px}
-.n-spec{font-family:'Space Mono',monospace;font-size:10px;color:#3A8060;letter-spacing:.5px;border-top:1px solid var(--line);padding-top:14px;line-height:1.7}
-
+.n-spec{font-family:'Space Mono',monospace;font-size:10px;color:#58B08A;letter-spacing:.5px;border-top:1px solid var(--line);padding-top:14px;line-height:1.7}
 .tokens-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);margin-top:56px}
 .tok{background:var(--void);padding:56px 48px;position:relative;overflow:hidden}
 .tok::before{content:attr(data-sym);position:absolute;right:32px;top:16px;font-family:'Space Mono',monospace;font-size:100px;font-weight:700;line-height:1;color:rgba(255,255,255,.025);z-index:0}
@@ -166,14 +110,12 @@ nav.scrolled{background:rgba(5,5,5,.97);border-color:var(--line);backdrop-filter
 .tok-row{display:flex;gap:16px;padding:11px 0;border-bottom:1px solid var(--line);font-size:12px;font-weight:300;color:var(--muted)}
 .tok-row:last-child{border-bottom:none}
 .tok-k{font-family:'Space Mono',monospace;font-size:10px;color:var(--dim);min-width:110px;flex-shrink:0;padding-top:1px}
-
 .metrics-bg{background:var(--deep);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
 .metrics-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);margin-top:56px}
 .metric{background:var(--deep);padding:36px 28px;text-align:center}
 .metric-v{font-family:'Space Mono',monospace;font-size:48px;font-weight:700;line-height:1;color:var(--silver);margin-bottom:6px}
 .metric-v b{color:var(--mint);font-weight:700}
 .metric-k{font-size:11px;font-weight:300;color:var(--muted);letter-spacing:.5px}
-
 .roadmap-rows{margin-top:56px;border-top:1px solid var(--line)}
 .rm-row{display:grid;grid-template-columns:120px 28px 1fr auto;gap:0;align-items:center;border-bottom:1px solid var(--line);transition:background .2s}
 .rm-row:hover{background:var(--surface)}
@@ -186,31 +128,22 @@ nav.scrolled{background:rgba(5,5,5,.97);border-color:var(--line);backdrop-filter
 .b-done{color:#00E5A0;border:1px solid rgba(0,229,160,.2)}
 .b-active{color:var(--silver);border:1px solid rgba(200,200,200,.15);animation:blink 3s ease infinite}
 .b-plan{color:var(--dim);border:1px solid var(--line)}
-
 .cta-wrap{border-top:1px solid var(--line);padding:140px 48px;position:relative;overflow:hidden}
 .cta-wrap::before{content:'';position:absolute;left:-10%;top:-50%;width:400px;height:400px;background:radial-gradient(circle,rgba(0,229,160,.03) 0%,transparent 70%);pointer-events:none}
-.cta-ghost{font-family:'Space Mono',monospace;font-size:clamp(28px,5vw,56px);font-weight:700;line-height:1.1;color:rgba(255,255,255,.18);margin-bottom:-8px;letter-spacing:-1px;display:block}
+.cta-ghost{font-family:'Space Mono',monospace;font-size:clamp(28px,5vw,56px);font-weight:700;line-height:1.1;color:rgba(255,255,255,.45);margin-bottom:-8px;letter-spacing:-1px;display:block}
 .cta-h{font-size:clamp(36px,6vw,64px);font-weight:300;color:var(--text);line-height:1.1;letter-spacing:-1px;margin-bottom:32px;max-width:700px}
 .cta-h span{color:var(--mint)}
 .cta-p{font-size:15px;font-weight:300;color:var(--silver-dim);line-height:1.7;max-width:460px;margin-bottom:48px}
 .cta-btns{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:40px}
 .cta-meta{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--dim)}
-
-footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:24px}
-.f-left{font-family:'Space Mono',monospace;font-size:11px;color:var(--dim);letter-spacing:1px}
-.f-center{font-family:'Space Mono',monospace;font-size:12px;letter-spacing:3px;color:var(--silver-dim);text-align:center}
-.f-links{display:flex;justify-content:flex-end;gap:24px;list-style:none}
-.f-links a{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1px;color:var(--dim);text-decoration:none;transition:color .2s}
-.f-links a:hover{color:var(--mint)}
-
 .r{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease}
-.r.on{opacity:1;transform:translateY(0)}
-.d1{transition-delay:.08s}.d2{transition-delay:.16s}.d3{transition-delay:.24s}.d4{transition-delay:.32s}
-
+.d1{transition-delay:.08s}
+.d2{transition-delay:.16s}
+.d3{transition-delay:.24s}
+.d4{transition-delay:.32s}
 @keyframes rise{to{opacity:1;transform:translateY(0)}}
 @keyframes breathe{0%,100%{opacity:1;box-shadow:0 0 8px var(--mint)}50%{opacity:.5;box-shadow:0 0 3px var(--mint)}}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
-
 @media(max-width:960px){
   nav{padding:0 24px}
   .nav-links{display:none}
@@ -239,24 +172,17 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
   .rm-badge{grid-column:3;grid-row:2;justify-self:start;margin:0 0 12px;white-space:normal}
 }
 /* MOBILE NAV */
-.nav-burger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:8px;z-index:600}
-.nav-burger span{display:block;width:22px;height:1px;background:var(--silver);transition:all .3s ease}
-.nav-burger.open span:nth-child(1){transform:translateY(6px) rotate(45deg)}
-.nav-burger.open span:nth-child(2){opacity:0}
-.nav-burger.open span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
-.mobile-menu{display:none;position:fixed;inset:56px 0 0 0;background:rgba(5,5,5,.98);backdrop-filter:blur(12px);z-index:490;flex-direction:column;padding:40px 32px;border-top:1px solid var(--line);overflow-y:auto}
-.mobile-menu a{font-family:'Space Mono',monospace;font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--silver-dim,#787878);text-decoration:none;padding:16px 0;border-bottom:1px solid var(--line);transition:color .2s}
-.mobile-menu a:last-child{border-bottom:none}
-.mobile-menu a:hover{color:var(--mint)}
-.mobile-menu.open{display:flex}
 @media(max-width:900px){.nav-links,.nav-gh{display:none}.nav-burger{display:flex}}
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-delay:0s!important;transition:none!important;scroll-behavior:auto!important}.r{opacity:1;transform:none}}
 </style>
 </head>
 <body>
+<a class="skip-link" href="#main">Skip to content</a>
+<noscript><style>.r{opacity:1;transform:none}</style></noscript>
 
 <nav id="nav">
-  <a href="#" class="nav-id">
-    <img src="logo/Prometheus.png" alt="Prometheus" onerror="this.style.display='none'">
+  <a href="./" class="nav-id">
+    <img src="logo/Prometheus-96.png" width="26" height="26" alt="Prometheus" onerror="this.style.display='none'">
     <span class="nav-wordmark">Prometheus</span>
   </a>
       <ul class="nav-links">
@@ -268,9 +194,10 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
       <li><a href="whitepaper.html">Whitepaper</a></li>
       <li><a href="guardian-economics.html">Economics</a></li>
     </ul>
-  <a href="https://github.com/NeaBouli/prometheus-" class="nav-gh" target="_blank">GitHub ↗</a>
+  <a href="https://github.com/NeaBouli/prometheus-" class="nav-gh" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
 <button class="nav-burger" id="burger" onclick="toggleMenu()" aria-label="Menu"><span></span><span></span><span></span></button>
 </nav>
+<span id="main" tabindex="-1"></span>
 <div class="mobile-menu" id="mobile-menu">
       <a href="index.html">Home</a>
       <a href="index.html#lifecycle">Protocol</a>
@@ -280,11 +207,11 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
       <a href="faq.html">FAQ</a>
       <a href="whitepaper.html">Whitepaper</a>
       <a href="guardian-economics.html">Economics</a>
-      <a href="https://github.com/NeaBouli/prometheus-" target="_blank">GitHub ↗</a>
+      <a href="https://github.com/NeaBouli/prometheus-" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
     </div>
 
 <section id="hero">
-  <img src="logo/Prometheus.png" alt="" class="hero-logo-ambient" onerror="this.style.display='none'">
+  <img src="logo/Prometheus-880.png" alt="" class="hero-logo-ambient" onerror="this.style.display='none'">
   <div class="hero-body">
     <div class="hero-status">
       <div class="hero-status-dot"></div>
@@ -298,7 +225,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
     <div class="hero-actions">
       <a href="whitepaper.html" class="btn-solid">Read the Whitepaper</a>
       <a href="faq.html" class="btn-outline">FAQ &amp; Docs</a>
-      <a href="https://github.com/NeaBouli/prometheus-" class="btn-outline" target="_blank">GitHub</a>
+      <a href="https://github.com/NeaBouli/prometheus-" class="btn-outline" target="_blank" rel="noopener noreferrer">GitHub</a>
     </div>
   </div>
   <div class="hero-footnote">
@@ -374,11 +301,11 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
     <p class="sub d1">Target properties remain distinct from implemented fixtures, Testnet evidence, and production deployment.</p>
     <div class="layers-grid">
       <div class="layer r">
-        <span class="layer-idx">1</span>
+        <span class="layer-idx" aria-hidden="true">1</span>
         <span class="layer-tag">Kaspa Layer 1</span>
         <div class="layer-name">Canonical state target</div>
         <ul class="layer-items">
-          <li>DAGKnight consensus · 100 BPS</li>
+          <li>Target: DAGKnight consensus · contracts assume 10 BPS</li>
           <li>Silverscript smart contracts</li>
           <li>Target PROM-RULES asset orchestration; current gate covers state/CID transitions</li>
           <li>Native Groth16 ZK-verification</li>
@@ -387,7 +314,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
         </ul>
       </div>
       <div class="layer r d1">
-        <span class="layer-idx">2</span>
+        <span class="layer-idx" aria-hidden="true">2</span>
         <span class="layer-tag">Optional services</span>
         <div class="layer-name">Non-canonical views</div>
         <ul class="layer-items">
@@ -400,7 +327,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
         </ul>
       </div>
       <div class="layer r d2">
-        <span class="layer-idx">0</span>
+        <span class="layer-idx" aria-hidden="true">0</span>
         <span class="layer-tag">Off-Chain · Device</span>
         <div class="layer-name">Action layer</div>
         <ul class="layer-items">
@@ -463,20 +390,20 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
     <p class="sub r d1">Validators stake KAS, never PROM. Planned primary PROM issuance is contribution-based; a later KAS/PROM pool would enable secondary trading.</p>
     <div class="tokens-grid">
       <div class="tok kas r" data-sym="KAS">
-        <img src="/prometheus-/logo/kas_coin.png" alt="KAS Token" style="height:64px;width:64px;object-fit:contain;display:block;margin-bottom:12px;position:relative;z-index:1;filter:drop-shadow(0 0 16px rgba(0,229,160,0.25));" onerror="this.style.display='none'">
+        <img src="logo/kas_coin-128.png" width="64" height="64" alt="KAS Token" style="height:64px;width:64px;object-fit:contain;display:block;margin-bottom:12px;position:relative;z-index:1;filter:drop-shadow(0 0 16px rgba(0,229,160,0.25));" onerror="this.style.display='none'">
         <div class="tok-sym">KAS</div>
         <div class="tok-lbl">Kaspa native token · Validator staking</div>
         <div class="tok-role">Target contract behavior uses KAS collateral. Tested state machines encode penalties, but no operated validator network currently stakes or slashes funds.</div>
         <div class="tok-rows">
           <div class="tok-row"><span class="tok-k">Tested minimum</span>10,000 KAS · adjustment state machine</div>
           <div class="tok-row"><span class="tok-k">Tested penalties</span>5% simple · 10% double-vote · 20% collusion</div>
-          <div class="tok-row"><span class="tok-k">Tested cooldown</span>7 days on exit</div>
+          <div class="tok-row"><span class="tok-k">Cooldown</span>7 days decided · current fixture about 2.8 h until contract revision</div>
           <div class="tok-row"><span class="tok-k">Source</span>Kaspa network · 0% pre-mine · fair launch</div>
           <div class="tok-row"><span class="tok-k">Liquidity</span>$1B+ market cap · no bootstrap needed</div>
         </div>
       </div>
       <div class="tok prom r d1" data-sym="PROM">
-        <img src="/prometheus-/logo/prom_coin.png" alt="PROM Token" style="height:64px;width:64px;object-fit:contain;display:block;margin-bottom:12px;position:relative;z-index:1;filter:drop-shadow(0 0 16px rgba(0,229,160,0.4));" onerror="this.style.opacity='0.3';this.alt='PROM'">
+        <img src="logo/prom_coin-128.png" width="64" height="64" alt="PROM Token" style="height:64px;width:64px;object-fit:contain;display:block;margin-bottom:12px;position:relative;z-index:1;filter:drop-shadow(0 0 16px rgba(0,229,160,0.4));" onerror="this.style.opacity='0.3';this.alt='PROM'">
         <div class="tok-sym">PROM</div>
         <div class="tok-lbl">Planned reward &amp; governance token</div>
         <div class="tok-role">Minting, emission, liquidity, and trading are not implemented, deployed, or active. Guardian reputation is separate L1 state.</div>
@@ -499,7 +426,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
   <div class="section">
     <span class="lbl r">05 / Numbers</span>
     <div class="metrics-grid">
-      <div class="metric r"><div class="metric-v"><b>160</b>+</div><div class="metric-k">Tests passing</div></div>
+      <div class="metric r"><div class="metric-v"><b>1k</b>+</div><div class="metric-k">Guardian tests passing, plus Rust suites</div></div>
       <div class="metric r d1"><div class="metric-v"><b>6</b></div><div class="metric-k">Silverscript contracts</div></div>
       <div class="metric r d2"><div class="metric-v">&lt;<b>60</b>s</div><div class="metric-k">Target; current fixture is same-host and stubbed</div></div>
       <div class="metric r d3"><div class="metric-v"><b>0</b>%</div><div class="metric-k">Pre-mine</div></div>
@@ -543,7 +470,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
   <h2 class="cta-h r">to <span>humanity</span>,<br>not to corporations.</h2>
   <p class="cta-p r d1">The contract design has no repository-controlled emergency-stop entrypoint. Current policy and membership inputs remain owner-controlled, and no public multi-host protocol network is operating. Availability and decentralized control are target properties, not current guarantees.</p>
   <div class="cta-btns r d2">
-    <a href="https://github.com/NeaBouli/prometheus-" class="btn-solid" target="_blank">Join on GitHub</a>
+    <a href="https://github.com/NeaBouli/prometheus-" class="btn-solid" target="_blank" rel="noopener noreferrer">Join on GitHub</a>
     <a href="whitepaper.html" class="btn-outline">Read the Whitepaper</a>
   </div>
   <div class="cta-meta r d3">MIT License &nbsp;·&nbsp; 0% Pre-mine specified &nbsp;·&nbsp; Public repository &nbsp;·&nbsp; Operation not decentralized yet</div>
@@ -557,7 +484,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
     <li><a href="roadmap.html">Roadmap</a></li>
     <li><a href="whitepaper.html">Whitepaper</a></li>
     <li><a href="CONTRIBUTING.md">Contributing</a></li>
-    <li><a href="https://github.com/NeaBouli/prometheus-" target="_blank">GitHub</a></li>
+    <li><a href="https://github.com/NeaBouli/prometheus-" target="_blank" rel="noopener noreferrer">GitHub</a></li>
   </ul>
 </footer>
 
@@ -566,13 +493,6 @@ const nav=document.getElementById('nav');
 window.addEventListener('scroll',()=>nav.classList.toggle('scrolled',window.scrollY>40),{passive:true});
 const obs=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('on');obs.unobserve(e.target)}}),{threshold:.08});
 document.querySelectorAll('.r').forEach(el=>obs.observe(el));
-</script>
-<script>
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/prometheus-/sw.js')
-    .then(() => console.log('SW registered'))
-    .catch(() => {});
-}
 </script>
 <script>function toggleMenu(){const burger=document.getElementById("burger");const menu=document.getElementById("mobile-menu");burger.classList.toggle("open");menu.classList.toggle("open");document.body.style.overflow=menu.classList.contains("open")?"hidden":""}document.querySelectorAll(".mobile-menu a").forEach(a=>{a.addEventListener("click",()=>{document.getElementById("burger").classList.remove("open");document.getElementById("mobile-menu").classList.remove("open");document.body.style.overflow=""})});</script>
 </body>

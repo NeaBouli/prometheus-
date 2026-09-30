@@ -59,7 +59,7 @@ impl RevealValidator {
     ///
     /// Bond = BOND_PERCENT (10%) of the validator's current KAS stake.
     pub fn calculate_bond(&self, stake_kas: u64) -> u64 {
-        stake_kas * BOND_PERCENT / 100
+        stake_kas.saturating_mul(BOND_PERCENT) / 100
     }
 
     /// Check if the provided bond meets the minimum requirement.
@@ -85,6 +85,15 @@ mod tests {
 
     fn make_commitment(vote: bool, salt: u64, block: u64, stake: u64) -> VoteCommitment {
         CommitmentBuilder::new(TEST_ADDR).build(1, vote, salt, block, stake)
+    }
+
+    #[test]
+    fn test_bond_math_saturates_instead_of_overflowing() {
+        let validator = RevealValidator;
+        assert_eq!(validator.calculate_bond(100_000), 10_000);
+        assert_eq!(validator.calculate_bond(u64::MAX), u64::MAX / 100);
+        let commitment = CommitmentBuilder::new([7u8; 32]).build(1, true, 42, 1_000, u64::MAX);
+        assert_eq!(commitment.bond_kas, validator.calculate_bond(u64::MAX));
     }
 
     #[test]

@@ -9,7 +9,6 @@
 <meta name="keywords" content="Prometheus FAQ, PROM token, KAS staking, decentralized security, AI threat detection, Kaspa blockchain, federated learning">
 <meta name="author" content="Prometheus Protocol">
 <meta name="robots" content="index, follow">
-<meta name="google-site-verification" content="googleaa2902079481c7a8">
 <link rel="manifest" href="/prometheus-/manifest.json">
 <meta name="theme-color" content="#00E5A0">
 <link rel="canonical" href="https://neabouli.github.io/prometheus-/faq.html">
@@ -35,40 +34,13 @@
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css?v=20260930">
 <style>
-:root {
-  --void: #050505;
-  --deep: #0a0a0a;
-  --surface: #0f0f0f;
-  --panel: #141414;
-  --line: rgba(255,255,255,0.07);
-  --line-bright: rgba(255,255,255,0.14);
-  --mint: #00E5A0;
-  --mint-dim: #00B880;
-  --mint-faint: rgba(0,229,160,0.06);
-  --silver: #C8C8C8;
-  --silver-dim: #787878;
-  --gold: #C8A060;
-  --text: #E2E2E2;
-  --muted: #666666;
-  --dim: #333333;
-}
-*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{font-family:'Space Grotesk',sans-serif;background:var(--void);color:var(--text);overflow-x:hidden;-webkit-font-smoothing:antialiased}
-body::before{content:'';position:fixed;inset:0;z-index:9999;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,0) 0px,rgba(0,0,0,0) 1px,rgba(0,0,0,0.03) 1px,rgba(0,0,0,0.03) 2px)}
-
 /* NAV */
 nav{position:fixed;top:0;left:0;right:0;z-index:500;padding:0 48px;height:56px;display:flex;align-items:center;justify-content:space-between;background:rgba(5,5,5,.97);border-bottom:1px solid var(--line);backdrop-filter:blur(8px)}
-.nav-id{display:flex;align-items:center;gap:14px;text-decoration:none}
-.nav-id img{height:26px;width:26px;object-fit:contain;filter:brightness(0) invert(1) brightness(.7)}
-.nav-wordmark{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;letter-spacing:4px;color:var(--silver);text-transform:uppercase}
-.nav-links{display:flex;gap:36px;list-style:none}
-.nav-links a{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color .2s}
 .nav-links a:hover,.nav-links a.active{color:var(--mint)}
 .nav-gh{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--mint);text-decoration:none;border:1px solid rgba(0,229,160,.3);padding:7px 18px;transition:background .2s}
 .nav-gh:hover{background:rgba(0,229,160,.08)}
-
 /* PAGE HEADER */
 .page-header{padding:140px 48px 80px;border-bottom:1px solid var(--line);position:relative;overflow:hidden}
 .page-header::before{content:'';position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:80px 80px;mask-image:radial-gradient(ellipse 60% 100% at 20% 50%,black 30%,transparent 100%)}
@@ -78,10 +50,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:500;padding:0 48px;height:56px;d
 .breadcrumb span{margin:0 8px;color:var(--dim)}
 .page-title{font-size:clamp(40px,6vw,72px);font-weight:300;color:var(--text);letter-spacing:-1px;line-height:1;margin-bottom:20px}
 .page-desc{font-size:15px;font-weight:300;color:var(--silver-dim);line-height:1.7;max-width:500px}
-
 /* LAYOUT */
 .faq-layout{display:grid;grid-template-columns:240px 1fr;gap:0;max-width:1280px;margin:0 auto;padding:0 48px}
-
 /* SIDEBAR */
 .sidebar{padding:48px 32px 48px 0;border-right:1px solid var(--line);position:sticky;top:56px;height:calc(100vh - 56px);overflow-y:auto}
 .sidebar-section{margin-bottom:32px}
@@ -90,20 +60,15 @@ nav{position:fixed;top:0;left:0;right:0;z-index:500;padding:0 48px;height:56px;d
 .sidebar-links li a{font-size:12px;font-weight:300;color:var(--muted);text-decoration:none;display:block;padding:5px 0;transition:color .2s;line-height:1.4}
 .sidebar-links li a:hover{color:var(--silver)}
 .sidebar-links li a.active{color:var(--mint)}
-
 /* FAQ CONTENT */
 .faq-content{padding:64px 0 120px 64px}
-
 .faq-group{margin-bottom:80px}
 .faq-group:last-child{margin-bottom:0}
-
 .group-label{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--mint);text-transform:uppercase;margin-bottom:8px;display:block}
 .group-title{font-size:clamp(24px,3vw,36px);font-weight:300;color:var(--text);letter-spacing:-.5px;margin-bottom:40px;padding-bottom:20px;border-bottom:1px solid var(--line)}
-
 /* FAQ ITEM */
 .faq-item{border-bottom:1px solid var(--line);padding:0}
 .faq-item:first-of-type{border-top:1px solid var(--line)}
-
 .faq-q{width:100%;background:none;border:none;text-align:left;padding:24px 0;display:flex;align-items:flex-start;justify-content:space-between;gap:24px;cursor:pointer;color:var(--text)}
 .faq-q-text{font-size:15px;font-weight:400;color:var(--silver);line-height:1.4;transition:color .2s}
 .faq-item:hover .faq-q-text{color:var(--text)}
@@ -111,7 +76,6 @@ nav{position:fixed;top:0;left:0;right:0;z-index:500;padding:0 48px;height:56px;d
 .faq-icon::after{content:'+';font-family:'Space Mono',monospace;font-size:12px;color:var(--muted);transition:color .2s}
 .faq-item.open .faq-icon{border-color:var(--mint);transform:rotate(45deg)}
 .faq-item.open .faq-icon::after{color:var(--mint)}
-
 .faq-a{max-height:0;overflow:hidden;transition:max-height .4s ease}
 .faq-item.open .faq-a{max-height:1000px}
 .faq-a-inner{padding:0 0 28px;font-size:14px;font-weight:300;color:var(--silver-dim);line-height:1.8;max-width:680px}
@@ -119,35 +83,24 @@ nav{position:fixed;top:0;left:0;right:0;z-index:500;padding:0 48px;height:56px;d
 .faq-a-inner p:last-child{margin-bottom:0}
 .faq-a-inner strong{color:var(--silver);font-weight:500}
 .faq-a-inner code{font-family:'Space Mono',monospace;font-size:11px;color:var(--mint);background:rgba(0,229,160,.06);padding:2px 6px}
-
 /* TABLE IN FAQ */
 .faq-table{width:100%;border-collapse:collapse;margin:16px 0;font-size:12px}
 .faq-table th{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;padding:10px 16px;border-bottom:1px solid var(--line);text-align:left;font-weight:400}
 .faq-table td{padding:10px 16px;border-bottom:1px solid rgba(255,255,255,.04);color:var(--silver-dim);font-weight:300}
 .faq-table td:first-child{font-family:'Space Mono',monospace;font-size:11px;color:var(--gold)}
 .faq-table tr:last-child td{border-bottom:none}
-
 /* CALLOUT */
 .callout{border-left:1px solid var(--mint);padding:16px 20px;background:var(--mint-faint);margin:16px 0}
 .callout p{color:var(--silver-dim);font-size:13px;line-height:1.7;margin:0}
 .callout strong{color:var(--mint)}
-
 /* FLOW */
 .flow{font-family:'Space Mono',monospace;font-size:11px;color:#5ABB90;line-height:2;padding:16px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin:16px 0}
-
 /* FOOTER */
-footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:24px}
-.f-left{font-family:'Space Mono',monospace;font-size:11px;color:var(--dim);letter-spacing:1px}
-.f-center{font-family:'Space Mono',monospace;font-size:12px;letter-spacing:3px;color:var(--silver-dim);text-align:center}
-.f-links{display:flex;justify-content:flex-end;gap:24px;list-style:none}
-.f-links a{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1px;color:var(--dim);text-decoration:none;transition:color .2s}
-.f-links a:hover{color:var(--mint)}
-
 /* REVEAL */
 .r{opacity:0;transform:translateY(20px);transition:opacity .5s ease,transform .5s ease}
-.r.on{opacity:1;transform:translateY(0)}
-.d1{transition-delay:.07s}.d2{transition-delay:.14s}.d3{transition-delay:.21s}
-
+.d1{transition-delay:.07s}
+.d2{transition-delay:.14s}
+.d3{transition-delay:.21s}
 @media(max-width:900px){
   nav{padding:0 24px}
   .nav-links{display:none}
@@ -162,24 +115,17 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
   .f-links{justify-content:flex-start;flex-wrap:wrap}
 }
 /* MOBILE NAV */
-.nav-burger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:8px;z-index:600}
-.nav-burger span{display:block;width:22px;height:1px;background:var(--silver);transition:all .3s ease}
-.nav-burger.open span:nth-child(1){transform:translateY(6px) rotate(45deg)}
-.nav-burger.open span:nth-child(2){opacity:0}
-.nav-burger.open span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
-.mobile-menu{display:none;position:fixed;inset:56px 0 0 0;background:rgba(5,5,5,.98);backdrop-filter:blur(12px);z-index:490;flex-direction:column;padding:40px 32px;border-top:1px solid var(--line);overflow-y:auto}
-.mobile-menu a{font-family:'Space Mono',monospace;font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--silver-dim,#787878);text-decoration:none;padding:16px 0;border-bottom:1px solid var(--line);transition:color .2s}
-.mobile-menu a:last-child{border-bottom:none}
-.mobile-menu a:hover{color:var(--mint)}
-.mobile-menu.open{display:flex}
 @media(max-width:900px){.nav-links,.nav-gh{display:none}.nav-burger{display:flex}}
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-delay:0s!important;transition:none!important;scroll-behavior:auto!important}.r{opacity:1;transform:none}}
 </style>
 </head>
 <body>
+<a class="skip-link" href="#main">Skip to content</a>
+<noscript><style>.r{opacity:1;transform:none}</style></noscript>
 
 <nav>
   <a href="index.html" class="nav-id">
-    <img src="logo/Prometheus.png" alt="Prometheus" onerror="this.style.display='none'">
+    <img src="logo/Prometheus-96.png" width="26" height="26" alt="Prometheus" onerror="this.style.display='none'">
     <span class="nav-wordmark">Prometheus</span>
   </a>
       <ul class="nav-links">
@@ -191,7 +137,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
       <li><a href="whitepaper.html">Whitepaper</a></li>
       <li><a href="guardian-economics.html">Economics</a></li>
     </ul>
-  <a href="https://github.com/NeaBouli/prometheus-" class="nav-gh" target="_blank">GitHub ↗</a>
+  <a href="https://github.com/NeaBouli/prometheus-" class="nav-gh" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
 <button class="nav-burger" id="burger" onclick="toggleMenu()" aria-label="Menu"><span></span><span></span><span></span></button>
 </nav>
 <div class="mobile-menu" id="mobile-menu">
@@ -203,7 +149,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
       <a href="faq.html">FAQ</a>
       <a href="whitepaper.html">Whitepaper</a>
       <a href="guardian-economics.html">Economics</a>
-      <a href="https://github.com/NeaBouli/prometheus-" target="_blank">GitHub ↗</a>
+      <a href="https://github.com/NeaBouli/prometheus-" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
     </div>
 
 <div class="page-header">
@@ -266,7 +212,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
   </aside>
 
   <!-- CONTENT -->
-  <main class="faq-content">
+  <main id="main" tabindex="-1" class="faq-content">
 
     <!-- TOKENOMICS -->
     <div class="faq-group r" id="tokenomics">
@@ -634,7 +580,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
     <li><a href="roadmap.html">Roadmap</a></li>
     <li><a href="whitepaper.html">Whitepaper</a></li>
     <li><a href="CONTRIBUTING.md">Contributing</a></li>
-    <li><a href="https://github.com/NeaBouli/prometheus-" target="_blank">GitHub</a></li>
+    <li><a href="https://github.com/NeaBouli/prometheus-" target="_blank" rel="noopener noreferrer">GitHub</a></li>
   </ul>
 </footer>
 
@@ -661,13 +607,6 @@ window.addEventListener('scroll', () => {
     a.classList.toggle('active', a.getAttribute('href') === '#' + current);
   });
 }, {passive: true});
-</script>
-<script>
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/prometheus-/sw.js')
-    .then(() => console.log('SW registered'))
-    .catch(() => {});
-}
 </script>
 <script>function toggleMenu(){const burger=document.getElementById("burger");const menu=document.getElementById("mobile-menu");burger.classList.toggle("open");menu.classList.toggle("open");document.body.style.overflow=menu.classList.contains("open")?"hidden":""}document.querySelectorAll(".mobile-menu a").forEach(a=>{a.addEventListener("click",()=>{document.getElementById("burger").classList.remove("open");document.getElementById("mobile-menu").classList.remove("open");document.body.style.overflow=""})});</script>
 </body>

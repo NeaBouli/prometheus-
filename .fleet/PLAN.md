@@ -455,3 +455,178 @@ Both runs require Gio budget approval (plan-level gate).
   files; this is not recorded as an independent review. Codex's required
   security review and local integration verification remain the review basis.
 - State: `A8 VERIFIED / PR #284 OPEN / REVIEW REQUIRED / PRODUCTION FALSE`.
+
+### 2026-09-30 — Claude stand-in starts (Codex token-limited)
+
+- Claude Code continues this thread per `codex-standin` on
+  `agent/claude/prometheus-standin-20260930` (stacked on `60ee6db`); handover
+  `.fleet/HANDOVER-CLAUDE-20260930.md`. No merge, release gate, or pinned-contract
+  change by the stand-in.
+- A8u1 (upgrade inventory) closed: Rusty Kaspa v2.1.0 + SilverScript v1.0.0
+  cannot form one lock graph yet (SilverScript pins v2.0.1 resp. untagged
+  `a41a333b`); only `silverc-deployer` breaks on v2.1.0 and its signing-request
+  schema binds `toccata_activation_daa_score`. Active pins stay unchanged;
+  A8u2 waits for an upstream SilverScript release on a rusty-kaspa tag.
+- PLAN's original A8 content (R6, GH-279, PRM-09) is still open and is next.
+- State: `A8u1 DONE / UPGRADE BLOCKED UPSTREAM / PRODUCTION FALSE`.
+
+### 2026-09-30 — GH-279 / PRM-09 locally verified (Claude stand-in)
+
+- Guardian Python dependencies are exact pins plus a generated, universal,
+  sha256 hash lock for Python 3.11; CI installs wheels-only with
+  `--require-hashes` and runs the new offline gate
+  `scripts/verify_guardian_python_deps.py` (binds yara-x to the runtime pin).
+  Public policy: `docs/dependency-policy.md`. yara-x 1.4.0 kept deliberately.
+- PASS: Guardian 1426 passed / 4 skipped in the locked 3.11 venv; Black,
+  Pylint 9.86; pip-audit clean; 18 gate tests; 374 script tests; ruff/mypy.
+- Review owed to Codex (supply-chain/CI surface). Hosted CI pending.
+- State: `GH-279 LOCAL VERIFIED / REVIEW OWED / PRODUCTION FALSE`.
+
+### 2026-09-30 — GH-283 compiled-contract semantic gate locally verified (Claude stand-in)
+
+- CI now compares the pinned-silverc smoke manifest with a reviewed compiled
+  expectation (script bytes, ABI, state layout, ctor args, compiler pin); a
+  negative regression proves two behavior-changing mutants that keep every
+  linted literal are rejected. Boundary documented in the silverc README.
+- Archive SHA-256 `4989f076…` reproduces the August H-001 evidence value.
+- Review owed to Codex. State: `GH-283 LOCAL VERIFIED / PRODUCTION FALSE`.
+
+### 2026-09-30 — A4H public honesty closed on the stand-in branch (Claude)
+
+- Re-verified the 2026-09-28 findings; most were already fixed. Corrected the
+  remaining confirmed items: non-working validator run command, present-tense
+  KAS staking/slashing, Sprint-1 legacy contract label, ACCEPTED label meaning.
+  No HTML change (visual gate not triggered). Claim/status/hygiene gates pass.
+- Review owed to Codex before any public activity. State: `A4H LOCAL VERIFIED`.
+
+### 2026-09-30 — A11 / GH-277 public records reconciled (Claude stand-in)
+
+- PRM-34 bounty labelled planned/unfunded (funding = Gio), PRM-36 supersede
+  banners + GH-272 closed in TODO, PRM-37 guides, PRM-38/39 landing and
+  guardian-economics wording with 4-viewport visual gate, PRM-40 paths,
+  PRM-41 project-specific CLAUDE.md, PRM-46 robots.txt (security.txt
+  intentionally not added on a project page).
+- State: `A11 LOCAL VERIFIED (PARTIAL: PRM-34 DECISION) / PRODUCTION FALSE`.
+
+### 2026-09-30 — A12a contrast (PRM-43) locally verified (Claude stand-in)
+
+- index.html duplicate-selector dead code removed (pixel-identical), text
+  tokens raised to WCAG AA on all five pages, unstyled links fixed; rendered
+  audit 796 → 0 failing text nodes; new CI gate `verify_site_css.py`.
+- State: `A12a LOCAL VERIFIED / POST-DEPLOY RECHECK OWED`.
+
+### 2026-09-30 — A12b accessibility/validity locally verified (Claude stand-in)
+
+- noopener on external links, logo href, skip link to focusable main,
+  reduced-motion and no-JS fallbacks. State: `A12b LOCAL VERIFIED`.
+
+### 2026-09-30 — A12d image weights locally verified (Claude stand-in)
+
+- Display-sized logo/coin variants; index images ≈3.1 MB → ≈208 KB.
+  PRM-35 cooldown text on the token card noted for #276. State: `A12d LOCAL VERIFIED`.
+
+### 2026-09-30 — Owner decision PRM-34: no bug bounty (Gio)
+
+- Gio: PROM would first have to be minted and there is no pool, so a PROM
+  bounty is not a sound approach — remove it. SECURITY.md now states there is
+  no bug bounty program (no PROM reward offered or planned); disclosure via
+  GitHub Security Advisories unchanged. A11 PRM-34 is thereby closed.
+
+### 2026-09-30 — Gio delegates technical owner decisions to Claude
+
+- Gio: "entscheide du, ich kenne mich hier nicht aus" (service worker, cooldown,
+  container defaults). Decisions and rationale below; review owed to Codex.
+- A10/#275 DECIDED remove: service worker never installed (root paths 404);
+  cleanup worker + registrations removed; dead GSC meta removed; explorer
+  outage wording. Report `.fleet/reports/a10-service-worker.md`.
+- A9/#280 DECIDED: 2000:2000, CPU caps 16/64, /tmp stays exec (JIT), loopback
+  vLLM documented as single-operator trust boundary. Report
+  `.fleet/reports/a9-guardian-compose.md`.
+- PRM-35 / #276 cooldown DECIDED: 7 days (6,048,000 blocks), because the 1-day
+  voting period must settle before exit. Implementation deferred to a reviewed
+  "contract bundle v2" (the deployer pins the H-001 bundle manifest); public
+  text states decided target vs current fixture. Report
+  `.fleet/reports/prm35-cooldown-decision.md`.
+
+### 2026-09-30 — A12c shared stylesheet (PRM-44) locally verified (Claude stand-in)
+
+- `assets/site.css` holds tokens + shared chrome; all pages pixel-identical
+  before/after (incl. menu and focus states); gate checks the combined
+  cascade. GH-278 (A12a–d) is complete on the stand-in branch.
+- State: `A12 LOCAL VERIFIED / POST-DEPLOY RECHECK OWED / PRODUCTION FALSE`.
+
+### 2026-09-30 — DA1 endpoint producer design delivered (Claude stand-in)
+
+- `docs/endpoint-producer-design-v1.md`: design-only resource-utilization
+  producer candidate mapped to all GH-267 requirements; no code, no status
+  change. Next: independent privacy review + owner approval before any brief.
+
+### 2026-09-30 — Stand-in branch hosted verification green
+
+- `workflow_dispatch` on `agent/claude/prometheus-standin-20260930` at
+  `bff7fc1`: Prometheus CI `36698349293` success (Memory Integrity,
+  Silverscript Contracts, Python Guardian, HTML Pages, Toolchain Pin Policy,
+  Current Silverc Runtime + Artifact Smoke, Rust Workspace, Rust Performance);
+  Security Audit `36698357152` success (Dependency Audit, Secret Detection,
+  Security Summary). This proves GH-279 wheels-only hash install on Ubuntu,
+  Compose rendering with the A9 CPU caps, the GH-283 gate + mutation regression,
+  and the site CSS gate on hosted runners. Later head `f737c7b` (action SHA
+  pins) still needs one hosted run.
+
+### 2026-09-30 — MS-B decision record proposed (Claude stand-in, delegated)
+
+- `docs/architecture/ms-b-contract-decisions.md`: D1–D7 for #276 with a
+  verified pinned-silverc capability baseline (tx.time→CLTV, this.age→CSV,
+  input/output amount introspection, checkSig/checkSigFromStack, no runtime
+  cross-contract calls). Binding only after Codex architecture review; child
+  issues listed for Codex to open; all outcomes ship as one "contract bundle v2".
+- Second hosted verification at `40dfd89`: CI `36702356697` + Security
+  `36702361053` all green (covers action SHA pins and PRM-12 code changes).
+
+### 2026-09-30 — Contract bundle v2 draft started (Claude stand-in)
+
+- Branch `agent/claude/contract-bundle-v2-draft` (on top of the stand-in
+  branch, head `2f132e4`): ValidatorStakingState enforces the 7-day cooldown on
+  chain via `this.age` (CSV, semantics verified in pinned rusty-kaspa), opens
+  the PRM-13 exit and rejects a zero withdrawal marker; 58 runtime tests pass.
+  Local contract CI 16/17: only the H-001 canary-profile step fails because
+  the deployer pins the v1 bundle manifest. The profile split (recommendation:
+  verify committed H-001 evidence instead of regenerating) is left to Codex.
+  Report `.fleet/reports/bundle-v2-draft-validator-staking.md` (on that branch).
+- Bundle v2 draft steps 3–4 (`4a13fa3`, `581f6a0`): RuleStorageState and
+  CommunityDonationsState use attested submissions/tallies with ≥50 %
+  participation, chain-bound times, value-backed donations and exact recipient
+  payouts; failed disbursement votes now end REJECTED. 72 runtime tests pass.
+  Finding: pinned silverc misaddresses the stack after `byte[](v, 8)` inside a
+  hashed concatenation (runtime InvalidPubkey); `byte[8](v)` works.
+- Bundle v2 draft steps 5–6 (`4f39515`, `47b712c`): GovernanceAutoTuning
+  autoTune bound to tx.time; DevIncentivePool gets a governance key and
+  attested grant finalization with REJECTED path. All five state contracts now
+  carry their MS-B draft changes; 73 runtime tests pass.
+
+### 2026-09-30 — Codex handback review started
+
+- Codex reviews stand-in security changes and hosted evidence; Kimi owns the
+  independent read-only contract-draft review (handback-contract-review).
+- Claude remains the preferred implementation worker. The next brief follows
+  review findings; historical H-001 evidence remains frozen.
+- State: `HANDBACK REVIEW IN PROGRESS / NO MERGE OR DEPLOY YET`.
+
+### 2026-09-30 — Codex accepts stand-in work with bounded follow-ups
+
+- PR #284 merged normally as 3a79bfe. Stand-in changes are replayed on the
+  dedicated handback integration branch; source branches remain preserved.
+- Codex accepted dependency locking, strict deployer formats, action pins and
+  container defaults after focused review; 98 gate tests passed. Hosted runs
+  36702356697 and 36702361053 at 40dfd89 independently confirmed via API.
+- Claude owns the scoped retired-worker cleanup fix. Kimi review dispatch and
+  canonical probe both returned token_limited; Codex reviewed the draft.
+- Contract draft remains unaccepted pending targeted authorization, elapsed
+  time and terminal-state repairs, followed by H-001/v2 profile integration.
+  Claude remains primary development worker; no duplicate implementation.
+
+### 2026-09-30 — handback-sw-scope-fix (Claude)
+
+- Retired worker cleanup scoped to the exact legacy cache `prometheus-v1`;
+  unrelated origin caches preserved. Browser regression green, fails on the old
+  worker. Report: `.fleet/reports/handback-sw-scope-fix.md`. No merge or deploy.

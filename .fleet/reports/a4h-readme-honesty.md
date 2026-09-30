@@ -1,0 +1,11 @@
+id: a4h-readme-honesty
+status: ok
+worker: claude (Codex stand-in, solo)
+branch: agent/claude/prometheus-standin-20260930
+summary: Re-verified every claim of ~/agent-fleet/community/prometheus-reddit/PROJEKT_BEFUND.md (written against an older checkout) against this branch. Most items were already corrected by earlier public-claim work and need no change: README intro is target/rollout-gated wording; Phi-3 described as fail-closed stub; Guardian 8B/70B as scaffold without evaluated model; client matcher as "custom YARA-style matcher"; ZK stub disclosed; PROM emission marked not implemented; index.html has no 4.0 version, no "100% Open Source", no "96%"; runtime fail-closed default is A4/#282; literal CI checks are GH-283 (both separate). Confirmed and corrected: (1) README quick-start `cargo run -p prometheus-validator` cannot work (library crate; verified `error: a bin target must be available`) → `cargo test -p prometheus-validator` (33 pass) with "library crate only" note; (2) README + WHITEPAPER KAS row stated staking/slashing in present tense → specified + tested state machines, no operated network locks/slashes KAS; llms.txt aligned; (3) Sprint-1 "6 Silverscript contracts, 54 tests" → legacy `.ss` contracts with the 2026-03-21 review record (README, docs/roadmap.md); (4) added the note that ACCEPTED is a review-process label, not production readiness.
+files: README.md, WHITEPAPER.md, docs/roadmap.md, llms.txt
+not changed (deliberate): roadmap.html Sprint-1 item "6 Silverscript contracts, 54 tests" (historically true; changing visible HTML would require the 4-viewport visual gate for no factual gain); index.html node card "Minimum 10,000 KAS stake" sits under an explicit "Target:" description.
+tests: verify_public_claim_consistency OK + test_public_claim_consistency OK; project-status consistency + tests OK; memory integrity OK; public documentation hygiene + tests OK; cargo test -p prometheus-validator 33 passed.
+risks: A4H was intended as an independent-worker gate before public (Reddit) activity; this pass was done by Claude alone — Codex/Gio review before any public activity remains required.
+security: none.
+next: Codex review; then the Reddit/public-activity gate can be reconsidered by Gio.

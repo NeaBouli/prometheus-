@@ -517,6 +517,37 @@ This is packaging and lifecycle evidence, not public Internet or multi-host proo
   3. if restart fails on identity, inspect parent/file mode and symlink flags,
   4. re-run identity and route validation tests before production routing is resumed.
 
+### Clock high-water in replay ledgers (fail-closed trade-off)
+
+The signed-ballot replay ledger (`jaeger/signed_ballots.py`, `_advance_time`)
+and the observable-approval consumption ledger
+(`jaeger/observable_approval_consumption.py`, `_advance_time`) persist the
+highest local time they have accepted. A later operation with an earlier local
+time is rejected (`BallotReplayError: replay ledger clock rollback detected`,
+respectively `ObservableApprovalReplayError`). This prevents a clock rollback
+from reopening expired sessions or consumed approvals.
+
+Trade-off: if the host clock ever jumps into the future (bad NTP source, manual
+change, VM restore) and an operation is accepted during that time, the ledger
+keeps that future high-water mark. After the clock is corrected, every
+operation is rejected until real time passes the stored mark. This is intended
+fail-closed behavior, not data corruption.
+
+Operator procedure:
+
+1. Stop the Guardian service; do not edit the SQLite ledger by hand.
+2. Confirm the host clock and NTP configuration are correct.
+3. If the stored high-water mark is only minutes or hours ahead, wait until
+   real time passes it and restart.
+4. If it is far in the future, the only recovery is an owner decision to retire
+   the ledger: archive the old ledger file with owner-only permissions, confirm
+   no ballot session or approval is in flight, and start with a new ledger.
+   A new ledger forgets past replay state, so previously accepted ballots or
+   consumed approvals from still-valid sessions could be replayed; only do this
+   after every such session has expired.
+5. Record the incident (time, cause, old high-water value, decision) in the
+   operator log.
+
 ## Verification commands
 
 ```bash

@@ -86,9 +86,9 @@ Sibling built flows (same modules, drawn in `map.puml`):
 | `modules/threat-proof` | Manifest-pinned KIP-16 Groth16 verification (v1 + v2) | `modules/threat-proof/src/main.rs::Cli` | built with test artifacts; production relation/keys/ceremony: blocked |
 | `modules/validator-node` | Commit-reveal voting + slashing state machines | `modules/validator-node/src/lib.rs` | built (state machines); operated validator network: open |
 | `modules/contracts` (legacy `.ss`) | Historical Silverscript contracts | `modules/contracts/*.ss` | built (accepted legacy; superseded, do not extend) |
-| `modules/contracts/silverc` | Seven current-Silverc fixtures with compile/ABI/runtime gates | `modules/contracts/silverc/*.sil` | built; six state deployments + oracle execution: blocked |
+| `modules/contracts/silverc` | Seven current-Silverc fixtures with compile/ABI/runtime gates plus a reviewed compiled-artifact expectation (`expected-compiled-artifacts.json`, GH-283, stand-in branch) | `modules/contracts/silverc/*.sil` | built; six state deployments + oracle execution: blocked; contract bundle v2 proposed (`ms-b-contract-decisions.md`) |
 | `modules/silverc-deployer` | Keyless Toccata-v1 genesis + reportMetrics operator | `modules/silverc-deployer/src/main.rs::Cli` | built (H-001 canary executed once, non-promotable); remaining real execution: blocked on external signatures |
-| `modules/web` | Static public status surface (GitHub Pages root pages); fabricated audit dashboard removed (GH-273) | `index.html` + sibling root pages | built |
+| `modules/web` | Static public status surface (GitHub Pages root pages); fabricated audit dashboard removed (GH-273); shared tokens/chrome in `assets/site.css`, WCAG AA text gated by `scripts/verify_site_css.py`, service worker retired (GH-275/278, stand-in branch) | `index.html` + sibling root pages | built |
 | `scripts/` | Release tooling: artifacts, requests, receipts, evidence, readiness, hygiene | `scripts/README` n/a — see `scripts/*.py` | built |
 | Target: client AI/inference | Real Phi-3-mini 4-bit ONNX, Fed-DART gradients-only | — | target (open) |
 | Target: endpoint detection (GH-258/261) | Observe-only → warn-only → operator-confirmed containment → separately approved automation | `modules/threat-hint/src/endpoint_observation.rs` (first data contract built); `scripts/verify_endpoint_producer_privacy_gate.py` + `docs/evidence/endpoint-producer-privacy-threat-model-v1.json` (GH-267 pre-producer gate, rebased PR #268 candidate, not on main) | target; producers require independent privacy/threat-model review first |
@@ -122,8 +122,7 @@ Sibling built flows (same modules, drawn in `map.puml`):
 
 ## 5. Widerspruch und Lücken
 
-- `memory/TODO.md:288` marks GH-272 `[~]` in progress, but HEAD `32ca5f1` is the merged
-  PR #281 — stale queue row (docs only).
+- Resolved 2026-09-30 (stand-in branch): the stale GH-272 TODO row is marked done.
 - `modules/guardian-node/jaeger/analyzer.py` hosts two tasks: the legacy heuristic
   LLM/YARA pipeline (`ThreatHint` with `indicators`) and the verified v1 path
   (`VerifiedThreatHint` without indicators). Two tasks in one module → two rows above;
@@ -135,7 +134,7 @@ Sibling built flows (same modules, drawn in `map.puml`):
   consistent only as dev-foundation vs. target — canonical PROM-RULES KRC-20
   orchestration stays target architecture.
 - `docs/agent-bridge/CODEX_BRIDGE.md` §1 startflow references
-  `/Users/gio/Desktop/repos/prometheus`; the fleet works in
+  `$HOME/Desktop/repos/prometheus`; the fleet works in
   `prometheus-master-plan-20260927-wt/*` worktrees — operational doc drift, no code impact.
 - Gap: no client-side proof generation exists anywhere (stub only); no automatic rule
   update loop (canonical manifest authority missing); GH-177 quality gate is merged but
@@ -180,22 +179,18 @@ Explicitly not to build (bound decisions):
 
 ## 8. Nächster Schritt — three safe implementation nodes (repo-local, no external gate)
 
-1. **GH-279** — decide Guardian dependency reproducibility and ownership policy.
-   Module `modules/guardian-node` (Compose/dependency boundary) + docs; no code
-   authority change (`memory/TODO.md:289`).
-2. **GH-280** — harden Guardian Compose runtime boundaries (identity, tmpfs, resource,
-   local-vLLM trust decisions) after the GH-279 decision; module
-   `modules/guardian-node/docker-compose.yml` + `tests/test_guardian_vllm_compose.py`
-   (`memory/TODO.md:290`).
-3. **GH-258/GH-261 next observe-only slice** — privacy/threat-model review package plus
-   a bounded local producer *design* on top of the merged GH-264 statement contract;
-   module `modules/threat-hint/src/endpoint_observation.rs` +
-   `docs/endpoint-observation-v1.md`; explicitly no sensor, transport, or response
-   (`memory/TODO.md:282`).
+Update 2026-09-30: the three nodes listed on 2026-09-27 (GH-279, GH-280, the
+GH-258/GH-261 producer design) are delivered on
+`agent/claude/prometheus-standin-20260930`, pending Codex review. Next nodes:
 
-Untouched by this mapping task: everything outside `docs/architecture/` and
-`.fleet/reports/` — in particular no product code, contracts, workflows, deployment,
-wallet, chain, or public-claim files.
+1. **Contract bundle v2** — after Codex accepts
+   `docs/architecture/ms-b-contract-decisions.md`: one reviewed revision of
+   `modules/contracts/silverc` + deployer profile (H-001 profile stays frozen).
+2. **Endpoint producer review** — independent privacy review of
+   `docs/endpoint-producer-design-v1.md` before any implementation brief.
+3. **Toolchain upgrade** — Rusty Kaspa v2.1.0 / SilverScript v1.0.0 once
+   upstream SilverScript depends on a rusty-kaspa release tag
+   (`.fleet/reports/a8u1-kaspa-silverscript-upgrade-inventory.md`).
 
 ## 9. Diagrammdateien
 

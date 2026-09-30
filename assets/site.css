@@ -1,0 +1,56 @@
+/* Prometheus public site: shared design tokens and page chrome (A12c, PRM-44).
+   Page-specific rules stay in each page's <style>. Responsive @media rules stay
+   inline so the cascade order of every page is unchanged. */
+:root{
+  --void:#050505;
+  --deep:#0a0a0a;
+  --surface:#0f0f0f;
+  --panel:#141414;
+  --line:rgba(255,255,255,0.07);
+  --line-bright:rgba(255,255,255,0.14);
+  --mint:#00E5A0;
+  --mint-dim:#00B880;
+  --mint-faint:rgba(0,229,160,0.06);
+  --mint-faint2:rgba(0,229,160,0.12);
+  --silver:#C8C8C8;
+  --silver-dim:#B0B0B0;
+  --silver-ghost:rgba(200,200,200,0.35);
+  --text:#E2E2E2;
+  --muted:#A0A0A0;
+  --dim:#8A8A8A;
+  --gold:#C8A060;
+  --warn:#FF9500;
+  --warn-faint:rgba(255,149,0,0.06);
+  --danger:#FF453A;
+  --danger-faint:rgba(255,69,58,0.06);
+}
+a{color:var(--mint)}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Space Grotesk',sans-serif;background:var(--void);color:var(--text);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+body::before{content:'';position:fixed;inset:0;z-index:9999;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,0) 0px,rgba(0,0,0,0) 1px,rgba(0,0,0,0.03) 1px,rgba(0,0,0,0.03) 2px)}
+.nav-id{display:flex;align-items:center;gap:14px;text-decoration:none}
+.nav-id img{height:26px;width:26px;object-fit:contain;filter:brightness(0) invert(1) brightness(.7)}
+.nav-wordmark{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;letter-spacing:4px;color:var(--silver);text-transform:uppercase}
+.nav-links{display:flex;gap:36px;list-style:none}
+.nav-links a{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color .2s}
+footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:24px}
+.f-left{font-family:'Space Mono',monospace;font-size:11px;color:var(--dim);letter-spacing:1px}
+.f-center{font-family:'Space Mono',monospace;font-size:12px;letter-spacing:3px;color:var(--silver-dim);text-align:center}
+.f-links{display:flex;justify-content:flex-end;gap:24px;list-style:none}
+.f-links a{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1px;color:var(--dim);text-decoration:none;transition:color .2s}
+.f-links a:hover{color:var(--mint)}
+.r.on{opacity:1;transform:translateY(0)}
+.nav-burger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:8px;z-index:600}
+.nav-burger span{display:block;width:22px;height:1px;background:var(--silver);transition:all .3s ease}
+.nav-burger.open span:nth-child(1){transform:translateY(6px) rotate(45deg)}
+.nav-burger.open span:nth-child(2){opacity:0}
+.nav-burger.open span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
+.mobile-menu{display:none;position:fixed;inset:56px 0 0 0;background:rgba(5,5,5,.98);backdrop-filter:blur(12px);z-index:490;flex-direction:column;padding:40px 32px;border-top:1px solid var(--line);overflow-y:auto}
+.mobile-menu a{font-family:'Space Mono',monospace;font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--silver-dim,#B0B0B0);text-decoration:none;padding:16px 0;border-bottom:1px solid var(--line);transition:color .2s}
+.mobile-menu a:last-child{border-bottom:none}
+.mobile-menu a:hover{color:var(--mint)}
+.mobile-menu.open{display:flex}
+.skip-link{position:absolute;left:-9999px;top:0;z-index:1000;background:var(--mint);color:#050505;padding:0 18px;min-height:44px;display:inline-flex;align-items:center;font-family:'Space Mono',monospace;font-size:12px;text-decoration:none}
+.skip-link:focus{left:16px;top:16px}
+#main:focus{outline:none}

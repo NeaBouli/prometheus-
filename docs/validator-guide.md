@@ -1,8 +1,15 @@
 # Prometheus Validator Guide
 
+> **Status (reviewed 2026-09-30):** this guide describes the **target** validator
+> role. No Prometheus validator network operates today, `prometheus-validator`
+> is a tested library crate without a binary, and no production ValidatorStaking
+> deployment exists (only the non-promotable H-001 Testnet-10 canary). Do not
+> send KAS to any contract on the basis of this guide. PROM emission is not
+> implemented. See [README](../README.md) and [roadmap](roadmap.md) for current status.
+
 ## What Do Validators Do?
 
-Validators secure the Prometheus network by staking KAS and voting on threat intelligence proposals. They earn PROM rewards for honest participation and face slashing for misbehavior.
+In the target design, validators secure the Prometheus network by staking KAS and voting on threat-intelligence proposals. They would earn PROM rewards for honest participation once emission exists, and face slashing for misbehavior.
 
 ## Requirements
 
@@ -25,16 +32,19 @@ cargo build --release -p kaspad
     --rpclisten=0.0.0.0:16210 --rpclisten-borsh=0.0.0.0:17210
 ```
 
-### 2. Build the Validator
+### 2. Build and test the validator library
 
 ```bash
 cd prometheus-
-cargo build --release -p prometheus-validator
+cargo test -p prometheus-validator
 ```
 
-### 3. Register as Validator
+This builds and tests the slashing/voting state machines. There is no validator
+binary or network node yet.
 
-Send a transaction with `MIN_STAKE_KAS` (10,000 KAS) to the ValidatorStaking contract calling `register(pubkey)`.
+### 3. Register as Validator (target — not available)
+
+Once a reviewed ValidatorStaking deployment exists, registration would send a transaction with `MIN_STAKE_KAS` (10,000 KAS) to the ValidatorStaking contract calling `register(pubkey)`.
 
 ## Voting Process
 
@@ -57,8 +67,8 @@ If your stake drops below 10,000 KAS after slashing, you are automatically deact
 
 ## Withdrawal
 
-Withdrawals have a 7-day cooldown (100,800 blocks at 10 BPS). Call `withdraw()` to initiate, then call again after the cooldown.
+The decided target is a 7-day cooldown (`6,048,000` blocks at 10 BPS), longer than the 1-day rule voting period so a validator cannot exit before its votes are settled. The current contract fixture still uses `COOLDOWN_BLOCKS = 100,800` (about 2.8 hours at 10 BPS); it changes only in the next reviewed contract-bundle revision, because the H-001 canary profile pins the current bundle manifest (audit PRM-35). Call `withdraw()` to initiate, then call again after the cooldown.
 
 ## Rewards
 
-Validators receive 40% of PROM emission (8,000,000 PROM/year), distributed proportionally to participation and reputation.
+Planned: validators would receive 40% of Year-1 PROM emission (8,000,000 PROM), distributed proportionally to participation. PROM minting and emission are not implemented, deployed, or active.

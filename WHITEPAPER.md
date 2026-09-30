@@ -216,7 +216,7 @@ privacy governance, and network/analyzer promotion remain blocked.
 
 | Token | Purpose | Mechanism |
 |-------|---------|-----------|
-| **KAS** | Validator staking | Native Kaspa token. Validators stake KAS (min 10,000). Slashed on misbehavior. |
+| **KAS** | Validator staking | Native Kaspa token. Specified: validators stake KAS (min 10,000) and are slashed on misbehavior. Staking and slashing are tested state machines; no operated network locks or slashes KAS today. |
 | **PROM** | Planned Rewards & Governance | Primary issuance is specified for verified contributions. Validators never stake PROM. Minting, emission, liquidity, and trading are not implemented, deployed, or active. |
 
 **Critical rule**: Validators stake KAS, never PROM. Planned primary PROM issuance is contribution-based; a planned KAS/PROM pool would allow secondary-market purchases after issuance.
@@ -269,7 +269,7 @@ if remaining_stake < MIN_STAKE_KAS: deactivate validator
 
 ### 6.3 Withdrawal
 
-7-day cooldown enforced via `COOLDOWN_BLOCKS = 100,800` (~7 days at 10 BPS).
+The decided target is a 7-day cooldown (`6,048,000` blocks at 10 BPS), longer than the 1-day rule voting period so a validator cannot exit before its votes are settled. The current contract fixture still uses `COOLDOWN_BLOCKS = 100,800` (about 2.8 hours at 10 BPS); it changes only in the next reviewed contract-bundle revision, because the H-001 canary profile pins the current bundle manifest (audit PRM-35).
 
 ---
 

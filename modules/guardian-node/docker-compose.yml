@@ -12,9 +12,17 @@
 #   * Models load only from caller-provisioned local ./models directories,
 #     mounted read-only. HF_HUB_OFFLINE/TRANSFORMERS_OFFLINE are forced.
 #     This file accepts and requires no HF_TOKEN or any other secret.
-#   * Non-root UID:GID 2000:0, all capabilities dropped, no-new-privileges,
-#     read-only root filesystem, bounded writable tmpfs only, bounded
-#     pids/memory/shm, no host IPC.
+#   * Non-root UID:GID 2000:2000 (no root group), all capabilities dropped,
+#     no-new-privileges, read-only root filesystem, bounded writable tmpfs
+#     only, bounded pids/CPU/memory/shm, no host IPC. ./models must be
+#     readable by UID or GID 2000.
+#   * /tmp is deliberately NOT mounted noexec: vLLM/Triton/torch JIT-compile
+#     kernels into the cache under HOME=/tmp and load them as shared objects;
+#     noexec would break inference. It stays nosuid,nodev and size-bounded.
+#   * Trust boundary: the vLLM API is unauthenticated. It is reachable only
+#     from the host loopback interface, so every local process and user on
+#     the host can send prompts to it. Run it only on a single-operator host;
+#     this file adds no API key because it must require no secret.
 #
 # Usage:
 #   8B (default):  docker compose up -d guardian-8b
@@ -33,7 +41,7 @@ services:
   guardian-8b:
     image: vllm/vllm-openai:v0.26.0@sha256:ffb2d59b1c059a5bd8d781320c9f5189de8293693b7d95da54befddaa54abf52
     pull_policy: never
-    user: "2000:0"
+    user: "2000:2000"
     init: true
     read_only: true
     restart: "no"
@@ -69,6 +77,7 @@ services:
     cap_drop:
       - ALL
     pids_limit: 2048
+    cpus: "16"
     mem_limit: 24g
     shm_size: 4g
     deploy:
@@ -94,7 +103,7 @@ services:
     profiles: ["70b"]
     image: vllm/vllm-openai:v0.26.0@sha256:ffb2d59b1c059a5bd8d781320c9f5189de8293693b7d95da54befddaa54abf52
     pull_policy: never
-    user: "2000:0"
+    user: "2000:2000"
     init: true
     read_only: true
     restart: "no"
@@ -132,6 +141,7 @@ services:
     cap_drop:
       - ALL
     pids_limit: 2048
+    cpus: "64"
     mem_limit: 256g
     shm_size: 16g
     deploy:

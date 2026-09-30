@@ -1,9 +1,22 @@
 # PROMETHEUS – MODULE STATUS
 # Format: | Module | Status | Progress | Last Update | Audit | Testnet Address |
 # Status: core lifecycle values plus evidence-qualified DEVELOPMENT/STUB/FIXTURE labels; every non-production label must retain its boundary in the row
-# Last Updated: 2026-09-13
+# Last Updated: 2026-09-30
 
 ---
+
+## AUDIT REMEDIATION STATUS (2026-09-30, not yet on main)
+
+A1-A8 are integrated on the Codex milestone branch (PR #284, hosted CI green,
+review required). A Claude stand-in continued on
+`agent/claude/prometheus-standin-20260930`: GH-279 dependency lock, GH-283
+compiled-contract gate, public-claim corrections (A4H), public records (GH-277),
+public-site contrast/accessibility/shared stylesheet/image weights (GH-278),
+service-worker removal (GH-275) and Guardian Compose hardening (GH-280).
+None of this is merged or deployed; production status is unchanged: no
+Prometheus protocol component is production-deployed. Validator cooldown
+target is 7 days; the current fixture keeps 100,800 blocks until a reviewed
+contract-bundle revision.
 
 ## PUBLIC CLAIM RECONCILIATION (2026-08-14)
 
@@ -397,7 +410,7 @@ Boundary: structural/public-key assignment consistency only; no source trust,
 ```text
 Historical ticket-close state: local review-ready; superseded by GH-117 merged status
 Ticket: GIO-PROM-20260726-006
-Worktree: /Users/gio/Desktop/repos/prometheus-v2-proof-binding
+Worktree: $HOME/Desktop/repos/prometheus-v2-proof-binding
 Policy: owner-only read-only exact schema pins network, BIP340 approver,
         opaque recipient scope, and nonzero raw-manifest SHA-256
 Composition: bind envelope/manifest; derive statement only from envelope;
@@ -1203,7 +1216,7 @@ Remaining: reviewed relation/artifacts, privacy/pairing, transport, actionable
 Historical ticket-close state: local review-ready; superseded by GH-117 merged status
 Baseline: b556fbbae428e7f6eef07c6d502b32e13e759813
 Branch: feat/local-v2-proof-binding
-Worktree: /Users/gio/Desktop/repos/prometheus-v2-proof-binding
+Worktree: $HOME/Desktop/repos/prometheus-v2-proof-binding
 Implemented: canonical Rust/Python v2 proof envelope, strict 19-field
              RelationManifest-v2, and one atomic data-only binding
 Trust: separately trusted network plus nonzero lowercase raw-manifest SHA-256

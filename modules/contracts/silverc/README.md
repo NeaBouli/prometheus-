@@ -158,6 +158,46 @@ contains the manifest. This is a CI-safe release-bundle gate for the available
 current-Silverc CLI surface; it does not claim that contracts were deployed to a
 network.
 
+### Compiled-artifact semantic gate (GH-283)
+
+The `contract-check` lint job greps fixture sources for expected literals. That
+proves only that the literals are present; a behavior-changing edit can keep
+them. CI therefore also compares the smoke-build manifest with the reviewed
+expectation `expected-compiled-artifacts.json` through
+`scripts/verify_silverc_compiled_semantics.py`.
+
+What the gate proves, for each of the seven fixtures compiled by the pinned
+`silverc` (`docs/architecture/toolchain-pins.json`) with the fixed constructor
+arguments in `smoke_silverc_artifacts.py`:
+
+- the compiled script bytes (SHA-256 and length) are exactly the reviewed ones;
+- the ABI entrypoint list, state layout, compiler version, and constructor
+  arguments are unchanged;
+- the fixture set and order are unchanged, and the compiler revision equals the
+  toolchain pin.
+
+`scripts/test_silverc_semantic_mutation.py` is the negative regression: it
+compiles behavior-changing mutants of `ValidatorStakingState.sil` (inverted bond
+floor, inverted reveal commitment check) that keep every linted literal and
+requires the gate to reject each one, while the unmutated source must recompile
+to the expected bytes.
+
+Outside the assurance boundary: the gate proves identity with a reviewed
+compilation, not that the reviewed contract logic is correct. Correctness rests
+on the runtime/fixture tests in `scripts/verify_silverc_h001.py`, on review, and
+on the planned audits. Source edits that compile to identical bytes (comments,
+formatting) are accepted by design. Constructor arguments other than the fixed
+fixture arguments are not covered.
+
+Changing a contract intentionally requires regenerating the expectation in the
+same reviewed change:
+
+```bash
+python3 scripts/smoke_silverc_artifacts.py
+python3 scripts/verify_silverc_compiled_semantics.py \
+  --built-manifest /tmp/prometheus-silverc-artifacts/manifest.json --write-expected
+```
+
 ## Deploy preflight
 
 `scripts/preflight_silverc_deploy.py` validates an already-built release bundle

@@ -35,7 +35,7 @@ EXPECTED_PROJECT_NAME: str = "prometheus-guardian-vllm"
 LOOPBACK_HOST: str = "127.0.0.1"
 CONTAINER_LISTEN_HOST: str = "0.0.0.0"
 INTERNAL_NETWORK: str = "guardian-internal"
-EXPECTED_USER: str = "2000:0"
+EXPECTED_USER: str = "2000:2000"
 EXPECTED_PULL_POLICY: str = "never"
 EXPECTED_PIDS_LIMIT: int = 2048
 EXPECTED_ENVIRONMENT: Mapping[str, str] = {
@@ -68,6 +68,7 @@ ALLOWED_SERVICE_KEYS: frozenset[str] = frozenset(
         "security_opt",
         "cap_drop",
         "pids_limit",
+        "cpus",
         "mem_limit",
         "shm_size",
         "deploy",
@@ -91,6 +92,7 @@ class ServicePolicy:  # pylint: disable=too-many-instance-attributes
     name: str
     host_port: int
     gpu_count: int
+    cpus: str
     mem_limit: str
     shm_size: str
     tmpfs_entry: str
@@ -135,6 +137,7 @@ SERVICE_POLICIES: tuple[ServicePolicy, ...] = (
         name="guardian-8b",
         host_port=8000,
         gpu_count=1,
+        cpus="16",
         mem_limit="24g",
         shm_size="4g",
         tmpfs_entry="/tmp:rw,nosuid,nodev,size=4g",
@@ -149,6 +152,7 @@ SERVICE_POLICIES: tuple[ServicePolicy, ...] = (
         name="guardian-70b",
         host_port=8001,
         gpu_count=4,
+        cpus="64",
         mem_limit="256g",
         shm_size="16g",
         tmpfs_entry="/tmp:rw,nosuid,nodev,size=8g",
@@ -293,6 +297,7 @@ def _validate_service(
     _expect_equal(
         errors, context, "pids_limit", service.get("pids_limit"), EXPECTED_PIDS_LIMIT
     )
+    _expect_equal(errors, context, "cpus", service.get("cpus"), policy.cpus)
     _expect_equal(
         errors, context, "mem_limit", service.get("mem_limit"), policy.mem_limit
     )

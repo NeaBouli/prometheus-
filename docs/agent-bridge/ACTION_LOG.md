@@ -318,7 +318,7 @@ Rules for all dev agents:
 - Do not use the Anthropic API, Anthropic SDK, `ANTHROPIC_API_KEY`, or direct HTTP calls for Codex -> Claude Code handoff.
 - Do not use `claude --bare`; bare mode does not read the local claude.ai OAuth/keychain session and will report not logged in.
 - Do not use `cc` for Claude Code; on this machine `cc` is the C compiler.
-- The Claude Code CLI command is `claude`; the stable wrapper is `/Users/gio/.local/bin/claude-code-terminal`.
+- The Claude Code CLI command is `claude`; the stable wrapper is `$HOME/.local/bin/claude-code-terminal`.
 - If a probe returns `401 Invalid authentication credentials`, the integration is using the wrong path: API instead of terminal.
 - Keep secrets, tokens, passwords, private keys, and keychain material out of bridge files.
 <!-- /CODEX_CLAUDE_CODE_TERMINAL_BRIDGE_V1 -->
@@ -354,7 +354,7 @@ Rules for all dev agents:
 - Rebuilt all seven release artifacts and the one-request non-promotable H-001 profile from exact main. The live keyless preflight revalidated the public funding outpoint as unspent/non-coinbase against a synced `rusty-kaspa 2.0.1` node above Toccata activation.
 - Prepared deterministic signing-request schema v2 outside the repository. Signing-request hash is `6b8e65065ca5ae2ca561ddd3fcb9659c384496fd31db32c137fcc9d811fa5323`; sighash is `174ccbe80d1d37e62d2bbabfbfba48245372df2bcf9e6724ac79ebc16b4e0bcd`. A second prepare was byte-identical and the public handoff directory passed Gitleaks.
 - No signature, wallet access, raw signed transaction, or broadcast occurred. External BIP340 signing now requires explicit approval; full operator verification remains mandatory before any one-shot broadcast.
-- Preserved the reproducible public handoff outside Git at `/Users/gio/Desktop/repos/prometheus-handoffs/9477fab` with owner-only permissions; the repository still contains no signing response, wallet material, or raw transaction.
+- Preserved the reproducible public handoff outside Git at `$HOME/Desktop/repos/prometheus-handoffs/9477fab` with owner-only permissions; the repository still contains no signing response, wallet material, or raw transaction.
 
 - Remote verification update:
   - `181cde2 ci: reject raw deploy receipt payloads`
@@ -440,7 +440,7 @@ Rules for all dev agents:
 - Exact-main Prometheus CI `29454591518`, Security Audit `29454591555`, and Pages `29454590793` passed before the rebuild.
 - Live read-only preflight revalidated public outpoint `24e81339f3656689643ca86e3c53c4c5336e4273bb127d25bdaf328e5da241c7:0` as unspent/non-coinbase through a synced, UTXO-indexed `rusty-kaspa 2.0.1` node at DAA `517950805`, above Toccata activation.
 - Two prepare runs were byte-identical to each other and the prior `9477fab` request. Signing-request hash remains `6b8e65065ca5ae2ca561ddd3fcb9659c384496fd31db32c137fcc9d811fa5323`; sighash remains `174ccbe80d1d37e62d2bbabfbfba48245372df2bcf9e6724ac79ebc16b4e0bcd`.
-- Preserved the public handoff outside Git at `/Users/gio/Desktop/repos/prometheus-handoffs/205e1ca` with 0700 directories and 0600 files. Full-directory Gitleaks v8.30.1 scanned about 1.27 MB and found no leaks.
+- Preserved the public handoff outside Git at `$HOME/Desktop/repos/prometheus-handoffs/205e1ca` with 0700 directories and 0600 files. Full-directory Gitleaks v8.30.1 scanned about 1.27 MB and found no leaks.
 - No wallet file, private key, secret, signature, raw transaction, or broadcast was accessed or produced. The next gate is an explicitly approved external BIP340 signature response, not repository-side signing.
 - PR #28 merged normally without admin bypass as `e9a970a9d3dbaa98cd754a4149075c0cca866001`; exact-main Prometheus CI `29455597727`, Security Audit `29455597677`, and Pages `29455597066` passed.
 - Live GitHub README, index, roadmap, and whitepaper contain the merged `205e1ca` handoff/live-preflight status and the synchronized 68-72% core-network estimate. Issue #9 was updated with the public evidence and unchanged signature/broadcast gates.
@@ -1079,7 +1079,7 @@ Rules for all dev agents:
 ## 2026-07-26 - GIO-PROM-20260726-005 local v2 proof binding started
 
 - Created isolated branch `feat/local-v2-proof-binding` and worktree
-  `/Users/gio/Desktop/repos/prometheus-v2-proof-binding` from exact public main
+  `$HOME/Desktop/repos/prometheus-v2-proof-binding` from exact public main
   `b556fbbae428e7f6eef07c6d502b32e13e759813`.
 - Scope is one local data-only Rust/Python binding between the separately
   review-ready canonical ThreatHint-v2 proof envelope and RelationManifest-v2.
@@ -5867,3 +5867,183 @@ Rules for all dev agents:
   it did not supply an independent review. Required security source review and
   combined local verification were completed by Codex before the PR.
 - Status: `A8 VERIFIED / PR #284 OPEN / REVIEW REQUIRED / PRODUCTION FALSE`.
+
+### 2026-09-30 - [AUTOR: CC] DECISION: Claude stand-in for Codex; A8u1 upgrade inventory
+
+- TYPE: DECISION — Claude stand-in. Codex is token-limited; Claude Code continues
+  the master-plan thread on `agent/claude/prometheus-standin-20260930` (stacked on
+  `60ee6db`). Handover: `.fleet/HANDOVER-CLAUDE-20260930.md`. No merge to main.
+- A8u1: candidate upgrade Rusty Kaspa v2.1.0 / SilverScript v1.0.0 inventoried.
+  Blocked upstream: SilverScript `d25bd34` depends on rusty-kaspa v2.0.1 and
+  SilverScript v1.0.0 on untagged rev `a41a333b`; the A8 pin gate correctly
+  rejects the resulting split graph. On v2.1.0 only `silverc-deployer` fails
+  (removed `toccata_activation`, `mempool_block_mass_cofactors`,
+  `EngineFlags::covenants_enabled`); its signing-request schema binds the Toccata
+  activation score, so a port needs a versioned schema. Active pins unchanged.
+- Report: `.fleet/reports/a8u1-kaspa-silverscript-upgrade-inventory.md`.
+- Status: `A8u1 DONE / UPGRADE BLOCKED UPSTREAM / PRODUCTION FALSE`.
+
+### 2026-09-30 - [AUTOR: CC] GH-279 / PRM-09 Guardian dependency reproducibility
+
+- Exact direct pins (httpx floor removed), generated universal sha256 lock
+  `modules/guardian-node/requirements-lock.txt` (29 packages, Python 3.11),
+  wheels-only hash-checked CI install, offline gate
+  `scripts/verify_guardian_python_deps.py` (+18 tests), public
+  `docs/dependency-policy.md`. yara-x 1.4.0 kept as documented pin.
+- PASS: Guardian 1426 passed / 4 skipped (locked venv); Black; Pylint 9.86;
+  pip-audit clean; 374 script tests; ruff; mypy strict.
+- Report `.fleet/reports/a8r6-guardian-python-deps.md`. Review owed to Codex.
+- Status: `GH-279 LOCAL VERIFIED / HOSTED CI PENDING / PRODUCTION FALSE`.
+
+### 2026-09-30 - [AUTOR: CC] GH-283 compiled-contract semantic gate
+
+- New `scripts/verify_silverc_compiled_semantics.py` + reviewed
+  `modules/contracts/silverc/expected-compiled-artifacts.json`; negative
+  regression `scripts/test_silverc_semantic_mutation.py` (2 literal-preserving
+  mutants rejected); 13 unit tests; CI wired; README assurance boundary.
+- Pinned bundle archive SHA-256 reproduces `4989f076…` from the H-001 evidence.
+- Report `.fleet/reports/gh283-silverc-semantic-gate.md`. Review owed to Codex.
+- Status: `GH-283 LOCAL VERIFIED / HOSTED CI PENDING / PRODUCTION FALSE`.
+
+### 2026-09-30 - [AUTOR: CC] A4H public honesty (remaining confirmed items)
+
+- README quick start now uses `cargo test -p prometheus-validator` (the crate
+  has no binary); KAS staking/slashing stated as specified + tested, not
+  operated (README, WHITEPAPER, llms.txt); Sprint-1 contracts labelled legacy
+  `.ss`; ACCEPTED explained as review label. Other findings already fixed.
+- PASS: public-claim, project-status, memory, documentation-hygiene gates +
+  tests. Report `.fleet/reports/a4h-readme-honesty.md`. Review owed to Codex.
+
+### 2026-09-30 - [AUTOR: CC] A11 / GH-277 public records reconciliation
+
+- PRM-34/36/37/38/39/40/41/46 addressed (see report
+  `.fleet/reports/a11-public-records.md`); visual gate evidence under
+  `.fleet/artifacts/a11-public-records/`. PRM-34 funding decision remains Gio's.
+- PASS: claim/status/hygiene/memory gates and 94 tests; 8/8 visual views clean.
+
+### 2026-09-30 - [AUTOR: CC] A12a public-site contrast (PRM-43)
+
+- Pasted-over CSS removed in index.html (pixel-identical proof), AA text
+  tokens on all pages, link color, decorative glyphs aria-hidden; rendered
+  audit 796 → 0 failing text nodes; CI gate `scripts/verify_site_css.py`.
+- Report `.fleet/reports/a12a-contrast.md`; evidence `.fleet/artifacts/a12a-contrast/`.
+
+### 2026-09-30 - [AUTOR: CC] A12b public-site accessibility (PRM-47/48)
+
+- noopener, logo href, skip link, reduced-motion + no-JS fallbacks on all five
+  pages; keyboard/reduced-motion/no-JS checks pass. Report `.fleet/reports/a12b-a11y.md`.
+
+### 2026-09-30 - [AUTOR: CC] A12d public-site image weights
+
+- Display-sized logo/coin images on five pages (≈3.1 MB → ≈208 KB on index).
+  Report `.fleet/reports/a12d-images.md`.
+
+### 2026-09-30 - [AUTOR: CC] DECISION (Gio): PRM-34 bug bounty removed
+
+- Owner decision: no PROM bug bounty (PROM not minted, no pool). SECURITY.md
+  "Rewards" section: no bug bounty program; reports carry no payment
+  entitlement. Claim/hygiene/memory/status gates pass.
+
+### 2026-09-30 - [AUTOR: CC] DECISION (delegated by Gio): A10 service worker, A9 Compose
+
+- A10/#275: service worker removed (never installed: root-absolute precache,
+  root index 404); self-unregistering cleanup sw.js; dead GSC meta removed;
+  README notes third-party TN10 explorer outage. Browser-verified.
+- A9/#280: Guardian Compose UID:GID 2000:2000, CPU caps 16/64, /tmp exec kept
+  for JIT kernels (documented), unauthenticated loopback vLLM documented as a
+  single-operator trust boundary. Guardian 1428 passed / 4 skipped.
+- PRM-35 cooldown (delegated decision): 7 days target; fixture unchanged until a
+  reviewed contract-bundle revision because `FULL_BUNDLE_MANIFEST_SHA256` pins
+  the H-001 canary bundle. Public text corrected to decided-vs-current.
+
+### 2026-09-30 - [AUTOR: CC] A12c shared stylesheet (PRM-44)
+
+- `assets/site.css` (tokens + chrome) linked by all five pages; pixel-identical
+  proof; `verify_site_css.py` checks shared+page cascade and the link.
+  Report `.fleet/reports/a12c-shared-css.md`. GH-278 complete on the branch.
+
+### 2026-09-30 - [AUTOR: CC] Records refresh + H-001 evidence fallback check
+
+- memory/TODO.md and memory/STATUS.md updated to the 2026-09-30 state (all
+  stand-in items marked in progress / pending Codex review; PRM-35 and the
+  Kaspa/SilverScript upgrade marked blocked with reasons).
+- H-001 re-verification: kaspa.org TN10 explorer 402; API indexer healthy but
+  404 for the canary tx/block (pruned). README states archival history is now
+  required; captured observation stays in the evidence file.
+
+### 2026-09-30 - [AUTOR: CC] DA1 endpoint producer design (design only)
+
+- `docs/endpoint-producer-design-v1.md` (resource-utilization producer
+  candidate, GH-267 mapping, risks, gates). Hygiene, claim and GH-267 gates pass.
+  Report `.fleet/reports/da1-endpoint-producer-design.md`.
+
+### 2026-09-30 - [AUTOR: CC] PRM-12: GitHub Actions pinned to commit SHAs
+
+- All 22 action references pinned to resolved commit SHAs (ref as comment).
+  Report `.fleet/reports/prm12-actions-sha-pin.md`. Hosted run on the new head owed.
+
+### 2026-09-30 - [AUTOR: CC] Hosted verification of the stand-in branch
+
+- Dispatched once at `bff7fc1`: Prometheus CI `36698349293` success (8/8 jobs),
+  Security Audit `36698357152` success (3/3 jobs). No PR, no merge.
+- PRM-12 (cont.): operator-authored deployer formats (funding spec, signature
+  response, broadcast journal/result) reject unknown fields; DeployRequest stays
+  a hash-bound projection. Deployer tests, clippy and the full local
+  h001-silverc-runtime job pass. Security review owed to Codex.
+- PRM-12 (cont.): saturating bond math in validator-node (regression test) and
+  a runbook entry for the replay-ledger clock high-water. Remaining: CI
+  governance self-attestation (needs admin-token decision), upstream lock dupes.
+
+### 2026-09-30 - [AUTOR: CC] MS-B contract decision record (proposal)
+
+- `docs/architecture/ms-b-contract-decisions.md` (D1–D7, capability baseline,
+  child-issue plan, open risks). Proposal only; Codex architecture review
+  required before it is binding. No code.
+
+### 2026-09-30 - [AUTOR: CC] Second hosted verification (current head)
+
+- Dispatched once at `40dfd89` (includes action SHA pins, deployer strictness,
+  bond math): Prometheus CI `36702356697` success (8/8), Security Audit
+  `36702361053` success (3/3). SHA-pinned actions work on hosted runners.
+
+### 2026-09-30 - [AUTOR: CC] Contract bundle v2 DRAFT (separate branch)
+
+- `agent/claude/contract-bundle-v2-draft` @ `2f132e4`: on-chain 7-day cooldown
+  (`this.age`), PRM-13 exit, zero-marker rejection; 58 runtime tests pass;
+  local contract CI fails only at the H-001 canary profile (v1 manifest pin).
+  Not integrable before Codex designs the profile split.
+- Bundle v2 draft step 2 (`f3e6735` on `agent/claude/contract-bundle-v2-draft`):
+  stake-backed value conservation and burned slashing (P2SH of OP_RETURN, the
+  only unspendable standard form) for ValidatorStakingState; 63 runtime tests.
+- Bundle v2 draft steps 3–4: RuleStorage + CommunityDonations attested
+  tallies/quorum/time/value (72 runtime tests). Upstream compiler finding
+  (`byte[](v, 8)` stack misaddressing in d25bd34) recorded in the draft report.
+- Bundle v2 draft steps 5–6: autoTune chain-time bound; DevIncentivePool
+  governance-attested finalization. 73 runtime tests.
+
+### 2026-09-30 - [AUTOR: CC] Stand-in hand-back ready
+
+- Handover `.fleet/HANDOVER-CLAUDE-20260930.md` is final for this session, including Gio's
+  evaluation request (Codex rates the work; if good, Codex dispatches the next brief to Claude).
+- Status: `STAND-IN HAND-BACK READY / REVIEW OWED TO CODEX / PRODUCTION FALSE`.
+
+### 2026-09-30 - Codex focused handback review
+
+- PR #284 merged through the normal squash gate as 3a79bfe; Pages build passed.
+- Stand-in supply-chain, container and deployer changes accepted after targeted
+  review and 98 passing gate tests; hosted evidence at 40dfd89 verified.
+- Claude continues as implementation owner. Retired-worker cleanup receives a
+  bounded correction before integration. Contract bundle v2 remains a draft
+  with focused review repairs and profile integration still required.
+- Kimi is token_limited according to dispatch and canonical probe. Codex
+  performed the required draft review; no production or chain action.
+
+### 2026-09-30 - [AUTOR: CC] Retired service worker cache scope (handback-sw-scope-fix)
+
+- `sw.js` activate now deletes only `prometheus-v1`, the single cache name the
+  historical worker (`20e8531`) created, instead of every cache on the shared
+  GitHub Pages origin; `skipWaiting` and `unregister` are unchanged.
+- Real-browser regression `scripts/browser_retired_service_worker_regression.mjs`
+  (Chromium via Playwright): owned cache removed, `other-project-v1`,
+  `prometheus-v2`, `workbox-precache-v2` preserved, 0 registrations; fails on the
+  previous `sw.js`. Site CSS, claim, status, hygiene, memory gates and tests pass.

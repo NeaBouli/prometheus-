@@ -9,6 +9,11 @@
 
 ---
 
+> **Record status (2026-09-30):** historical working record, not the current
+> project status. Current sources: `README.md` (Project Status), `docs/roadmap.md`,
+> `memory/STATUS.md`, and the delivery plan `.fleet/PLAN.md`. Entries below are
+> retained unchanged as audit history.
+
 ## PROJEKT-IDENTITÄT
 
 | Eigenschaft        | Wert                                                   |

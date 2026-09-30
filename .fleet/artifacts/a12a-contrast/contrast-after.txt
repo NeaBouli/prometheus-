@@ -1,0 +1,6 @@
+== index.html: 1 failing text nodes, 1 classes
+  1x em rgba(0, 0, 0, 0) 1.00
+== roadmap.html: 0 failing text nodes, 0 classes
+== faq.html: 0 failing text nodes, 0 classes
+== whitepaper.html: 0 failing text nodes, 0 classes
+== guardian-economics.html: 0 failing text nodes, 0 classes

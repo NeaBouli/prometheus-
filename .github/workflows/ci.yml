@@ -17,8 +17,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-python@v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: '3.11'
       - name: Check Memory Files
@@ -47,7 +47,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - name: Test compiled-artifact semantic gate (GH-283)
+        run: python3 -m unittest scripts.test_silverc_compiled_semantics
       - name: Verify KAS/PROM separation (PATTERN-001)
         run: |
           echo "Checking contracts for KAS/PROM separation..."
@@ -209,8 +211,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-python@v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: '3.11'
       - name: Verify Rusty Kaspa / SilverScript pins
@@ -225,11 +227,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
-      - uses: actions/checkout@v7
-      - uses: dtolnay/rust-toolchain@1.95.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: dtolnay/rust-toolchain@46817827a5bfabe028bf34e1cce71fd40e2ff697 # 1.95.0
         with:
           components: rustfmt, clippy
-      - uses: Swatinem/rust-cache@v2
+      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2
       - name: Verify keyless Toccata-v1 genesis operator
         run: |
           cargo test -p prometheus-silverc-deployer
@@ -276,6 +278,13 @@ jobs:
             --archive /tmp/prometheus-silverc-artifacts.tar.gz
           test -s /tmp/prometheus-silverc-artifacts.tar.gz
           tar -tzf /tmp/prometheus-silverc-artifacts.tar.gz | grep -q 'prometheus-silverc-artifacts/manifest.json'
+      - name: Verify compiled contract semantics against reviewed expectation (GH-283)
+        run: |
+          python3 scripts/verify_silverc_compiled_semantics.py \
+            --built-manifest /tmp/prometheus-silverc-artifacts/manifest.json
+          python3 scripts/test_silverc_semantic_mutation.py \
+            --silverc /tmp/prom-silverscript/target/debug/silverc \
+            --built-manifest /tmp/prometheus-silverc-artifacts/manifest.json
       - name: Preflight current-silverc release bundle
         run: |
           python3 scripts/preflight_silverc_deploy.py \
@@ -2424,11 +2433,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 35
     steps:
-      - uses: actions/checkout@v7
-      - uses: dtolnay/rust-toolchain@1.95.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: dtolnay/rust-toolchain@46817827a5bfabe028bf34e1cce71fd40e2ff697 # 1.95.0
         with:
           components: rustfmt, clippy
-      - uses: Swatinem/rust-cache@v2
+      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2
       - name: Format Check
         run: cargo fmt --all --check
       - name: Clippy
@@ -2463,11 +2472,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: false
-      - uses: dtolnay/rust-toolchain@1.95.0
-      - uses: Swatinem/rust-cache@v2
+      - uses: dtolnay/rust-toolchain@46817827a5bfabe028bf34e1cce71fd40e2ff697 # 1.95.0
+      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2
       - name: Commitment Build Release Performance Gate
         run: >-
           cargo test --release --locked -p prometheus-client --test performance
@@ -2480,12 +2489,18 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-python@v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: '3.11'
+      - name: Verify Guardian dependency pins and lock
+        run: |
+          python3 scripts/verify_guardian_python_deps.py
+          python3 -m unittest scripts.test_guardian_python_deps
       - name: Install dependencies
-        run: pip install -r modules/guardian-node/requirements.txt
+        run: >-
+          python -m pip install --disable-pip-version-check
+          --require-hashes --only-binary :all: -r modules/guardian-node/requirements-lock.txt
       - name: Render Guardian vLLM Compose
         run: >-
           docker compose --profile 70b
@@ -2538,7 +2553,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - name: Verify key pages exist
         run: |
           for f in index.html faq.html roadmap.html whitepaper.html guardian-economics.html; do
@@ -2566,6 +2581,10 @@ jobs:
           for f in robots.txt sitemap.xml llms.txt manifest.json sw.js; do
             test -f "$f" && echo "OK: $f" || (echo "MISSING: $f" && exit 1)
           done
+      - name: Verify page stylesheets (no pasted-over duplicates, AA text tokens)
+        run: |
+          python3 scripts/verify_site_css.py
+          python3 -m unittest scripts.test_site_css
       - name: Verify H-001 public closeout evidence
         run: |
           python3 scripts/verify_h001_canary_closeout_evidence.py
