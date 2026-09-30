@@ -519,3 +519,8 @@ Both runs require Gio budget approval (plan-level gate).
 
 - noopener on external links, logo href, skip link to focusable main,
   reduced-motion and no-JS fallbacks. State: `A12b LOCAL VERIFIED`.
+
+### 2026-09-30 — A12d image weights locally verified (Claude stand-in)
+
+- Display-sized logo/coin variants; index images ≈3.1 MB → ≈208 KB.
+  PRM-35 cooldown text on the token card noted for #276. State: `A12d LOCAL VERIFIED`.

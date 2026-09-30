@@ -5932,3 +5932,8 @@ Rules for all dev agents:
 
 - noopener, logo href, skip link, reduced-motion + no-JS fallbacks on all five
   pages; keyboard/reduced-motion/no-JS checks pass. Report `.fleet/reports/a12b-a11y.md`.
+
+### 2026-09-30 - [AUTOR: CC] A12d public-site image weights
+
+- Display-sized logo/coin images on five pages (≈3.1 MB → ≈208 KB on index).
+  Report `.fleet/reports/a12d-images.md`.

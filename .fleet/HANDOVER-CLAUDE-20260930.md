@@ -30,6 +30,7 @@ Goal: continue exactly from the hand-back point without re-research.
 | 2026-09-30 | A11 / GH-277 | Public records: bounty label, memory banners, guides, paths, CLAUDE.md, robots, landing wording | Gates + 4-viewport visual gate pass. Report `.fleet/reports/a11-public-records.md`. |
 | 2026-09-30 | A12a / PRM-43 | WCAG AA contrast on all public pages + CSS dedupe + CI gate | 796→0 failing text nodes; 5 pages × 4 viewports clean. Report `.fleet/reports/a12a-contrast.md`. |
 | 2026-09-30 | A12b / PRM-47/48 | noopener, skip link, reduced-motion/no-JS fallbacks | Keyboard + reduced-motion + no-JS checks pass. Report `.fleet/reports/a12b-a11y.md`. |
+| 2026-09-30 | A12d | Display-sized images (index ≈3.1 MB → ≈208 KB) | Images load at 1440/390; layout gate clean. Report `.fleet/reports/a12d-images.md`. |
 
 ## Current state
 - Branch/worktree: `agent/claude/prometheus-standin-20260930` in
