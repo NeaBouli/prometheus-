@@ -67,7 +67,7 @@ If your stake drops below 10,000 KAS after slashing, you are automatically deact
 
 ## Withdrawal
 
-Withdrawals have a cooldown of `COOLDOWN_BLOCKS = 100,800` blocks. The documented "7 days at 10 BPS" does not match that constant (100,800 blocks are about 2.8 hours at 10 BPS); the intended value is an open owner decision (audit PRM-35, issue #276). Call `withdraw()` to initiate, then call again after the cooldown.
+The decided target is a 7-day cooldown (`6,048,000` blocks at 10 BPS), longer than the 1-day rule voting period so a validator cannot exit before its votes are settled. The current contract fixture still uses `COOLDOWN_BLOCKS = 100,800` (about 2.8 hours at 10 BPS); it changes only in the next reviewed contract-bundle revision, because the H-001 canary profile pins the current bundle manifest (audit PRM-35). Call `withdraw()` to initiate, then call again after the cooldown.
 
 ## Rewards
 
