@@ -2581,6 +2581,10 @@ jobs:
           for f in robots.txt sitemap.xml llms.txt manifest.json sw.js; do
             test -f "$f" && echo "OK: $f" || (echo "MISSING: $f" && exit 1)
           done
+      - name: Verify page stylesheets (no pasted-over duplicates, AA text tokens)
+        run: |
+          python3 scripts/verify_site_css.py
+          python3 -m unittest scripts.test_site_css
       - name: Verify H-001 public closeout evidence
         run: |
           python3 scripts/verify_h001_canary_closeout_evidence.py

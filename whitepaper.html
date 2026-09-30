@@ -36,12 +36,13 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
+a{color:var(--mint)}
 :root {
   --void: #050505;--deep: #0a0a0a;--surface: #0f0f0f;--panel: #141414;
   --line: rgba(255,255,255,0.07);--line-bright: rgba(255,255,255,0.14);
   --mint: #00E5A0;--mint-dim: #00B880;--mint-faint: rgba(0,229,160,0.06);
-  --silver: #C8C8C8;--silver-dim: #787878;--gold: #C8A060;
-  --text: #E2E2E2;--muted: #666666;--dim: #333333;
+  --silver: #C8C8C8;--silver-dim: #B0B0B0;--gold: #C8A060;
+  --text: #E2E2E2;--muted:#A0A0A0;--dim:#8A8A8A;
 }
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
@@ -168,7 +169,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
 .nav-burger.open span:nth-child(2){opacity:0}
 .nav-burger.open span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
 .mobile-menu{display:none;position:fixed;inset:56px 0 0 0;background:rgba(5,5,5,.98);backdrop-filter:blur(12px);z-index:490;flex-direction:column;padding:40px 32px;border-top:1px solid var(--line);overflow-y:auto}
-.mobile-menu a{font-family:'Space Mono',monospace;font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--silver-dim,#787878);text-decoration:none;padding:16px 0;border-bottom:1px solid var(--line);transition:color .2s}
+.mobile-menu a{font-family:'Space Mono',monospace;font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--silver-dim,#B0B0B0);text-decoration:none;padding:16px 0;border-bottom:1px solid var(--line);transition:color .2s}
 .mobile-menu a:last-child{border-bottom:none}
 .mobile-menu a:hover{color:var(--mint)}
 .mobile-menu.open{display:flex}

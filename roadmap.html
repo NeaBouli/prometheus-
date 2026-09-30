@@ -36,12 +36,13 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
+a{color:var(--mint)}
 :root {
   --void: #050505;--deep: #0a0a0a;--surface: #0f0f0f;--panel: #141414;
   --line: rgba(255,255,255,0.07);--line-bright: rgba(255,255,255,0.14);
   --mint: #00E5A0;--mint-dim: #00B880;--mint-faint: rgba(0,229,160,0.06);
-  --silver: #C8C8C8;--silver-dim: #787878;--gold: #C8A060;
-  --text: #E2E2E2;--muted: #666666;--dim: #333333;
+  --silver: #C8C8C8;--silver-dim: #B0B0B0;--gold: #C8A060;
+  --text: #E2E2E2;--muted:#A0A0A0;--dim:#8A8A8A;
 }
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
@@ -110,8 +111,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:500;padding:0 48px;height:56px;d
 .sprint-items code{white-space:normal;overflow-wrap:anywhere}
 .sprint-items li:last-child{border-bottom:none}
 .sprint-items li::before{content:'';position:absolute;left:0;top:8px;width:1px;height:12px;background:var(--mint);opacity:.4}
-.sprint-items li.done-item{color:#3A6050}
-.sprint-items li.done-item::before{background:#3A6050}
+.sprint-items li.done-item{color:#5FA888}
+.sprint-items li.done-item::before{background:#5FA888}
 
 /* DEVICES TABLE */
 .devices-section{background:var(--deep);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:80px 48px}
@@ -176,7 +177,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
 .nav-burger.open span:nth-child(2){opacity:0}
 .nav-burger.open span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
 .mobile-menu{display:none;position:fixed;inset:56px 0 0 0;background:rgba(5,5,5,.98);backdrop-filter:blur(12px);z-index:490;flex-direction:column;padding:40px 32px;border-top:1px solid var(--line);overflow-y:auto}
-.mobile-menu a{font-family:'Space Mono',monospace;font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--silver-dim,#787878);text-decoration:none;padding:16px 0;border-bottom:1px solid var(--line);transition:color .2s}
+.mobile-menu a{font-family:'Space Mono',monospace;font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--silver-dim,#B0B0B0);text-decoration:none;padding:16px 0;border-bottom:1px solid var(--line);transition:color .2s}
 .mobile-menu a:last-child{border-bottom:none}
 .mobile-menu a:hover{color:var(--mint)}
 .mobile-menu.open{display:flex}
@@ -270,7 +271,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
   <!-- PHASE 0 -->
   <div class="phase r">
     <div class="phase-header">
-      <div class="phase-letter">0</div>
+      <div class="phase-letter" aria-hidden="true">0</div>
       <div class="phase-meta">
         <span class="phase-tag">Phase 0 · Development foundation</span>
         <div><span class="phase-title">Repository foundations accepted, not production operation.</span>
@@ -331,7 +332,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
   <!-- PHASE A -->
   <div class="phase r">
     <div class="phase-header">
-      <div class="phase-letter">A</div>
+      <div class="phase-letter" aria-hidden="true">A</div>
       <div class="phase-meta">
         <span class="phase-tag">Phase A · Post-Toccata Verification</span>
         <div><span class="phase-title">Runtime gates and the funded H-001 Testnet-10 canary pass; six state deployments remain.</span>
@@ -442,7 +443,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
   <!-- PHASE B -->
   <div class="phase r">
     <div class="phase-header">
-      <div class="phase-letter">B</div>
+      <div class="phase-letter" aria-hidden="true">B</div>
       <div class="phase-meta">
         <span class="phase-tag">Phase B · AI Production</span>
         <div><span class="phase-title">Real Phi-3. Fine-tuned LLaMA 3. Fed-DART live.</span>
@@ -514,7 +515,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
   <!-- PHASE C -->
   <div class="phase r">
     <div class="phase-header">
-      <div class="phase-letter">C</div>
+      <div class="phase-letter" aria-hidden="true">C</div>
       <div class="phase-meta">
         <span class="phase-tag">Phase C · Desktop Release</span>
         <div><span class="phase-title">Full desktop client. Public beta.</span>
@@ -573,7 +574,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
   <!-- PHASE D -->
   <div class="phase r">
     <div class="phase-header">
-      <div class="phase-letter">D</div>
+      <div class="phase-letter" aria-hidden="true">D</div>
       <div class="phase-meta">
         <span class="phase-tag">Phase D · Mobile</span>
         <div><span class="phase-title">iOS + Android. Full public release.</span>
@@ -610,7 +611,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
   <!-- PHASE E -->
   <div class="phase r">
     <div class="phase-header">
-      <div class="phase-letter">E</div>
+      <div class="phase-letter" aria-hidden="true">E</div>
       <div class="phase-meta">
         <span class="phase-tag">Phase E · vProgs</span>
         <div><span class="phase-title">Complete architectural vision.</span>
