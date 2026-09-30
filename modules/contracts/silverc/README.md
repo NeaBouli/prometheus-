@@ -785,18 +785,30 @@ Silverscript ref, builds covenant declaration sigscripts, and runtime-tests
 the proposal lifecycle transitions for:
 
 - `submitProposal`
-- `voteOnProposal`
 - `finalizeProposal`
 - `deactivateRule`
 
+Bundle v2 draft (MS-B D1, D2, D4): the free per-vote transition `voteOnProposal`
+(any key could vote, repeatedly) is removed. Ballots are collected off chain by
+the canonical membership source and signed-ballot replay ledger; the contract
+accepts:
+
+- `submitProposal` only with a `membership_attestation` (`checkSigFromStack` by the
+  governance/attestation key over `sha256("prometheus-rule-submission-v1" ||
+  u64le(next_proposal_id) || guardian_pk || threat_hash)`) and `tx.time >= block_height`;
+- `finalizeProposal` only with an attested tally (`sha256("prometheus-rule-tally-v1" ||
+  u64le(proposal_id) || u64le(for) || u64le(against) || u64le(active_set_size) ||
+  validator_set_root)`), at least 50 % participation of the active set, approval of at
+  least 6,700 bps of cast votes (ties accepted), and `tx.time >= voting_end_block`.
+  The set size and root are not part of the transaction outputs, so the attestation is
+  what binds them.
+
 Current runtime coverage:
 
-- `submitProposal` accepts a valid guardian signature and successor state
-- `submitProposal` rejects confidence below `MIN_CONFIDENCE`
-- `voteOnProposal` accepts a valid validator support vote and successor state
-- `voteOnProposal` rejects votes at or after `voting_end_block`
-- `finalizeProposal` accepts accepted and rejected proposal outcomes
-- `finalizeProposal` rejects zero-vote finalization
+- `submitProposal` accepts an attested guardian; rejects a forged attestation, confidence
+  below `MIN_CONFIDENCE`, and a submission height above the lock time
+- `finalizeProposal` accepts accepting, rejecting and exact-threshold tallies; rejects zero
+  votes, participation below 50 %, a tampered set size, and finalization before the voting end
 - `deactivateRule` accepts deactivation of an active accepted rule
 - `deactivateRule` rejects pending/non-accepted rule state
 

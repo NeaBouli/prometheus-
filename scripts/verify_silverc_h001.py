@@ -658,6 +658,7 @@ fn prometheus_rule_storage_state_fixture_compiles_against_current_silverc() {
             Expr::bytes(rule_cid.clone()),
             Expr::int(9_000),
             Expr::int(1_000),
+            Expr::bytes(vec![0u8; 64]),
             Expr::bytes(sig.clone()),
         ],
     );
@@ -687,20 +688,19 @@ fn prometheus_rule_storage_state_fixture_compiles_against_current_silverc() {
             0,
         ),
     );
-    build_covenant_sigscript(
-        &pending,
-        "voteOnProposal",
-        vec![
-            Expr::bool(true),
-            Expr::int(1_100),
-            Expr::bytes(sig.clone()),
-            Expr::bytes(validator_pk),
-        ],
-    );
+    let _ = &validator_pk;
     build_covenant_sigscript(
         &pending,
         "finalizeProposal",
-        vec![Expr::int(865_000), Expr::bytes(sig.clone())],
+        vec![
+            Expr::int(865_000),
+            Expr::int(8),
+            Expr::int(2),
+            Expr::int(10),
+            Expr::bytes(vec![5u8; 32]),
+            Expr::bytes(vec![0u8; 64]),
+            Expr::bytes(sig.clone()),
+        ],
     );
 
     let accepted = compile_rule_storage_state(
@@ -1828,425 +1828,208 @@ fn prometheus_dev_incentive_pool_execute_runtime_rejects_insufficient_approval()
     common::assert_verify_like_error(err);
 }
 
-#[test]
-fn prometheus_rule_storage_submit_proposal_runtime_accepts_valid_transition() {
+fn rule_submission_digest(next_proposal_id: i64, guardian_pk: &[u8], threat_hash: &[u8]) -> [u8; 32] {
+    use sha2::{Digest, Sha256};
+    let mut hasher = Sha256::new();
+    hasher.update(b"prometheus-rule-submission-v1");
+    hasher.update(next_proposal_id.to_le_bytes());
+    hasher.update(guardian_pk);
+    hasher.update(threat_hash);
+    hasher.finalize().into()
+}
+
+fn rule_tally_digest(proposal_id: i64, tally_for: i64, tally_against: i64, active_set_size: i64, set_root: &[u8]) -> [u8; 32] {
+    use sha2::{Digest, Sha256};
+    let mut hasher = Sha256::new();
+    hasher.update(b"prometheus-rule-tally-v1");
+    hasher.update(proposal_id.to_le_bytes());
+    hasher.update(tally_for.to_le_bytes());
+    hasher.update(tally_against.to_le_bytes());
+    hasher.update(active_set_size.to_le_bytes());
+    hasher.update(set_root);
+    hasher.finalize().into()
+}
+
+fn attest(keypair: &Keypair, digest: [u8; 32]) -> Vec<u8> {
+    let msg = Message::from_digest_slice(&digest).expect("valid attestation digest");
+    keypair.sign_schnorr(msg).as_ref().to_vec()
+}
+
+fn rule_storage_submit_case(attestor_seed: u8, confidence: i64, lock_time: u64) -> Result<(), kaspa_txscript_errors::TxScriptError> {
     let contract_path = std::env::var("PROMETHEUS_RULE_STORAGE_STATE_CONTRACT")
         .expect("PROMETHEUS_RULE_STORAGE_STATE_CONTRACT is set");
     let source = std::fs::read_to_string(contract_path).expect("read Prometheus rule storage contract fixture");
-    let governance_pk = keypair_from_seed(8).x_only_public_key().0.serialize().to_vec();
+    let governance_keypair = keypair_from_seed(8);
+    let governance_pk = governance_keypair.x_only_public_key().0.serialize().to_vec();
     let guardian_keypair = keypair_from_seed(9);
     let guardian_pk = guardian_keypair.x_only_public_key().0.serialize().to_vec();
     let threat_hash = vec![3u8; 32];
     let rule_cid = cid36(4);
-
     let empty = compile_rule_storage_state(
         &source,
         rule_storage_state_args(governance_pk.clone(), 1, 0, guardian_pk.clone(), zero32(), 0, zero36(), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, 0),
     );
     let pending = compile_rule_storage_state(
         &source,
-        rule_storage_state_args(
-            governance_pk,
-            2,
-            1,
-            guardian_pk.clone(),
-            threat_hash.clone(),
-            0,
-            rule_cid.clone(),
-            9_000,
-            1_000,
-            0,
-            0,
-            865_000,
-            1,
-            0,
-            1,
-            0,
-            0,
-            0,
-            false,
-            0,
-        ),
+        rule_storage_state_args(governance_pk, 2, 1, guardian_pk.clone(), threat_hash.clone(), 0, rule_cid.clone(), confidence, 1_000, 0, 0, 865_000, 1, 0, 1, 0, 0, 0, false, 0),
     );
-
-    let placeholder_sigscript = rule_storage_state_entry_sigscript(
-        &empty,
-        "submitProposal",
+    let attestation = attest(&keypair_from_seed(attestor_seed), rule_submission_digest(1, &guardian_pk, &threat_hash));
+    let args = |sig: Vec<u8>| {
         vec![
             Expr::bytes(guardian_pk.clone()),
             Expr::bytes(threat_hash.clone()),
             Expr::int(0),
             Expr::bytes(rule_cid.clone()),
-            Expr::int(9_000),
+            Expr::int(confidence),
             Expr::int(1_000),
-            Expr::bytes(dummy_signature()),
-        ],
-    );
-    let outputs = vec![covenant_output(&pending, 0, COV_A)];
+            Expr::bytes(attestation.clone()),
+            Expr::bytes(sig),
+        ]
+    };
+    let placeholder = rule_storage_state_entry_sigscript(&empty, "submitProposal", args(dummy_signature()));
     let entries = vec![covenant_utxo(&empty, COV_A)];
     let mut tx = Transaction::new(
         1,
-        vec![tx_input_with_sigops(0, placeholder_sigscript, 1)],
-        outputs,
-        0,
+        vec![tx_input_with_sigops(0, placeholder, 2)],
+        vec![covenant_output(&pending, 0, COV_A)],
+        lock_time,
         Default::default(),
         0,
         vec![],
     );
     let sig = sign_tx_input(&tx, &entries, 0, &guardian_keypair);
-    tx.inputs[0].signature_script = rule_storage_state_entry_sigscript(
-        &empty,
-        "submitProposal",
-        vec![
-            Expr::bytes(guardian_pk),
-            Expr::bytes(threat_hash),
-            Expr::int(0),
-            Expr::bytes(rule_cid),
-            Expr::int(9_000),
-            Expr::int(1_000),
-            Expr::bytes(sig),
-        ],
-    );
+    tx.inputs[0].signature_script = rule_storage_state_entry_sigscript(&empty, "submitProposal", args(sig));
+    execute_input_with_covenants(tx, entries, 0)
+}
 
-    let result = execute_input_with_covenants(tx, entries, 0);
-    assert!(
-        result.is_ok(),
-        "RuleStorage submitProposal runtime should accept valid guardian signature/state transition: {:?}",
-        result.err()
-    );
+#[test]
+fn prometheus_rule_storage_submit_proposal_runtime_accepts_attested_guardian() {
+    let result = rule_storage_submit_case(8, 9_000, 1_000);
+    assert!(result.is_ok(), "attested submission must be accepted: {:?}", result.err());
+}
+
+#[test]
+fn prometheus_rule_storage_submit_proposal_runtime_rejects_unattested_guardian() {
+    // PRM-17: a guardian key without a membership attestation from the governance key is rejected.
+    let err = rule_storage_submit_case(99, 9_000, 1_000).expect_err("forged attestation must fail");
+    common::assert_verify_like_error(err);
 }
 
 #[test]
 fn prometheus_rule_storage_submit_proposal_runtime_rejects_low_confidence() {
+    let err = rule_storage_submit_case(8, 8_499, 1_000).expect_err("submitProposal must reject low confidence");
+    common::assert_verify_like_error(err);
+}
+
+#[test]
+fn prometheus_rule_storage_submit_proposal_runtime_rejects_future_block_height() {
+    // PRM-15: the claimed submission height may not exceed the chain-bound lock time.
+    let err = rule_storage_submit_case(8, 9_000, 999).expect_err("future submission height must fail");
+    assert!(matches!(err, kaspa_txscript_errors::TxScriptError::UnsatisfiedLockTime(_)), "expected lock-time failure, got {err:?}");
+}
+
+#[allow(clippy::too_many_arguments)]
+fn rule_storage_finalize_case(
+    tally_for: i64,
+    tally_against: i64,
+    signed_set_size: i64,
+    claimed_set_size: i64,
+    lock_time: u64,
+    expect_accepted: bool,
+) -> Result<(), kaspa_txscript_errors::TxScriptError> {
     let contract_path = std::env::var("PROMETHEUS_RULE_STORAGE_STATE_CONTRACT")
         .expect("PROMETHEUS_RULE_STORAGE_STATE_CONTRACT is set");
     let source = std::fs::read_to_string(contract_path).expect("read Prometheus rule storage contract fixture");
-    let governance_pk = keypair_from_seed(8).x_only_public_key().0.serialize().to_vec();
-    let guardian_keypair = keypair_from_seed(9);
-    let guardian_pk = guardian_keypair.x_only_public_key().0.serialize().to_vec();
+    let governance_keypair = keypair_from_seed(8);
+    let governance_pk = governance_keypair.x_only_public_key().0.serialize().to_vec();
+    let guardian_pk = keypair_from_seed(9).x_only_public_key().0.serialize().to_vec();
     let threat_hash = vec![3u8; 32];
     let rule_cid = cid36(4);
-
-    let empty = compile_rule_storage_state(
+    let set_root = vec![5u8; 32];
+    let pending = compile_rule_storage_state(
         &source,
-        rule_storage_state_args(governance_pk.clone(), 1, 0, guardian_pk.clone(), zero32(), 0, zero36(), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, 0),
+        rule_storage_state_args(governance_pk.clone(), 2, 1, guardian_pk.clone(), threat_hash.clone(), 0, rule_cid.clone(), 9_000, 1_000, 0, 0, 865_000, 1, 0, 1, 0, 0, 0, false, 0),
     );
-    let low_confidence_next = compile_rule_storage_state(
-        &source,
-        rule_storage_state_args(
-            governance_pk,
-            2,
-            1,
-            guardian_pk.clone(),
-            threat_hash.clone(),
-            0,
-            rule_cid.clone(),
-            8_499,
-            1_000,
-            0,
-            0,
-            865_000,
-            1,
-            0,
-            1,
-            0,
-            0,
-            0,
-            false,
-            0,
-        ),
-    );
-
-    let placeholder_sigscript = rule_storage_state_entry_sigscript(
-        &empty,
-        "submitProposal",
+    let total = tally_for + tally_against;
+    let approval = if total > 0 { tally_for * 10_000 / total } else { 0 };
+    let next = if expect_accepted {
+        rule_storage_state_args(governance_pk, 2, 1, guardian_pk, threat_hash, 0, rule_cid, 9_000, 1_000, tally_for, tally_against, 865_000, 2, 1, 1, 0, approval, 865_000, true, 1)
+    } else {
+        rule_storage_state_args(governance_pk, 2, 1, guardian_pk, threat_hash, 0, rule_cid, 9_000, 1_000, tally_for, tally_against, 865_000, 3, 0, 1, 0, approval, 0, false, 2)
+    };
+    let next_state = compile_rule_storage_state(&source, next);
+    let attestation = attest(&governance_keypair, rule_tally_digest(1, tally_for, tally_against, signed_set_size, &set_root));
+    let args = |sig: Vec<u8>| {
         vec![
-            Expr::bytes(guardian_pk.clone()),
-            Expr::bytes(threat_hash.clone()),
-            Expr::int(0),
-            Expr::bytes(rule_cid.clone()),
-            Expr::int(8_499),
-            Expr::int(1_000),
-            Expr::bytes(dummy_signature()),
-        ],
-    );
-    let outputs = vec![covenant_output(&low_confidence_next, 0, COV_A)];
-    let entries = vec![covenant_utxo(&empty, COV_A)];
-    let mut tx = Transaction::new(
-        1,
-        vec![tx_input_with_sigops(0, placeholder_sigscript, 1)],
-        outputs,
-        0,
-        Default::default(),
-        0,
-        vec![],
-    );
-    let sig = sign_tx_input(&tx, &entries, 0, &guardian_keypair);
-    tx.inputs[0].signature_script = rule_storage_state_entry_sigscript(
-        &empty,
-        "submitProposal",
-        vec![
-            Expr::bytes(guardian_pk),
-            Expr::bytes(threat_hash),
-            Expr::int(0),
-            Expr::bytes(rule_cid),
-            Expr::int(8_499),
-            Expr::int(1_000),
+            Expr::int(865_000),
+            Expr::int(tally_for),
+            Expr::int(tally_against),
+            Expr::int(claimed_set_size),
+            Expr::bytes(set_root.clone()),
+            Expr::bytes(attestation.clone()),
             Expr::bytes(sig),
-        ],
-    );
-
-    let err = execute_input_with_covenants(tx, entries, 0).expect_err("submitProposal must reject confidence below MIN_CONFIDENCE");
-    common::assert_verify_like_error(err);
-}
-
-#[test]
-fn prometheus_rule_storage_vote_on_proposal_runtime_accepts_support_vote() {
-    let contract_path = std::env::var("PROMETHEUS_RULE_STORAGE_STATE_CONTRACT")
-        .expect("PROMETHEUS_RULE_STORAGE_STATE_CONTRACT is set");
-    let source = std::fs::read_to_string(contract_path).expect("read Prometheus rule storage contract fixture");
-    let governance_pk = keypair_from_seed(8).x_only_public_key().0.serialize().to_vec();
-    let guardian_pk = keypair_from_seed(9).x_only_public_key().0.serialize().to_vec();
-    let validator_keypair = keypair_from_seed(7);
-    let validator_pk = validator_keypair.x_only_public_key().0.serialize().to_vec();
-    let threat_hash = vec![3u8; 32];
-    let rule_cid = cid36(4);
-
-    let pending = compile_rule_storage_state(
-        &source,
-        rule_storage_state_args(governance_pk.clone(), 2, 1, guardian_pk.clone(), threat_hash.clone(), 0, rule_cid.clone(), 9_000, 1_000, 0, 0, 865_000, 1, 0, 1, 0, 0, 0, false, 0),
-    );
-    let voted = compile_rule_storage_state(
-        &source,
-        rule_storage_state_args(governance_pk, 2, 1, guardian_pk, threat_hash, 0, rule_cid, 9_000, 1_000, 1, 0, 865_000, 1, 0, 1, 0, 0, 0, false, 0),
-    );
-
-    let placeholder_sigscript = rule_storage_state_entry_sigscript(
-        &pending,
-        "voteOnProposal",
-        vec![Expr::bool(true), Expr::int(1_100), Expr::bytes(dummy_signature()), Expr::bytes(validator_pk.clone())],
-    );
-    let outputs = vec![covenant_output(&voted, 0, COV_A)];
+        ]
+    };
+    let placeholder = rule_storage_state_entry_sigscript(&pending, "finalizeProposal", args(dummy_signature()));
     let entries = vec![covenant_utxo(&pending, COV_A)];
     let mut tx = Transaction::new(
         1,
-        vec![tx_input_with_sigops(0, placeholder_sigscript, 1)],
-        outputs,
-        0,
-        Default::default(),
-        0,
-        vec![],
-    );
-    let sig = sign_tx_input(&tx, &entries, 0, &validator_keypair);
-    tx.inputs[0].signature_script = rule_storage_state_entry_sigscript(
-        &pending,
-        "voteOnProposal",
-        vec![Expr::bool(true), Expr::int(1_100), Expr::bytes(sig), Expr::bytes(validator_pk)],
-    );
-
-    let result = execute_input_with_covenants(tx, entries, 0);
-    assert!(
-        result.is_ok(),
-        "RuleStorage voteOnProposal runtime should accept valid validator signature/state transition: {:?}",
-        result.err()
-    );
-}
-
-#[test]
-fn prometheus_rule_storage_vote_on_proposal_runtime_rejects_late_vote() {
-    let contract_path = std::env::var("PROMETHEUS_RULE_STORAGE_STATE_CONTRACT")
-        .expect("PROMETHEUS_RULE_STORAGE_STATE_CONTRACT is set");
-    let source = std::fs::read_to_string(contract_path).expect("read Prometheus rule storage contract fixture");
-    let governance_pk = keypair_from_seed(8).x_only_public_key().0.serialize().to_vec();
-    let guardian_pk = keypair_from_seed(9).x_only_public_key().0.serialize().to_vec();
-    let validator_keypair = keypair_from_seed(7);
-    let validator_pk = validator_keypair.x_only_public_key().0.serialize().to_vec();
-    let threat_hash = vec![3u8; 32];
-    let rule_cid = cid36(4);
-
-    let pending = compile_rule_storage_state(
-        &source,
-        rule_storage_state_args(governance_pk.clone(), 2, 1, guardian_pk.clone(), threat_hash.clone(), 0, rule_cid.clone(), 9_000, 1_000, 0, 0, 865_000, 1, 0, 1, 0, 0, 0, false, 0),
-    );
-    let invalid_next = compile_rule_storage_state(
-        &source,
-        rule_storage_state_args(governance_pk, 2, 1, guardian_pk, threat_hash, 0, rule_cid, 9_000, 1_000, 1, 0, 865_000, 1, 0, 1, 0, 0, 0, false, 0),
-    );
-
-    let placeholder_sigscript = rule_storage_state_entry_sigscript(
-        &pending,
-        "voteOnProposal",
-        vec![Expr::bool(true), Expr::int(865_000), Expr::bytes(dummy_signature()), Expr::bytes(validator_pk.clone())],
-    );
-    let outputs = vec![covenant_output(&invalid_next, 0, COV_A)];
-    let entries = vec![covenant_utxo(&pending, COV_A)];
-    let mut tx = Transaction::new(
-        1,
-        vec![tx_input_with_sigops(0, placeholder_sigscript, 1)],
-        outputs,
-        0,
-        Default::default(),
-        0,
-        vec![],
-    );
-    let sig = sign_tx_input(&tx, &entries, 0, &validator_keypair);
-    tx.inputs[0].signature_script = rule_storage_state_entry_sigscript(
-        &pending,
-        "voteOnProposal",
-        vec![Expr::bool(true), Expr::int(865_000), Expr::bytes(sig), Expr::bytes(validator_pk)],
-    );
-
-    let err = execute_input_with_covenants(tx, entries, 0).expect_err("voteOnProposal must reject votes at or after voting_end_block");
-    common::assert_verify_like_error(err);
-}
-
-#[test]
-fn prometheus_rule_storage_finalize_proposal_runtime_accepts_accepted_transition() {
-    let contract_path = std::env::var("PROMETHEUS_RULE_STORAGE_STATE_CONTRACT")
-        .expect("PROMETHEUS_RULE_STORAGE_STATE_CONTRACT is set");
-    let source = std::fs::read_to_string(contract_path).expect("read Prometheus rule storage contract fixture");
-    let governance_keypair = keypair_from_seed(8);
-    let governance_pk = governance_keypair.x_only_public_key().0.serialize().to_vec();
-    let guardian_pk = keypair_from_seed(9).x_only_public_key().0.serialize().to_vec();
-    let threat_hash = vec![3u8; 32];
-    let rule_cid = cid36(4);
-
-    let pending = compile_rule_storage_state(
-        &source,
-        rule_storage_state_args(governance_pk.clone(), 2, 1, guardian_pk.clone(), threat_hash.clone(), 0, rule_cid.clone(), 9_000, 1_000, 2, 0, 865_000, 1, 0, 1, 0, 0, 0, false, 0),
-    );
-    let accepted = compile_rule_storage_state(
-        &source,
-        rule_storage_state_args(governance_pk, 2, 1, guardian_pk, threat_hash, 0, rule_cid, 9_000, 1_000, 2, 0, 865_000, 2, 1, 1, 0, 10_000, 865_000, true, 1),
-    );
-
-    let placeholder_sigscript = rule_storage_state_entry_sigscript(
-        &pending,
-        "finalizeProposal",
-        vec![Expr::int(865_000), Expr::bytes(dummy_signature())],
-    );
-    let outputs = vec![covenant_output(&accepted, 0, COV_A)];
-    let entries = vec![covenant_utxo(&pending, COV_A)];
-    let mut tx = Transaction::new(
-        1,
-        vec![tx_input_with_sigops(0, placeholder_sigscript, 1)],
-        outputs,
-        0,
+        vec![tx_input_with_sigops(0, placeholder, 2)],
+        vec![covenant_output(&next_state, 0, COV_A)],
+        lock_time,
         Default::default(),
         0,
         vec![],
     );
     let sig = sign_tx_input(&tx, &entries, 0, &governance_keypair);
-    tx.inputs[0].signature_script = rule_storage_state_entry_sigscript(
-        &pending,
-        "finalizeProposal",
-        vec![Expr::int(865_000), Expr::bytes(sig)],
-    );
-
-    let result = execute_input_with_covenants(tx, entries, 0);
-    assert!(
-        result.is_ok(),
-        "RuleStorage finalizeProposal runtime should accept accepted proposal transition: {:?}",
-        result.err()
-    );
+    tx.inputs[0].signature_script = rule_storage_state_entry_sigscript(&pending, "finalizeProposal", args(sig));
+    execute_input_with_covenants(tx, entries, 0)
 }
 
 #[test]
-fn prometheus_rule_storage_finalize_proposal_runtime_accepts_rejected_transition() {
-    let contract_path = std::env::var("PROMETHEUS_RULE_STORAGE_STATE_CONTRACT")
-        .expect("PROMETHEUS_RULE_STORAGE_STATE_CONTRACT is set");
-    let source = std::fs::read_to_string(contract_path).expect("read Prometheus rule storage contract fixture");
-    let governance_keypair = keypair_from_seed(8);
-    let governance_pk = governance_keypair.x_only_public_key().0.serialize().to_vec();
-    let guardian_pk = keypair_from_seed(9).x_only_public_key().0.serialize().to_vec();
-    let threat_hash = vec![3u8; 32];
-    let rule_cid = cid36(4);
+fn prometheus_rule_storage_finalize_proposal_runtime_accepts_accepted_tally() {
+    let result = rule_storage_finalize_case(8, 2, 10, 10, 865_000, true);
+    assert!(result.is_ok(), "attested accepting tally must finalize: {:?}", result.err());
+}
 
-    let pending = compile_rule_storage_state(
-        &source,
-        rule_storage_state_args(governance_pk.clone(), 2, 1, guardian_pk.clone(), threat_hash.clone(), 0, rule_cid.clone(), 9_000, 1_000, 1, 2, 865_000, 1, 0, 1, 0, 0, 0, false, 0),
-    );
-    let rejected = compile_rule_storage_state(
-        &source,
-        rule_storage_state_args(governance_pk, 2, 1, guardian_pk, threat_hash, 0, rule_cid, 9_000, 1_000, 1, 2, 865_000, 3, 0, 1, 0, 3_333, 0, false, 2),
-    );
+#[test]
+fn prometheus_rule_storage_finalize_proposal_runtime_accepts_rejected_tally() {
+    let result = rule_storage_finalize_case(3, 7, 10, 10, 865_000, false);
+    assert!(result.is_ok(), "attested rejecting tally must finalize as rejected: {:?}", result.err());
+}
 
-    let placeholder_sigscript = rule_storage_state_entry_sigscript(
-        &pending,
-        "finalizeProposal",
-        vec![Expr::int(865_000), Expr::bytes(dummy_signature())],
-    );
-    let outputs = vec![covenant_output(&rejected, 0, COV_A)];
-    let entries = vec![covenant_utxo(&pending, COV_A)];
-    let mut tx = Transaction::new(
-        1,
-        vec![tx_input_with_sigops(0, placeholder_sigscript, 1)],
-        outputs,
-        0,
-        Default::default(),
-        0,
-        vec![],
-    );
-    let sig = sign_tx_input(&tx, &entries, 0, &governance_keypair);
-    tx.inputs[0].signature_script = rule_storage_state_entry_sigscript(
-        &pending,
-        "finalizeProposal",
-        vec![Expr::int(865_000), Expr::bytes(sig)],
-    );
-
-    let result = execute_input_with_covenants(tx, entries, 0);
-    assert!(
-        result.is_ok(),
-        "RuleStorage finalizeProposal runtime should accept rejected proposal transition: {:?}",
-        result.err()
-    );
+#[test]
+fn prometheus_rule_storage_finalize_proposal_runtime_accepts_exact_threshold_tie() {
+    // 67 of 100 = 6700 bps: ties at the threshold are accepted (documented in PRM-26).
+    let result = rule_storage_finalize_case(67, 33, 100, 100, 865_000, true);
+    assert!(result.is_ok(), "approval exactly at 6700 bps must accept: {:?}", result.err());
 }
 
 #[test]
 fn prometheus_rule_storage_finalize_proposal_runtime_rejects_no_votes() {
-    let contract_path = std::env::var("PROMETHEUS_RULE_STORAGE_STATE_CONTRACT")
-        .expect("PROMETHEUS_RULE_STORAGE_STATE_CONTRACT is set");
-    let source = std::fs::read_to_string(contract_path).expect("read Prometheus rule storage contract fixture");
-    let governance_keypair = keypair_from_seed(8);
-    let governance_pk = governance_keypair.x_only_public_key().0.serialize().to_vec();
-    let guardian_pk = keypair_from_seed(9).x_only_public_key().0.serialize().to_vec();
-    let threat_hash = vec![3u8; 32];
-    let rule_cid = cid36(4);
-
-    let pending = compile_rule_storage_state(
-        &source,
-        rule_storage_state_args(governance_pk.clone(), 2, 1, guardian_pk.clone(), threat_hash.clone(), 0, rule_cid.clone(), 9_000, 1_000, 0, 0, 865_000, 1, 0, 1, 0, 0, 0, false, 0),
-    );
-    let invalid_next = compile_rule_storage_state(
-        &source,
-        rule_storage_state_args(governance_pk, 2, 1, guardian_pk, threat_hash, 0, rule_cid, 9_000, 1_000, 0, 0, 865_000, 3, 0, 1, 0, 0, 0, false, 2),
-    );
-
-    let placeholder_sigscript = rule_storage_state_entry_sigscript(
-        &pending,
-        "finalizeProposal",
-        vec![Expr::int(865_000), Expr::bytes(dummy_signature())],
-    );
-    let outputs = vec![covenant_output(&invalid_next, 0, COV_A)];
-    let entries = vec![covenant_utxo(&pending, COV_A)];
-    let mut tx = Transaction::new(
-        1,
-        vec![tx_input_with_sigops(0, placeholder_sigscript, 1)],
-        outputs,
-        0,
-        Default::default(),
-        0,
-        vec![],
-    );
-    let sig = sign_tx_input(&tx, &entries, 0, &governance_keypair);
-    tx.inputs[0].signature_script = rule_storage_state_entry_sigscript(
-        &pending,
-        "finalizeProposal",
-        vec![Expr::int(865_000), Expr::bytes(sig)],
-    );
-
-    let err = execute_input_with_covenants(tx, entries, 0).expect_err("finalizeProposal must reject zero total votes");
+    let err = rule_storage_finalize_case(0, 0, 10, 10, 865_000, false).expect_err("zero votes must fail");
     common::assert_verify_like_error(err);
+}
+
+#[test]
+fn prometheus_rule_storage_finalize_proposal_runtime_rejects_low_participation() {
+    // PRM-18: one approving vote out of ten active validators is not a quorum.
+    let err = rule_storage_finalize_case(1, 0, 10, 10, 865_000, true).expect_err("participation below 50% must fail");
+    common::assert_verify_like_error(err);
+}
+
+#[test]
+fn prometheus_rule_storage_finalize_proposal_runtime_rejects_tampered_set_size() {
+    // The set size is not part of the transaction outputs; the attestation must bind it.
+    let err = rule_storage_finalize_case(2, 0, 10, 4, 865_000, true).expect_err("tampered set size must fail");
+    common::assert_verify_like_error(err);
+}
+
+#[test]
+fn prometheus_rule_storage_finalize_proposal_runtime_rejects_before_voting_end() {
+    // PRM-15: finalization is bound to the chain lock time, not a caller-supplied height.
+    let err = rule_storage_finalize_case(8, 2, 10, 10, 864_999, true).expect_err("early finalize must fail");
+    assert!(matches!(err, kaspa_txscript_errors::TxScriptError::UnsatisfiedLockTime(_)), "expected lock-time failure, got {err:?}");
 }
 
 #[test]

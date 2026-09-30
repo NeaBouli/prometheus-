@@ -181,7 +181,6 @@ FIXTURES = (
         ],
         abi=(
             "__covenant_entrypoint_auth_submitProposal",
-            "__covenant_entrypoint_auth_voteOnProposal",
             "__covenant_entrypoint_auth_finalizeProposal",
             "__covenant_entrypoint_auth_deactivateRule",
         ),
