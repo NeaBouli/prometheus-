@@ -23,7 +23,7 @@
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Prometheus Guardian Economics — Honest Analysis">
-<meta name="twitter:description" content="70B Guardian costs $60k-120k. We document the problem and 5 solution paths. Radical transparency.">
+<meta name="twitter:description" content="70B Guardian costs $60k-120k. We document the problem and 6 candidate paths. Radical transparency.">
 <meta name="twitter:image" content="https://neabouli.github.io/prometheus-/logo/Prometheus.png">
 <!-- GEO: AI-readable -->
 <meta name="ai-summary" content="Non-production planning scenarios for Prometheus Guardian economics. Hardware costs, PROM prices, rewards, node counts, model quality and break-even values are illustrative and unproven. PROM minting, emission, liquidity and trading are inactive; no Guardian network or real 8B/70B evaluation is proven.">
@@ -255,6 +255,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
       <li><a href="#ensemble">Ensemble voting protocol</a></li>
       <li><a href="#pooling">Guardian pooling</a></li>
       <li><a href="#specialization">Specialization sharding</a></li>
+      <li><a href="#cloud-pooling">Incentivized cloud pooling</a></li>
       <li><a href="#plonk">PLONK vs Groth16</a></li>
     </ul>
     <span class="sb-label">Bootstrapping</span>
@@ -409,7 +410,7 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
     </div>
 
     <!-- SOLUTIONS -->
-    <div class="wp-section r" id="hybrid-routing">
+    <div class="wp-section r" id="solutions">
       <span class="sec-label">Solution Approaches</span>
       <h2 class="sec-title">Six candidate paths for Guardian centralization.</h2>
       <p>Repository state machines and an 8B-first routing scaffold exist, but none of these approaches is proven as an operated decentralization solution. Merged and exact-main-verified GH-253/PR #254 adds owner-local transition-key succession mechanics only; real-world key ownership, external/decentralized membership authority, Sybil resistance, model quality, public multi-host behavior and economics remain open, and no production authority follows. Product exact main is <code>5920cb4bb737376977f762beb0d5e3108519c7a0</code>; Prometheus CI <code>34031999904</code>, Security Audit <code>34031999907</code>, and Pages <code>34031999575</code> pass.</p>
@@ -433,29 +434,29 @@ footer{border-top:1px solid var(--line);padding:32px 48px;display:grid;grid-temp
         <div class="sol-card" id="pooling">
           <span class="sol-tag mid">Medium term · Architecture needed</span>
           <div class="sol-title">3. Guardian Pooling Protocol</div>
-          <div class="sol-desc">Multiple operators share a single 70B node. PROM rewards split on-chain proportional to compute contribution. A data center with 4× A100 can serve 10+ operators who each contribute GPU time and receive proportional PROM.</div>
-          <div class="sol-impact">Impact: Lowers 70B entry barrier from $60k to $6k per operator. On-chain split ensures trustless revenue sharing.</div>
+          <div class="sol-desc">Proposal: multiple operators would share a single 70B node, with PROM rewards split on-chain proportional to compute contribution. A data center with 4× A100 can serve 10+ operators who each contribute GPU time and receive proportional PROM.</div>
+          <div class="sol-impact">Target impact: could lower the 70B entry barrier from about $60k toward $6k per operator; on-chain revenue sharing is not implemented and unproven.</div>
         </div>
 
         <div class="sol-card" id="specialization">
           <span class="sol-tag mid">Medium term · Ecosystem maturity needed</span>
           <div class="sol-title">4. Specialization Sharding</div>
           <div class="sol-desc">8B Guardians specialize by attack class: Guardian A handles ransomware, Guardian B handles network intrusion, Guardian C handles privilege escalation. Specialization + fine-tuning makes 8B competitive with 70B within its domain.</div>
-          <div class="sol-impact">Impact: Fine-tuned 8B models match 70B quality in their specialty. Natural ecosystem of specialized Guardians emerges organically.</div>
+          <div class="sol-impact">Target impact: fine-tuned 8B specialists might approach 70B quality in their specialty; no model evaluation supports this yet.</div>
         </div>
 
-        <div class="sol-card">
+        <div class="sol-card" id="cloud-pooling">
           <span class="sol-tag mid">Medium term · Research needed</span>
           <div class="sol-title">5. Incentivized Cloud Pooling</div>
-          <div class="sol-desc">DAO provides initial grants (from Dev Pool) to cover first 6–12 months of 70B cloud costs for selected operators. Operators commit to providing public Guardian service in return. After PROM market price matures, grants phase out.</div>
-          <div class="sol-impact">Impact: Ensures 70B presence in early bootstrapping phase without requiring operators to bear full risk during price discovery.</div>
+          <div class="sol-desc">Proposal: the DAO would provide initial grants (from Dev Pool) to cover first 6–12 months of 70B cloud costs for selected operators. Operators would commit to providing public Guardian service in return, and grants would phase out once a PROM market exists.</div>
+          <div class="sol-impact">Target impact: could keep 70B capacity available during bootstrapping without operators bearing the full cost; no grant program exists.</div>
         </div>
 
         <div class="sol-card" id="plonk">
           <span class="sol-tag mid">Medium term · Cryptography research</span>
           <div class="sol-title">6. PLONK instead of Groth16</div>
-          <div class="sol-desc">Groth16 ZK-proofs can take 5–30 seconds on CPU (Light Client hardware). PLONK proofs are faster to generate and don't require a trusted setup. If Kaspa natively supports PLONK verification, Light Client proof generation drops to &lt;2 seconds.</div>
-          <div class="sol-impact">Impact: 60-second SLA becomes reliably achievable even on weak hardware. Removes GPU requirement for Light Clients entirely.</div>
+          <div class="sol-desc">Groth16 ZK-proofs can take 5–30 seconds on CPU (Light Client hardware). PLONK proofs are faster to generate and don't require a trusted setup. If Kaspa natively supports PLONK verification, Light Client proof generation could drop below 2 seconds.</div>
+          <div class="sol-impact">Target impact: could make the under-60-second target more attainable on weak hardware; depends on Kaspa PLONK verification support and remains unproven.</div>
         </div>
 
       </div>
