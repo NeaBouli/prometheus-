@@ -217,6 +217,7 @@ FIXTURES = (
         filename="DevIncentivePoolState.sil",
         contract_name="DevIncentivePoolState",
         args=[
+            expr_bytes(b(13)),
             expr_int(1),
             expr_int(0),
             expr_int(0),
@@ -236,8 +237,7 @@ FIXTURES = (
         ],
         abi=(
             "__covenant_entrypoint_auth_proposeGrant",
-            "__covenant_entrypoint_auth_voteGrant",
-            "__covenant_entrypoint_auth_executeGrant",
+            "__covenant_entrypoint_auth_finalizeGrant",
         ),
     ),
     Fixture(

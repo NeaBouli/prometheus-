@@ -735,6 +735,13 @@ Verified rejection paths include grant amount above `MAX_GRANT_PROM`, voting at
 `voting_end_block`, execution below `QUORUM_VOTES`, and execution below
 `VALIDATOR_QUORUM`.
 
+Bundle v2 draft (MS-B D1, D4): the contract gains a `governance_pk` constructor field; the free
+`voteGrant` transition is removed and the permissionless `executeGrant` is replaced by
+`finalizeGrant`, which requires the governance signature, an attested tally
+(`"prometheus-grant-tally-v1"` domain), `tx.time >= voting_end_block`, at least 50 % participation
+and 6,700 bps approval; otherwise the grant ends REJECTED. The pool remains PROM accounting only
+(no value moves; PROM emission is not implemented).
+
 ## CommunityDonationsState.sil
 
 `CommunityDonationsState.sil` is the current-`silverc` port fixture for the

@@ -139,7 +139,7 @@ jobs:
           grep -q 'VALIDATOR_QUORUM = 6700' "$fixture"
           grep -q 'pool_balance_prom' "$fixture"
           grep -q 'proposeGrant' "$fixture"
-          grep -q 'executeGrant' "$fixture"
+          grep -q 'finalizeGrant' "$fixture"
           if grep -q 'transfer' "$fixture"; then
             echo "ERROR: DevIncentivePoolState fixture must not pretend to transfer PROM in current Silverc."
             exit 1
