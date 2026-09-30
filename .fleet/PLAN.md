@@ -624,3 +624,9 @@ Both runs require Gio budget approval (plan-level gate).
 - Contract draft remains unaccepted pending targeted authorization, elapsed
   time and terminal-state repairs, followed by H-001/v2 profile integration.
   Claude remains primary development worker; no duplicate implementation.
+
+### 2026-09-30 — handback-sw-scope-fix (Claude)
+
+- Retired worker cleanup scoped to the exact legacy cache `prometheus-v1`;
+  unrelated origin caches preserved. Browser regression green, fails on the old
+  worker. Report: `.fleet/reports/handback-sw-scope-fix.md`. No merge or deploy.

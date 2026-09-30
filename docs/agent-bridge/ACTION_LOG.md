@@ -6037,3 +6037,13 @@ Rules for all dev agents:
   with focused review repairs and profile integration still required.
 - Kimi is token_limited according to dispatch and canonical probe. Codex
   performed the required draft review; no production or chain action.
+
+### 2026-09-30 - [AUTOR: CC] Retired service worker cache scope (handback-sw-scope-fix)
+
+- `sw.js` activate now deletes only `prometheus-v1`, the single cache name the
+  historical worker (`20e8531`) created, instead of every cache on the shared
+  GitHub Pages origin; `skipWaiting` and `unregister` are unchanged.
+- Real-browser regression `scripts/browser_retired_service_worker_regression.mjs`
+  (Chromium via Playwright): owned cache removed, `other-project-v1`,
+  `prometheus-v2`, `workbox-precache-v2` preserved, 0 registrations; fails on the
+  previous `sw.js`. Site CSS, claim, status, hygiene, memory gates and tests pass.
