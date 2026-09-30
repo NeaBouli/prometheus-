@@ -498,3 +498,12 @@ Both runs require Gio budget approval (plan-level gate).
   KAS staking/slashing, Sprint-1 legacy contract label, ACCEPTED label meaning.
   No HTML change (visual gate not triggered). Claim/status/hygiene gates pass.
 - Review owed to Codex before any public activity. State: `A4H LOCAL VERIFIED`.
+
+### 2026-09-30 — A11 / GH-277 public records reconciled (Claude stand-in)
+
+- PRM-34 bounty labelled planned/unfunded (funding = Gio), PRM-36 supersede
+  banners + GH-272 closed in TODO, PRM-37 guides, PRM-38/39 landing and
+  guardian-economics wording with 4-viewport visual gate, PRM-40 paths,
+  PRM-41 project-specific CLAUDE.md, PRM-46 robots.txt (security.txt
+  intentionally not added on a project page).
+- State: `A11 LOCAL VERIFIED (PARTIAL: PRM-34 DECISION) / PRODUCTION FALSE`.
