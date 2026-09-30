@@ -91,7 +91,7 @@
 | sitemap.xml | 5 URLs mit Priority + Lastmod |
 | manifest.json | PWA-Support, 2 Icons (Prometheus + PROM coin) |
 | sw.js | Service Worker für Offline-Caching |
-| SECURITY.md | Bug Bounty + Disclosure Policy (GitHub only, no email) |
+| SECURITY.md | Disclosure Policy (GitHub only, no email; no bug bounty program) |
 | docs/repository-security.md | Branch Protection Anleitung für Core Dev |
 | googleaa2902079481c7a8.html | Google Search Console Verification |
 
