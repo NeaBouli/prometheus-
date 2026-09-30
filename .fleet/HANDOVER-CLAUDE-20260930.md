@@ -40,6 +40,7 @@ Goal: continue exactly from the hand-back point without re-research.
 | 2026-09-30 | Records | memory/TODO + STATUS refreshed to 2026-09-30 | Memory/status/claim gates pass. |
 | 2026-09-30 | DA1 | Endpoint producer design (design only) | Hygiene/claim/GH-267 gates pass. Report `.fleet/reports/da1-endpoint-producer-design.md`. |
 | 2026-09-30 | PRM-12 (part) | Actions pinned to commit SHAs | YAML/tests OK; hosted run on f737c7b owed. Report `.fleet/reports/prm12-actions-sha-pin.md`. |
+| 2026-09-30 | PRM-12 (part) | deny_unknown_fields on operator-authored deployer formats | Deployer tests + clippy + full local silverc CI job pass. |
 
 ## Current state
 - Branch/worktree: `agent/claude/prometheus-standin-20260930` in
@@ -52,6 +53,7 @@ Goal: continue exactly from the hand-back point without re-research.
 - See A8u1 F3/F4 (deployer binds `toccata_activation_daa_score` into signing request/receipt schema).
 
 ## Review owed to Codex
+- PRM-12: silverc-deployer deny_unknown_fields (Rust, security surface).
 - A9: container identity/resources (security surface); A10 cleanup worker.
 - GH-279: dependency/CI supply-chain change (ci.yml python-check install + gate). Solo by Claude.
 - GH-283: CI contract-assurance gate + expectation file. Solo by Claude.
