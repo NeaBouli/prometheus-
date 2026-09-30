@@ -1,4 +1,4 @@
-id: bundle-v2-draft-validator-staking (MS-B D6 + PRM-13 + PRM-15 for withdrawal)
+id: bundle-v2-draft (file name kept for history; covers all five state contracts) (MS-B D6 + PRM-13 + PRM-15 for withdrawal)
 status: DRAFT — contract level verified; NOT integrable until the deployment-profile split below is designed and reviewed by Codex
 worker: claude (Codex stand-in); branch agent/claude/contract-bundle-v2-draft (stacked on the stand-in branch)
 contract changes (ValidatorStakingState.sil):
@@ -32,3 +32,6 @@ step 4 (CommunityDonationsState, MS-B D1–D4), same branch:
 step 5 (GovernanceAutoTuningState, MS-B D2): autoTune requires tx.time >= block_height (PRM-15 ratchet closed); new test rejects a height above the lock time; 73 runtime tests pass. reportMetrics intentionally unchanged (keyless operator uses lock time 0 — deployer follow-up).
 step 6 (DevIncentivePoolState, MS-B D1/D4): new governance_pk constructor field (first argument); voteGrant removed; permissionless executeGrant replaced by finalizeGrant with governance signature, attested tally, tx.time >= voting end, ≥50 % participation, ≥6700 bps, REJECTED path; proposeGrant bound to tx.time. Tests 73 passed (dev: approved executes, rejected/low participation end REJECTED, tampered set size and early finalize rejected). Constructor args hash and state layout changed (smoke fixture updated).
 not in this draft: D5 manifest/genesis binding, deployer profile split, reportMetrics lock time, GuardianReputationState genesis-anchor tooling.
+
+status after step 6 (head of agent/claude/contract-bundle-v2-draft): local contract-check 10/10 and h001-silverc-runtime 6/7 through preflight pass; the only failing step remains "Verify non-promotable H-001 canary deployment profile" (v1 manifest pin, see open design above). 73 pinned runtime tests pass.
+integration order for Codex: (1) accept/adjust docs/architecture/ms-b-contract-decisions.md, (2) design the deployer profile split (recommended: frozen H-001 manifest constant + CI verifies committed H-001 evidence), (3) deployer v2 requirements: genesis output value = stake/pool in sompi, completeWithdraw input sequence >= 6,048,000, lock times for tx.time-bound transitions, attestation tooling for membership/tallies, (4) then review this branch commit by commit.
