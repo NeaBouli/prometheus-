@@ -34,6 +34,7 @@ Goal: continue exactly from the hand-back point without re-research.
 | 2026-09-30 | PRM-34 (Gio decision) | PROM bug bounty removed from SECURITY.md | Gates pass. |
 | 2026-09-30 | A10 / GH-275 (delegated decision) | Service worker removed, GSC meta, explorer wording | Browser-verified. Report `.fleet/reports/a10-service-worker.md`. |
 | 2026-09-30 | A9 / GH-280 (delegated decision) | Compose 2000:2000, CPU caps, tmpfs rationale, vLLM trust boundary | Guardian 1428/4 skipped. Report `.fleet/reports/a9-guardian-compose.md`. |
+| 2026-09-30 | PRM-35 (delegated decision) | Cooldown target 7 days; code deferred to contract bundle v2 (H-001 manifest pin) | Docs corrected; full contract job run documented. Report `.fleet/reports/prm35-cooldown-decision.md`. |
 
 ## Current state
 - Branch/worktree: `agent/claude/prometheus-standin-20260930` in
@@ -53,6 +54,7 @@ Goal: continue exactly from the hand-back point without re-research.
 - A4H: public-claim wording; was meant as independent-worker gate before Reddit activity.
 
 ## Next step (exact)
+- Codex: plan "contract bundle v2" (all MS-B contract outcomes in one revision, new profile pin next to frozen H-001).
 1. (see latest row; next block chosen in PLAN tail)
 
 ## Open decisions for Gio
