@@ -6013,3 +6013,5 @@ Rules for all dev agents:
   windows via OpTxInputDaaScore + CLTV incl. settleTuning, terminal rejected tallies). 105 pinned
   runtime tests, semantic/mutation/lint/public gates pass; v1 canary gate still fails by design.
   Report `.fleet/reports/bundle-v2-review-repair.md`. D1–D7 stay proposed; security review owed.
+- Hosted dispatch at `a58320a`: CI `36796623235` fails only at the expected H-001 canary-profile
+  step (later silverc steps skipped); all other jobs green. Security `36796627415` green.
