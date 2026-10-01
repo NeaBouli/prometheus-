@@ -1,6 +1,11 @@
 # D5 Genesis / Instance Binding — Design Record (proposal)
 
-Status: **proposed** (Claude, 2026-10-01, brief `bundle-v2-d5-genesis-binding-design`).
+Status: **proposed** (Claude, 2026-10-01, brief `bundle-v2-d5-genesis-binding-design`;
+Codex review 2026-10-01: working basis, evidence wording corrected in
+`bundle-v2-d5-offline-covenant-id`). Decisions: deployment-specific
+constructor/compiled identity reviewed separately from the placeholder
+fixtures; per-contract authority keys as the draft default (not production key
+approval); D5 is off-chain binding now; H-001 is not a D5 anchor.
 Binding only after Codex review. No contract logic, Rust, pin, evidence or
 runtime acceptance change. v2 stays non-promotable; D1–D7 stay proposed.
 Architecture node: MAP M1/MS-B — reviewed deployment manifest → genesis covenant
@@ -20,7 +25,7 @@ identity → off-chain state acceptance.
 | Python tooling | metrics tools identify the contract by outpoint only; receipt/evidence verifiers never read a covenant id or funding outpoint | `scripts/verify_silverc_deploy_receipt_evidence.py:172-174`, `scripts/build_metrics_oracle_tx_request.py:71-113` |
 | Guardian / validator node | no covenant or GuardianReputation reader | — |
 | Contracts | no constructor takes another contract's covenant id or script hash; `OpInputCovenantId` is used only for self-binding of attestations | `RuleStorageState.sil:103-111`, `:173-186`; pools likewise |
-| H-001 evidence | covenant id appears only in the canary summary with a recorded boolean `covenant_id_match`; the funding outpoint is not recorded, so the id is not independently recomputable | `docs/evidence/gh-9-h001-canary-confirmed-2026-08-12.json:30`, `:57` |
+| H-001 evidence | covenant id appears only in the canary summary with a recorded boolean `covenant_id_match`; the funding outpoint is not part of the frozen record, so this record lacks the D5 reconstruction anchor (an external reconstruction from chain data is not ruled out) | `docs/evidence/gh-9-h001-canary-confirmed-2026-08-12.json:30`, `:57` |
 
 ## 2. Precomputable vs. evidence-bound identity
 
@@ -34,17 +39,27 @@ identity → off-chain state acceptance.
 | deploy tx id / instance id | precomputable only once the full unsigned tx (fees, change) is fixed; not part of the plan | from public evidence |
 | block hash, DAA score, confirmations | not available | **public evidence only** |
 
-A claimed id, a fixture, or an operator receipt never proves chain identity. Only
-(a) recomputation of the id from reviewed plan fields and (b) a stored public
-node/explorer UTXO response carrying that id together prove it. Because the id
-commits to the script and the constructor arguments, a lookalike covenant with
-forged initial state (audit PRM-25) necessarily has a different id.
+A claimed id, a fixture, or an operator receipt never proves chain identity.
+Recomputation of the id from reviewed plan fields establishes what the id
+must be. A stored raw RPC/explorer response together with its own SHA-256
+establishes only internal consistency (the claimed fields match the stored
+bytes), not provenance or consensus truth: whoever stores the response could
+have fabricated it. Accepting chain evidence therefore needs an explicit
+trusted-source model, for example responses from at least two independently
+operated nodes or explorers, captured by a reviewer who is not the operator,
+optionally with a block-hash/DAA cross-check against a header source. Evidence
+acceptance stays **blocked** until that model is decided in its own block.
+Because the id commits to the script and the constructor arguments, a
+lookalike covenant with forged initial state (audit PRM-25) has a different id
+unless the hash is broken.
 
 ## 3. Circular constructor dependencies
 
 The id hashes the script, and the script embeds the constructor arguments. If
 contract A embedded B's id and B embedded A's id, each id would be an input to
-the other's hash; no deployment can satisfy both. Rules:
+the other's hash. Satisfying both would require finding a fixed point of the
+hash function; this is not proven impossible but is computationally
+infeasible in practice. Cycles are therefore prohibited by policy. Rules:
 
 1. Trust edges (`trusted_roles`: covenant ids embedded as constructor arguments)
    must form a DAG; self-edges are forbidden.
@@ -104,7 +119,8 @@ check, and the validator then enforces rules 1–2.
 8. Trust graph acyclic; deployment order topological.
 9. Plan phase result: never executable; always blocked on id recomputation;
    v2 additionally blocked as non-promotable.
-10. Evidence phase: refused for non-promotable bundles. Per role: public
+10. Evidence phase (draft checks only; acceptance blocked until the
+    trusted-source model in section 2 is decided): refused for non-promotable bundles. Per role: public
     source kind only; same network; raw response hash; structural parse;
     claimed fields equal the raw fields; output index 0, not coinbase; instance =
     `deploy_tx_id:0`; deploy tx differs from the funding tx; block hash; at least
@@ -163,19 +179,22 @@ labels, not chain data.
    validator supports both and reports the result.
 3. **D5 wording.** Amend D5 as in section 3: an off-chain binding now;
    constructor-embedded ids only together with a concrete co-spend check.
-4. **H-001 history.** The canary covenant id is not independently verifiable
-   (no funding outpoint recorded). Historical evidence stays frozen and is not
-   used as a D5 anchor.
+4. **H-001 history.** The frozen canary record lacks the D5 reconstruction
+   anchor (no funding outpoint recorded); a later external reconstruction from
+   chain data is not claimed impossible. Historical evidence stays frozen and
+   is not used as a D5 anchor.
 
 ## 8. Minimal proposed implementation (needs Codex approval, in order)
 
-1. **Rust, offline:** a deployer command that returns the covenant id for
+1. **Rust, offline (implemented in `bundle-v2-d5-offline-covenant-id`):**
+   `prometheus-silverc-deployer calculate-covenant-id`. It returns the covenant id for
    (funding outpoint, genesis value, artifact). It reuses the output
    construction of `prepare_genesis` and the existing
    `kaspa_consensus_core::hashing::covenant_id`, with no keys and no network.
    Paths: `modules/silverc-deployer/src/lib.rs`, `src/main.rs`, deployer tests.
-   The Rust pins stay unchanged.
-2. **Evidence capture:** record `funding_outpoint`, `covenant_id` and the raw
+   The Rust pins stay unchanged. Its output is classified
+   `NOT_CHAIN_EVIDENCE` and `NOT_DEPLOYMENT_AUTHORIZATION`.
+2. **Evidence capture (blocked until the trusted-source model above is decided):** record `funding_outpoint`, `covenant_id` and the raw
    public UTXO response in observation and evidence outputs. Paths:
    `lib.rs` (`NodeObservation`), `scripts/verify_silverc_deploy_receipt_evidence.py`
    and the receipt schemas.

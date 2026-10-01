@@ -36,7 +36,8 @@ STATUS_EVIDENCE_PENDING_RECOMPUTE = (
 )
 RECOMPUTE_BLOCKER = (
     "predicted covenant ids are not recomputed: requires the existing "
-    "kaspa_consensus_core covenant_id helper exposed offline by the Rust deployer (not implemented)"
+    "kaspa_consensus_core covenant_id helper (deployer calculate-covenant-id); "
+    "this draft does not call it, and evidence acceptance needs a trusted-source model"
 )
 
 

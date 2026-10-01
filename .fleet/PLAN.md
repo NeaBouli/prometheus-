@@ -584,6 +584,13 @@ Both runs require Gio budget approval (plan-level gate).
   only after profile separation and review; no duplicate implementation.
 - Claude's scheduled 03:31 CI/Security dispatch must not be duplicated.
 
+### 2026-10-01 - bundle-v2-d5-offline-covenant-id delivered (Claude)
+
+- Branch `agent/claude/bundle-v2-d5-offline-covenant-id` on eaf8eb7: D5 step (a)
+  offline covenant-id command plus D5 wording corrections. Evidence capture,
+  Python acceptance and client allowlist remain blocked.
+- Waiting on Codex: review; hosted CI only on Codex coordination.
+
 ### 2026-10-01 - bundle-v2-d5-genesis-binding-design delivered (Claude)
 
 - Branch `agent/claude/bundle-v2-d5-genesis-binding-design` on 506cf01: D5

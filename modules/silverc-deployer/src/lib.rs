@@ -63,6 +63,12 @@ pub const FULL_DEPLOYMENT_CONTRACTS: [&str; 7] = [
     "GovernanceAutoTuningState",
 ];
 
+pub const COVENANT_ID_CALCULATION_KIND: &str = "prometheus.silverc.genesis.covenant_id_calculation";
+pub const COVENANT_ID_CALCULATION_SCHEMA_VERSION: u32 = 1;
+/// A calculated identity is neither chain evidence nor deployment authorization.
+pub const COVENANT_ID_CALCULATION_CLASSIFICATION: [&str; 2] =
+    ["NOT_CHAIN_EVIDENCE", "NOT_DEPLOYMENT_AUTHORIZATION"];
+
 const SCHNORR_SCRIPT_LEN: usize = 66;
 const RPC_REQUEST_TIMEOUT: Duration = Duration::from_secs(20);
 const SECRET_MARKERS: &[&str] = &[
@@ -393,6 +399,25 @@ pub struct NodeObservation {
     pub daa_depth: u64,
     pub observed_at_unix_seconds: u64,
     pub explorer_block_hash_required: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub struct CovenantIdCalculation {
+    pub schema_version: u32,
+    pub kind: String,
+    pub classification: Vec<String>,
+    pub contract_name: String,
+    pub artifact_sha256: String,
+    pub script_sha256: String,
+    pub script_len: usize,
+    pub funding_outpoint: OutpointSpec,
+    pub genesis_output_value: u64,
+    pub contract_output_index: u32,
+    pub authorizing_input: u16,
+    pub contract_script_public_key: ScriptSpec,
+    pub covenant_id: String,
+    pub derivation: String,
 }
 
 #[derive(Debug)]
@@ -1007,6 +1032,123 @@ fn expected_fee_mass_profile(
     )
 }
 
+/// Contract output of the genesis layout before its covenant binding is set.
+fn unbound_genesis_contract_output(genesis_output_value: u64, script: &[u8]) -> TransactionOutput {
+    TransactionOutput {
+        value: genesis_output_value,
+        script_public_key: pay_to_script_hash_script(script),
+        covenant: None,
+    }
+}
+
+/// Covenant id of one authorized genesis output, via the pinned consensus helper.
+fn genesis_covenant_id(
+    funding_outpoint: TransactionOutpoint,
+    contract_output_index: u32,
+    unbound_contract_output: &TransactionOutput,
+) -> TransactionId {
+    kaspa_consensus_core::hashing::covenant_id::covenant_id(
+        funding_outpoint,
+        std::iter::once((contract_output_index, unbound_contract_output)),
+    )
+}
+
+/// Parse a canonical `<lowercase txid>:<u32 index>` outpoint.
+pub fn parse_funding_outpoint(value: &str) -> Result<TransactionOutpoint> {
+    let (transaction_id, index) = value
+        .split_once(':')
+        .ok_or_else(|| anyhow!("funding outpoint must be <txid>:<index>"))?;
+    validate_lower_hex(transaction_id, 32, "funding outpoint transaction_id")?;
+    if index.is_empty()
+        || !index.bytes().all(|byte| byte.is_ascii_digit())
+        || (index.len() > 1 && index.starts_with('0'))
+    {
+        bail!("funding outpoint index must be a canonical decimal u32");
+    }
+    let index = index
+        .parse::<u32>()
+        .context("funding outpoint index exceeds u32")?;
+    OutpointSpec {
+        transaction_id: transaction_id.to_string(),
+        index,
+    }
+    .to_outpoint()
+}
+
+/// Load an artifact against hashes taken from an already validated release manifest.
+pub fn load_artifact_for_calculation(
+    path: &Path,
+    expected_artifact_sha256: &str,
+    expected_script_sha256: &str,
+) -> Result<SilvercArtifact> {
+    validate_lower_hex(expected_artifact_sha256, 32, "expected artifact_sha256")?;
+    validate_lower_hex(expected_script_sha256, 32, "expected script_sha256")?;
+    let bytes = fs::read(path).with_context(|| format!("failed to read {}", path.display()))?;
+    if sha256_hex(&bytes) != expected_artifact_sha256 {
+        bail!("Silverc artifact_sha256 mismatch");
+    }
+    let value: Value = serde_json::from_slice(&bytes)
+        .with_context(|| format!("invalid JSON in {}", path.display()))?;
+    reject_secret_fields(&value, "$")?;
+    let artifact: SilvercArtifact = serde_json::from_value(value)?;
+    if artifact.script.is_empty() {
+        bail!("Silverc compiled script must not be empty");
+    }
+    if sha256_hex(&artifact.script) != expected_script_sha256 {
+        bail!("Silverc compiled script hash mismatch");
+    }
+    Ok(artifact)
+}
+
+/// Offline covenant-id calculation under the existing genesis layout.
+///
+/// Uses the same unbound output construction and consensus helper as
+/// `prepare_genesis`. It takes no keys, network, request or funding UTXO and
+/// builds no transaction; the result is classified as neither chain evidence
+/// nor deployment authorization.
+pub fn calculate_genesis_covenant_id(
+    artifact: &SilvercArtifact,
+    verified_artifact_sha256: &str,
+    funding_outpoint: &str,
+    genesis_output_value: u64,
+) -> Result<CovenantIdCalculation> {
+    if genesis_output_value == 0 {
+        bail!("genesis_output_value must be nonzero");
+    }
+    if artifact.script.is_empty() {
+        bail!("Silverc compiled script must not be empty");
+    }
+    validate_lower_hex(verified_artifact_sha256, 32, "verified artifact_sha256")?;
+    let outpoint = parse_funding_outpoint(funding_outpoint)?;
+    let unbound_contract_output =
+        unbound_genesis_contract_output(genesis_output_value, &artifact.script);
+    let covenant_id =
+        genesis_covenant_id(outpoint, CONTRACT_OUTPUT_INDEX, &unbound_contract_output);
+    Ok(CovenantIdCalculation {
+        schema_version: COVENANT_ID_CALCULATION_SCHEMA_VERSION,
+        kind: COVENANT_ID_CALCULATION_KIND.to_string(),
+        classification: COVENANT_ID_CALCULATION_CLASSIFICATION
+            .iter()
+            .map(|item| item.to_string())
+            .collect(),
+        contract_name: artifact.contract_name.clone(),
+        artifact_sha256: verified_artifact_sha256.to_string(),
+        script_sha256: sha256_hex(&artifact.script),
+        script_len: artifact.script.len(),
+        funding_outpoint: OutpointSpec::from_outpoint(outpoint),
+        genesis_output_value,
+        contract_output_index: CONTRACT_OUTPUT_INDEX,
+        authorizing_input: FUNDING_INPUT_INDEX,
+        contract_script_public_key: ScriptSpec::from_script_public_key(
+            &unbound_contract_output.script_public_key,
+        ),
+        covenant_id: covenant_id.to_string(),
+        derivation: "kaspa_consensus_core::hashing::covenant_id(funding_outpoint, \
+                     [(contract_output_index, unbound P2SH genesis output)])"
+            .to_string(),
+    })
+}
+
 pub fn prepare_genesis(
     request: &DeployRequest,
     artifact: &SilvercArtifact,
@@ -1072,15 +1214,13 @@ pub fn prepare_genesis(
         bail!("implicit transaction fee exceeds maximum_fee_sompi");
     }
 
-    let contract_script_public_key = pay_to_script_hash_script(&artifact.script);
-    let unbound_contract_output = TransactionOutput {
-        value: funding.genesis_output_value,
-        script_public_key: contract_script_public_key.clone(),
-        covenant: None,
-    };
-    let covenant_id = kaspa_consensus_core::hashing::covenant_id::covenant_id(
+    let unbound_contract_output =
+        unbound_genesis_contract_output(funding.genesis_output_value, &artifact.script);
+    let contract_script_public_key = unbound_contract_output.script_public_key.clone();
+    let covenant_id = genesis_covenant_id(
         funding_outpoint,
-        std::iter::once((CONTRACT_OUTPUT_INDEX, &unbound_contract_output)),
+        CONTRACT_OUTPUT_INDEX,
+        &unbound_contract_output,
     );
     let mut outputs = vec![TransactionOutput {
         covenant: Some(CovenantBinding {
@@ -3330,4 +3470,239 @@ mod tests {
 
         fs::remove_dir_all(temp_dir).unwrap();
     }
+
+    fn calculation_for(
+        artifact: &SilvercArtifact,
+        outpoint: &str,
+        value: u64,
+    ) -> CovenantIdCalculation {
+        calculate_genesis_covenant_id(artifact, &"aa".repeat(32), outpoint, value).unwrap()
+    }
+
+    #[test]
+    fn covenant_id_calculation_matches_prepare_genesis() {
+        let (request, artifact, funding) = deterministic_fixture();
+        let prepared = prepare_genesis(&request, &artifact, &funding).unwrap();
+        let outpoint = format!(
+            "{}:{}",
+            funding.funding_outpoint.transaction_id, funding.funding_outpoint.index
+        );
+        let calculation = calculation_for(&artifact, &outpoint, funding.genesis_output_value);
+        assert_eq!(
+            calculation.covenant_id,
+            prepared.signing_request.covenant_id
+        );
+        assert_eq!(
+            calculation.contract_script_public_key,
+            prepared.signing_request.contract_script_public_key
+        );
+        assert_eq!(
+            calculation.contract_output_index,
+            prepared.signing_request.contract_output_index
+        );
+        assert_eq!(
+            calculation.authorizing_input,
+            prepared.signing_request.authorizing_input
+        );
+        assert_eq!(
+            calculation.funding_outpoint,
+            prepared.signing_request.funding_outpoint
+        );
+
+        let (request, artifact, funding, _) = fixture();
+        let prepared = prepare_genesis(&request, &artifact, &funding).unwrap();
+        let outpoint = format!(
+            "{}:{}",
+            funding.funding_outpoint.transaction_id, funding.funding_outpoint.index
+        );
+        assert_eq!(
+            calculation_for(&artifact, &outpoint, funding.genesis_output_value).covenant_id,
+            prepared.signing_request.covenant_id
+        );
+    }
+
+    #[test]
+    fn covenant_id_calculation_is_deterministic_and_classified() {
+        let (_, artifact, _) = deterministic_fixture();
+        let outpoint = format!("{}:3", "11".repeat(32));
+        let first = calculation_for(&artifact, &outpoint, 1_000_000_000);
+        let second = calculation_for(&artifact, &outpoint, 1_000_000_000);
+        assert_eq!(first, second);
+        assert_eq!(
+            first.covenant_id, DETERMINISTIC_COVENANT_ID_VECTOR,
+            "pinned regression vector for the deterministic fixture"
+        );
+        assert_eq!(first.kind, COVENANT_ID_CALCULATION_KIND);
+        assert_eq!(
+            first.classification,
+            vec!["NOT_CHAIN_EVIDENCE", "NOT_DEPLOYMENT_AUTHORIZATION"]
+        );
+        assert_eq!(first.script_sha256, sha256_hex(&artifact.script));
+        assert_eq!(first.artifact_sha256, "aa".repeat(32));
+        let value = serde_json::to_value(&first).unwrap();
+        for forbidden in [
+            "unsigned_transaction_id",
+            "deployed_instance_id",
+            "sighash_hex",
+            "signing_request_sha256",
+            "request_sha256",
+        ] {
+            assert!(
+                value.get(forbidden).is_none(),
+                "{forbidden} must not be exported"
+            );
+        }
+    }
+
+    #[test]
+    fn covenant_id_changes_with_every_bound_input() {
+        let (_, artifact, _) = deterministic_fixture();
+        let base_outpoint = format!("{}:3", "11".repeat(32));
+        let base = calculation_for(&artifact, &base_outpoint, 1_000_000_000).covenant_id;
+        let other_txid =
+            calculation_for(&artifact, &format!("{}:3", "22".repeat(32)), 1_000_000_000);
+        let other_index =
+            calculation_for(&artifact, &format!("{}:4", "11".repeat(32)), 1_000_000_000);
+        let other_value = calculation_for(&artifact, &base_outpoint, 1_000_000_001);
+        let mut changed_script = artifact.clone();
+        changed_script.script.push(0x51);
+        let other_script = calculation_for(&changed_script, &base_outpoint, 1_000_000_000);
+        let ids: BTreeSet<_> = [
+            base.clone(),
+            other_txid.covenant_id,
+            other_index.covenant_id,
+            other_value.covenant_id,
+            other_script.covenant_id,
+        ]
+        .into_iter()
+        .collect();
+        assert_eq!(ids.len(), 5, "each bound input must change the identity");
+
+        let outpoint = parse_funding_outpoint(&base_outpoint).unwrap();
+        let output = unbound_genesis_contract_output(1_000_000_000, &artifact.script);
+        assert_eq!(
+            genesis_covenant_id(outpoint, CONTRACT_OUTPUT_INDEX, &output).to_string(),
+            base
+        );
+        assert_ne!(
+            genesis_covenant_id(outpoint, 1, &output).to_string(),
+            base,
+            "output index is bound"
+        );
+        let other_version = TransactionOutput {
+            script_public_key: ScriptPublicKey::new(
+                output.script_public_key.version() + 1,
+                output.script_public_key.script().into(),
+            ),
+            ..output.clone()
+        };
+        assert_ne!(
+            genesis_covenant_id(outpoint, CONTRACT_OUTPUT_INDEX, &other_version).to_string(),
+            base,
+            "script version is bound"
+        );
+        let bound = TransactionOutput {
+            covenant: Some(CovenantBinding {
+                authorizing_input: FUNDING_INPUT_INDEX,
+                covenant_id: TransactionId::from_str(&"33".repeat(32)).unwrap(),
+            }),
+            ..output
+        };
+        assert_eq!(
+            genesis_covenant_id(outpoint, CONTRACT_OUTPUT_INDEX, &bound).to_string(),
+            base,
+            "the covenant binding itself is excluded from the identity"
+        );
+    }
+
+    #[test]
+    fn covenant_id_calculation_rejects_malformed_inputs() {
+        let (_, artifact, _) = deterministic_fixture();
+        let txid = "11".repeat(32);
+        for outpoint in [
+            String::new(),
+            txid.clone(),
+            format!("{txid}:"),
+            format!("{txid}:01"),
+            format!("{txid}:-1"),
+            format!("{txid}:+1"),
+            format!("{txid}: 1"),
+            format!("{txid}:4294967296"),
+            format!("{txid}:1:2"),
+            format!("{}:0", "AB".repeat(32)),
+            format!("{}:0", &txid[..62]),
+            format!("{}zz:0", &txid[..62]),
+        ] {
+            assert!(
+                calculate_genesis_covenant_id(&artifact, &"aa".repeat(32), &outpoint, 1).is_err(),
+                "outpoint `{outpoint}` must fail closed"
+            );
+        }
+        let max_index = format!("{txid}:4294967295");
+        assert!(calculate_genesis_covenant_id(&artifact, &"aa".repeat(32), &max_index, 1).is_ok());
+        let outpoint = format!("{txid}:0");
+        assert!(calculate_genesis_covenant_id(&artifact, &"aa".repeat(32), &outpoint, 0).is_err());
+        assert!(calculate_genesis_covenant_id(&artifact, &"AA".repeat(32), &outpoint, 1).is_err());
+        assert!(calculate_genesis_covenant_id(&artifact, "aa", &outpoint, 1).is_err());
+        let mut empty = artifact.clone();
+        empty.script.clear();
+        assert!(calculate_genesis_covenant_id(&empty, &"aa".repeat(32), &outpoint, 1).is_err());
+        assert!(
+            calculate_genesis_covenant_id(&artifact, &"aa".repeat(32), &outpoint, u64::MAX).is_ok(),
+            "u64 range is accepted by the calculation; funding checks stay in prepare_genesis"
+        );
+    }
+
+    #[test]
+    fn calculation_artifact_loader_binds_manifest_hashes() {
+        let dir = std::env::temp_dir().join(format!(
+            "prometheus-covenant-calc-{}-{}",
+            std::process::id(),
+            SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        fs::create_dir_all(&dir).unwrap();
+        let (_, artifact, _) = deterministic_fixture();
+        let path = dir.join("artifact.json");
+        let bytes = serde_json::to_vec(&artifact).unwrap();
+        fs::write(&path, &bytes).unwrap();
+        let artifact_sha = sha256_hex(&bytes);
+        let script_sha = sha256_hex(&artifact.script);
+        let loaded = load_artifact_for_calculation(&path, &artifact_sha, &script_sha).unwrap();
+        assert_eq!(loaded.script, artifact.script);
+        assert!(load_artifact_for_calculation(&path, &"00".repeat(32), &script_sha).is_err());
+        assert!(load_artifact_for_calculation(&path, &artifact_sha, &"00".repeat(32)).is_err());
+        assert!(
+            load_artifact_for_calculation(&path, &artifact_sha.to_uppercase(), &script_sha)
+                .is_err()
+        );
+        let secret =
+            br#"{"contract_name":"X","compiler_version":"t","script":[81],"private_key":"x"}"#;
+        fs::write(&path, secret).unwrap();
+        assert!(
+            load_artifact_for_calculation(&path, &sha256_hex(secret), &sha256_hex(&[81])).is_err()
+        );
+        fs::remove_dir_all(dir).unwrap();
+    }
+
+    #[test]
+    fn non_v1_manifest_stays_rejected_by_genesis_profile_gate() {
+        // Any manifest other than the pinned v1 bundle (including the v2 draft,
+        // exercised end to end in scripts/test_silverc_bundle_profiles.py) is
+        // rejected; the offline calculation does not touch this gate.
+        let (mut request, _, _, _) = fixture();
+        request.deployment_profile.full_bundle_manifest_sha256 = "cd".repeat(32);
+        let error = validate_deployment_profile(&request)
+            .unwrap_err()
+            .to_string();
+        assert!(
+            error.contains("release-manifest binding mismatch"),
+            "{error}"
+        );
+    }
+
+    const DETERMINISTIC_COVENANT_ID_VECTOR: &str =
+        "3a81b23246d64864e295fb5aa5e1cc36d45711fd402a602fb7ef765ec8d21b8a";
 }

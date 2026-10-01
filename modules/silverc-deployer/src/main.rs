@@ -14,7 +14,8 @@ use prometheus_silverc_deployer::oracle::{
 };
 use prometheus_silverc_deployer::{
     acquire_broadcast_lock, broadcast_journal_path, broadcast_verified_transaction,
-    create_public_json, finalize_broadcast_journal, import_external_signature_files, load_artifact,
+    calculate_genesis_covenant_id, create_public_json, finalize_broadcast_journal,
+    import_external_signature_files, load_artifact, load_artifact_for_calculation,
     load_broadcast_journal, load_broadcast_result, load_deploy_request, load_funding_spec,
     load_signature_response, load_signing_request, observe_deployed_utxo, preflight_deploy_node,
     preflight_node, prepare_broadcast_journal, prepare_genesis, reject_import_output_collisions,
@@ -69,6 +70,26 @@ enum Command {
         encoding: Encoding,
         #[arg(long)]
         evidence_out: PathBuf,
+    },
+    /// Offline: calculate a genesis covenant id from public inputs only.
+    /// The result is NOT chain evidence and NOT deployment authorization; no
+    /// request, transaction, signing request, receipt, or broadcast is produced.
+    CalculateCovenantId {
+        #[arg(long)]
+        artifact: PathBuf,
+        /// artifact_sha256 from an already validated release manifest.
+        #[arg(long)]
+        expected_artifact_sha256: String,
+        /// script_sha256 from an already validated release manifest.
+        #[arg(long)]
+        expected_script_sha256: String,
+        /// Canonical `<lowercase txid>:<u32 index>`.
+        #[arg(long)]
+        funding_outpoint: String,
+        #[arg(long)]
+        genesis_output_value_sompi: u64,
+        #[arg(long)]
+        calculation_out: PathBuf,
     },
     /// Build and verify a public digest request for an external Schnorr signer.
     Prepare {
@@ -281,6 +302,37 @@ async fn main() -> Result<()> {
             let evidence = preflight_deploy_node(&request, &funding, encoding.into()).await?;
             write_public_json(&evidence_out, &evidence)?;
             println!("{}", serde_json::to_string_pretty(&evidence)?);
+        }
+        Command::CalculateCovenantId {
+            artifact,
+            expected_artifact_sha256,
+            expected_script_sha256,
+            funding_outpoint,
+            genesis_output_value_sompi,
+            calculation_out,
+        } => {
+            reject_import_output_collisions(
+                &[("artifact input", &artifact)],
+                &[("covenant-id calculation output", &calculation_out)],
+            )?;
+            let loaded = load_artifact_for_calculation(
+                &artifact,
+                &expected_artifact_sha256,
+                &expected_script_sha256,
+            )?;
+            let calculation = calculate_genesis_covenant_id(
+                &loaded,
+                &expected_artifact_sha256,
+                &funding_outpoint,
+                genesis_output_value_sompi,
+            )?;
+            if !create_public_json(&calculation_out, &calculation)? {
+                anyhow::bail!(
+                    "refusing to overwrite existing {}",
+                    calculation_out.display()
+                );
+            }
+            println!("{}", serde_json::to_string_pretty(&calculation)?);
         }
         Command::Prepare {
             request,

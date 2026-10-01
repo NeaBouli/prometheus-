@@ -6057,3 +6057,14 @@ Rules for all dev agents:
   synthetic sample. Four Codex decisions and a four-step implementation plan in
   `.fleet/reports/bundle-v2-d5-genesis-binding-design.md`. Script suite 438 OK.
 
+### 2026-10-01 - [AUTOR: CC] bundle-v2-d5-offline-covenant-id delivered (D5 step a)
+
+- Deployer `calculate-covenant-id`: offline covenant id from funding outpoint,
+  genesis value and a manifest-hash-verified artifact via the pinned
+  `kaspa_consensus_core` helper; output classified NOT_CHAIN_EVIDENCE /
+  NOT_DEPLOYMENT_AUTHORIZATION, exclusive create, no keys/network/transaction.
+  prepare_genesis shares the same construction (pre-existing vector unchanged);
+  pins and profile gates untouched; v2 still rejected.
+- D5 design wording corrected (consistency vs provenance, trusted-source model,
+  cycles by policy, H-001 anchor). Deployer tests 64 OK, clippy/fmt clean.
+
