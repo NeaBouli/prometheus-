@@ -9,6 +9,7 @@ import sys
 from pathlib import Path
 from typing import Any
 
+from silverc_bundles import add_bundle_argument, bundle_from_args, require_profile, require_promotable  # noqa: F401
 from preflight_silverc_deploy import bundle_root_from_args, validate_manifest
 from verify_metrics_oracle_tx_result import load_json, validate_request
 from verify_silverc_h001 import DEFAULT_SILVERSCRIPT_REF
@@ -36,6 +37,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--summary-out", type=Path, help="Optional JSON procedure summary path")
     parser.add_argument("--runbook-out", type=Path, help="Optional Markdown operator procedure path")
+    add_bundle_argument(parser)
     return parser.parse_args()
 
 
@@ -169,7 +171,9 @@ def main() -> int:
     args = parse_args()
     bundle_dir, tmp = bundle_root_from_args(args)
     try:
-        manifest = validate_manifest(bundle_dir, args.silverscript_ref)
+        bundle = bundle_from_args(args)
+        require_promotable(bundle, "a metrics-oracle operator procedure")
+        manifest = validate_manifest(bundle_dir, args.silverscript_ref, bundle)
         request_summary = validate_request(load_json(args.tx_request.expanduser().resolve()), manifest)
         procedure = build_procedure(request_summary)
         write_json(args.summary_out, procedure)

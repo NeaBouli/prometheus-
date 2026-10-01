@@ -1,0 +1,2891 @@
+{
+  "bundle_id": "h001-v1",
+  "fixtures": [
+    {
+      "abi": [
+        "verify"
+      ],
+      "args": [
+        {
+          "data": [
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            }
+          ],
+          "kind": "array"
+        }
+      ],
+      "contract_name": "ValidatorStakingH001",
+      "filename": "ValidatorStakingH001.sil"
+    },
+    {
+      "abi": [
+        "__covenant_entrypoint_auth_commitVote",
+        "__covenant_entrypoint_auth_revealVote",
+        "__covenant_entrypoint_auth_slashInvalidReveal",
+        "__covenant_entrypoint_auth_requestWithdraw",
+        "__covenant_entrypoint_auth_completeWithdraw"
+      ],
+      "args": [
+        {
+          "data": [
+            {
+              "data": 1,
+              "kind": "byte"
+            },
+            {
+              "data": 1,
+              "kind": "byte"
+            },
+            {
+              "data": 1,
+              "kind": "byte"
+            },
+            {
+              "data": 1,
+              "kind": "byte"
+            },
+            {
+              "data": 1,
+              "kind": "byte"
+            },
+            {
+              "data": 1,
+              "kind": "byte"
+            },
+            {
+              "data": 1,
+              "kind": "byte"
+            },
+            {
+              "data": 1,
+              "kind": "byte"
+            },
+            {
+              "data": 1,
+              "kind": "byte"
+            },
+            {
+              "data": 1,
+              "kind": "byte"
+            },
+            {
+              "data": 1,
+              "kind": "byte"
+            },
+            {
+              "data": 1,
+              "kind": "byte"
+            },
+            {
+              "data": 1,
+              "kind": "byte"
+            },
+            {
+              "data": 1,
+              "kind": "byte"
+            },
+            {
+              "data": 1,
+              "kind": "byte"
+            },
+            {
+              "data": 1,
+              "kind": "byte"
+            },
+            {
+              "data": 1,
+              "kind": "byte"
+            },
+            {
+              "data": 1,
+              "kind": "byte"
+            },
+            {
+              "data": 1,
+              "kind": "byte"
+            },
+            {
+              "data": 1,
+              "kind": "byte"
+            },
+            {
+              "data": 1,
+              "kind": "byte"
+            },
+            {
+              "data": 1,
+              "kind": "byte"
+            },
+            {
+              "data": 1,
+              "kind": "byte"
+            },
+            {
+              "data": 1,
+              "kind": "byte"
+            },
+            {
+              "data": 1,
+              "kind": "byte"
+            },
+            {
+              "data": 1,
+              "kind": "byte"
+            },
+            {
+              "data": 1,
+              "kind": "byte"
+            },
+            {
+              "data": 1,
+              "kind": "byte"
+            },
+            {
+              "data": 1,
+              "kind": "byte"
+            },
+            {
+              "data": 1,
+              "kind": "byte"
+            },
+            {
+              "data": 1,
+              "kind": "byte"
+            },
+            {
+              "data": 1,
+              "kind": "byte"
+            }
+          ],
+          "kind": "array"
+        },
+        {
+          "data": 10000,
+          "kind": "int"
+        },
+        {
+          "data": true,
+          "kind": "bool"
+        },
+        {
+          "data": 1,
+          "kind": "int"
+        },
+        {
+          "data": 1000,
+          "kind": "int"
+        },
+        {
+          "data": 0,
+          "kind": "int"
+        },
+        {
+          "data": 0,
+          "kind": "int"
+        },
+        {
+          "data": [
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            }
+          ],
+          "kind": "array"
+        },
+        {
+          "data": 0,
+          "kind": "int"
+        },
+        {
+          "data": 0,
+          "kind": "int"
+        },
+        {
+          "data": 0,
+          "kind": "int"
+        }
+      ],
+      "contract_name": "ValidatorStakingState",
+      "filename": "ValidatorStakingState.sil"
+    },
+    {
+      "abi": [
+        "__covenant_entrypoint_auth_register",
+        "__covenant_entrypoint_auth_proposalAccepted",
+        "__covenant_entrypoint_auth_proposalRejected"
+      ],
+      "args": [
+        {
+          "data": [
+            {
+              "data": 2,
+              "kind": "byte"
+            },
+            {
+              "data": 2,
+              "kind": "byte"
+            },
+            {
+              "data": 2,
+              "kind": "byte"
+            },
+            {
+              "data": 2,
+              "kind": "byte"
+            },
+            {
+              "data": 2,
+              "kind": "byte"
+            },
+            {
+              "data": 2,
+              "kind": "byte"
+            },
+            {
+              "data": 2,
+              "kind": "byte"
+            },
+            {
+              "data": 2,
+              "kind": "byte"
+            },
+            {
+              "data": 2,
+              "kind": "byte"
+            },
+            {
+              "data": 2,
+              "kind": "byte"
+            },
+            {
+              "data": 2,
+              "kind": "byte"
+            },
+            {
+              "data": 2,
+              "kind": "byte"
+            },
+            {
+              "data": 2,
+              "kind": "byte"
+            },
+            {
+              "data": 2,
+              "kind": "byte"
+            },
+            {
+              "data": 2,
+              "kind": "byte"
+            },
+            {
+              "data": 2,
+              "kind": "byte"
+            },
+            {
+              "data": 2,
+              "kind": "byte"
+            },
+            {
+              "data": 2,
+              "kind": "byte"
+            },
+            {
+              "data": 2,
+              "kind": "byte"
+            },
+            {
+              "data": 2,
+              "kind": "byte"
+            },
+            {
+              "data": 2,
+              "kind": "byte"
+            },
+            {
+              "data": 2,
+              "kind": "byte"
+            },
+            {
+              "data": 2,
+              "kind": "byte"
+            },
+            {
+              "data": 2,
+              "kind": "byte"
+            },
+            {
+              "data": 2,
+              "kind": "byte"
+            },
+            {
+              "data": 2,
+              "kind": "byte"
+            },
+            {
+              "data": 2,
+              "kind": "byte"
+            },
+            {
+              "data": 2,
+              "kind": "byte"
+            },
+            {
+              "data": 2,
+              "kind": "byte"
+            },
+            {
+              "data": 2,
+              "kind": "byte"
+            },
+            {
+              "data": 2,
+              "kind": "byte"
+            },
+            {
+              "data": 2,
+              "kind": "byte"
+            }
+          ],
+          "kind": "array"
+        },
+        {
+          "data": [
+            {
+              "data": 3,
+              "kind": "byte"
+            },
+            {
+              "data": 3,
+              "kind": "byte"
+            },
+            {
+              "data": 3,
+              "kind": "byte"
+            },
+            {
+              "data": 3,
+              "kind": "byte"
+            },
+            {
+              "data": 3,
+              "kind": "byte"
+            },
+            {
+              "data": 3,
+              "kind": "byte"
+            },
+            {
+              "data": 3,
+              "kind": "byte"
+            },
+            {
+              "data": 3,
+              "kind": "byte"
+            },
+            {
+              "data": 3,
+              "kind": "byte"
+            },
+            {
+              "data": 3,
+              "kind": "byte"
+            },
+            {
+              "data": 3,
+              "kind": "byte"
+            },
+            {
+              "data": 3,
+              "kind": "byte"
+            },
+            {
+              "data": 3,
+              "kind": "byte"
+            },
+            {
+              "data": 3,
+              "kind": "byte"
+            },
+            {
+              "data": 3,
+              "kind": "byte"
+            },
+            {
+              "data": 3,
+              "kind": "byte"
+            },
+            {
+              "data": 3,
+              "kind": "byte"
+            },
+            {
+              "data": 3,
+              "kind": "byte"
+            },
+            {
+              "data": 3,
+              "kind": "byte"
+            },
+            {
+              "data": 3,
+              "kind": "byte"
+            },
+            {
+              "data": 3,
+              "kind": "byte"
+            },
+            {
+              "data": 3,
+              "kind": "byte"
+            },
+            {
+              "data": 3,
+              "kind": "byte"
+            },
+            {
+              "data": 3,
+              "kind": "byte"
+            },
+            {
+              "data": 3,
+              "kind": "byte"
+            },
+            {
+              "data": 3,
+              "kind": "byte"
+            },
+            {
+              "data": 3,
+              "kind": "byte"
+            },
+            {
+              "data": 3,
+              "kind": "byte"
+            },
+            {
+              "data": 3,
+              "kind": "byte"
+            },
+            {
+              "data": 3,
+              "kind": "byte"
+            },
+            {
+              "data": 3,
+              "kind": "byte"
+            },
+            {
+              "data": 3,
+              "kind": "byte"
+            }
+          ],
+          "kind": "array"
+        },
+        {
+          "data": 100,
+          "kind": "int"
+        },
+        {
+          "data": 1000,
+          "kind": "int"
+        },
+        {
+          "data": 0,
+          "kind": "int"
+        },
+        {
+          "data": 0,
+          "kind": "int"
+        },
+        {
+          "data": 1,
+          "kind": "int"
+        },
+        {
+          "data": 1,
+          "kind": "int"
+        }
+      ],
+      "contract_name": "GuardianReputationState",
+      "filename": "GuardianReputationState.sil"
+    },
+    {
+      "abi": [
+        "__covenant_entrypoint_auth_submitProposal",
+        "__covenant_entrypoint_auth_voteOnProposal",
+        "__covenant_entrypoint_auth_finalizeProposal",
+        "__covenant_entrypoint_auth_deactivateRule"
+      ],
+      "args": [
+        {
+          "data": [
+            {
+              "data": 4,
+              "kind": "byte"
+            },
+            {
+              "data": 4,
+              "kind": "byte"
+            },
+            {
+              "data": 4,
+              "kind": "byte"
+            },
+            {
+              "data": 4,
+              "kind": "byte"
+            },
+            {
+              "data": 4,
+              "kind": "byte"
+            },
+            {
+              "data": 4,
+              "kind": "byte"
+            },
+            {
+              "data": 4,
+              "kind": "byte"
+            },
+            {
+              "data": 4,
+              "kind": "byte"
+            },
+            {
+              "data": 4,
+              "kind": "byte"
+            },
+            {
+              "data": 4,
+              "kind": "byte"
+            },
+            {
+              "data": 4,
+              "kind": "byte"
+            },
+            {
+              "data": 4,
+              "kind": "byte"
+            },
+            {
+              "data": 4,
+              "kind": "byte"
+            },
+            {
+              "data": 4,
+              "kind": "byte"
+            },
+            {
+              "data": 4,
+              "kind": "byte"
+            },
+            {
+              "data": 4,
+              "kind": "byte"
+            },
+            {
+              "data": 4,
+              "kind": "byte"
+            },
+            {
+              "data": 4,
+              "kind": "byte"
+            },
+            {
+              "data": 4,
+              "kind": "byte"
+            },
+            {
+              "data": 4,
+              "kind": "byte"
+            },
+            {
+              "data": 4,
+              "kind": "byte"
+            },
+            {
+              "data": 4,
+              "kind": "byte"
+            },
+            {
+              "data": 4,
+              "kind": "byte"
+            },
+            {
+              "data": 4,
+              "kind": "byte"
+            },
+            {
+              "data": 4,
+              "kind": "byte"
+            },
+            {
+              "data": 4,
+              "kind": "byte"
+            },
+            {
+              "data": 4,
+              "kind": "byte"
+            },
+            {
+              "data": 4,
+              "kind": "byte"
+            },
+            {
+              "data": 4,
+              "kind": "byte"
+            },
+            {
+              "data": 4,
+              "kind": "byte"
+            },
+            {
+              "data": 4,
+              "kind": "byte"
+            },
+            {
+              "data": 4,
+              "kind": "byte"
+            }
+          ],
+          "kind": "array"
+        },
+        {
+          "data": 1,
+          "kind": "int"
+        },
+        {
+          "data": 0,
+          "kind": "int"
+        },
+        {
+          "data": [
+            {
+              "data": 5,
+              "kind": "byte"
+            },
+            {
+              "data": 5,
+              "kind": "byte"
+            },
+            {
+              "data": 5,
+              "kind": "byte"
+            },
+            {
+              "data": 5,
+              "kind": "byte"
+            },
+            {
+              "data": 5,
+              "kind": "byte"
+            },
+            {
+              "data": 5,
+              "kind": "byte"
+            },
+            {
+              "data": 5,
+              "kind": "byte"
+            },
+            {
+              "data": 5,
+              "kind": "byte"
+            },
+            {
+              "data": 5,
+              "kind": "byte"
+            },
+            {
+              "data": 5,
+              "kind": "byte"
+            },
+            {
+              "data": 5,
+              "kind": "byte"
+            },
+            {
+              "data": 5,
+              "kind": "byte"
+            },
+            {
+              "data": 5,
+              "kind": "byte"
+            },
+            {
+              "data": 5,
+              "kind": "byte"
+            },
+            {
+              "data": 5,
+              "kind": "byte"
+            },
+            {
+              "data": 5,
+              "kind": "byte"
+            },
+            {
+              "data": 5,
+              "kind": "byte"
+            },
+            {
+              "data": 5,
+              "kind": "byte"
+            },
+            {
+              "data": 5,
+              "kind": "byte"
+            },
+            {
+              "data": 5,
+              "kind": "byte"
+            },
+            {
+              "data": 5,
+              "kind": "byte"
+            },
+            {
+              "data": 5,
+              "kind": "byte"
+            },
+            {
+              "data": 5,
+              "kind": "byte"
+            },
+            {
+              "data": 5,
+              "kind": "byte"
+            },
+            {
+              "data": 5,
+              "kind": "byte"
+            },
+            {
+              "data": 5,
+              "kind": "byte"
+            },
+            {
+              "data": 5,
+              "kind": "byte"
+            },
+            {
+              "data": 5,
+              "kind": "byte"
+            },
+            {
+              "data": 5,
+              "kind": "byte"
+            },
+            {
+              "data": 5,
+              "kind": "byte"
+            },
+            {
+              "data": 5,
+              "kind": "byte"
+            },
+            {
+              "data": 5,
+              "kind": "byte"
+            }
+          ],
+          "kind": "array"
+        },
+        {
+          "data": [
+            {
+              "data": 6,
+              "kind": "byte"
+            },
+            {
+              "data": 6,
+              "kind": "byte"
+            },
+            {
+              "data": 6,
+              "kind": "byte"
+            },
+            {
+              "data": 6,
+              "kind": "byte"
+            },
+            {
+              "data": 6,
+              "kind": "byte"
+            },
+            {
+              "data": 6,
+              "kind": "byte"
+            },
+            {
+              "data": 6,
+              "kind": "byte"
+            },
+            {
+              "data": 6,
+              "kind": "byte"
+            },
+            {
+              "data": 6,
+              "kind": "byte"
+            },
+            {
+              "data": 6,
+              "kind": "byte"
+            },
+            {
+              "data": 6,
+              "kind": "byte"
+            },
+            {
+              "data": 6,
+              "kind": "byte"
+            },
+            {
+              "data": 6,
+              "kind": "byte"
+            },
+            {
+              "data": 6,
+              "kind": "byte"
+            },
+            {
+              "data": 6,
+              "kind": "byte"
+            },
+            {
+              "data": 6,
+              "kind": "byte"
+            },
+            {
+              "data": 6,
+              "kind": "byte"
+            },
+            {
+              "data": 6,
+              "kind": "byte"
+            },
+            {
+              "data": 6,
+              "kind": "byte"
+            },
+            {
+              "data": 6,
+              "kind": "byte"
+            },
+            {
+              "data": 6,
+              "kind": "byte"
+            },
+            {
+              "data": 6,
+              "kind": "byte"
+            },
+            {
+              "data": 6,
+              "kind": "byte"
+            },
+            {
+              "data": 6,
+              "kind": "byte"
+            },
+            {
+              "data": 6,
+              "kind": "byte"
+            },
+            {
+              "data": 6,
+              "kind": "byte"
+            },
+            {
+              "data": 6,
+              "kind": "byte"
+            },
+            {
+              "data": 6,
+              "kind": "byte"
+            },
+            {
+              "data": 6,
+              "kind": "byte"
+            },
+            {
+              "data": 6,
+              "kind": "byte"
+            },
+            {
+              "data": 6,
+              "kind": "byte"
+            },
+            {
+              "data": 6,
+              "kind": "byte"
+            }
+          ],
+          "kind": "array"
+        },
+        {
+          "data": 0,
+          "kind": "int"
+        },
+        {
+          "data": [
+            {
+              "data": 7,
+              "kind": "byte"
+            },
+            {
+              "data": 7,
+              "kind": "byte"
+            },
+            {
+              "data": 7,
+              "kind": "byte"
+            },
+            {
+              "data": 7,
+              "kind": "byte"
+            },
+            {
+              "data": 7,
+              "kind": "byte"
+            },
+            {
+              "data": 7,
+              "kind": "byte"
+            },
+            {
+              "data": 7,
+              "kind": "byte"
+            },
+            {
+              "data": 7,
+              "kind": "byte"
+            },
+            {
+              "data": 7,
+              "kind": "byte"
+            },
+            {
+              "data": 7,
+              "kind": "byte"
+            },
+            {
+              "data": 7,
+              "kind": "byte"
+            },
+            {
+              "data": 7,
+              "kind": "byte"
+            },
+            {
+              "data": 7,
+              "kind": "byte"
+            },
+            {
+              "data": 7,
+              "kind": "byte"
+            },
+            {
+              "data": 7,
+              "kind": "byte"
+            },
+            {
+              "data": 7,
+              "kind": "byte"
+            },
+            {
+              "data": 7,
+              "kind": "byte"
+            },
+            {
+              "data": 7,
+              "kind": "byte"
+            },
+            {
+              "data": 7,
+              "kind": "byte"
+            },
+            {
+              "data": 7,
+              "kind": "byte"
+            },
+            {
+              "data": 7,
+              "kind": "byte"
+            },
+            {
+              "data": 7,
+              "kind": "byte"
+            },
+            {
+              "data": 7,
+              "kind": "byte"
+            },
+            {
+              "data": 7,
+              "kind": "byte"
+            },
+            {
+              "data": 7,
+              "kind": "byte"
+            },
+            {
+              "data": 7,
+              "kind": "byte"
+            },
+            {
+              "data": 7,
+              "kind": "byte"
+            },
+            {
+              "data": 7,
+              "kind": "byte"
+            },
+            {
+              "data": 7,
+              "kind": "byte"
+            },
+            {
+              "data": 7,
+              "kind": "byte"
+            },
+            {
+              "data": 7,
+              "kind": "byte"
+            },
+            {
+              "data": 7,
+              "kind": "byte"
+            },
+            {
+              "data": 7,
+              "kind": "byte"
+            },
+            {
+              "data": 7,
+              "kind": "byte"
+            },
+            {
+              "data": 7,
+              "kind": "byte"
+            },
+            {
+              "data": 7,
+              "kind": "byte"
+            }
+          ],
+          "kind": "array"
+        },
+        {
+          "data": 8500,
+          "kind": "int"
+        },
+        {
+          "data": 0,
+          "kind": "int"
+        },
+        {
+          "data": 0,
+          "kind": "int"
+        },
+        {
+          "data": 0,
+          "kind": "int"
+        },
+        {
+          "data": 0,
+          "kind": "int"
+        },
+        {
+          "data": 0,
+          "kind": "int"
+        },
+        {
+          "data": 0,
+          "kind": "int"
+        },
+        {
+          "data": 0,
+          "kind": "int"
+        },
+        {
+          "data": 0,
+          "kind": "int"
+        },
+        {
+          "data": 0,
+          "kind": "int"
+        },
+        {
+          "data": 0,
+          "kind": "int"
+        },
+        {
+          "data": false,
+          "kind": "bool"
+        },
+        {
+          "data": 0,
+          "kind": "int"
+        }
+      ],
+      "contract_name": "RuleStorageState",
+      "filename": "RuleStorageState.sil"
+    },
+    {
+      "abi": [
+        "__covenant_entrypoint_auth_donateKas",
+        "__covenant_entrypoint_auth_proposeDisbursement",
+        "__covenant_entrypoint_auth_voteDisbursement",
+        "__covenant_entrypoint_auth_executeDisbursement"
+      ],
+      "args": [
+        {
+          "data": [
+            {
+              "data": 8,
+              "kind": "byte"
+            },
+            {
+              "data": 8,
+              "kind": "byte"
+            },
+            {
+              "data": 8,
+              "kind": "byte"
+            },
+            {
+              "data": 8,
+              "kind": "byte"
+            },
+            {
+              "data": 8,
+              "kind": "byte"
+            },
+            {
+              "data": 8,
+              "kind": "byte"
+            },
+            {
+              "data": 8,
+              "kind": "byte"
+            },
+            {
+              "data": 8,
+              "kind": "byte"
+            },
+            {
+              "data": 8,
+              "kind": "byte"
+            },
+            {
+              "data": 8,
+              "kind": "byte"
+            },
+            {
+              "data": 8,
+              "kind": "byte"
+            },
+            {
+              "data": 8,
+              "kind": "byte"
+            },
+            {
+              "data": 8,
+              "kind": "byte"
+            },
+            {
+              "data": 8,
+              "kind": "byte"
+            },
+            {
+              "data": 8,
+              "kind": "byte"
+            },
+            {
+              "data": 8,
+              "kind": "byte"
+            },
+            {
+              "data": 8,
+              "kind": "byte"
+            },
+            {
+              "data": 8,
+              "kind": "byte"
+            },
+            {
+              "data": 8,
+              "kind": "byte"
+            },
+            {
+              "data": 8,
+              "kind": "byte"
+            },
+            {
+              "data": 8,
+              "kind": "byte"
+            },
+            {
+              "data": 8,
+              "kind": "byte"
+            },
+            {
+              "data": 8,
+              "kind": "byte"
+            },
+            {
+              "data": 8,
+              "kind": "byte"
+            },
+            {
+              "data": 8,
+              "kind": "byte"
+            },
+            {
+              "data": 8,
+              "kind": "byte"
+            },
+            {
+              "data": 8,
+              "kind": "byte"
+            },
+            {
+              "data": 8,
+              "kind": "byte"
+            },
+            {
+              "data": 8,
+              "kind": "byte"
+            },
+            {
+              "data": 8,
+              "kind": "byte"
+            },
+            {
+              "data": 8,
+              "kind": "byte"
+            },
+            {
+              "data": 8,
+              "kind": "byte"
+            }
+          ],
+          "kind": "array"
+        },
+        {
+          "data": 0,
+          "kind": "int"
+        },
+        {
+          "data": 0,
+          "kind": "int"
+        },
+        {
+          "data": 0,
+          "kind": "int"
+        },
+        {
+          "data": 1,
+          "kind": "int"
+        },
+        {
+          "data": 0,
+          "kind": "int"
+        },
+        {
+          "data": [
+            {
+              "data": 9,
+              "kind": "byte"
+            },
+            {
+              "data": 9,
+              "kind": "byte"
+            },
+            {
+              "data": 9,
+              "kind": "byte"
+            },
+            {
+              "data": 9,
+              "kind": "byte"
+            },
+            {
+              "data": 9,
+              "kind": "byte"
+            },
+            {
+              "data": 9,
+              "kind": "byte"
+            },
+            {
+              "data": 9,
+              "kind": "byte"
+            },
+            {
+              "data": 9,
+              "kind": "byte"
+            },
+            {
+              "data": 9,
+              "kind": "byte"
+            },
+            {
+              "data": 9,
+              "kind": "byte"
+            },
+            {
+              "data": 9,
+              "kind": "byte"
+            },
+            {
+              "data": 9,
+              "kind": "byte"
+            },
+            {
+              "data": 9,
+              "kind": "byte"
+            },
+            {
+              "data": 9,
+              "kind": "byte"
+            },
+            {
+              "data": 9,
+              "kind": "byte"
+            },
+            {
+              "data": 9,
+              "kind": "byte"
+            },
+            {
+              "data": 9,
+              "kind": "byte"
+            },
+            {
+              "data": 9,
+              "kind": "byte"
+            },
+            {
+              "data": 9,
+              "kind": "byte"
+            },
+            {
+              "data": 9,
+              "kind": "byte"
+            },
+            {
+              "data": 9,
+              "kind": "byte"
+            },
+            {
+              "data": 9,
+              "kind": "byte"
+            },
+            {
+              "data": 9,
+              "kind": "byte"
+            },
+            {
+              "data": 9,
+              "kind": "byte"
+            },
+            {
+              "data": 9,
+              "kind": "byte"
+            },
+            {
+              "data": 9,
+              "kind": "byte"
+            },
+            {
+              "data": 9,
+              "kind": "byte"
+            },
+            {
+              "data": 9,
+              "kind": "byte"
+            },
+            {
+              "data": 9,
+              "kind": "byte"
+            },
+            {
+              "data": 9,
+              "kind": "byte"
+            },
+            {
+              "data": 9,
+              "kind": "byte"
+            },
+            {
+              "data": 9,
+              "kind": "byte"
+            }
+          ],
+          "kind": "array"
+        },
+        {
+          "data": 0,
+          "kind": "int"
+        },
+        {
+          "data": [
+            {
+              "data": 13,
+              "kind": "byte"
+            },
+            {
+              "data": 13,
+              "kind": "byte"
+            },
+            {
+              "data": 13,
+              "kind": "byte"
+            },
+            {
+              "data": 13,
+              "kind": "byte"
+            },
+            {
+              "data": 13,
+              "kind": "byte"
+            },
+            {
+              "data": 13,
+              "kind": "byte"
+            },
+            {
+              "data": 13,
+              "kind": "byte"
+            },
+            {
+              "data": 13,
+              "kind": "byte"
+            },
+            {
+              "data": 13,
+              "kind": "byte"
+            },
+            {
+              "data": 13,
+              "kind": "byte"
+            },
+            {
+              "data": 13,
+              "kind": "byte"
+            },
+            {
+              "data": 13,
+              "kind": "byte"
+            },
+            {
+              "data": 13,
+              "kind": "byte"
+            },
+            {
+              "data": 13,
+              "kind": "byte"
+            },
+            {
+              "data": 13,
+              "kind": "byte"
+            },
+            {
+              "data": 13,
+              "kind": "byte"
+            },
+            {
+              "data": 13,
+              "kind": "byte"
+            },
+            {
+              "data": 13,
+              "kind": "byte"
+            },
+            {
+              "data": 13,
+              "kind": "byte"
+            },
+            {
+              "data": 13,
+              "kind": "byte"
+            },
+            {
+              "data": 13,
+              "kind": "byte"
+            },
+            {
+              "data": 13,
+              "kind": "byte"
+            },
+            {
+              "data": 13,
+              "kind": "byte"
+            },
+            {
+              "data": 13,
+              "kind": "byte"
+            },
+            {
+              "data": 13,
+              "kind": "byte"
+            },
+            {
+              "data": 13,
+              "kind": "byte"
+            },
+            {
+              "data": 13,
+              "kind": "byte"
+            },
+            {
+              "data": 13,
+              "kind": "byte"
+            },
+            {
+              "data": 13,
+              "kind": "byte"
+            },
+            {
+              "data": 13,
+              "kind": "byte"
+            },
+            {
+              "data": 13,
+              "kind": "byte"
+            },
+            {
+              "data": 13,
+              "kind": "byte"
+            }
+          ],
+          "kind": "array"
+        },
+        {
+          "data": 0,
+          "kind": "int"
+        },
+        {
+          "data": 0,
+          "kind": "int"
+        },
+        {
+          "data": 0,
+          "kind": "int"
+        },
+        {
+          "data": 0,
+          "kind": "int"
+        },
+        {
+          "data": false,
+          "kind": "bool"
+        },
+        {
+          "data": [
+            {
+              "data": 14,
+              "kind": "byte"
+            },
+            {
+              "data": 14,
+              "kind": "byte"
+            },
+            {
+              "data": 14,
+              "kind": "byte"
+            },
+            {
+              "data": 14,
+              "kind": "byte"
+            },
+            {
+              "data": 14,
+              "kind": "byte"
+            },
+            {
+              "data": 14,
+              "kind": "byte"
+            },
+            {
+              "data": 14,
+              "kind": "byte"
+            },
+            {
+              "data": 14,
+              "kind": "byte"
+            },
+            {
+              "data": 14,
+              "kind": "byte"
+            },
+            {
+              "data": 14,
+              "kind": "byte"
+            },
+            {
+              "data": 14,
+              "kind": "byte"
+            },
+            {
+              "data": 14,
+              "kind": "byte"
+            },
+            {
+              "data": 14,
+              "kind": "byte"
+            },
+            {
+              "data": 14,
+              "kind": "byte"
+            },
+            {
+              "data": 14,
+              "kind": "byte"
+            },
+            {
+              "data": 14,
+              "kind": "byte"
+            },
+            {
+              "data": 14,
+              "kind": "byte"
+            },
+            {
+              "data": 14,
+              "kind": "byte"
+            },
+            {
+              "data": 14,
+              "kind": "byte"
+            },
+            {
+              "data": 14,
+              "kind": "byte"
+            },
+            {
+              "data": 14,
+              "kind": "byte"
+            },
+            {
+              "data": 14,
+              "kind": "byte"
+            },
+            {
+              "data": 14,
+              "kind": "byte"
+            },
+            {
+              "data": 14,
+              "kind": "byte"
+            },
+            {
+              "data": 14,
+              "kind": "byte"
+            },
+            {
+              "data": 14,
+              "kind": "byte"
+            },
+            {
+              "data": 14,
+              "kind": "byte"
+            },
+            {
+              "data": 14,
+              "kind": "byte"
+            },
+            {
+              "data": 14,
+              "kind": "byte"
+            },
+            {
+              "data": 14,
+              "kind": "byte"
+            },
+            {
+              "data": 14,
+              "kind": "byte"
+            },
+            {
+              "data": 14,
+              "kind": "byte"
+            }
+          ],
+          "kind": "array"
+        },
+        {
+          "data": [
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            }
+          ],
+          "kind": "array"
+        },
+        {
+          "data": 0,
+          "kind": "int"
+        }
+      ],
+      "contract_name": "CommunityDonationsState",
+      "filename": "CommunityDonationsState.sil"
+    },
+    {
+      "abi": [
+        "__covenant_entrypoint_auth_proposeGrant",
+        "__covenant_entrypoint_auth_voteGrant",
+        "__covenant_entrypoint_auth_executeGrant"
+      ],
+      "args": [
+        {
+          "data": 1,
+          "kind": "int"
+        },
+        {
+          "data": 0,
+          "kind": "int"
+        },
+        {
+          "data": 0,
+          "kind": "int"
+        },
+        {
+          "data": [
+            {
+              "data": 10,
+              "kind": "byte"
+            },
+            {
+              "data": 10,
+              "kind": "byte"
+            },
+            {
+              "data": 10,
+              "kind": "byte"
+            },
+            {
+              "data": 10,
+              "kind": "byte"
+            },
+            {
+              "data": 10,
+              "kind": "byte"
+            },
+            {
+              "data": 10,
+              "kind": "byte"
+            },
+            {
+              "data": 10,
+              "kind": "byte"
+            },
+            {
+              "data": 10,
+              "kind": "byte"
+            },
+            {
+              "data": 10,
+              "kind": "byte"
+            },
+            {
+              "data": 10,
+              "kind": "byte"
+            },
+            {
+              "data": 10,
+              "kind": "byte"
+            },
+            {
+              "data": 10,
+              "kind": "byte"
+            },
+            {
+              "data": 10,
+              "kind": "byte"
+            },
+            {
+              "data": 10,
+              "kind": "byte"
+            },
+            {
+              "data": 10,
+              "kind": "byte"
+            },
+            {
+              "data": 10,
+              "kind": "byte"
+            },
+            {
+              "data": 10,
+              "kind": "byte"
+            },
+            {
+              "data": 10,
+              "kind": "byte"
+            },
+            {
+              "data": 10,
+              "kind": "byte"
+            },
+            {
+              "data": 10,
+              "kind": "byte"
+            },
+            {
+              "data": 10,
+              "kind": "byte"
+            },
+            {
+              "data": 10,
+              "kind": "byte"
+            },
+            {
+              "data": 10,
+              "kind": "byte"
+            },
+            {
+              "data": 10,
+              "kind": "byte"
+            },
+            {
+              "data": 10,
+              "kind": "byte"
+            },
+            {
+              "data": 10,
+              "kind": "byte"
+            },
+            {
+              "data": 10,
+              "kind": "byte"
+            },
+            {
+              "data": 10,
+              "kind": "byte"
+            },
+            {
+              "data": 10,
+              "kind": "byte"
+            },
+            {
+              "data": 10,
+              "kind": "byte"
+            },
+            {
+              "data": 10,
+              "kind": "byte"
+            },
+            {
+              "data": 10,
+              "kind": "byte"
+            }
+          ],
+          "kind": "array"
+        },
+        {
+          "data": [
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            }
+          ],
+          "kind": "array"
+        },
+        {
+          "data": [
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            },
+            {
+              "data": 0,
+              "kind": "byte"
+            }
+          ],
+          "kind": "array"
+        },
+        {
+          "data": 0,
+          "kind": "int"
+        },
+        {
+          "data": 1,
+          "kind": "int"
+        },
+        {
+          "data": 0,
+          "kind": "int"
+        },
+        {
+          "data": 0,
+          "kind": "int"
+        },
+        {
+          "data": 0,
+          "kind": "int"
+        },
+        {
+          "data": 0,
+          "kind": "int"
+        },
+        {
+          "data": false,
+          "kind": "bool"
+        },
+        {
+          "data": false,
+          "kind": "bool"
+        },
+        {
+          "data": 0,
+          "kind": "int"
+        },
+        {
+          "data": [
+            {
+              "data": 12,
+              "kind": "byte"
+            },
+            {
+              "data": 12,
+              "kind": "byte"
+            },
+            {
+              "data": 12,
+              "kind": "byte"
+            },
+            {
+              "data": 12,
+              "kind": "byte"
+            },
+            {
+              "data": 12,
+              "kind": "byte"
+            },
+            {
+              "data": 12,
+              "kind": "byte"
+            },
+            {
+              "data": 12,
+              "kind": "byte"
+            },
+            {
+              "data": 12,
+              "kind": "byte"
+            },
+            {
+              "data": 12,
+              "kind": "byte"
+            },
+            {
+              "data": 12,
+              "kind": "byte"
+            },
+            {
+              "data": 12,
+              "kind": "byte"
+            },
+            {
+              "data": 12,
+              "kind": "byte"
+            },
+            {
+              "data": 12,
+              "kind": "byte"
+            },
+            {
+              "data": 12,
+              "kind": "byte"
+            },
+            {
+              "data": 12,
+              "kind": "byte"
+            },
+            {
+              "data": 12,
+              "kind": "byte"
+            },
+            {
+              "data": 12,
+              "kind": "byte"
+            },
+            {
+              "data": 12,
+              "kind": "byte"
+            },
+            {
+              "data": 12,
+              "kind": "byte"
+            },
+            {
+              "data": 12,
+              "kind": "byte"
+            },
+            {
+              "data": 12,
+              "kind": "byte"
+            },
+            {
+              "data": 12,
+              "kind": "byte"
+            },
+            {
+              "data": 12,
+              "kind": "byte"
+            },
+            {
+              "data": 12,
+              "kind": "byte"
+            },
+            {
+              "data": 12,
+              "kind": "byte"
+            },
+            {
+              "data": 12,
+              "kind": "byte"
+            },
+            {
+              "data": 12,
+              "kind": "byte"
+            },
+            {
+              "data": 12,
+              "kind": "byte"
+            },
+            {
+              "data": 12,
+              "kind": "byte"
+            },
+            {
+              "data": 12,
+              "kind": "byte"
+            },
+            {
+              "data": 12,
+              "kind": "byte"
+            },
+            {
+              "data": 12,
+              "kind": "byte"
+            }
+          ],
+          "kind": "array"
+        }
+      ],
+      "contract_name": "DevIncentivePoolState",
+      "filename": "DevIncentivePoolState.sil"
+    },
+    {
+      "abi": [
+        "__covenant_entrypoint_auth_reportMetrics",
+        "__covenant_entrypoint_auth_autoTune"
+      ],
+      "args": [
+        {
+          "data": [
+            {
+              "data": 11,
+              "kind": "byte"
+            },
+            {
+              "data": 11,
+              "kind": "byte"
+            },
+            {
+              "data": 11,
+              "kind": "byte"
+            },
+            {
+              "data": 11,
+              "kind": "byte"
+            },
+            {
+              "data": 11,
+              "kind": "byte"
+            },
+            {
+              "data": 11,
+              "kind": "byte"
+            },
+            {
+              "data": 11,
+              "kind": "byte"
+            },
+            {
+              "data": 11,
+              "kind": "byte"
+            },
+            {
+              "data": 11,
+              "kind": "byte"
+            },
+            {
+              "data": 11,
+              "kind": "byte"
+            },
+            {
+              "data": 11,
+              "kind": "byte"
+            },
+            {
+              "data": 11,
+              "kind": "byte"
+            },
+            {
+              "data": 11,
+              "kind": "byte"
+            },
+            {
+              "data": 11,
+              "kind": "byte"
+            },
+            {
+              "data": 11,
+              "kind": "byte"
+            },
+            {
+              "data": 11,
+              "kind": "byte"
+            },
+            {
+              "data": 11,
+              "kind": "byte"
+            },
+            {
+              "data": 11,
+              "kind": "byte"
+            },
+            {
+              "data": 11,
+              "kind": "byte"
+            },
+            {
+              "data": 11,
+              "kind": "byte"
+            },
+            {
+              "data": 11,
+              "kind": "byte"
+            },
+            {
+              "data": 11,
+              "kind": "byte"
+            },
+            {
+              "data": 11,
+              "kind": "byte"
+            },
+            {
+              "data": 11,
+              "kind": "byte"
+            },
+            {
+              "data": 11,
+              "kind": "byte"
+            },
+            {
+              "data": 11,
+              "kind": "byte"
+            },
+            {
+              "data": 11,
+              "kind": "byte"
+            },
+            {
+              "data": 11,
+              "kind": "byte"
+            },
+            {
+              "data": 11,
+              "kind": "byte"
+            },
+            {
+              "data": 11,
+              "kind": "byte"
+            },
+            {
+              "data": 11,
+              "kind": "byte"
+            },
+            {
+              "data": 11,
+              "kind": "byte"
+            }
+          ],
+          "kind": "array"
+        },
+        {
+          "data": 10000,
+          "kind": "int"
+        },
+        {
+          "data": 1000,
+          "kind": "int"
+        },
+        {
+          "data": 8500,
+          "kind": "int"
+        },
+        {
+          "data": 6700,
+          "kind": "int"
+        },
+        {
+          "data": 100,
+          "kind": "int"
+        },
+        {
+          "data": 0,
+          "kind": "int"
+        },
+        {
+          "data": 100,
+          "kind": "int"
+        },
+        {
+          "data": 500,
+          "kind": "int"
+        },
+        {
+          "data": 10,
+          "kind": "int"
+        },
+        {
+          "data": 0,
+          "kind": "int"
+        },
+        {
+          "data": 0,
+          "kind": "int"
+        }
+      ],
+      "contract_name": "GovernanceAutoTuningState",
+      "filename": "GovernanceAutoTuningState.sil"
+    }
+  ],
+  "schema_version": 1
+}

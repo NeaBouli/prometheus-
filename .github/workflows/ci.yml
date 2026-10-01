@@ -275,9 +275,16 @@ jobs:
       - name: Build current-silverc release bundle archive
         run: |
           python3 scripts/smoke_silverc_artifacts.py \
+            --bundle v2-draft \
             --archive /tmp/prometheus-silverc-artifacts.tar.gz
           test -s /tmp/prometheus-silverc-artifacts.tar.gz
           tar -tzf /tmp/prometheus-silverc-artifacts.tar.gz | grep -q 'prometheus-silverc-artifacts/manifest.json'
+          # Immutable historical H-001 bundle, rebuilt from frozen reproduction material.
+          python3 scripts/smoke_silverc_artifacts.py \
+            --bundle h001-v1 \
+            --out-dir /tmp/prometheus-silverc-artifacts-h001-v1 \
+            --archive /tmp/prometheus-silverc-artifacts-h001-v1.tar.gz
+          echo "4989f0768f2d2fc749fdd3aea227c1be6e55f5cbf35ac9c83e891b6abdf3977d  /tmp/prometheus-silverc-artifacts-h001-v1.tar.gz" | sha256sum -c -
       - name: Verify compiled contract semantics against reviewed expectation (GH-283)
         run: |
           python3 scripts/verify_silverc_compiled_semantics.py \
@@ -288,7 +295,8 @@ jobs:
       - name: Preflight current-silverc release bundle
         run: |
           python3 scripts/preflight_silverc_deploy.py \
-            --archive /tmp/prometheus-silverc-artifacts.tar.gz \
+            --archive /tmp/prometheus-silverc-artifacts-h001-v1.tar.gz \
+            --bundle h001-v1 \
             --network sandbox \
             --rpc-url ws://127.0.0.1:17210 \
             --deployer-address kaspatest:qptestpreflight000000000000000000000000000000000 \
@@ -318,11 +326,39 @@ jobs:
       - name: Verify non-promotable H-001 canary deployment profile
         run: |
           python3 scripts/test_silverc_canary_profile.py \
-            --archive /tmp/prometheus-silverc-artifacts.tar.gz
+            --archive /tmp/prometheus-silverc-artifacts-h001-v1.tar.gz \
+            --bundle h001-v1
+      - name: Verify h001-v1 / v2-draft bundle profile separation
+        run: |
+          python3 -m unittest scripts.test_silverc_bundles
+          python3 scripts/test_silverc_bundle_profiles.py \
+            --v1-archive /tmp/prometheus-silverc-artifacts-h001-v1.tar.gz \
+            --v2-archive /tmp/prometheus-silverc-artifacts.tar.gz \
+            --deployer target/debug/prometheus-silverc-deployer
+          # v2-draft: static draft checks only; never deploy-supported.
+          python3 scripts/preflight_silverc_deploy.py \
+            --archive /tmp/prometheus-silverc-artifacts.tar.gz \
+            --bundle v2-draft \
+            --network sandbox \
+            --rpc-url ws://127.0.0.1:17210 \
+            --deployer-address kaspatest:qptestpreflight000000000000000000000000000000000 \
+            --metrics-oracle-pubkey 1111111111111111111111111111111111111111111111111111111111111111 \
+            --plan-out /tmp/prometheus-silverc-v2-draft-preflight.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          plan = json.loads(Path("/tmp/prometheus-silverc-v2-draft-preflight.json").read_text())
+          assert plan["bundle_identity"]["id"] == "v2-draft"
+          assert plan["bundle_identity"]["promotable"] is False
+          assert plan["deploy_supported"] is False
+          assert any("non-promotable draft" in blocker for blocker in plan["deploy_blockers"])
+          PY
       - name: Build keyless genesis deploy request set
         run: |
           python3 scripts/build_silverc_deploy_requests.py \
-            --archive /tmp/prometheus-silverc-artifacts.tar.gz \
+            --archive /tmp/prometheus-silverc-artifacts-h001-v1.tar.gz \
+            --bundle h001-v1 \
             --out-dir /tmp/prometheus-silverc-deploy-requests \
             --network sandbox \
             --rpc-url ws://127.0.0.1:17210 \
@@ -331,7 +367,8 @@ jobs:
             --request-set-out /tmp/prometheus-silverc-deploy-request-set.json \
             --runbook-out /tmp/prometheus-silverc-deploy-requests.md
           python3 scripts/build_silverc_deploy_requests.py \
-            --archive /tmp/prometheus-silverc-artifacts.tar.gz \
+            --archive /tmp/prometheus-silverc-artifacts-h001-v1.tar.gz \
+            --bundle h001-v1 \
             --out-dir /tmp/prometheus-silverc-resolver-deploy-requests \
             --network testnet \
             --rpc-url kaspa-resolver://public \
@@ -386,8 +423,10 @@ jobs:
               [
                   "python3",
                   "scripts/build_silverc_deploy_requests.py",
+                  "--bundle",
+                  "h001-v1",
                   "--archive",
-                  "/tmp/prometheus-silverc-artifacts.tar.gz",
+                  "/tmp/prometheus-silverc-artifacts-h001-v1.tar.gz",
                   "--out-dir",
                   "/tmp/prometheus-silverc-deploy-requests-bad",
                   "--network",
@@ -409,8 +448,10 @@ jobs:
               [
                   "python3",
                   "scripts/build_silverc_deploy_requests.py",
+                  "--bundle",
+                  "h001-v1",
                   "--archive",
-                  "/tmp/prometheus-silverc-artifacts.tar.gz",
+                  "/tmp/prometheus-silverc-artifacts-h001-v1.tar.gz",
                   "--out-dir",
                   "/tmp/prometheus-silverc-deploy-requests-http",
                   "--network",
@@ -433,8 +474,10 @@ jobs:
                   [
                       "python3",
                       "scripts/build_silverc_deploy_requests.py",
+                      "--bundle",
+                      "h001-v1",
                       "--archive",
-                      "/tmp/prometheus-silverc-artifacts.tar.gz",
+                      "/tmp/prometheus-silverc-artifacts-h001-v1.tar.gz",
                       "--out-dir",
                       f"/tmp/prometheus-silverc-deploy-requests-resolver-{network}",
                       "--network",
@@ -455,13 +498,15 @@ jobs:
       - name: Verify keyless genesis deploy request set
         run: |
           python3 scripts/verify_silverc_deploy_requests.py \
-            --archive /tmp/prometheus-silverc-artifacts.tar.gz \
+            --archive /tmp/prometheus-silverc-artifacts-h001-v1.tar.gz \
+            --bundle h001-v1 \
             --request-set /tmp/prometheus-silverc-deploy-request-set.json \
             --requests-dir /tmp/prometheus-silverc-deploy-requests \
             --summary-out /tmp/prometheus-silverc-deploy-request-verification.json \
             --runbook-out /tmp/prometheus-silverc-deploy-request-verification.md
           python3 scripts/verify_silverc_deploy_requests.py \
-            --archive /tmp/prometheus-silverc-artifacts.tar.gz \
+            --archive /tmp/prometheus-silverc-artifacts-h001-v1.tar.gz \
+            --bundle h001-v1 \
             --request-set /tmp/prometheus-silverc-resolver-deploy-request-set.json \
             --requests-dir /tmp/prometheus-silverc-resolver-deploy-requests \
             --summary-out /tmp/prometheus-silverc-resolver-deploy-request-verification.json
@@ -506,8 +551,10 @@ jobs:
                   [
                       "python3",
                       "scripts/verify_silverc_deploy_requests.py",
+                      "--bundle",
+                      "h001-v1",
                       "--archive",
-                      "/tmp/prometheus-silverc-artifacts.tar.gz",
+                      "/tmp/prometheus-silverc-artifacts-h001-v1.tar.gz",
                       "--request-set",
                       str(bad_set),
                       "--requests-dir",
@@ -532,8 +579,10 @@ jobs:
                   [
                       "python3",
                       "scripts/verify_silverc_deploy_requests.py",
+                      "--bundle",
+                      "h001-v1",
                       "--archive",
-                      "/tmp/prometheus-silverc-artifacts.tar.gz",
+                      "/tmp/prometheus-silverc-artifacts-h001-v1.tar.gz",
                       "--request-set",
                       str(bad_scope_set),
                       "--requests-dir",
@@ -560,8 +609,10 @@ jobs:
                   [
                       "python3",
                       "scripts/verify_silverc_deploy_requests.py",
+                      "--bundle",
+                      "h001-v1",
                       "--archive",
-                      "/tmp/prometheus-silverc-artifacts.tar.gz",
+                      "/tmp/prometheus-silverc-artifacts-h001-v1.tar.gz",
                       "--request-set",
                       "/tmp/prometheus-silverc-deploy-request-set.json",
                       "--requests-dir",
@@ -576,7 +627,8 @@ jobs:
       - name: Build public deploy operator procedure
         run: |
           python3 scripts/build_silverc_deploy_operator_procedure.py \
-            --archive /tmp/prometheus-silverc-artifacts.tar.gz \
+            --archive /tmp/prometheus-silverc-artifacts-h001-v1.tar.gz \
+            --bundle h001-v1 \
             --request-set /tmp/prometheus-silverc-deploy-request-set.json \
             --requests-dir /tmp/prometheus-silverc-deploy-requests \
             --summary-out /tmp/prometheus-silverc-deploy-operator-procedure.json \
@@ -632,8 +684,10 @@ jobs:
               [
                   "python3",
                   "scripts/build_silverc_deploy_operator_procedure.py",
+                  "--bundle",
+                  "h001-v1",
                   "--archive",
-                  "/tmp/prometheus-silverc-artifacts.tar.gz",
+                  "/tmp/prometheus-silverc-artifacts-h001-v1.tar.gz",
                   "--request-set",
                   str(bad_path),
                   "--requests-dir",
@@ -653,8 +707,10 @@ jobs:
               [
                   "python3",
                   "scripts/build_silverc_deploy_operator_procedure.py",
+                  "--bundle",
+                  "h001-v1",
                   "--archive",
-                  "/tmp/prometheus-silverc-artifacts.tar.gz",
+                  "/tmp/prometheus-silverc-artifacts-h001-v1.tar.gz",
                   "--request-set",
                   str(bad_path),
                   "--requests-dir",
@@ -713,7 +769,8 @@ jobs:
           )
           PY
           python3 scripts/build_silverc_operator_receipts.py \
-            --archive /tmp/prometheus-silverc-artifacts.tar.gz \
+            --archive /tmp/prometheus-silverc-artifacts-h001-v1.tar.gz \
+            --bundle h001-v1 \
             --request-set /tmp/prometheus-silverc-deploy-request-set.json \
             --requests-dir /tmp/prometheus-silverc-deploy-requests \
             --orchestrator-results /tmp/prometheus-silverc-external-deploy-results.json \
@@ -724,12 +781,14 @@ jobs:
           test -s /tmp/prometheus-silverc-operator-receipts-summary.json
           test -s /tmp/prometheus-silverc-operator-receipts.md
           python3 scripts/verify_silverc_deploy_receipts.py \
-            --archive /tmp/prometheus-silverc-artifacts.tar.gz \
+            --archive /tmp/prometheus-silverc-artifacts-h001-v1.tar.gz \
+            --bundle h001-v1 \
             --receipts /tmp/prometheus-silverc-operator-receipts.json \
             --require-operator-record \
             --summary-out /tmp/prometheus-silverc-operator-receipts-verify.json
           python3 scripts/stage_silverc_deployment_status.py \
-            --archive /tmp/prometheus-silverc-artifacts.tar.gz \
+            --archive /tmp/prometheus-silverc-artifacts-h001-v1.tar.gz \
+            --bundle h001-v1 \
             --operator-receipts /tmp/prometheus-silverc-operator-receipts.json \
             --status-out /tmp/prometheus-silverc-operator-receipts-status.json \
             --snippet-out /tmp/prometheus-silverc-operator-receipts-status.md
@@ -773,7 +832,8 @@ jobs:
           )
           PY
           python3 scripts/verify_silverc_deploy_receipt_evidence.py \
-            --archive /tmp/prometheus-silverc-artifacts.tar.gz \
+            --archive /tmp/prometheus-silverc-artifacts-h001-v1.tar.gz \
+            --bundle h001-v1 \
             --receipts /tmp/prometheus-silverc-operator-receipts.json \
             --evidence /tmp/prometheus-silverc-deploy-receipt-public-evidence.json \
             --summary-out /tmp/prometheus-silverc-deploy-receipt-public-evidence-summary.json \
@@ -823,8 +883,10 @@ jobs:
               [
                   "python3",
                   "scripts/build_silverc_operator_receipts.py",
+                  "--bundle",
+                  "h001-v1",
                   "--archive",
-                  "/tmp/prometheus-silverc-artifacts.tar.gz",
+                  "/tmp/prometheus-silverc-artifacts-h001-v1.tar.gz",
                   "--request-set",
                   "/tmp/prometheus-silverc-deploy-request-set.json",
                   "--requests-dir",
@@ -847,8 +909,10 @@ jobs:
               [
                   "python3",
                   "scripts/build_silverc_operator_receipts.py",
+                  "--bundle",
+                  "h001-v1",
                   "--archive",
-                  "/tmp/prometheus-silverc-artifacts.tar.gz",
+                  "/tmp/prometheus-silverc-artifacts-h001-v1.tar.gz",
                   "--request-set",
                   "/tmp/prometheus-silverc-deploy-request-set.json",
                   "--requests-dir",
@@ -871,8 +935,10 @@ jobs:
               [
                   "python3",
                   "scripts/build_silverc_operator_receipts.py",
+                  "--bundle",
+                  "h001-v1",
                   "--archive",
-                  "/tmp/prometheus-silverc-artifacts.tar.gz",
+                  "/tmp/prometheus-silverc-artifacts-h001-v1.tar.gz",
                   "--request-set",
                   "/tmp/prometheus-silverc-deploy-request-set.json",
                   "--requests-dir",
@@ -895,8 +961,10 @@ jobs:
               [
                   "python3",
                   "scripts/verify_silverc_deploy_receipt_evidence.py",
+                  "--bundle",
+                  "h001-v1",
                   "--archive",
-                  "/tmp/prometheus-silverc-artifacts.tar.gz",
+                  "/tmp/prometheus-silverc-artifacts-h001-v1.tar.gz",
                   "--receipts",
                   "/tmp/prometheus-silverc-operator-receipts.json",
                   "--evidence",
@@ -917,8 +985,10 @@ jobs:
               [
                   "python3",
                   "scripts/verify_silverc_deploy_receipt_evidence.py",
+                  "--bundle",
+                  "h001-v1",
                   "--archive",
-                  "/tmp/prometheus-silverc-artifacts.tar.gz",
+                  "/tmp/prometheus-silverc-artifacts-h001-v1.tar.gz",
                   "--receipts",
                   "/tmp/prometheus-silverc-operator-receipts.json",
                   "--evidence",
@@ -939,8 +1009,10 @@ jobs:
               [
                   "python3",
                   "scripts/verify_silverc_deploy_receipt_evidence.py",
+                  "--bundle",
+                  "h001-v1",
                   "--archive",
-                  "/tmp/prometheus-silverc-artifacts.tar.gz",
+                  "/tmp/prometheus-silverc-artifacts-h001-v1.tar.gz",
                   "--receipts",
                   "/tmp/prometheus-silverc-operator-receipts.json",
                   "--evidence",
@@ -961,8 +1033,10 @@ jobs:
               [
                   "python3",
                   "scripts/verify_silverc_deploy_receipt_evidence.py",
+                  "--bundle",
+                  "h001-v1",
                   "--archive",
-                  "/tmp/prometheus-silverc-artifacts.tar.gz",
+                  "/tmp/prometheus-silverc-artifacts-h001-v1.tar.gz",
                   "--receipts",
                   "/tmp/prometheus-silverc-operator-receipts.json",
                   "--evidence",
@@ -977,7 +1051,8 @@ jobs:
       - name: Build unsigned metrics-oracle transaction request
         run: |
           python3 scripts/build_metrics_oracle_tx_request.py \
-            --archive /tmp/prometheus-silverc-artifacts.tar.gz \
+            --archive /tmp/prometheus-silverc-artifacts-h001-v1.tar.gz \
+            --bundle h001-v1 \
             --report modules/contracts/silverc/metrics-oracle-report.sample.json \
             --tx-request-out /tmp/prometheus-metrics-oracle-tx-request.json \
             --runbook-out /tmp/prometheus-metrics-oracle-tx-request.md
@@ -1011,8 +1086,10 @@ jobs:
               [
                   "python3",
                   "scripts/build_metrics_oracle_tx_request.py",
+                  "--bundle",
+                  "h001-v1",
                   "--archive",
-                  "/tmp/prometheus-silverc-artifacts.tar.gz",
+                  "/tmp/prometheus-silverc-artifacts-h001-v1.tar.gz",
                   "--report",
                   "modules/contracts/silverc/metrics-oracle-report.sample.json",
                   "--contract-instance-id",
@@ -1065,8 +1142,10 @@ jobs:
               [
                   "python3",
                   "scripts/verify_metrics_oracle_tx_result.py",
+                  "--bundle",
+                  "h001-v1",
                   "--archive",
-                  "/tmp/prometheus-silverc-artifacts.tar.gz",
+                  "/tmp/prometheus-silverc-artifacts-h001-v1.tar.gz",
                   "--tx-request",
                   ready_path,
                   "--tx-result",
@@ -1130,8 +1209,10 @@ jobs:
               [
                   "python3",
                   "scripts/verify_metrics_oracle_tx_evidence.py",
+                  "--bundle",
+                  "h001-v1",
                   "--archive",
-                  "/tmp/prometheus-silverc-artifacts.tar.gz",
+                  "/tmp/prometheus-silverc-artifacts-h001-v1.tar.gz",
                   "--tx-request",
                   ready_path,
                   "--tx-result",
@@ -1162,8 +1243,10 @@ jobs:
               [
                   "python3",
                   "scripts/stage_metrics_oracle_status.py",
+                  "--bundle",
+                  "h001-v1",
                   "--archive",
-                  "/tmp/prometheus-silverc-artifacts.tar.gz",
+                  "/tmp/prometheus-silverc-artifacts-h001-v1.tar.gz",
                   "--tx-request",
                   ready_path,
                   "--tx-result",
@@ -1196,8 +1279,10 @@ jobs:
               [
                   "python3",
                   "scripts/build_metrics_oracle_operator_procedure.py",
+                  "--bundle",
+                  "h001-v1",
                   "--archive",
-                  "/tmp/prometheus-silverc-artifacts.tar.gz",
+                  "/tmp/prometheus-silverc-artifacts-h001-v1.tar.gz",
                   "--tx-request",
                   ready_path,
                   "--summary-out",
@@ -1584,8 +1669,10 @@ jobs:
               [
                   "python3",
                   "scripts/build_metrics_oracle_tx_request.py",
+                  "--bundle",
+                  "h001-v1",
                   "--archive",
-                  "/tmp/prometheus-silverc-artifacts.tar.gz",
+                  "/tmp/prometheus-silverc-artifacts-h001-v1.tar.gz",
                   "--report",
                   "modules/contracts/silverc/metrics-oracle-report.sample.json",
                   "--require-contract-instance-id",
@@ -1600,8 +1687,10 @@ jobs:
               [
                   "python3",
                   "scripts/build_metrics_oracle_tx_request.py",
+                  "--bundle",
+                  "h001-v1",
                   "--archive",
-                  "/tmp/prometheus-silverc-artifacts.tar.gz",
+                  "/tmp/prometheus-silverc-artifacts-h001-v1.tar.gz",
                   "--report",
                   "modules/contracts/silverc/metrics-oracle-report.sample.json",
                   "--contract-instance-id",
@@ -1617,8 +1706,10 @@ jobs:
               [
                   "python3",
                   "scripts/verify_metrics_oracle_tx_result.py",
+                  "--bundle",
+                  "h001-v1",
                   "--archive",
-                  "/tmp/prometheus-silverc-artifacts.tar.gz",
+                  "/tmp/prometheus-silverc-artifacts-h001-v1.tar.gz",
                   "--tx-request",
                   "/tmp/prometheus-metrics-oracle-tx-request.json",
                   "--tx-result",
@@ -1634,8 +1725,10 @@ jobs:
               [
                   "python3",
                   "scripts/stage_metrics_oracle_status.py",
+                  "--bundle",
+                  "h001-v1",
                   "--archive",
-                  "/tmp/prometheus-silverc-artifacts.tar.gz",
+                  "/tmp/prometheus-silverc-artifacts-h001-v1.tar.gz",
                   "--tx-request",
                   "/tmp/prometheus-metrics-oracle-tx-request.json",
                   "--tx-result",
@@ -1651,8 +1744,10 @@ jobs:
               [
                   "python3",
                   "scripts/build_metrics_oracle_operator_procedure.py",
+                  "--bundle",
+                  "h001-v1",
                   "--archive",
-                  "/tmp/prometheus-silverc-artifacts.tar.gz",
+                  "/tmp/prometheus-silverc-artifacts-h001-v1.tar.gz",
                   "--tx-request",
                   "/tmp/prometheus-metrics-oracle-tx-request.json",
               ],
@@ -1670,8 +1765,10 @@ jobs:
               [
                   "python3",
                   "scripts/build_metrics_oracle_operator_procedure.py",
+                  "--bundle",
+                  "h001-v1",
                   "--archive",
-                  "/tmp/prometheus-silverc-artifacts.tar.gz",
+                  "/tmp/prometheus-silverc-artifacts-h001-v1.tar.gz",
                   "--tx-request",
                   str(bad_path),
               ],
@@ -1685,8 +1782,10 @@ jobs:
               [
                   "python3",
                   "scripts/stage_metrics_oracle_status.py",
+                  "--bundle",
+                  "h001-v1",
                   "--archive",
-                  "/tmp/prometheus-silverc-artifacts.tar.gz",
+                  "/tmp/prometheus-silverc-artifacts-h001-v1.tar.gz",
                   "--tx-request",
                   str(bad_path),
                   "--tx-result",
@@ -1706,8 +1805,10 @@ jobs:
               [
                   "python3",
                   "scripts/verify_metrics_oracle_tx_result.py",
+                  "--bundle",
+                  "h001-v1",
                   "--archive",
-                  "/tmp/prometheus-silverc-artifacts.tar.gz",
+                  "/tmp/prometheus-silverc-artifacts-h001-v1.tar.gz",
                   "--tx-request",
                   ready_path,
                   "--tx-result",
@@ -1723,8 +1824,10 @@ jobs:
               [
                   "python3",
                   "scripts/stage_metrics_oracle_status.py",
+                  "--bundle",
+                  "h001-v1",
                   "--archive",
-                  "/tmp/prometheus-silverc-artifacts.tar.gz",
+                  "/tmp/prometheus-silverc-artifacts-h001-v1.tar.gz",
                   "--tx-request",
                   ready_path,
                   "--tx-result",
@@ -1744,8 +1847,10 @@ jobs:
               [
                   "python3",
                   "scripts/verify_metrics_oracle_tx_result.py",
+                  "--bundle",
+                  "h001-v1",
                   "--archive",
-                  "/tmp/prometheus-silverc-artifacts.tar.gz",
+                  "/tmp/prometheus-silverc-artifacts-h001-v1.tar.gz",
                   "--tx-request",
                   ready_path,
                   "--tx-result",
@@ -1765,8 +1870,10 @@ jobs:
               [
                   "python3",
                   "scripts/verify_metrics_oracle_tx_result.py",
+                  "--bundle",
+                  "h001-v1",
                   "--archive",
-                  "/tmp/prometheus-silverc-artifacts.tar.gz",
+                  "/tmp/prometheus-silverc-artifacts-h001-v1.tar.gz",
                   "--tx-request",
                   ready_path,
                   "--tx-result",
@@ -1782,8 +1889,10 @@ jobs:
               [
                   "python3",
                   "scripts/stage_metrics_oracle_status.py",
+                  "--bundle",
+                  "h001-v1",
                   "--archive",
-                  "/tmp/prometheus-silverc-artifacts.tar.gz",
+                  "/tmp/prometheus-silverc-artifacts-h001-v1.tar.gz",
                   "--tx-request",
                   ready_path,
                   "--tx-result",
@@ -1803,8 +1912,10 @@ jobs:
               [
                   "python3",
                   "scripts/verify_metrics_oracle_tx_evidence.py",
+                  "--bundle",
+                  "h001-v1",
                   "--archive",
-                  "/tmp/prometheus-silverc-artifacts.tar.gz",
+                  "/tmp/prometheus-silverc-artifacts-h001-v1.tar.gz",
                   "--tx-request",
                   ready_path,
                   "--tx-result",
@@ -1826,8 +1937,10 @@ jobs:
               [
                   "python3",
                   "scripts/verify_metrics_oracle_tx_evidence.py",
+                  "--bundle",
+                  "h001-v1",
                   "--archive",
-                  "/tmp/prometheus-silverc-artifacts.tar.gz",
+                  "/tmp/prometheus-silverc-artifacts-h001-v1.tar.gz",
                   "--tx-request",
                   ready_path,
                   "--tx-result",
@@ -1849,8 +1962,10 @@ jobs:
               [
                   "python3",
                   "scripts/verify_metrics_oracle_tx_evidence.py",
+                  "--bundle",
+                  "h001-v1",
                   "--archive",
-                  "/tmp/prometheus-silverc-artifacts.tar.gz",
+                  "/tmp/prometheus-silverc-artifacts-h001-v1.tar.gz",
                   "--tx-request",
                   ready_path,
                   "--tx-result",
@@ -1872,8 +1987,10 @@ jobs:
               [
                   "python3",
                   "scripts/verify_metrics_oracle_tx_evidence.py",
+                  "--bundle",
+                  "h001-v1",
                   "--archive",
-                  "/tmp/prometheus-silverc-artifacts.tar.gz",
+                  "/tmp/prometheus-silverc-artifacts-h001-v1.tar.gz",
                   "--tx-request",
                   ready_path,
                   "--tx-result",
@@ -1890,7 +2007,8 @@ jobs:
       - name: Verify sample deployment receipts
         run: |
           python3 scripts/verify_silverc_deploy_receipts.py \
-            --archive /tmp/prometheus-silverc-artifacts.tar.gz \
+            --archive /tmp/prometheus-silverc-artifacts-h001-v1.tar.gz \
+            --bundle h001-v1 \
             --receipts modules/contracts/silverc/deploy-receipts.sample.json \
             --summary-out /tmp/prometheus-silverc-deploy-receipts-summary.json \
             --runbook-out /tmp/prometheus-silverc-deploy-receipts.md
@@ -1929,8 +2047,10 @@ jobs:
               [
                   "python3",
                   "scripts/verify_silverc_deploy_receipts.py",
+                  "--bundle",
+                  "h001-v1",
                   "--archive",
-                  "/tmp/prometheus-silverc-artifacts.tar.gz",
+                  "/tmp/prometheus-silverc-artifacts-h001-v1.tar.gz",
                   "--receipts",
                   str(receipt_path),
                   "--require-operator-record",
@@ -1950,8 +2070,10 @@ jobs:
               [
                   "python3",
                   "scripts/verify_silverc_deploy_receipts.py",
+                  "--bundle",
+                  "h001-v1",
                   "--archive",
-                  "/tmp/prometheus-silverc-artifacts.tar.gz",
+                  "/tmp/prometheus-silverc-artifacts-h001-v1.tar.gz",
                   "--receipts",
                   secret_path,
               ],
@@ -1970,8 +2092,10 @@ jobs:
               [
                   "python3",
                   "scripts/verify_silverc_deploy_receipts.py",
+                  "--bundle",
+                  "h001-v1",
                   "--archive",
-                  "/tmp/prometheus-silverc-artifacts.tar.gz",
+                  "/tmp/prometheus-silverc-artifacts-h001-v1.tar.gz",
                   "--receipts",
                   raw_path,
               ],
@@ -1990,8 +2114,10 @@ jobs:
               [
                   "python3",
                   "scripts/verify_silverc_deploy_receipts.py",
+                  "--bundle",
+                  "h001-v1",
                   "--archive",
-                  "/tmp/prometheus-silverc-artifacts.tar.gz",
+                  "/tmp/prometheus-silverc-artifacts-h001-v1.tar.gz",
                   "--receipts",
                   hash_path,
               ],
@@ -2015,7 +2141,8 @@ jobs:
           Path("/tmp/prometheus-silverc-operator-record-ci.json").write_text(json.dumps(data, indent=2) + "\n")
           PY
           python3 scripts/stage_silverc_deployment_status.py \
-            --archive /tmp/prometheus-silverc-artifacts.tar.gz \
+            --archive /tmp/prometheus-silverc-artifacts-h001-v1.tar.gz \
+            --bundle h001-v1 \
             --operator-receipts /tmp/prometheus-silverc-operator-record-ci.json \
             --status-out /tmp/prometheus-silverc-status-draft.json \
             --snippet-out /tmp/prometheus-silverc-status-draft.md
@@ -2044,8 +2171,10 @@ jobs:
               [
                   "python3",
                   "scripts/stage_silverc_deployment_status.py",
+                  "--bundle",
+                  "h001-v1",
                   "--archive",
-                  "/tmp/prometheus-silverc-artifacts.tar.gz",
+                  "/tmp/prometheus-silverc-artifacts-h001-v1.tar.gz",
                   "--operator-receipts",
                   "modules/contracts/silverc/deploy-receipts.sample.json",
               ],
@@ -2058,7 +2187,8 @@ jobs:
       - name: Build operator handoff package
         run: |
           python3 scripts/build_silverc_operator_handoff.py \
-            --archive /tmp/prometheus-silverc-artifacts.tar.gz \
+            --archive /tmp/prometheus-silverc-artifacts-h001-v1.tar.gz \
+            --bundle h001-v1 \
             --out-dir /tmp/prometheus-silverc-operator-handoff \
             --network sandbox \
             --rpc-url ws://127.0.0.1:17210 \
@@ -2114,7 +2244,8 @@ jobs:
           assert "deploy-requests/07-GovernanceAutoTuningState.deploy-request.json" in summary["included_files"]
           PY
           python3 scripts/build_silverc_operator_handoff.py \
-            --archive /tmp/prometheus-silverc-artifacts.tar.gz \
+            --archive /tmp/prometheus-silverc-artifacts-h001-v1.tar.gz \
+            --bundle h001-v1 \
             --out-dir /tmp/prometheus-silverc-operator-handoff-import \
             --network sandbox \
             --rpc-url ws://127.0.0.1:17210 \
@@ -2148,7 +2279,8 @@ jobs:
           assert "missing public release hardening evidence" in summary["blockers"]
           PY
           python3 scripts/build_silverc_operator_handoff.py \
-            --archive /tmp/prometheus-silverc-artifacts.tar.gz \
+            --archive /tmp/prometheus-silverc-artifacts-h001-v1.tar.gz \
+            --bundle h001-v1 \
             --out-dir /tmp/prometheus-silverc-operator-handoff-oracle-missing-evidence \
             --network sandbox \
             --rpc-url ws://127.0.0.1:17210 \
@@ -2173,7 +2305,8 @@ jobs:
           assert "missing public release hardening evidence" in summary["blockers"]
           PY
           python3 scripts/build_silverc_operator_handoff.py \
-            --archive /tmp/prometheus-silverc-artifacts.tar.gz \
+            --archive /tmp/prometheus-silverc-artifacts-h001-v1.tar.gz \
+            --bundle h001-v1 \
             --out-dir /tmp/prometheus-silverc-operator-handoff-oracle-result \
             --network sandbox \
             --rpc-url ws://127.0.0.1:17210 \

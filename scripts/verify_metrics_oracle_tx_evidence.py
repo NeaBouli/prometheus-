@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Any
 
 from preflight_metrics_oracle_report import CONTRACT_NAME, ENTRYPOINT, canonical_json_bytes
+from silverc_bundles import add_bundle_argument, bundle_from_args, require_profile, require_promotable  # noqa: F401
 from preflight_silverc_deploy import NETWORKS, bundle_root_from_args, validate_manifest
 from verify_metrics_oracle_tx_result import validate_request, validate_result
 from verify_silverc_h001 import DEFAULT_SILVERSCRIPT_REF
@@ -48,6 +49,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--summary-out", type=Path, help="Optional JSON verification summary path")
     parser.add_argument("--runbook-out", type=Path, help="Optional Markdown evidence runbook path")
+    add_bundle_argument(parser)
     return parser.parse_args()
 
 
@@ -267,7 +269,9 @@ def main() -> int:
     args = parse_args()
     bundle_dir, tmp = bundle_root_from_args(args)
     try:
-        manifest = validate_manifest(bundle_dir, args.silverscript_ref)
+        bundle = bundle_from_args(args)
+        require_promotable(bundle, "metrics-oracle evidence")
+        manifest = validate_manifest(bundle_dir, args.silverscript_ref, bundle)
         tx_request = load_json(args.tx_request.expanduser().resolve())
         tx_result = load_json(args.tx_result.expanduser().resolve())
         request_summary = validate_request(tx_request, manifest)

@@ -87,6 +87,7 @@ Sibling built flows (same modules, drawn in `map.puml`):
 | `modules/validator-node` | Commit-reveal voting + slashing state machines | `modules/validator-node/src/lib.rs` | built (state machines); operated validator network: open |
 | `modules/contracts` (legacy `.ss`) | Historical Silverscript contracts | `modules/contracts/*.ss` | built (accepted legacy; superseded, do not extend) |
 | `modules/contracts/silverc` | Seven current-Silverc fixtures with compile/ABI/runtime gates plus a reviewed compiled-artifact expectation (`expected-compiled-artifacts.json`, GH-283, stand-in branch) | `modules/contracts/silverc/*.sil` | built; six state deployments + oracle execution: blocked; contract bundle v2 proposed (`ms-b-contract-decisions.md`) |
+| `modules/contracts/silverc/bundles/h001-v1` | Frozen H-001 v1 reproduction material (sources, fixtures, manifest, provenance pinned to `e6d5464`); never a development source | `scripts/silverc_bundles.py::get_bundle` | built; rebuilds archive `4989f07…` byte-exact; read-only |
 | `modules/silverc-deployer` | Keyless Toccata-v1 genesis + reportMetrics operator | `modules/silverc-deployer/src/main.rs::Cli` | built (H-001 canary executed once, non-promotable); remaining real execution: blocked on external signatures |
 | `modules/web` | Static public status surface (GitHub Pages root pages); fabricated audit dashboard removed (GH-273); shared tokens/chrome in `assets/site.css`, WCAG AA text gated by `scripts/verify_site_css.py`, service worker retired (GH-275/278, stand-in branch) | `index.html` + sibling root pages | built |
 | `scripts/` | Release tooling: artifacts, requests, receipts, evidence, readiness, hygiene | `scripts/README` n/a — see `scripts/*.py` | built |
@@ -186,6 +187,10 @@ GH-258/GH-261 producer design) are delivered on
 1. **Contract bundle v2** — after Codex accepts
    `docs/architecture/ms-b-contract-decisions.md`: one reviewed revision of
    `modules/contracts/silverc` + deployer profile (H-001 profile stays frozen).
+   Profile separation (`bundle-v2-profile-separation`): every bundle tool takes a
+   required `--bundle h001-v1|v2-draft` from the closed registry
+   `scripts/silverc_bundles.py`; operator chain runs only on `h001-v1`, the
+   Rust deployer pins only the v1 manifest, `v2-draft` is static-check only.
 2. **Endpoint producer review** — independent privacy review of
    `docs/endpoint-producer-design-v1.md` before any implementation brief.
 3. **Toolchain upgrade** — Rusty Kaspa v2.1.0 / SilverScript v1.0.0 once

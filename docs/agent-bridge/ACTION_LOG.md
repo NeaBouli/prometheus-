@@ -6022,3 +6022,19 @@ Rules for all dev agents:
   Frozen historical H-001 evidence stays unchanged; v2 stays non-promotable.
 - No duplicate CI dispatch, contract integration, signing or deployment.
   Operator implementation is a subsequent separately reviewed block.
+
+### 2026-10-01 - [AUTOR: CC] bundle-v2-profile-separation delivered
+
+- Closed bundle registry `scripts/silverc_bundles.py` (`h001-v1`, `v2-draft`);
+  required `--bundle` on every bundle tool, no default/fallback/detection.
+- Frozen H-001 v1 reproduction material under
+  `modules/contracts/silverc/bundles/h001-v1/` (origin e6d5464, full SHA-256
+  pins); rebuilds archive 4989f07 byte-exact. Rust deployer pins unchanged (v1).
+- v2-draft: static request checks only; Rust `prepare` rejects it before export;
+  receipts/status/evidence/procedures/handoff/oracle request refuse it.
+- CI: operator chain now runs fully on v1 (previously skipped steps included);
+  new separation step. Local replay h001-silverc-runtime 16/16, contract-check
+  10/10, scripts 413 OK, public gates pass. Report
+  `.fleet/reports/bundle-v2-profile-separation.md`. Awaiting Codex review and
+  one coordinated exact-head hosted CI run.
+

@@ -93,6 +93,9 @@ def parse_args() -> argparse.Namespace:
         type=Path,
         help="Optional .tar.gz path for a deterministic release bundle archive",
     )
+    from silverc_bundles import add_bundle_argument
+
+    add_bundle_argument(parser)
     return parser.parse_args()
 
 
@@ -296,8 +299,8 @@ def write_constructor_args(fixture: Fixture, directory: Path) -> Path:
     return args_path
 
 
-def compile_fixture(silverc: Path, fixture: Fixture, output_dir: Path) -> dict[str, Any]:
-    source = CONTRACT_DIR / fixture.filename
+def compile_fixture(silverc: Path, fixture: Any, output_dir: Path, source_dir: Path = CONTRACT_DIR) -> dict[str, Any]:
+    source = source_dir / fixture.filename
     if not source.exists():
         raise FileNotFoundError(f"missing fixture: {source}")
 
@@ -350,7 +353,9 @@ def manifest_entry(
     abi_names = [entry["name"] for entry in artifact_data["abi"]]
     return {
         "contract_name": fixture.contract_name,
-        "source_file": str(source.relative_to(ROOT)),
+        # Recorded path is bundle-independent so a frozen historical bundle
+        # reproduces its original manifest byte-exactly.
+        "source_file": f"modules/contracts/silverc/{source.name}",
         "artifact_file": artifact.name,
         "compiler_version": artifact_data["compiler_version"],
         "source_sha256": sha256_file(source),
@@ -368,6 +373,7 @@ def write_manifest(
     silver_ref: str,
     silver_commit: str,
     entries: list[dict[str, Any]],
+    bundle: Any,
 ) -> Path:
     manifest = {
         "schema_version": 1,
@@ -378,7 +384,7 @@ def write_manifest(
     }
     manifest_path = output_dir / MANIFEST_NAME
     manifest_path.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    validate_manifest(manifest_path, output_dir)
+    validate_manifest(manifest_path, output_dir, bundle)
     return manifest_path
 
 
@@ -408,17 +414,20 @@ def create_deterministic_archive(output_dir: Path, archive_path: Path) -> Path:
     return archive_path
 
 
-def validate_manifest(manifest_path: Path, output_dir: Path) -> None:
+def validate_manifest(manifest_path: Path, output_dir: Path, bundle: Any) -> None:
+    from silverc_bundles import require_manifest_pin
+
+    fixtures = bundle.fixtures
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     entries = manifest.get("fixtures")
     if manifest.get("schema_version") != 1:
         raise ValueError(f"{manifest_path}: unsupported schema_version")
-    if manifest.get("fixture_count") != len(FIXTURES):
+    if manifest.get("fixture_count") != len(fixtures):
         raise ValueError(f"{manifest_path}: fixture_count mismatch")
-    if not isinstance(entries, list) or len(entries) != len(FIXTURES):
+    if not isinstance(entries, list) or len(entries) != len(fixtures):
         raise ValueError(f"{manifest_path}: fixtures list mismatch")
 
-    expected_names = [fixture.contract_name for fixture in FIXTURES]
+    expected_names = [fixture.contract_name for fixture in fixtures]
     actual_names = [entry.get("contract_name") for entry in entries]
     if actual_names != expected_names:
         raise ValueError(f"{manifest_path}: fixture order/name mismatch")
@@ -432,7 +441,7 @@ def validate_manifest(manifest_path: Path, output_dir: Path) -> None:
         artifact = output_dir / entry["artifact_file"]
         if entry.get("artifact_sha256") != sha256_file(artifact):
             raise ValueError(f"{manifest_path}: artifact hash mismatch for {artifact.name}")
-        source = ROOT / entry["source_file"]
+        source = bundle.source_path(entry["source_file"])
         if entry.get("source_sha256") != sha256_file(source):
             raise ValueError(f"{manifest_path}: source hash mismatch for {source}")
         artifact_data = json.loads(artifact.read_text(encoding="utf-8"))
@@ -441,6 +450,7 @@ def validate_manifest(manifest_path: Path, output_dir: Path) -> None:
             raise ValueError(f"{manifest_path}: script hash mismatch for {artifact.name}")
         if entry.get("script_len") != len(script):
             raise ValueError(f"{manifest_path}: script length mismatch for {artifact.name}")
+    require_manifest_pin(bundle, manifest)
 
 
 def main() -> int:
@@ -457,18 +467,24 @@ def main() -> int:
         shutil.rmtree(output_dir)
     output_dir.mkdir(parents=True)
 
+    from silverc_bundles import bundle_from_args
+
+    bundle = bundle_from_args(args)
     entries = []
-    for fixture in FIXTURES:
-        entries.append(compile_fixture(silverc, fixture, output_dir))
+    for fixture in bundle.fixtures:
+        entries.append(compile_fixture(silverc, fixture, output_dir, bundle.source_dir))
         print(f"OK: {fixture.contract_name}", flush=True)
 
-    manifest_path = write_manifest(output_dir, silver_ref, silver_commit, entries)
-    print(f"Compiled {len(FIXTURES)} silverc artifacts into {output_dir}")
+    manifest_path = write_manifest(output_dir, silver_ref, silver_commit, entries, bundle)
+    print(f"Compiled {len(bundle.fixtures)} silverc artifacts into {output_dir} (bundle {bundle.bundle_id})")
     print(f"Wrote release manifest: {manifest_path}")
     if args.archive:
         archive_path = create_deterministic_archive(output_dir, args.archive)
         print(f"Wrote release archive: {archive_path}")
-        print(f"Archive SHA-256: {sha256_file(archive_path)}")
+        archive_sha256 = sha256_file(archive_path)
+        print(f"Archive SHA-256: {archive_sha256}")
+        if bundle.archive_sha256 is not None and archive_sha256 != bundle.archive_sha256:
+            raise ValueError(f"{bundle.bundle_id}: archive does not match the pinned archive SHA-256")
     return 0
 
 

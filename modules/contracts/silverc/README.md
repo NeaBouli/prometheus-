@@ -23,7 +23,7 @@ Run from the Prometheus repo root:
 
 ```bash
 python3 scripts/verify_silverc_h001.py
-python3 scripts/smoke_silverc_artifacts.py
+python3 scripts/smoke_silverc_artifacts.py --bundle v2-draft
 ```
 
 The script uses `/tmp/prom-silverscript` and the pinned upstream ref
@@ -32,25 +32,26 @@ The script uses `/tmp/prom-silverscript` and the pinned upstream ref
 ```bash
 SILVERSCRIPT_REPO=/path/to/silverscript python3 scripts/verify_silverc_h001.py
 SILVERSCRIPT_REF=<commit-or-tag> python3 scripts/verify_silverc_h001.py
-SILVERSCRIPT_REPO=/path/to/silverscript python3 scripts/smoke_silverc_artifacts.py
-PROMETHEUS_SILVERC_ARTIFACT_DIR=/tmp/out python3 scripts/smoke_silverc_artifacts.py
-python3 scripts/smoke_silverc_artifacts.py --out-dir /tmp/out --archive /tmp/prometheus-silverc-artifacts.tar.gz
-python3 scripts/preflight_silverc_deploy.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --network sandbox --rpc-url ws://127.0.0.1:17210 --deployer-address kaspatest:qptestpreflight000000000000000000000000000000000 --metrics-oracle-pubkey 1111111111111111111111111111111111111111111111111111111111111111 --plan-out /tmp/prometheus-silverc-deploy-preflight.json --runbook-out /tmp/prometheus-silverc-deploy-runbook.md
-python3 scripts/build_silverc_deploy_requests.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --out-dir /tmp/prometheus-silverc-deploy-requests --network sandbox --rpc-url ws://127.0.0.1:17210 --deployer-address kaspatest:qptestpreflight000000000000000000000000000000000 --metrics-oracle-pubkey 1111111111111111111111111111111111111111111111111111111111111111 --request-set-out /tmp/prometheus-silverc-deploy-request-set.json --runbook-out /tmp/prometheus-silverc-deploy-requests.md
-python3 scripts/verify_silverc_deploy_requests.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --request-set /tmp/prometheus-silverc-deploy-request-set.json --requests-dir /tmp/prometheus-silverc-deploy-requests --summary-out /tmp/prometheus-silverc-deploy-request-verification.json --runbook-out /tmp/prometheus-silverc-deploy-request-verification.md
-python3 scripts/build_silverc_deploy_operator_procedure.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --request-set /tmp/prometheus-silverc-deploy-request-set.json --requests-dir /tmp/prometheus-silverc-deploy-requests --summary-out /tmp/prometheus-silverc-deploy-operator-procedure.json --runbook-out /tmp/prometheus-silverc-deploy-operator-procedure.md
-python3 scripts/build_silverc_operator_receipts.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --request-set /tmp/prometheus-silverc-deploy-request-set.json --requests-dir /tmp/prometheus-silverc-deploy-requests --orchestrator-results /path/to/public-external-deploy-results.json --operator-receipts-out /tmp/prometheus-silverc-operator-receipts.json --summary-out /tmp/prometheus-silverc-operator-receipts-summary.json --runbook-out /tmp/prometheus-silverc-operator-receipts.md
-python3 scripts/verify_silverc_deploy_receipts.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --receipts modules/contracts/silverc/deploy-receipts.sample.json --summary-out /tmp/prometheus-silverc-deploy-receipts-summary.json --runbook-out /tmp/prometheus-silverc-deploy-receipts.md
-python3 scripts/verify_silverc_deploy_receipt_evidence.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --receipts /path/to/operator-record-receipts.json --evidence /path/to/public-node-or-explorer-evidence.json --summary-out /tmp/prometheus-silverc-deploy-receipt-evidence-summary.json --runbook-out /tmp/prometheus-silverc-deploy-receipt-evidence.md
-python3 scripts/stage_silverc_deployment_status.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --operator-receipts /path/to/operator-record-receipts.json --status-out /tmp/prometheus-silverc-status-draft.json --snippet-out /tmp/prometheus-silverc-status-draft.md
+SILVERSCRIPT_REPO=/path/to/silverscript python3 scripts/smoke_silverc_artifacts.py --bundle v2-draft
+PROMETHEUS_SILVERC_ARTIFACT_DIR=/tmp/out python3 scripts/smoke_silverc_artifacts.py --bundle v2-draft
+python3 scripts/smoke_silverc_artifacts.py --bundle v2-draft --out-dir /tmp/out --archive /tmp/prometheus-silverc-artifacts.tar.gz
+python3 scripts/smoke_silverc_artifacts.py --bundle h001-v1 --out-dir /tmp/prometheus-silverc-artifacts-h001-v1 --archive /tmp/prometheus-silverc-artifacts-h001-v1.tar.gz
+python3 scripts/preflight_silverc_deploy.py --bundle h001-v1 --archive /tmp/prometheus-silverc-artifacts-h001-v1.tar.gz --network sandbox --rpc-url ws://127.0.0.1:17210 --deployer-address kaspatest:qptestpreflight000000000000000000000000000000000 --metrics-oracle-pubkey 1111111111111111111111111111111111111111111111111111111111111111 --plan-out /tmp/prometheus-silverc-deploy-preflight.json --runbook-out /tmp/prometheus-silverc-deploy-runbook.md
+python3 scripts/build_silverc_deploy_requests.py --bundle h001-v1 --archive /tmp/prometheus-silverc-artifacts-h001-v1.tar.gz --out-dir /tmp/prometheus-silverc-deploy-requests --network sandbox --rpc-url ws://127.0.0.1:17210 --deployer-address kaspatest:qptestpreflight000000000000000000000000000000000 --metrics-oracle-pubkey 1111111111111111111111111111111111111111111111111111111111111111 --request-set-out /tmp/prometheus-silverc-deploy-request-set.json --runbook-out /tmp/prometheus-silverc-deploy-requests.md
+python3 scripts/verify_silverc_deploy_requests.py --bundle h001-v1 --archive /tmp/prometheus-silverc-artifacts-h001-v1.tar.gz --request-set /tmp/prometheus-silverc-deploy-request-set.json --requests-dir /tmp/prometheus-silverc-deploy-requests --summary-out /tmp/prometheus-silverc-deploy-request-verification.json --runbook-out /tmp/prometheus-silverc-deploy-request-verification.md
+python3 scripts/build_silverc_deploy_operator_procedure.py --bundle h001-v1 --archive /tmp/prometheus-silverc-artifacts-h001-v1.tar.gz --request-set /tmp/prometheus-silverc-deploy-request-set.json --requests-dir /tmp/prometheus-silverc-deploy-requests --summary-out /tmp/prometheus-silverc-deploy-operator-procedure.json --runbook-out /tmp/prometheus-silverc-deploy-operator-procedure.md
+python3 scripts/build_silverc_operator_receipts.py --bundle h001-v1 --archive /tmp/prometheus-silverc-artifacts-h001-v1.tar.gz --request-set /tmp/prometheus-silverc-deploy-request-set.json --requests-dir /tmp/prometheus-silverc-deploy-requests --orchestrator-results /path/to/public-external-deploy-results.json --operator-receipts-out /tmp/prometheus-silverc-operator-receipts.json --summary-out /tmp/prometheus-silverc-operator-receipts-summary.json --runbook-out /tmp/prometheus-silverc-operator-receipts.md
+python3 scripts/verify_silverc_deploy_receipts.py --bundle h001-v1 --archive /tmp/prometheus-silverc-artifacts-h001-v1.tar.gz --receipts modules/contracts/silverc/deploy-receipts.sample.json --summary-out /tmp/prometheus-silverc-deploy-receipts-summary.json --runbook-out /tmp/prometheus-silverc-deploy-receipts.md
+python3 scripts/verify_silverc_deploy_receipt_evidence.py --bundle h001-v1 --archive /tmp/prometheus-silverc-artifacts-h001-v1.tar.gz --receipts /path/to/operator-record-receipts.json --evidence /path/to/public-node-or-explorer-evidence.json --summary-out /tmp/prometheus-silverc-deploy-receipt-evidence-summary.json --runbook-out /tmp/prometheus-silverc-deploy-receipt-evidence.md
+python3 scripts/stage_silverc_deployment_status.py --bundle h001-v1 --archive /tmp/prometheus-silverc-artifacts-h001-v1.tar.gz --operator-receipts /path/to/operator-record-receipts.json --status-out /tmp/prometheus-silverc-status-draft.json --snippet-out /tmp/prometheus-silverc-status-draft.md
 python3 scripts/preflight_metrics_oracle_report.py --report modules/contracts/silverc/metrics-oracle-report.sample.json --plan-out /tmp/prometheus-metrics-oracle-preflight.json --runbook-out /tmp/prometheus-metrics-oracle-runbook.md
-python3 scripts/build_metrics_oracle_tx_request.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --report modules/contracts/silverc/metrics-oracle-report.sample.json --contract-instance-id 7777777777777777777777777777777777777777777777777777777777777777:0 --tx-request-out /tmp/prometheus-metrics-oracle-tx-request.json --runbook-out /tmp/prometheus-metrics-oracle-tx-request.md
-python3 scripts/build_metrics_oracle_operator_procedure.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --tx-request /tmp/prometheus-metrics-oracle-tx-request.json --summary-out /tmp/prometheus-metrics-oracle-operator-procedure.json --runbook-out /tmp/prometheus-metrics-oracle-operator-procedure.md
-python3 scripts/verify_metrics_oracle_tx_result.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --tx-request /tmp/prometheus-metrics-oracle-tx-request.json --tx-result /path/to/public-metrics-oracle-tx-result.json --summary-out /tmp/prometheus-metrics-oracle-tx-result-summary.json --runbook-out /tmp/prometheus-metrics-oracle-tx-result.md
-python3 scripts/verify_metrics_oracle_tx_evidence.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --tx-request /tmp/prometheus-metrics-oracle-tx-request.json --tx-result /path/to/public-metrics-oracle-tx-result.json --evidence /path/to/public-metrics-oracle-tx-evidence.json --summary-out /tmp/prometheus-metrics-oracle-tx-public-evidence-summary.json --runbook-out /tmp/prometheus-metrics-oracle-tx-public-evidence.md
-python3 scripts/stage_metrics_oracle_status.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --tx-request /tmp/prometheus-metrics-oracle-tx-request.json --tx-result /path/to/public-metrics-oracle-tx-result.json --status-out /tmp/prometheus-metrics-oracle-status-draft.json --snippet-out /tmp/prometheus-metrics-oracle-status-draft.md
+python3 scripts/build_metrics_oracle_tx_request.py --bundle h001-v1 --archive /tmp/prometheus-silverc-artifacts-h001-v1.tar.gz --report modules/contracts/silverc/metrics-oracle-report.sample.json --contract-instance-id 7777777777777777777777777777777777777777777777777777777777777777:0 --tx-request-out /tmp/prometheus-metrics-oracle-tx-request.json --runbook-out /tmp/prometheus-metrics-oracle-tx-request.md
+python3 scripts/build_metrics_oracle_operator_procedure.py --bundle h001-v1 --archive /tmp/prometheus-silverc-artifacts-h001-v1.tar.gz --tx-request /tmp/prometheus-metrics-oracle-tx-request.json --summary-out /tmp/prometheus-metrics-oracle-operator-procedure.json --runbook-out /tmp/prometheus-metrics-oracle-operator-procedure.md
+python3 scripts/verify_metrics_oracle_tx_result.py --bundle h001-v1 --archive /tmp/prometheus-silverc-artifacts-h001-v1.tar.gz --tx-request /tmp/prometheus-metrics-oracle-tx-request.json --tx-result /path/to/public-metrics-oracle-tx-result.json --summary-out /tmp/prometheus-metrics-oracle-tx-result-summary.json --runbook-out /tmp/prometheus-metrics-oracle-tx-result.md
+python3 scripts/verify_metrics_oracle_tx_evidence.py --bundle h001-v1 --archive /tmp/prometheus-silverc-artifacts-h001-v1.tar.gz --tx-request /tmp/prometheus-metrics-oracle-tx-request.json --tx-result /path/to/public-metrics-oracle-tx-result.json --evidence /path/to/public-metrics-oracle-tx-evidence.json --summary-out /tmp/prometheus-metrics-oracle-tx-public-evidence-summary.json --runbook-out /tmp/prometheus-metrics-oracle-tx-public-evidence.md
+python3 scripts/stage_metrics_oracle_status.py --bundle h001-v1 --archive /tmp/prometheus-silverc-artifacts-h001-v1.tar.gz --tx-request /tmp/prometheus-metrics-oracle-tx-request.json --tx-result /path/to/public-metrics-oracle-tx-result.json --status-out /tmp/prometheus-metrics-oracle-status-draft.json --snippet-out /tmp/prometheus-metrics-oracle-status-draft.md
 python3 scripts/verify_release_hardening_evidence.py --evidence /path/to/public-release-hardening-evidence.json --expected-commit "$(git rev-parse HEAD)" --summary-out /tmp/prometheus-release-hardening-evidence-summary.json --runbook-out /tmp/prometheus-release-hardening-evidence.md
-python3 scripts/build_silverc_operator_handoff.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --out-dir /tmp/prometheus-silverc-operator-handoff --network sandbox --rpc-url ws://127.0.0.1:17210 --deployer-address kaspatest:qptestpreflight000000000000000000000000000000000 --metrics-oracle-pubkey 1111111111111111111111111111111111111111111111111111111111111111 --orchestrator-results /path/to/public-external-deploy-results.json --deploy-receipt-evidence /path/to/public-node-or-explorer-evidence.json --metrics-tx-result /path/to/public-metrics-oracle-tx-result.json --metrics-tx-evidence /path/to/public-metrics-oracle-tx-evidence.json --release-hardening-evidence /path/to/public-release-hardening-evidence.json
+python3 scripts/build_silverc_operator_handoff.py --bundle h001-v1 --archive /tmp/prometheus-silverc-artifacts-h001-v1.tar.gz --out-dir /tmp/prometheus-silverc-operator-handoff --network sandbox --rpc-url ws://127.0.0.1:17210 --deployer-address kaspatest:qptestpreflight000000000000000000000000000000000 --metrics-oracle-pubkey 1111111111111111111111111111111111111111111111111111111111111111 --orchestrator-results /path/to/public-external-deploy-results.json --deploy-receipt-evidence /path/to/public-node-or-explorer-evidence.json --metrics-tx-result /path/to/public-metrics-oracle-tx-result.json --metrics-tx-evidence /path/to/public-metrics-oracle-tx-evidence.json --release-hardening-evidence /path/to/public-release-hardening-evidence.json
 python3 scripts/audit_silverc_release_readiness.py --handoff-dir /tmp/prometheus-silverc-operator-handoff --summary-out /tmp/prometheus-silverc-release-readiness.json --runbook-out /tmp/prometheus-silverc-release-readiness.md
 ```
 
@@ -201,12 +202,19 @@ Changing a contract intentionally requires regenerating the expectation in the
 same reviewed change:
 
 ```bash
-python3 scripts/smoke_silverc_artifacts.py
+python3 scripts/smoke_silverc_artifacts.py --bundle v2-draft
 python3 scripts/verify_silverc_compiled_semantics.py \
   --built-manifest /tmp/prometheus-silverc-artifacts/manifest.json --write-expected
 ```
 
 ## Deploy preflight
+
+Every bundle tool requires `--bundle h001-v1|v2-draft` (closed registry in
+`scripts/silverc_bundles.py`; no default). `h001-v1` is rebuilt from the frozen
+reproduction material in `bundles/h001-v1/` and is the only bundle the Rust
+deployer accepts. `v2-draft` (the current sources in this directory) supports
+static request checks only; receipts, status, evidence, operator procedures
+and handoffs refuse it.
 
 `scripts/preflight_silverc_deploy.py` validates an already-built release bundle
 from either `--bundle-dir` or `--archive` before any network deploy attempt. It
@@ -257,10 +265,10 @@ changed contract selections, manifest mismatches, mainnet/direct-RPC canary
 targets, and attempted canary promotion fail closed.
 
 ```bash
-python3 scripts/preflight_silverc_deploy.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --deployment-profile testnet-10-validator-staking-h001 --network testnet --rpc-url kaspa-resolver://public --deployer-address <public-deployer-address> --plan-out /tmp/prometheus-h001-canary-preflight.json --runbook-out /tmp/prometheus-h001-canary-preflight.md
-python3 scripts/build_silverc_deploy_requests.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --deployment-profile testnet-10-validator-staking-h001 --out-dir /tmp/prometheus-h001-canary-requests --network testnet --rpc-url kaspa-resolver://public --deployer-address <public-deployer-address> --request-set-out /tmp/prometheus-h001-canary-request-set.json --runbook-out /tmp/prometheus-h001-canary-requests.md
-python3 scripts/verify_silverc_deploy_requests.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --request-set /tmp/prometheus-h001-canary-request-set.json --requests-dir /tmp/prometheus-h001-canary-requests --summary-out /tmp/prometheus-h001-canary-verification.json
-python3 scripts/build_silverc_deploy_operator_procedure.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --request-set /tmp/prometheus-h001-canary-request-set.json --requests-dir /tmp/prometheus-h001-canary-requests --summary-out /tmp/prometheus-h001-canary-procedure.json --runbook-out /tmp/prometheus-h001-canary-procedure.md
+python3 scripts/preflight_silverc_deploy.py --bundle h001-v1 --archive /tmp/prometheus-silverc-artifacts-h001-v1.tar.gz --deployment-profile testnet-10-validator-staking-h001 --network testnet --rpc-url kaspa-resolver://public --deployer-address <public-deployer-address> --plan-out /tmp/prometheus-h001-canary-preflight.json --runbook-out /tmp/prometheus-h001-canary-preflight.md
+python3 scripts/build_silverc_deploy_requests.py --bundle h001-v1 --archive /tmp/prometheus-silverc-artifacts-h001-v1.tar.gz --deployment-profile testnet-10-validator-staking-h001 --out-dir /tmp/prometheus-h001-canary-requests --network testnet --rpc-url kaspa-resolver://public --deployer-address <public-deployer-address> --request-set-out /tmp/prometheus-h001-canary-request-set.json --runbook-out /tmp/prometheus-h001-canary-requests.md
+python3 scripts/verify_silverc_deploy_requests.py --bundle h001-v1 --archive /tmp/prometheus-silverc-artifacts-h001-v1.tar.gz --request-set /tmp/prometheus-h001-canary-request-set.json --requests-dir /tmp/prometheus-h001-canary-requests --summary-out /tmp/prometheus-h001-canary-verification.json
+python3 scripts/build_silverc_deploy_operator_procedure.py --bundle h001-v1 --archive /tmp/prometheus-silverc-artifacts-h001-v1.tar.gz --request-set /tmp/prometheus-h001-canary-request-set.json --requests-dir /tmp/prometheus-h001-canary-requests --summary-out /tmp/prometheus-h001-canary-procedure.json --runbook-out /tmp/prometheus-h001-canary-procedure.md
 ```
 
 ## Keyless Toccata-v1 genesis operator

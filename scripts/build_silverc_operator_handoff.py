@@ -12,6 +12,9 @@ from hashlib import sha256
 from pathlib import Path
 from typing import Any
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from silverc_bundles import add_bundle_argument, bundle_from_args, require_promotable  # noqa: E402
+
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_REPORT = ROOT / "modules" / "contracts" / "silverc" / "metrics-oracle-report.sample.json"
 DEFAULT_CI_RECEIPTS = ROOT / "modules" / "contracts" / "silverc" / "deploy-receipts.sample.json"
@@ -27,6 +30,7 @@ def parse_args() -> argparse.Namespace:
         )
     )
     parser.add_argument("--archive", type=Path, required=True, help="Validated release .tar.gz archive")
+    add_bundle_argument(parser)
     parser.add_argument("--out-dir", type=Path, default=DEFAULT_OUT_DIR, help="Output handoff directory")
     parser.add_argument("--network", choices=("sandbox", "testnet", "mainnet"), default="sandbox")
     parser.add_argument("--rpc-url", required=True, help="Public Kaspa RPC/wRPC endpoint")
@@ -85,7 +89,13 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
+SELECTED_BUNDLE: list[str] = []
+
+
 def run(cmd: list[str]) -> subprocess.CompletedProcess[str]:
+    # Every archive-consuming tool receives the explicitly selected bundle.
+    if "--archive" in cmd and "--bundle" not in cmd:
+        cmd = [*cmd, *SELECTED_BUNDLE]
     proc = subprocess.run(cmd, cwd=ROOT, text=True, capture_output=True)
     if proc.returncode != 0:
         if proc.stdout:
@@ -601,6 +611,8 @@ def write_handoff_markdown(out_dir: Path, summary: dict[str, Any]) -> None:
 
 def main() -> int:
     args = parse_args()
+    require_promotable(bundle_from_args(args), "an operator handoff package")
+    SELECTED_BUNDLE[:] = ["--bundle", args.bundle]
     archive = ensure_public_file(args.archive, "release archive")
     report = ensure_public_file(args.report, "metrics-oracle report")
     ci_receipts = ensure_public_file(args.ci_receipts, "ci receipt fixture")

@@ -9,6 +9,7 @@ import sys
 from pathlib import Path
 from typing import Any
 
+from silverc_bundles import add_bundle_argument, bundle_from_args, require_profile, require_promotable  # noqa: F401
 from preflight_silverc_deploy import bundle_root_from_args, load_json, validate_manifest
 from silverc_deployment_profiles import CANARY_SCOPE_NOTICE, is_canary, procedure_status
 from verify_silverc_deploy_requests import validate_request_set
@@ -50,6 +51,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--summary-out", type=Path, help="Optional JSON procedure summary path")
     parser.add_argument("--runbook-out", type=Path, help="Optional Markdown operator procedure path")
+    add_bundle_argument(parser)
     return parser.parse_args()
 
 
@@ -218,12 +220,14 @@ def main() -> int:
     args = parse_args()
     bundle_dir, tmp = bundle_root_from_args(args)
     try:
-        manifest = validate_manifest(bundle_dir, args.silverscript_ref)
+        bundle = bundle_from_args(args)
+        require_promotable(bundle, "an executable deploy operator procedure")
+        manifest = validate_manifest(bundle_dir, args.silverscript_ref, bundle)
         request_set = load_json(args.request_set.expanduser().resolve())
         requests_dir = args.requests_dir.expanduser().resolve()
         if not requests_dir.is_dir():
             raise FileNotFoundError(f"requests directory not found: {requests_dir}")
-        request_summary = validate_request_set(request_set=request_set, requests_dir=requests_dir, manifest=manifest)
+        request_summary = validate_request_set(request_set=request_set, requests_dir=requests_dir, manifest=manifest, bundle=bundle)
         procedure = build_procedure(request_summary)
         write_json(args.summary_out, procedure)
         write_runbook(args.runbook_out, procedure)

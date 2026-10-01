@@ -1,0 +1,18 @@
+pragma silverscript ^0.1.0;
+
+// ValidatorStaking H-001 compatibility fixture for current upstream silverc.
+//
+// Scope:
+// - Verifies only the canonical commit-reveal preimage.
+// - Does not model validator state, staking, slashing, bond accounting, or ACL.
+//
+// Canonical Prometheus H-001 preimage:
+// vote_byte(1) || salt_le(8) || block_height_le(8)
+contract ValidatorStakingH001(byte[32] expected) {
+    entrypoint function verify(bool vote, int salt, int block_height) {
+        byte[] vote_byte = vote ? byte[](0x01) : byte[](0x00);
+        byte[] preimage = vote_byte + byte[8](salt) + byte[8](block_height);
+        require(sha256(preimage) == expected);
+    }
+}
+
