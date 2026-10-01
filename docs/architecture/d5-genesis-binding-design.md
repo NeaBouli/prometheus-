@@ -194,10 +194,9 @@ labels, not chain data.
    Paths: `modules/silverc-deployer/src/lib.rs`, `src/main.rs`, deployer tests.
    The Rust pins stay unchanged. Its output is classified
    `NOT_CHAIN_EVIDENCE` and `NOT_DEPLOYMENT_AUTHORIZATION`.
-2. **Evidence capture (blocked until the trusted-source model above is decided):** record `funding_outpoint`, `covenant_id` and the raw
-   public UTXO response in observation and evidence outputs. Paths:
-   `lib.rs` (`NodeObservation`), `scripts/verify_silverc_deploy_receipt_evidence.py`
-   and the receipt schemas.
+2. **Evidence capture (implemented as a candidate in `bundle-v2-d5-evidence-capture`;
+   acceptance stays blocked until the trusted-source model is decided):** see
+   section 9.
 3. **Python binding:** replace `RECOMPUTE_BLOCKER` with the call to step 1 and
    move the validator from draft to tooling behind the bundle registry
    (`scripts/silverc_genesis_binding_draft.py`).
@@ -205,6 +204,47 @@ labels, not chain data.
    only covenant ids from a confirmed binding, with role
    (`modules/client/src/blockchain/rule_observation.rs`, step 7 of
    `verify_observation_shared`).
+
+## 9. D5 evidence candidate (step b)
+
+`prometheus-silverc-deployer observe ... --d5-evidence-candidate-out <path>`
+writes, in addition to the unchanged `NodeObservation`, a separate document
+`prometheus.silverc.d5.genesis_evidence_candidate` (schema 1). Without the
+flag, `observe` behaves exactly as before. v1 requests, signing requests,
+receipts and the historical H-001 evidence are not changed.
+
+| Part | Source | Fields |
+|---|---|---|
+| `preparation` | validated preparation inputs (`validated_preparation_inputs_not_chain_proof`) | network id, contract name, request and signing-request hashes, funding outpoint, genesis value, contract output index, contract script public key, calculated covenant id, expected deploy tx id |
+| `observed` | typed `get_utxos_by_addresses` entry from the configured node (`configured_node_get_utxos_by_addresses_typed_entry`) | outpoint, amount, script public key, covenant id, block DAA score, coinbase flag (strict allowlist) |
+| `observed_virtual_daa_score`, `daa_depth` | `get_block_dag_info` from the same node | — |
+| `observed_snapshot_sha256`, `candidate_sha256` | canonical JSON (sorted keys, compact) SHA-256 | — |
+
+- The status is always `OBSERVED_NOT_INDEPENDENTLY_CONFIRMED`. The
+  classification is `NOT_CHAIN_PROOF`, `NOT_D5_ACCEPTANCE` and
+  `NOT_DEPLOYMENT_AUTHORIZATION`. The trust model is
+  `single_operator_configured_node` with `independent_confirmation: false`.
+- The trust model lists the missing checks: a second independent node or
+  explorer, a reviewer-captured response, a block hash/header cross-check, and
+  network identity independent of the endpoint.
+- The snapshot is a normalized allowlist of the typed entry, not the complete
+  raw wire response. Its hash proves integrity and internal consistency only.
+- Not stored: RPC endpoint, deployer or contract address, headers, logs,
+  timestamps, and wallet or operator metadata.
+- `verify_d5_evidence_candidate` checks the fixed schema, status,
+  classification and trust model, the documented sources, and every listed
+  relationship:
+  - the recalculated covenant id from the preparation fields;
+  - the observed outpoint, value, script and covenant id;
+  - not coinbase;
+  - DAA depth;
+  - both hashes.
+- Parsing rejects unknown, duplicate and missing fields.
+- The CLI runs the collision gate before any read. The candidate is created
+  exclusively and before the observation is written; an existing candidate
+  aborts the command.
+- The Python draft evidence format (section 4) is still a design draft;
+  aligning it with this candidate belongs to step 3.
 
 Non-goals: no signing, wallet, chain, deployment export, production or Mainnet
 claim; no change to H-001, proof, toolchain or Rust pins, tokenomics, slash or

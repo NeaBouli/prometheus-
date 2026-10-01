@@ -584,6 +584,13 @@ Both runs require Gio budget approval (plan-level gate).
   only after profile separation and review; no duplicate implementation.
 - Claude's scheduled 03:31 CI/Security dispatch must not be duplicated.
 
+### 2026-10-01 - bundle-v2-d5-evidence-capture delivered (Claude)
+
+- Branch `agent/claude/bundle-v2-d5-evidence-capture` on ea73277: D5 step (b)
+  evidence candidate (observed, not independently confirmed). Acceptance,
+  Python binding and client allowlist remain blocked.
+- Waiting on Codex: review; hosted CI only on Codex coordination.
+
 ### 2026-10-01 - bundle-v2-d5-offline-covenant-id delivered (Claude)
 
 - Branch `agent/claude/bundle-v2-d5-offline-covenant-id` on eaf8eb7: D5 step (a)

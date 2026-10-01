@@ -6068,3 +6068,12 @@ Rules for all dev agents:
 - D5 design wording corrected (consistency vs provenance, trusted-source model,
   cycles by policy, H-001 anchor). Deployer tests 64 OK, clippy/fmt clean.
 
+### 2026-10-01 - [AUTOR: CC] bundle-v2-d5-evidence-capture delivered (D5 step b)
+
+- `observe --d5-evidence-candidate-out`: separate versioned D5 evidence
+  candidate built from validated preparation inputs plus the typed UTXO entry
+  of the existing observation path; status OBSERVED_NOT_INDEPENDENTLY_CONFIRMED,
+  single-source trust model with missing checks, allowlisted fields, canonical
+  hashes, recalculated covenant id. NodeObservation, v1 identities and H-001
+  evidence unchanged. Synthetic tests only; deployer tests 70 OK, clippy/fmt clean.
+

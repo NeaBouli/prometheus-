@@ -93,7 +93,13 @@ const SUBCOMMANDS: &[Subcommand] = &[
     Subcommand {
         name: "observe",
         inputs: GENESIS_INPUTS,
-        outputs: &[("--evidence-out", "observation evidence output")],
+        outputs: &[
+            ("--evidence-out", "observation evidence output"),
+            (
+                "--d5-evidence-candidate-out",
+                "D5 evidence candidate output",
+            ),
+        ],
         extra: &[],
     },
 ];
