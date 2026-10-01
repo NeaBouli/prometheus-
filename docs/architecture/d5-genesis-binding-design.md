@@ -231,14 +231,28 @@ receipts and the historical H-001 evidence are not changed.
   raw wire response. Its hash proves integrity and internal consistency only.
 - Not stored: RPC endpoint, deployer or contract address, headers, logs,
   timestamps, and wallet or operator metadata.
-- `verify_d5_evidence_candidate` checks the fixed schema, status,
-  classification and trust model, the documented sources, and every listed
-  relationship:
-  - the recalculated covenant id from the preparation fields;
+- `verify_d5_evidence_candidate(candidate, validated_context)` requires the
+  externally validated signing request returned by `rebuild_and_verify`.
+  There is no optional or default bypass. Every exported preparation field
+  must equal that context:
+  - network, contract, request and signing-request hashes;
+  - funding outpoint, value and output index, which must be the fixed genesis
+    index 0;
+  - script, calculated covenant id and expected deploy txid.
+
+  Authority never comes from hashes carried inside the candidate. The verifier
+  then checks:
+  - the fixed schema, status, classification and trust model, and the
+    documented sources;
+  - the recalculated covenant id;
   - the observed outpoint, value, script and covenant id;
   - not coinbase;
-  - DAA depth;
-  - both hashes.
+  - DAA chronology: a genesis DAA score above the observed virtual DAA score
+    is rejected, not clamped to depth 0;
+  - DAA depth and both hashes.
+
+  The result is context-bound consistency only. It is still not independent
+  chain proof or D5 acceptance.
 - Parsing rejects unknown, duplicate and missing fields.
 - The CLI runs the collision gate before any read. The candidate is created
   exclusively and before the observation is written; an existing candidate

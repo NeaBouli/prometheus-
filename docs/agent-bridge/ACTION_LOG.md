@@ -6077,3 +6077,12 @@ Rules for all dev agents:
   hashes, recalculated covenant id. NodeObservation, v1 identities and H-001
   evidence unchanged. Synthetic tests only; deployer tests 70 OK, clippy/fmt clean.
 
+### 2026-10-01 - [AUTOR: CC] bundle-v2-d5-capture-context-correction delivered
+
+- Codex review gaps fixed: future genesis DAA score is rejected (no clamp to
+  depth 0); the single candidate verifier now requires the validated signing
+  request and compares every preparation field plus the fixed output index.
+  Self-consistent substitutions (network, role, hashes, funding outpoint,
+  deploy txid, script, value) fail against the original context. Deployer
+  tests 73 OK, clippy/fmt clean.
+

@@ -1856,9 +1856,14 @@ fn d5_candidate_hash(candidate: &D5EvidenceCandidate) -> Result<String> {
     Ok(sha256_hex(&canonical_json(&value)?))
 }
 
-/// Check every D5 relationship of a candidate; the candidate is never upgraded
-/// beyond OBSERVED_NOT_INDEPENDENTLY_CONFIRMED.
-pub fn verify_d5_evidence_candidate(candidate: &D5EvidenceCandidate) -> Result<()> {
+/// Verify a D5 candidate against the externally validated preparation context
+/// (the signing request returned by `rebuild_and_verify`). This establishes
+/// context-bound consistency only; it is never independent chain proof or D5
+/// acceptance, and the candidate stays OBSERVED_NOT_INDEPENDENTLY_CONFIRMED.
+pub fn verify_d5_evidence_candidate(
+    candidate: &D5EvidenceCandidate,
+    validated_context: &SigningRequest,
+) -> Result<()> {
     if candidate.schema_version != D5_EVIDENCE_CANDIDATE_SCHEMA_VERSION
         || candidate.kind != D5_EVIDENCE_CANDIDATE_KIND
         || candidate.status != D5_EVIDENCE_CANDIDATE_STATUS
@@ -1904,6 +1909,24 @@ pub fn verify_d5_evidence_candidate(candidate: &D5EvidenceCandidate) -> Result<(
     if preparation.genesis_output_value == 0 {
         bail!("D5 genesis_output_value must be nonzero");
     }
+    // Authority comes only from the validated context, never from candidate hashes.
+    let context = validated_context;
+    if preparation.network_id != context.network_id
+        || preparation.contract_name != context.contract_name
+        || preparation.request_sha256 != context.request_sha256
+        || preparation.signing_request_sha256 != context.signing_request_sha256
+        || preparation.funding_outpoint != context.funding_outpoint
+        || preparation.genesis_output_value != context.genesis_output_value
+        || preparation.contract_output_index != context.contract_output_index
+        || preparation.contract_script_public_key != context.contract_script_public_key
+        || preparation.calculated_covenant_id != context.covenant_id
+        || preparation.expected_deploy_tx_id != context.unsigned_transaction_id
+    {
+        bail!("D5 preparation fields differ from the validated preparation context");
+    }
+    if preparation.contract_output_index != CONTRACT_OUTPUT_INDEX {
+        bail!("D5 contract output index must be the fixed genesis output index");
+    }
     let funding_outpoint = preparation.funding_outpoint.to_outpoint()?;
     let contract_script = preparation
         .contract_script_public_key
@@ -1937,11 +1960,11 @@ pub fn verify_d5_evidence_candidate(candidate: &D5EvidenceCandidate) -> Result<(
     if observed.is_coinbase {
         bail!("D5 observed genesis output must not be coinbase");
     }
-    if candidate.daa_depth
-        != candidate
-            .observed_virtual_daa_score
-            .saturating_sub(observed.block_daa_score)
-    {
+    let depth = candidate
+        .observed_virtual_daa_score
+        .checked_sub(observed.block_daa_score)
+        .ok_or_else(|| anyhow!("D5 genesis DAA score is above the observed virtual DAA score"))?;
+    if candidate.daa_depth != depth {
         bail!("D5 DAA depth is inconsistent with the observed DAA scores");
     }
     if canonical_sha256(observed)? != candidate.observed_snapshot_sha256 {
@@ -1964,6 +1987,9 @@ pub fn build_d5_evidence_candidate(
         .utxo_entry
         .covenant_id
         .ok_or_else(|| anyhow!("D5 observed UTXO has no covenant id anchor"))?;
+    let daa_depth = observed_virtual_daa_score
+        .checked_sub(entry.utxo_entry.block_daa_score)
+        .ok_or_else(|| anyhow!("D5 genesis DAA score is above the observed virtual DAA score"))?;
     let observed = D5ObservedUtxoSnapshot {
         source: D5_SNAPSHOT_SOURCE.to_string(),
         outpoint: OutpointSpec {
@@ -2009,7 +2035,7 @@ pub fn build_d5_evidence_candidate(
         observed_snapshot_sha256: canonical_sha256(&observed)?,
         observed,
         observed_virtual_daa_score,
-        daa_depth: observed_virtual_daa_score.saturating_sub(entry.utxo_entry.block_daa_score),
+        daa_depth,
         relationships: D5_RELATIONSHIPS
             .iter()
             .map(|item| item.to_string())
@@ -2018,7 +2044,7 @@ pub fn build_d5_evidence_candidate(
     };
     candidate.candidate_sha256 = "0".repeat(64);
     candidate.candidate_sha256 = d5_candidate_hash(&candidate)?;
-    verify_d5_evidence_candidate(&candidate)?;
+    verify_d5_evidence_candidate(&candidate, signing_request)?;
     Ok(candidate)
 }
 
@@ -4088,7 +4114,7 @@ mod tests {
             signing_request.funding_outpoint
         );
         assert_eq!(candidate.daa_depth, 200);
-        verify_d5_evidence_candidate(&candidate).unwrap();
+        verify_d5_evidence_candidate(&candidate, &signing_request).unwrap();
     }
 
     #[test]
@@ -4229,7 +4255,7 @@ mod tests {
         let mut tampered = base.clone();
         tampered.observed.block_daa_score -= 1;
         tampered.daa_depth += 1;
-        assert!(verify_d5_evidence_candidate(&tampered)
+        assert!(verify_d5_evidence_candidate(&tampered, &signing_request)
             .unwrap_err()
             .to_string()
             .contains("snapshot hash"));
@@ -4237,7 +4263,7 @@ mod tests {
         let mut tampered = base.clone();
         tampered.observed_virtual_daa_score += 1;
         tampered.daa_depth += 1;
-        assert!(verify_d5_evidence_candidate(&tampered)
+        assert!(verify_d5_evidence_candidate(&tampered, &signing_request)
             .unwrap_err()
             .to_string()
             .contains("candidate hash"));
@@ -4245,36 +4271,36 @@ mod tests {
         let mut tampered = base.clone();
         tampered.daa_depth += 1;
         rehash(&mut tampered);
-        assert!(verify_d5_evidence_candidate(&tampered).is_err());
+        assert!(verify_d5_evidence_candidate(&tampered, &signing_request).is_err());
 
         let mut upgraded = base.clone();
         upgraded.status = "CONFIRMED".to_string();
         rehash(&mut upgraded);
-        assert!(verify_d5_evidence_candidate(&upgraded).is_err());
+        assert!(verify_d5_evidence_candidate(&upgraded, &signing_request).is_err());
 
         let mut upgraded = base.clone();
         upgraded.trust_model.independent_confirmation = true;
         rehash(&mut upgraded);
-        assert!(verify_d5_evidence_candidate(&upgraded).is_err());
+        assert!(verify_d5_evidence_candidate(&upgraded, &signing_request).is_err());
 
         let mut upgraded = base.clone();
         upgraded.classification.pop();
         rehash(&mut upgraded);
-        assert!(verify_d5_evidence_candidate(&upgraded).is_err());
+        assert!(verify_d5_evidence_candidate(&upgraded, &signing_request).is_err());
 
         let mut relabeled = base.clone();
         relabeled.observed.source = "independent_explorer".to_string();
         rehash(&mut relabeled);
-        assert!(verify_d5_evidence_candidate(&relabeled).is_err());
+        assert!(verify_d5_evidence_candidate(&relabeled, &signing_request).is_err());
 
         let mut swapped = base;
         swapped.observed.covenant_id = "66".repeat(32);
         swapped.preparation.calculated_covenant_id = "66".repeat(32);
         rehash(&mut swapped);
-        assert!(verify_d5_evidence_candidate(&swapped)
+        assert!(verify_d5_evidence_candidate(&swapped, &signing_request)
             .unwrap_err()
             .to_string()
-            .contains("calculated covenant id"));
+            .contains("validated preparation context"));
     }
 
     #[test]
@@ -4283,7 +4309,7 @@ mod tests {
         let candidate = build_d5_evidence_candidate(&signing_request, &entry, 467_580_000).unwrap();
         let mut value = serde_json::to_value(&candidate).unwrap();
         let parsed: D5EvidenceCandidate = serde_json::from_value(value.clone()).unwrap();
-        verify_d5_evidence_candidate(&parsed).unwrap();
+        verify_d5_evidence_candidate(&parsed, &signing_request).unwrap();
 
         value["observed"]["rpc_url"] = Value::String("ws://127.0.0.1:17210".to_string());
         assert!(serde_json::from_value::<D5EvidenceCandidate>(value.clone()).is_err());
@@ -4297,5 +4323,173 @@ mod tests {
         let text = serde_json::to_string(&candidate).unwrap();
         let duplicated = text.replacen("\"status\":", "\"status\":\"CONFIRMED\",\"status\":", 1);
         assert!(serde_json::from_str::<D5EvidenceCandidate>(&duplicated).is_err());
+    }
+
+    type ContextSubstitution = Box<dyn Fn(&mut SigningRequest)>;
+
+    fn recompute_context_covenant_id(context: &mut SigningRequest) {
+        context.covenant_id = genesis_covenant_id(
+            context.funding_outpoint.to_outpoint().unwrap(),
+            context.contract_output_index,
+            &TransactionOutput {
+                value: context.genesis_output_value,
+                script_public_key: context
+                    .contract_script_public_key
+                    .to_script_public_key()
+                    .unwrap(),
+                covenant: None,
+            },
+        )
+        .to_string();
+    }
+
+    /// Internally self-consistent candidate (observed fields and both hashes
+    /// recomputed) for a substituted context.
+    fn self_consistent_candidate(context: &SigningRequest) -> D5EvidenceCandidate {
+        let entry = d5_entry(
+            context,
+            &context.unsigned_transaction_id,
+            context.contract_output_index,
+            context.genesis_output_value,
+            Some(&context.covenant_id),
+            false,
+        );
+        build_d5_evidence_candidate(context, &entry, 467_580_000).unwrap()
+    }
+
+    #[test]
+    fn d5_candidate_rejects_impossible_daa_chronology() {
+        let (signing_request, entry) = d5_inputs();
+        let equal =
+            build_d5_evidence_candidate(&signing_request, &entry, entry.utxo_entry.block_daa_score)
+                .unwrap();
+        assert_eq!(equal.daa_depth, 0, "equal scores are a valid zero depth");
+        verify_d5_evidence_candidate(&equal, &signing_request).unwrap();
+
+        let error = build_d5_evidence_candidate(
+            &signing_request,
+            &entry,
+            entry.utxo_entry.block_daa_score - 1,
+        )
+        .unwrap_err()
+        .to_string();
+        assert!(
+            error.contains("above the observed virtual DAA score"),
+            "{error}"
+        );
+
+        let mut future = equal;
+        future.observed.block_daa_score = future.observed_virtual_daa_score + 1;
+        future.daa_depth = 0;
+        rehash(&mut future);
+        let error = verify_d5_evidence_candidate(&future, &signing_request)
+            .unwrap_err()
+            .to_string();
+        assert!(
+            error.contains("above the observed virtual DAA score"),
+            "{error}"
+        );
+
+        let mut altered =
+            build_d5_evidence_candidate(&signing_request, &entry, 467_580_000).unwrap();
+        altered.observed_virtual_daa_score -= 50;
+        altered.daa_depth -= 50;
+        rehash(&mut altered);
+        verify_d5_evidence_candidate(&altered, &signing_request).unwrap();
+        altered.observed.block_daa_score += 10;
+        rehash(&mut altered);
+        assert!(verify_d5_evidence_candidate(&altered, &signing_request)
+            .unwrap_err()
+            .to_string()
+            .contains("DAA depth"));
+    }
+
+    #[test]
+    fn d5_candidate_is_bound_to_the_validated_context() {
+        let (original, _) = d5_inputs();
+        let substitutions: Vec<(&str, ContextSubstitution)> = vec![
+            (
+                "network",
+                Box::new(|c| c.network_id = "mainnet".to_string()),
+            ),
+            (
+                "contract role",
+                Box::new(|c| c.contract_name = "RuleStorageState".to_string()),
+            ),
+            (
+                "request identity",
+                Box::new(|c| c.request_sha256 = "88".repeat(32)),
+            ),
+            (
+                "signing identity",
+                Box::new(|c| c.signing_request_sha256 = "99".repeat(32)),
+            ),
+            (
+                "funding outpoint",
+                Box::new(|c| {
+                    c.funding_outpoint.index += 1;
+                    recompute_context_covenant_id(c);
+                }),
+            ),
+            (
+                "expected deploy txid",
+                Box::new(|c| c.unsigned_transaction_id = "77".repeat(32)),
+            ),
+            (
+                "script",
+                Box::new(|c| {
+                    c.contract_script_public_key =
+                        ScriptSpec::from_script_public_key(&pay_to_script_hash_script(&[
+                            0x51, 0x51,
+                        ]));
+                    recompute_context_covenant_id(c);
+                }),
+            ),
+            (
+                "value",
+                Box::new(|c| {
+                    c.genesis_output_value += 1;
+                    recompute_context_covenant_id(c);
+                }),
+            ),
+        ];
+        for (label, substitute) in substitutions {
+            let mut context = original.clone();
+            substitute(&mut context);
+            let candidate = self_consistent_candidate(&context);
+            verify_d5_evidence_candidate(&candidate, &context).unwrap_or_else(|error| {
+                panic!("{label}: substitute must be self-consistent: {error}")
+            });
+            let error = verify_d5_evidence_candidate(&candidate, &original)
+                .unwrap_err()
+                .to_string();
+            assert!(
+                error.contains("validated preparation context"),
+                "{label}: {error}"
+            );
+        }
+
+        let matching = self_consistent_candidate(&original);
+        verify_d5_evidence_candidate(&matching, &original).unwrap();
+    }
+
+    #[test]
+    fn d5_candidate_enforces_fixed_genesis_output_index() {
+        let (original, _) = d5_inputs();
+        let mut context = original.clone();
+        context.contract_output_index = 1;
+        recompute_context_covenant_id(&mut context);
+        let entry = d5_entry(
+            &context,
+            &context.unsigned_transaction_id,
+            1,
+            context.genesis_output_value,
+            Some(&context.covenant_id),
+            false,
+        );
+        let error = build_d5_evidence_candidate(&context, &entry, 467_580_000)
+            .unwrap_err()
+            .to_string();
+        assert!(error.contains("fixed genesis output index"), "{error}");
     }
 }

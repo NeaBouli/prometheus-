@@ -584,6 +584,12 @@ Both runs require Gio budget approval (plan-level gate).
   only after profile separation and review; no duplicate implementation.
 - Claude's scheduled 03:31 CI/Security dispatch must not be duplicated.
 
+### 2026-10-01 - bundle-v2-d5-capture-context-correction delivered (Claude)
+
+- Branch `agent/claude/bundle-v2-d5-capture-context-correction` on 20ff442:
+  DAA chronology rejection and mandatory validated-context verification.
+- Waiting on Codex: correction review; hosted CI only on Codex coordination.
+
 ### 2026-10-01 - bundle-v2-d5-evidence-capture delivered (Claude)
 
 - Branch `agent/claude/bundle-v2-d5-evidence-capture` on ea73277: D5 step (b)
