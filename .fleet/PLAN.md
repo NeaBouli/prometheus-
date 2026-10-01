@@ -584,6 +584,13 @@ Both runs require Gio budget approval (plan-level gate).
   only after profile separation and review; no duplicate implementation.
 - Claude's scheduled 03:31 CI/Security dispatch must not be duplicated.
 
+### 2026-10-01 - bundle-v2-d5-genesis-binding-design delivered (Claude)
+
+- Branch `agent/claude/bundle-v2-d5-genesis-binding-design` on 506cf01: D5
+  design record, non-executable draft validator and matrix tests.
+- Waiting on Codex: four decisions and approval of the implementation order
+  before any runtime acceptance change. No hosted dispatch.
+
 ### 2026-10-01 - bundle-v2-early-gate-correction delivered (Claude)
 
 - Branch `agent/claude/bundle-v2-early-gate-correction` on af24d3f: v2 refusal

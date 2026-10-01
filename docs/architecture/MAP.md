@@ -191,6 +191,9 @@ GH-258/GH-261 producer design) are delivered on
    required `--bundle h001-v1|v2-draft` from the closed registry
    `scripts/silverc_bundles.py`; operator chain runs only on `h001-v1`, the
    Rust deployer pins only the v1 manifest, `v2-draft` is static-check only.
+   D5 genesis binding (proposed design, `d5-genesis-binding-design.md`): draft
+   validator `scripts/silverc_genesis_binding_draft.py` (no CLI, not wired into
+   tooling); runtime acceptance unchanged until Codex approves the plan.
 2. **Endpoint producer review** — independent privacy review of
    `docs/endpoint-producer-design-v1.md` before any implementation brief.
 3. **Toolchain upgrade** — Rusty Kaspa v2.1.0 / SilverScript v1.0.0 once

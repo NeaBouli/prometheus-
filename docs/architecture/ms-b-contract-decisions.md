@@ -88,6 +88,10 @@ part of the reviewed release bundle. Off-chain tooling accepts only states whose
 genesis covenant ID appears in that manifest, which closes the lookalike
 covenant gap for GuardianReputation.
 
+Design detail (proposed, 2026-10-01): `d5-genesis-binding-design.md` — ids are
+precomputable but proven only by recomputation plus public UTXO evidence;
+constructor-embedded ids must form a DAG; v2 has no trust edges today.
+
 ### D6 — Validator cooldown (PRM-35)
 
 Decided earlier today: 7 days = 6,048,000 blocks at 10 BPS, longer than the

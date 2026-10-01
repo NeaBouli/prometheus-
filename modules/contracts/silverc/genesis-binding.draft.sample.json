@@ -1,0 +1,114 @@
+{
+  "plan": {
+    "authority_keys": {
+      "governance:community_donations": {
+        "kind": "governance",
+        "xonly_pubkey": "0808080808080808080808080808080808080808080808080808080808080808"
+      },
+      "governance:dev_incentive_pool": {
+        "kind": "governance",
+        "xonly_pubkey": "0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d"
+      },
+      "governance:guardian_reputation": {
+        "kind": "governance",
+        "xonly_pubkey": "0303030303030303030303030303030303030303030303030303030303030303"
+      },
+      "governance:rule_storage": {
+        "kind": "governance",
+        "xonly_pubkey": "0404040404040404040404040404040404040404040404040404040404040404"
+      },
+      "metrics_oracle:governance_auto_tuning": {
+        "kind": "metrics_oracle",
+        "xonly_pubkey": "0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b"
+      },
+      "validator:validator_staking": {
+        "kind": "validator",
+        "xonly_pubkey": "0101010101010101010101010101010101010101010101010101010101010101"
+      }
+    },
+    "contracts": [
+      {
+        "authority_key": "validator:validator_staking",
+        "constructor_args_sha256": "e2421ba3100806b9a8fe8b0c922a1b9fe396a29bd9f68c88d5727466979acba2",
+        "contract_name": "ValidatorStakingState",
+        "funding_outpoint": "014abd94ec4c190a1a1a0b49e404d3245fb91e7ac1cc78568c036014acd4eb3b:0",
+        "genesis_value_sompi": 100000000,
+        "predicted_covenant_id": "8ecf87a6ffc7d5ea8ab184f36e65dfa378e5a22c56662558f53931a9df97fb5b",
+        "role": "validator_staking",
+        "script_sha256": "b2f58a9451367c2c20b85cf1b0687288a2af56defd89b65b1569cdebbe536929",
+        "trusted_roles": []
+      },
+      {
+        "authority_key": "governance:guardian_reputation",
+        "constructor_args_sha256": "efb379dc47bc7578c1bcbb07b20a481633bef4f80fa9ef3103f1ea9b113554e6",
+        "contract_name": "GuardianReputationState",
+        "funding_outpoint": "700096ae1e109da9830cc7dcd18639f810e92b670d3e10990964a219a69a2735:0",
+        "genesis_value_sompi": 100000000,
+        "predicted_covenant_id": "575830d101f1f7d8d7665dd1868fec8f1908561d33d78ab4ee39e31df641d536",
+        "role": "guardian_reputation",
+        "script_sha256": "9e437234f5681559a192fc92551b6ee61099211f4a6336ff9d9d15cd37f416a9",
+        "trusted_roles": []
+      },
+      {
+        "authority_key": "governance:rule_storage",
+        "constructor_args_sha256": "993a21a585568f7befae6caa700b6188a607c23ddcd58705da2d78dbb37946c1",
+        "contract_name": "RuleStorageState",
+        "funding_outpoint": "710d6ea404866916c0abb33229e49727647854d063713fad388caf02ce442f78:0",
+        "genesis_value_sompi": 100000000,
+        "predicted_covenant_id": "47ed1c52ca9839d06ca652b2846695227141801f7f56962d0dba65a481ad2ffd",
+        "role": "rule_storage",
+        "script_sha256": "19ec233d2a2c3f5e267b7bb3ba1c08298ab661ce02303765aa82bd108f741074",
+        "trusted_roles": []
+      },
+      {
+        "authority_key": "governance:community_donations",
+        "constructor_args_sha256": "491d910c11701e62b172b73e83120f77e8b8b1c0dc4c994841e8d329a302f903",
+        "contract_name": "CommunityDonationsState",
+        "funding_outpoint": "6fcbb650a4ad5c8a1d4933479cbd446521f222e69a22a3ccb58a5cfcb3ac7ad2:0",
+        "genesis_value_sompi": 100000000,
+        "predicted_covenant_id": "2bc31c1d578ee83f5887177df1d5a927c0782d40123a72a2ca18aede6ecdbf90",
+        "role": "community_donations",
+        "script_sha256": "826b9737066b2d424a3dc2457b2ef40df9aa6373275152c0aaa86ae1bf090c13",
+        "trusted_roles": []
+      },
+      {
+        "authority_key": "governance:dev_incentive_pool",
+        "constructor_args_sha256": "7d1af9ac6ef1951b0a923c42a7ed4b9d5a51133105ae6abfacff7957164b6291",
+        "contract_name": "DevIncentivePoolState",
+        "funding_outpoint": "817540691431f32f0efb3b445c3a6c3ff4492861c54713d5665b63c578fad5d0:0",
+        "genesis_value_sompi": 100000000,
+        "predicted_covenant_id": "bbfaa0ecda06bf09d14c962a14f3f60af20d4f56538d49114806e027c57c8eda",
+        "role": "dev_incentive_pool",
+        "script_sha256": "9a412b89cb0d6ed3619db305b1d807fd78bfef3a0ce40dd668a48034b205549c",
+        "trusted_roles": []
+      },
+      {
+        "authority_key": "metrics_oracle:governance_auto_tuning",
+        "constructor_args_sha256": "0c42df19e3acdee17020feb459c98298f27d4795f724a827c9665bff23b416bd",
+        "contract_name": "GovernanceAutoTuningState",
+        "funding_outpoint": "c4ffd03f2b8c6b3e2bf33e9edc33f5d031fbe6fe293bffbec3d74b54315c4203:0",
+        "genesis_value_sompi": 100000000,
+        "predicted_covenant_id": "dabf880faff2bd0a11fc3e34be88c4653ab1e002f2ac05bc86aaef5648947409",
+        "role": "governance_auto_tuning",
+        "script_sha256": "65d3cc36e3ee3a72ec5d8c434122d2863d77f9a6a6f88ce1314bf21e94c8d1aa",
+        "trusted_roles": []
+      }
+    ],
+    "deployment_order": [
+      "validator_staking",
+      "guardian_reputation",
+      "rule_storage",
+      "community_donations",
+      "dev_incentive_pool",
+      "governance_auto_tuning"
+    ],
+    "network_id": "testnet-10",
+    "release": {
+      "bundle_id": "v2-draft",
+      "bundle_manifest_sha256": "b4e48882f40e90ea3c7991454211b66572b999dd7cc02c805c642d73289e4150",
+      "silverscript_commit": "d25bd3427a093c17327ca3d6b9e1aa5f7688c863"
+    },
+    "schema": "prometheus.silverc.genesis-binding",
+    "schema_version": "1-draft"
+  }
+}

@@ -6048,3 +6048,12 @@ Rules for all dev agents:
   control). Fails on af24d3f (18 failures), passes on the fix. Script suite 415
   OK. Report `.fleet/reports/bundle-v2-early-gate-correction.md`.
 
+### 2026-10-01 - [AUTOR: CC] bundle-v2-d5-genesis-binding-design delivered (proposal)
+
+- `docs/architecture/d5-genesis-binding-design.md`: covenant ids are
+  precomputable (funding outpoint + genesis output) but proven only by
+  recomputation plus stored public UTXO evidence; constructor-embedded ids must
+  form a DAG; v2 has no trust edges. Draft validator (no CLI) + 23-test matrix +
+  synthetic sample. Four Codex decisions and a four-step implementation plan in
+  `.fleet/reports/bundle-v2-d5-genesis-binding-design.md`. Script suite 438 OK.
+

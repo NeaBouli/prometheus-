@@ -1,0 +1,192 @@
+# D5 Genesis / Instance Binding — Design Record (proposal)
+
+Status: **proposed** (Claude, 2026-10-01, brief `bundle-v2-d5-genesis-binding-design`).
+Binding only after Codex review. No contract logic, Rust, pin, evidence or
+runtime acceptance change. v2 stays non-promotable; D1–D7 stay proposed.
+Architecture node: MAP M1/MS-B — reviewed deployment manifest → genesis covenant
+identity → off-chain state acceptance.
+
+## 1. Traced facts (existing call sites)
+
+| Topic | Fact | Source |
+|---|---|---|
+| Derivation | `covenant_id = H(funding outpoint txid, index, n, [output index, value, script version, script bytes])`; the binding itself and signatures are excluded | rusty-kaspa v2.0.1 `consensus/core/src/hashing/covenant_id.rs:16-29` |
+| Consensus | genesis covenant id is recomputed; mismatch fails with `WrongGenesisCovenantId` | `crypto/txscript/src/covenants.rs:148-160` |
+| Deployer | `prepare_genesis` computes the id locally from the funding outpoint and the unbound contract output (index 0, genesis value, P2SH of the artifact script) before signing | `modules/silverc-deployer/src/lib.rs:1010`, `:1075-1091` |
+| Txid | Kaspa v1 txid excludes signature scripts, so `deploy_tx_id` and `deployed_instance_id = deploy_tx_id:0` are also fixed before signing | `tx.rs:207-250`; `lib.rs:1133`, `:1178` |
+| Post-broadcast | node UTXO must match outpoint, amount, covenant id and script | `lib.rs:1595-1615` (`deployed_contract_entry`) |
+| Client | rule observation accepts the covenant id named in an owner-signed manifest; no role registry or genesis allowlist | `modules/client/src/blockchain/rule_observation.rs:471-509` |
+| Oracle operator | covenant id comes from the operator-supplied transition spec | `modules/silverc-deployer/src/oracle.rs:743`, `:982` |
+| Python tooling | metrics tools identify the contract by outpoint only; receipt/evidence verifiers never read a covenant id or funding outpoint | `scripts/verify_silverc_deploy_receipt_evidence.py:172-174`, `scripts/build_metrics_oracle_tx_request.py:71-113` |
+| Guardian / validator node | no covenant or GuardianReputation reader | — |
+| Contracts | no constructor takes another contract's covenant id or script hash; `OpInputCovenantId` is used only for self-binding of attestations | `RuleStorageState.sil:103-111`, `:173-186`; pools likewise |
+| H-001 evidence | covenant id appears only in the canary summary with a recorded boolean `covenant_id_match`; the funding outpoint is not recorded, so the id is not independently recomputable | `docs/evidence/gh-9-h001-canary-confirmed-2026-08-12.json:30`, `:57` |
+
+## 2. Precomputable vs. evidence-bound identity
+
+| Field | Plan identity (pre-deployment) | Deployment identity (post-confirmation) |
+|---|---|---|
+| network, bundle id, bundle manifest hash | fixed by the reviewed plan; manifest hash checked against the hardcoded registry pin | same |
+| role, contract name, script/constructor-args SHA-256 | fixed by the plan, checked against the validated release manifest | same |
+| authority key (validator / governance / metrics-oracle) | declared once, must equal the constructor argument of that contract | same |
+| funding outpoint, genesis value | chosen in the plan | the genesis tx must spend it (enforced by consensus through the id) |
+| covenant id | **precomputable** from funding outpoint + value + script (existing Rust helper) | must equal the id on the public UTXO |
+| deploy tx id / instance id | precomputable only once the full unsigned tx (fees, change) is fixed; not part of the plan | from public evidence |
+| block hash, DAA score, confirmations | not available | **public evidence only** |
+
+A claimed id, a fixture, or an operator receipt never proves chain identity. Only
+(a) recomputation of the id from reviewed plan fields and (b) a stored public
+node/explorer UTXO response carrying that id together prove it. Because the id
+commits to the script and the constructor arguments, a lookalike covenant with
+forged initial state (audit PRM-25) necessarily has a different id.
+
+## 3. Circular constructor dependencies
+
+The id hashes the script, and the script embeds the constructor arguments. If
+contract A embedded B's id and B embedded A's id, each id would be an input to
+the other's hash; no deployment can satisfy both. Rules:
+
+1. Trust edges (`trusted_roles`: covenant ids embedded as constructor arguments)
+   must form a DAG; self-edges are forbidden.
+2. Deployment order must be topological, so every embedded id is precomputed
+   from an earlier entry. Ids remain precomputable before any signature.
+3. The current v2 draft has **no** trust edges. No v2 contract can use another
+   contract's id today: there are no runtime cross-contract calls and no
+   co-spend (`OpInputCovenantId` of another input) checks.
+
+Recommendation: amend D5. The off-chain binding below is sufficient now.
+Constructor-embedded ids are added only together with a concrete co-spend
+check, and the validator then enforces rules 1–2.
+
+## 4. Draft binding document (`prometheus.silverc.genesis-binding`, `1-draft`)
+
+```json
+{
+  "plan": {
+    "schema": "prometheus.silverc.genesis-binding", "schema_version": "1-draft",
+    "network_id": "testnet-10",
+    "release": {"bundle_id": "...", "bundle_manifest_sha256": "...", "silverscript_commit": "..."},
+    "authority_keys": {"<name>": {"kind": "governance|metrics_oracle|validator", "xonly_pubkey": "<hex32>"}},
+    "contracts": [{"role": "...", "contract_name": "...", "script_sha256": "...",
+                   "constructor_args_sha256": "...", "authority_key": "<name>",
+                   "genesis_value_sompi": 1, "funding_outpoint": "<txid>:<index>",
+                   "trusted_roles": [], "predicted_covenant_id": "<hex32>"}],
+    "deployment_order": ["..."]
+  },
+  "evidence": {"<role>": {"source_kind": "public_node_utxo|public_explorer_utxo",
+               "network_id": "...", "deploy_tx_id": "...", "deployed_instance_id": "<txid>:0",
+               "covenant_id": "...", "amount_sompi": 1, "block_hash": "...",
+               "block_daa_score": 1, "confirmations": 10,
+               "raw_response": {"outpoint": {}, "utxoEntry": {}}, "raw_response_sha256": "..."}}
+}
+```
+
+- The plan hash is the canonical JSON SHA-256 (sorted keys, compact). It is
+  pinned out of band by review; the document carries no self-declared hash.
+- Roles form a closed table of the six state contracts, each with a key kind
+  and constructor position (validated against the `.sil` headers in tests).
+  `ValidatorStakingH001` is the frozen canary and not a v2 role.
+- `evidence` is absent in the plan phase. Each evidence item embeds the stored
+  raw node response, which is parsed structurally and compared field by field.
+
+## 5. Validation order (deterministic, fail-closed)
+
+1. Document shape (`plan`, optional `evidence`; exact field sets everywhere).
+2. Plan hash equals the reviewed pin.
+3. Schema/version; network in the allowed set (draft: `testnet-10`).
+4. Release: bundle id equals the selected bundle; manifest hash equals the hardcoded registry pin.
+5. Authority keys: format; every key used.
+6. Roles: closed set, each exactly once; contract name per role; script and
+   constructor-args hash equal the validated release manifest; authority key
+   kind per role; key equals the constructor argument.
+7. Anchors: funding outpoint format (uint32 index), unique; genesis value > 0;
+   predicted ids well-formed and unique.
+8. Trust graph acyclic; deployment order topological.
+9. Plan phase result: never executable; always blocked on id recomputation;
+   v2 additionally blocked as non-promotable.
+10. Evidence phase: refused for non-promotable bundles. Per role: public
+    source kind only; same network; raw response hash; structural parse;
+    claimed fields equal the raw fields; output index 0, not coinbase; instance =
+    `deploy_tx_id:0`; deploy tx differs from the funding tx; block hash; at least
+    10 confirmations; observed id equals the predicted id; amount equals the
+    genesis value; ids unique. Missing roles → blocked.
+11. Acceptance (`accept_state`): only after complete consistent evidence. The
+    observed id must map to exactly one role on the same network; unknown id →
+    lookalike; claimed role must match.
+
+Statuses: `D5_PLAN_CONSISTENT_NOT_EXECUTABLE`,
+`D5_PLAN_CONSISTENT_COVENANT_ID_RECOMPUTE_BLOCKED`,
+`D5_BLOCKED_MISSING_GENESIS_EVIDENCE`,
+`D5_EVIDENCE_CONSISTENT_COVENANT_ID_RECOMPUTE_BLOCKED`. No status claims a
+confirmed deployment while the recomputation is unimplemented.
+
+## 6. Validation matrix
+
+Implemented in `scripts/silverc_genesis_binding_draft.py` (no CLI, no writes)
+and tested in `scripts/test_silverc_genesis_binding_draft.py`. The sample
+`modules/contracts/silverc/genesis-binding.draft.sample.json` uses synthetic
+labels, not chain data.
+
+| Case | Code |
+|---|---|
+| plan altered after review | `PLAN_PIN` |
+| lookalike contract (changed constructor args / script) | `COMPILED_IDENTITY` |
+| cross-bundle id or manifest hash | `BUNDLE` |
+| cross-network plan / evidence / state | `NETWORK`, `EVIDENCE_NETWORK` |
+| role ↔ contract substitution, swapped roles | `ROLE_CONTRACT` |
+| duplicate / missing / unknown role | `DUPLICATE_ROLE`, `ROLE_SET`, `ROLE_UNKNOWN` |
+| wrong key kind, key not the constructor argument, unused key | `KEY_KIND`, `KEY_CONSTRUCTOR`, `KEY_UNUSED` |
+| duplicate funding outpoint / covenant id | `DUPLICATE_OUTPOINT`, `DUPLICATE_COVENANT_ID` |
+| malformed outpoint, value | `OUTPOINT`, `GENESIS_VALUE` |
+| self, two- and three-contract cycles | `CIRCULAR_DEPENDENCY` |
+| acyclic edge deployed in the wrong order, unknown edge | `DEPLOYMENT_ORDER`, `TRUST_GRAPH` |
+| self-declared hash or extra field | `SHAPE` |
+| v2 with evidence | `NON_PROMOTABLE` |
+| operator record / receipt / fixture as evidence | `EVIDENCE_SOURCE` |
+| raw response tampered or malformed | `EVIDENCE_RAW` |
+| claimed field ≠ raw field, amount ≠ plan | `EVIDENCE_INCONSISTENT` |
+| wrong index, coinbase, instance, confirmations, block hash | `EVIDENCE_ANCHOR` |
+| consistent evidence for a different covenant id | `COVENANT_MISMATCH` |
+| missing evidence for a role | blocked status; acceptance refused (`NOT_CONFIRMED`) |
+| unknown id / role claim at acceptance | `LOOKALIKE`, `ROLE_SUBSTITUTION` |
+
+## 7. Findings requiring Codex decisions
+
+1. **Placeholder constructor set.** The v2 bundle manifest (`b4e48882…`) binds
+   placeholder constructor arguments, so every real authority key changes the
+   scripts, the covenant ids and the manifest hash. A deployment needs a
+   reviewed deployment-specific constructor set and compiled identity; the
+   binding then refers to that identity, never to the placeholder test bundle.
+2. **Governance key sharing.** The fixtures use a distinct placeholder
+   governance key per contract (`shared_governance_key: false`); D1 implies one
+   attestation key. Decide whether the key is shared or per contract; the
+   validator supports both and reports the result.
+3. **D5 wording.** Amend D5 as in section 3: an off-chain binding now;
+   constructor-embedded ids only together with a concrete co-spend check.
+4. **H-001 history.** The canary covenant id is not independently verifiable
+   (no funding outpoint recorded). Historical evidence stays frozen and is not
+   used as a D5 anchor.
+
+## 8. Minimal proposed implementation (needs Codex approval, in order)
+
+1. **Rust, offline:** a deployer command that returns the covenant id for
+   (funding outpoint, genesis value, artifact). It reuses the output
+   construction of `prepare_genesis` and the existing
+   `kaspa_consensus_core::hashing::covenant_id`, with no keys and no network.
+   Paths: `modules/silverc-deployer/src/lib.rs`, `src/main.rs`, deployer tests.
+   The Rust pins stay unchanged.
+2. **Evidence capture:** record `funding_outpoint`, `covenant_id` and the raw
+   public UTXO response in observation and evidence outputs. Paths:
+   `lib.rs` (`NodeObservation`), `scripts/verify_silverc_deploy_receipt_evidence.py`
+   and the receipt schemas.
+3. **Python binding:** replace `RECOMPUTE_BLOCKER` with the call to step 1 and
+   move the validator from draft to tooling behind the bundle registry
+   (`scripts/silverc_genesis_binding_draft.py`).
+4. **Runtime acceptance (separate brief):** client rule observation accepts
+   only covenant ids from a confirmed binding, with role
+   (`modules/client/src/blockchain/rule_observation.rs`, step 7 of
+   `verify_observation_shared`).
+
+Non-goals: no signing, wallet, chain, deployment export, production or Mainnet
+claim; no change to H-001, proof, toolchain or Rust pins, tokenomics, slash or
+commit-reveal.
