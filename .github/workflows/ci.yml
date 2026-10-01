@@ -330,7 +330,7 @@ jobs:
             --bundle h001-v1
       - name: Verify h001-v1 / v2-draft bundle profile separation
         run: |
-          python3 -m unittest scripts.test_silverc_bundles
+          python3 -m unittest scripts.test_silverc_bundles scripts.test_silverc_early_gate
           python3 scripts/test_silverc_bundle_profiles.py \
             --v1-archive /tmp/prometheus-silverc-artifacts-h001-v1.tar.gz \
             --v2-archive /tmp/prometheus-silverc-artifacts.tar.gz \

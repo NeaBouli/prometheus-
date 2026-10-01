@@ -152,10 +152,11 @@ def build_status(summary: dict[str, Any]) -> dict[str, Any]:
 
 def main() -> int:
     args = parse_args()
+    # Bundle gate first: a draft bundle is refused before any input is read.
+    bundle = bundle_from_args(args)
+    require_promotable(bundle, "deployment status staging")
     bundle_dir, tmp = bundle_root_from_args(args)
     try:
-        bundle = bundle_from_args(args)
-        require_promotable(bundle, "deployment status staging")
         manifest = validate_manifest(bundle_dir, args.silverscript_ref, bundle)
         receipts_doc = load_json(args.operator_receipts.expanduser().resolve())
         summary = validate_receipts_document(receipts_doc, manifest, require_operator_record=True)

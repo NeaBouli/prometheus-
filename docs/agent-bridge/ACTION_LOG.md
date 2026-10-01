@@ -6038,3 +6038,13 @@ Rules for all dev agents:
   `.fleet/reports/bundle-v2-profile-separation.md`. Awaiting Codex review and
   one coordinated exact-head hosted CI run.
 
+### 2026-10-01 - [AUTOR: CC] bundle-v2-early-gate-correction delivered
+
+- Codex review finding confirmed: 9 v2-refusing entrypoints extracted the
+  archive before `require_promotable`. Gate moved to the first statement after
+  argument parsing; handoff and oracle tx request were already correct.
+- New regression `scripts/test_silverc_early_gate.py` (11 entrypoints x
+  missing/malformed inputs, all read/extract/write paths patched to fail; v1
+  control). Fails on af24d3f (18 failures), passes on the fix. Script suite 415
+  OK. Report `.fleet/reports/bundle-v2-early-gate-correction.md`.
+

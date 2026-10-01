@@ -126,10 +126,11 @@ def build_status(result_summary: dict[str, Any]) -> dict[str, Any]:
 
 def main() -> int:
     args = parse_args()
+    # Bundle gate first: a draft bundle is refused before any input is read.
+    bundle = bundle_from_args(args)
+    require_promotable(bundle, "metrics-oracle status staging")
     bundle_dir, tmp = bundle_root_from_args(args)
     try:
-        bundle = bundle_from_args(args)
-        require_promotable(bundle, "metrics-oracle status staging")
         manifest = validate_manifest(bundle_dir, args.silverscript_ref, bundle)
         request_summary = validate_request(load_json(args.tx_request.expanduser().resolve()), manifest)
         result_summary = validate_result(load_json(args.tx_result.expanduser().resolve()), request_summary)

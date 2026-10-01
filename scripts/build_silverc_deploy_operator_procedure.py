@@ -218,10 +218,11 @@ def write_runbook(path: Path | None, procedure: dict[str, Any]) -> None:
 
 def main() -> int:
     args = parse_args()
+    # Bundle gate first: a draft bundle is refused before any input is read.
+    bundle = bundle_from_args(args)
+    require_promotable(bundle, "an executable deploy operator procedure")
     bundle_dir, tmp = bundle_root_from_args(args)
     try:
-        bundle = bundle_from_args(args)
-        require_promotable(bundle, "an executable deploy operator procedure")
         manifest = validate_manifest(bundle_dir, args.silverscript_ref, bundle)
         request_set = load_json(args.request_set.expanduser().resolve())
         requests_dir = args.requests_dir.expanduser().resolve()

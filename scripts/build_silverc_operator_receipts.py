@@ -335,10 +335,11 @@ def build_summary(
 
 def main() -> int:
     args = parse_args()
+    # Bundle gate first: a draft bundle is refused before any input is read.
+    bundle = bundle_from_args(args)
+    require_promotable(bundle, "operator receipts")
     bundle_dir, tmp = bundle_root_from_args(args)
     try:
-        bundle = bundle_from_args(args)
-        require_promotable(bundle, "operator receipts")
         manifest = validate_manifest(bundle_dir, args.silverscript_ref, bundle)
         request_set = load_json(args.request_set.expanduser().resolve())
         requests_dir = args.requests_dir.expanduser().resolve()
