@@ -6100,3 +6100,10 @@ Rules for all dev agents:
   line (delivered blocks with heads and CI runs, who waits for whom, open
   decisions, next gated tickets). Status comment posted on issue #276.
 
+### 2026-10-03 - [AUTOR: CC] bundle-v2-d5-alignment-closed-gate delivered
+
+- Codex C1 review findings fixed: candidate schema_version must be a strict
+  integer (bool/float rejected like Rust); draft accept_state is an
+  unconditional closed gate (NOT_CONFIRMED for genuine and forged results, no
+  prepared switch). Delta proven against 2595ce8. Python 442 OK, gates PASS.
+

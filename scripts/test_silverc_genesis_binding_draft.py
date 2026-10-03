@@ -390,34 +390,41 @@ class EvidenceMatrixTest(D5Base):
                 result, {"network_id": "testnet-10", "covenant_id": guardian}
             )
 
-    def test_acceptance_logic_for_a_hypothetical_confirmed_result(self) -> None:
-        # Not producible by this draft: independently_confirmed is never set.
-        result = dict(
-            self.validate(self.confirmed(), self.twin), independently_confirmed=True
-        )
-        guardian = result["covenant_ids"]["guardian_reputation"]
-        self.assertEqual(
-            d5.accept_state(
-                result, {"network_id": "testnet-10", "covenant_id": guardian}
+    def test_acceptance_gate_is_closed_for_forged_results(self) -> None:
+        genuine = self.validate(self.confirmed(), self.twin)
+        guardian = genuine["covenant_ids"]["guardian_reputation"]
+        forged_results = [
+            dict(genuine, independently_confirmed=True),
+            dict(genuine, independently_confirmed=True, blockers=[]),
+            dict(genuine, independently_confirmed=True, executable=True, blockers=[]),
+            dict(
+                genuine,
+                status="D5_CONFIRMED",
+                independently_confirmed=True,
+                blockers=[],
             ),
-            "guardian_reputation",
-        )
-        with self.assertRaisesRegex(d5.BindingError, "LOOKALIKE"):
-            d5.accept_state(
-                result,
-                {"network_id": "testnet-10", "covenant_id": synthetic("lookalike")},
-            )
-        with self.assertRaisesRegex(d5.BindingError, "ROLE_SUBSTITUTION"):
-            d5.accept_state(
-                result,
-                {
-                    "network_id": "testnet-10",
-                    "covenant_id": guardian,
-                    "role": "rule_storage",
-                },
-            )
-        with self.assertRaisesRegex(d5.BindingError, "EVIDENCE_NETWORK"):
-            d5.accept_state(result, {"network_id": "mainnet", "covenant_id": guardian})
+            {
+                "status": d5.STATUS_EVIDENCE_PENDING_RECOMPUTE,
+                "independently_confirmed": True,
+                "network_id": "testnet-10",
+                "covenant_ids": {"guardian_reputation": guardian},
+                "blockers": [],
+            },
+            {},
+        ]
+        observations = [
+            {"network_id": "testnet-10", "covenant_id": guardian},
+            {
+                "network_id": "testnet-10",
+                "covenant_id": guardian,
+                "role": "guardian_reputation",
+            },
+        ]
+        for result in [genuine, *forged_results]:
+            for observed in observations:
+                with self.subTest(result=sorted(result), observed=observed):
+                    with self.assertRaisesRegex(d5.BindingError, "NOT_CONFIRMED"):
+                        d5.accept_state(result, observed)
 
     def test_missing_evidence_blocks(self) -> None:
         doc = self.confirmed()
@@ -534,6 +541,11 @@ class EvidenceMatrixTest(D5Base):
             self.assert_code(code, doc, self.twin)
 
         mutate(lambda c: c.update(status="CONFIRMED"), "CANDIDATE_SCHEMA")
+        for version in (True, 1.0, "1", None, -1, 2):
+            with self.subTest(schema_version=version):
+                mutate(
+                    lambda c, v=version: c.update(schema_version=v), "CANDIDATE_SCHEMA"
+                )
         mutate(lambda c: c["classification"].pop(), "CANDIDATE_SCHEMA")
         mutate(
             lambda c: c["trust_model"].update(independent_confirmation=True),

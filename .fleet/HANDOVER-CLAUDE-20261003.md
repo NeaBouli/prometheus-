@@ -13,12 +13,13 @@ status change. Codex owns review, integration, merge and release decisions.
 | bundle-v2-d5-offline-covenant-id | agent/claude/bundle-v2-d5-offline-covenant-id | ea73277 | 36811470926 / 36811473498 green | accepted |
 | bundle-v2-d5-evidence-capture | agent/claude/bundle-v2-d5-evidence-capture | 20ff442 | none on this head | corrected below |
 | bundle-v2-d5-capture-context-correction | agent/claude/bundle-v2-d5-capture-context-correction | 61549b1 | 36814029226 / 36814032876 green | accepted |
-| bundle-v2-d5-binding-alignment (C1) | agent/claude/bundle-v2-d5-binding-alignment | 2595ce8 (+docs 95aa512) | not dispatched | approved in scope by Codex 15:19Z; **Codex review in progress** |
+| bundle-v2-d5-binding-alignment (C1) | agent/claude/bundle-v2-d5-binding-alignment | 2595ce8 (+docs 95aa512, f6d3dc6) | not dispatched | reviewed by Codex 15:21Z: two findings, fixed below |
+| bundle-v2-d5-alignment-closed-gate | agent/claude/bundle-v2-d5-alignment-closed-gate | HEAD_PLACEHOLDER | not dispatched | **waiting for Codex review** |
 
 ## Who waits for whom
 
-- **Codex** (15:19Z): split accepted; reviewing C1; no activation and no prepared
-  switch (activation gets its own acceptance later).
+- **Codex**: review of the closed-gate correction; then one hosted CI/Security
+  run on that head if he releases it.
 - **Kimi (K1)**: independent read-only security review of contract v2 at
   61549b1 (`.fleet/tasks/bundle-v2-independent-security-review.md`).
   **Blocked on Gio**: Codex needs the explicit confirmation sentence for the

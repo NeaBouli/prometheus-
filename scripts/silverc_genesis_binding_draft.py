@@ -18,7 +18,7 @@ import json
 import re
 from dataclasses import dataclass
 from hashlib import sha256
-from typing import Any
+from typing import Any, NoReturn
 
 from silverc_bundles import Bundle
 
@@ -456,6 +456,13 @@ def verify_candidate_document(
     This is internal consistency only; plan/context binding is separate.
     """
     item = _exact_keys(candidate, CANDIDATE_KEYS, "SHAPE", label)
+    # Strict integer first: True and 1.0 compare equal to 1 in Python but not in Rust.
+    _uint(
+        item["schema_version"],
+        "CANDIDATE_SCHEMA",
+        f"{label}: schema_version",
+        0xFFFFFFFF,
+    )
     _require(
         item["schema_version"] == CANDIDATE_SCHEMA_VERSION
         and item["kind"] == CANDIDATE_KIND
@@ -701,40 +708,17 @@ def validate_genesis_binding(
     return result
 
 
-def accept_state(result: dict[str, Any], observed: dict[str, Any]) -> str:
-    """Off-chain acceptance: map an observed state to its role or reject it.
+def accept_state(result: dict[str, Any], observed: dict[str, Any]) -> NoReturn:
+    """Closed acceptance gate of the D5 draft: always refuses.
 
-    Only a result with complete, consistent and independently confirmed
-    evidence can accept a state. This draft never sets
-    ``independently_confirmed``, so every real result is refused until the
-    trusted-source model exists. A covenant id that is not in the binding
-    (lookalike) is rejected.
+    No result - genuine, forged or caller-modified, whatever its status, flags
+    or blockers - may map a state to a role. Acceptance requires a separately
+    reviewed and explicitly authorized trusted-source and recomputation
+    implementation; until then this function only reports NOT_CONFIRMED.
     """
-    _require(
-        result.get("status") == STATUS_EVIDENCE_PENDING_RECOMPUTE
-        and result.get("independently_confirmed") is True,
+    del result, observed
+    raise BindingError(
         "NOT_CONFIRMED",
-        "no independently confirmed deployment identity to accept states against",
+        "D5 draft acceptance gate is closed; no state is accepted until a separately "
+        "reviewed trusted-source and recomputation implementation is authorized",
     )
-    _require(
-        observed.get("network_id") == result["network_id"],
-        "EVIDENCE_NETWORK",
-        "state from another network",
-    )
-    roles = [
-        role
-        for role, cid in result["covenant_ids"].items()
-        if cid == observed.get("covenant_id")
-    ]
-    _require(
-        len(roles) == 1,
-        "LOOKALIKE",
-        "covenant id is not bound by the deployment identity",
-    )
-    claimed = observed.get("role")
-    _require(
-        claimed in (None, roles[0]),
-        "ROLE_SUBSTITUTION",
-        "state claims a different role",
-    )
-    return str(roles[0])

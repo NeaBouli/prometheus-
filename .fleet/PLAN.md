@@ -584,6 +584,13 @@ Both runs require Gio budget approval (plan-level gate).
   only after profile separation and review; no duplicate implementation.
 - Claude's scheduled 03:31 CI/Security dispatch must not be duplicated.
 
+### 2026-10-03 - bundle-v2-d5-alignment-closed-gate delivered (Claude)
+
+- Branch `agent/claude/bundle-v2-d5-alignment-closed-gate`: strict
+  schema_version, closed draft acceptance gate. Waiting on Codex review.
+- K1 still waits for Gio's explicit transfer confirmation; G1 queued until the
+  writing slot is free.
+
 ### 2026-10-03 - bundle-v2-d5-binding-alignment delivered (Claude, C1)
 
 - Branch `agent/claude/bundle-v2-d5-binding-alignment` on 61549b1: Python draft

@@ -137,11 +137,13 @@ check, and the validator then enforces rules 1–2.
       must equal the predicted id.
 
     Covenant ids must be unique. Missing roles → blocked.
-11. Acceptance (`accept_state`): only for a result that is complete,
-    consistent and `independently_confirmed`. The draft never sets that flag,
-    so every real result is refused (`NOT_CONFIRMED`) until the trusted-source
-    model exists. Otherwise, the observed id must map to exactly one role on
-    the same network; an unknown id is a lookalike; a claimed role must match.
+11. Acceptance (`accept_state`): **closed gate.** The draft unconditionally
+    refuses with `NOT_CONFIRMED`. Any result, whether genuine, forged or
+    caller-modified (status, `independently_confirmed`, `executable` or
+    blockers), is refused. There is no prepared activation switch. Acceptance
+    needs a separately reviewed and explicitly authorized trusted-source and
+    recomputation implementation. Role, network and lookalike substitutions are
+    rejected earlier, at the candidate-to-plan binding (step 10).
 
 Statuses: `D5_PLAN_CONSISTENT_NOT_EXECUTABLE`,
 `D5_PLAN_CONSISTENT_COVENANT_ID_RECOMPUTE_BLOCKED`,
@@ -182,8 +184,9 @@ labels, not chain data.
 | self-consistent candidate with another funding outpoint / value | `EVIDENCE_CONTEXT` |
 | consistent candidate for a different covenant id | `COVENANT_MISMATCH` |
 | missing evidence for a role | blocked status |
-| any real result at acceptance (never independently confirmed) | `NOT_CONFIRMED` |
-| unknown id / role claim (hypothetical confirmed result) | `LOOKALIKE`, `ROLE_SUBSTITUTION` |
+| any result at acceptance (closed gate) | `NOT_CONFIRMED` |
+| forged result (flags, status or blockers altered) at acceptance | `NOT_CONFIRMED` |
+| candidate `schema_version` given as bool, float or string | `CANDIDATE_SCHEMA` |
 
 ## 7. Findings requiring Codex decisions
 
