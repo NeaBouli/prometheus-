@@ -13,23 +13,23 @@ status change. Codex owns review, integration, merge and release decisions.
 | bundle-v2-d5-offline-covenant-id | agent/claude/bundle-v2-d5-offline-covenant-id | ea73277 | 36811470926 / 36811473498 green | accepted |
 | bundle-v2-d5-evidence-capture | agent/claude/bundle-v2-d5-evidence-capture | 20ff442 | none on this head | corrected below |
 | bundle-v2-d5-capture-context-correction | agent/claude/bundle-v2-d5-capture-context-correction | 61549b1 | 36814029226 / 36814032876 green | accepted |
-| bundle-v2-d5-binding-alignment (C1) | agent/claude/bundle-v2-d5-binding-alignment | 2595ce8 | not dispatched | **waiting for Codex review** |
+| bundle-v2-d5-binding-alignment (C1) | agent/claude/bundle-v2-d5-binding-alignment | 2595ce8 (+docs 95aa512) | not dispatched | approved in scope by Codex 15:19Z; **Codex review in progress** |
 
 ## Who waits for whom
 
-- **Codex**: read the queued messages (Prometheus chat must be opened by Gio to
-  deliver them); dispatch K1 and G1; review C1.
+- **Codex** (15:19Z): split accepted; reviewing C1; no activation and no prepared
+  switch (activation gets its own acceptance later).
 - **Kimi (K1)**: independent read-only security review of contract v2 at
-  61549b1 (`.fleet/tasks/bundle-v2-independent-security-review.md`). Gio
-  approved Kimi involvement on 2026-10-03 ("voll einbeziehen"); Codex decides
-  whether that covers the code transfer.
+  61549b1 (`.fleet/tasks/bundle-v2-independent-security-review.md`).
+  **Blocked on Gio**: Codex needs the explicit confirmation sentence for the
+  code transfer to Kimi (see open decisions); no dispatch or workaround before.
 - **Claude**: C2 = fix K1 findings once they arrive; C3 = Zelcore check once a
   link or brief exists.
-- **Grok (G1)**: mypy annotation at `scripts/verify_silverc_deploy_receipts.py:162`.
+- **Grok (G1)**: mypy annotation at `scripts/verify_silverc_deploy_receipts.py:162` — deferred by Codex while C1 writes (one writing worker at a time).
 
 ## Open decisions
 
-- Gio: explicit OK for the code transfer to Kimi, if Codex asks again.
+- Gio: confirm in the Codex chat, verbatim: "Ich genehmige für K1 die Übermittlung der im bestehenden Review-Brief abgegrenzten Quellcode- und Testdateien an Kimi über `kimi-strong-worker`, ausschließlich read-only und ohne Secrets oder private Operatordaten."
 - Codex: trusted-source model for D5 evidence acceptance (Kimi K2 can draft variants).
 - Codex: D1–D7 remain proposed; full contract security acceptance pending K1.
 
