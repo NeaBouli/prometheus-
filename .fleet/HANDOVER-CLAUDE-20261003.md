@@ -17,7 +17,7 @@ status change. Codex owns review, integration, merge and release decisions.
 | bundle-v2-d5-alignment-closed-gate | agent/claude/bundle-v2-d5-alignment-closed-gate | 684a4d5 (code) (docs 1c96d98) | 37134471451 / 37134474481 green | accepted |
 | g1-receipt-mypy-annotation | agent/claude/g1-receipt-mypy-annotation | 1e0849d (docs f090c35) | not dispatched | accepted by Codex |
 | landing-status-20261004 (+correction) | agent/claude/landing-status-20261004-correction | 417e2fb | not dispatched | waiting for Codex UI review (evidence ~/agent-fleet/evidence/prometheus/landing-status-20261004-correction/) |
-| c2-k1-followup | agent/claude/c2-k1-followup | C2HEAD | not dispatched | **waiting for Codex review** |
+| c2-k1-followup | agent/claude/c2-k1-followup | 994f017 | not dispatched | **waiting for Codex review** |
 
 ## Who waits for whom
 
