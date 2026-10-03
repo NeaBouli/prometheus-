@@ -6047,3 +6047,13 @@ Rules for all dev agents:
   (Chromium via Playwright): owned cache removed, `other-project-v1`,
   `prometheus-v2`, `workbox-precache-v2` preserved, 0 registrations; fails on the
   previous `sw.js`. Site CSS, claim, status, hygiene, memory gates and tests pass.
+
+### 2026-10-04 - [AUTOR: CC] landing-status-20261004 (public landing kept current)
+
+- index.html roadmap: added "Community audit remediation (PRM-01…PRM-48)"
+  (#284/#285 with exact-main CI/Security/Pages ids, Merged) and "Contract bundle
+  v2 decisions (MS-B, #276)" (draft on reviewed worker branches, not merged,
+  non-promotable, review in progress). Footer review date/baseline unchanged
+  (gate-pinned; site-wide reconciliation proposed separately). Visual gate at
+  4 viewports passed and inspected; public gates and pages/memory CI replay pass.
+

@@ -630,3 +630,10 @@ Both runs require Gio budget approval (plan-level gate).
 - Retired worker cleanup scoped to the exact legacy cache `prometheus-v1`;
   unrelated origin caches preserved. Browser regression green, fails on the old
   worker. Report: `.fleet/reports/handback-sw-scope-fix.md`. No merge or deploy.
+
+### 2026-10-04 - landing-status-20261004 delivered (Claude)
+
+- Branch `agent/claude/landing-status-20261004` on main e6d5464: two factual
+  roadmap rows on the public landing; waiting on Codex review. Proposal: a
+  separate site-wide claim reconciliation after the contract-v2 review.
+
