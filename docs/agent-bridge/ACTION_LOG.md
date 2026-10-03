@@ -6057,3 +6057,10 @@ Rules for all dev agents:
   (gate-pinned; site-wide reconciliation proposed separately). Visual gate at
   4 viewports passed and inspected; public gates and pages/memory CI replay pass.
 
+### 2026-10-04 - [AUTOR: CC] landing-status-20261004-correction delivered
+
+- Audit row narrowed to the merged A1–A8 repository blocks (#270 stays open);
+  contract v2 row states K1 completed with changes requested. Evidence:
+  four screenshots + assertions under
+  ~/agent-fleet/evidence/prometheus/landing-status-20261004-correction/.
+
