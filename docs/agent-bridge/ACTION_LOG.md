@@ -6094,3 +6094,9 @@ Rules for all dev agents:
   `independently_confirmed: false`; `accept_state` refuses every real result.
   Draft only, not wired. Python 442 OK, deployer 74 OK, clippy/fmt clean.
 
+### 2026-10-03 - [AUTOR: CC] Status: TODO/handover consolidated
+
+- `.fleet/HANDOVER-CLAUDE-20261003.md`: living TODO for the contract-v2/D5
+  line (delivered blocks with heads and CI runs, who waits for whom, open
+  decisions, next gated tickets). Status comment posted on issue #276.
+
