@@ -637,3 +637,9 @@ Both runs require Gio budget approval (plan-level gate).
   roadmap rows on the public landing; waiting on Codex review. Proposal: a
   separate site-wide claim reconciliation after the contract-v2 review.
 
+### 2026-10-04 - landing-status-20261004-correction delivered (Claude)
+
+- Branch `agent/claude/landing-status-20261004-correction`: wording per Codex
+  review; screenshot evidence preserved; waiting on Codex UI review. Next for
+  Claude: C2 (K1 follow-up), sequenced after this write.
+
