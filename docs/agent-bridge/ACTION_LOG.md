@@ -6086,3 +6086,11 @@ Rules for all dev agents:
   deploy txid, script, value) fail against the original context. Deployer
   tests 73 OK, clippy/fmt clean.
 
+### 2026-10-03 - [AUTOR: CC] bundle-v2-d5-binding-alignment (C1, prepared, not activated)
+
+- Python D5 draft evidence phase now consumes Rust evidence candidates bound to
+  the reviewed plan (network, role contract, funding outpoint, value, predicted
+  id); cross-language fixture pins hashing and constants. Results stay
+  `independently_confirmed: false`; `accept_state` refuses every real result.
+  Draft only, not wired. Python 442 OK, deployer 74 OK, clippy/fmt clean.
+

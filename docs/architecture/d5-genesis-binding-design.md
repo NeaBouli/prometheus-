@@ -88,11 +88,7 @@ check, and the validator then enforces rules 1–2.
                    "trusted_roles": [], "predicted_covenant_id": "<hex32>"}],
     "deployment_order": ["..."]
   },
-  "evidence": {"<role>": {"source_kind": "public_node_utxo|public_explorer_utxo",
-               "network_id": "...", "deploy_tx_id": "...", "deployed_instance_id": "<txid>:0",
-               "covenant_id": "...", "amount_sompi": 1, "block_hash": "...",
-               "block_daa_score": 1, "confirmations": 10,
-               "raw_response": {"outpoint": {}, "utxoEntry": {}}, "raw_response_sha256": "..."}}
+  "evidence": {"<role>": "<prometheus.silverc.d5.genesis_evidence_candidate v1, section 9>"}
 }
 ```
 
@@ -101,8 +97,10 @@ check, and the validator then enforces rules 1–2.
 - Roles form a closed table of the six state contracts, each with a key kind
   and constructor position (validated against the `.sil` headers in tests).
   `ValidatorStakingH001` is the frozen canary and not a v2 role.
-- `evidence` is absent in the plan phase. Each evidence item embeds the stored
-  raw node response, which is parsed structurally and compared field by field.
+- `evidence` is absent in the plan phase. Since `bundle-v2-d5-binding-alignment`
+  each evidence item is a Rust D5 evidence candidate (section 9). The earlier
+  ad-hoc evidence format with a raw response, confirmations and block hash was
+  removed.
 
 ## 5. Validation order (deterministic, fail-closed)
 
@@ -120,15 +118,30 @@ check, and the validator then enforces rules 1–2.
 9. Plan phase result: never executable; always blocked on id recomputation;
    v2 additionally blocked as non-promotable.
 10. Evidence phase (draft checks only; acceptance blocked until the
-    trusted-source model in section 2 is decided): refused for non-promotable bundles. Per role: public
-    source kind only; same network; raw response hash; structural parse;
-    claimed fields equal the raw fields; output index 0, not coinbase; instance =
-    `deploy_tx_id:0`; deploy tx differs from the funding tx; block hash; at least
-    10 confirmations; observed id equals the predicted id; amount equals the
-    genesis value; ids unique. Missing roles → blocked.
-11. Acceptance (`accept_state`): only after complete consistent evidence. The
-    observed id must map to exactly one role on the same network; unknown id →
-    lookalike; claimed role must match.
+    trusted-source model in section 2 is decided): refused for non-promotable
+    bundles. Each role's candidate is checked in two steps.
+    - Internal consistency (`verify_candidate_document`):
+      - exact field sets;
+      - schema, status, classification, trust model, sources and the
+        relationship list pinned to the Rust constants via a cross-language
+        fixture;
+      - fixed output index 0;
+      - observed outpoint = expected deploy txid:0; the deploy tx differs from
+        the funding tx;
+      - observed value, script and covenant id match;
+      - not coinbase;
+      - DAA chronology and depth;
+      - snapshot and candidate hashes.
+    - Plan context: the network, contract of the role, funding outpoint and
+      genesis value must equal the plan entry, and the calculated covenant id
+      must equal the predicted id.
+
+    Covenant ids must be unique. Missing roles → blocked.
+11. Acceptance (`accept_state`): only for a result that is complete,
+    consistent and `independently_confirmed`. The draft never sets that flag,
+    so every real result is refused (`NOT_CONFIRMED`) until the trusted-source
+    model exists. Otherwise, the observed id must map to exactly one role on
+    the same network; an unknown id is a lookalike; a claimed role must match.
 
 Statuses: `D5_PLAN_CONSISTENT_NOT_EXECUTABLE`,
 `D5_PLAN_CONSISTENT_COVENANT_ID_RECOMPUTE_BLOCKED`,
@@ -158,13 +171,19 @@ labels, not chain data.
 | acyclic edge deployed in the wrong order, unknown edge | `DEPLOYMENT_ORDER`, `TRUST_GRAPH` |
 | self-declared hash or extra field | `SHAPE` |
 | v2 with evidence | `NON_PROMOTABLE` |
-| operator record / receipt / fixture as evidence | `EVIDENCE_SOURCE` |
-| raw response tampered or malformed | `EVIDENCE_RAW` |
-| claimed field ≠ raw field, amount ≠ plan | `EVIDENCE_INCONSISTENT` |
-| wrong index, coinbase, instance, confirmations, block hash | `EVIDENCE_ANCHOR` |
-| consistent evidence for a different covenant id | `COVENANT_MISMATCH` |
-| missing evidence for a role | blocked status; acceptance refused (`NOT_CONFIRMED`) |
-| unknown id / role claim at acceptance | `LOOKALIKE`, `ROLE_SUBSTITUTION` |
+| candidate status / classification / relationship change | `CANDIDATE_SCHEMA` |
+| trust model upgraded (independent confirmation, fewer missing checks) | `CANDIDATE_TRUST` |
+| relabeled field source | `CANDIDATE_SOURCE` |
+| unknown, missing or legacy field (e.g. `raw_response`, `rpc_url`) | `SHAPE` |
+| snapshot or candidate hash mismatch | `EVIDENCE_HASH` |
+| observed value / script / DAA depth inconsistent | `EVIDENCE_INCONSISTENT` |
+| wrong or non-fixed index, coinbase, future DAA, deploy tx = funding tx | `EVIDENCE_ANCHOR` |
+| self-consistent candidate with another network / contract | `EVIDENCE_NETWORK`, `ROLE_CONTRACT` |
+| self-consistent candidate with another funding outpoint / value | `EVIDENCE_CONTEXT` |
+| consistent candidate for a different covenant id | `COVENANT_MISMATCH` |
+| missing evidence for a role | blocked status |
+| any real result at acceptance (never independently confirmed) | `NOT_CONFIRMED` |
+| unknown id / role claim (hypothetical confirmed result) | `LOOKALIKE`, `ROLE_SUBSTITUTION` |
 
 ## 7. Findings requiring Codex decisions
 
@@ -197,9 +216,13 @@ labels, not chain data.
 2. **Evidence capture (implemented as a candidate in `bundle-v2-d5-evidence-capture`;
    acceptance stays blocked until the trusted-source model is decided):** see
    section 9.
-3. **Python binding:** replace `RECOMPUTE_BLOCKER` with the call to step 1 and
-   move the validator from draft to tooling behind the bundle registry
-   (`scripts/silverc_genesis_binding_draft.py`).
+3. **Python binding:** prepared without activation in
+   `bundle-v2-d5-binding-alignment`. The draft now consumes Rust candidates,
+   bound to the plan, with a cross-language fixture
+   (`modules/silverc-deployer/tests/fixtures/d5-evidence-candidate.synthetic.json`).
+   Still open after the independent security review and the trusted-source
+   decision: replace `RECOMPUTE_BLOCKER` with the call to step 1 and move the
+   validator from draft to tooling behind the bundle registry.
 4. **Runtime acceptance (separate brief):** client rule observation accepts
    only covenant ids from a confirmed binding, with role
    (`modules/client/src/blockchain/rule_observation.rs`, step 7 of

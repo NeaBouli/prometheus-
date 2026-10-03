@@ -584,6 +584,13 @@ Both runs require Gio budget approval (plan-level gate).
   only after profile separation and review; no duplicate implementation.
 - Claude's scheduled 03:31 CI/Security dispatch must not be duplicated.
 
+### 2026-10-03 - bundle-v2-d5-binding-alignment delivered (Claude, C1)
+
+- Branch `agent/claude/bundle-v2-d5-binding-alignment` on 61549b1: Python draft
+  binding aligned to Rust D5 candidates; no activation. Proposed fleet split:
+  Kimi K1 security review + K2 trusted-source variants, Grok G1 mypy fix.
+- Waiting on Codex: review of C1 and dispatch of K1/G1.
+
 ### 2026-10-01 - bundle-v2-d5-capture-context-correction delivered (Claude)
 
 - Branch `agent/claude/bundle-v2-d5-capture-context-correction` on 20ff442:

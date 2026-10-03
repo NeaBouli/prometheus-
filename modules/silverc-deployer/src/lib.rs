@@ -4492,4 +4492,17 @@ mod tests {
             .to_string();
         assert!(error.contains("fixed genesis output index"), "{error}");
     }
+
+    /// Cross-language fixture: the Python D5 draft verifies the same bytes.
+    #[test]
+    fn d5_candidate_matches_cross_language_fixture() {
+        let (signing_request, entry) = d5_inputs();
+        let candidate = build_d5_evidence_candidate(&signing_request, &entry, 467_580_000).unwrap();
+        let fixture: D5EvidenceCandidate = serde_json::from_str(include_str!(
+            "../tests/fixtures/d5-evidence-candidate.synthetic.json"
+        ))
+        .unwrap();
+        assert_eq!(candidate, fixture);
+        verify_d5_evidence_candidate(&fixture, &signing_request).unwrap();
+    }
 }

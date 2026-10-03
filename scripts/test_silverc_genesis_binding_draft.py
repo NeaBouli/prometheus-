@@ -78,32 +78,66 @@ def build_plan(bundle: bundles.Bundle) -> dict[str, Any]:
     }
 
 
+CANDIDATE_FIXTURE = (
+    ROOT
+    / "modules/silverc-deployer/tests/fixtures/d5-evidence-candidate.synthetic.json"
+)
+P2SH_SCRIPT = {"version": 0, "script_hex": "aa20" + "ab" * 32 + "87"}
+
+
+def rehash(candidate: dict[str, Any]) -> dict[str, Any]:
+    candidate["observed_snapshot_sha256"] = d5.canonical_sha256(candidate["observed"])
+    unhashed = {k: v for k, v in candidate.items() if k != "candidate_sha256"}
+    candidate["candidate_sha256"] = d5.canonical_sha256(unhashed)
+    return candidate
+
+
 def build_evidence(
     entry: dict[str, Any], network: str = "testnet-10"
 ) -> dict[str, Any]:
+    """Synthetic candidate in the Rust D5 schema for one plan entry."""
+    txid, index = entry["funding_outpoint"].split(":")
     deploy_tx = synthetic("deploy:" + entry["role"])
-    raw = {
-        "outpoint": {"transactionId": deploy_tx, "index": 0},
-        "utxoEntry": {
-            "amount": str(entry["genesis_value_sompi"]),
-            "covenantId": entry["predicted_covenant_id"],
-            "blockDaaScore": "123456789",
-            "isCoinbase": False,
+    candidate = {
+        "schema_version": d5.CANDIDATE_SCHEMA_VERSION,
+        "kind": d5.CANDIDATE_KIND,
+        "status": d5.CANDIDATE_STATUS,
+        "classification": list(d5.CANDIDATE_CLASSIFICATION),
+        "trust_model": {
+            "source": d5.CANDIDATE_TRUST_SOURCE,
+            "independent_confirmation": False,
+            "snapshot_note": d5.CANDIDATE_SNAPSHOT_NOTE,
+            "missing_independent_checks": list(d5.CANDIDATE_MISSING_CHECKS),
         },
+        "preparation": {
+            "source": d5.CANDIDATE_PREPARATION_SOURCE,
+            "network_id": network,
+            "contract_name": entry["contract_name"],
+            "request_sha256": synthetic("request:" + entry["role"]),
+            "signing_request_sha256": synthetic("signing:" + entry["role"]),
+            "funding_outpoint": {"transaction_id": txid, "index": int(index)},
+            "genesis_output_value": entry["genesis_value_sompi"],
+            "contract_output_index": 0,
+            "contract_script_public_key": dict(P2SH_SCRIPT),
+            "calculated_covenant_id": entry["predicted_covenant_id"],
+            "expected_deploy_tx_id": deploy_tx,
+        },
+        "observed": {
+            "source": d5.CANDIDATE_SNAPSHOT_SOURCE,
+            "outpoint": {"transaction_id": deploy_tx, "index": 0},
+            "amount": entry["genesis_value_sompi"],
+            "script_public_key": dict(P2SH_SCRIPT),
+            "covenant_id": entry["predicted_covenant_id"],
+            "block_daa_score": 123_456_789,
+            "is_coinbase": False,
+        },
+        "observed_snapshot_sha256": "",
+        "observed_virtual_daa_score": 123_456_999,
+        "daa_depth": 210,
+        "relationships": list(d5.CANDIDATE_RELATIONSHIPS),
+        "candidate_sha256": "",
     }
-    return {
-        "source_kind": "public_node_utxo",
-        "network_id": network,
-        "deploy_tx_id": deploy_tx,
-        "deployed_instance_id": f"{deploy_tx}:0",
-        "covenant_id": entry["predicted_covenant_id"],
-        "amount_sompi": entry["genesis_value_sompi"],
-        "block_hash": synthetic("block:" + entry["role"]),
-        "block_daa_score": 123456789,
-        "confirmations": 20,
-        "raw_response": raw,
-        "raw_response_sha256": d5.canonical_sha256(raw),
-    }
+    return rehash(candidate)
 
 
 def entry(plan: dict[str, Any], role: str) -> dict[str, Any]:
@@ -343,12 +377,24 @@ class EvidenceMatrixTest(D5Base):
         }
         self.assert_code("NON_PROMOTABLE", doc, self.v2)
 
-    def test_complete_evidence_stays_blocked_on_recompute_and_accepts_bound_states(
-        self,
-    ) -> None:
+    def test_complete_candidates_stay_blocked_and_accept_nothing(self) -> None:
         result = self.validate(self.confirmed(), self.twin)
         self.assertEqual(result["status"], d5.STATUS_EVIDENCE_PENDING_RECOMPUTE)
         self.assertFalse(result["executable"])
+        self.assertFalse(result["independently_confirmed"])
+        self.assertIn(d5.RECOMPUTE_BLOCKER, result["blockers"])
+        self.assertIn(d5.TRUST_BLOCKER, result["blockers"])
+        guardian = result["covenant_ids"]["guardian_reputation"]
+        with self.assertRaisesRegex(d5.BindingError, "NOT_CONFIRMED"):
+            d5.accept_state(
+                result, {"network_id": "testnet-10", "covenant_id": guardian}
+            )
+
+    def test_acceptance_logic_for_a_hypothetical_confirmed_result(self) -> None:
+        # Not producible by this draft: independently_confirmed is never set.
+        result = dict(
+            self.validate(self.confirmed(), self.twin), independently_confirmed=True
+        )
         guardian = result["covenant_ids"]["guardian_reputation"]
         self.assertEqual(
             d5.accept_state(
@@ -356,12 +402,11 @@ class EvidenceMatrixTest(D5Base):
             ),
             "guardian_reputation",
         )
-        lookalike = {
-            "network_id": "testnet-10",
-            "covenant_id": synthetic("lookalike-guardian"),
-        }
         with self.assertRaisesRegex(d5.BindingError, "LOOKALIKE"):
-            d5.accept_state(result, lookalike)
+            d5.accept_state(
+                result,
+                {"network_id": "testnet-10", "covenant_id": synthetic("lookalike")},
+            )
         with self.assertRaisesRegex(d5.BindingError, "ROLE_SUBSTITUTION"):
             d5.accept_state(
                 result,
@@ -374,106 +419,175 @@ class EvidenceMatrixTest(D5Base):
         with self.assertRaisesRegex(d5.BindingError, "EVIDENCE_NETWORK"):
             d5.accept_state(result, {"network_id": "mainnet", "covenant_id": guardian})
 
-    def test_missing_evidence_blocks_and_accepts_nothing(self) -> None:
+    def test_missing_evidence_blocks(self) -> None:
         doc = self.confirmed()
         del doc["evidence"]["guardian_reputation"]
         result = self.validate(doc, self.twin)
         self.assertEqual(result["status"], d5.STATUS_BLOCKED_EVIDENCE)
         self.assertIn("guardian_reputation", result["blockers"][-1])
-        with self.assertRaisesRegex(d5.BindingError, "NOT_CONFIRMED"):
-            d5.accept_state(
-                result,
-                {
-                    "network_id": "testnet-10",
-                    "covenant_id": synthetic("covenant:rule_storage"),
-                },
-            )
 
-    def test_operator_claims_are_not_chain_evidence(self) -> None:
-        for kind in ("operator_record", "operator_receipt", "fixture", "claimed"):
-            doc = self.confirmed()
-            doc["evidence"]["rule_storage"]["source_kind"] = kind
-            with self.subTest(kind=kind):
-                self.assert_code("EVIDENCE_SOURCE", doc, self.twin)
-
-    def test_evidence_inconsistencies_rejected(self) -> None:
+    def test_context_substitutions_rejected_even_when_self_consistent(self) -> None:
         def mutate(role: str, change: Any, code: str) -> None:
             doc = self.confirmed()
             change(doc["evidence"][role])
+            rehash(doc["evidence"][role])
+            d5.verify_candidate_document(doc["evidence"][role])  # still self-consistent
             self.assert_code(code, doc, self.twin)
+
+        def other_funding(c: dict[str, Any]) -> None:
+            c["preparation"]["funding_outpoint"]["index"] += 1
+
+        def other_value(c: dict[str, Any]) -> None:
+            c["preparation"]["genesis_output_value"] += 1
+            c["observed"]["amount"] += 1
+
+        def other_id(c: dict[str, Any]) -> None:
+            c["preparation"]["calculated_covenant_id"] = synthetic("lookalike")
+            c["observed"]["covenant_id"] = synthetic("lookalike")
 
         mutate(
             "rule_storage",
-            lambda e: e.update(network_id="testnet-11"),
+            lambda c: c["preparation"].update(network_id="testnet-11"),
             "EVIDENCE_NETWORK",
         )
         mutate(
             "rule_storage",
-            lambda e: e.update(raw_response_sha256=synthetic("tampered")),
-            "EVIDENCE_RAW",
+            lambda c: c["preparation"].update(contract_name="CommunityDonationsState"),
+            "ROLE_CONTRACT",
         )
+        mutate("rule_storage", other_funding, "EVIDENCE_CONTEXT")
+        mutate("rule_storage", other_value, "EVIDENCE_CONTEXT")
+        mutate("rule_storage", other_id, "COVENANT_MISMATCH")
+
+    def test_candidate_internal_inconsistencies_rejected(self) -> None:
+        def mutate(change: Any, code: str, rehashed: bool = True) -> None:
+            doc = self.confirmed()
+            change(doc["evidence"]["guardian_reputation"])
+            if rehashed:
+                rehash(doc["evidence"]["guardian_reputation"])
+            self.assert_code(code, doc, self.twin)
+
         mutate(
-            "rule_storage",
-            lambda e: e.update(
-                raw_response={"unexpected": True},
-                raw_response_sha256=d5.canonical_sha256({"unexpected": True}),
-            ),
-            "EVIDENCE_RAW",
-        )
-        mutate(
-            "rule_storage",
-            lambda e: e.update(covenant_id=synthetic("claimed")),
+            lambda c: c["observed"].update(amount=c["observed"]["amount"] + 1),
             "EVIDENCE_INCONSISTENT",
         )
         mutate(
-            "rule_storage",
-            lambda e: e.update(deployed_instance_id=f"{e['deploy_tx_id']}:1"),
+            lambda c: c["observed"].update(covenant_id=synthetic("x")),
+            "COVENANT_MISMATCH",
+        )
+        mutate(lambda c: c["observed"]["outpoint"].update(index=1), "EVIDENCE_ANCHOR")
+        mutate(lambda c: c["observed"].update(is_coinbase=True), "EVIDENCE_ANCHOR")
+        mutate(
+            lambda c: c["observed"].update(
+                script_public_key={"version": 0, "script_hex": "51"}
+            ),
+            "EVIDENCE_INCONSISTENT",
+        )
+        mutate(
+            lambda c: c.update(daa_depth=c["daa_depth"] + 1), "EVIDENCE_INCONSISTENT"
+        )
+        mutate(
+            lambda c: (
+                c["observed"].update(
+                    block_daa_score=c["observed_virtual_daa_score"] + 1
+                ),
+                c.update(daa_depth=0),
+            ),
             "EVIDENCE_ANCHOR",
         )
         mutate(
-            "rule_storage",
-            lambda e: e.update(confirmations=d5.MIN_CONFIRMATIONS - 1),
+            lambda c: c["preparation"].update(contract_output_index=1),
             "EVIDENCE_ANCHOR",
         )
         mutate(
-            "rule_storage", lambda e: e.update(block_hash="missing"), "EVIDENCE_ANCHOR"
+            lambda c: c["preparation"].update(
+                expected_deploy_tx_id=c["preparation"]["funding_outpoint"][
+                    "transaction_id"
+                ]
+            ),
+            "EVIDENCE_ANCHOR",
+        )
+        mutate(
+            lambda c: (
+                c["observed"].update(
+                    block_daa_score=c["observed"]["block_daa_score"] - 1
+                ),
+                c.update(daa_depth=c["daa_depth"] + 1),
+            ),
+            "EVIDENCE_HASH",
+            rehashed=False,
+        )
+        mutate(
+            lambda c: c.update(
+                observed_virtual_daa_score=c["observed_virtual_daa_score"] + 1,
+                daa_depth=c["daa_depth"] + 1,
+            ),
+            "EVIDENCE_HASH",
+            rehashed=False,
         )
 
-    def test_raw_response_with_other_covenant_or_anchor_rejected(self) -> None:
-        def rewrite_raw(role: str, change: Any) -> dict[str, Any]:
+    def test_status_and_trust_upgrades_rejected(self) -> None:
+        def mutate(change: Any, code: str) -> None:
             doc = self.confirmed()
-            evidence = doc["evidence"][role]
-            change(evidence["raw_response"])
-            evidence["raw_response_sha256"] = d5.canonical_sha256(
-                evidence["raw_response"]
-            )
-            raw = evidence["raw_response"]
-            evidence["covenant_id"] = raw["utxoEntry"]["covenantId"]
-            evidence["amount_sompi"] = int(raw["utxoEntry"]["amount"])
-            return doc
+            change(doc["evidence"]["rule_storage"])
+            rehash(doc["evidence"]["rule_storage"])
+            self.assert_code(code, doc, self.twin)
 
-        doc = rewrite_raw(
-            "guardian_reputation",
-            lambda r: r["utxoEntry"].update(covenantId=synthetic("lookalike")),
+        mutate(lambda c: c.update(status="CONFIRMED"), "CANDIDATE_SCHEMA")
+        mutate(lambda c: c["classification"].pop(), "CANDIDATE_SCHEMA")
+        mutate(
+            lambda c: c["trust_model"].update(independent_confirmation=True),
+            "CANDIDATE_TRUST",
         )
-        self.assert_code("COVENANT_MISMATCH", doc, self.twin)
-        doc = rewrite_raw(
-            "guardian_reputation", lambda r: r["outpoint"].update(index=1)
+        mutate(
+            lambda c: c["trust_model"]["missing_independent_checks"].pop(),
+            "CANDIDATE_TRUST",
         )
-        self.assert_code("EVIDENCE_ANCHOR", doc, self.twin)
-        doc = rewrite_raw(
-            "guardian_reputation", lambda r: r["utxoEntry"].update(isCoinbase=True)
+        mutate(
+            lambda c: c["observed"].update(source="independent_explorer"),
+            "CANDIDATE_SOURCE",
         )
-        self.assert_code("EVIDENCE_ANCHOR", doc, self.twin)
-        doc = rewrite_raw(
-            "guardian_reputation", lambda r: r["utxoEntry"].update(amount="1")
-        )
-        self.assert_code("EVIDENCE_INCONSISTENT", doc, self.twin)
+
+    def test_unknown_missing_and_legacy_fields_rejected(self) -> None:
+        for change in (
+            lambda c: c["observed"].update(rpc_url="ws://127.0.0.1:17210"),
+            lambda c: c.update(raw_response={}),
+            lambda c: c["preparation"].pop("request_sha256"),
+            lambda c: c.pop("observed_snapshot_sha256"),
+        ):
+            doc = self.confirmed()
+            change(doc["evidence"]["rule_storage"])
+            self.assert_code("SHAPE", doc, self.twin)
 
     def test_evidence_for_unknown_role_rejected(self) -> None:
         doc = self.confirmed()
         doc["evidence"]["validator_staking_h001"] = doc["evidence"]["rule_storage"]
         self.assert_code("ROLE_UNKNOWN", doc, self.twin)
+
+
+class CrossLanguageFixtureTest(unittest.TestCase):
+    """The Rust deployer produced this candidate; Python must verify the same bytes."""
+
+    def test_rust_candidate_verifies_and_constants_match(self) -> None:
+        candidate = json.loads(CANDIDATE_FIXTURE.read_text(encoding="utf-8"))
+        d5.verify_candidate_document(candidate)
+        self.assertEqual(candidate["kind"], d5.CANDIDATE_KIND)
+        self.assertEqual(candidate["status"], d5.CANDIDATE_STATUS)
+        self.assertEqual(candidate["classification"], d5.CANDIDATE_CLASSIFICATION)
+        self.assertEqual(candidate["relationships"], d5.CANDIDATE_RELATIONSHIPS)
+        self.assertEqual(
+            candidate["trust_model"]["snapshot_note"], d5.CANDIDATE_SNAPSHOT_NOTE
+        )
+        self.assertEqual(
+            candidate["trust_model"]["missing_independent_checks"],
+            d5.CANDIDATE_MISSING_CHECKS,
+        )
+
+    def test_tampered_rust_candidate_rejected(self) -> None:
+        candidate = json.loads(CANDIDATE_FIXTURE.read_text(encoding="utf-8"))
+        candidate["observed"]["block_daa_score"] -= 1
+        with self.assertRaises(d5.BindingError):
+            d5.verify_candidate_document(candidate)
 
 
 class SampleFixtureTest(D5Base):

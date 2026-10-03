@@ -25,14 +25,53 @@ from silverc_bundles import Bundle
 SCHEMA = "prometheus.silverc.genesis-binding"
 SCHEMA_VERSION = "1-draft"
 ALLOWED_NETWORKS = ("testnet-10",)
-PUBLIC_EVIDENCE_KINDS = ("public_node_utxo", "public_explorer_utxo")
-MIN_CONFIRMATIONS = 10
+# D5 evidence candidates are produced by the Rust deployer
+# (`observe --d5-evidence-candidate-out`); these constants mirror lib.rs and
+# are pinned against the cross-language fixture in the tests.
+CANDIDATE_KIND = "prometheus.silverc.d5.genesis_evidence_candidate"
+CANDIDATE_SCHEMA_VERSION = 1
+CANDIDATE_STATUS = "OBSERVED_NOT_INDEPENDENTLY_CONFIRMED"
+CANDIDATE_CLASSIFICATION = [
+    "NOT_CHAIN_PROOF",
+    "NOT_D5_ACCEPTANCE",
+    "NOT_DEPLOYMENT_AUTHORIZATION",
+]
+CANDIDATE_TRUST_SOURCE = "single_operator_configured_node"
+CANDIDATE_SNAPSHOT_SOURCE = "configured_node_get_utxos_by_addresses_typed_entry"
+CANDIDATE_PREPARATION_SOURCE = "validated_preparation_inputs_not_chain_proof"
+CANDIDATE_SNAPSHOT_NOTE = (
+    "normalized allowlisted snapshot of the typed UTXO entry, not the complete raw "
+    "wire response; its hash proves integrity and internal consistency only, not "
+    "provider provenance, network identity, or consensus"
+)
+CANDIDATE_MISSING_CHECKS = [
+    "second independently operated node or explorer",
+    "reviewer-captured response independent of the operator",
+    "block hash and header cross-check for the genesis DAA score",
+    "network identity independent of the configured endpoint",
+]
+CANDIDATE_RELATIONSHIPS = [
+    "preparation.calculated_covenant_id == covenant_id(preparation.funding_outpoint, "
+    "[(preparation.contract_output_index, preparation.genesis_output_value, "
+    "preparation.contract_script_public_key)])",
+    "observed.outpoint == (preparation.expected_deploy_tx_id, preparation.contract_output_index)",
+    "observed.amount == preparation.genesis_output_value",
+    "observed.script_public_key == preparation.contract_script_public_key",
+    "observed.covenant_id == preparation.calculated_covenant_id",
+    "observed.is_coinbase == false",
+    "observed_snapshot_sha256 == sha256(canonical_json(observed))",
+]
+CONTRACT_OUTPUT_INDEX = 0
 
 STATUS_PLAN_NOT_EXECUTABLE = "D5_PLAN_CONSISTENT_NOT_EXECUTABLE"
 STATUS_PLAN_PENDING_RECOMPUTE = "D5_PLAN_CONSISTENT_COVENANT_ID_RECOMPUTE_BLOCKED"
 STATUS_BLOCKED_EVIDENCE = "D5_BLOCKED_MISSING_GENESIS_EVIDENCE"
 STATUS_EVIDENCE_PENDING_RECOMPUTE = (
     "D5_EVIDENCE_CONSISTENT_COVENANT_ID_RECOMPUTE_BLOCKED"
+)
+TRUST_BLOCKER = (
+    "evidence candidates are OBSERVED_NOT_INDEPENDENTLY_CONFIRMED (single configured "
+    "node); acceptance requires the D5 trusted-source model and independent confirmation"
 )
 RECOMPUTE_BLOCKER = (
     "predicted covenant ids are not recomputed: requires the existing "
@@ -93,19 +132,50 @@ ENTRY_KEYS = {
     "trusted_roles",
     "predicted_covenant_id",
 }
-EVIDENCE_KEYS = {
-    "source_kind",
-    "network_id",
-    "deploy_tx_id",
-    "deployed_instance_id",
-    "covenant_id",
-    "amount_sompi",
-    "block_hash",
-    "block_daa_score",
-    "confirmations",
-    "raw_response",
-    "raw_response_sha256",
+CANDIDATE_KEYS = {
+    "schema_version",
+    "kind",
+    "status",
+    "classification",
+    "trust_model",
+    "preparation",
+    "observed",
+    "observed_snapshot_sha256",
+    "observed_virtual_daa_score",
+    "daa_depth",
+    "relationships",
+    "candidate_sha256",
 }
+TRUST_KEYS = {
+    "source",
+    "independent_confirmation",
+    "snapshot_note",
+    "missing_independent_checks",
+}
+PREPARATION_KEYS = {
+    "source",
+    "network_id",
+    "contract_name",
+    "request_sha256",
+    "signing_request_sha256",
+    "funding_outpoint",
+    "genesis_output_value",
+    "contract_output_index",
+    "contract_script_public_key",
+    "calculated_covenant_id",
+    "expected_deploy_tx_id",
+}
+OBSERVED_KEYS = {
+    "source",
+    "outpoint",
+    "amount",
+    "script_public_key",
+    "covenant_id",
+    "block_daa_score",
+    "is_coinbase",
+}
+OUTPOINT_KEYS = {"transaction_id", "index"}
+SCRIPT_KEYS = {"version", "script_hex"}
 
 
 class BindingError(ValueError):
@@ -343,95 +413,198 @@ def _validate_plan(
     return entries
 
 
-def _validate_evidence(
-    entry: dict[str, Any], evidence: Any, network: str, role: str
-) -> None:
-    item = _exact_keys(evidence, EVIDENCE_KEYS, "SHAPE", f"evidence.{role}")
+def _uint(value: Any, code: str, label: str, maximum: int = 2**64 - 1) -> int:
     _require(
-        item["source_kind"] in PUBLIC_EVIDENCE_KINDS,
-        "EVIDENCE_SOURCE",
-        f"{role}: operator records or claims are not chain evidence",
+        isinstance(value, int)
+        and not isinstance(value, bool)
+        and 0 <= value <= maximum,
+        code,
+        f"{label}: expected unsigned integer",
+    )
+    return int(value)
+
+
+def _hex32(value: Any, code: str, label: str) -> str:
+    _require(isinstance(value, str) and HEX32.fullmatch(value) is not None, code, label)
+    return str(value)
+
+
+def _outpoint(value: Any, label: str) -> str:
+    item = _exact_keys(value, OUTPOINT_KEYS, "SHAPE", label)
+    txid = _hex32(item["transaction_id"], "EVIDENCE_ANCHOR", f"{label}: transaction id")
+    index = _uint(item["index"], "EVIDENCE_ANCHOR", f"{label}: index", 0xFFFFFFFF)
+    return f"{txid}:{index}"
+
+
+def _script(value: Any, label: str) -> dict[str, Any]:
+    item = _exact_keys(value, SCRIPT_KEYS, "SHAPE", label)
+    _uint(item["version"], "SHAPE", f"{label}: version", 0xFFFF)
+    _require(
+        isinstance(item["script_hex"], str)
+        and re.fullmatch(r"(?:[0-9a-f]{2})+", item["script_hex"]) is not None,
+        "SHAPE",
+        f"{label}: script_hex",
+    )
+    return item
+
+
+def verify_candidate_document(
+    candidate: Any, label: str = "candidate"
+) -> dict[str, Any]:
+    """Structural, constant, hash and relationship checks of one Rust candidate.
+
+    This is internal consistency only; plan/context binding is separate.
+    """
+    item = _exact_keys(candidate, CANDIDATE_KEYS, "SHAPE", label)
+    _require(
+        item["schema_version"] == CANDIDATE_SCHEMA_VERSION
+        and item["kind"] == CANDIDATE_KIND
+        and item["status"] == CANDIDATE_STATUS
+        and item["classification"] == CANDIDATE_CLASSIFICATION
+        and item["relationships"] == CANDIDATE_RELATIONSHIPS,
+        "CANDIDATE_SCHEMA",
+        f"{label}: unsupported schema, status, classification or relationships",
+    )
+    trust = _exact_keys(
+        item["trust_model"], TRUST_KEYS, "SHAPE", f"{label}.trust_model"
     )
     _require(
-        item["network_id"] == network,
+        trust["source"] == CANDIDATE_TRUST_SOURCE
+        and trust["independent_confirmation"] is False
+        and trust["snapshot_note"] == CANDIDATE_SNAPSHOT_NOTE
+        and trust["missing_independent_checks"] == CANDIDATE_MISSING_CHECKS,
+        "CANDIDATE_TRUST",
+        f"{label}: trust model must stay single-source and unconfirmed",
+    )
+    prep = _exact_keys(
+        item["preparation"], PREPARATION_KEYS, "SHAPE", f"{label}.preparation"
+    )
+    obs = _exact_keys(item["observed"], OBSERVED_KEYS, "SHAPE", f"{label}.observed")
+    _require(
+        prep["source"] == CANDIDATE_PREPARATION_SOURCE
+        and obs["source"] == CANDIDATE_SNAPSHOT_SOURCE,
+        "CANDIDATE_SOURCE",
+        f"{label}: field sources are not the documented sources",
+    )
+    for field in (
+        "request_sha256",
+        "signing_request_sha256",
+        "calculated_covenant_id",
+        "expected_deploy_tx_id",
+    ):
+        _hex32(prep[field], "SHAPE", f"{label}.preparation.{field}")
+    _hex32(obs["covenant_id"], "SHAPE", f"{label}.observed.covenant_id")
+    _hex32(
+        item["observed_snapshot_sha256"], "SHAPE", f"{label}: observed_snapshot_sha256"
+    )
+    _hex32(item["candidate_sha256"], "SHAPE", f"{label}: candidate_sha256")
+    _require(isinstance(prep["network_id"], str), "SHAPE", f"{label}: network_id")
+    _require(isinstance(prep["contract_name"], str), "SHAPE", f"{label}: contract_name")
+    value = _uint(
+        prep["genesis_output_value"], "SHAPE", f"{label}: genesis_output_value"
+    )
+    _require(value > 0, "GENESIS_VALUE", f"{label}: genesis value must be nonzero")
+    index = _uint(
+        prep["contract_output_index"], "SHAPE", f"{label}: output index", 0xFFFFFFFF
+    )
+    _require(
+        index == CONTRACT_OUTPUT_INDEX,
+        "EVIDENCE_ANCHOR",
+        f"{label}: fixed genesis output index",
+    )
+    funding = _outpoint(
+        prep["funding_outpoint"], f"{label}.preparation.funding_outpoint"
+    )
+    prep_script = _script(
+        prep["contract_script_public_key"], f"{label}.preparation.script"
+    )
+    observed_outpoint = _outpoint(obs["outpoint"], f"{label}.observed.outpoint")
+    obs_script = _script(obs["script_public_key"], f"{label}.observed.script")
+    amount = _uint(obs["amount"], "SHAPE", f"{label}.observed.amount")
+    block = _uint(obs["block_daa_score"], "SHAPE", f"{label}.observed.block_daa_score")
+    virtual = _uint(
+        item["observed_virtual_daa_score"], "SHAPE", f"{label}: virtual DAA score"
+    )
+    depth = _uint(item["daa_depth"], "SHAPE", f"{label}: daa_depth")
+    _require(isinstance(obs["is_coinbase"], bool), "SHAPE", f"{label}: is_coinbase")
+
+    _require(
+        observed_outpoint == f"{prep['expected_deploy_tx_id']}:{CONTRACT_OUTPUT_INDEX}",
+        "EVIDENCE_ANCHOR",
+        f"{label}: observed outpoint is not the expected genesis outpoint",
+    )
+    _require(
+        prep["expected_deploy_tx_id"] != funding.split(":")[0],
+        "EVIDENCE_ANCHOR",
+        f"{label}: genesis transaction must spend, not equal, the funding outpoint",
+    )
+    _require(
+        amount == value, "EVIDENCE_INCONSISTENT", f"{label}: observed value differs"
+    )
+    _require(
+        obs_script == prep_script,
+        "EVIDENCE_INCONSISTENT",
+        f"{label}: observed script differs",
+    )
+    _require(
+        obs["covenant_id"] == prep["calculated_covenant_id"],
+        "COVENANT_MISMATCH",
+        f"{label}: observed covenant id differs from the calculated id",
+    )
+    _require(
+        obs["is_coinbase"] is False, "EVIDENCE_ANCHOR", f"{label}: coinbase output"
+    )
+    _require(
+        block <= virtual,
+        "EVIDENCE_ANCHOR",
+        f"{label}: genesis DAA score above virtual DAA score",
+    )
+    _require(depth == virtual - block, "EVIDENCE_INCONSISTENT", f"{label}: DAA depth")
+    _require(
+        canonical_sha256(obs) == item["observed_snapshot_sha256"],
+        "EVIDENCE_HASH",
+        f"{label}: observed snapshot hash",
+    )
+    unhashed = {key: val for key, val in item.items() if key != "candidate_sha256"}
+    _require(
+        canonical_sha256(unhashed) == item["candidate_sha256"],
+        "EVIDENCE_HASH",
+        f"{label}: candidate hash",
+    )
+    return item
+
+
+def _bind_candidate(
+    entry: dict[str, Any], candidate: Any, network: str, role: str
+) -> None:
+    """Bind a candidate to its reviewed plan entry (context binding)."""
+    item = verify_candidate_document(candidate, f"evidence.{role}")
+    prep = item["preparation"]
+    _require(
+        prep["network_id"] == network,
         "EVIDENCE_NETWORK",
         f"{role}: evidence from another network",
     )
-    raw = item["raw_response"]
     _require(
-        isinstance(raw, dict),
-        "EVIDENCE_RAW",
-        f"{role}: raw_response must be the stored node response",
+        prep["contract_name"] == ROLES[role].contract_name,
+        "ROLE_CONTRACT",
+        f"{role}: candidate for another contract",
+    )
+    funding = f"{prep['funding_outpoint']['transaction_id']}:{prep['funding_outpoint']['index']}"
+    _require(
+        funding == entry["funding_outpoint"],
+        "EVIDENCE_CONTEXT",
+        f"{role}: funding outpoint differs from plan",
     )
     _require(
-        canonical_sha256(raw) == item["raw_response_sha256"],
-        "EVIDENCE_RAW",
-        f"{role}: raw response hash",
-    )
-    try:
-        outpoint = raw["outpoint"]
-        utxo = raw["utxoEntry"]
-        observed = {
-            "deploy_tx_id": outpoint["transactionId"],
-            "index": outpoint["index"],
-            "amount_sompi": int(utxo["amount"]),
-            "covenant_id": utxo["covenantId"],
-            "block_daa_score": int(utxo["blockDaaScore"]),
-            "is_coinbase": utxo["isCoinbase"],
-        }
-    except (KeyError, TypeError, ValueError) as exc:
-        raise BindingError(
-            "EVIDENCE_RAW", f"{role}: malformed raw node response"
-        ) from exc
-    _require(
-        observed["is_coinbase"] is False, "EVIDENCE_ANCHOR", f"{role}: coinbase output"
-    )
-    _require(
-        observed["index"] == 0,
-        "EVIDENCE_ANCHOR",
-        f"{role}: genesis contract output must be index 0",
-    )
-    for field in ("deploy_tx_id", "amount_sompi", "covenant_id", "block_daa_score"):
-        _require(
-            item[field] == observed[field],
-            "EVIDENCE_INCONSISTENT",
-            f"{role}: {field} differs from raw response",
-        )
-    _require(
-        HEX32.fullmatch(str(item["deploy_tx_id"])) is not None,
-        "EVIDENCE_ANCHOR",
-        f"{role}: deploy tx id",
-    )
-    _require(
-        item["deployed_instance_id"] == f"{item['deploy_tx_id']}:0",
-        "EVIDENCE_ANCHOR",
-        f"{role}: instance id",
-    )
-    _require(
-        item["deploy_tx_id"] != entry["funding_outpoint"].split(":")[0],
-        "EVIDENCE_ANCHOR",
-        f"{role}: genesis transaction must spend, not equal, the funding outpoint",
-    )
-    _require(
-        HEX32.fullmatch(str(item["block_hash"])) is not None,
-        "EVIDENCE_ANCHOR",
-        f"{role}: block hash",
-    )
-    confirmations = item["confirmations"]
-    _require(
-        isinstance(confirmations, int) and confirmations >= MIN_CONFIRMATIONS,
-        "EVIDENCE_ANCHOR",
-        f"{role}: insufficient confirmations",
-    )
-    _require(
-        item["covenant_id"] == entry["predicted_covenant_id"],
-        "COVENANT_MISMATCH",
-        f"{role}: observed covenant id differs from the planned id",
-    )
-    _require(
-        item["amount_sompi"] == entry["genesis_value_sompi"],
-        "EVIDENCE_INCONSISTENT",
+        prep["genesis_output_value"] == entry["genesis_value_sompi"],
+        "EVIDENCE_CONTEXT",
         f"{role}: genesis value differs from plan",
+    )
+    _require(
+        prep["calculated_covenant_id"] == entry["predicted_covenant_id"],
+        "COVENANT_MISMATCH",
+        f"{role}: calculated covenant id differs from the planned id",
     )
 
 
@@ -478,6 +651,7 @@ def validate_genesis_binding(
         "network_id": plan["network_id"],
         "shared_governance_key": shared,
         "executable": False,
+        "independently_confirmed": False,
         "blockers": [RECOMPUTE_BLOCKER],
     }
     if "evidence" not in document:
@@ -506,8 +680,9 @@ def validate_genesis_binding(
     )
     missing = sorted(set(entries) - set(evidence))
     for role in sorted(evidence):
-        _validate_evidence(entries[role], evidence[role], plan["network_id"], role)
-    observed_ids = [evidence[role]["covenant_id"] for role in evidence]
+        _bind_candidate(entries[role], evidence[role], plan["network_id"], role)
+    observed_ids = [evidence[role]["observed"]["covenant_id"] for role in evidence]
+    result["blockers"].append(TRUST_BLOCKER)
     _require(
         len(set(observed_ids)) == len(observed_ids),
         "DUPLICATE_COVENANT_ID",
@@ -529,13 +704,17 @@ def validate_genesis_binding(
 def accept_state(result: dict[str, Any], observed: dict[str, Any]) -> str:
     """Off-chain acceptance: map an observed state to its role or reject it.
 
-    Only a result with complete, consistent public evidence can accept a state.
-    A covenant id that is not in the binding (lookalike) is rejected.
+    Only a result with complete, consistent and independently confirmed
+    evidence can accept a state. This draft never sets
+    ``independently_confirmed``, so every real result is refused until the
+    trusted-source model exists. A covenant id that is not in the binding
+    (lookalike) is rejected.
     """
     _require(
-        result.get("status") == STATUS_EVIDENCE_PENDING_RECOMPUTE,
+        result.get("status") == STATUS_EVIDENCE_PENDING_RECOMPUTE
+        and result.get("independently_confirmed") is True,
         "NOT_CONFIRMED",
-        "no evidenced deployment identity to accept states against",
+        "no independently confirmed deployment identity to accept states against",
     )
     _require(
         observed.get("network_id") == result["network_id"],

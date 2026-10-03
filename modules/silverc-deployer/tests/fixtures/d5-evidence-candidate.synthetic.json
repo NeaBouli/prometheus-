@@ -1,0 +1,68 @@
+{
+  "candidate_sha256": "07c6981e93b59587099a4105ba696ebae14caadac75d3a0c7a1802ed9b32edc5",
+  "classification": [
+    "NOT_CHAIN_PROOF",
+    "NOT_D5_ACCEPTANCE",
+    "NOT_DEPLOYMENT_AUTHORIZATION"
+  ],
+  "daa_depth": 200,
+  "kind": "prometheus.silverc.d5.genesis_evidence_candidate",
+  "observed": {
+    "amount": 1000000000,
+    "block_daa_score": 467579800,
+    "covenant_id": "3a81b23246d64864e295fb5aa5e1cc36d45711fd402a602fb7ef765ec8d21b8a",
+    "is_coinbase": false,
+    "outpoint": {
+      "index": 0,
+      "transaction_id": "ed712e28099236861820dda3b9fa251bad57e7f343fff9e38f687d3304d5badc"
+    },
+    "script_public_key": {
+      "script_hex": "aa2029d06e359504f84c5fec18193b02f185100391795f2158f354be0be42406322187",
+      "version": 0
+    },
+    "source": "configured_node_get_utxos_by_addresses_typed_entry"
+  },
+  "observed_snapshot_sha256": "20bb981659caf14f451fb7bdcfde690e3dc2f137f601e31b332e85f38034380a",
+  "observed_virtual_daa_score": 467580000,
+  "preparation": {
+    "calculated_covenant_id": "3a81b23246d64864e295fb5aa5e1cc36d45711fd402a602fb7ef765ec8d21b8a",
+    "contract_name": "ValidatorStakingH001",
+    "contract_output_index": 0,
+    "contract_script_public_key": {
+      "script_hex": "aa2029d06e359504f84c5fec18193b02f185100391795f2158f354be0be42406322187",
+      "version": 0
+    },
+    "expected_deploy_tx_id": "ed712e28099236861820dda3b9fa251bad57e7f343fff9e38f687d3304d5badc",
+    "funding_outpoint": {
+      "index": 3,
+      "transaction_id": "1111111111111111111111111111111111111111111111111111111111111111"
+    },
+    "genesis_output_value": 1000000000,
+    "network_id": "testnet-10",
+    "request_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "signing_request_sha256": "cc3eb54db55bcf5c96a6361c525f2679b16414577ba2ccbce17642b99ad1cc30",
+    "source": "validated_preparation_inputs_not_chain_proof"
+  },
+  "relationships": [
+    "preparation.calculated_covenant_id == covenant_id(preparation.funding_outpoint, [(preparation.contract_output_index, preparation.genesis_output_value, preparation.contract_script_public_key)])",
+    "observed.outpoint == (preparation.expected_deploy_tx_id, preparation.contract_output_index)",
+    "observed.amount == preparation.genesis_output_value",
+    "observed.script_public_key == preparation.contract_script_public_key",
+    "observed.covenant_id == preparation.calculated_covenant_id",
+    "observed.is_coinbase == false",
+    "observed_snapshot_sha256 == sha256(canonical_json(observed))"
+  ],
+  "schema_version": 1,
+  "status": "OBSERVED_NOT_INDEPENDENTLY_CONFIRMED",
+  "trust_model": {
+    "independent_confirmation": false,
+    "missing_independent_checks": [
+      "second independently operated node or explorer",
+      "reviewer-captured response independent of the operator",
+      "block hash and header cross-check for the genesis DAA score",
+      "network identity independent of the configured endpoint"
+    ],
+    "snapshot_note": "normalized allowlisted snapshot of the typed UTXO entry, not the complete raw wire response; its hash proves integrity and internal consistency only, not provider provenance, network identity, or consensus",
+    "source": "single_operator_configured_node"
+  }
+}
