@@ -159,7 +159,7 @@ def validate_receipts_document(
     if len(receipts) != len(expected_names):
         raise ValueError("receipts: expected one receipt per manifest contract")
 
-    seen = set()
+    seen: set[str] = set()
     normalized_receipts = []
     for index, receipt in enumerate(receipts):
         if not isinstance(receipt, dict):

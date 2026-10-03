@@ -6107,3 +6107,11 @@ Rules for all dev agents:
   unconditional closed gate (NOT_CONFIRMED for genuine and forged results, no
   prepared switch). Delta proven against 2595ce8. Python 442 OK, gates PASS.
 
+### 2026-10-03 - [AUTOR: CC] g1-receipt-mypy-annotation delivered
+
+- `seen: set[str]` annotation in verify_silverc_deploy_receipts.py:162 (G1,
+  taken over from Grok). mypy clean for the file; strict leaves one
+  pre-existing finding in smoke_silverc_artifacts.py:340. Python 442 OK.
+- Previous head 1c96d98 (closed gate): CI 37134471451 and Security
+  37134474481 green.
+

@@ -14,19 +14,19 @@ status change. Codex owns review, integration, merge and release decisions.
 | bundle-v2-d5-evidence-capture | agent/claude/bundle-v2-d5-evidence-capture | 20ff442 | none on this head | corrected below |
 | bundle-v2-d5-capture-context-correction | agent/claude/bundle-v2-d5-capture-context-correction | 61549b1 | 36814029226 / 36814032876 green | accepted |
 | bundle-v2-d5-binding-alignment (C1) | agent/claude/bundle-v2-d5-binding-alignment | 2595ce8 (+docs 95aa512, f6d3dc6) | not dispatched | reviewed by Codex 15:21Z: two findings, fixed below |
-| bundle-v2-d5-alignment-closed-gate | agent/claude/bundle-v2-d5-alignment-closed-gate | 684a4d5 (code) | not dispatched | **waiting for Codex review** |
+| bundle-v2-d5-alignment-closed-gate | agent/claude/bundle-v2-d5-alignment-closed-gate | 684a4d5 (code) (docs 1c96d98) | 37134471451 / 37134474481 green | accepted |
+| g1-receipt-mypy-annotation | agent/claude/g1-receipt-mypy-annotation | G1HEAD | not dispatched | **waiting for Codex review** |
 
 ## Who waits for whom
 
-- **Codex**: review of the closed-gate correction; then one hosted CI/Security
-  run on that head if he releases it.
+- **Codex**: review G1; K1 dispatch once Gio's confirmation arrives.
 - **Kimi (K1)**: independent read-only security review of contract v2 at
   61549b1 (`.fleet/tasks/bundle-v2-independent-security-review.md`).
   **Blocked on Gio**: Codex needs the explicit confirmation sentence for the
   code transfer to Kimi (see open decisions); no dispatch or workaround before.
 - **Claude**: C2 = fix K1 findings once they arrive; C3 = Zelcore check once a
   link or brief exists.
-- **Grok (G1)**: mypy annotation at `scripts/verify_silverc_deploy_receipts.py:162` — deferred by Codex while C1 writes (one writing worker at a time).
+- **G1**: done by Claude on Codex's instruction (no external dispatch); waiting for review.
 
 ## Open decisions
 

@@ -584,6 +584,11 @@ Both runs require Gio budget approval (plan-level gate).
   only after profile separation and review; no duplicate implementation.
 - Claude's scheduled 03:31 CI/Security dispatch must not be duplicated.
 
+### 2026-10-03 - g1-receipt-mypy-annotation delivered (Claude)
+
+- Branch `agent/claude/g1-receipt-mypy-annotation` on 1c96d98: one-line type
+  annotation; waiting on Codex review. Closed-gate head 1c96d98 hosted green.
+
 ### 2026-10-03 - bundle-v2-d5-alignment-closed-gate delivered (Claude)
 
 - Branch `agent/claude/bundle-v2-d5-alignment-closed-gate`: strict
