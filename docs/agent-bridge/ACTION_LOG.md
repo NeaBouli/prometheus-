@@ -6115,3 +6115,11 @@ Rules for all dev agents:
 - Previous head 1c96d98 (closed gate): CI 37134471451 and Security
   37134474481 green.
 
+### 2026-10-04 - [AUTOR: CC] c2-k1-followup delivered (K1 follow-up)
+
+- C2a: contract README v2 sections reconciled with current code and tests;
+  frozen v1 kept explicitly historical. C2b: arithmetic adjudication delivered
+  privately to Codex (checked engine arithmetic; no wrap). F2: unused constants
+  are compiled-script neutral. Four arithmetic boundary runtime tests added
+  (run on the next coordinated hosted run). No contract or pin change.
+

@@ -652,3 +652,10 @@ Both runs require Gio budget approval (plan-level gate).
   issues listed for Codex to open; all outcomes ship as one "contract bundle v2".
 - Second hosted verification at `40dfd89`: CI `36702356697` + Security
   `36702361053` all green (covers action SHA pins and PRM-12 code changes).
+
+### 2026-10-04 - c2-k1-followup delivered (Claude)
+
+- Branch `agent/claude/c2-k1-followup` on f090c35: README reconciliation,
+  private F3 adjudication, F2 identity evidence, new runtime regressions.
+  Waiting on Codex review and a coordinated hosted run.
+

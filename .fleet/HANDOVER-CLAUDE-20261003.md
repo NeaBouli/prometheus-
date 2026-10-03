@@ -15,22 +15,23 @@ status change. Codex owns review, integration, merge and release decisions.
 | bundle-v2-d5-capture-context-correction | agent/claude/bundle-v2-d5-capture-context-correction | 61549b1 | 36814029226 / 36814032876 green | accepted |
 | bundle-v2-d5-binding-alignment (C1) | agent/claude/bundle-v2-d5-binding-alignment | 2595ce8 (+docs 95aa512, f6d3dc6) | not dispatched | reviewed by Codex 15:21Z: two findings, fixed below |
 | bundle-v2-d5-alignment-closed-gate | agent/claude/bundle-v2-d5-alignment-closed-gate | 684a4d5 (code) (docs 1c96d98) | 37134471451 / 37134474481 green | accepted |
-| g1-receipt-mypy-annotation | agent/claude/g1-receipt-mypy-annotation | 1e0849d | not dispatched | **waiting for Codex review** |
+| g1-receipt-mypy-annotation | agent/claude/g1-receipt-mypy-annotation | 1e0849d (docs f090c35) | not dispatched | accepted by Codex |
+| landing-status-20261004 (+correction) | agent/claude/landing-status-20261004-correction | 417e2fb | not dispatched | waiting for Codex UI review (evidence ~/agent-fleet/evidence/prometheus/landing-status-20261004-correction/) |
+| c2-k1-followup | agent/claude/c2-k1-followup | C2HEAD | not dispatched | **waiting for Codex review** |
 
 ## Who waits for whom
 
-- **Codex**: review G1; K1 dispatch once Gio's confirmation arrives.
-- **Kimi (K1)**: independent read-only security review of contract v2 at
-  61549b1 (`.fleet/tasks/bundle-v2-independent-security-review.md`).
-  **Blocked on Gio**: Codex needs the explicit confirmation sentence for the
-  code transfer to Kimi (see open decisions); no dispatch or workaround before.
-- **Claude**: C2 = fix K1 findings once they arrive; C3 = Zelcore check once a
-  link or brief exists.
-- **G1**: done by Claude on Codex's instruction (no external dispatch); waiting for review.
+- **Codex**: review C2 and the landing correction; coordinate one hosted run for the new runtime regressions.
+- **Kimi (K1)**: done 2026-10-03 on 61549b1 (Gio approved the transfer):
+  changes requested; follow-up C2 delivered by Claude.
+- **Claude**: C3 = Zelcore check once a link or brief exists; site-wide October claim
+  reconciliation after C2 (Codex decision).
+- **G1**: done by Claude, accepted by Codex.
 
 ## Open decisions
 
-- Gio: confirm in the Codex chat, verbatim: "Ich genehmige für K1 die Übermittlung der im bestehenden Review-Brief abgegrenzten Quellcode- und Testdateien an Kimi über `kimi-strong-worker`, ausschließlich read-only und ohne Secrets oder private Operatordaten."
+- Gio: K1 transfer approved 2026-10-03 (done).
+- Codex: C2 decisions (optional donation bound, unused constants in next source revision, constructor counter bounds).
 - Codex: trusted-source model for D5 evidence acceptance (Kimi K2 can draft variants).
 - Codex: D1–D7 remain proposed; full contract security acceptance pending K1.
 

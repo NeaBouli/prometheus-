@@ -951,6 +951,64 @@ fn prometheus_community_donations_donate_runtime_records_pending_voting_end() {
     assert!(result.is_ok(), "donation during a pending proposal must record the consensus voting end: {:?}", result.err());
 }
 
+// Arithmetic boundaries (K1 follow-up): the pinned engine evaluates OpAdd/OpSub/OpMul with checked
+// i64 arithmetic, so an overflow aborts the transition instead of wrapping. The after-state uses
+// wrapping values only so the test itself never panics; the script must fail before comparing it.
+fn cd_donate_boundary_case(before_total_kas: i64, amount: i64, output_sompi: u64) -> Result<(), kaspa_txscript_errors::TxScriptError> {
+    let source = cd_source();
+    let governance_pk = keypair_from_seed(8).x_only_public_key().0.serialize().to_vec();
+    let donor_keypair = keypair_from_seed(6);
+    let donor_pk = donor_keypair.x_only_public_key().0.serialize().to_vec();
+    let recipient_pk = keypair_from_seed(4).x_only_public_key().0.serialize().to_vec();
+    let message_hash = vec![2u8; 32];
+    let before = compile_community_donations_state(
+        &source,
+        community_donations_state_args(governance_pk.clone(), 3, before_total_kas, 500, 2, 1, recipient_pk.clone(), 0, zero32(), 0, 0, 0, 0, false, donor_pk.clone(), zero32(), 0),
+    );
+    let after = compile_community_donations_state(
+        &source,
+        community_donations_state_args(governance_pk, 4, before_total_kas.wrapping_add(amount), 500i64.wrapping_add(amount), 2, 1, recipient_pk, 0, zero32(), 0, 0, 0, 0, false, donor_pk.clone(), message_hash.clone(), 1_000),
+    );
+    let args = move |sig: Vec<u8>| -> Vec<Expr<'static>> {
+        vec![Expr::bytes(donor_pk.clone()), Expr::int(amount), Expr::bytes(message_hash.clone()), Expr::int(1_000), Expr::bytes(sig)]
+    };
+    spend_transition(&before, "donateKas", &args, COV_A, PROPOSAL_DAA, kas(500), vec![state_output(&after, COV_A, output_sompi)], 1_000, Some(&donor_keypair))
+}
+
+fn assert_number_too_big(err: kaspa_txscript_errors::TxScriptError) {
+    assert!(matches!(err, kaspa_txscript_errors::TxScriptError::NumberTooBig(_)), "expected checked-arithmetic overflow, got {err:?}");
+}
+
+#[test]
+fn prometheus_community_donations_donate_runtime_rejects_value_multiplication_overflow() {
+    let amount = i64::MAX / 100_000_000 + 1;
+    let err = cd_donate_boundary_case(500, amount, kas(600)).expect_err("amount * SOMPI_PER_KAS overflow must abort");
+    assert_number_too_big(err);
+}
+
+#[test]
+fn prometheus_community_donations_donate_runtime_rejects_value_addition_overflow() {
+    // amount * SOMPI_PER_KAS still fits i64, adding the covenant value does not.
+    let amount = i64::MAX / 100_000_000;
+    let err = cd_donate_boundary_case(500, amount, kas(600)).expect_err("covenant value + donation overflow must abort");
+    assert_number_too_big(err);
+}
+
+#[test]
+fn prometheus_community_donations_donate_runtime_rejects_cumulative_total_overflow() {
+    // Cumulative counters are not value-backed; overflow aborts the donation (liveness only, no wrap).
+    let err = cd_donate_boundary_case(i64::MAX - 50, 100, kas(600)).expect_err("total_donated_kas overflow must abort");
+    assert_number_too_big(err);
+}
+
+#[test]
+fn prometheus_community_donations_donate_runtime_accepts_large_in_range_donation() {
+    let amount: i64 = 1_000_000_000;
+    let output = kas(500) + (amount as u64) * 100_000_000;
+    let result = cd_donate_boundary_case(500, amount, output);
+    assert!(result.is_ok(), "a large value-backed donation inside i64 range must be accepted: {:?}", result.err());
+}
+
 fn disbursement_proposal_digest(covenant_id: Hash, nonce: i64, recipient_pk: &[u8], amount: i64, purpose_hash: &[u8], proposer_pk: &[u8]) -> [u8; 32] {
     sha256_parts(&[
         &b"prometheus-disbursement-proposal-v2"[..],

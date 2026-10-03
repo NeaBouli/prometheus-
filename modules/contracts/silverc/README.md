@@ -727,8 +727,10 @@ current covenant state model:
 - grant voting period is `GRANT_VOTING_BLOCKS = 604800`
 - reward formula uses `REWARD_PER_LINE = 10`
 - complexity is bounded by `MIN_COMPLEXITY = 1` and `MAX_COMPLEXITY = 10`
-- execution quorum is `QUORUM_VOTES = 10`
-- validator approval threshold is `VALIDATOR_QUORUM = 6700`
+- validator approval threshold is `VALIDATOR_QUORUM = 6700` (basis points of cast votes)
+- `QUORUM_VOTES = 10` is still declared but unused in the v2 draft; the participation rule
+  below replaces it (removing it does not change the compiled script, but would change the
+  source hash bound by the release manifest)
 - pool accounting remains PROM-denominated, but PROM is not a staking asset
 
 The fixture intentionally does not pretend to support legacy global maps,
@@ -737,28 +739,37 @@ emission-contract deposits, or direct PROM `transfer(...)` in current Silverc.
 The known legacy `deposit()` ACL question remains a deployment/orchestration
 decision once the emission authority is finalized.
 
-The shared verifier currently compiles this fixture against the same pinned
-upstream Silverscript ref and runtime-tests covenant transitions for:
+Current fixture = contract bundle v2 draft (`--bundle v2-draft`, non-promotable). The frozen
+H-001 v1 reproduction source in `bundles/h001-v1/` keeps the earlier `proposeGrant`,
+`voteGrant` and `executeGrant` transitions and is not maintained further.
 
-- `proposeGrant`
-- `voteGrant`
-- `executeGrant`
+v2 transitions (MS-B D1, D2, D4 and the 2026-09-30 review repair):
 
-Verified rejection paths include grant amount above `MAX_GRANT_PROM`, voting at
-`voting_end_block`, execution below `QUORUM_VOTES`, and execution below
-`VALIDATOR_QUORUM`.
+- `proposeGrant` requires a governance attestation (`checkSigFromStack` by `governance_pk`)
+  over `sha256("prometheus-grant-proposal-v2" || covenant_instance_id || u64le(next_grant_id)
+  || developer_pk || contribution_hash || description_hash || u64le(lines) ||
+  u64le(complexity) || u64le(amount) || proposer_pk)`, where `covenant_instance_id` is
+  `OpInputCovenantId` of the spent covenant input; the amount is capped by `MAX_GRANT_PROM`.
+- `finalizeGrant` requires the governance signature and an attested tally over
+  `sha256("prometheus-grant-tally-v2" || covenant_instance_id || u64le(grant_id) ||
+  content_hash || u64le(voting_end) || u64le(for) || u64le(against) ||
+  u64le(active_set_size) || validator_set_root)`, with
+  `content_hash = sha256(developer_pk || contribution_hash || description_hash ||
+  u64le(lines) || u64le(complexity) || u64le(amount) || proposer_pk)`. The voting window
+  starts at the consensus DAA score of the spent proposal UTXO (`OpTxInputDaaScore`) and
+  finalization requires `tx.time >= start + GRANT_VOTING_BLOCKS`.
+- Every attested tally is terminal: with participation of at least 50 % of the active set
+  (`2 * (for + against) >= active_set_size`, `for + against <= active_set_size`) and
+  approval of at least 6,700 bps of cast votes (`for * 10000 >= 6700 * (for + against)`,
+  ties at the threshold accepted) the grant is EXECUTED, otherwise REJECTED.
+- The pool is PROM accounting only; no value moves and PROM emission is not implemented.
 
-Bundle v2 draft (MS-B D1, D4): the contract gains a `governance_pk` constructor field; the free
-`voteGrant` transition is removed and the permissionless `executeGrant` is replaced by
-`finalizeGrant`, which requires the governance signature, an attested tally
-(`"prometheus-grant-tally-v1"` domain), `tx.time >= voting_end_block`, at least 50 % participation
-and 6,700 bps approval; otherwise the grant ends REJECTED. The pool remains PROM accounting only
-(no value moves; PROM emission is not implemented).
-
-Review repair (2026-09-30): windows and intervals are anchored at consensus DAA scores of the
-spent covenant UTXO (`OpTxInputDaaScore`) and enforced with `tx.time`; attestation digests are
-versioned (`-v2`) and bind the covenant instance, proposal id and complete content; every attested
-tally is terminal (REJECTED on zero/low participation). Details: `docs/architecture/ms-b-contract-decisions.md`.
+Current runtime coverage (pinned verifier): `proposeGrant` accepts a valid attested proposal
+and rejects an amount above `MAX_GRANT_PROM` and a mismatched attestation context;
+`finalizeGrant` executes an approved grant, records rejected and zero-vote tallies as
+terminal rejections, cannot execute on low participation, and rejects finalization before
+the voting end, an old start height, a tampered set size and a mismatched attestation
+context. Details: `docs/architecture/ms-b-contract-decisions.md`.
 
 ## CommunityDonationsState.sil
 
@@ -770,10 +781,12 @@ The fixture keeps the legacy invariants that are safe to express in the current
 covenant state model:
 
 - minimum donation is `MIN_DONATION_KAS = 1`
-- disbursement quorum is `DISBURSEMENT_QUORUM = 10`
-- validator approval threshold is `VALIDATOR_QUORUM = 6700`
-- pool accounting remains KAS-denominated
-- disbursements require governance signature at execution
+- validator approval threshold is `VALIDATOR_QUORUM = 6700` (basis points of cast votes)
+- `DISBURSEMENT_QUORUM = 10` is still declared but unused in the v2 draft; the participation
+  rule below replaces it (removing it does not change the compiled script, but would change
+  the source hash bound by the release manifest)
+- pool accounting remains KAS-denominated and value-backed
+- disbursements require the governance signature at finalization
 
 The fixture intentionally does not pretend to support legacy global maps,
 string storage, `msg.sender`, `tx.value`, event emission, cross-contract
@@ -787,25 +800,44 @@ upstream Silverscript ref and runtime-tests covenant transitions for:
 - `proposeDisbursement`
 - `finalizeDisbursement`
 
-Bundle v2 draft (MS-B D1–D4): the free `voteDisbursement` transition is removed and
-`executeDisbursement` is replaced by `finalizeDisbursement`, which takes an attested tally
-(`sha256("prometheus-disbursement-tally-v1" || u64le(disbursement_id) || u64le(for) ||
-u64le(against) || u64le(active_set_size) || validator_set_root)`, `checkSigFromStack` by the
-governance key) after `tx.time >= voting_end_block`. With at least 50 % participation and
-6,700 bps approval it pays exactly `amount_kas` sompi-scaled to the recipient's P2PK output
-and keeps the rest in the covenant; otherwise the proposal ends REJECTED with the value
-unchanged (previously a failed vote left the slot PENDING forever). The covenant value must
-equal `pool_balance_kas * 100000000` sompi, and `donateKas` must add exactly the donated value.
-`DISBURSEMENT_QUORUM` is kept for reference but superseded by the participation rule.
+Current fixture = contract bundle v2 draft (`--bundle v2-draft`, non-promotable). The frozen
+H-001 v1 reproduction source in `bundles/h001-v1/` keeps the earlier `voteDisbursement` and
+`executeDisbursement` transitions and is not maintained further.
 
-Review repair (2026-09-30): windows and intervals are anchored at consensus DAA scores of the
-spent covenant UTXO (`OpTxInputDaaScore`) and enforced with `tx.time`; attestation digests are
-versioned (`-v2`) and bind the covenant instance, proposal id and complete content; every attested
-tally is terminal (REJECTED on zero/low participation). Details: `docs/architecture/ms-b-contract-decisions.md`.
+v2 transitions (MS-B D1–D4 and the 2026-09-30 review repair):
 
-Verified rejection paths include zero donation amount, disbursement amount
-above pool balance, voting at `voting_end_block`, and execution below
-`DISBURSEMENT_QUORUM`.
+- The covenant value must equal `pool_balance_kas * 100000000` sompi in every transition.
+- `donateKas` requires the donor signature and an output that adds exactly
+  `amount * 100000000` sompi; the donor-declared label height must lie between the spent
+  state's DAA score and the lock time (`tx.time`). Arithmetic is evaluated by the pinned
+  engine with checked 64-bit signed integers, so an overflow aborts the transition.
+- `proposeDisbursement` requires a governance attestation over
+  `sha256("prometheus-disbursement-proposal-v2" || covenant_instance_id ||
+  u64le(next_disbursement_id) || recipient_pk || u64le(amount) || purpose_hash ||
+  proposer_pk)` and an amount not above the pool balance; value is unchanged.
+- `finalizeDisbursement` requires the governance signature and an attested tally over
+  `sha256("prometheus-disbursement-tally-v2" || covenant_instance_id ||
+  u64le(disbursement_id) || recipient_pk || u64le(amount_kas) || purpose_hash ||
+  u64le(voting_end) || u64le(for) || u64le(against) || u64le(active_set_size) ||
+  validator_set_root)`. The voting end is the consensus DAA score of the spent proposal
+  UTXO plus `DISBURSEMENT_VOTING_BLOCKS` (recorded by the first later transition) and
+  `tx.time >= voting_end` is required.
+- Every attested tally is terminal: with at least 50 % participation and 6,700 bps approval
+  (ties accepted) it pays exactly `amount_kas` sompi-scaled to the recipient's P2PK output
+  and keeps the rest in the covenant; otherwise the proposal ends REJECTED with the value
+  unchanged.
+
+Current runtime coverage (pinned verifier): `donateKas` accepts a value-backed donation and
+a large in-range donation, records the pending voting end, and rejects a zero amount, an
+unbacked donation, a future label height, a label before the previous transition, and
+64-bit overflow of the value multiplication, the value addition and the cumulative total;
+`proposeDisbursement` accepts a valid attested proposal and rejects an amount above the
+pool, unattested, replayed, cross-instance and substituted-amount attestations;
+`finalizeDisbursement` pays the recipient on approval, records rejected, low-participation
+and zero-vote tallies as terminal rejections, keeps a window recorded by a donation, and
+rejects finalization before the voting end, an old start height, a tampered set size, a
+mismatched attestation context, payout to another key and keeping the payout value.
+Details: `docs/architecture/ms-b-contract-decisions.md`.
 
 ## RuleStorageState.sil
 
@@ -833,34 +865,43 @@ the proposal lifecycle transitions for:
 - `finalizeProposal`
 - `deactivateRule`
 
-Bundle v2 draft (MS-B D1, D2, D4): the free per-vote transition `voteOnProposal`
-(any key could vote, repeatedly) is removed. Ballots are collected off chain by
-the canonical membership source and signed-ballot replay ledger; the contract
-accepts:
+Current fixture = contract bundle v2 draft (`--bundle v2-draft`, non-promotable). The frozen
+H-001 v1 reproduction source in `bundles/h001-v1/` keeps the earlier `voteOnProposal`
+transition and is not maintained further.
 
-Review repair (2026-09-30): windows and intervals are anchored at consensus DAA scores of the
-spent covenant UTXO (`OpTxInputDaaScore`) and enforced with `tx.time`; attestation digests are
-versioned (`-v2`) and bind the covenant instance, proposal id and complete content; every attested
-tally is terminal (REJECTED on zero/low participation). Details: `docs/architecture/ms-b-contract-decisions.md`.
+v2 transitions (MS-B D1, D2, D4 and the 2026-09-30 review repair): the free per-vote
+transition is removed. Ballots are collected off chain by the canonical membership source
+and the signed-ballot replay ledger; the contract accepts:
 
-- `submitProposal` only with a `membership_attestation` (`checkSigFromStack` by the
-  governance/attestation key over `sha256("prometheus-rule-submission-v1" ||
-  u64le(next_proposal_id) || guardian_pk || threat_hash)`) and `tx.time >= block_height`;
-- `finalizeProposal` only with an attested tally (`sha256("prometheus-rule-tally-v1" ||
-  u64le(proposal_id) || u64le(for) || u64le(against) || u64le(active_set_size) ||
-  validator_set_root)`), at least 50 % participation of the active set, approval of at
-  least 6,700 bps of cast votes (ties accepted), and `tx.time >= voting_end_block`.
-  The set size and root are not part of the transaction outputs, so the attestation is
-  what binds them.
+- `submitProposal` only with a membership attestation (`checkSigFromStack` by the
+  governance/attestation key) over `sha256("prometheus-rule-submission-v2" ||
+  covenant_instance_id || u64le(next_proposal_id) || content_hash)`, with
+  `content_hash = sha256(guardian_pk || threat_hash || u64le(rule_type) || rule_cid ||
+  u64le(confidence))`, confidence between `MIN_CONFIDENCE` and 10000, and no pending
+  proposal;
+- `finalizeProposal` only with the governance signature and an attested tally over
+  `sha256("prometheus-rule-tally-v2" || covenant_instance_id || u64le(proposal_id) ||
+  content_hash || u64le(session_start) || u64le(for) || u64le(against) ||
+  u64le(active_set_size) || validator_set_root)`. The session starts at the consensus DAA
+  score of the spent submission UTXO and `tx.time >= session_start + VOTING_BLOCKS` is
+  required. Every attested tally is terminal: at least 50 % participation of the active set
+  and approval of at least 6,700 bps of cast votes (integer `for * 10000 / (for + against)`,
+  ties accepted) accept the rule, otherwise it ends REJECTED. The set size and root are not
+  part of the transaction outputs, so the attestation is what binds them.
 
-Current runtime coverage:
+Current runtime coverage (pinned verifier):
 
-- `submitProposal` accepts an attested guardian; rejects a forged attestation, confidence
-  below `MIN_CONFIDENCE`, and a submission height above the lock time
-- `finalizeProposal` accepts accepting, rejecting and exact-threshold tallies; rejects zero
-  votes, participation below 50 %, a tampered set size, and finalization before the voting end
-- `deactivateRule` accepts deactivation of an active accepted rule
-- `deactivateRule` rejects pending/non-accepted rule state
+- `submitProposal` accepts an attested guardian and a submission after a terminal
+  rejection; rejects unattested, replayed and cross-instance attestations, substituted rule
+  content, confidence below `MIN_CONFIDENCE`, an unaccepted input and a submission while a
+  proposal is pending
+- `finalizeProposal` accepts accepting, rejecting and exact-threshold tallies; records
+  low-participation and zero-vote tallies as terminal rejections; rejects finalization
+  before the voting end, an old start height, a tampered set size, cross-instance and
+  replayed tallies, tallies for other content or another session, an unattested or early
+  rejection and an unaccepted input
+- `deactivateRule` accepts deactivation of an active accepted rule and rejects pending or
+  non-accepted rule state
 
 ## GuardianReputationState.sil
 
