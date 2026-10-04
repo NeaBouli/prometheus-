@@ -18,3 +18,4 @@ evidence (preserved, not temp; keep until integration and post-deploy review):
 visual assertions: all four viewports -> no page errors, horizontal overflow 0, description clipping 0, badges "A1–A8 merged" and "In progress" visible in viewport. Screenshots inspected by Claude.
 tests: public gates (documentation hygiene, public-claim consistency, project-status consistency, memory integrity, verify_site_css) -> PASS
 remaining gates: Codex screenshot inspection and UI acceptance; merge and post-deploy Pages check by Codex; site-wide October claim reconciliation after C2.
+follow-up (README, same branch): README.md Project Status gains two paragraphs that mirror the landing rows (A1-A8 merged with exact PR/run ids and #270 open; contract bundle v2 draft with completed K1, changes requested). Footer-style review date line unchanged (gate-pinned). Public gates PASS. README is not rendered HTML, so no visual gate.
