@@ -12,18 +12,29 @@
 
 ## What is Prometheus?
 
-Prometheus transforms every connected device into a sensor in a global threat detection swarm — without central control, without a foundation, without hidden interests. It combines on-device AI (Phi-3-mini) with LLaMA 3 guardian nodes and Kaspa L1 consensus to create an incorruptible, zero-pre-mine security protocol.
+Prometheus is building a decentralized threat-intelligence network on Kaspa: every connected device
+becomes a sensor, without central control, without a foundation, without hidden interests.
+
+The design target combines on-device AI with guardian nodes and Kaspa L1 consensus. **That target is not
+reached yet.** What exists today is the protocol and operator layer around it — contracts, the keyless
+genesis and state-transition operators, the Groth16 verifier, the Guardian P2P transport, and the
+client. Local model inference and guardian LLM analysis are not implemented; see
+[What runs today](#what-runs-today) for the exact boundary.
 
 ---
 
 ## Quick Start
 
-| Node Type | Hardware | Command |
-|-----------|----------|---------|
-| **Light Client** | Any device, 4 GB RAM | `cargo run -p prometheus-client` |
-| **Validator** | Kaspa node + 10,000 KAS stake | `cargo run -p prometheus-validator` |
-| **Guardian (8B)** | RTX 4070 Ti+, 16 GB VRAM | `cd modules/guardian-node && docker compose up guardian-8b` |
-| **Guardian (70B)** | 4x A100/H100, 128 GB RAM | Uncomment `guardian-70b` in docker-compose.yml |
+| Node Type | Status | Hardware | Command |
+|-----------|--------|----------|---------|
+| **Light Client** | runs | Any device, 4 GB RAM | `cargo run -p prometheus-client` |
+| **Validator** | planned | Kaspa node + 10,000 KAS stake | no binary yet — `prometheus-validator` is a library crate (`modules/validator-node/src/lib.rs`) with no `main.rs` |
+| **Guardian (8B)** | bring your own weights | RTX 4070 Ti+, 16 GB VRAM | `cd modules/guardian-node && docker compose up guardian-8b` |
+| **Guardian (70B)** | planned | 4x A100/H100, 128 GB RAM | Uncomment `guardian-70b` in docker-compose.yml |
+
+The Guardian compose file starts [vLLM](https://github.com/vllm-project/vllm) and mounts `./models`,
+expecting `Meta-Llama-3-8B-Instruct` to already be there. The repository ships no weights and no model
+pull; you have to supply them yourself. Only the light client runs from a clean checkout.
 
 ```bash
 git clone https://github.com/NeaBouli/prometheus-.git
@@ -56,7 +67,8 @@ Layer 1 (Kaspa L1):  ValidatorStaking | GuardianReputation | RuleStorage | Gover
 Layer 2 (P2P):       Guardian ballot request/response over QUIC (implemented core)
                      Rule distribution and client/validator carriers remain rollout work
 
-Off-Chain:           Phi-3-mini (local AI) | LLaMA 3 8B-first/70B-escalation | Fed-DART
+Off-Chain (target):  Phi-3-mini (local AI) | LLaMA 3 8B-first/70B-escalation | Fed-DART
+                     Not implemented. The local inference path is a stub and no model runs.
                      Data-minimal by design; current v1 sends bounded claim metadata, not raw files
 ```
 
@@ -67,21 +79,65 @@ Off-Chain:           Phi-3-mini (local AI) | LLaMA 3 8B-first/70B-escalation | F
 | Token | Role | Details |
 |-------|------|---------|
 | **KAS** | Validator Staking | Kaspa native token. Validators stake KAS (min 10,000). Slashed on misbehavior. |
-| **PROM** | Rewards & Governance | 0% pre-mine. Earned by guardians for accepted proposals. 20M annual emission. |
+| **PROM** | Rewards & Governance (planned) | 0% pre-mine. Earned by guardians for accepted proposals. 20M annual emission. No mint, ledger or emission code exists yet; the parameters are specification, not implementation. |
 
 **Important:** Validators stake KAS, never PROM. PROM is earned through contribution, never purchased or staked.
 Guardian reputation is a separate canonical Kaspa L1 state in `GuardianReputationState`; it is not a PROM balance, badge, or NFT.
 
 ---
 
+## What runs today
+
+<a id="what-runs-today"></a>
+
+This section is the honest boundary between the specification and the checkout. Everything listed as
+implemented is verifiable in the source at the given path.
+
+**Implemented and tested**
+
+- **Keyless signing operator.** `prometheus-silverc-deployer` never accepts a private key, seed, wallet
+  or raw transaction. It exports only the 32-byte BIP340 digest for external signing, verifies the
+  returned signature and the complete transaction before writing anything, and keeps an exclusive
+  crash-recovery journal with a file lock (`modules/silverc-deployer/src/lib.rs`).
+- **Groth16 verifier with pinned trust anchors.** The relation manifest pins the upstream rusty-kaspa
+  commit, the arkworks version and the verifying-key SHA-256; a mismatch fails closed with
+  `VerifyingKeyTrustMismatch` (`modules/threat-proof/src/lib.rs`).
+- **Runtime stub gate.** Placeholder proofs are bound to the deploy profile, so a development stub
+  cannot silently be accepted in another profile (`modules/client/src/runtime.rs`).
+- **Transport identity is not identity.** `PeerId` is transport metadata only, and the crate refuses to
+  compile on non-Unix targets rather than degrade silently (`modules/guardian-p2p/src/lib.rs`).
+- **Test and lint discipline.** 287 Rust test functions across the workspace, plus a Python suite that
+  independently revalidates the shared byte-exact vector corpora. CI runs
+  `cargo clippy --workspace -- -D warnings` and, for the deployer, `--all-targets` on top
+  (`.github/workflows/ci.yml:204,2398`). Panicking calls are concentrated in test modules rather than
+  in the operator paths.
+
+**Not implemented, despite appearing elsewhere in this document**
+
+- **Local model inference.** `Phi3Model` checks whether a file exists and otherwise logs
+  `running in stub mode`. There is no ONNX Runtime dependency anywhere in the workspace and no model is
+  loaded or executed (`modules/client/src/ai/phi3.rs`).
+- **Guardian LLM analysis.** The compose file expects weights you must supply; nothing is pulled.
+- **The YARA engine.** The scanner matches byte patterns from `Vec<Vec<u8>>` with a minimum-match
+  threshold. It uses YARA-*style* rule naming, not libyara and not YARA rule syntax
+  (`modules/client/src/security/scanner.rs`).
+- **PROM emission.** No mint, no ledger, no emission code.
+- **A validator binary.** `prometheus-validator` is a library crate without `main.rs`.
+
+---
+
 ## Project Status
+
+`ACCEPTED` below is a process label: the sprint passed its own review gate. It does not mean the
+feature is production-ready, and for Sprints 2 and 3 it does not mean the named component is
+implemented. Read it together with [What runs today](#what-runs-today).
 
 | Sprint | Status | Description |
 |--------|--------|-------------|
 | 0 — Setup | DONE | Kaspa testnet-10 node, repo structure, CI/CD |
 | 1 — Contracts | ACCEPTED | 6 Silverscript contracts, 54 tests |
-| 2 — Client | ACCEPTED | Kaspa RPC, KRC-20 reader, YARA scanner, ZK stub |
-| 3 — AI | ACCEPTED | Phi-3 wrapper, anomaly detection, Fed-DART |
+| 2 — Client | ACCEPTED | Kaspa RPC, KRC-20 reader, byte-pattern scanner (YARA-style rule shape, not the YARA engine), ZK stub |
+| 3 — AI | ACCEPTED | Phi-3 wrapper **as a stub** (no model, no ONNX dependency), anomaly detection, Fed-DART |
 | 4 — Guardian | ACCEPTED | Docker, vLLM, YARA generator, analyzer |
 | 5 — Voting | ACCEPTED | Commit-Reveal, bond system, slashing engine |
 | 6 — E2E | ACCEPTED | Development-stub lifecycle fixture and security tests; test foundation, not production evidence |
