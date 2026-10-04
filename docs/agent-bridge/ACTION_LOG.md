@@ -6064,3 +6064,9 @@ Rules for all dev agents:
   four screenshots + assertions under
   ~/agent-fleet/evidence/prometheus/landing-status-20261004-correction/.
 
+### 2026-10-04 - [AUTOR: CC] README status mirrors the landing
+
+- README Project Status: added the A1–A8 remediation (merged, #270 open) and
+  contract bundle v2 (draft, K1 changes requested) paragraphs, same wording as
+  the landing rows. Public gates PASS.
+
