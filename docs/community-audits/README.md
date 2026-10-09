@@ -97,3 +97,13 @@ ending `ff37` is **superseded**: it carries the uncorrected register (8 High,
 15 Medium; PRM-01 and PRM-02 valid). No corrected PDF is published in this repository, so no
 replacement PDF digest is recorded. The Markdown reports and the pins above
 are authoritative.
+
+## Maintainer Status Overlay (2026-10-10)
+
+The reports above describe their dated audit baseline, not current live
+vulnerabilities or release readiness. The separate
+[48-ID maintainer reconciliation](maintainer-status-2026-10-10.md) maps
+withdrawals, exact merged repairs, partial items, external uncertainty and
+remaining pre-deployment gates. It preserves the corrected report bytes/pins
+and superseded PDF history; issue #270 remains open. No full security acceptance
+or production claim follows from either the historical reports or the overlay.

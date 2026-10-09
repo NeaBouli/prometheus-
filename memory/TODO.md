@@ -301,3 +301,12 @@
 - [~] [P2] Publish K2 documentation through PR #290 | Codex | Initial acf410a candidate CI38002767198/Security38002767165 pass; final documentation-review correction checks and normal merge remain. No production acceptance follows.
 - [!] [P1] D5-T1..T6 source policy/capture/recompute/acceptance/client/evidence | Core dev + required independent/owner review | Open/proposed; no source access/cost, chain or deployment authorization inferred. D1-D7, constructors, full v2/security and closed D5 gates remain.
 - [ ] [P2] Audit #270 evidence reconciliation | Codex (queued, not started) | Reuse accepted reports/exact commits and public intake corrections; PRM-01 was invalidated, do not rebuild a fix. Separate merged/invalidated/informational/pre-deployment/externally blocked status; no security issue closure inferred.
+
+## Task-Only Follow-Up (2026-10-10; supersedes preceding task snapshots)
+
+- [x] [P2] K2 specification/publication | Codex | PR290 normally merged as098470f, final candidate CI38003597437/Security38003597447 pass, mainCI38004606618/Pages38004606457 pass; three public artifacts byte-verified. No selected policy or activation.
+- [~] [P2] Audit270 evidence reconciliation/publication | Codex | All48 IDs plus PRM-A01 cataloged; exact merged evidence reused. Own candidate validation/normal PR publication pending; no issue closure.
+- [ ] [P2] PRM-31/45 bounded metadata closeout | Next task | Manifest icon declarations, Economics ai-status metadata and llms Pages entry remain; no PWA feature or redesign.
+- [ ] [P2] GH-271 publication-history closeout | Maintainer/auditor coordination | Corrected Markdown/pins and PDF supersession published; original external PR/issue history remains open.
+- [!] [P1] GH-282/PRM-12 remaining scope decisions | Core dev | ThreatHint gate repaired; other runtime defaults and machine-attested governance/compatibility residuals are separate.
+- [!] [P1] Contract/D1-D7/constructors/full v2/D5/client/security/rollout | Core dev + required independent/owner gates | Still open; K2, CI or a status catalog does not activate acceptance.

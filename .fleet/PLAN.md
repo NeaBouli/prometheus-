@@ -685,3 +685,11 @@ Both runs require Gio budget approval (plan-level gate).
 - Static diff/matrix/source checks pass; local target tests NOT RUN because macOS rejects requested memory bound before test launch; PlantUML not installed, source only. Hosted required checks/publication pending; no manual dispatch.
 - Model selection, source approval, policy thresholds, constructor/D1-D7/full v2/D5 acceptance, later independent review and rollout remain open. Codex Security NOT CONNECTED/NOT RUN; specification is not a gate exemption or activation.
 - Report .fleet/reports/k2-d5-trust-spec-20261010.md; scoped self-review recorded separately. Documentation task PARTIAL until normal PR verification; full project NOT_COMPLETE.
+
+## 2026-10-10 - CODEX - K2 final closure; audit register reconciliation
+- K2 specification/publication is DONE through normal PR290 merge098470f; final candidate3fa0118 CI38003597437 SUCCESS8/8 and Security38003597447 SUCCESS3/3, exact-main CI38004606618 SUCCESS8/8. Pages38004606457 succeeded; model/diagram/MAP artifacts were live byte-identical. Earlier pending snapshots are historical, not remaining work.
+- K2 did not select/activate a model or D5 trust; no code/contract/pin/chain change. Source/policy/constructor/D1-D7/full v2/client/security/rollout gates remain open; Codex Security NOT CONNECTED/NOT RUN.
+- Current sole-writer task: audit270 reports -> remediation catalog -> release gates, owner-directed Codex execution while Claude is paused. Base098470f, branch agent/codex/audit-register-reconciliation-20261010. No worker outage or expanded external payload authorization inferred.
+- Delivered draft catalog for all48 stable IDs plus separate PRM-A01, preserving corrected0C/7H/14M/20L/5I historical ratings and unchanged report pins. Exact merged evidence reused; issue state is distinct from repair state, no security-issue closure or new product fix.
+- Partial items include broader runtime defaults, PRM-12 residuals, manifest/Economics metadata and llms Pages omission. External fallback/source availability and all contract pre-deployment gates remain open. See docs/community-audits/maintainer-status-2026-10-10.md for every row/child/receipt.
+- Verification/publication pending at this checkpoint; full project NOT_COMPLETE. Final task results will be appended; original plan/history/foreign local changes preserved.

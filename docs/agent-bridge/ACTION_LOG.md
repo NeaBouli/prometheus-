@@ -6110,3 +6110,9 @@ Rules for all dev agents:
 - Codex owns this task while Claude remains paused. No Kimi/Claude dispatch or external code-transfer extension, no source capture, chain, wallet, deployment or infrastructure action.
 - Static scope/matrix/source checks pass; isolated local target suites NOT RUN (memory limit rejected before execution), PlantUML rendering unavailable. Required hosted checks and PR remain pending, no duplicate dispatch.
 - Documentation self-review complete, not independent acceptance. Model/policy/constructors/security/activation/client/rollout gates stay open; Codex Security NOT CONNECTED/NOT RUN. See task report for honest results and blockers.
+
+## 2026-10-10 - CODEX - K2 closure and audit catalog candidate
+- PR290 main098470f is normally merged; final candidate CI38003597437/Security38003597447 and main CI38004606618 passed. Pages38004606457 passed and three changed public artifacts byte-matched. K2 proposal/publication Done only; earlier pending entries are snapshots.
+- Audit270 documentation task now owns the existing reports -> remediation catalog -> release-gate node. All48 IDs and separate dependency addendum mapped; original corrected reports/pins/PDF history untouched. No duplicate code repair or security-issue closure.
+- Scoped merged repairs distinguished from partial runtime/hygiene/metadata gaps, historical external uncertainty, informational controls and open contract/D5/security gates. Public catalog and required task Memory/PLAN records prepared; verification/normal PR publication pending.
+- Codex sole writer under owner instruction, Claude paused. No source/pin/tokenomics change, payload transfer, live capture, wallet/chain/production/infrastructure action or foreign-file mutation.

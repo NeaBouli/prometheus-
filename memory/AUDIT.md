@@ -2880,3 +2880,21 @@ changed.
 - Required model/policy/source/constructor/D1-D7/full v2/independent-security/
   client/rollout gates remain open. Codex Security NOT CONNECTED/NOT RUN is
   distinct from GitHub Security Audit. No detailed private finding published.
+
+## 2026-10-10 - Maintainer Audit Register Reconciliation (documentation only)
+
+- All48 stable IDs plus the separate PRM-A01 addendum are mapped to evidence,
+  bounded dispositions, remaining gates and child tickets. Corrected report
+  bytes/pins and the superseded PDF record are preserved, not re-audited.
+- PRM-01/02 invalidations and corrected historical0C/7H/14M/20L/5I totals are
+  explicit. Scope-limited repairs are not general security acceptance;
+  current issue state and original audit history are retained separately.
+- Accepted reports and exact PR284/285 receipts reused; K2 final candidate/main
+  checks and live publication completed, specification only. C2 remains an
+  unmerged/non-promotable candidate with no complete independent acceptance.
+- Parent-side static catalog/hash/reference checks and own protected publication
+  checks still pending here. No target-controlled local execution, live audit,
+  private finding disclosure or automatic security-issue closure.
+- Broader runtime defaults, hygiene/metadata residuals, independent-source/
+  constructor/D1-D7/full v2/D5/client/rollout gates remain open. Codex Security
+  NOT CONNECTED/NOT RUN; no product/security-policy/chain action.

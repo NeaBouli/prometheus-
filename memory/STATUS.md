@@ -2083,3 +2083,23 @@ This task checkpoint does not recalculate rollout readiness or change the
 2026-10-09 project-wide public review baseline; historical entries above stay
 historical. Source trust/policy, constructor/D1-D7, full v2/D5/security/client
 acceptance and authorized rollout remain open.
+
+## Task-Only Publication And Audit Register Snapshot (2026-10-10)
+
+K2 proposed specification/publication is Done through PR #290, exact main
+`098470fdfb2c343206afa93c13995bf70af32c63`. Final candidate CI38003597437
+and Security38003597447 pass; exact-main CI38004606618 and Pages38004606457
+pass. The three changed public artifacts were byte-verified. Earlier pending
+K2 entries above are historical checkpoints; no trust/model activation follows.
+
+The [maintainer PRM overlay](../docs/community-audits/maintainer-status-2026-10-10.md)
+catalogs all48 stable IDs plus PRM-A01, using unchanged corrected report pins
+and existing merged receipts. Historical ratings are 0C/7H/14M/20L/5I after
+two withdrawals, not a remaining-vulnerability count. Audit #270 remains open;
+bounded merged repairs do not automatically close child issues.
+
+This audit-catalog task is a documentation candidate awaiting its own protected
+publication checks. No source or production state changed. Runtime/hygiene/
+metadata residuals, independent external evidence and contract/D1-D7/D5/v2/
+client/security/rollout gates remain. Codex Security NOT CONNECTED/NOT RUN.
+The 2026-10-09 project-wide public review baseline is unchanged.
