@@ -1,0 +1,34 @@
+@startmindmap
+* D5: reviewed plan to state binding
+** Delivered worker source at 3e94ce0 (unmerged)
+*** Rust: context-bound observed candidate
+*** Python: validate_genesis_binding -> _bind_candidate
+**** verify_candidate_document
+*** accept_state: NOT_CONFIRMED (closed)
+** Proposed trust work (open, not simulated)
+*** T1: independent reviewer corroboration
+*** T2: validating-source/network/current-state policy
+*** Python binding to existing Rust covenant_id helper
+*** Separately reviewed runtime acceptance and client allowlist
+** Unchanged release gates
+*** v2 non-promotable; Rust pins v1
+*** D1-D7 / deployment constructors / independent review
+@endmindmap
+
+@startuml
+title Inspected D5 worker boundary at 3e94ce0 (unmerged)
+component "Reviewed plan + selected bundle" as plan
+component "silverc_genesis_binding_draft.py\nvalidate_genesis_binding" as binding
+component "_bind_candidate\nverify_candidate_document" as candidate
+component "accept_state\nunconditional NOT_CONFIRMED" as closed
+plan --> binding : externally supplied plan pin
+binding --> candidate : evidence item + role/plan context
+note right of candidate
+Consistency only, not independent chain proof.
+Recomputation/source corroboration remain open.
+end note
+note right of closed
+Every input is refused.
+No current acceptance or activation switch.
+end note
+@enduml
