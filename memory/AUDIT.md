@@ -2858,3 +2858,25 @@ changed.
   broader operational behavior is not claimed.
 - Result: `PR #281 REVIEW FIX / Final hosted recheck and protected merge
   pending / Production false`.
+
+## 2026-10-10 - K2 Proposed D5 Trust Specification Review
+
+- Scope: existing MAP M1/MS-B plan/genesis/off-chain acceptance boundary,
+  documentation only. Current worker source3e94ce0 is explicitly unmerged;
+  no full/independent contract security acceptance is claimed.
+- Codex self-review covers source independence, reviewer provenance, pinned
+  network/bootstrap identity, accepted genesis versus block existence,
+  current-state/reorg/successor/expiry boundaries and strict policy binding.
+- Four variants and 26 future adverse cases are a specification, not executed
+  live or synthetic acceptance evidence. Current unconditional NOT_CONFIRMED,
+  non-promotable v2, v1 pins and historical H-001 remain unchanged.
+- Initial candidate acf410a CI38002767198 PASS8/8 and Security38002767165
+  PASS3/3; hosted claims80/CSS12/H-0014 and consistency13 pass. Local target
+  suites did not launch under requested memory isolation; no weaker retry or
+  local pass. PlantUML source only. Final documentation-correction checks and
+  normal PR290 merge remain pending.
+- Two minor PR-review documentation points are addressed: final staged-check
+  record and task Memory allowlist/entries. No new product fix or policy change.
+- Required model/policy/source/constructor/D1-D7/full v2/independent-security/
+  client/rollout gates remain open. Codex Security NOT CONNECTED/NOT RUN is
+  distinct from GitHub Security Audit. No detailed private finding published.

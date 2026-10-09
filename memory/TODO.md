@@ -294,3 +294,10 @@
 - [~] [P2] GH-278 frontend system and accessibility | Claude (Codex stand-in) | A12a contrast, A12b a11y, A12c shared stylesheet, A12d image weights done on stand-in branch; post-deploy recheck owed
 - [!] [P1] PRM-35 validator cooldown | Contract bundle v2 (Codex) | Decided target 7 days = 6,048,000 blocks; fixture change blocked until a reviewed bundle revision because the deployer pins the H-001 bundle manifest
 - [!] [P2] Rusty Kaspa v2.1.0 / SilverScript v1.0.0 upgrade | Watch | Blocked upstream: no SilverScript release on a rusty-kaspa tag >= v2.1.0 (see .fleet/reports/a8u1-*)
+
+## Current Task Addendum (2026-10-10; historical rows retained)
+
+- [x] [P2] K2 proposed D5 trust specification written | Codex | Four variants, 26 future TS criteria, six dependent tasks and source-only diagram; no selected policy or activation. See docs/architecture/d5-trusted-source-model.md.
+- [~] [P2] Publish K2 documentation through PR #290 | Codex | Initial acf410a candidate CI38002767198/Security38002767165 pass; final documentation-review correction checks and normal merge remain. No production acceptance follows.
+- [!] [P1] D5-T1..T6 source policy/capture/recompute/acceptance/client/evidence | Core dev + required independent/owner review | Open/proposed; no source access/cost, chain or deployment authorization inferred. D1-D7, constructors, full v2/security and closed D5 gates remain.
+- [ ] [P2] Audit #270 evidence reconciliation | Codex (queued, not started) | Reuse accepted reports/exact commits and public intake corrections; PRM-01 was invalidated, do not rebuild a fix. Separate merged/invalidated/informational/pre-deployment/externally blocked status; no security issue closure inferred.

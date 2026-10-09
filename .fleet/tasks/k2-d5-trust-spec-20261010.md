@@ -16,7 +16,9 @@ freshness, reorgs, evidence provenance, policy pins and review boundaries.
 
 Allowed files: this brief; `docs/architecture/d5-trusted-source-model.md`;
 `docs/architecture/d5-trust-boundary.puml`; a bounded pointer in
-`docs/architecture/MAP.md`; this task's report and append-only PLAN/ACTION_LOG.
+`docs/architecture/MAP.md`; this task's report and append-only PLAN/ACTION_LOG;
+task-only appendices in `memory/STATUS.md`, `memory/TODO.md`, `memory/AUDIT.md`.
+Historical records and the project-wide public review baseline stay unchanged.
 
 No contract, source, fixture, bundle, dependency, workflow, client, signature,
 wallet, endpoint, network capture, deployment or acceptance change. No worker

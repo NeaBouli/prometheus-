@@ -2059,3 +2059,27 @@ Boundary: lockfile-only source update plus status records; no public-protocol
           or contract-semantic change found; no broader operational claim
 Production: false; normal protected merge and exact-main verification required
 ```
+
+## K2 TASK-ONLY D5 DESIGN CHECKPOINT (2026-10-10)
+
+PR [#290](https://github.com/NeaBouli/prometheus-/pull/290) supplies the
+[proposed trusted-source specification](../docs/architecture/d5-trusted-source-model.md):
+four variants, 26 future adverse-case criteria and six dependent open tasks.
+It does not select/activate a model, import the unmerged C2 code, deploy a
+contract or change runtime/client acceptance. D5 acceptance remains closed;
+v2 remains non-promotable, the Rust deployer remains v1-pinned and production
+remains false. No source capture or new independent security review occurred.
+
+Initial candidate `acf410a0b8998618ce0b1ce4249e4e7fe53debc8` passes CI
+[38002767198](https://github.com/NeaBouli/prometheus-/actions/runs/38002767198)
+(8/8) and Security Audit
+[38002767165](https://github.com/NeaBouli/prometheus-/actions/runs/38002767165)
+(3/3). The documentation review correction still needs final-head checks and
+normal merge. Local isolated target suites did not launch; PlantUML was not
+rendered. See the task report for limitations. Codex Security is NOT CONNECTED
+/ NOT RUN, distinct from Actions Security Audit.
+
+This task checkpoint does not recalculate rollout readiness or change the
+2026-10-09 project-wide public review baseline; historical entries above stay
+historical. Source trust/policy, constructor/D1-D7, full v2/D5/security/client
+acceptance and authorized rollout remain open.
