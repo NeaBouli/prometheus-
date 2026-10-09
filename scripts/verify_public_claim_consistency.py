@@ -76,6 +76,19 @@ OCTOBER_REQUIRED_FRAGMENTS = (
     "D5 acceptance stays closed; the Rust deployer remains v1-pinned",
     "No production deployment or achieved under-60-second lifecycle is claimed",
 )
+OCTOBER_PROHIBITED_CLAIMS = tuple(
+    re.compile(pattern, re.I)
+    for pattern in (
+        r"\bcontract bundle v2(?:\s*\([^)]*276[^)]*\))?\s+"
+        r"(?:(?:is|has been)\s+)?(?:now\s+)?"
+        r"(?:deployed|promotable|production[- ]ready)\b",
+        r"\bD5 (?:acceptance|evidence)\s+(?:is|has been)\s+"
+        r"(?:now\s+)?(?:open|enabled|confirmed|independently confirmed)\b",
+        r"\bRust deployer\s+(?:supports|authorizes|executes|deploys)\s+v2\b",
+        r"\bCodex Security\s+(?:is|has|has been)\s+"
+        r"(?:now\s+)?(?:passed|connected|completed|run)\b",
+    )
+)
 GH253_AS_OF = "2026-09-06"
 GH253_MERGE_COMMIT = "5920cb4bb737376977f762beb0d5e3108519c7a0"
 GH253_EXACT_MAIN_RUNS = {
@@ -1270,6 +1283,10 @@ def verify(root: Path) -> list[str]:
             for fragment in OCTOBER_REQUIRED_FRAGMENTS
         ):
             errors.append(f"{relative}: October checkpoint boundary missing")
+        if any(
+            pattern.search(normalized_metadata) for pattern in OCTOBER_PROHIBITED_CLAIMS
+        ):
+            errors.append(f"{relative}: October closed-gate claim contradiction")
         if (
             latest_metadata
             and " ".join(latest_metadata.split()).casefold() not in normalized_metadata

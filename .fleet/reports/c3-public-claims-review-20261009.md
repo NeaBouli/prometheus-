@@ -32,3 +32,12 @@ open. C2/v2 integration, trusted-source acceptance, D1-D7, client allowlist,
 production proof/model/network validation and Codex Security remain separate.
 Codex Security is NOT CONNECTED/NOT RUN; this review grants no scan, deployment,
 funding, signing, production or infrastructure authorization.
+
+## PR #288 Follow-Up Review
+
+The two confirmed automated comments are addressed within C3 scope: project-
+prefixed machine-evidence URLs and explicit contradictory-claim rejection.
+Two delta regressions pass; valid negative boundaries remain accepted. No
+unrelated formatter churn retained, product authority change or gate bypass.
+Earlier local full-suite evidence belongs to e9316a8; the final candidate
+requires its own hosted checks and complete changed-module test execution.

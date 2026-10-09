@@ -6098,3 +6098,8 @@ Rules for all dev agents:
 - Final stable-source script suite: 401 tests in 1039.438 seconds, OK. Earlier blocked/moving-source attempts were not passes; no assertion or gate weakened. Public consistency, hygiene, pin policy, Ruff, verifier mypy, stale-launch scan and diff checks pass; five unchanged test-module mypy findings remain.
 - Scope self-review .fleet/reports/c3-public-claims-review-20261009.md accepts the local implementation only. Twenty responsive page states and 28 screenshots inspected; no UI production-trigger/CSS change. Replay aggregate loss remains explicitly documented, not an invented full replay pass.
 - C3 remains PARTIAL for publishing: save exact scoped commit, push task branch, normal PR/required checks, then live Pages verification. C2 candidate remains unmerged and full v2/security/rollout gates remain open; Claude paused, K2 queued, Codex Security NOT RUN.
+
+## 2026-10-09 - CODEX - C3 bounded PR-review correction
+- PR288 automated comments independently checked: new llms evidence URLs needed the project prefix; retained negative checkpoints did not themselves reject a conflicting v2 deployment statement. Both fixed within documentation-gate scope.
+- Added prohibited positive v2/D5/Rust-v2/Codex-Security claims plus negative-language and intact-checkpoint regressions. Two new tests PASS (28.132s); consistency13, hygiene, Ruff, verifier mypy and diff PASS. Full changed-module suite running; final-head CI required. Prior401 full-script pass belongs to e9316a8, not relabeled as a new-head run.
+- No rendered HTML/CSS/JS delta or contract/authority change. Existing responsive evidence remains applicable. New commit/push follows; no duplicate dispatch, admin bypass or release claim.

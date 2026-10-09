@@ -27,7 +27,7 @@ No unsupported panic count/distribution from the closed PR287 is included.
 | Command | Actual result |
 | --- | --- |
 | python3 scripts/verify_public_claim_consistency.py | PASS, 13 synchronized surfaces |
-| python3 -m unittest discover -s scripts -p 'test_*.py' | PASS, 401 tests in 1039.438 seconds, zero failures |
+| python3 -m unittest discover -s scripts -p 'test_*.py' | PASS on e9316a8 before the bounded PR-review delta, 401 tests in 1039.438 seconds, zero failures |
 | Existing ci.yml memory-check/pages-check run-step replay | Memory 5/5 PASS; first five Pages steps PASS; final aggregate output not retained. The full script suite separately passes the synchronized-claims unit tests; the stale-launch check separately passes. Not claimed as one complete replay |
 | ruff check scripts/verify_public_claim_consistency.py scripts/test_public_claim_consistency.py | PASS |
 | mypy scripts/verify_public_claim_consistency.py | PASS, no issues |
@@ -80,3 +80,21 @@ sandbox-blocked fixture runs and a run crossing an in-progress ledger edit
 were not counted as passing results. No gate was disabled or assertion
 weakened. Local replay aggregate output loss is documented rather than
 converted into a claimed pass. Hosted C3 checks remain a separate requirement.
+
+## Bounded PR #288 Review Correction
+
+Both automated comments were checked against the candidate, not treated as
+instructions. The two new llms.txt evidence URLs now include the public-site
+project prefix. The October gate rejects positive v2 deployment/promotion,
+D5 confirmation, Rust v2 execution and Codex Security success claims even when
+the required negative checkpoint is retained. No architecture or authority
+changes. Negative-boundary language remains valid.
+
+- Two new regression methods: PASS in 28.132 seconds, including intact
+  Markdown/HTML checkpoints plus a conflicting deployment claim, seven
+  prohibited examples and eight valid negative boundaries.
+- Current public consistency 13 surfaces, hygiene, Ruff, verifier mypy and
+  diff checks: PASS. Full changed-module tests and final-head hosted checks
+  remain required; the earlier 401 result is not relabeled as a final-head run.
+- No rendered HTML/CSS/JS delta after the inspected screenshots; llms.txt is
+  machine-facing text. No extra browser run claimed or needed for this delta.

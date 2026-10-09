@@ -107,6 +107,66 @@ class PublicClaimConsistencyTests(unittest.TestCase):
                         )
                     )
 
+    def test_october_contradictions_fail_with_checkpoint_intact(self) -> None:
+        root = SCRIPT.parents[1]
+        for relative in (Path("README.md"), Path("index.html")):
+            with self.subTest(surface=relative):
+                with tempfile.TemporaryDirectory() as directory:
+                    fixture = Path(directory)
+                    copy_gh267_verification_fixture(root, fixture)
+                    path = fixture / relative
+                    original = path.read_text(encoding="utf-8")
+                    self.assertTrue(
+                        all(
+                            fragment in original
+                            for fragment in MODULE.OCTOBER_REQUIRED_FRAGMENTS
+                        )
+                    )
+                    path.write_text(
+                        original + "\nContract bundle v2 (`#276`) is deployed.\n",
+                        encoding="utf-8",
+                    )
+                    self.assertTrue(
+                        any(
+                            "October closed-gate claim contradiction" in error
+                            for error in MODULE.verify(fixture)
+                        )
+                    )
+
+    def test_october_prohibited_claim_patterns_preserve_negative_boundaries(
+        self,
+    ) -> None:
+        for text in (
+            "Contract bundle v2 (#276) is deployed.",
+            "Contract bundle v2 is now promotable.",
+            "Contract bundle v2 has been production-ready.",
+            "D5 acceptance is enabled.",
+            "D5 evidence is independently confirmed.",
+            "Rust deployer supports v2.",
+            "Codex Security has passed.",
+        ):
+            with self.subTest(contradiction=text):
+                self.assertTrue(
+                    any(
+                        pattern.search(text)
+                        for pattern in MODULE.OCTOBER_PROHIBITED_CLAIMS
+                    )
+                )
+        for text in (
+            *MODULE.OCTOBER_REQUIRED_FRAGMENTS,
+            "Contract bundle v2 is not deployed.",
+            "D5 acceptance is not enabled.",
+            "Rust deployer does not support v2.",
+            "Codex Security is not connected and has not run.",
+        ):
+            with self.subTest(boundary=text):
+                self.assertFalse(
+                    any(
+                        pattern.search(text)
+                        for pattern in MODULE.OCTOBER_PROHIBITED_CLAIMS
+                    )
+                )
+
     def test_audit_baseline_date_drift_is_rejected(self) -> None:
         changed = copy.deepcopy(self.status)
         changed["as_of"] = MODULE.LATEST_PROJECT_UPDATE
