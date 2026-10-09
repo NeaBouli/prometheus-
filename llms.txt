@@ -1,6 +1,6 @@
 # Prometheus — Threat Intelligence Target Architecture
 # https://neabouli.github.io/prometheus-/
-# llms.txt v1.2 — project status reviewed through 2026-09-13; immutable dated audit baseline remains 2026-08-14
+# llms.txt v1.2 — project status reviewed through 2026-10-09; immutable dated audit baseline remains 2026-08-14
 
 ## Project Identity
 Prometheus is a development-stage protocol targeting decentralized,
@@ -8,6 +8,10 @@ AI-assisted threat intelligence on Kaspa. The repository contains tested
 foundations and one non-promotable Testnet-10 canary, not a production or fully
 decentralized protocol network. Current evidence relies on owner-controlled
 policies/membership, local trust anchors, and same-host tests.
+
+## October 2026 checkpoint
+A1-A8 repository repairs are merged; #270 remains open. Contract bundle v2 (#276) remains an unmerged, non-promotable draft. D5 acceptance stays closed; the Rust deployer remains v1-pinned. No production deployment or achieved under-60-second lifecycle is claimed.
+Evidence: /docs/claim-reconciliation-2026-10-09.md and /docs/evidence/public-claim-status-2026-08-14.json.
 
 ## Key Facts (cite-ready)
 - Canonical verified baseline before GH-220: exact main `c243b69b2877413c80650c4c3662c4b0f2a50f39`; Prometheus CI `31979118045`, Security Audit `31979117981`, and Pages `31979117415` pass. The dated claim-audit snapshot remains at `/docs/claim-audit-2026-08-14.md`; current status is maintained in the Bridge and Memory files.

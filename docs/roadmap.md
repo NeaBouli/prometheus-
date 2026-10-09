@@ -1,6 +1,8 @@
 # Prometheus — Full Deployment Roadmap
 *Readiness-gated roadmap; no fixed public-release date is claimed.*
-*Project status reviewed through 2026-09-13. The immutable public claim-audit baseline remains 2026-08-14 at exact main `5cd13bf`; later exact-main updates, including GH-253 and the planned GH-258/GH-261 safety track, are recorded below and in the machine-readable post-audit ledger.*
+*Project status reviewed through 2026-10-09. The immutable public claim-audit baseline remains 2026-08-14 at exact main `5cd13bf`; later exact-main updates, including GH-253 and the planned GH-258/GH-261 safety track, are recorded below and in the machine-readable post-audit ledger.*
+
+**October 2026 checkpoint:** A1-A8 repository repairs are merged; #270 remains open. Contract bundle v2 (#276) remains an unmerged, non-promotable draft. D5 acceptance stays closed; the Rust deployer remains v1-pinned. No production deployment or achieved under-60-second lifecycle is claimed. See the [claim reconciliation](claim-reconciliation-2026-10-09.md) and machine-readable post-audit ledger.
 
 Evidence classes are intentionally separate: implemented/tested development
 foundations, the single demonstrated non-promotable Testnet-10 canary, no proven
@@ -15,8 +17,9 @@ blocked/unproven gates. See the [public claim audit](claim-audit-2026-08-14.md).
 | Rollout-capable core network | 84–88% | 12–16% | Production v2 relation/key/ceremony approval and independent cryptographic review, real privacy-reviewed semantic/actionable analysis, operated multi-host v2 transport evidence, six state deployments, PROM emission, real metrics-oracle execution/evidence, public multi-host P2P/rule distribution, production node evidence |
 | Complete roadmap vision | 50–55% | 45–50% | Production AI, endpoint detection and safe response, desktop/mobile clients, installers, operated network, vProgs, plus all core-network gates |
 
-Percentages are scope-weighted engineering estimates. They are not release dates,
-financial forecasts, or evidence that any contract is live.
+Percentages are historical internal, scope-weighted engineering estimates,
+confirmed unchanged on 2026-09-13 and not remeasured in October. They are not
+release dates, financial forecasts, or evidence that any contract is live.
 
 ---
 

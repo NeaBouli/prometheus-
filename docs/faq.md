@@ -1,8 +1,10 @@
 # Prometheus — Frequently Asked Questions
 
-*Project status reviewed through 2026-09-13; immutable public claim-audit baseline: 2026-08-14.*
+*Project status reviewed through 2026-10-09; immutable public claim-audit baseline: 2026-08-14.*
 
 ---
+
+**October 2026 checkpoint:** A1-A8 repository repairs are merged; #270 remains open. Contract bundle v2 (#276) remains an unmerged, non-promotable draft. D5 acceptance stays closed; the Rust deployer remains v1-pinned. No production deployment or achieved under-60-second lifecycle is claimed. See the [claim reconciliation](claim-reconciliation-2026-10-09.md) and machine-readable post-audit ledger.
 
 ## Tokenomics
 

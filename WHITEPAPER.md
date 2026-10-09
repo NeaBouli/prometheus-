@@ -1,10 +1,12 @@
 # Prometheus: Decentralized AI-Powered Threat Intelligence on Kaspa
 
-*Project status reviewed through 2026-09-13; immutable public claim-audit baseline: 2026-08-14.*
+*Project status reviewed through 2026-10-09; immutable public claim-audit baseline: 2026-08-14.*
+
+**October 2026 checkpoint:** A1-A8 repository repairs are merged; #270 remains open. Contract bundle v2 (#276) remains an unmerged, non-promotable draft. D5 acceptance stays closed; the Rust deployer remains v1-pinned. No production deployment or achieved under-60-second lifecycle is claimed. See the [claim reconciliation](docs/claim-reconciliation-2026-10-09.md) and machine-readable post-audit ledger.
 
 **Whitepaper v4.0 — March 2026**
 
-**Current status reconciliation — August 2026:** The isolated H-001 Testnet-10 canary is complete: external BIP340 signing, full Kaspa transaction verification, one-shot broadcast, confirmed covenant output, `operator_record`, and independent public REST evidence pass. This non-promotable canary does not authorize Mainnet or full rollout. The rollout-capable core remains 84-88% complete and the complete roadmap vision remains 50-55% complete; production proof artifacts and independent cryptographic review, privacy-reviewed semantic/actionable analysis, six state deployments, metrics-oracle evidence, and production multi-host/node operation remain open.
+**Historical status reconciliation — August 2026:** The isolated H-001 Testnet-10 canary is complete: external BIP340 signing, full Kaspa transaction verification, one-shot broadcast, confirmed covenant output, `operator_record`, and independent public REST evidence pass. This non-promotable canary does not authorize Mainnet or full rollout. The historical internal, scope-weighted engineering estimates were 84-88% for the rollout-capable core and 50-55% for the complete roadmap vision; they were confirmed unchanged on 2026-09-13 and have not been remeasured in October. Production proof artifacts and independent cryptographic review, privacy-reviewed semantic/actionable analysis, six state deployments, metrics-oracle evidence, and production multi-host/node operation remain open.
 
 The July status paragraph below is retained as a historical snapshot; its H-001 signing and broadcast statements are superseded by the current reconciliation above.
 

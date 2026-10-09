@@ -643,3 +643,31 @@ Both runs require Gio budget approval (plan-level gate).
   review; screenshot evidence preserved; waiting on Codex UI review. Next for
   Claude: C2 (K1 follow-up), sequenced after this write.
 
+## 2026-10-09 - CODEX - C3 started in isolated documentation branch
+- Owner-directed solo execution; Claude remains paused. No worker outage or duplicate delegation inferred.
+- C3 branch agent/codex/c3-public-claims-20261009 starts from verified main e6d5464a8535a9a3095507501af7f8706c336258. Accepted landing/README commits were reused as 4df4b11, cb2cd5d and 79b25e7; no v2 product changes imported.
+- Scope: architecture node public web/docs -> claim consistency verifier -> public status ledger. October reconciliation preserves the immutable August audit and H-001 evidence; historical engineering estimates will not be re-measured by a documentation edit.
+- C2 Security Audit37988101662 SUCCESS on exact 3e94ce0. CI37988100086 still IN_PROGRESS; four new engine regressions remain unverified until the runtime log is checked. No additional dispatch.
+- PR287 is closed unmerged; current main already contains most honesty corrections. Only useful missing context is consolidated, without replaying stale wording or unsupported panic claims.
+- K2 and contract security/trusted-source/acceptance gates remain open. Codex Security NOT CONNECTED / NOT RUN; no deployment, signing, broadcast, infrastructure change or social publication.
+
+## 2026-10-09 - CODEX - C2 exact-head runtime gate passed
+- Exact worker head 3e94ce0fa81591d2a0e23758dfc46a735a8b8a92: Prometheus CI37988100086 SUCCESS (8/8 including Rust Performance); Security Audit37988101662 SUCCESS (3/3). Dispatched exactly once each.
+- Codex inspected runtime job114015148385 log: all four new donateRuntime boundary regressions actually ran and passed (multiplication, addition, cumulative-total rejection; large in-range donation acceptance). Runtime109 passed, zero failed/ignored. Keyless operator library66, calculation CLI2 and collision6 tests passed; bundle separation/early-gate and complete v1 operator steps passed.
+- C2 bounded documentation/runtime follow-up is accepted for integration. Worker branch is not merged; no compiled identity/pin change or full contract/security/deployment acceptance follows. K1 covered original61549b1 only.
+- Decisions unchanged: no new donation cap, unused constants remain until a separate source/manifest revision, constructor/cumulative-counter bounds remain a deployment-review gate.
+- C3 public-claims consolidation continues independently from main, without v2 code. K2/trusted-source/client allowlist/D1-D7 and rollout gates remain open. Claude paused, Codex Security NOT RUN; no worker dispatch, deployment, chain or infrastructure action.
+
+
+## 2026-10-09 - CODEX - C3 reconciliation implemented, publishing gate pending
+- Reused accepted bc37515 work without importing v2 product changes. Updated README, WHITEPAPER, FAQ/roadmap Markdown and HTML, landing, economics page, llms.txt, sitemap, Memory status and public JSON ledger; added the seventeen-row docs/claim-reconciliation-2026-10-09.md and C2/C3 reports.
+- Added exact October evidence/closed-gate drift checks and eleven-surface checkpoint regressions. Immutable August audit, H-001 records, September event dates and historical engineering estimates preserved; no product module, workflow, dependency, contract, pin or tokenomics delta.
+- Local public consistency (13 surfaces), hygiene, pin policy, Ruff, verifier mypy and diff checks PASS. Test-module mypy retains five pre-existing findings on unchanged lines, not globally clean. Memory replay 5/5 PASS; full script suite is still running. Full Pages replay aggregate output was not retained and is not claimed as a complete pass.
+- Browser gate PASS on five pages/four viewports with 28 screenshots inspected; menu states, clipping/overflow, assets and natural visibility checked. Early animation-timing captures were corrected in the test only; no reveal-trigger/CSS product patch. Durable reproduction/assertions/screenshots are owner-local.
+- C2 exact 3e94ce0 CI/Security and 109 runtime tests/four new cases are verified; v2 remains unmerged/non-promotable and full acceptance stays open. Claude paused; K2/trusted-source/client allowlist/D1-D7 and production gates remain open. Codex Security NOT CONNECTED/NOT RUN.
+- Next: finish script tests, save scoped self-review, normal documentation PR with required checks, then live Pages verification after an authorized normal merge. Status PARTIAL, no deployment/chain/infrastructure/social action.
+
+## 2026-10-09 - CODEX - C3 local verification complete
+- Final stable-source script suite: 401 tests in 1039.438 seconds, OK. Earlier blocked/moving-source attempts were not passes; no assertion or gate weakened. Public consistency, hygiene, pin policy, Ruff, verifier mypy, stale-launch scan and diff checks pass; five unchanged test-module mypy findings remain.
+- Scope self-review .fleet/reports/c3-public-claims-review-20261009.md accepts the local implementation only. Twenty responsive page states and 28 screenshots inspected; no UI production-trigger/CSS change. Replay aggregate loss remains explicitly documented, not an invented full replay pass.
+- C3 remains PARTIAL for publishing: save exact scoped commit, push task branch, normal PR/required checks, then live Pages verification. C2 candidate remains unmerged and full v2/security/rollout gates remain open; Claude paused, K2 queued, Codex Security NOT RUN.

@@ -13,7 +13,69 @@ from typing import Any
 STATUS_PATH = Path("docs/evidence/public-claim-status-2026-08-14.json")
 SITEMAP_PATH = Path("sitemap.xml")
 AUDIT_BASELINE_DATE = "2026-08-14"
-LATEST_PROJECT_UPDATE = "2026-09-13"
+LATEST_PROJECT_UPDATE = "2026-10-09"
+SEPTEMBER_ENDPOINT_CHECKPOINT = "2026-09-13"
+OCTOBER_STATUS = {
+    "as_of": "2026-10-09",
+    "repository_baseline": "e6d5464a8535a9a3095507501af7f8706c336258",
+    "audit_register": {
+        "issue": 270,
+        "status": "open",
+        "merged_scope": "A1_A8_repository_only",
+    },
+    "merged_remediation": [
+        {
+            "pull_request": 284,
+            "merge_commit": "3a79bfec375ef0023c00520b8cf113427f889710",
+            "exact_main_runs": {
+                "prometheus_ci": 36766270695,
+                "security_audit": 36766270804,
+                "pages": 36766269974,
+            },
+        },
+        {
+            "pull_request": 285,
+            "merge_commit": "e6d5464a8535a9a3095507501af7f8706c336258",
+            "exact_main_runs": {
+                "prometheus_ci": 36769372160,
+                "security_audit": 36769372493,
+                "pages": 36769371268,
+            },
+        },
+    ],
+    "contract_bundle_v2": {
+        "issue": 276,
+        "status": "unmerged_non_promotable_draft",
+        "independent_review_head": "61549b19055f84ee2e83dd40d209d8a229e2522b",
+        "independent_review": "changes_requested_bounded_follow_up",
+        "bounded_c2_follow_up": {
+            "head": "3e94ce0fa81591d2a0e23758dfc46a735a8b8a92",
+            "status": "verified_worker_branch_not_merged",
+            "prometheus_ci": 37988100086,
+            "security_audit": 37988101662,
+            "runtime_tests_passed": 109,
+            "new_boundary_regressions_passed": 4,
+        },
+        "d5_acceptance": "unconditionally_closed",
+        "rust_deployer_manifest": "h001_v1_only",
+        "deployment_authorization": False,
+        "full_security_acceptance": False,
+    },
+    "codex_security": "planned_not_connected_not_run",
+    "under_60_seconds": "target_only",
+    "engineering_estimates": {
+        "as_of": "2026-09-13",
+        "classification": "historical_internal_scope_weighted",
+        "remeasured_in_october": False,
+    },
+    "production_ready": False,
+}
+OCTOBER_REQUIRED_FRAGMENTS = (
+    "A1-A8 repository repairs are merged; #270 remains open",
+    "Contract bundle v2 (#276) remains an unmerged, non-promotable draft",
+    "D5 acceptance stays closed; the Rust deployer remains v1-pinned",
+    "No production deployment or achieved under-60-second lifecycle is claimed",
+)
 GH253_AS_OF = "2026-09-06"
 GH253_MERGE_COMMIT = "5920cb4bb737376977f762beb0d5e3108519c7a0"
 GH253_EXACT_MAIN_RUNS = {
@@ -40,37 +102,37 @@ PUBLIC_FILES = (
 LATEST_METADATA_FRAGMENTS = {
     Path(
         "README.md"
-    ): "Public project status was reviewed through 2026-09-13. The immutable claim-audit baseline remains 2026-08-14",
+    ): "Public project status was reviewed through 2026-10-09. The immutable claim-audit baseline remains 2026-08-14",
     Path(
         "WHITEPAPER.md"
-    ): "Project status reviewed through 2026-09-13; immutable public claim-audit baseline: 2026-08-14",
+    ): "Project status reviewed through 2026-10-09; immutable public claim-audit baseline: 2026-08-14",
     Path(
         "docs/roadmap.md"
-    ): "Project status reviewed through 2026-09-13. The immutable public claim-audit baseline remains 2026-08-14",
+    ): "Project status reviewed through 2026-10-09. The immutable public claim-audit baseline remains 2026-08-14",
     Path(
         "docs/faq.md"
-    ): "Project status reviewed through 2026-09-13; immutable public claim-audit baseline: 2026-08-14",
+    ): "Project status reviewed through 2026-10-09; immutable public claim-audit baseline: 2026-08-14",
     Path(
         "memory/STATUS.md"
-    ): "Latest project/public status review: 2026-09-13. The section date and exact evidence below remain the immutable 2026-08-14 audit baseline",
+    ): "Latest project/public status review: 2026-10-09. The section date and exact evidence below remain the immutable 2026-08-14 audit baseline",
     Path(
         "index.html"
-    ): 'Project status reviewed 2026-09-13 · immutable <a href="docs/claim-audit-2026-08-14.md">claim-audit baseline</a> 2026-08-14',
+    ): 'Project status reviewed 2026-10-09 · immutable <a href="docs/claim-audit-2026-08-14.md">claim-audit baseline</a> 2026-08-14',
     Path(
         "roadmap.html"
-    ): 'Project status reviewed 2026-09-13 · immutable <a href="docs/claim-audit-2026-08-14.md">claim-audit baseline</a> 2026-08-14',
+    ): 'Project status reviewed 2026-10-09 · immutable <a href="docs/claim-audit-2026-08-14.md">claim-audit baseline</a> 2026-08-14',
     Path(
         "whitepaper.html"
-    ): 'Project status reviewed 2026-09-13 · immutable <a href="docs/claim-audit-2026-08-14.md">claim-audit baseline</a> 2026-08-14',
+    ): 'Project status reviewed 2026-10-09 · immutable <a href="docs/claim-audit-2026-08-14.md">claim-audit baseline</a> 2026-08-14',
     Path(
         "faq.html"
-    ): 'Project status reviewed 2026-09-13 · immutable <a href="docs/claim-audit-2026-08-14.md">claim-audit baseline</a> 2026-08-14',
+    ): 'Project status reviewed 2026-10-09 · immutable <a href="docs/claim-audit-2026-08-14.md">claim-audit baseline</a> 2026-08-14',
     Path(
         "guardian-economics.html"
-    ): 'Project status reviewed 2026-09-13 · immutable <a href="docs/claim-audit-2026-08-14.md">claim-audit baseline</a> 2026-08-14',
+    ): 'Project status reviewed 2026-10-09 · immutable <a href="docs/claim-audit-2026-08-14.md">claim-audit baseline</a> 2026-08-14',
     Path(
         "llms.txt"
-    ): "project status reviewed through 2026-09-13; immutable dated audit baseline remains 2026-08-14",
+    ): "project status reviewed through 2026-10-09; immutable dated audit baseline remains 2026-08-14",
 }
 
 STALE_METADATA_PATTERNS = (
@@ -679,6 +741,11 @@ def validate_status(data: dict[str, Any]) -> list[str]:
         "production_ready": False,
     }:
         errors.append("latest project update metadata is invalid")
+    october = data.get("post_audit_updates", {}).get("october_2026")
+    if json.dumps(october, sort_keys=True) != json.dumps(
+        OCTOBER_STATUS, sort_keys=True
+    ):
+        errors.append("October checkpoint evidence or closed-gate status drift")
     gh_234 = data.get("post_audit_updates", {}).get("gh_234", {})
     gh_238 = data.get("post_audit_updates", {}).get("gh_238", {})
     gh_242 = data.get("post_audit_updates", {}).get("gh_242", {})
@@ -931,7 +998,7 @@ def validate_status(data: dict[str, Any]) -> list[str]:
         if gh_253.get(field) is not False:
             errors.append(f"GH-253 {field} must remain false")
     if (
-        gh_258.get("as_of") != LATEST_PROJECT_UPDATE
+        gh_258.get("as_of") != SEPTEMBER_ENDPOINT_CHECKPOINT
         or gh_258.get("issue") != 258
         or gh_258.get("follow_up_issue") != 261
         or gh_258.get("status") != "planned_documentation_only"
@@ -960,7 +1027,7 @@ def validate_status(data: dict[str, Any]) -> list[str]:
         if gh_258.get(field) is not False:
             errors.append(f"GH-258 {field} must remain false")
     if (
-        gh_264.get("as_of") != LATEST_PROJECT_UPDATE
+        gh_264.get("as_of") != SEPTEMBER_ENDPOINT_CHECKPOINT
         or gh_264.get("issue") != 264
         or gh_264.get("status") != "repository_candidate_implemented_and_locally_tested"
         or gh_264.get("classification") != "canonical_observe_only_endpoint_statement"
@@ -987,7 +1054,7 @@ def validate_status(data: dict[str, Any]) -> list[str]:
         if gh_264.get(field) is not False:
             errors.append(f"GH-264 {field} must remain false")
     if (
-        gh_267.get("as_of") != LATEST_PROJECT_UPDATE
+        gh_267.get("as_of") != SEPTEMBER_ENDPOINT_CHECKPOINT
         or gh_267.get("issue") != 267
         or gh_267.get("status") != "repository_candidate_implemented_and_locally_tested"
         or gh_267.get("classification") != "pre_producer_privacy_threat_model_gate"
@@ -1198,6 +1265,11 @@ def verify(root: Path) -> list[str]:
                 errors.append(f"{relative}: required status boundary missing")
         latest_metadata = LATEST_METADATA_FRAGMENTS.get(relative)
         normalized_metadata = " ".join(text.split()).casefold()
+        if latest_metadata and any(
+            fragment.casefold() not in normalized_metadata
+            for fragment in OCTOBER_REQUIRED_FRAGMENTS
+        ):
+            errors.append(f"{relative}: October checkpoint boundary missing")
         if (
             latest_metadata
             and " ".join(latest_metadata.split()).casefold() not in normalized_metadata

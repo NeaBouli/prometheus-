@@ -43,6 +43,70 @@ class PublicClaimConsistencyTests(unittest.TestCase):
     def test_canonical_status_passes(self) -> None:
         self.assertEqual(MODULE.validate_status(self.status), [])
 
+    def test_october_checkpoint_rejects_evidence_or_authority_drift(self) -> None:
+        paths_and_values = (
+            (("audit_register", "status"), "closed"),
+            (("repository_baseline",), "0" * 40),
+            (("contract_bundle_v2", "status"), "merged"),
+            (("contract_bundle_v2", "d5_acceptance"), "confirmed"),
+            (("contract_bundle_v2", "rust_deployer_manifest"), "v2"),
+            (("contract_bundle_v2", "deployment_authorization"), True),
+            (("contract_bundle_v2", "deployment_authorization"), 0),
+            (("contract_bundle_v2", "full_security_acceptance"), True),
+            (("codex_security",), "passed"),
+            (("under_60_seconds",), "achieved"),
+            (("engineering_estimates", "remeasured_in_october"), True),
+            (("production_ready",), True),
+            (("production_ready",), 0),
+        )
+        for keys, value in paths_and_values:
+            with self.subTest(keys=keys, value=value):
+                changed = copy.deepcopy(self.status)
+                record = changed["post_audit_updates"]["october_2026"]
+                for key in keys[:-1]:
+                    record = record[key]
+                record[keys[-1]] = value
+                self.assertTrue(
+                    any(
+                        "October checkpoint" in error
+                        for error in MODULE.validate_status(changed)
+                    )
+                )
+        malformed_records: tuple[Any, ...] = (None, [], {}, "released")
+        for malformed_record in malformed_records:
+            with self.subTest(record=malformed_record):
+                changed = copy.deepcopy(self.status)
+                changed["post_audit_updates"]["october_2026"] = malformed_record
+                self.assertTrue(MODULE.validate_status(changed))
+        for index in (0, 1):
+            with self.subTest(merged_evidence=index):
+                changed = copy.deepcopy(self.status)
+                record = changed["post_audit_updates"]["october_2026"]
+                record["merged_remediation"][index]["exact_main_runs"]["pages"] = 1
+                self.assertTrue(MODULE.validate_status(changed))
+
+    def test_october_checkpoint_is_required_on_every_reviewed_surface(self) -> None:
+        root = SCRIPT.parents[1]
+        for relative in MODULE.LATEST_METADATA_FRAGMENTS:
+            with self.subTest(surface=relative):
+                with tempfile.TemporaryDirectory() as directory:
+                    fixture = Path(directory)
+                    copy_gh267_verification_fixture(root, fixture)
+                    path = fixture / relative
+                    path.write_text(
+                        path.read_text(encoding="utf-8").replace(
+                            MODULE.OCTOBER_REQUIRED_FRAGMENTS[1],
+                            "Contract bundle v2 released",
+                        ),
+                        encoding="utf-8",
+                    )
+                    self.assertTrue(
+                        any(
+                            "October checkpoint boundary missing" in error
+                            for error in MODULE.verify(fixture)
+                        )
+                    )
+
     def test_audit_baseline_date_drift_is_rejected(self) -> None:
         changed = copy.deepcopy(self.status)
         changed["as_of"] = MODULE.LATEST_PROJECT_UPDATE
@@ -1207,7 +1271,7 @@ class PublicClaimConsistencyTests(unittest.TestCase):
             readme = tmp_root / "README.md"
             readme.write_text(
                 readme.read_text(encoding="utf-8").replace(
-                    "Public project status was reviewed through 2026-09-13.",
+                    "Public project status was reviewed through 2026-10-09.",
                     "Public project status date pending.",
                     1,
                 ),
