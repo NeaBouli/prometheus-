@@ -78,6 +78,6 @@ changed by this patch.
 
 Actual local commands, results, responsive screenshots, candidate commit/PR
 and unresolved publishing gates are recorded in
-[the C3 verification report](../.fleet/reports/c3-public-claims-consolidation-20261009.md).
+[the C3 verification report on GitHub](https://github.com/NeaBouli/prometheus-/blob/main/.fleet/reports/c3-public-claims-consolidation-20261009.md).
 Live Pages verification remains pending until a normal reviewed merge and
 deployment; local screenshots are not live-deployment evidence.
