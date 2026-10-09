@@ -6103,3 +6103,10 @@ Rules for all dev agents:
 - PR288 automated comments independently checked: new llms evidence URLs needed the project prefix; retained negative checkpoints did not themselves reject a conflicting v2 deployment statement. Both fixed within documentation-gate scope.
 - Added prohibited positive v2/D5/Rust-v2/Codex-Security claims plus negative-language and intact-checkpoint regressions. Two new tests PASS (28.132s); consistency13, hygiene, Ruff, verifier mypy and diff PASS. Full changed-module suite running; final-head CI required. Prior401 full-script pass belongs to e9316a8, not relabeled as a new-head run.
 - No rendered HTML/CSS/JS delta or contract/authority change. Existing responsive evidence remains applicable. New commit/push follows; no duplicate dispatch, admin bypass or release claim.
+
+## 2026-10-10 - CODEX - K2 trust specification prepared
+- Main251307a/C3 publication verified; formerly pending CI37997143555 now SUCCESS8/8. Worker C2 remains3e94ce0, unmerged; reuse as evidence only.
+- Added D5 proposed trust variants, source-independence/network/current-state/freshness/reorg requirements, 26 adverse-case criteria, scoped diagram source and dependent tasks. MAP pointer names the existing node; no product or acceptance change.
+- Codex owns this task while Claude remains paused. No Kimi/Claude dispatch or external code-transfer extension, no source capture, chain, wallet, deployment or infrastructure action.
+- Static scope/matrix/source checks pass; isolated local target suites NOT RUN (memory limit rejected before execution), PlantUML rendering unavailable. Required hosted checks and PR remain pending, no duplicate dispatch.
+- Documentation self-review complete, not independent acceptance. Model/policy/constructors/security/activation/client/rollout gates stay open; Codex Security NOT CONNECTED/NOT RUN. See task report for honest results and blockers.

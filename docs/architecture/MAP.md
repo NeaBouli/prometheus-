@@ -186,6 +186,11 @@ GH-258/GH-261 producer design) are delivered on
 1. **Contract bundle v2** — after Codex accepts
    `docs/architecture/ms-b-contract-decisions.md`: one reviewed revision of
    `modules/contracts/silverc` + deployer profile (H-001 profile stays frozen).
+   D5 follow-up: [trusted-source variants and acceptance specification](d5-trusted-source-model.md)
+   (K2, 2026-10-10) names this existing plan -> genesis -> state-binding
+   boundary. It is a proposal referencing unmerged worker head `3e94ce0`,
+   not an activated trust model or independent security acceptance. Historical
+   H-001, v1 pins and the closed v2/D5 gates remain unchanged.
 2. **Endpoint producer review** — independent privacy review of
    `docs/endpoint-producer-design-v1.md` before any implementation brief.
 3. **Toolchain upgrade** — Rusty Kaspa v2.1.0 / SilverScript v1.0.0 once

@@ -676,3 +676,12 @@ Both runs require Gio budget approval (plan-level gate).
 - PR288 automated comments independently checked: new llms evidence URLs needed the project prefix; retained negative checkpoints did not themselves reject a conflicting v2 deployment statement. Both fixed within documentation-gate scope.
 - Added prohibited positive v2/D5/Rust-v2/Codex-Security claims plus negative-language and intact-checkpoint regressions. Two new tests PASS (28.132s); consistency13, hygiene, Ruff, verifier mypy and diff PASS. Full changed-module suite running; final-head CI required. Prior401 full-script pass belongs to e9316a8, not relabeled as a new-head run.
 - No rendered HTML/CSS/JS delta or contract/authority change. Existing responsive evidence remains applicable. New commit/push follows; no duplicate dispatch, admin bypass or release claim.
+
+## 2026-10-10 - CODEX - K2 trust specification prepared
+- C3 normal PR288/289 publication is complete at main251307a; CI37997143555 SUCCESS8/8, Security37997143573 SUCCESS3/3 and Pages37997143075 SUCCESS. This task builds from that documentation-only public baseline.
+- Owner-directed Codex execution, Claude paused; no worker outage, duplicate assignment or new external code payload inferred. K2 variants supplied locally, not by Kimi; K1 source scope remains61549b1.
+- Existing MAP M1/MS-B node: reviewed plan -> genesis identity -> observed candidate -> closed acceptance. Four proposed variants, source/network/reorg/provenance/expiry criteria, 26 adverse cases and six dependent follow-up tickets documented.
+- Current v2 implementation is referenced at unmerged C2 head3e94ce0, not imported. Source, contracts, pins, immutable evidence, policy, runtime, client and tokenomics unchanged. No source capture, deployment, signing or chain/network mutation.
+- Static diff/matrix/source checks pass; local target tests NOT RUN because macOS rejects requested memory bound before test launch; PlantUML not installed, source only. Hosted required checks/publication pending; no manual dispatch.
+- Model selection, source approval, policy thresholds, constructor/D1-D7/full v2/D5 acceptance, later independent review and rollout remain open. Codex Security NOT CONNECTED/NOT RUN; specification is not a gate exemption or activation.
+- Report .fleet/reports/k2-d5-trust-spec-20261010.md; scoped self-review recorded separately. Documentation task PARTIAL until normal PR verification; full project NOT_COMPLETE.
