@@ -1,11 +1,15 @@
 # PROMETHEUS – MODULE STATUS
 # Format: | Module | Status | Progress | Last Update | Audit | Testnet Address |
 # Status: core lifecycle values plus evidence-qualified DEVELOPMENT/STUB/FIXTURE labels; every non-production label must retain its boundary in the row
-# Last Updated: 2026-09-30
+# Last Updated: 2026-10-09
 
 ---
 
-## AUDIT REMEDIATION STATUS (2026-09-30, not yet on main)
+## HISTORICAL AUDIT REMEDIATION SNAPSHOT (2026-09-30)
+
+The following branch snapshot is historical, not current status. PR #284 and
+PR #285 subsequently merged; the October checkpoint below supersedes its
+unmerged/deployment wording. No production protocol deployment followed.
 
 A1-A8 are integrated on the Codex milestone branch (PR #284, hosted CI green,
 review required). A Claude stand-in continued on
@@ -18,9 +22,11 @@ Prometheus protocol component is production-deployed. Validator cooldown
 target is 7 days; the current fixture keeps 100,800 blocks until a reviewed
 contract-bundle revision.
 
+**October 2026 checkpoint:** A1-A8 repository repairs are merged; #270 remains open. Contract bundle v2 (#276) remains an unmerged, non-promotable draft. D5 acceptance stays closed; the Rust deployer remains v1-pinned. No production deployment or achieved under-60-second lifecycle is claimed. See the [claim reconciliation](../docs/claim-reconciliation-2026-10-09.md) and machine-readable post-audit ledger.
+
 ## PUBLIC CLAIM RECONCILIATION (2026-08-14)
 
-Latest project/public status review: 2026-09-13. The section date and exact
+Latest project/public status review: 2026-10-09. The section date and exact
 evidence below remain the immutable 2026-08-14 audit baseline; later exact-main
 updates are recorded in the dated status sections that follow and in the
 machine-readable post-audit ledger.

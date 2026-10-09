@@ -2,7 +2,7 @@
   "schema_version": 1,
   "as_of": "2026-08-14",
   "latest_project_update": {
-    "as_of": "2026-09-13",
+    "as_of": "2026-10-09",
     "audit_baseline_as_of": "2026-08-14",
     "classification": "post_audit_updates_recorded_below",
     "production_ready": false
@@ -29,6 +29,61 @@
     "scope": "local_raw_cidv1_exact_byte_ingestion_development_only"
   },
   "post_audit_updates": {
+    "october_2026": {
+      "as_of": "2026-10-09",
+      "repository_baseline": "e6d5464a8535a9a3095507501af7f8706c336258",
+      "audit_register": {
+        "issue": 270,
+        "status": "open",
+        "merged_scope": "A1_A8_repository_only"
+      },
+      "merged_remediation": [
+        {
+          "pull_request": 284,
+          "merge_commit": "3a79bfec375ef0023c00520b8cf113427f889710",
+          "exact_main_runs": {
+            "prometheus_ci": 36766270695,
+            "security_audit": 36766270804,
+            "pages": 36766269974
+          }
+        },
+        {
+          "pull_request": 285,
+          "merge_commit": "e6d5464a8535a9a3095507501af7f8706c336258",
+          "exact_main_runs": {
+            "prometheus_ci": 36769372160,
+            "security_audit": 36769372493,
+            "pages": 36769371268
+          }
+        }
+      ],
+      "contract_bundle_v2": {
+        "issue": 276,
+        "status": "unmerged_non_promotable_draft",
+        "independent_review_head": "61549b19055f84ee2e83dd40d209d8a229e2522b",
+        "independent_review": "changes_requested_bounded_follow_up",
+        "bounded_c2_follow_up": {
+          "head": "3e94ce0fa81591d2a0e23758dfc46a735a8b8a92",
+          "status": "verified_worker_branch_not_merged",
+          "prometheus_ci": 37988100086,
+          "security_audit": 37988101662,
+          "runtime_tests_passed": 109,
+          "new_boundary_regressions_passed": 4
+        },
+        "d5_acceptance": "unconditionally_closed",
+        "rust_deployer_manifest": "h001_v1_only",
+        "deployment_authorization": false,
+        "full_security_acceptance": false
+      },
+      "codex_security": "planned_not_connected_not_run",
+      "under_60_seconds": "target_only",
+      "engineering_estimates": {
+        "as_of": "2026-09-13",
+        "classification": "historical_internal_scope_weighted",
+        "remeasured_in_october": false
+      },
+      "production_ready": false
+    },
     "gh_234": {
       "as_of": "2026-08-29",
       "issue": 234,
