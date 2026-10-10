@@ -13,3 +13,12 @@ Core integrates the finished worker delta; no second implementation owner.
 - Fresh exact-head full CI/Security, protected PR merge, main CI/Security/Pages
   and live desktop/mobile readback/visual evidence are required before Done.
 - No main push, bypass, chain, wallet, production or infrastructure action.
+
+## Review Amendment
+
+PR297 review requires exact public-text validation and recorded evidence.
+Existing CI explicitly runs claim/status/Memory checks, but omits the existing
+documentation-hygiene checker and its tests. Core may register those two
+commands in the existing HTML Pages job, without new workflow, permissions,
+runner, action/compiler pins, relaxed checks or product changes. Existing
+public-web verification hop only; fresh exact-head CI/Security required.

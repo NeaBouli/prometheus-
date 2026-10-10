@@ -26,3 +26,21 @@ target tests or builds executed locally. Hosted full suites are NOT_RUN here.
 risks: Hosted checks, protected merge and live validation remain open.
 Constructor, D1-D7, independent trust/client/activation and rollout gates remain.
 next: Core publishes via normal PR and verifies actual exact-head/main results.
+
+## Verified Source-Head Evidence And Review Follow-Up
+
+Exact source head85d9c0fa056c13066ad517845281c418ac2d3334:
+Prometheus CI38026272562 SUCCESS8/8; Security38026272642 SUCCESS3/3.
+Existing claim checker/tests, status checker/tests and Memory checker passed
+in their actual hosted steps. Full v1 operator chain through handoff passed.
+These results supersede the earlier NOT_RUN snapshot only for that exact head.
+
+Authentic-font candidate gate8/8 PASS; Space Grotesk300/400/500 and
+Space Mono400/700 loaded. Core opened every fresh image; no clipping/overflow,
+contrast/focus/navigation assertions pass. No deployed HTML acceptance yet.
+
+Review exposed a real coverage gap: the existing documentation-hygiene checker
+and its tests were not registered in CI. Both are now added to HTML Pages;
+no runner/action/compiler/permission/product changes or checks weakened.
+Fresh final-head CI/Security, protected merge and live verification remain
+pending. Source HTML bytes are unchanged by this evidence/CI registration delta.

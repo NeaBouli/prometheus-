@@ -6152,3 +6152,9 @@ Rules for all dev agents:
 - Only authorized Whitepaper-local #validators responsive table CSS added, three lines; wrapping/fixed width preserves every cell and column. No shared CSS/JS/assets/source/fixture/pin/baseline change or unmerged public links.
 - Corrected local browser PASS8/8, all-cell clipping/scroll regression PASS, focus/navigation/contrast PASS. Eight fresh images opened; partial evidence preserved under original names, corrected/ adds final evidence. Worker scope OK; no public deployment/main adoption or hosted-CI claim.
 - Records/report append-only, same branch/base retained; local browser/server completed, temporary output removed. Core owns final semantic review/exact transplant, commit/push and fresh hosted/post-deploy gates; no new agent, target-code execution or remote action.
+
+
+
+## 2026-10-10 - CODEX - PR297 validation review follow-up
+- Exact source85d9c0f CI38026272562 SUCCESS8/8, Security38026272642 SUCCESS3/3; public claims/tests, status/tests and Memory checker actually passed. Full existing v1 operator chain through handoff passed. Authentic-font candidate gate8/8 PASS and all8 images independently opened by Core; no deployed HTML acceptance claimed.
+- Two review threads requested validators and recorded visual results. Actual inspection found existing documentation-hygiene checker/tests missing from CI registration; added only those two commands to the existing HTML Pages job. Source HTML unchanged, no permissions/pins/runners/product behavior modified or checks weakened. Fresh exact final-head CI/Security and main/live gates required before Done.

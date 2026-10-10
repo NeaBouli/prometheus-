@@ -2601,6 +2601,10 @@ jobs:
         run: |
           python3 scripts/verify_public_claim_consistency.py
           python3 -m unittest scripts/test_public_claim_consistency.py
+      - name: Verify public documentation hygiene
+        run: |
+          python3 scripts/check_public_documentation_hygiene.py
+          python3 -m unittest scripts/test_public_documentation_hygiene.py
       - name: Verify public launch status is not stale
         run: |
           files=(index.html faq.html roadmap.html whitepaper.html guardian-economics.html README.md WHITEPAPER.md docs/roadmap.md llms.txt)

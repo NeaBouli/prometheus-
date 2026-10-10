@@ -730,3 +730,9 @@ Both runs require Gio budget approval (plan-level gate).
 - Authorized three-line whitepaper.html-only media-rule addition scopes fixed table width/wrapping to #validators below900px. All content/columns preserved; no shared CSS/JS/assets/source/fixture/pin/baseline change.
 - Trusted sandboxed loopback rerun PASS8/8, exact all-cell/no-horizontal-scroll regression PASS; mobile table342px,scrollWidth/clientWidth342, two columns. Every fresh image opened; minimum contrast5.9038:1 Index/8.3982:1 Whitepaper. Previous partial evidence unchanged; corrected/ holds new artifacts.
 - Append-only scope/provenance checks PASS; local worker handles closed and temporary output removed. Worker scope OK, full goal NOT_COMPLETE. No contract adoption, activation, public deployment, main integration, commits/push or provider action; Core owns independent transplant/review and fresh hosted/post-deploy gates.
+
+
+
+## 2026-10-10 - CODEX - PR297 validation review follow-up
+- Exact source85d9c0f CI38026272562 SUCCESS8/8, Security38026272642 SUCCESS3/3; public claims/tests, status/tests and Memory checker actually passed. Full existing v1 operator chain through handoff passed. Authentic-font candidate gate8/8 PASS and all8 images independently opened by Core; no deployed HTML acceptance claimed.
+- Two review threads requested validators and recorded visual results. Actual inspection found existing documentation-hygiene checker/tests missing from CI registration; added only those two commands to the existing HTML Pages job. Source HTML unchanged, no permissions/pins/runners/product behavior modified or checks weakened. Fresh exact final-head CI/Security and main/live gates required before Done.
