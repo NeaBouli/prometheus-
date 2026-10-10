@@ -241,3 +241,16 @@ or production claim follows from this catalog.
 [C2]: https://github.com/NeaBouli/prometheus-/blob/4ec519e51cbbd1a05b578307c3b734bbcd41afd9/.fleet/reports/c2-exact-head-verification-20261009.md
 [C3]: https://github.com/NeaBouli/prometheus-/blob/4ec519e51cbbd1a05b578307c3b734bbcd41afd9/.fleet/reports/c3-public-claims-consolidation-20261009.md
 [K2]: https://github.com/NeaBouli/prometheus-/blob/098470fdfb2c343206afa93c13995bf70af32c63/docs/architecture/d5-trusted-source-model.md
+
+## Later Metadata Candidate (2026-10-10)
+
+The preceding table/counts are the dated base098470f snapshot, not rewritten
+audit history. A bounded PRM-31/45 follow-up now corrects the two icon sizes,
+adds a truthful Economics ai-status and includes Economics in llms.txt Pages.
+It adds three focused regressions without changing rendered content, image
+bytes, dates, PWA behavior, source, policy or production claims. Parent-side
+static scope/negative checks pass; protected hosted tests/merge/live readback
+remain pending at this candidate checkpoint. See
+[the task report](../../.fleet/reports/public-metadata-20261010.md).
+This does not close273/275 automatically, change historical severity totals or
+clear any contract/D5/full-security/rollout gate.
