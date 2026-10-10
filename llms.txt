@@ -74,6 +74,7 @@ Evidence: https://neabouli.github.io/prometheus-/docs/claim-reconciliation-2026-
 - Whitepaper: https://neabouli.github.io/prometheus-/whitepaper.html
 - FAQ: https://neabouli.github.io/prometheus-/faq.html
 - Roadmap: https://neabouli.github.io/prometheus-/roadmap.html
+- Guardian Economics: https://neabouli.github.io/prometheus-/guardian-economics.html
 - GitHub: https://github.com/NeaBouli/prometheus-
 
 ## Questions this project answers

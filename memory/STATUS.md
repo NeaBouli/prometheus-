@@ -2103,3 +2103,19 @@ publication checks. No source or production state changed. Runtime/hygiene/
 metadata residuals, independent external evidence and contract/D1-D7/D5/v2/
 client/security/rollout gates remain. Codex Security NOT CONNECTED/NOT RUN.
 The 2026-10-09 project-wide public review baseline is unchanged.
+
+## Task-Only Metadata Candidate (2026-10-10)
+
+Audit catalog PR291 is Done at main1315ce41e385d27b6b6eb9b6af19e523629580a4:
+candidate CI38006444235/Security38006444240, exact-main CI38007173270/
+Security38007173221/Pages38007173026 PASS; catalog and README live bytes match.
+The completed clean task worktree was verified/archived. Pending snapshots
+above are historical, not unfinished catalog work; audit270 itself stays open.
+
+PRM-31/45 metadata candidate fixes the manifest icon dimensions, Economics
+ai-status and llms.txt page discovery, with three focused regression tests.
+Parent-side scope/negative controls and Ruff/diff pass. Required hosted tests,
+protected merge and live readback remain pending at this checkpoint; local
+target tests were not run. Public2026-10-09 status baseline and all rendered
+content, assets and runtime/contract/policy/acceptance gates are unchanged.
+No production readiness follows. Codex Security NOT CONNECTED/NOT RUN.

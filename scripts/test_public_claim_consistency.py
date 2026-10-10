@@ -10,6 +10,7 @@ import re
 import shutil
 import tempfile
 import unittest
+from html.parser import HTMLParser
 from pathlib import Path
 from typing import Any
 
@@ -42,6 +43,58 @@ class PublicClaimConsistencyTests(unittest.TestCase):
 
     def test_canonical_status_passes(self) -> None:
         self.assertEqual(MODULE.validate_status(self.status), [])
+
+    def test_manifest_icon_sizes_match_original_png_dimensions(self) -> None:
+        root = SCRIPT.parents[1]
+        manifest = json.loads((root / "manifest.json").read_text(encoding="utf-8"))
+        self.assertEqual(len(manifest["icons"]), 2)
+        self.assertEqual(
+            {icon["src"] for icon in manifest["icons"]},
+            {"logo/Prometheus.png", "logo/prom_coin.png"},
+        )
+        for icon in manifest["icons"]:
+            with self.subTest(icon=icon["src"]):
+                with (root / icon["src"]).open("rb") as image:
+                    header = image.read(24)
+                self.assertEqual(header[:8], b"\x89PNG\r\n\x1a\n")
+                self.assertEqual(header[8:16], b"\x00\x00\x00\rIHDR")
+                width = int.from_bytes(header[16:20], "big")
+                height = int.from_bytes(header[20:24], "big")
+                self.assertGreater(width, 0)
+                self.assertGreater(height, 0)
+                self.assertEqual(icon["sizes"], f"{width}x{height}")
+
+    def test_economics_has_one_explicit_nonproduction_ai_status(self) -> None:
+        statuses: list[str | None] = []
+
+        class MetadataParser(HTMLParser):
+            def handle_starttag(
+                self, tag: str, attrs: list[tuple[str, str | None]]
+            ) -> None:
+                metadata = dict(attrs)
+                if tag == "meta" and metadata.get("name") == "ai-status":
+                    statuses.append(metadata.get("content"))
+
+        parser = MetadataParser()
+        parser.feed(
+            (SCRIPT.parents[1] / "guardian-economics.html").read_text(encoding="utf-8")
+        )
+        parser.close()
+        self.assertEqual(
+            statuses,
+            ["active-development, illustrative-planning, production-not-deployed"],
+        )
+
+    def test_llms_pages_lists_economics_once(self) -> None:
+        text = (SCRIPT.parents[1] / "llms.txt").read_text(encoding="utf-8")
+        pages = text.split("\n## Pages\n", 1)[1].split("\n## ", 1)[0]
+        self.assertEqual(
+            pages.splitlines().count(
+                "- Guardian Economics: "
+                "https://neabouli.github.io/prometheus-/guardian-economics.html"
+            ),
+            1,
+        )
 
     def test_october_checkpoint_rejects_evidence_or_authority_drift(self) -> None:
         paths_and_values = (

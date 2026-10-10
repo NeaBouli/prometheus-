@@ -9,13 +9,13 @@
   "icons": [
     {
       "src": "logo/Prometheus.png",
-      "sizes": "512x512",
+      "sizes": "1024x1024",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
       "src": "logo/prom_coin.png",
-      "sizes": "512x512",
+      "sizes": "1024x1024",
       "type": "image/png",
       "purpose": "any"
     }

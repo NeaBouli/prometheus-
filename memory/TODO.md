@@ -310,3 +310,9 @@
 - [ ] [P2] GH-271 publication-history closeout | Maintainer/auditor coordination | Corrected Markdown/pins and PDF supersession published; original external PR/issue history remains open.
 - [!] [P1] GH-282/PRM-12 remaining scope decisions | Core dev | ThreatHint gate repaired; other runtime defaults and machine-attested governance/compatibility residuals are separate.
 - [!] [P1] Contract/D1-D7/constructors/full v2/D5/client/security/rollout | Core dev + required independent/owner gates | Still open; K2, CI or a status catalog does not activate acceptance.
+
+## Task-Only Metadata Checkpoint (2026-10-10)
+
+- [x] [P2] Audit catalog protected publication | Codex | PR291 main1315ce4; candidate CI38006444235/Security38006444240 and mainCI38007173270/Security38007173221/Pages38007173026 PASS; live catalog/README byte-matched, own worktree archived. Audit270 itself remains open.
+- [~] [P2] PRM-31/45 metadata publication | Codex sole writer | Three static gaps corrected plus three regressions; parent static/Ruff/diff pass. Exact-head hosted CI, protected merge and live readback pending; no visible content or PWA change.
+- [!] [P1] Existing runtime/hygiene, source/constructor/D1-D7/v2/D5/client/full-security/rollout gates | Unchanged | No security issue auto-closure, model activation or production readiness from metadata. Claude remains owner-paused.

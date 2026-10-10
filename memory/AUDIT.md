@@ -2898,3 +2898,20 @@ changed.
 - Broader runtime defaults, hygiene/metadata residuals, independent-source/
   constructor/D1-D7/full v2/D5/client/rollout gates remain open. Codex Security
   NOT CONNECTED/NOT RUN; no product/security-policy/chain action.
+
+## 2026-10-10 - Public Metadata Candidate (bounded audit follow-up)
+
+- PR291 catalog publication completed normally at1315ce4 with exact candidate
+  and main CI/Security/Pages PASS and two live byte matches; historical ratings,
+  source reports/pins and remaining security gates unchanged.
+- Audit trail: manifest.json, guardian-economics.html, llms.txt,
+  scripts/test_public_claim_consistency.py; task brief/report, PLAN/ACTION_LOG,
+  maintainer overlay and task-only Memory STATUS/TODO/AUDIT addenda.
+- Parent-owned static assertions prove exact three public changes, original
+  icon/ledger bytes, old-baseline rejection and five adverse controls. Ruff and
+  diff PASS. Local target suites NOT RUN; actual required hosted results and
+  protected publication are still pending at this committed checkpoint.
+- No finding reclassification, issue auto-closure, rendered UI change, source
+  capture, contract/pin/policy/tokenomics/runtime/authority change or private
+  detail disclosure. Source/D1-D7/D5/client/full-security/rollout gates remain;
+  Codex Security NOT CONNECTED/NOT RUN.
