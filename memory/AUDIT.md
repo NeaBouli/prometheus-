@@ -2915,3 +2915,29 @@ changed.
   capture, contract/pin/policy/tokenomics/runtime/authority change or private
   detail disclosure. Source/D1-D7/D5/client/full-security/rollout gates remain;
   Codex Security NOT CONNECTED/NOT RUN.
+
+## 2026-10-10 - C2 Current-Main Draft Integration Preview
+
+- Metadata PR292 exact candidate/main CI/Security/Pages and live byte checks
+  complete;273 closed by explicit acceptance mapping,275/270 remain open.
+- Scoped existing M1/MS-B source imported mechanically from3e94ce0; no duplicate
+  worker implementation. Closed51-path inventory,50 source/test files unchanged
+  from worker plus additive D5 CI test step. Current public/claim/SW/ledger/audit
+  records preserved, architecture/runbook pointers reconciled without accepting
+  D1-D7 or source trust. Task-only PLAN/Bridge/Memory/brief/report added.
+- Focused Ruff PASS; strict mypy inherited helper finding remains. Frozen H-001
+  EOF whitespace is preserved for exact provenance, not silently fixed or called
+  clean. Hosted full integration/runtime/profile/D5 tests pending; no unsafe local
+  execution, heavy build, new cryptography or source/pin/policy revision.
+- K1 covered original61549b1, not all later deltas; prior scoped reviews/C2
+ 109 runtime checks are evidence only, not new-head/full security acceptance.
+  Codex Security NOT CONNECTED/NOT RUN, main merge/independent acceptance/
+  constructors/D5/client/rollout held. No private finding or operator data,
+  deployment, signature, broadcast, access or production action.
+
+
+Final bounded type delta: one artifact-reader dict annotation resolves the
+inherited strict finding, runtime unchanged. Scoped strict two-file check and
+Ruff PASS. Source manifest pins all51 worker blobs with explicit CI/type glue;
+49 unchanged, historical EOF preserved. This is not a whole-workspace type
+claim, independent review or v2/D5/main-integration acceptance.

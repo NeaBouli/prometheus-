@@ -14,11 +14,12 @@ use prometheus_silverc_deployer::oracle::{
 };
 use prometheus_silverc_deployer::{
     acquire_broadcast_lock, broadcast_journal_path, broadcast_verified_transaction,
-    create_public_json, finalize_broadcast_journal, import_external_signature_files, load_artifact,
-    load_broadcast_journal, load_broadcast_result, load_deploy_request, load_funding_spec,
-    load_signature_response, load_signing_request, observe_deployed_utxo, preflight_deploy_node,
-    preflight_node, prepare_broadcast_journal, prepare_genesis, reject_import_output_collisions,
-    verify_signature_response, write_public_json,
+    build_d5_evidence_candidate, calculate_genesis_covenant_id, create_public_json,
+    finalize_broadcast_journal, import_external_signature_files, load_artifact,
+    load_artifact_for_calculation, load_broadcast_journal, load_broadcast_result,
+    load_deploy_request, load_funding_spec, load_signature_response, load_signing_request,
+    observe_deployed_utxo_entry, preflight_deploy_node, preflight_node, prepare_broadcast_journal,
+    prepare_genesis, reject_import_output_collisions, verify_signature_response, write_public_json,
 };
 
 #[derive(Debug, Clone, Copy, ValueEnum)]
@@ -69,6 +70,26 @@ enum Command {
         encoding: Encoding,
         #[arg(long)]
         evidence_out: PathBuf,
+    },
+    /// Offline: calculate a genesis covenant id from public inputs only.
+    /// The result is NOT chain evidence and NOT deployment authorization; no
+    /// request, transaction, signing request, receipt, or broadcast is produced.
+    CalculateCovenantId {
+        #[arg(long)]
+        artifact: PathBuf,
+        /// artifact_sha256 from an already validated release manifest.
+        #[arg(long)]
+        expected_artifact_sha256: String,
+        /// script_sha256 from an already validated release manifest.
+        #[arg(long)]
+        expected_script_sha256: String,
+        /// Canonical `<lowercase txid>:<u32 index>`.
+        #[arg(long)]
+        funding_outpoint: String,
+        #[arg(long)]
+        genesis_output_value_sompi: u64,
+        #[arg(long)]
+        calculation_out: PathBuf,
     },
     /// Build and verify a public digest request for an external Schnorr signer.
     Prepare {
@@ -148,6 +169,10 @@ enum Command {
         encoding: Encoding,
         #[arg(long)]
         evidence_out: PathBuf,
+        /// Optional D5 evidence candidate (OBSERVED_NOT_INDEPENDENTLY_CONFIRMED;
+        /// not chain proof, D5 acceptance, or deployment authorization).
+        #[arg(long)]
+        d5_evidence_candidate_out: Option<PathBuf>,
     },
     /// Build a dual-signature request for a value-preserving reportMetrics transition.
     ReportMetricsPrepare {
@@ -281,6 +306,37 @@ async fn main() -> Result<()> {
             let evidence = preflight_deploy_node(&request, &funding, encoding.into()).await?;
             write_public_json(&evidence_out, &evidence)?;
             println!("{}", serde_json::to_string_pretty(&evidence)?);
+        }
+        Command::CalculateCovenantId {
+            artifact,
+            expected_artifact_sha256,
+            expected_script_sha256,
+            funding_outpoint,
+            genesis_output_value_sompi,
+            calculation_out,
+        } => {
+            reject_import_output_collisions(
+                &[("artifact input", &artifact)],
+                &[("covenant-id calculation output", &calculation_out)],
+            )?;
+            let loaded = load_artifact_for_calculation(
+                &artifact,
+                &expected_artifact_sha256,
+                &expected_script_sha256,
+            )?;
+            let calculation = calculate_genesis_covenant_id(
+                &loaded,
+                &expected_artifact_sha256,
+                &funding_outpoint,
+                genesis_output_value_sompi,
+            )?;
+            if !create_public_json(&calculation_out, &calculation)? {
+                anyhow::bail!(
+                    "refusing to overwrite existing {}",
+                    calculation_out.display()
+                );
+            }
+            println!("{}", serde_json::to_string_pretty(&calculation)?);
         }
         Command::Prepare {
             request,
@@ -440,7 +496,12 @@ async fn main() -> Result<()> {
             signature_response,
             encoding,
             evidence_out,
+            d5_evidence_candidate_out,
         } => {
+            let mut outputs = vec![("observation evidence output", evidence_out.as_path())];
+            if let Some(path) = &d5_evidence_candidate_out {
+                outputs.push(("D5 evidence candidate output", path.as_path()));
+            }
             reject_import_output_collisions(
                 &[
                     ("request input", &request),
@@ -449,8 +510,13 @@ async fn main() -> Result<()> {
                     ("signing-request input", &signing_request),
                     ("signature-response input", &signature_response),
                 ],
-                &[("observation evidence output", &evidence_out)],
+                &outputs,
             )?;
+            if let Some(path) = &d5_evidence_candidate_out {
+                if path.exists() {
+                    anyhow::bail!("refusing to overwrite existing {}", path.display());
+                }
+            }
             let (verified, signing_request) = rebuild_and_verify(
                 &request,
                 &artifact,
@@ -458,10 +524,26 @@ async fn main() -> Result<()> {
                 &signing_request,
                 &signature_response,
             )?;
-            let evidence =
-                observe_deployed_utxo(&verified, &signing_request, encoding.into()).await?;
-            write_public_json(&evidence_out, &evidence)?;
-            println!("{}", serde_json::to_string_pretty(&evidence)?);
+            let observed =
+                observe_deployed_utxo_entry(&verified, &signing_request, encoding.into()).await?;
+            let candidate = d5_evidence_candidate_out
+                .as_ref()
+                .map(|_| {
+                    build_d5_evidence_candidate(
+                        &signing_request,
+                        &observed.entry,
+                        observed.observed_virtual_daa_score,
+                    )
+                })
+                .transpose()?;
+            // Exclusive candidate first: an existing candidate aborts before any write.
+            if let (Some(path), Some(candidate)) = (&d5_evidence_candidate_out, &candidate) {
+                if !create_public_json(path, candidate)? {
+                    anyhow::bail!("refusing to overwrite existing {}", path.display());
+                }
+            }
+            write_public_json(&evidence_out, &observed.observation)?;
+            println!("{}", serde_json::to_string_pretty(&observed.observation)?);
         }
         Command::ReportMetricsPrepare {
             transition_spec,
