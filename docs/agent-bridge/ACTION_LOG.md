@@ -6133,3 +6133,8 @@ Rules for all dev agents:
 ## 2026-10-10 - CODEX - Preview type warning resolved; exact source manifest
 - The inherited strict helper warning is resolved by one dict[str, Any] annotation only; strict validator/helper check SUCCESS2 files, focused Ruff PASS.49 imported files remain exact C2, workflow adds two-line existing D5 unit step. Parent main-path/source/append-only/seven historical source/provenance checks PASS.
 - Source manifest lists all51 worker blobs and both bounded glue exceptions; no hidden source redesign. Preserved historical EOF whitespace remains a documented global-diff warning, not silently fixed. Exact-head hosted CI/Draft publication pending; full-security/Codex Security/D1-D7/D5/main merge/rollout held.
+
+## 2026-10-10 - CODEX - MS-B docs-only correction submitted
+- Existing ADR/current contract README reconciled to the delivered draft, including the stale autoTune description. No contract, fixture, release pin, runtime, workflow, tokenomics or trust-policy change; original review heads and main untouched.
+- Final exact-head scope/semantic and existing hosted CI/Security results pending at submission. Stacked PR is documentation review only, not D1-D7/security/constructor/D5/deployment acceptance; final external receipt must supersede this historical checkpoint.
+- Existing independent review/trust/client/rollout holds and paused-worker boundaries unchanged. No private gap data, new code transfer, target execution or chain/infrastructure action.
