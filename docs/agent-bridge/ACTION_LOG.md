@@ -6168,3 +6168,7 @@ Rules for all dev agents:
 ## 2026-10-10 - CODEX - PR297 validation review follow-up
 - Exact source85d9c0f CI38026272562 SUCCESS8/8, Security38026272642 SUCCESS3/3; public claims/tests, status/tests and Memory checker actually passed. Full existing v1 operator chain through handoff passed. Authentic-font candidate gate8/8 PASS and all8 images independently opened by Core; no deployed HTML acceptance claimed.
 - Two review threads requested validators and recorded visual results. Actual inspection found existing documentation-hygiene checker/tests missing from CI registration; added only those two commands to the existing HTML Pages job. Source HTML unchanged, no permissions/pins/runners/product behavior modified or checks weakened. Fresh exact final-head CI/Security and main/live gates required before Done.
+## 2026-10-10 - CODEX - MS-B docs-only correction submitted
+- Existing ADR/current contract README reconciled to the delivered draft, including the stale autoTune description. No contract, fixture, release pin, runtime, workflow, tokenomics or trust-policy change; original review heads and main untouched.
+- Final exact-head scope/semantic and existing hosted CI/Security results pending at submission. Stacked PR is documentation review only, not D1-D7/security/constructor/D5/deployment acceptance; final external receipt must supersede this historical checkpoint.
+- Existing independent review/trust/client/rollout holds and paused-worker boundaries unchanged. No private gap data, new code transfer, target execution or chain/infrastructure action.

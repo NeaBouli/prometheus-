@@ -488,10 +488,11 @@ upstream Silverscript ref and runtime-tests covenant transitions for:
 Verified rejection paths include `fp_rate` above `MAX_FP_RATE` and auto-tuning
 before `TUNING_INTERVAL_BLOCKS`.
 
-Bundle v2 draft (MS-B D2): `autoTune` additionally requires `tx.time >= block_height`, so a
-fabricated future height can no longer ratchet parameters in consecutive transitions; tuning
-happens at most once per real `TUNING_INTERVAL_BLOCKS`. `reportMetrics` is unchanged because the
-keyless operator builds it with lock time 0; binding it to `tx.time` needs a deployer change.
+Bundle v2 draft (MS-B D2): `autoTune` has no caller-height argument. It requires
+`tx.time >= tuning_anchor + TUNING_INTERVAL_BLOCKS`, using the spent UTXO's consensus DAA
+score while its anchor is pending; `settleTuning` records that anchor for later transitions.
+`reportMetrics` retains its oracle-signed height as metadata, not the tuning clock; the
+keyless operator remains unchanged. Initial-anchor and release acceptance remain open.
 
 Review repair (2026-09-30): windows and intervals are anchored at consensus DAA scores of the
 spent covenant UTXO (`OpTxInputDaaScore`) and enforced with `tx.time`; attestation digests are
