@@ -38,8 +38,12 @@ if (!process.env.PLAYWRIGHT_MODULE || !process.env.CHROME || !process.env.EVIDEN
 const out = path.resolve(process.env.EVIDENCE_DIR);
 await mkdir(out, { recursive: true, mode: 0o700 });
 const sha = bytes => createHash('sha256').update(bytes).digest('hex');
+let previousText = null;
 try {
-  const previous = JSON.parse(await readFile(path.join(out, 'observations.json'), 'utf8'));
+  previousText = await readFile(path.join(out, 'observations.json'), 'utf8');
+} catch (error) { if (error.code !== 'ENOENT') throw error; }
+if (previousText !== null) {
+  const previous = JSON.parse(previousText);
   const allowedScreenshots = new Set(['homepage-1440x1000.png', 'homepage-1180x820.png',
     'homepage-820x1180.png', 'homepage-390x844.png']);
   if (!Array.isArray(previous.screenshots) ||
@@ -51,7 +55,7 @@ try {
   for (const file of ['observations.json', 'repro.mjs', ...previous.screenshots.map(s => s.filename)]) {
     await copyFile(path.join(out, file), path.join(archive, file));
   }
-} catch (error) { if (error.code !== 'ENOENT') throw error; }
+}
 const { chromium } = createRequire(import.meta.url)(process.env.PLAYWRIGHT_MODULE);
 const legacy = git('show', '20e8531de5d39969a8c1fe32340d5411f7ab7af0:sw.js');
 const retired = localProducts.get('sw.js');
