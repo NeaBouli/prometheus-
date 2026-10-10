@@ -716,3 +716,23 @@ Both runs require Gio budget approval (plan-level gate).
 - Native Codex source review41b301b: no blocking product findings. Actual CodeRabbit review5477386046: inherited expected-value variable can skip the child matrix. Separate child marker plus invalid CI parent sentinel prepared; only tests/CI invocation change, production/caller guards unchanged.
 - Existing architecture hop client runtime selection -> stub guard; bounded review repair, not a new module or permission. Existing owned archive restored and worktree moved to a unique follow-up path, original archive preserved. Fresh exact-head hosted checks and independent delta review required before normal protected PR295 merge.
 - Claude owner-paused; no Kimi payload or managed scan, no new paid review or chain/production action. Underlying v2, D5, constructor, key and rollout gates remain OPEN; full goal ACTIVE/NOT_COMPLETE.
+
+
+## 2026-10-10 - CODEX - M2-DOC-V1-V2-COOLDOWN Partial Delivery
+- Sole writer on agent/codex/v2-fixture-profile-clarity-20261010, immutable base649e4959586dd72b81a539df620802cecae9bfe3. Existing contract-fixture documentation -> modules/web render hop only; four named surfaces plus append-only coordination records/report.
+- Frozen historical h001-v1 100,800 versus unaccepted/non-promotable v2-draft 6,048,000; approximate 2.8h/7d only at assumed10 consensus-score units/s. No accepted duration, D1-D7 adoption, activation, fully deployed historical protocol or production readiness.
+- Static scope/literals/arithmetic/JS/CSS/assets checks PASS. Eight responsive screenshots opened;7/8 cases PASS, whitepaper390x844 existing table clips changed text (row x24,width384.40625; viewport390). Visual gate remains PARTIAL; no prohibited layout repair.
+- Core owns semantic review, exact independent backport if appropriate, final commit/push and exact-head hosted CI/Security/Pages gates. Parent-reported main752f58b blob parity is integration context only, not worker verification/publication. No private artifacts or provider/production action.
+- Evidence: /Users/gio/agent-fleet/evidence/prometheus/v2-fixture-profile-clarity-20261010; report .fleet/reports/v2-fixture-profile-clarity-20261010.md. No local repository suite/build; local server/browser handles closed. Full goal remains NOT_COMPLETE.
+
+## 2026-10-10 - CODEX - Same M2 Task, Core-Amended Local Completion
+- Same owner/branch/base, no restart or extra agent. Frozen source shows caller-provided block_height for historical100,800, not consensus-enforced DAA; draft6,048,000 is this.age consensus DAA-score interval. Four surfaces agree, nominal2.8h/7d assumes10 respective units/s only; prior blanket units wording superseded.
+- Authorized three-line whitepaper.html-only media-rule addition scopes fixed table width/wrapping to #validators below900px. All content/columns preserved; no shared CSS/JS/assets/source/fixture/pin/baseline change.
+- Trusted sandboxed loopback rerun PASS8/8, exact all-cell/no-horizontal-scroll regression PASS; mobile table342px,scrollWidth/clientWidth342, two columns. Every fresh image opened; minimum contrast5.9038:1 Index/8.3982:1 Whitepaper. Previous partial evidence unchanged; corrected/ holds new artifacts.
+- Append-only scope/provenance checks PASS; local worker handles closed and temporary output removed. Worker scope OK, full goal NOT_COMPLETE. No contract adoption, activation, public deployment, main integration, commits/push or provider action; Core owns independent transplant/review and fresh hosted/post-deploy gates.
+
+
+
+## 2026-10-10 - CODEX - PR297 validation review follow-up
+- Exact source85d9c0f CI38026272562 SUCCESS8/8, Security38026272642 SUCCESS3/3; public claims/tests, status/tests and Memory checker actually passed. Full existing v1 operator chain through handoff passed. Authentic-font candidate gate8/8 PASS and all8 images independently opened by Core; no deployed HTML acceptance claimed.
+- Two review threads requested validators and recorded visual results. Actual inspection found existing documentation-hygiene checker/tests missing from CI registration; added only those two commands to the existing HTML Pages job. Source HTML unchanged, no permissions/pins/runners/product behavior modified or checks weakened. Fresh exact final-head CI/Security and main/live gates required before Done.

@@ -118,6 +118,9 @@ ul.wp-list li::before{content:'';flex-shrink:0;width:1px;height:14px;background:
   .sidebar{display:none}
   .wp-content{padding:48px 0 80px}
   .wp-table{display:block;max-width:100%;overflow-x:auto}
+  #validators .wp-table{display:table;table-layout:fixed}
+  #validators .wp-table th,#validators .wp-table td{white-space:normal;overflow-wrap:anywhere}
+  #validators .wp-table th:first-child,#validators .wp-table td:first-child{width:34%}
   footer{grid-template-columns:1fr;gap:16px;padding:24px}
   .f-links{justify-content:flex-start}
 }
@@ -477,7 +480,7 @@ lora_config = LoraConfig(
         <tr><td>Slashing — double vote</td><td>10% KAS loss</td></tr>
         <tr><td>Slashing — collusion</td><td>20% KAS loss</td></tr>
         <tr><td>Escalation</td><td>multiplier = min(3, slashing_count / 3 + 1)</td></tr>
-        <tr><td>Cooldown</td><td>Target 7 days (6,048,000 blocks at 10 BPS); current fixture 100,800 blocks (about 2.8 hours) until the next reviewed contract revision</td></tr>
+        <tr><td>Cooldown</td><td>Frozen historical h001-v1 retains a 100,800-count cooldown checked against caller-provided block_height, not consensus-enforced DAA. Unaccepted, non-promotable v2-draft uses 6,048,000 consensus DAA-score units via this.age. Nominally approximately 2.8 hours and 7 days, respectively, only assuming 10 count units/s for v1 and 10 DAA-score units/s for v2; not guaranteed wall-clock durations. The historical fixture is not fully deployed or production-ready. The draft does not replace the pinned v1 release or establish a new accepted contract duration; D1-D7 adoption, independent acceptance, activation and rollout remain gated.</td></tr>
         <tr><td>Bond per vote</td><td>10% of current stake</td></tr>
         <tr><td>Access control on slash()</td><td>Only GOVERNANCE_CONTRACT or RULE_STORAGE_CONTRACT</td></tr>
       </table>
