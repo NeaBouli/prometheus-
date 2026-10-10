@@ -248,3 +248,19 @@ mindmap
       open: mobile (Flutter), Tauri UI
       open: GH-258/261 endpoint detection (observe -> warn -> contain)
 ```
+
+## Contract-v2 Integration Preview (2026-10-10; not main acceptance)
+
+The existing M1/MS-B path now has an isolated integration candidate reusing
+C2 source3e94ce0 on public-main eecbaf5; no new module or architecture branch.
+Frozen historical reproduction material lives under
+modules/contracts/silverc/bundles/h001-v1, with required bundle selection in
+scripts/silverc_bundles.py. The v1 operator chain remains separate from the
+static/non-promotable v2-draft. Rust release pins still accept only v1.
+
+The delivered offline identity helper and context-bound observed-only D5
+candidate lead to scripts/silverc_genesis_binding_draft.py::accept_state,
+which unconditionally refuses. See [the delivered D5 design](d5-genesis-binding-design.md)
+and the retained [K2 trust proposal](d5-trusted-source-model.md). No source
+model, confirmation, client binding, D1-D7/security acceptance or deployment
+is activated. Exact integration tests and independent gates remain open.

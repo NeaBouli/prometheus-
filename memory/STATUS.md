@@ -2119,3 +2119,28 @@ protected merge and live readback remain pending at this checkpoint; local
 target tests were not run. Public2026-10-09 status baseline and all rendered
 content, assets and runtime/contract/policy/acceptance gates are unchanged.
 No production readiness follows. Codex Security NOT CONNECTED/NOT RUN.
+
+## Task-Only Integration Preview (2026-10-10)
+
+Metadata PR292 is Done at eecbaf5731b6a0e2f3a77aebe8f42e97cf1daf47:
+exact candidate/main CI/Security and Pages all pass, three live byte matches;
+273 closed after full scoped adjudication,275/270 stay open. Earlier pending
+metadata entries are historical checkpoints. Own worktree verified/archived.
+
+The current candidate reuses C2's already delivered contract-v2/profile/D5
+code on this main without restoring old public claims or changing source trust.
+It is a Draft integration preview, not accepted/merged main, real deployment,
+independent confirmation or production readiness. Exact integration tests still
+pending; strict mypy retains one inherited finding and frozen historical source
+has one documented EOF whitespace exception. D1-D7/constructor/full-security/
+Codex Security/D5/source-policy/client/rollout gates remain held.
+Rust remains v1-pinned, v2 non-promotable, accept_state unconditionally closed.
+The2026-10-09 project-wide public review baseline is unchanged.
+
+
+Final local preview checkpoint: the preceding inherited type warning was
+reproduced and resolved with one annotation. Scoped strict validator/helper
+mypy now passes2 files; Ruff and parent source/pin/main-preservation/append-only
+checks pass.49 worker source blobs are exact plus two-line CI/one annotation
+glue, pinned by the task source manifest. No compiled identity beyond C2, Rust
+release pin or activation changes; hosted integration/full acceptance pending.

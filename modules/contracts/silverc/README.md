@@ -23,7 +23,7 @@ Run from the Prometheus repo root:
 
 ```bash
 python3 scripts/verify_silverc_h001.py
-python3 scripts/smoke_silverc_artifacts.py
+python3 scripts/smoke_silverc_artifacts.py --bundle v2-draft
 ```
 
 The script uses `/tmp/prom-silverscript` and the pinned upstream ref
@@ -32,25 +32,26 @@ The script uses `/tmp/prom-silverscript` and the pinned upstream ref
 ```bash
 SILVERSCRIPT_REPO=/path/to/silverscript python3 scripts/verify_silverc_h001.py
 SILVERSCRIPT_REF=<commit-or-tag> python3 scripts/verify_silverc_h001.py
-SILVERSCRIPT_REPO=/path/to/silverscript python3 scripts/smoke_silverc_artifacts.py
-PROMETHEUS_SILVERC_ARTIFACT_DIR=/tmp/out python3 scripts/smoke_silverc_artifacts.py
-python3 scripts/smoke_silverc_artifacts.py --out-dir /tmp/out --archive /tmp/prometheus-silverc-artifacts.tar.gz
-python3 scripts/preflight_silverc_deploy.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --network sandbox --rpc-url ws://127.0.0.1:17210 --deployer-address kaspatest:qptestpreflight000000000000000000000000000000000 --metrics-oracle-pubkey 1111111111111111111111111111111111111111111111111111111111111111 --plan-out /tmp/prometheus-silverc-deploy-preflight.json --runbook-out /tmp/prometheus-silverc-deploy-runbook.md
-python3 scripts/build_silverc_deploy_requests.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --out-dir /tmp/prometheus-silverc-deploy-requests --network sandbox --rpc-url ws://127.0.0.1:17210 --deployer-address kaspatest:qptestpreflight000000000000000000000000000000000 --metrics-oracle-pubkey 1111111111111111111111111111111111111111111111111111111111111111 --request-set-out /tmp/prometheus-silverc-deploy-request-set.json --runbook-out /tmp/prometheus-silverc-deploy-requests.md
-python3 scripts/verify_silverc_deploy_requests.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --request-set /tmp/prometheus-silverc-deploy-request-set.json --requests-dir /tmp/prometheus-silverc-deploy-requests --summary-out /tmp/prometheus-silverc-deploy-request-verification.json --runbook-out /tmp/prometheus-silverc-deploy-request-verification.md
-python3 scripts/build_silverc_deploy_operator_procedure.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --request-set /tmp/prometheus-silverc-deploy-request-set.json --requests-dir /tmp/prometheus-silverc-deploy-requests --summary-out /tmp/prometheus-silverc-deploy-operator-procedure.json --runbook-out /tmp/prometheus-silverc-deploy-operator-procedure.md
-python3 scripts/build_silverc_operator_receipts.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --request-set /tmp/prometheus-silverc-deploy-request-set.json --requests-dir /tmp/prometheus-silverc-deploy-requests --orchestrator-results /path/to/public-external-deploy-results.json --operator-receipts-out /tmp/prometheus-silverc-operator-receipts.json --summary-out /tmp/prometheus-silverc-operator-receipts-summary.json --runbook-out /tmp/prometheus-silverc-operator-receipts.md
-python3 scripts/verify_silverc_deploy_receipts.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --receipts modules/contracts/silverc/deploy-receipts.sample.json --summary-out /tmp/prometheus-silverc-deploy-receipts-summary.json --runbook-out /tmp/prometheus-silverc-deploy-receipts.md
-python3 scripts/verify_silverc_deploy_receipt_evidence.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --receipts /path/to/operator-record-receipts.json --evidence /path/to/public-node-or-explorer-evidence.json --summary-out /tmp/prometheus-silverc-deploy-receipt-evidence-summary.json --runbook-out /tmp/prometheus-silverc-deploy-receipt-evidence.md
-python3 scripts/stage_silverc_deployment_status.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --operator-receipts /path/to/operator-record-receipts.json --status-out /tmp/prometheus-silverc-status-draft.json --snippet-out /tmp/prometheus-silverc-status-draft.md
+SILVERSCRIPT_REPO=/path/to/silverscript python3 scripts/smoke_silverc_artifacts.py --bundle v2-draft
+PROMETHEUS_SILVERC_ARTIFACT_DIR=/tmp/out python3 scripts/smoke_silverc_artifacts.py --bundle v2-draft
+python3 scripts/smoke_silverc_artifacts.py --bundle v2-draft --out-dir /tmp/out --archive /tmp/prometheus-silverc-artifacts.tar.gz
+python3 scripts/smoke_silverc_artifacts.py --bundle h001-v1 --out-dir /tmp/prometheus-silverc-artifacts-h001-v1 --archive /tmp/prometheus-silverc-artifacts-h001-v1.tar.gz
+python3 scripts/preflight_silverc_deploy.py --bundle h001-v1 --archive /tmp/prometheus-silverc-artifacts-h001-v1.tar.gz --network sandbox --rpc-url ws://127.0.0.1:17210 --deployer-address kaspatest:qptestpreflight000000000000000000000000000000000 --metrics-oracle-pubkey 1111111111111111111111111111111111111111111111111111111111111111 --plan-out /tmp/prometheus-silverc-deploy-preflight.json --runbook-out /tmp/prometheus-silverc-deploy-runbook.md
+python3 scripts/build_silverc_deploy_requests.py --bundle h001-v1 --archive /tmp/prometheus-silverc-artifacts-h001-v1.tar.gz --out-dir /tmp/prometheus-silverc-deploy-requests --network sandbox --rpc-url ws://127.0.0.1:17210 --deployer-address kaspatest:qptestpreflight000000000000000000000000000000000 --metrics-oracle-pubkey 1111111111111111111111111111111111111111111111111111111111111111 --request-set-out /tmp/prometheus-silverc-deploy-request-set.json --runbook-out /tmp/prometheus-silverc-deploy-requests.md
+python3 scripts/verify_silverc_deploy_requests.py --bundle h001-v1 --archive /tmp/prometheus-silverc-artifacts-h001-v1.tar.gz --request-set /tmp/prometheus-silverc-deploy-request-set.json --requests-dir /tmp/prometheus-silverc-deploy-requests --summary-out /tmp/prometheus-silverc-deploy-request-verification.json --runbook-out /tmp/prometheus-silverc-deploy-request-verification.md
+python3 scripts/build_silverc_deploy_operator_procedure.py --bundle h001-v1 --archive /tmp/prometheus-silverc-artifacts-h001-v1.tar.gz --request-set /tmp/prometheus-silverc-deploy-request-set.json --requests-dir /tmp/prometheus-silverc-deploy-requests --summary-out /tmp/prometheus-silverc-deploy-operator-procedure.json --runbook-out /tmp/prometheus-silverc-deploy-operator-procedure.md
+python3 scripts/build_silverc_operator_receipts.py --bundle h001-v1 --archive /tmp/prometheus-silverc-artifacts-h001-v1.tar.gz --request-set /tmp/prometheus-silverc-deploy-request-set.json --requests-dir /tmp/prometheus-silverc-deploy-requests --orchestrator-results /path/to/public-external-deploy-results.json --operator-receipts-out /tmp/prometheus-silverc-operator-receipts.json --summary-out /tmp/prometheus-silverc-operator-receipts-summary.json --runbook-out /tmp/prometheus-silverc-operator-receipts.md
+python3 scripts/verify_silverc_deploy_receipts.py --bundle h001-v1 --archive /tmp/prometheus-silverc-artifacts-h001-v1.tar.gz --receipts modules/contracts/silverc/deploy-receipts.sample.json --summary-out /tmp/prometheus-silverc-deploy-receipts-summary.json --runbook-out /tmp/prometheus-silverc-deploy-receipts.md
+python3 scripts/verify_silverc_deploy_receipt_evidence.py --bundle h001-v1 --archive /tmp/prometheus-silverc-artifacts-h001-v1.tar.gz --receipts /path/to/operator-record-receipts.json --evidence /path/to/public-node-or-explorer-evidence.json --summary-out /tmp/prometheus-silverc-deploy-receipt-evidence-summary.json --runbook-out /tmp/prometheus-silverc-deploy-receipt-evidence.md
+python3 scripts/stage_silverc_deployment_status.py --bundle h001-v1 --archive /tmp/prometheus-silverc-artifacts-h001-v1.tar.gz --operator-receipts /path/to/operator-record-receipts.json --status-out /tmp/prometheus-silverc-status-draft.json --snippet-out /tmp/prometheus-silverc-status-draft.md
 python3 scripts/preflight_metrics_oracle_report.py --report modules/contracts/silverc/metrics-oracle-report.sample.json --plan-out /tmp/prometheus-metrics-oracle-preflight.json --runbook-out /tmp/prometheus-metrics-oracle-runbook.md
-python3 scripts/build_metrics_oracle_tx_request.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --report modules/contracts/silverc/metrics-oracle-report.sample.json --contract-instance-id 7777777777777777777777777777777777777777777777777777777777777777:0 --tx-request-out /tmp/prometheus-metrics-oracle-tx-request.json --runbook-out /tmp/prometheus-metrics-oracle-tx-request.md
-python3 scripts/build_metrics_oracle_operator_procedure.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --tx-request /tmp/prometheus-metrics-oracle-tx-request.json --summary-out /tmp/prometheus-metrics-oracle-operator-procedure.json --runbook-out /tmp/prometheus-metrics-oracle-operator-procedure.md
-python3 scripts/verify_metrics_oracle_tx_result.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --tx-request /tmp/prometheus-metrics-oracle-tx-request.json --tx-result /path/to/public-metrics-oracle-tx-result.json --summary-out /tmp/prometheus-metrics-oracle-tx-result-summary.json --runbook-out /tmp/prometheus-metrics-oracle-tx-result.md
-python3 scripts/verify_metrics_oracle_tx_evidence.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --tx-request /tmp/prometheus-metrics-oracle-tx-request.json --tx-result /path/to/public-metrics-oracle-tx-result.json --evidence /path/to/public-metrics-oracle-tx-evidence.json --summary-out /tmp/prometheus-metrics-oracle-tx-public-evidence-summary.json --runbook-out /tmp/prometheus-metrics-oracle-tx-public-evidence.md
-python3 scripts/stage_metrics_oracle_status.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --tx-request /tmp/prometheus-metrics-oracle-tx-request.json --tx-result /path/to/public-metrics-oracle-tx-result.json --status-out /tmp/prometheus-metrics-oracle-status-draft.json --snippet-out /tmp/prometheus-metrics-oracle-status-draft.md
+python3 scripts/build_metrics_oracle_tx_request.py --bundle h001-v1 --archive /tmp/prometheus-silverc-artifacts-h001-v1.tar.gz --report modules/contracts/silverc/metrics-oracle-report.sample.json --contract-instance-id 7777777777777777777777777777777777777777777777777777777777777777:0 --tx-request-out /tmp/prometheus-metrics-oracle-tx-request.json --runbook-out /tmp/prometheus-metrics-oracle-tx-request.md
+python3 scripts/build_metrics_oracle_operator_procedure.py --bundle h001-v1 --archive /tmp/prometheus-silverc-artifacts-h001-v1.tar.gz --tx-request /tmp/prometheus-metrics-oracle-tx-request.json --summary-out /tmp/prometheus-metrics-oracle-operator-procedure.json --runbook-out /tmp/prometheus-metrics-oracle-operator-procedure.md
+python3 scripts/verify_metrics_oracle_tx_result.py --bundle h001-v1 --archive /tmp/prometheus-silverc-artifacts-h001-v1.tar.gz --tx-request /tmp/prometheus-metrics-oracle-tx-request.json --tx-result /path/to/public-metrics-oracle-tx-result.json --summary-out /tmp/prometheus-metrics-oracle-tx-result-summary.json --runbook-out /tmp/prometheus-metrics-oracle-tx-result.md
+python3 scripts/verify_metrics_oracle_tx_evidence.py --bundle h001-v1 --archive /tmp/prometheus-silverc-artifacts-h001-v1.tar.gz --tx-request /tmp/prometheus-metrics-oracle-tx-request.json --tx-result /path/to/public-metrics-oracle-tx-result.json --evidence /path/to/public-metrics-oracle-tx-evidence.json --summary-out /tmp/prometheus-metrics-oracle-tx-public-evidence-summary.json --runbook-out /tmp/prometheus-metrics-oracle-tx-public-evidence.md
+python3 scripts/stage_metrics_oracle_status.py --bundle h001-v1 --archive /tmp/prometheus-silverc-artifacts-h001-v1.tar.gz --tx-request /tmp/prometheus-metrics-oracle-tx-request.json --tx-result /path/to/public-metrics-oracle-tx-result.json --status-out /tmp/prometheus-metrics-oracle-status-draft.json --snippet-out /tmp/prometheus-metrics-oracle-status-draft.md
 python3 scripts/verify_release_hardening_evidence.py --evidence /path/to/public-release-hardening-evidence.json --expected-commit "$(git rev-parse HEAD)" --summary-out /tmp/prometheus-release-hardening-evidence-summary.json --runbook-out /tmp/prometheus-release-hardening-evidence.md
-python3 scripts/build_silverc_operator_handoff.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --out-dir /tmp/prometheus-silverc-operator-handoff --network sandbox --rpc-url ws://127.0.0.1:17210 --deployer-address kaspatest:qptestpreflight000000000000000000000000000000000 --metrics-oracle-pubkey 1111111111111111111111111111111111111111111111111111111111111111 --orchestrator-results /path/to/public-external-deploy-results.json --deploy-receipt-evidence /path/to/public-node-or-explorer-evidence.json --metrics-tx-result /path/to/public-metrics-oracle-tx-result.json --metrics-tx-evidence /path/to/public-metrics-oracle-tx-evidence.json --release-hardening-evidence /path/to/public-release-hardening-evidence.json
+python3 scripts/build_silverc_operator_handoff.py --bundle h001-v1 --archive /tmp/prometheus-silverc-artifacts-h001-v1.tar.gz --out-dir /tmp/prometheus-silverc-operator-handoff --network sandbox --rpc-url ws://127.0.0.1:17210 --deployer-address kaspatest:qptestpreflight000000000000000000000000000000000 --metrics-oracle-pubkey 1111111111111111111111111111111111111111111111111111111111111111 --orchestrator-results /path/to/public-external-deploy-results.json --deploy-receipt-evidence /path/to/public-node-or-explorer-evidence.json --metrics-tx-result /path/to/public-metrics-oracle-tx-result.json --metrics-tx-evidence /path/to/public-metrics-oracle-tx-evidence.json --release-hardening-evidence /path/to/public-release-hardening-evidence.json
 python3 scripts/audit_silverc_release_readiness.py --handoff-dir /tmp/prometheus-silverc-operator-handoff --summary-out /tmp/prometheus-silverc-release-readiness.json --runbook-out /tmp/prometheus-silverc-release-readiness.md
 ```
 
@@ -63,7 +64,15 @@ legacy invariants:
 - validators stake KAS, never PROM
 - minimum stake is `MIN_STAKE_KAS = 10000`
 - commit bond is `BOND_PERCENT = 10`
-- withdrawal cooldown is `COOLDOWN_BLOCKS = 100800`
+- withdrawal cooldown is `COOLDOWN_BLOCKS = 6048000` (7 days at 10 BPS), enforced by
+  `completeWithdraw` as `this.age >= COOLDOWN_BLOCKS` (OP_CHECKSEQUENCEVERIFY on the
+  withdrawal UTXO); `requestWithdraw` also opens an exit for a validator slashed below
+  `MIN_STAKE_KAS` and rejects a zero marker (PRM-13, PRM-35; bundle v2 draft)
+- value conservation (bundle v2 draft, MS-B D3): the covenant UTXO value must equal
+  `stake_kas * 100000000` sompi; commit/reveal/requestWithdraw keep that value in output 0;
+  `slashInvalidReveal` moves exactly `bond_kas * 100000000` sompi to output 1, a P2SH of the
+  always-failing script `OP_RETURN` (standard and provably unspendable), and keeps the rest in
+  output 0. The genesis output value must therefore equal the initial stake in sompi.
 - reveal verification uses the same H-001 canonical preimage as
   `ValidatorStakingH001.sil`
 
@@ -193,12 +202,19 @@ Changing a contract intentionally requires regenerating the expectation in the
 same reviewed change:
 
 ```bash
-python3 scripts/smoke_silverc_artifacts.py
+python3 scripts/smoke_silverc_artifacts.py --bundle v2-draft
 python3 scripts/verify_silverc_compiled_semantics.py \
   --built-manifest /tmp/prometheus-silverc-artifacts/manifest.json --write-expected
 ```
 
 ## Deploy preflight
+
+Every bundle tool requires `--bundle h001-v1|v2-draft` (closed registry in
+`scripts/silverc_bundles.py`; no default). `h001-v1` is rebuilt from the frozen
+reproduction material in `bundles/h001-v1/` and is the only bundle the Rust
+deployer accepts. `v2-draft` (the current sources in this directory) supports
+static request checks only; receipts, status, evidence, operator procedures
+and handoffs refuse it.
 
 `scripts/preflight_silverc_deploy.py` validates an already-built release bundle
 from either `--bundle-dir` or `--archive` before any network deploy attempt. It
@@ -249,10 +265,10 @@ changed contract selections, manifest mismatches, mainnet/direct-RPC canary
 targets, and attempted canary promotion fail closed.
 
 ```bash
-python3 scripts/preflight_silverc_deploy.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --deployment-profile testnet-10-validator-staking-h001 --network testnet --rpc-url kaspa-resolver://public --deployer-address <public-deployer-address> --plan-out /tmp/prometheus-h001-canary-preflight.json --runbook-out /tmp/prometheus-h001-canary-preflight.md
-python3 scripts/build_silverc_deploy_requests.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --deployment-profile testnet-10-validator-staking-h001 --out-dir /tmp/prometheus-h001-canary-requests --network testnet --rpc-url kaspa-resolver://public --deployer-address <public-deployer-address> --request-set-out /tmp/prometheus-h001-canary-request-set.json --runbook-out /tmp/prometheus-h001-canary-requests.md
-python3 scripts/verify_silverc_deploy_requests.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --request-set /tmp/prometheus-h001-canary-request-set.json --requests-dir /tmp/prometheus-h001-canary-requests --summary-out /tmp/prometheus-h001-canary-verification.json
-python3 scripts/build_silverc_deploy_operator_procedure.py --archive /tmp/prometheus-silverc-artifacts.tar.gz --request-set /tmp/prometheus-h001-canary-request-set.json --requests-dir /tmp/prometheus-h001-canary-requests --summary-out /tmp/prometheus-h001-canary-procedure.json --runbook-out /tmp/prometheus-h001-canary-procedure.md
+python3 scripts/preflight_silverc_deploy.py --bundle h001-v1 --archive /tmp/prometheus-silverc-artifacts-h001-v1.tar.gz --deployment-profile testnet-10-validator-staking-h001 --network testnet --rpc-url kaspa-resolver://public --deployer-address <public-deployer-address> --plan-out /tmp/prometheus-h001-canary-preflight.json --runbook-out /tmp/prometheus-h001-canary-preflight.md
+python3 scripts/build_silverc_deploy_requests.py --bundle h001-v1 --archive /tmp/prometheus-silverc-artifacts-h001-v1.tar.gz --deployment-profile testnet-10-validator-staking-h001 --out-dir /tmp/prometheus-h001-canary-requests --network testnet --rpc-url kaspa-resolver://public --deployer-address <public-deployer-address> --request-set-out /tmp/prometheus-h001-canary-request-set.json --runbook-out /tmp/prometheus-h001-canary-requests.md
+python3 scripts/verify_silverc_deploy_requests.py --bundle h001-v1 --archive /tmp/prometheus-silverc-artifacts-h001-v1.tar.gz --request-set /tmp/prometheus-h001-canary-request-set.json --requests-dir /tmp/prometheus-h001-canary-requests --summary-out /tmp/prometheus-h001-canary-verification.json
+python3 scripts/build_silverc_deploy_operator_procedure.py --bundle h001-v1 --archive /tmp/prometheus-silverc-artifacts-h001-v1.tar.gz --request-set /tmp/prometheus-h001-canary-request-set.json --requests-dir /tmp/prometheus-h001-canary-requests --summary-out /tmp/prometheus-h001-canary-procedure.json --runbook-out /tmp/prometheus-h001-canary-procedure.md
 ```
 
 ## Keyless Toccata-v1 genesis operator
@@ -471,6 +487,16 @@ upstream Silverscript ref and runtime-tests covenant transitions for:
 
 Verified rejection paths include `fp_rate` above `MAX_FP_RATE` and auto-tuning
 before `TUNING_INTERVAL_BLOCKS`.
+
+Bundle v2 draft (MS-B D2): `autoTune` additionally requires `tx.time >= block_height`, so a
+fabricated future height can no longer ratchet parameters in consecutive transitions; tuning
+happens at most once per real `TUNING_INTERVAL_BLOCKS`. `reportMetrics` is unchanged because the
+keyless operator builds it with lock time 0; binding it to `tx.time` needs a deployer change.
+
+Review repair (2026-09-30): windows and intervals are anchored at consensus DAA scores of the
+spent covenant UTXO (`OpTxInputDaaScore`) and enforced with `tx.time`; attestation digests are
+versioned (`-v2`) and bind the covenant instance, proposal id and complete content; every attested
+tally is terminal (REJECTED on zero/low participation). Details: `docs/architecture/ms-b-contract-decisions.md`.
 
 ## Metrics-oracle report preflight
 
@@ -701,8 +727,10 @@ current covenant state model:
 - grant voting period is `GRANT_VOTING_BLOCKS = 604800`
 - reward formula uses `REWARD_PER_LINE = 10`
 - complexity is bounded by `MIN_COMPLEXITY = 1` and `MAX_COMPLEXITY = 10`
-- execution quorum is `QUORUM_VOTES = 10`
-- validator approval threshold is `VALIDATOR_QUORUM = 6700`
+- validator approval threshold is `VALIDATOR_QUORUM = 6700` (basis points of cast votes)
+- `QUORUM_VOTES = 10` is still declared but unused in the v2 draft; the participation rule
+  below replaces it (removing it does not change the compiled script, but would change the
+  source hash bound by the release manifest)
 - pool accounting remains PROM-denominated, but PROM is not a staking asset
 
 The fixture intentionally does not pretend to support legacy global maps,
@@ -711,16 +739,37 @@ emission-contract deposits, or direct PROM `transfer(...)` in current Silverc.
 The known legacy `deposit()` ACL question remains a deployment/orchestration
 decision once the emission authority is finalized.
 
-The shared verifier currently compiles this fixture against the same pinned
-upstream Silverscript ref and runtime-tests covenant transitions for:
+Current fixture = contract bundle v2 draft (`--bundle v2-draft`, non-promotable). The frozen
+H-001 v1 reproduction source in `bundles/h001-v1/` keeps the earlier `proposeGrant`,
+`voteGrant` and `executeGrant` transitions and is not maintained further.
 
-- `proposeGrant`
-- `voteGrant`
-- `executeGrant`
+v2 transitions (MS-B D1, D2, D4 and the 2026-09-30 review repair):
 
-Verified rejection paths include grant amount above `MAX_GRANT_PROM`, voting at
-`voting_end_block`, execution below `QUORUM_VOTES`, and execution below
-`VALIDATOR_QUORUM`.
+- `proposeGrant` requires a governance attestation (`checkSigFromStack` by `governance_pk`)
+  over `sha256("prometheus-grant-proposal-v2" || covenant_instance_id || u64le(next_grant_id)
+  || developer_pk || contribution_hash || description_hash || u64le(lines) ||
+  u64le(complexity) || u64le(amount) || proposer_pk)`, where `covenant_instance_id` is
+  `OpInputCovenantId` of the spent covenant input; the amount is capped by `MAX_GRANT_PROM`.
+- `finalizeGrant` requires the governance signature and an attested tally over
+  `sha256("prometheus-grant-tally-v2" || covenant_instance_id || u64le(grant_id) ||
+  content_hash || u64le(voting_end) || u64le(for) || u64le(against) ||
+  u64le(active_set_size) || validator_set_root)`, with
+  `content_hash = sha256(developer_pk || contribution_hash || description_hash ||
+  u64le(lines) || u64le(complexity) || u64le(amount) || proposer_pk)`. The voting window
+  starts at the consensus DAA score of the spent proposal UTXO (`OpTxInputDaaScore`) and
+  finalization requires `tx.time >= start + GRANT_VOTING_BLOCKS`.
+- Every attested tally is terminal: with participation of at least 50 % of the active set
+  (`2 * (for + against) >= active_set_size`, `for + against <= active_set_size`) and
+  approval of at least 6,700 bps of cast votes (`for * 10000 >= 6700 * (for + against)`,
+  ties at the threshold accepted) the grant is EXECUTED, otherwise REJECTED.
+- The pool is PROM accounting only; no value moves and PROM emission is not implemented.
+
+Current runtime coverage (pinned verifier): `proposeGrant` accepts a valid attested proposal
+and rejects an amount above `MAX_GRANT_PROM` and a mismatched attestation context;
+`finalizeGrant` executes an approved grant, records rejected and zero-vote tallies as
+terminal rejections, cannot execute on low participation, and rejects finalization before
+the voting end, an old start height, a tampered set size and a mismatched attestation
+context. Details: `docs/architecture/ms-b-contract-decisions.md`.
 
 ## CommunityDonationsState.sil
 
@@ -732,10 +781,12 @@ The fixture keeps the legacy invariants that are safe to express in the current
 covenant state model:
 
 - minimum donation is `MIN_DONATION_KAS = 1`
-- disbursement quorum is `DISBURSEMENT_QUORUM = 10`
-- validator approval threshold is `VALIDATOR_QUORUM = 6700`
-- pool accounting remains KAS-denominated
-- disbursements require governance signature at execution
+- validator approval threshold is `VALIDATOR_QUORUM = 6700` (basis points of cast votes)
+- `DISBURSEMENT_QUORUM = 10` is still declared but unused in the v2 draft; the participation
+  rule below replaces it (removing it does not change the compiled script, but would change
+  the source hash bound by the release manifest)
+- pool accounting remains KAS-denominated and value-backed
+- disbursements require the governance signature at finalization
 
 The fixture intentionally does not pretend to support legacy global maps,
 string storage, `msg.sender`, `tx.value`, event emission, cross-contract
@@ -747,12 +798,46 @@ upstream Silverscript ref and runtime-tests covenant transitions for:
 
 - `donateKas`
 - `proposeDisbursement`
-- `voteDisbursement`
-- `executeDisbursement`
+- `finalizeDisbursement`
 
-Verified rejection paths include zero donation amount, disbursement amount
-above pool balance, voting at `voting_end_block`, and execution below
-`DISBURSEMENT_QUORUM`.
+Current fixture = contract bundle v2 draft (`--bundle v2-draft`, non-promotable). The frozen
+H-001 v1 reproduction source in `bundles/h001-v1/` keeps the earlier `voteDisbursement` and
+`executeDisbursement` transitions and is not maintained further.
+
+v2 transitions (MS-B D1–D4 and the 2026-09-30 review repair):
+
+- The covenant value must equal `pool_balance_kas * 100000000` sompi in every transition.
+- `donateKas` requires the donor signature and an output that adds exactly
+  `amount * 100000000` sompi; the donor-declared label height must lie between the spent
+  state's DAA score and the lock time (`tx.time`). Arithmetic is evaluated by the pinned
+  engine with checked 64-bit signed integers, so an overflow aborts the transition.
+- `proposeDisbursement` requires a governance attestation over
+  `sha256("prometheus-disbursement-proposal-v2" || covenant_instance_id ||
+  u64le(next_disbursement_id) || recipient_pk || u64le(amount) || purpose_hash ||
+  proposer_pk)` and an amount not above the pool balance; value is unchanged.
+- `finalizeDisbursement` requires the governance signature and an attested tally over
+  `sha256("prometheus-disbursement-tally-v2" || covenant_instance_id ||
+  u64le(disbursement_id) || recipient_pk || u64le(amount_kas) || purpose_hash ||
+  u64le(voting_end) || u64le(for) || u64le(against) || u64le(active_set_size) ||
+  validator_set_root)`. The voting end is the consensus DAA score of the spent proposal
+  UTXO plus `DISBURSEMENT_VOTING_BLOCKS` (recorded by the first later transition) and
+  `tx.time >= voting_end` is required.
+- Every attested tally is terminal: with at least 50 % participation and 6,700 bps approval
+  (ties accepted) it pays exactly `amount_kas` sompi-scaled to the recipient's P2PK output
+  and keeps the rest in the covenant; otherwise the proposal ends REJECTED with the value
+  unchanged.
+
+Current runtime coverage (pinned verifier): `donateKas` accepts a value-backed donation and
+a large in-range donation, records the pending voting end, and rejects a zero amount, an
+unbacked donation, a future label height, a label before the previous transition, and
+64-bit overflow of the value multiplication, the value addition and the cumulative total;
+`proposeDisbursement` accepts a valid attested proposal and rejects an amount above the
+pool, unattested, replayed, cross-instance and substituted-amount attestations;
+`finalizeDisbursement` pays the recipient on approval, records rejected, low-participation
+and zero-vote tallies as terminal rejections, keeps a window recorded by a donation, and
+rejects finalization before the voting end, an old start height, a tampered set size, a
+mismatched attestation context, payout to another key and keeping the payout value.
+Details: `docs/architecture/ms-b-contract-decisions.md`.
 
 ## RuleStorageState.sil
 
@@ -777,20 +862,46 @@ Silverscript ref, builds covenant declaration sigscripts, and runtime-tests
 the proposal lifecycle transitions for:
 
 - `submitProposal`
-- `voteOnProposal`
 - `finalizeProposal`
 - `deactivateRule`
 
-Current runtime coverage:
+Current fixture = contract bundle v2 draft (`--bundle v2-draft`, non-promotable). The frozen
+H-001 v1 reproduction source in `bundles/h001-v1/` keeps the earlier `voteOnProposal`
+transition and is not maintained further.
 
-- `submitProposal` accepts a valid guardian signature and successor state
-- `submitProposal` rejects confidence below `MIN_CONFIDENCE`
-- `voteOnProposal` accepts a valid validator support vote and successor state
-- `voteOnProposal` rejects votes at or after `voting_end_block`
-- `finalizeProposal` accepts accepted and rejected proposal outcomes
-- `finalizeProposal` rejects zero-vote finalization
-- `deactivateRule` accepts deactivation of an active accepted rule
-- `deactivateRule` rejects pending/non-accepted rule state
+v2 transitions (MS-B D1, D2, D4 and the 2026-09-30 review repair): the free per-vote
+transition is removed. Ballots are collected off chain by the canonical membership source
+and the signed-ballot replay ledger; the contract accepts:
+
+- `submitProposal` only with a membership attestation (`checkSigFromStack` by the
+  governance/attestation key) over `sha256("prometheus-rule-submission-v2" ||
+  covenant_instance_id || u64le(next_proposal_id) || content_hash)`, with
+  `content_hash = sha256(guardian_pk || threat_hash || u64le(rule_type) || rule_cid ||
+  u64le(confidence))`, confidence between `MIN_CONFIDENCE` and 10000, and no pending
+  proposal;
+- `finalizeProposal` only with the governance signature and an attested tally over
+  `sha256("prometheus-rule-tally-v2" || covenant_instance_id || u64le(proposal_id) ||
+  content_hash || u64le(session_start) || u64le(for) || u64le(against) ||
+  u64le(active_set_size) || validator_set_root)`. The session starts at the consensus DAA
+  score of the spent submission UTXO and `tx.time >= session_start + VOTING_BLOCKS` is
+  required. Every attested tally is terminal: at least 50 % participation of the active set
+  and approval of at least 6,700 bps of cast votes (integer `for * 10000 / (for + against)`,
+  ties accepted) accept the rule, otherwise it ends REJECTED. The set size and root are not
+  part of the transaction outputs, so the attestation is what binds them.
+
+Current runtime coverage (pinned verifier):
+
+- `submitProposal` accepts an attested guardian and a submission after a terminal
+  rejection; rejects unattested, replayed and cross-instance attestations, substituted rule
+  content, confidence below `MIN_CONFIDENCE`, an unaccepted input and a submission while a
+  proposal is pending
+- `finalizeProposal` accepts accepting, rejecting and exact-threshold tallies; records
+  low-participation and zero-vote tallies as terminal rejections; rejects finalization
+  before the voting end, an old start height, a tampered set size, cross-instance and
+  replayed tallies, tallies for other content or another session, an unattested or early
+  rejection and an unaccepted input
+- `deactivateRule` accepts deactivation of an active accepted rule and rejects pending or
+  non-accepted rule state
 
 ## GuardianReputationState.sil
 

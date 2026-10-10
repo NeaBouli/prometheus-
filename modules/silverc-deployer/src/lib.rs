@@ -63,6 +63,44 @@ pub const FULL_DEPLOYMENT_CONTRACTS: [&str; 7] = [
     "GovernanceAutoTuningState",
 ];
 
+pub const COVENANT_ID_CALCULATION_KIND: &str = "prometheus.silverc.genesis.covenant_id_calculation";
+pub const COVENANT_ID_CALCULATION_SCHEMA_VERSION: u32 = 1;
+/// A calculated identity is neither chain evidence nor deployment authorization.
+pub const COVENANT_ID_CALCULATION_CLASSIFICATION: [&str; 2] =
+    ["NOT_CHAIN_EVIDENCE", "NOT_DEPLOYMENT_AUTHORIZATION"];
+
+pub const D5_EVIDENCE_CANDIDATE_KIND: &str = "prometheus.silverc.d5.genesis_evidence_candidate";
+pub const D5_EVIDENCE_CANDIDATE_SCHEMA_VERSION: u32 = 1;
+pub const D5_EVIDENCE_CANDIDATE_STATUS: &str = "OBSERVED_NOT_INDEPENDENTLY_CONFIRMED";
+pub const D5_EVIDENCE_CANDIDATE_CLASSIFICATION: [&str; 3] = [
+    "NOT_CHAIN_PROOF",
+    "NOT_D5_ACCEPTANCE",
+    "NOT_DEPLOYMENT_AUTHORIZATION",
+];
+const D5_TRUST_SOURCE: &str = "single_operator_configured_node";
+const D5_SNAPSHOT_SOURCE: &str = "configured_node_get_utxos_by_addresses_typed_entry";
+const D5_PREPARATION_SOURCE: &str = "validated_preparation_inputs_not_chain_proof";
+const D5_SNAPSHOT_NOTE: &str = "normalized allowlisted snapshot of the typed UTXO entry, not the \
+     complete raw wire response; its hash proves integrity and internal consistency only, not \
+     provider provenance, network identity, or consensus";
+const D5_MISSING_INDEPENDENT_CHECKS: [&str; 4] = [
+    "second independently operated node or explorer",
+    "reviewer-captured response independent of the operator",
+    "block hash and header cross-check for the genesis DAA score",
+    "network identity independent of the configured endpoint",
+];
+const D5_RELATIONSHIPS: [&str; 7] = [
+    "preparation.calculated_covenant_id == covenant_id(preparation.funding_outpoint, \
+     [(preparation.contract_output_index, preparation.genesis_output_value, \
+     preparation.contract_script_public_key)])",
+    "observed.outpoint == (preparation.expected_deploy_tx_id, preparation.contract_output_index)",
+    "observed.amount == preparation.genesis_output_value",
+    "observed.script_public_key == preparation.contract_script_public_key",
+    "observed.covenant_id == preparation.calculated_covenant_id",
+    "observed.is_coinbase == false",
+    "observed_snapshot_sha256 == sha256(canonical_json(observed))",
+];
+
 const SCHNORR_SCRIPT_LEN: usize = 66;
 const RPC_REQUEST_TIMEOUT: Duration = Duration::from_secs(20);
 const SECRET_MARKERS: &[&str] = &[
@@ -393,6 +431,82 @@ pub struct NodeObservation {
     pub daa_depth: u64,
     pub observed_at_unix_seconds: u64,
     pub explorer_block_hash_required: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub struct D5TrustModel {
+    pub source: String,
+    pub independent_confirmation: bool,
+    pub snapshot_note: String,
+    pub missing_independent_checks: Vec<String>,
+}
+
+/// Validated preparation inputs. They bind what the observation must match;
+/// they are not chain proof.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub struct D5PreparationInputs {
+    pub source: String,
+    pub network_id: String,
+    pub contract_name: String,
+    pub request_sha256: String,
+    pub signing_request_sha256: String,
+    pub funding_outpoint: OutpointSpec,
+    pub genesis_output_value: u64,
+    pub contract_output_index: u32,
+    pub contract_script_public_key: ScriptSpec,
+    pub calculated_covenant_id: String,
+    pub expected_deploy_tx_id: String,
+}
+
+/// Strictly allowlisted public fields of the typed UTXO entry.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub struct D5ObservedUtxoSnapshot {
+    pub source: String,
+    pub outpoint: OutpointSpec,
+    pub amount: u64,
+    pub script_public_key: ScriptSpec,
+    pub covenant_id: String,
+    pub block_daa_score: u64,
+    pub is_coinbase: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub struct D5EvidenceCandidate {
+    pub schema_version: u32,
+    pub kind: String,
+    pub status: String,
+    pub classification: Vec<String>,
+    pub trust_model: D5TrustModel,
+    pub preparation: D5PreparationInputs,
+    pub observed: D5ObservedUtxoSnapshot,
+    pub observed_snapshot_sha256: String,
+    pub observed_virtual_daa_score: u64,
+    pub daa_depth: u64,
+    pub relationships: Vec<String>,
+    pub candidate_sha256: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub struct CovenantIdCalculation {
+    pub schema_version: u32,
+    pub kind: String,
+    pub classification: Vec<String>,
+    pub contract_name: String,
+    pub artifact_sha256: String,
+    pub script_sha256: String,
+    pub script_len: usize,
+    pub funding_outpoint: OutpointSpec,
+    pub genesis_output_value: u64,
+    pub contract_output_index: u32,
+    pub authorizing_input: u16,
+    pub contract_script_public_key: ScriptSpec,
+    pub covenant_id: String,
+    pub derivation: String,
 }
 
 #[derive(Debug)]
@@ -1007,6 +1121,123 @@ fn expected_fee_mass_profile(
     )
 }
 
+/// Contract output of the genesis layout before its covenant binding is set.
+fn unbound_genesis_contract_output(genesis_output_value: u64, script: &[u8]) -> TransactionOutput {
+    TransactionOutput {
+        value: genesis_output_value,
+        script_public_key: pay_to_script_hash_script(script),
+        covenant: None,
+    }
+}
+
+/// Covenant id of one authorized genesis output, via the pinned consensus helper.
+fn genesis_covenant_id(
+    funding_outpoint: TransactionOutpoint,
+    contract_output_index: u32,
+    unbound_contract_output: &TransactionOutput,
+) -> TransactionId {
+    kaspa_consensus_core::hashing::covenant_id::covenant_id(
+        funding_outpoint,
+        std::iter::once((contract_output_index, unbound_contract_output)),
+    )
+}
+
+/// Parse a canonical `<lowercase txid>:<u32 index>` outpoint.
+pub fn parse_funding_outpoint(value: &str) -> Result<TransactionOutpoint> {
+    let (transaction_id, index) = value
+        .split_once(':')
+        .ok_or_else(|| anyhow!("funding outpoint must be <txid>:<index>"))?;
+    validate_lower_hex(transaction_id, 32, "funding outpoint transaction_id")?;
+    if index.is_empty()
+        || !index.bytes().all(|byte| byte.is_ascii_digit())
+        || (index.len() > 1 && index.starts_with('0'))
+    {
+        bail!("funding outpoint index must be a canonical decimal u32");
+    }
+    let index = index
+        .parse::<u32>()
+        .context("funding outpoint index exceeds u32")?;
+    OutpointSpec {
+        transaction_id: transaction_id.to_string(),
+        index,
+    }
+    .to_outpoint()
+}
+
+/// Load an artifact against hashes taken from an already validated release manifest.
+pub fn load_artifact_for_calculation(
+    path: &Path,
+    expected_artifact_sha256: &str,
+    expected_script_sha256: &str,
+) -> Result<SilvercArtifact> {
+    validate_lower_hex(expected_artifact_sha256, 32, "expected artifact_sha256")?;
+    validate_lower_hex(expected_script_sha256, 32, "expected script_sha256")?;
+    let bytes = fs::read(path).with_context(|| format!("failed to read {}", path.display()))?;
+    if sha256_hex(&bytes) != expected_artifact_sha256 {
+        bail!("Silverc artifact_sha256 mismatch");
+    }
+    let value: Value = serde_json::from_slice(&bytes)
+        .with_context(|| format!("invalid JSON in {}", path.display()))?;
+    reject_secret_fields(&value, "$")?;
+    let artifact: SilvercArtifact = serde_json::from_value(value)?;
+    if artifact.script.is_empty() {
+        bail!("Silverc compiled script must not be empty");
+    }
+    if sha256_hex(&artifact.script) != expected_script_sha256 {
+        bail!("Silverc compiled script hash mismatch");
+    }
+    Ok(artifact)
+}
+
+/// Offline covenant-id calculation under the existing genesis layout.
+///
+/// Uses the same unbound output construction and consensus helper as
+/// `prepare_genesis`. It takes no keys, network, request or funding UTXO and
+/// builds no transaction; the result is classified as neither chain evidence
+/// nor deployment authorization.
+pub fn calculate_genesis_covenant_id(
+    artifact: &SilvercArtifact,
+    verified_artifact_sha256: &str,
+    funding_outpoint: &str,
+    genesis_output_value: u64,
+) -> Result<CovenantIdCalculation> {
+    if genesis_output_value == 0 {
+        bail!("genesis_output_value must be nonzero");
+    }
+    if artifact.script.is_empty() {
+        bail!("Silverc compiled script must not be empty");
+    }
+    validate_lower_hex(verified_artifact_sha256, 32, "verified artifact_sha256")?;
+    let outpoint = parse_funding_outpoint(funding_outpoint)?;
+    let unbound_contract_output =
+        unbound_genesis_contract_output(genesis_output_value, &artifact.script);
+    let covenant_id =
+        genesis_covenant_id(outpoint, CONTRACT_OUTPUT_INDEX, &unbound_contract_output);
+    Ok(CovenantIdCalculation {
+        schema_version: COVENANT_ID_CALCULATION_SCHEMA_VERSION,
+        kind: COVENANT_ID_CALCULATION_KIND.to_string(),
+        classification: COVENANT_ID_CALCULATION_CLASSIFICATION
+            .iter()
+            .map(|item| item.to_string())
+            .collect(),
+        contract_name: artifact.contract_name.clone(),
+        artifact_sha256: verified_artifact_sha256.to_string(),
+        script_sha256: sha256_hex(&artifact.script),
+        script_len: artifact.script.len(),
+        funding_outpoint: OutpointSpec::from_outpoint(outpoint),
+        genesis_output_value,
+        contract_output_index: CONTRACT_OUTPUT_INDEX,
+        authorizing_input: FUNDING_INPUT_INDEX,
+        contract_script_public_key: ScriptSpec::from_script_public_key(
+            &unbound_contract_output.script_public_key,
+        ),
+        covenant_id: covenant_id.to_string(),
+        derivation: "kaspa_consensus_core::hashing::covenant_id(funding_outpoint, \
+                     [(contract_output_index, unbound P2SH genesis output)])"
+            .to_string(),
+    })
+}
+
 pub fn prepare_genesis(
     request: &DeployRequest,
     artifact: &SilvercArtifact,
@@ -1072,15 +1303,13 @@ pub fn prepare_genesis(
         bail!("implicit transaction fee exceeds maximum_fee_sompi");
     }
 
-    let contract_script_public_key = pay_to_script_hash_script(&artifact.script);
-    let unbound_contract_output = TransactionOutput {
-        value: funding.genesis_output_value,
-        script_public_key: contract_script_public_key.clone(),
-        covenant: None,
-    };
-    let covenant_id = kaspa_consensus_core::hashing::covenant_id::covenant_id(
+    let unbound_contract_output =
+        unbound_genesis_contract_output(funding.genesis_output_value, &artifact.script);
+    let contract_script_public_key = unbound_contract_output.script_public_key.clone();
+    let covenant_id = genesis_covenant_id(
         funding_outpoint,
-        std::iter::once((CONTRACT_OUTPUT_INDEX, &unbound_contract_output)),
+        CONTRACT_OUTPUT_INDEX,
+        &unbound_contract_output,
     );
     let mut outputs = vec![TransactionOutput {
         covenant: Some(CovenantBinding {
@@ -1614,6 +1843,211 @@ fn deployed_contract_entry(
     Ok(Some(entry))
 }
 
+fn canonical_sha256<T: Serialize>(value: &T) -> Result<String> {
+    Ok(sha256_hex(&canonical_json(&serde_json::to_value(value)?)?))
+}
+
+fn d5_candidate_hash(candidate: &D5EvidenceCandidate) -> Result<String> {
+    let mut value = serde_json::to_value(candidate)?;
+    value
+        .as_object_mut()
+        .ok_or_else(|| anyhow!("D5 evidence candidate must serialize as an object"))?
+        .remove("candidate_sha256");
+    Ok(sha256_hex(&canonical_json(&value)?))
+}
+
+/// Verify a D5 candidate against the externally validated preparation context
+/// (the signing request returned by `rebuild_and_verify`). This establishes
+/// context-bound consistency only; it is never independent chain proof or D5
+/// acceptance, and the candidate stays OBSERVED_NOT_INDEPENDENTLY_CONFIRMED.
+pub fn verify_d5_evidence_candidate(
+    candidate: &D5EvidenceCandidate,
+    validated_context: &SigningRequest,
+) -> Result<()> {
+    if candidate.schema_version != D5_EVIDENCE_CANDIDATE_SCHEMA_VERSION
+        || candidate.kind != D5_EVIDENCE_CANDIDATE_KIND
+        || candidate.status != D5_EVIDENCE_CANDIDATE_STATUS
+        || candidate.classification != D5_EVIDENCE_CANDIDATE_CLASSIFICATION
+        || candidate.relationships != D5_RELATIONSHIPS
+    {
+        bail!("unsupported D5 evidence candidate schema, status, classification, or relationships");
+    }
+    let trust = &candidate.trust_model;
+    if trust.source != D5_TRUST_SOURCE
+        || trust.independent_confirmation
+        || trust.snapshot_note != D5_SNAPSHOT_NOTE
+        || trust.missing_independent_checks != D5_MISSING_INDEPENDENT_CHECKS
+    {
+        bail!("D5 evidence candidate must keep the single-source trust model");
+    }
+    let preparation = &candidate.preparation;
+    let observed = &candidate.observed;
+    if preparation.source != D5_PREPARATION_SOURCE || observed.source != D5_SNAPSHOT_SOURCE {
+        bail!("D5 evidence candidate field sources are not the documented sources");
+    }
+    NetworkId::from_str(&preparation.network_id).context("invalid D5 network_id")?;
+    for (value, label) in [
+        (&preparation.request_sha256, "request_sha256"),
+        (
+            &preparation.signing_request_sha256,
+            "signing_request_sha256",
+        ),
+        (
+            &preparation.calculated_covenant_id,
+            "calculated_covenant_id",
+        ),
+        (&preparation.expected_deploy_tx_id, "expected_deploy_tx_id"),
+        (&observed.covenant_id, "observed covenant_id"),
+        (
+            &candidate.observed_snapshot_sha256,
+            "observed_snapshot_sha256",
+        ),
+        (&candidate.candidate_sha256, "candidate_sha256"),
+    ] {
+        validate_lower_hex(value, 32, label)?;
+    }
+    if preparation.genesis_output_value == 0 {
+        bail!("D5 genesis_output_value must be nonzero");
+    }
+    // Authority comes only from the validated context, never from candidate hashes.
+    let context = validated_context;
+    if preparation.network_id != context.network_id
+        || preparation.contract_name != context.contract_name
+        || preparation.request_sha256 != context.request_sha256
+        || preparation.signing_request_sha256 != context.signing_request_sha256
+        || preparation.funding_outpoint != context.funding_outpoint
+        || preparation.genesis_output_value != context.genesis_output_value
+        || preparation.contract_output_index != context.contract_output_index
+        || preparation.contract_script_public_key != context.contract_script_public_key
+        || preparation.calculated_covenant_id != context.covenant_id
+        || preparation.expected_deploy_tx_id != context.unsigned_transaction_id
+    {
+        bail!("D5 preparation fields differ from the validated preparation context");
+    }
+    if preparation.contract_output_index != CONTRACT_OUTPUT_INDEX {
+        bail!("D5 contract output index must be the fixed genesis output index");
+    }
+    let funding_outpoint = preparation.funding_outpoint.to_outpoint()?;
+    let contract_script = preparation
+        .contract_script_public_key
+        .to_script_public_key()?;
+    let recalculated = genesis_covenant_id(
+        funding_outpoint,
+        preparation.contract_output_index,
+        &TransactionOutput {
+            value: preparation.genesis_output_value,
+            script_public_key: contract_script,
+            covenant: None,
+        },
+    );
+    if recalculated.to_string() != preparation.calculated_covenant_id {
+        bail!("D5 calculated covenant id does not match the preparation inputs");
+    }
+    if observed.outpoint.transaction_id != preparation.expected_deploy_tx_id
+        || observed.outpoint.index != preparation.contract_output_index
+    {
+        bail!("D5 observed outpoint is not the expected genesis outpoint");
+    }
+    if observed.amount != preparation.genesis_output_value {
+        bail!("D5 observed value differs from the genesis output value");
+    }
+    if observed.script_public_key != preparation.contract_script_public_key {
+        bail!("D5 observed script differs from the contract script");
+    }
+    if observed.covenant_id != preparation.calculated_covenant_id {
+        bail!("D5 observed covenant id differs from the calculated covenant id");
+    }
+    if observed.is_coinbase {
+        bail!("D5 observed genesis output must not be coinbase");
+    }
+    let depth = candidate
+        .observed_virtual_daa_score
+        .checked_sub(observed.block_daa_score)
+        .ok_or_else(|| anyhow!("D5 genesis DAA score is above the observed virtual DAA score"))?;
+    if candidate.daa_depth != depth {
+        bail!("D5 DAA depth is inconsistent with the observed DAA scores");
+    }
+    if canonical_sha256(observed)? != candidate.observed_snapshot_sha256 {
+        bail!("D5 observed snapshot hash mismatch");
+    }
+    if d5_candidate_hash(candidate)? != candidate.candidate_sha256 {
+        bail!("D5 evidence candidate hash mismatch");
+    }
+    Ok(())
+}
+
+/// Build a D5 evidence candidate from validated preparation inputs and the
+/// typed UTXO entry already matched by `deployed_contract_entry`.
+pub fn build_d5_evidence_candidate(
+    signing_request: &SigningRequest,
+    entry: &RpcUtxosByAddressesEntry,
+    observed_virtual_daa_score: u64,
+) -> Result<D5EvidenceCandidate> {
+    let covenant_id = entry
+        .utxo_entry
+        .covenant_id
+        .ok_or_else(|| anyhow!("D5 observed UTXO has no covenant id anchor"))?;
+    let daa_depth = observed_virtual_daa_score
+        .checked_sub(entry.utxo_entry.block_daa_score)
+        .ok_or_else(|| anyhow!("D5 genesis DAA score is above the observed virtual DAA score"))?;
+    let observed = D5ObservedUtxoSnapshot {
+        source: D5_SNAPSHOT_SOURCE.to_string(),
+        outpoint: OutpointSpec {
+            transaction_id: entry.outpoint.transaction_id.to_string(),
+            index: entry.outpoint.index,
+        },
+        amount: entry.utxo_entry.amount,
+        script_public_key: ScriptSpec::from_script_public_key(&entry.utxo_entry.script_public_key),
+        covenant_id: covenant_id.to_string(),
+        block_daa_score: entry.utxo_entry.block_daa_score,
+        is_coinbase: entry.utxo_entry.is_coinbase,
+    };
+    let mut candidate = D5EvidenceCandidate {
+        schema_version: D5_EVIDENCE_CANDIDATE_SCHEMA_VERSION,
+        kind: D5_EVIDENCE_CANDIDATE_KIND.to_string(),
+        status: D5_EVIDENCE_CANDIDATE_STATUS.to_string(),
+        classification: D5_EVIDENCE_CANDIDATE_CLASSIFICATION
+            .iter()
+            .map(|item| item.to_string())
+            .collect(),
+        trust_model: D5TrustModel {
+            source: D5_TRUST_SOURCE.to_string(),
+            independent_confirmation: false,
+            snapshot_note: D5_SNAPSHOT_NOTE.to_string(),
+            missing_independent_checks: D5_MISSING_INDEPENDENT_CHECKS
+                .iter()
+                .map(|item| item.to_string())
+                .collect(),
+        },
+        preparation: D5PreparationInputs {
+            source: D5_PREPARATION_SOURCE.to_string(),
+            network_id: signing_request.network_id.clone(),
+            contract_name: signing_request.contract_name.clone(),
+            request_sha256: signing_request.request_sha256.clone(),
+            signing_request_sha256: signing_request.signing_request_sha256.clone(),
+            funding_outpoint: signing_request.funding_outpoint.clone(),
+            genesis_output_value: signing_request.genesis_output_value,
+            contract_output_index: signing_request.contract_output_index,
+            contract_script_public_key: signing_request.contract_script_public_key.clone(),
+            calculated_covenant_id: signing_request.covenant_id.clone(),
+            expected_deploy_tx_id: signing_request.unsigned_transaction_id.clone(),
+        },
+        observed_snapshot_sha256: canonical_sha256(&observed)?,
+        observed,
+        observed_virtual_daa_score,
+        daa_depth,
+        relationships: D5_RELATIONSHIPS
+            .iter()
+            .map(|item| item.to_string())
+            .collect(),
+        candidate_sha256: String::new(),
+    };
+    candidate.candidate_sha256 = "0".repeat(64);
+    candidate.candidate_sha256 = d5_candidate_hash(&candidate)?;
+    verify_d5_evidence_candidate(&candidate, signing_request)?;
+    Ok(candidate)
+}
+
 fn broadcast_result(
     signing_request: &SigningRequest,
     status: &str,
@@ -1973,6 +2407,25 @@ pub async fn observe_deployed_utxo(
     signing_request: &SigningRequest,
     encoding: WrpcEncoding,
 ) -> Result<NodeObservation> {
+    Ok(
+        observe_deployed_utxo_entry(verified, signing_request, encoding)
+            .await?
+            .observation,
+    )
+}
+
+/// Node observation plus the matched typed UTXO entry for optional D5 capture.
+pub struct DeployedUtxoObservation {
+    pub observation: NodeObservation,
+    pub entry: RpcUtxosByAddressesEntry,
+    pub observed_virtual_daa_score: u64,
+}
+
+pub async fn observe_deployed_utxo_entry(
+    verified: &VerifiedSignedTransaction,
+    signing_request: &SigningRequest,
+    encoding: WrpcEncoding,
+) -> Result<DeployedUtxoObservation> {
     validate_verified_transaction_binding(verified, signing_request)?;
     let network_id = NetworkId::from_str(&signing_request.network_id)?;
     let params = consensus_params(network_id)?;
@@ -2001,7 +2454,7 @@ pub async fn observe_deployed_utxo(
     let dag = dag_result.context("failed to query virtual DAA score")?;
     let entry = deployed_contract_entry(entries, signing_request)?
         .ok_or_else(|| anyhow!("deployed contract UTXO is not visible on the configured node"))?;
-    Ok(NodeObservation {
+    let observation = NodeObservation {
         schema_version: 1,
         evidence_type: "prometheus_silverc_genesis_node_observation".to_string(),
         status: "confirmed_utxo_observed".to_string(),
@@ -2023,6 +2476,11 @@ pub async fn observe_deployed_utxo(
             .saturating_sub(entry.utxo_entry.block_daa_score),
         observed_at_unix_seconds: unix_seconds()?,
         explorer_block_hash_required: true,
+    };
+    Ok(DeployedUtxoObservation {
+        observation,
+        entry,
+        observed_virtual_daa_score: dag.virtual_daa_score,
     })
 }
 
@@ -3329,5 +3787,722 @@ mod tests {
         );
 
         fs::remove_dir_all(temp_dir).unwrap();
+    }
+
+    fn calculation_for(
+        artifact: &SilvercArtifact,
+        outpoint: &str,
+        value: u64,
+    ) -> CovenantIdCalculation {
+        calculate_genesis_covenant_id(artifact, &"aa".repeat(32), outpoint, value).unwrap()
+    }
+
+    #[test]
+    fn covenant_id_calculation_matches_prepare_genesis() {
+        let (request, artifact, funding) = deterministic_fixture();
+        let prepared = prepare_genesis(&request, &artifact, &funding).unwrap();
+        let outpoint = format!(
+            "{}:{}",
+            funding.funding_outpoint.transaction_id, funding.funding_outpoint.index
+        );
+        let calculation = calculation_for(&artifact, &outpoint, funding.genesis_output_value);
+        assert_eq!(
+            calculation.covenant_id,
+            prepared.signing_request.covenant_id
+        );
+        assert_eq!(
+            calculation.contract_script_public_key,
+            prepared.signing_request.contract_script_public_key
+        );
+        assert_eq!(
+            calculation.contract_output_index,
+            prepared.signing_request.contract_output_index
+        );
+        assert_eq!(
+            calculation.authorizing_input,
+            prepared.signing_request.authorizing_input
+        );
+        assert_eq!(
+            calculation.funding_outpoint,
+            prepared.signing_request.funding_outpoint
+        );
+
+        let (request, artifact, funding, _) = fixture();
+        let prepared = prepare_genesis(&request, &artifact, &funding).unwrap();
+        let outpoint = format!(
+            "{}:{}",
+            funding.funding_outpoint.transaction_id, funding.funding_outpoint.index
+        );
+        assert_eq!(
+            calculation_for(&artifact, &outpoint, funding.genesis_output_value).covenant_id,
+            prepared.signing_request.covenant_id
+        );
+    }
+
+    #[test]
+    fn covenant_id_calculation_is_deterministic_and_classified() {
+        let (_, artifact, _) = deterministic_fixture();
+        let outpoint = format!("{}:3", "11".repeat(32));
+        let first = calculation_for(&artifact, &outpoint, 1_000_000_000);
+        let second = calculation_for(&artifact, &outpoint, 1_000_000_000);
+        assert_eq!(first, second);
+        assert_eq!(
+            first.covenant_id, DETERMINISTIC_COVENANT_ID_VECTOR,
+            "pinned regression vector for the deterministic fixture"
+        );
+        assert_eq!(first.kind, COVENANT_ID_CALCULATION_KIND);
+        assert_eq!(
+            first.classification,
+            vec!["NOT_CHAIN_EVIDENCE", "NOT_DEPLOYMENT_AUTHORIZATION"]
+        );
+        assert_eq!(first.script_sha256, sha256_hex(&artifact.script));
+        assert_eq!(first.artifact_sha256, "aa".repeat(32));
+        let value = serde_json::to_value(&first).unwrap();
+        for forbidden in [
+            "unsigned_transaction_id",
+            "deployed_instance_id",
+            "sighash_hex",
+            "signing_request_sha256",
+            "request_sha256",
+        ] {
+            assert!(
+                value.get(forbidden).is_none(),
+                "{forbidden} must not be exported"
+            );
+        }
+    }
+
+    #[test]
+    fn covenant_id_changes_with_every_bound_input() {
+        let (_, artifact, _) = deterministic_fixture();
+        let base_outpoint = format!("{}:3", "11".repeat(32));
+        let base = calculation_for(&artifact, &base_outpoint, 1_000_000_000).covenant_id;
+        let other_txid =
+            calculation_for(&artifact, &format!("{}:3", "22".repeat(32)), 1_000_000_000);
+        let other_index =
+            calculation_for(&artifact, &format!("{}:4", "11".repeat(32)), 1_000_000_000);
+        let other_value = calculation_for(&artifact, &base_outpoint, 1_000_000_001);
+        let mut changed_script = artifact.clone();
+        changed_script.script.push(0x51);
+        let other_script = calculation_for(&changed_script, &base_outpoint, 1_000_000_000);
+        let ids: BTreeSet<_> = [
+            base.clone(),
+            other_txid.covenant_id,
+            other_index.covenant_id,
+            other_value.covenant_id,
+            other_script.covenant_id,
+        ]
+        .into_iter()
+        .collect();
+        assert_eq!(ids.len(), 5, "each bound input must change the identity");
+
+        let outpoint = parse_funding_outpoint(&base_outpoint).unwrap();
+        let output = unbound_genesis_contract_output(1_000_000_000, &artifact.script);
+        assert_eq!(
+            genesis_covenant_id(outpoint, CONTRACT_OUTPUT_INDEX, &output).to_string(),
+            base
+        );
+        assert_ne!(
+            genesis_covenant_id(outpoint, 1, &output).to_string(),
+            base,
+            "output index is bound"
+        );
+        let other_version = TransactionOutput {
+            script_public_key: ScriptPublicKey::new(
+                output.script_public_key.version() + 1,
+                output.script_public_key.script().into(),
+            ),
+            ..output.clone()
+        };
+        assert_ne!(
+            genesis_covenant_id(outpoint, CONTRACT_OUTPUT_INDEX, &other_version).to_string(),
+            base,
+            "script version is bound"
+        );
+        let bound = TransactionOutput {
+            covenant: Some(CovenantBinding {
+                authorizing_input: FUNDING_INPUT_INDEX,
+                covenant_id: TransactionId::from_str(&"33".repeat(32)).unwrap(),
+            }),
+            ..output
+        };
+        assert_eq!(
+            genesis_covenant_id(outpoint, CONTRACT_OUTPUT_INDEX, &bound).to_string(),
+            base,
+            "the covenant binding itself is excluded from the identity"
+        );
+    }
+
+    #[test]
+    fn covenant_id_calculation_rejects_malformed_inputs() {
+        let (_, artifact, _) = deterministic_fixture();
+        let txid = "11".repeat(32);
+        for outpoint in [
+            String::new(),
+            txid.clone(),
+            format!("{txid}:"),
+            format!("{txid}:01"),
+            format!("{txid}:-1"),
+            format!("{txid}:+1"),
+            format!("{txid}: 1"),
+            format!("{txid}:4294967296"),
+            format!("{txid}:1:2"),
+            format!("{}:0", "AB".repeat(32)),
+            format!("{}:0", &txid[..62]),
+            format!("{}zz:0", &txid[..62]),
+        ] {
+            assert!(
+                calculate_genesis_covenant_id(&artifact, &"aa".repeat(32), &outpoint, 1).is_err(),
+                "outpoint `{outpoint}` must fail closed"
+            );
+        }
+        let max_index = format!("{txid}:4294967295");
+        assert!(calculate_genesis_covenant_id(&artifact, &"aa".repeat(32), &max_index, 1).is_ok());
+        let outpoint = format!("{txid}:0");
+        assert!(calculate_genesis_covenant_id(&artifact, &"aa".repeat(32), &outpoint, 0).is_err());
+        assert!(calculate_genesis_covenant_id(&artifact, &"AA".repeat(32), &outpoint, 1).is_err());
+        assert!(calculate_genesis_covenant_id(&artifact, "aa", &outpoint, 1).is_err());
+        let mut empty = artifact.clone();
+        empty.script.clear();
+        assert!(calculate_genesis_covenant_id(&empty, &"aa".repeat(32), &outpoint, 1).is_err());
+        assert!(
+            calculate_genesis_covenant_id(&artifact, &"aa".repeat(32), &outpoint, u64::MAX).is_ok(),
+            "u64 range is accepted by the calculation; funding checks stay in prepare_genesis"
+        );
+    }
+
+    #[test]
+    fn calculation_artifact_loader_binds_manifest_hashes() {
+        let dir = std::env::temp_dir().join(format!(
+            "prometheus-covenant-calc-{}-{}",
+            std::process::id(),
+            SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        fs::create_dir_all(&dir).unwrap();
+        let (_, artifact, _) = deterministic_fixture();
+        let path = dir.join("artifact.json");
+        let bytes = serde_json::to_vec(&artifact).unwrap();
+        fs::write(&path, &bytes).unwrap();
+        let artifact_sha = sha256_hex(&bytes);
+        let script_sha = sha256_hex(&artifact.script);
+        let loaded = load_artifact_for_calculation(&path, &artifact_sha, &script_sha).unwrap();
+        assert_eq!(loaded.script, artifact.script);
+        assert!(load_artifact_for_calculation(&path, &"00".repeat(32), &script_sha).is_err());
+        assert!(load_artifact_for_calculation(&path, &artifact_sha, &"00".repeat(32)).is_err());
+        assert!(
+            load_artifact_for_calculation(&path, &artifact_sha.to_uppercase(), &script_sha)
+                .is_err()
+        );
+        let secret =
+            br#"{"contract_name":"X","compiler_version":"t","script":[81],"private_key":"x"}"#;
+        fs::write(&path, secret).unwrap();
+        assert!(
+            load_artifact_for_calculation(&path, &sha256_hex(secret), &sha256_hex(&[81])).is_err()
+        );
+        fs::remove_dir_all(dir).unwrap();
+    }
+
+    #[test]
+    fn non_v1_manifest_stays_rejected_by_genesis_profile_gate() {
+        // Any manifest other than the pinned v1 bundle (including the v2 draft,
+        // exercised end to end in scripts/test_silverc_bundle_profiles.py) is
+        // rejected; the offline calculation does not touch this gate.
+        let (mut request, _, _, _) = fixture();
+        request.deployment_profile.full_bundle_manifest_sha256 = "cd".repeat(32);
+        let error = validate_deployment_profile(&request)
+            .unwrap_err()
+            .to_string();
+        assert!(
+            error.contains("release-manifest binding mismatch"),
+            "{error}"
+        );
+    }
+
+    const DETERMINISTIC_COVENANT_ID_VECTOR: &str =
+        "3a81b23246d64864e295fb5aa5e1cc36d45711fd402a602fb7ef765ec8d21b8a";
+
+    fn d5_inputs() -> (SigningRequest, RpcUtxosByAddressesEntry) {
+        let (request, artifact, funding) = deterministic_fixture();
+        let signing_request = prepare_genesis(&request, &artifact, &funding)
+            .unwrap()
+            .signing_request;
+        let entry = d5_entry(
+            &signing_request,
+            &signing_request.unsigned_transaction_id,
+            signing_request.contract_output_index,
+            signing_request.genesis_output_value,
+            Some(&signing_request.covenant_id),
+            false,
+        );
+        (signing_request, entry)
+    }
+
+    fn d5_entry(
+        signing_request: &SigningRequest,
+        txid: &str,
+        index: u32,
+        amount: u64,
+        covenant_id: Option<&str>,
+        is_coinbase: bool,
+    ) -> RpcUtxosByAddressesEntry {
+        RpcUtxosByAddressesEntry {
+            address: Some(Address::try_from(signing_request.contract_address.as_str()).unwrap()),
+            outpoint: TransactionOutpoint {
+                transaction_id: TransactionId::from_str(txid).unwrap(),
+                index,
+            }
+            .into(),
+            utxo_entry: kaspa_rpc_core::RpcUtxoEntry::new(
+                amount,
+                signing_request
+                    .contract_script_public_key
+                    .to_script_public_key()
+                    .unwrap(),
+                467_579_800,
+                is_coinbase,
+                covenant_id.map(|value| TransactionId::from_str(value).unwrap()),
+            ),
+        }
+    }
+
+    fn rehash(candidate: &mut D5EvidenceCandidate) {
+        candidate.observed_snapshot_sha256 = canonical_sha256(&candidate.observed).unwrap();
+        candidate.candidate_sha256 = d5_candidate_hash(candidate).unwrap();
+    }
+
+    #[test]
+    fn d5_candidate_captures_bound_fields_deterministically() {
+        let (signing_request, entry) = d5_inputs();
+        let before = serde_json::to_value(&signing_request).unwrap();
+        let candidate = build_d5_evidence_candidate(&signing_request, &entry, 467_580_000).unwrap();
+        assert_eq!(
+            serde_json::to_value(&signing_request).unwrap(),
+            before,
+            "v1 signing identity must not change"
+        );
+        assert_eq!(
+            candidate,
+            build_d5_evidence_candidate(&signing_request, &entry, 467_580_000).unwrap()
+        );
+        assert_eq!(candidate.status, "OBSERVED_NOT_INDEPENDENTLY_CONFIRMED");
+        assert_eq!(
+            candidate.classification,
+            [
+                "NOT_CHAIN_PROOF",
+                "NOT_D5_ACCEPTANCE",
+                "NOT_DEPLOYMENT_AUTHORIZATION"
+            ]
+        );
+        assert!(!candidate.trust_model.independent_confirmation);
+        assert_eq!(
+            candidate.preparation.calculated_covenant_id,
+            "3a81b23246d64864e295fb5aa5e1cc36d45711fd402a602fb7ef765ec8d21b8a"
+        );
+        assert_eq!(
+            candidate.observed.covenant_id,
+            candidate.preparation.calculated_covenant_id
+        );
+        assert_eq!(
+            candidate.observed.outpoint.transaction_id,
+            signing_request.unsigned_transaction_id
+        );
+        assert_eq!(
+            candidate.preparation.funding_outpoint,
+            signing_request.funding_outpoint
+        );
+        assert_eq!(candidate.daa_depth, 200);
+        verify_d5_evidence_candidate(&candidate, &signing_request).unwrap();
+    }
+
+    #[test]
+    fn d5_candidate_stores_only_allowlisted_public_fields() {
+        let (signing_request, entry) = d5_inputs();
+        let candidate = build_d5_evidence_candidate(&signing_request, &entry, 467_580_000).unwrap();
+        let value = serde_json::to_value(&candidate).unwrap();
+        reject_secret_fields(&value, "$").unwrap();
+        let keys = |object: &Value| -> BTreeSet<String> {
+            object.as_object().unwrap().keys().cloned().collect()
+        };
+        assert_eq!(
+            keys(&value["observed"]),
+            [
+                "amount",
+                "block_daa_score",
+                "covenant_id",
+                "is_coinbase",
+                "outpoint",
+                "script_public_key",
+                "source"
+            ]
+            .into_iter()
+            .map(String::from)
+            .collect()
+        );
+        let text = serde_json::to_string(&candidate).unwrap();
+        for forbidden in [
+            signing_request.rpc_url.as_str(),
+            signing_request.deployer_address.as_str(),
+            signing_request.contract_address.as_str(),
+            signing_request.sighash_hex.as_str(),
+            "rpc_url",
+            "deployer_address",
+            "observed_at",
+            "\"headers\":",
+            "\"endpoint\":",
+        ] {
+            assert!(!text.contains(forbidden), "{forbidden} must not be stored");
+        }
+    }
+
+    #[test]
+    fn d5_candidate_rejects_observation_mismatches_and_missing_anchor() {
+        let (signing_request, _) = d5_inputs();
+        let txid = signing_request.unsigned_transaction_id.clone();
+        let value = signing_request.genesis_output_value;
+        let covenant = signing_request.covenant_id.clone();
+        let other = "44".repeat(32);
+        let cases = [
+            (
+                "missing anchor",
+                d5_entry(&signing_request, &txid, 0, value, None, false),
+                "no covenant id anchor",
+            ),
+            (
+                "observed id",
+                d5_entry(&signing_request, &txid, 0, value, Some(&other), false),
+                "observed covenant id",
+            ),
+            (
+                "outpoint txid",
+                d5_entry(&signing_request, &other, 0, value, Some(&covenant), false),
+                "observed outpoint",
+            ),
+            (
+                "outpoint index",
+                d5_entry(&signing_request, &txid, 1, value, Some(&covenant), false),
+                "observed outpoint",
+            ),
+            (
+                "value",
+                d5_entry(
+                    &signing_request,
+                    &txid,
+                    0,
+                    value + 1,
+                    Some(&covenant),
+                    false,
+                ),
+                "observed value",
+            ),
+            (
+                "coinbase",
+                d5_entry(&signing_request, &txid, 0, value, Some(&covenant), true),
+                "coinbase",
+            ),
+        ];
+        for (label, entry, expected) in cases {
+            let error = build_d5_evidence_candidate(&signing_request, &entry, 467_580_000)
+                .unwrap_err()
+                .to_string();
+            assert!(error.contains(expected), "{label}: {error}");
+        }
+        let mut entry = d5_entry(&signing_request, &txid, 0, value, Some(&covenant), false);
+        entry.utxo_entry.script_public_key = ScriptPublicKey::new(0, vec![0x51].into());
+        let error = build_d5_evidence_candidate(&signing_request, &entry, 467_580_000)
+            .unwrap_err()
+            .to_string();
+        assert!(error.contains("observed script"), "{error}");
+    }
+
+    #[test]
+    fn d5_candidate_rejects_funding_and_calculated_identity_substitution() {
+        let (signing_request, entry) = d5_inputs();
+        let mut substituted_funding = signing_request.clone();
+        substituted_funding.funding_outpoint.index += 1;
+        let error = build_d5_evidence_candidate(&substituted_funding, &entry, 467_580_000)
+            .unwrap_err()
+            .to_string();
+        assert!(error.contains("calculated covenant id"), "{error}");
+
+        let mut substituted_calculated = signing_request.clone();
+        substituted_calculated.covenant_id = "55".repeat(32);
+        let lookalike = d5_entry(
+            &signing_request,
+            &signing_request.unsigned_transaction_id,
+            0,
+            signing_request.genesis_output_value,
+            Some(&"55".repeat(32)),
+            false,
+        );
+        let error = build_d5_evidence_candidate(&substituted_calculated, &lookalike, 467_580_000)
+            .unwrap_err()
+            .to_string();
+        assert!(error.contains("calculated covenant id"), "{error}");
+
+        let mut bad_network = signing_request.clone();
+        bad_network.network_id = "not-a-network".to_string();
+        assert!(build_d5_evidence_candidate(&bad_network, &entry, 467_580_000).is_err());
+    }
+
+    #[test]
+    fn d5_candidate_rejects_tampering_and_status_upgrades() {
+        let (signing_request, entry) = d5_inputs();
+        let base = build_d5_evidence_candidate(&signing_request, &entry, 467_580_000).unwrap();
+
+        let mut tampered = base.clone();
+        tampered.observed.block_daa_score -= 1;
+        tampered.daa_depth += 1;
+        assert!(verify_d5_evidence_candidate(&tampered, &signing_request)
+            .unwrap_err()
+            .to_string()
+            .contains("snapshot hash"));
+
+        let mut tampered = base.clone();
+        tampered.observed_virtual_daa_score += 1;
+        tampered.daa_depth += 1;
+        assert!(verify_d5_evidence_candidate(&tampered, &signing_request)
+            .unwrap_err()
+            .to_string()
+            .contains("candidate hash"));
+
+        let mut tampered = base.clone();
+        tampered.daa_depth += 1;
+        rehash(&mut tampered);
+        assert!(verify_d5_evidence_candidate(&tampered, &signing_request).is_err());
+
+        let mut upgraded = base.clone();
+        upgraded.status = "CONFIRMED".to_string();
+        rehash(&mut upgraded);
+        assert!(verify_d5_evidence_candidate(&upgraded, &signing_request).is_err());
+
+        let mut upgraded = base.clone();
+        upgraded.trust_model.independent_confirmation = true;
+        rehash(&mut upgraded);
+        assert!(verify_d5_evidence_candidate(&upgraded, &signing_request).is_err());
+
+        let mut upgraded = base.clone();
+        upgraded.classification.pop();
+        rehash(&mut upgraded);
+        assert!(verify_d5_evidence_candidate(&upgraded, &signing_request).is_err());
+
+        let mut relabeled = base.clone();
+        relabeled.observed.source = "independent_explorer".to_string();
+        rehash(&mut relabeled);
+        assert!(verify_d5_evidence_candidate(&relabeled, &signing_request).is_err());
+
+        let mut swapped = base;
+        swapped.observed.covenant_id = "66".repeat(32);
+        swapped.preparation.calculated_covenant_id = "66".repeat(32);
+        rehash(&mut swapped);
+        assert!(verify_d5_evidence_candidate(&swapped, &signing_request)
+            .unwrap_err()
+            .to_string()
+            .contains("validated preparation context"));
+    }
+
+    #[test]
+    fn d5_candidate_json_rejects_unknown_duplicate_and_missing_fields() {
+        let (signing_request, entry) = d5_inputs();
+        let candidate = build_d5_evidence_candidate(&signing_request, &entry, 467_580_000).unwrap();
+        let mut value = serde_json::to_value(&candidate).unwrap();
+        let parsed: D5EvidenceCandidate = serde_json::from_value(value.clone()).unwrap();
+        verify_d5_evidence_candidate(&parsed, &signing_request).unwrap();
+
+        value["observed"]["rpc_url"] = Value::String("ws://127.0.0.1:17210".to_string());
+        assert!(serde_json::from_value::<D5EvidenceCandidate>(value.clone()).is_err());
+        value["observed"].as_object_mut().unwrap().remove("rpc_url");
+        value
+            .as_object_mut()
+            .unwrap()
+            .remove("observed_snapshot_sha256");
+        assert!(serde_json::from_value::<D5EvidenceCandidate>(value).is_err());
+
+        let text = serde_json::to_string(&candidate).unwrap();
+        let duplicated = text.replacen("\"status\":", "\"status\":\"CONFIRMED\",\"status\":", 1);
+        assert!(serde_json::from_str::<D5EvidenceCandidate>(&duplicated).is_err());
+    }
+
+    type ContextSubstitution = Box<dyn Fn(&mut SigningRequest)>;
+
+    fn recompute_context_covenant_id(context: &mut SigningRequest) {
+        context.covenant_id = genesis_covenant_id(
+            context.funding_outpoint.to_outpoint().unwrap(),
+            context.contract_output_index,
+            &TransactionOutput {
+                value: context.genesis_output_value,
+                script_public_key: context
+                    .contract_script_public_key
+                    .to_script_public_key()
+                    .unwrap(),
+                covenant: None,
+            },
+        )
+        .to_string();
+    }
+
+    /// Internally self-consistent candidate (observed fields and both hashes
+    /// recomputed) for a substituted context.
+    fn self_consistent_candidate(context: &SigningRequest) -> D5EvidenceCandidate {
+        let entry = d5_entry(
+            context,
+            &context.unsigned_transaction_id,
+            context.contract_output_index,
+            context.genesis_output_value,
+            Some(&context.covenant_id),
+            false,
+        );
+        build_d5_evidence_candidate(context, &entry, 467_580_000).unwrap()
+    }
+
+    #[test]
+    fn d5_candidate_rejects_impossible_daa_chronology() {
+        let (signing_request, entry) = d5_inputs();
+        let equal =
+            build_d5_evidence_candidate(&signing_request, &entry, entry.utxo_entry.block_daa_score)
+                .unwrap();
+        assert_eq!(equal.daa_depth, 0, "equal scores are a valid zero depth");
+        verify_d5_evidence_candidate(&equal, &signing_request).unwrap();
+
+        let error = build_d5_evidence_candidate(
+            &signing_request,
+            &entry,
+            entry.utxo_entry.block_daa_score - 1,
+        )
+        .unwrap_err()
+        .to_string();
+        assert!(
+            error.contains("above the observed virtual DAA score"),
+            "{error}"
+        );
+
+        let mut future = equal;
+        future.observed.block_daa_score = future.observed_virtual_daa_score + 1;
+        future.daa_depth = 0;
+        rehash(&mut future);
+        let error = verify_d5_evidence_candidate(&future, &signing_request)
+            .unwrap_err()
+            .to_string();
+        assert!(
+            error.contains("above the observed virtual DAA score"),
+            "{error}"
+        );
+
+        let mut altered =
+            build_d5_evidence_candidate(&signing_request, &entry, 467_580_000).unwrap();
+        altered.observed_virtual_daa_score -= 50;
+        altered.daa_depth -= 50;
+        rehash(&mut altered);
+        verify_d5_evidence_candidate(&altered, &signing_request).unwrap();
+        altered.observed.block_daa_score += 10;
+        rehash(&mut altered);
+        assert!(verify_d5_evidence_candidate(&altered, &signing_request)
+            .unwrap_err()
+            .to_string()
+            .contains("DAA depth"));
+    }
+
+    #[test]
+    fn d5_candidate_is_bound_to_the_validated_context() {
+        let (original, _) = d5_inputs();
+        let substitutions: Vec<(&str, ContextSubstitution)> = vec![
+            (
+                "network",
+                Box::new(|c| c.network_id = "mainnet".to_string()),
+            ),
+            (
+                "contract role",
+                Box::new(|c| c.contract_name = "RuleStorageState".to_string()),
+            ),
+            (
+                "request identity",
+                Box::new(|c| c.request_sha256 = "88".repeat(32)),
+            ),
+            (
+                "signing identity",
+                Box::new(|c| c.signing_request_sha256 = "99".repeat(32)),
+            ),
+            (
+                "funding outpoint",
+                Box::new(|c| {
+                    c.funding_outpoint.index += 1;
+                    recompute_context_covenant_id(c);
+                }),
+            ),
+            (
+                "expected deploy txid",
+                Box::new(|c| c.unsigned_transaction_id = "77".repeat(32)),
+            ),
+            (
+                "script",
+                Box::new(|c| {
+                    c.contract_script_public_key =
+                        ScriptSpec::from_script_public_key(&pay_to_script_hash_script(&[
+                            0x51, 0x51,
+                        ]));
+                    recompute_context_covenant_id(c);
+                }),
+            ),
+            (
+                "value",
+                Box::new(|c| {
+                    c.genesis_output_value += 1;
+                    recompute_context_covenant_id(c);
+                }),
+            ),
+        ];
+        for (label, substitute) in substitutions {
+            let mut context = original.clone();
+            substitute(&mut context);
+            let candidate = self_consistent_candidate(&context);
+            verify_d5_evidence_candidate(&candidate, &context).unwrap_or_else(|error| {
+                panic!("{label}: substitute must be self-consistent: {error}")
+            });
+            let error = verify_d5_evidence_candidate(&candidate, &original)
+                .unwrap_err()
+                .to_string();
+            assert!(
+                error.contains("validated preparation context"),
+                "{label}: {error}"
+            );
+        }
+
+        let matching = self_consistent_candidate(&original);
+        verify_d5_evidence_candidate(&matching, &original).unwrap();
+    }
+
+    #[test]
+    fn d5_candidate_enforces_fixed_genesis_output_index() {
+        let (original, _) = d5_inputs();
+        let mut context = original.clone();
+        context.contract_output_index = 1;
+        recompute_context_covenant_id(&mut context);
+        let entry = d5_entry(
+            &context,
+            &context.unsigned_transaction_id,
+            1,
+            context.genesis_output_value,
+            Some(&context.covenant_id),
+            false,
+        );
+        let error = build_d5_evidence_candidate(&context, &entry, 467_580_000)
+            .unwrap_err()
+            .to_string();
+        assert!(error.contains("fixed genesis output index"), "{error}");
+    }
+
+    /// Cross-language fixture: the Python D5 draft verifies the same bytes.
+    #[test]
+    fn d5_candidate_matches_cross_language_fixture() {
+        let (signing_request, entry) = d5_inputs();
+        let candidate = build_d5_evidence_candidate(&signing_request, &entry, 467_580_000).unwrap();
+        let fixture: D5EvidenceCandidate = serde_json::from_str(include_str!(
+            "../tests/fixtures/d5-evidence-candidate.synthetic.json"
+        ))
+        .unwrap();
+        assert_eq!(candidate, fixture);
+        verify_d5_evidence_candidate(&fixture, &signing_request).unwrap();
     }
 }

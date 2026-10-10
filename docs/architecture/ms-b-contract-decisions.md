@@ -146,3 +146,21 @@ by Codex):
 - SilverScript v1.0.0 adds stricter resource and initial-state validation; the
   bundle v2 port should target it once upstream aligns on a rusty-kaspa release
   (`.fleet/reports/a8u1-kaspa-silverscript-upgrade-inventory.md`).
+
+## Later Draft Implementation Checkpoint (2026-10-10)
+
+D1-D7 above remain proposals, not architecture/security/deployment acceptance.
+The isolated C2 integration preview preserves the delivered v2-draft instead
+of implementing the earlier prose literally. Current versioned attestation
+digests, proposal/session/instance binding and terminal outcomes are described
+in modules/contracts/silverc/README.md; older D1 nonce wording is not an ABI.
+
+In particular, D5 currently implements off-chain identity calculation and
+observed-only consistency, not embedded cross-contract IDs or runtime calls.
+There are no current contract trust edges/co-spend checks. Future embedded IDs
+require a reviewed concrete check and acyclic deployment policy; see
+[the D5 design](d5-genesis-binding-design.md) and
+[the unactivated K2 source model](d5-trusted-source-model.md).
+Python acceptance remains unconditionally closed, v2 non-promotable and Rust
+v1-pinned. Constructor/counter limits, governance-key topology, independent
+full review and the prospective Codex Security gate remain open.

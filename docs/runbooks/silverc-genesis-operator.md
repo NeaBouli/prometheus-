@@ -64,11 +64,18 @@ Changing the profile object, contract selection, or release-manifest binding
 invalidates the request hash and is rejected after rehashing as well.
 
 Prepare and verify the canary handoff only after building the deterministic
-release archive:
+historical archive with explicit bundle selection:
+
+```bash
+python3 scripts/smoke_silverc_artifacts.py --bundle h001-v1 \
+  --out-dir /tmp/prometheus-silverc-artifacts-h001-v1 \
+  --archive /tmp/prometheus-silverc-artifacts-h001-v1.tar.gz
+```
 
 ```bash
 python3 scripts/preflight_silverc_deploy.py \
-  --archive /tmp/prometheus-silverc-artifacts.tar.gz \
+  --archive /tmp/prometheus-silverc-artifacts-h001-v1.tar.gz \
+  --bundle h001-v1 \
   --deployment-profile testnet-10-validator-staking-h001 \
   --network testnet \
   --rpc-url kaspa-resolver://public \
@@ -76,7 +83,8 @@ python3 scripts/preflight_silverc_deploy.py \
   --plan-out /tmp/prometheus-h001-canary-preflight.json
 
 python3 scripts/build_silverc_deploy_requests.py \
-  --archive /tmp/prometheus-silverc-artifacts.tar.gz \
+  --archive /tmp/prometheus-silverc-artifacts-h001-v1.tar.gz \
+  --bundle h001-v1 \
   --deployment-profile testnet-10-validator-staking-h001 \
   --out-dir /tmp/prometheus-h001-canary-requests \
   --network testnet \
@@ -85,7 +93,8 @@ python3 scripts/build_silverc_deploy_requests.py \
   --request-set-out /tmp/prometheus-h001-canary-request-set.json
 
 python3 scripts/verify_silverc_deploy_requests.py \
-  --archive /tmp/prometheus-silverc-artifacts.tar.gz \
+  --archive /tmp/prometheus-silverc-artifacts-h001-v1.tar.gz \
+  --bundle h001-v1 \
   --request-set /tmp/prometheus-h001-canary-request-set.json \
   --requests-dir /tmp/prometheus-h001-canary-requests \
   --summary-out /tmp/prometheus-h001-canary-verification.json
