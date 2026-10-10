@@ -2119,3 +2119,9 @@ protected merge and live readback remain pending at this checkpoint; local
 target tests were not run. Public2026-10-09 status baseline and all rendered
 content, assets and runtime/contract/policy/acceptance gates are unchanged.
 No production readiness follows. Codex Security NOT CONNECTED/NOT RUN.
+
+
+## 2026-10-10 - CODEX - CI baseline configured, hosted verification pending
+- Eleven existing CI/Security runner selectors now explicitly ubuntu-24.04; new CiRegistrationTest covers both .yml/.yaml workflow jobs. No product/contract/source/toolchain/action pin, permissions, triggers, checks or rollout policy change. No new runtime module, Ubuntu26 remains a separate compatibility task; OS pin is not an immutable image lock.
+- Scoped parent YAML equality/AST PASS, exactly eleven labels changed; Ruff and git diff --check PASS. Actionlint unavailable/NOT RUN; target suites not executed locally. Hosted exact-head full CI/Security and normal protected PR still required. Source task/report retained under .fleet; MAP records this existing release-tooling hop.
+- README/public landing claims unaffected and retained. PR293 stays Draft; D1-D7/constructor/trust/security/D5/client/full rollout open. Claude paused, no expanded Kimi payload or duplicate work. Full rollout goal ACTIVE/NOT_COMPLETE.

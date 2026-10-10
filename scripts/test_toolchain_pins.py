@@ -528,6 +528,18 @@ class PolicyValidationTest(Fixture):
 
 
 class CiRegistrationTest(unittest.TestCase):
+    def test_all_workflow_jobs_pin_validated_runner_baseline(self) -> None:
+        import yaml  # type: ignore[import-untyped]
+
+        for path in sorted((REPO / ".github/workflows").iterdir()):
+            if path.suffix not in {".yml", ".yaml"}:
+                continue
+            jobs = yaml.safe_load(path.read_text(encoding="utf-8"))["jobs"]
+            self.assertTrue(jobs, path.name)
+            for name, job in jobs.items():
+                with self.subTest(workflow=path.name, job=name):
+                    self.assertEqual(job["runs-on"], "ubuntu-24.04")
+
     def test_workflow_parses_and_gates_rust_jobs(self) -> None:
         try:
             import yaml  # type: ignore[import-untyped]

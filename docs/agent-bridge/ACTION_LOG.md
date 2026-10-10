@@ -6122,3 +6122,9 @@ Rules for all dev agents:
 - Existing modules/web static metadata/discovery node only: manifest icon sizes now match both1024x1024 originals, Economics gets one development/illustrative/non-production ai-status and its Pages entry in llms.txt. Added three regressions; public content/layout/assets/baseline unchanged.
 - Actual parent-side scope/negative controls PASS after harness buffer/path corrections; Ruff and diff PASS. Repository-controlled local tests NOT RUN due isolation memory-limit blocker; actual relevant full hosted checks/publication still pending. No invented screenshots or local replay.
 - Codex sole writer, Claude paused (not outage). No secret, private audit detail, payload transfer, contract/pin/policy/tokenomics/chain/production/infrastructure action. Codex Security NOT CONNECTED/NOT RUN; all source/D1-D7/D5/client/full-security/rollout gates remain. Report records changed files and pending acceptance.
+
+
+## 2026-10-10 - CODEX - CI baseline configured, hosted verification pending
+- Eleven existing CI/Security runner selectors now explicitly ubuntu-24.04; new CiRegistrationTest covers both .yml/.yaml workflow jobs. No product/contract/source/toolchain/action pin, permissions, triggers, checks or rollout policy change. No new runtime module, Ubuntu26 remains a separate compatibility task; OS pin is not an immutable image lock.
+- Scoped parent YAML equality/AST PASS, exactly eleven labels changed; Ruff and git diff --check PASS. Actionlint unavailable/NOT RUN; target suites not executed locally. Hosted exact-head full CI/Security and normal protected PR still required. Source task/report retained under .fleet; MAP records this existing release-tooling hop.
+- README/public landing claims unaffected and retained. PR293 stays Draft; D1-D7/constructor/trust/security/D5/client/full rollout open. Claude paused, no expanded Kimi payload or duplicate work. Full rollout goal ACTIVE/NOT_COMPLETE.

@@ -699,3 +699,9 @@ Both runs require Gio budget approval (plan-level gate).
 - Active rollout goal unchanged. Sole writer Codex, Claude paused by owner assignment (not outage); PRM-31/45 modules/web metadata/discovery block claimed from this main. Three exact public gaps corrected, three existing-suite regressions added; parent-owned static scope and five adverse controls PASS, Ruff/diff PASS.
 - Public baseline2026-10-09, original icons/rendered content/styles/scripts/dates/ledger, contracts/pins/policies/tokenomics and all D5/security/rollout gates preserved. No duplicate worker, external payload, target-controlled local test, chain/production/infrastructure action. Hosted CI/PR/live publication pending, task In Progress.
 - Brief/report: .fleet/tasks/public-metadata-20261010.md and .fleet/reports/public-metadata-20261010.md. Next safe plan node after this task: remaining audit issue dispositions, then controlled v2 integration prerequisites; no gate bypass.
+
+
+## 2026-10-10 - CODEX - CI baseline configured, hosted verification pending
+- Eleven existing CI/Security runner selectors now explicitly ubuntu-24.04; new CiRegistrationTest covers both .yml/.yaml workflow jobs. No product/contract/source/toolchain/action pin, permissions, triggers, checks or rollout policy change. No new runtime module, Ubuntu26 remains a separate compatibility task; OS pin is not an immutable image lock.
+- Scoped parent YAML equality/AST PASS, exactly eleven labels changed; Ruff and git diff --check PASS. Actionlint unavailable/NOT RUN; target suites not executed locally. Hosted exact-head full CI/Security and normal protected PR still required. Source task/report retained under .fleet; MAP records this existing release-tooling hop.
+- README/public landing claims unaffected and retained. PR293 stays Draft; D1-D7/constructor/trust/security/D5/client/full rollout open. Claude paused, no expanded Kimi payload or duplicate work. Full rollout goal ACTIVE/NOT_COMPLETE.
