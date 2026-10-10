@@ -67,7 +67,9 @@ If your stake drops below 10,000 KAS after slashing, you are automatically deact
 
 ## Withdrawal
 
-The decided target is a 7-day cooldown (`6,048,000` blocks at 10 BPS), longer than the 1-day rule voting period so a validator cannot exit before its votes are settled. The current contract fixture still uses `COOLDOWN_BLOCKS = 100,800` (about 2.8 hours at 10 BPS); it changes only in the next reviewed contract-bundle revision, because the H-001 canary profile pins the current bundle manifest (audit PRM-35). Call `withdraw()` to initiate, then call again after the cooldown.
+Frozen historical h001-v1 retains a 100,800-count cooldown checked against caller-provided block_height, not consensus-enforced DAA. Unaccepted, non-promotable v2-draft uses 6,048,000 consensus DAA-score units via this.age. Nominally approximately 2.8 hours and 7 days, respectively, only assuming 10 count units/s for v1 and 10 DAA-score units/s for v2; not guaranteed wall-clock durations.
+
+The historical fixture is not fully deployed or production-ready. The draft does not replace the pinned v1 release or establish a new accepted contract duration; D1-D7 adoption, independent acceptance, activation and rollout remain gated. The fixture withdrawal sequence is to initiate a request, then complete it after the fixture-specific count or DAA-score condition; this is not a live-network operating instruction.
 
 ## Rewards
 

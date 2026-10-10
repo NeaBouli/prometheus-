@@ -6139,3 +6139,16 @@ Rules for all dev agents:
 - Native Codex source review41b301b: no blocking product findings. Actual CodeRabbit review5477386046: inherited expected-value variable can skip the child matrix. Separate child marker plus invalid CI parent sentinel prepared; only tests/CI invocation change, production/caller guards unchanged.
 - Existing architecture hop client runtime selection -> stub guard; bounded review repair, not a new module or permission. Existing owned archive restored and worktree moved to a unique follow-up path, original archive preserved. Fresh exact-head hosted checks and independent delta review required before normal protected PR295 merge.
 - Claude owner-paused; no Kimi payload or managed scan, no new paid review or chain/production action. Underlying v2, D5, constructor, key and rollout gates remain OPEN; full goal ACTIVE/NOT_COMPLETE.
+
+
+## 2026-10-10 - CODEX - M2 Cooldown Documentation Partial Delivery
+- Four named public surfaces clarify historical h001-v1 versus unaccepted/non-promotable v2-draft;100,800/6,048,000 consensus-score values remain, approximate2.8h/7d assumes10 score units/s rather than guaranteed wall time. No contract adoption or activation.
+- Immutable649e495 dedicated branch preserved; no source/config/fixture/pin/JS/CSS/assets/public-baseline changes or unmerged relative bundle links. Only bounded append-only coordination records and task report accompany the text patch.
+- Static checks PASS; all8 responsive changed-area images opened,7 cases PASS. Whitepaper390x844 changed text is clipped by the existing table; visual gate PARTIAL, repair outside CSS scope not attempted. Google Fonts not fetched; fallback-font-only local evidence.
+- Local worker server/browser handles closed; no repository tests/build, commits/push, hosted/provider/production action or private scan data. Core owns review, publication/backport and fresh hosted gates; no public deployment/main-adoption claim. Report .fleet/reports/v2-fixture-profile-clarity-20261010.md.
+
+## 2026-10-10 - CODEX - Same M2 Task Completed Under Core Amendment
+- Historical h001-v1 caller-provided block_height count is now explicitly distinct from v2-draft consensus DAA-score this.age. Retained100,800/6,048,000; nominal2.8h/7d only assumes10 respective units/s. Previous blanket score wording superseded, acceptance/activation limits unchanged.
+- Only authorized Whitepaper-local #validators responsive table CSS added, three lines; wrapping/fixed width preserves every cell and column. No shared CSS/JS/assets/source/fixture/pin/baseline change or unmerged public links.
+- Corrected local browser PASS8/8, all-cell clipping/scroll regression PASS, focus/navigation/contrast PASS. Eight fresh images opened; partial evidence preserved under original names, corrected/ adds final evidence. Worker scope OK; no public deployment/main adoption or hosted-CI claim.
+- Records/report append-only, same branch/base retained; local browser/server completed, temporary output removed. Core owns final semantic review/exact transplant, commit/push and fresh hosted/post-deploy gates; no new agent, target-code execution or remote action.
