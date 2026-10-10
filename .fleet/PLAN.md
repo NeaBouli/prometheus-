@@ -712,3 +712,8 @@ Both runs require Gio budget approval (plan-level gate).
 - Final imported source cohort:49 files byte-exact C2, two-line explicit D5 CI step plus one non-runtime-changing artifact-reader type annotation. Inherited strict finding reproduced then fixed; strict validator/helper check now PASS2 files, focused Ruff and parent source/exclusion/provenance/append-only checks PASS. No whole-workspace type-clean claim.
 - .fleet/source-manifests/v2-integration-preview-20261010.json pins all51 worker blobs and the two exact glue deltas; historical EOF exception retained. No additional contract/compiled-source/trust revision beyond delivered C2. Rust release pins unchanged; full review/main integration held.
 - Hosted exact-head full verification/Draft PR next; no unsafe local target execution, extra worker payload, duplicate dispatch or deployment. Initial checkpoint warnings above are historical; full goal remains ACTIVE/NOT_COMPLETE.
+
+## 2026-10-10 - CODEX - MS-B docs reconciliation submission
+- Existing M1/MS-B ADR -> contract README corrected from core conformance review: actual D1 context, D2 metadata/anchors, D4 trust, D5 closed off-chain status, D6 explicit units and D7 individual audit closure. Original29324980e6/29541b301b and main remain unchanged.
+- Docs-only stacked branch; no contract/fixture/source/compiled pin/runtime/workflow/policy/public-page change. Parent scope/semantics and final exact hosted CI/Security required; submission-time status partial, final receipt will supersede without documentation-only rerun churn.
+- Claude paused, pending Kimi reviews not outages; no new source transfer or activation. Full rollout goal ACTIVE/NOT_COMPLETE; dependent acceptance gates remain.
