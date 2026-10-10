@@ -33,3 +33,5 @@ amendment-tested-revision: 58d742aa7442ddc1663dbd9c3553e644bf0a7a2b; amended too
 pre-consolidation-harness-sha256: 6dadef86cfeef692487c9ddd155555f970fbad93da8b920312749384f0d6eca6; Core reports amended complete run34026 exit0/all9 cases66 assertions PASS, not a new owner run.
 consolidation-checks: node --check PASS; runtime body exact-equals reviewed superset (SHA2564233d4563d99ce60f3d8f29e2d2acc5e1e156fc329552d3c47855b2ae5edc015); Git/source pins/guards unchanged; no other scripts/CI callers; no browser rerun.
 next: Core owns committed-head/full CI/postmerge/live gate/adjudication and current sanitized evidence; no commit/push/external write/CI/deploy performed here.
+
+core: full code372ebfe993eb7a9691c1386f5a6a3ac75261bbd9 canonical run exit0, nine cases/66 assertions; all4 exact image hashes inspected/reused; sanitized browser-only snapshot qualified. Hosted CI/Security/normal merge/main/Pages recheck pending; no product/UI/SW change or archival fallback acceptance.

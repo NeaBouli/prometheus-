@@ -1,0 +1,708 @@
+{
+  "schema_version": 1,
+  "kind": "prometheus.pages.retirement.browser_evidence",
+  "date": "2026-10-10",
+  "status": "BROWSER_ASSERTIONS_PASS_ONLY",
+  "production_readiness": false,
+  "product_source_main": "58d742aa7442ddc1663dbd9c3553e644bf0a7a2b",
+  "tested_source_revision": "372ebfe993eb7a9691c1386f5a6a3ac75261bbd9",
+  "harness": {
+    "path": "scripts/browser_retired_service_worker_regression.mjs",
+    "sha256": "23831131ceef3a5d00c1288c6afb75aa0c382d96810d4408c4a2370afeb32cfa"
+  },
+  "classification": "loopback lifecycle fixtures plus exact public HTTP response replay",
+  "historical_live_install": "not inferred; counterfactual success is not deployed history",
+  "browser": {
+    "version": "154.0.8037.98",
+    "sandbox_enabled": true,
+    "fresh_nonpersistent_contexts": true
+  },
+  "sources": {
+    "historical_commit": "20e8531de5d39969a8c1fe32340d5411f7ab7af0",
+    "historical_sw_sha256": "7e45aadd9d4c1e36df9a74e035b92193bf840d8e78819cadf1bf22da1edc7399",
+    "retirement_sw_sha256": "e2821c24c190a8df9c8aff9582654554d0a6d68d8ecd35c9d5b79cb6a00f45a0",
+    "fonts": [
+      {
+        "status": 200,
+        "sha256": "4ee7f7d678281cb94b781c53485d1e6181fd165f37ba3c427e5eb29c29c5c9f7"
+      },
+      {
+        "status": 200,
+        "sha256": "2f29b31d803a928d21f96dbe7a5f8bfa5c5c98917736c2d195bc7c737bc906ba"
+      },
+      {
+        "status": 200,
+        "sha256": "ec926d5065eaca49a48f96e312bbae0bbc5733c24215cf5dfabbdccee926fef7"
+      },
+      {
+        "status": 200,
+        "sha256": "3e699ead1876244fa392243054ddefe7cf631b488438828a8a100731a22ab995"
+      },
+      {
+        "status": 200,
+        "sha256": "829aad32ab9525358de2a7ebc718d05a6b335e67421aad5e1e09cd1fa796af4e"
+      },
+      {
+        "status": 200,
+        "sha256": "5be2b984cdb8befc8ad1871d10f1aa8337f7d2bae3c6bf0ce720d0745ac1a8ec"
+      }
+    ]
+  },
+  "assertion_count": 66,
+  "cases": [
+    {
+      "name": "source-contract",
+      "pass": true,
+      "assertions": [
+        {
+          "name": "exact unchanged historical and retirement script pins",
+          "pass": true
+        },
+        {
+          "name": "current live files equal exact baseline",
+          "pass": true
+        },
+        {
+          "name": "index.html: no registration",
+          "pass": true
+        },
+        {
+          "name": "faq.html: no registration",
+          "pass": true
+        },
+        {
+          "name": "roadmap.html: no registration",
+          "pass": true
+        },
+        {
+          "name": "whitepaper.html: no registration",
+          "pass": true
+        },
+        {
+          "name": "guardian-economics.html: no registration",
+          "pass": true
+        },
+        {
+          "name": "googleaa2902079481c7a8.html: no registration",
+          "pass": true
+        },
+        {
+          "name": "homepage development and no-production status",
+          "pass": true
+        },
+        {
+          "name": "actual missing-root status includes 404",
+          "pass": true
+        }
+      ],
+      "states": {}
+    },
+    {
+      "name": "fresh-current-pages",
+      "pass": true,
+      "assertions": [
+        {
+          "name": "index.html: current bytes and no worker",
+          "pass": true
+        },
+        {
+          "name": "faq.html: current bytes and no worker",
+          "pass": true
+        },
+        {
+          "name": "roadmap.html: current bytes and no worker",
+          "pass": true
+        },
+        {
+          "name": "whitepaper.html: current bytes and no worker",
+          "pass": true
+        },
+        {
+          "name": "guardian-economics.html: current bytes and no worker",
+          "pass": true
+        },
+        {
+          "name": "googleaa2902079481c7a8.html: current bytes and no worker",
+          "pass": true
+        }
+      ],
+      "states": {}
+    },
+    {
+      "name": "fresh-retirement",
+      "pass": true,
+      "assertions": [
+        {
+          "name": "only exact historical cache removed",
+          "pass": true
+        },
+        {
+          "name": "foreign and near-match cache bytes preserved",
+          "pass": true
+        },
+        {
+          "name": "actual reload releases controller and registration",
+          "pass": true
+        },
+        {
+          "name": "current online bytes, not stale own cache",
+          "pass": true
+        },
+        {
+          "name": "offline current navigation unsupported, no stale response",
+          "pass": true
+        },
+        {
+          "name": "online recovery exact current bytes with no own cache or worker",
+          "pass": true
+        }
+      ],
+      "states": {
+        "install": {
+          "transitions": [
+            "installing",
+            "installed",
+            "activating",
+            "redundant"
+          ],
+          "final": "redundant"
+        },
+        "after_retirement": {
+          "registrations": 0,
+          "controller": null,
+          "caches": [
+            "other-project-v1",
+            "prometheus-v1-extra",
+            "prometheus-v10",
+            "prometheus-v2",
+            "workbox-precache-v2",
+            "x-prometheus-v1"
+          ]
+        },
+        "after_reload": {
+          "registrations": 0,
+          "controller": null,
+          "caches": [
+            "other-project-v1",
+            "prometheus-v1-extra",
+            "prometheus-v10",
+            "prometheus-v2",
+            "workbox-precache-v2",
+            "x-prometheus-v1"
+          ]
+        },
+        "recovered": {
+          "registrations": 0,
+          "controller": null,
+          "caches": [
+            "other-project-v1",
+            "prometheus-v1-extra",
+            "prometheus-v10",
+            "prometheus-v2",
+            "workbox-precache-v2",
+            "x-prometheus-v1"
+          ]
+        }
+      }
+    },
+    {
+      "name": "legacy-update-counterfactual",
+      "pass": true,
+      "assertions": [
+        {
+          "name": "historical worker genuinely activated",
+          "pass": true
+        },
+        {
+          "name": "historical precache present before foreign seeding",
+          "pass": true
+        },
+        {
+          "name": "historical worker controls reload",
+          "pass": true
+        },
+        {
+          "name": "legacy offline cache-first negative control",
+          "pass": true
+        },
+        {
+          "name": "only exact historical cache removed",
+          "pass": true
+        },
+        {
+          "name": "foreign and near-match cache bytes preserved",
+          "pass": true
+        },
+        {
+          "name": "actual reload releases controller and registration",
+          "pass": true
+        },
+        {
+          "name": "current online bytes, not stale own cache",
+          "pass": true
+        },
+        {
+          "name": "offline current navigation unsupported, no stale response",
+          "pass": true
+        },
+        {
+          "name": "online recovery exact current bytes with no own cache or worker",
+          "pass": true
+        }
+      ],
+      "states": {
+        "install": {
+          "transitions": [
+            "installing",
+            "installed",
+            "activating",
+            "activated"
+          ],
+          "final": "activated"
+        },
+        "update": {
+          "transitions": [
+            "installing",
+            "installed",
+            "activating",
+            "activated"
+          ],
+          "final": "activated"
+        },
+        "after_install": {
+          "registrations": 1,
+          "controller": null,
+          "caches": [
+            "prometheus-v1"
+          ]
+        },
+        "after_retirement": {
+          "registrations": 0,
+          "controller": "activated",
+          "caches": [
+            "other-project-v1",
+            "prometheus-v1-extra",
+            "prometheus-v10",
+            "prometheus-v2",
+            "workbox-precache-v2",
+            "x-prometheus-v1"
+          ]
+        },
+        "after_reload": {
+          "registrations": 0,
+          "controller": null,
+          "caches": [
+            "other-project-v1",
+            "prometheus-v1-extra",
+            "prometheus-v10",
+            "prometheus-v2",
+            "workbox-precache-v2",
+            "x-prometheus-v1"
+          ]
+        },
+        "recovered": {
+          "registrations": 0,
+          "controller": null,
+          "caches": [
+            "other-project-v1",
+            "prometheus-v1-extra",
+            "prometheus-v10",
+            "prometheus-v2",
+            "workbox-precache-v2",
+            "x-prometheus-v1"
+          ]
+        }
+      }
+    },
+    {
+      "name": "legacy-realistic-missing-root",
+      "pass": true,
+      "assertions": [
+        {
+          "name": "unmodified historical install becomes redundant",
+          "pass": true
+        },
+        {
+          "name": "missing root fetched with actual public 404",
+          "pass": true
+        },
+        {
+          "name": "no active registration or controller after failed installation",
+          "pass": true
+        },
+        {
+          "name": "failed addAll retained no precache responses",
+          "pass": true
+        }
+      ],
+      "states": {
+        "install": {
+          "transitions": [
+            "installing",
+            "redundant"
+          ],
+          "final": "redundant"
+        },
+        "state": {
+          "registrations": 0,
+          "controller": null,
+          "caches": [
+            "prometheus-v1"
+          ]
+        }
+      }
+    },
+    {
+      "name": "homepage-1440x1000",
+      "pass": true,
+      "assertions": [
+        {
+          "name": "no horizontal overflow or clipped homepage heading",
+          "pass": true
+        },
+        {
+          "name": "actual existing font families loaded",
+          "pass": true
+        },
+        {
+          "name": "homepage heading, copy and actions do not overlap",
+          "pass": true
+        },
+        {
+          "name": "existing images render",
+          "pass": true
+        },
+        {
+          "name": "visible current no-production status",
+          "pass": true
+        },
+        {
+          "name": "no page exceptions",
+          "pass": true
+        },
+        {
+          "name": "no registration/controller",
+          "pass": true
+        }
+      ],
+      "states": {}
+    },
+    {
+      "name": "homepage-1180x820",
+      "pass": true,
+      "assertions": [
+        {
+          "name": "no horizontal overflow or clipped homepage heading",
+          "pass": true
+        },
+        {
+          "name": "actual existing font families loaded",
+          "pass": true
+        },
+        {
+          "name": "homepage heading, copy and actions do not overlap",
+          "pass": true
+        },
+        {
+          "name": "existing images render",
+          "pass": true
+        },
+        {
+          "name": "visible current no-production status",
+          "pass": true
+        },
+        {
+          "name": "no page exceptions",
+          "pass": true
+        },
+        {
+          "name": "no registration/controller",
+          "pass": true
+        }
+      ],
+      "states": {}
+    },
+    {
+      "name": "homepage-820x1180",
+      "pass": true,
+      "assertions": [
+        {
+          "name": "no horizontal overflow or clipped homepage heading",
+          "pass": true
+        },
+        {
+          "name": "actual existing font families loaded",
+          "pass": true
+        },
+        {
+          "name": "homepage heading, copy and actions do not overlap",
+          "pass": true
+        },
+        {
+          "name": "existing images render",
+          "pass": true
+        },
+        {
+          "name": "visible current no-production status",
+          "pass": true
+        },
+        {
+          "name": "no page exceptions",
+          "pass": true
+        },
+        {
+          "name": "no registration/controller",
+          "pass": true
+        }
+      ],
+      "states": {}
+    },
+    {
+      "name": "homepage-390x844",
+      "pass": true,
+      "assertions": [
+        {
+          "name": "no horizontal overflow or clipped homepage heading",
+          "pass": true
+        },
+        {
+          "name": "actual existing font families loaded",
+          "pass": true
+        },
+        {
+          "name": "homepage heading, copy and actions do not overlap",
+          "pass": true
+        },
+        {
+          "name": "existing images render",
+          "pass": true
+        },
+        {
+          "name": "visible current no-production status",
+          "pass": true
+        },
+        {
+          "name": "no page exceptions",
+          "pass": true
+        },
+        {
+          "name": "no registration/controller",
+          "pass": true
+        },
+        {
+          "name": "mobile navigation opens",
+          "pass": true
+        },
+        {
+          "name": "mobile navigation closes",
+          "pass": true
+        }
+      ],
+      "states": {}
+    }
+  ],
+  "public_resources": [
+    {
+      "resource": "index.html",
+      "status": 200,
+      "sha256": "915afe286b039573b3e19b33969249d696020c9938c08f972360dc3f8a86fc4f",
+      "equals_baseline": true,
+      "equals_exact_git_blob": true,
+      "local_git_blob_sha256": "915afe286b039573b3e19b33969249d696020c9938c08f972360dc3f8a86fc4f"
+    },
+    {
+      "resource": "faq.html",
+      "status": 200,
+      "sha256": "37f0ee1621243373dff1b23a3e41d27440bab96835f61ed0c8fbafdf91571cd9",
+      "equals_baseline": true,
+      "equals_exact_git_blob": true,
+      "local_git_blob_sha256": "37f0ee1621243373dff1b23a3e41d27440bab96835f61ed0c8fbafdf91571cd9"
+    },
+    {
+      "resource": "roadmap.html",
+      "status": 200,
+      "sha256": "a21b1795e04172d28dab85735f9da65e24718c28c71e7bbf91800b414b03b050",
+      "equals_baseline": true,
+      "equals_exact_git_blob": true,
+      "local_git_blob_sha256": "a21b1795e04172d28dab85735f9da65e24718c28c71e7bbf91800b414b03b050"
+    },
+    {
+      "resource": "whitepaper.html",
+      "status": 200,
+      "sha256": "0904070c924e73830a32e62dc71e379397d0c0a05eea82b120bef3fb02b50d41",
+      "equals_baseline": true,
+      "equals_exact_git_blob": true,
+      "local_git_blob_sha256": "0904070c924e73830a32e62dc71e379397d0c0a05eea82b120bef3fb02b50d41"
+    },
+    {
+      "resource": "guardian-economics.html",
+      "status": 200,
+      "sha256": "249da9928beb66f4a7b6c83569ccc06325983a9f3c6398b209681dc0982f2512",
+      "equals_baseline": true,
+      "equals_exact_git_blob": true,
+      "local_git_blob_sha256": "249da9928beb66f4a7b6c83569ccc06325983a9f3c6398b209681dc0982f2512"
+    },
+    {
+      "resource": "googleaa2902079481c7a8.html",
+      "status": 200,
+      "sha256": "0712b96d036bbf28751850ab492ee8190a682e6b1fdf2517afa7e74fac44c437",
+      "equals_baseline": true,
+      "equals_exact_git_blob": true,
+      "local_git_blob_sha256": "0712b96d036bbf28751850ab492ee8190a682e6b1fdf2517afa7e74fac44c437"
+    },
+    {
+      "resource": "sw.js",
+      "status": 200,
+      "sha256": "e2821c24c190a8df9c8aff9582654554d0a6d68d8ecd35c9d5b79cb6a00f45a0",
+      "equals_baseline": true,
+      "equals_exact_git_blob": true,
+      "local_git_blob_sha256": "e2821c24c190a8df9c8aff9582654554d0a6d68d8ecd35c9d5b79cb6a00f45a0"
+    },
+    {
+      "resource": "assets/site.css",
+      "status": 200,
+      "sha256": "6c7bcb1791cfa14c0685178b00d79d6f0af8d93551e8987ca3da6552bcd91cf1",
+      "equals_baseline": true,
+      "equals_exact_git_blob": true,
+      "local_git_blob_sha256": "6c7bcb1791cfa14c0685178b00d79d6f0af8d93551e8987ca3da6552bcd91cf1"
+    },
+    {
+      "resource": "manifest.json",
+      "status": 200,
+      "sha256": "f626f212a3a4433e13bd7845271c2000a4973ce5963625821ced9cff2511cda7",
+      "equals_baseline": true,
+      "equals_exact_git_blob": true,
+      "local_git_blob_sha256": "f626f212a3a4433e13bd7845271c2000a4973ce5963625821ced9cff2511cda7"
+    },
+    {
+      "resource": "logo/Prometheus-96.png",
+      "status": 200,
+      "sha256": "788408be929b0fe70e1f55daadd0aa2f7a5e5c90a5f5f623e8fb50879e36660f",
+      "equals_baseline": true,
+      "equals_exact_git_blob": true,
+      "local_git_blob_sha256": "788408be929b0fe70e1f55daadd0aa2f7a5e5c90a5f5f623e8fb50879e36660f"
+    },
+    {
+      "resource": "logo/Prometheus-880.png",
+      "status": 200,
+      "sha256": "74b5408604bb0564a81139ee9418772fc184749cb4b9b945da77acc688a455c7",
+      "equals_baseline": true,
+      "equals_exact_git_blob": true,
+      "local_git_blob_sha256": "74b5408604bb0564a81139ee9418772fc184749cb4b9b945da77acc688a455c7"
+    },
+    {
+      "resource": "logo/kas_coin-128.png",
+      "status": 200,
+      "sha256": "2aa8a6a9f6033767b05cf19bf27a600a119b69b13ecf14eae635dc03ecd55cf1",
+      "equals_baseline": true,
+      "equals_exact_git_blob": true,
+      "local_git_blob_sha256": "2aa8a6a9f6033767b05cf19bf27a600a119b69b13ecf14eae635dc03ecd55cf1"
+    },
+    {
+      "resource": "logo/prom_coin-128.png",
+      "status": 200,
+      "sha256": "464e5e33a503d2fb59b8401b0eb885a373fadeb36be690d28271a89d2f3b16ee",
+      "equals_baseline": true,
+      "equals_exact_git_blob": true,
+      "local_git_blob_sha256": "464e5e33a503d2fb59b8401b0eb885a373fadeb36be690d28271a89d2f3b16ee"
+    },
+    {
+      "resource": "historical-root:/",
+      "status": 404,
+      "sha256": "70d613e3acfba24fd2876fcbacaf639e1e111ef4d54baf70761c47673f37d6a3"
+    },
+    {
+      "resource": "historical-root:/index.html",
+      "status": 404,
+      "sha256": "70d613e3acfba24fd2876fcbacaf639e1e111ef4d54baf70761c47673f37d6a3"
+    },
+    {
+      "resource": "historical-root:/faq.html",
+      "status": 404,
+      "sha256": "70d613e3acfba24fd2876fcbacaf639e1e111ef4d54baf70761c47673f37d6a3"
+    },
+    {
+      "resource": "historical-root:/roadmap.html",
+      "status": 404,
+      "sha256": "70d613e3acfba24fd2876fcbacaf639e1e111ef4d54baf70761c47673f37d6a3"
+    },
+    {
+      "resource": "historical-root:/whitepaper.html",
+      "status": 404,
+      "sha256": "70d613e3acfba24fd2876fcbacaf639e1e111ef4d54baf70761c47673f37d6a3"
+    },
+    {
+      "resource": "historical-root:/logo/Prometheus.png",
+      "status": 404,
+      "sha256": "70d613e3acfba24fd2876fcbacaf639e1e111ef4d54baf70761c47673f37d6a3"
+    },
+    {
+      "resource": "historical-root:/sitemap.xml",
+      "status": 404,
+      "sha256": "70d613e3acfba24fd2876fcbacaf639e1e111ef4d54baf70761c47673f37d6a3"
+    },
+    {
+      "resource": "historical-root:/llms.txt",
+      "status": 404,
+      "sha256": "70d613e3acfba24fd2876fcbacaf639e1e111ef4d54baf70761c47673f37d6a3"
+    }
+  ],
+  "screenshots": [
+    {
+      "filename": "homepage-1440x1000.png",
+      "sha256": "a4e39e250a5f48708afa9e4e273da8b06a9b4e23f87b83c539650c1f424a5972",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "classification": "current public HTTP replay, fresh isolated Chrome",
+      "inspected": true,
+      "inspection": "Core opened exact hash or reused the same previously inspected bitmap hash"
+    },
+    {
+      "filename": "homepage-1180x820.png",
+      "sha256": "e0365970897ce8b0f9e5eb94a46c43b080bb49ca2cc956c3e4122cff742ac4bc",
+      "viewport": [
+        1180,
+        820
+      ],
+      "classification": "current public HTTP replay, fresh isolated Chrome",
+      "inspected": true,
+      "inspection": "Core opened exact hash or reused the same previously inspected bitmap hash"
+    },
+    {
+      "filename": "homepage-820x1180.png",
+      "sha256": "16460a73e3383c520d31cf021f6ab32ea01f5d098c47eff17d2666d2a3d11a76",
+      "viewport": [
+        820,
+        1180
+      ],
+      "classification": "current public HTTP replay, fresh isolated Chrome",
+      "inspected": true,
+      "inspection": "Core opened exact hash or reused the same previously inspected bitmap hash"
+    },
+    {
+      "filename": "homepage-390x844.png",
+      "sha256": "2fc5efbfb6217597d0c8b7a790a23ccddf2e17e0e2ea4f016c7cf2deecefcf6f",
+      "viewport": [
+        390,
+        844
+      ],
+      "classification": "current public HTTP replay, fresh isolated Chrome",
+      "inspected": true,
+      "inspection": "Core opened exact hash or reused the same previously inspected bitmap hash"
+    }
+  ],
+  "negative_controls": {
+    "legacy_offline_stale_response_witnessed": true,
+    "real_missing_root_install_rejected": true,
+    "earlier_harness_failures_retained_separately": true,
+    "no_current_product_bug_inferred": true
+  },
+  "limits": [
+    "Real browser with exact public HTTP response replay, not direct browser transport or deployed historical-user proof",
+    "Legacy successful install has explicitly counterfactual root availability; historical JavaScript unchanged",
+    "Independent archival-history fallback remains OPEN; no chain-history evidence supplied",
+    "No v2, full-security, protocol or production acceptance"
+  ]
+}
