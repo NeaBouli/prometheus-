@@ -249,3 +249,23 @@ mindmap
       open: mobile (Flutter), Tauri UI
       open: GH-258/261 endpoint detection (observe -> warn -> contain)
 ```
+
+2026-10-10 GH275 browser status (main58d742a, owner-local, partial): existing
+`modules/web` / public-web -> historical registration/sw.js -> CacheStorage ->
+retirement activate/exact-name cleanup/unregister -> actual reload hop tested
+with fresh sandboxed Chrome154 and a narrow harness (66 assertions, nine cases).
+Historical JS20e8531 unchanged; successful installation is explicitly a
+counterfactual root-availability fixture, while actual public root404 replay
+independently rejects installation. Current public HTTP replay matches baseline;
+no historical live installation or release acceptance is inferred. Evidence:
+`docs/evidence/gh-275-browser-retirement-2026-10-10.json`. Core CI/security/live
+and independent archival-history gates remain open; product source unchanged.
+
+2026-10-10 GH275 same-hop consolidation: the original separate-helper deviation
+is corrected under Core's explicit scope amendment. Sole canonical test entry:
+`scripts/browser_retired_service_worker_regression.mjs`; amended superset runtime,
+source pins, Git guards and cases unchanged, authored untracked helper removed.
+Core reports amended run34026 exit0/all9 cases66 assertions PASS; consolidation
+has syntax/exact-body/Git checks only, no additional browser run. Captured
+historical repro/negative observations remain immutable; Core owns current
+sanitized evidence and committed-head/CI/postmerge acceptance. No product change.
