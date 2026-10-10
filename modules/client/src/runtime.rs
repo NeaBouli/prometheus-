@@ -24,8 +24,8 @@ pub enum RuntimeMode {
 impl RuntimeMode {
     /// Read the current runtime mode from `PROMETHEUS_RUNTIME`.
     ///
-    /// Unknown or missing values fall back to development mode so existing local
-    /// tests remain deterministic and offline.
+    /// Missing, invalid, or unreadable values use the restrictive Beta policy;
+    /// only an explicit Development selection permits security-critical stubs.
     pub fn from_env() -> Self {
         Self::parse(&env::var(RUNTIME_MODE_ENV).unwrap_or_default())
     }
@@ -41,9 +41,9 @@ impl RuntimeMode {
             .and_then(Self::try_parse)
     }
 
-    /// Parse a runtime mode string, falling back to development.
+    /// Parse a runtime mode string, falling back to the restrictive Beta policy.
     pub fn parse(value: &str) -> Self {
-        Self::try_parse(value).unwrap_or(Self::Development)
+        Self::try_parse(value).unwrap_or(Self::Beta)
     }
 
     /// Strictly parse a runtime mode string; empty or unknown values are `None`.
@@ -86,9 +86,57 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_parse_default_mode_as_development() {
-        assert_eq!(RuntimeMode::parse(""), RuntimeMode::Development);
+    fn test_parse_missing_and_invalid_modes_fail_closed() {
+        for value in ["", "unknown", "dev", " development", "development\n"] {
+            let mode = RuntimeMode::parse(value);
+            assert_eq!(mode, RuntimeMode::Beta);
+            assert!(require_stub_allowed_for(mode, "test component").is_err());
+        }
         assert_eq!(RuntimeMode::parse("development"), RuntimeMode::Development);
+    }
+
+    #[test]
+    fn test_env_selection_and_stub_gate_in_isolated_processes() {
+        const EXPECTED: &str = "PROMETHEUS_RUNTIME_TEST_EXPECTED";
+        if let Ok(expected) = env::var(EXPECTED) {
+            assert_eq!(format!("{:?}", RuntimeMode::from_env()), expected);
+            assert_eq!(
+                require_stub_allowed("test component").is_ok(),
+                expected == "Development"
+            );
+            return;
+        }
+        for (value, expected) in [
+            (None, "Beta"),
+            (Some(""), "Beta"),
+            (Some("unknown"), "Beta"),
+            (Some("development"), "Development"),
+            (Some("beta"), "Beta"),
+            (Some("mainnet"), "Mainnet"),
+        ] {
+            let mut command =
+                std::process::Command::new(env::current_exe().expect("test executable"));
+            command
+                .args([
+                    "--exact",
+                    "runtime::tests::test_env_selection_and_stub_gate_in_isolated_processes",
+                ])
+                .env(EXPECTED, expected);
+            match value {
+                Some(value) => {
+                    command.env(RUNTIME_MODE_ENV, value);
+                }
+                None => {
+                    command.env_remove(RUNTIME_MODE_ENV);
+                }
+            }
+            let output = command.output().expect("isolated runtime test");
+            assert!(output.status.success(), "isolated runtime selection failed");
+            assert!(
+                String::from_utf8_lossy(&output.stdout).contains("1 passed"),
+                "child must run the selected test"
+            );
+        }
     }
 
     #[test]
