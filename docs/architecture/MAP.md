@@ -76,7 +76,7 @@ Sibling built flows (same modules, drawn in `map.puml`):
 | Modul | Eine Aufgabe | Einstieg | Stand |
 | --- | --- | --- | --- |
 | `modules/client` (CLI, wRPC, rule sync, hint submit) | Light Client: Kaspa wRPC connection, RuleStorage sync, dev scanner, ThreatHint v1/v2 senders, miner companion | `modules/client/src/main.rs::Cli` | built (Development/Testnet-10 boundaries only) |
-| `modules/client` AI + ZK stubs | Phi-3 detection, Fed-DART, client proofs | `client/src/ai/phi3.rs`, `ai/detection.rs`, `ai/federated.rs`, `network/zk_proof.rs` | partial (fail-closed stubs, rejected under `PROMETHEUS_RUNTIME=beta/mainnet`); real inference/proving: open |
+| `modules/client` AI + ZK stubs | Phi-3 detection, Fed-DART, client proofs | `client/src/ai/phi3.rs`, `ai/detection.rs`, `ai/federated.rs`, `network/zk_proof.rs` | partial (stubs require explicit Development; missing/invalid selection uses restrictive Beta, not deployment authority); real inference/proving: open |
 | `modules/client` dev scanner | Bounded custom byte-pattern matching | `client/src/security/scanner.rs::YaraScanner` | partial (built as dev tool; not a YARA engine; production scan engine: open) |
 | `modules/guardian-p2p` | Opaque ballot + ThreatHint v1/v2 transport, persistent identity, relay/AutoNAT, operated sidecar | `modules/guardian-p2p/src/lib.rs::GuardianP2p`, `src/main.rs::Cli` | built (same-host + one controlled two-host run); public multi-host: blocked |
 | `modules/guardian-node` hint pipeline (jaeger) | Verifier ingress, replay/outbox durability, v1 adapter, v2 promotion/acceptance/worker | `jaeger/threat_hint_service.py::main`, `jaeger/threat_hint_v2_acceptance.py` | built (local, fail-closed); production proof acceptance: blocked; actionable analysis: open |

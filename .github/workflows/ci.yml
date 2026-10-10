@@ -2461,7 +2461,13 @@ jobs:
           cargo test -p prometheus-client --lib network::p2p
           cargo test -p prometheus-client --test threat_hint_v2_p2p_loopback
           cargo test -p prometheus-client --test threat_hint_p2p_loopback
+      - name: Verify fail-closed runtime selection (GH282)
+        env:
+          PROMETHEUS_RUNTIME_TEST_EXPECTED: parent-sentinel-not-a-runtime
+        run: cargo test -p prometheus-client --lib runtime::tests -- --nocapture
       - name: Tests
+        env:
+          PROMETHEUS_RUNTIME: development
         run: cargo test --workspace
         timeout-minutes: 30
 
@@ -2478,6 +2484,8 @@ jobs:
       - uses: dtolnay/rust-toolchain@46817827a5bfabe028bf34e1cce71fd40e2ff697 # 1.95.0
       - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2
       - name: Commitment Build Release Performance Gate
+        env:
+          PROMETHEUS_RUNTIME: development
         run: >-
           cargo test --release --locked -p prometheus-client --test performance
           test_commitment_build_performance_budget -- --exact

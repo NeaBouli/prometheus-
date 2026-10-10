@@ -33,6 +33,11 @@ Public project status was reviewed through 2026-10-09. The immutable claim-audit
 
 Commands below exercise development components, not a production threat-intelligence network. See the [October claim reconciliation](docs/claim-reconciliation-2026-10-09.md) for exact evidence and remaining gates.
 
+Select `PROMETHEUS_RUNTIME=development` explicitly for local development.
+Missing, empty, invalid or unreadable values forbid security-critical stubs;
+the restrictive Beta fallback is not deployment authorization. Commands with
+explicit-profile requirements still reject missing or invalid configuration.
+
 | Development component | Target hardware | Command |
 |-----------|----------|---------|
 | **Light Client foundation** | Development host; explicitly select the development profile | `PROMETHEUS_RUNTIME=development cargo run -p prometheus-client` |
