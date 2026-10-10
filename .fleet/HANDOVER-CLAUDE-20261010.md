@@ -17,6 +17,9 @@ Gio authorized Claude as temporary local orchestrator because Codex's token allo
 ## Done (Claude, 2026-10-10)
 - ACK + claim; #276 readiness queue aligned (issuecomment-6100848279); brief
   .fleet/tasks/msb-constructor-semantics-review.md.
+- msb-constructor-semantics-review DONE (analysis only): private report
+  ~/Documents/Codex/prometheus-constructor-semantics-review-20261010.md (0600, sha256 a3615991…779c),
+  all 86 slots; public generic summary #276 issuecomment-6101001254. No contract/pin change.
 
 ## Open / waiting
 - Gio: constructor counter bounds + key topology, D1-D7 adoption, D5 trusted-source choice,
@@ -24,6 +27,11 @@ Gio authorized Claude as temporary local orchestrator because Codex's token allo
 - Review owed: complete v2 security acceptance at one agreed exact head.
 - Disk ~1 GB free: no builds until space returns.
 
-## Next (Claude)
-1. msb-constructor-semantics-review (analysis/doc only).
+## Gio instruction 2026-10-10 (evening)
+- Codex app closed / Codex paused. Claude works with its Claude Code terminal partners and Kimi 3
+  (fully included from the next block). Pause before the next task block until Gio reactivates.
+
+## Next (after reactivation)
+1. Genesis checklist (machine-checkable, repo-only) from the constructor findings — candidate for Kimi.
 2. #275 archival-fallback feasibility (read-only).
+3. Owner decisions unchanged (see Open).
