@@ -2941,3 +2941,30 @@ inherited strict finding, runtime unchanged. Scoped strict two-file check and
 Ruff PASS. Source manifest pins all51 worker blobs with explicit CI/type glue;
 49 unchanged, historical EOF preserved. This is not a whole-workspace type
 claim, independent review or v2/D5/main-integration acceptance.
+
+## 2026-10-10 - M2-DOC-V1-V2-COOLDOWN Local Documentation Checkpoint
+
+- Four public documentation surfaces distinguish frozen historical h001-v1
+  (100,800 consensus-score units) from unaccepted, non-promotable v2-draft
+  (6,048,000). Approximate 2.8-hour/7-day equivalents assume 10 score units/s;
+  no guaranteed wall clock, new accepted duration or D1-D7 adoption follows.
+- Static literals/arithmetic, unchanged inline JS/CSS and assets checks pass.
+  Local sandboxed responsive review inspected all eight changed-area images;
+  seven cases pass, whitepaper.html at 390x844 clips text in the existing table.
+  Status PARTIAL; CSS/source/pins/baseline untouched, hosted gates with Core.
+- No private scan payload, security reassessment, deployment or main-adoption
+  claim. Report: .fleet/reports/v2-fixture-profile-clarity-20261010.md.
+
+## 2026-10-10 - M2 Core-Amended Local Completion
+
+- Supersedes the preceding blanket units claim: frozen h001-v1 checks a
+  caller-provided block_height count against100,800, not consensus-enforced
+  DAA. Unaccepted/non-promotable v2-draft checks this.age against6,048,000
+  consensus DAA-score units. Nominal2.8h/7d assumes10 respective units/s.
+- Core-authorized three-line inline CSS addition only scopes the Whitepaper
+  validator table below900px; fixed width/wrapping, all content preserved.
+  Shared CSS/JS/assets, source/pins/baseline remain unchanged. Eight corrected
+  responsive cases PASS; all fresh images opened. Mobile table342px with two
+  visible columns and no horizontal scroll/clipping; old evidence retained.
+- Worker scope OK, no publication/main adoption or contract acceptance.
+  Hosted and post-deploy gates remain Core-owned; report addendum records limits.
