@@ -31,3 +31,5 @@ architecture: MAP M1/MS-B contracts -> frozen registry -> keyless deployer -> ob
 - Core reviews Stage 2 and commits; full independent acceptance/source/D1-D7/constructor/client/Codex Security/rollout holds unchanged, D5 closed and v2 non-promotable.
 - Local hooks disabled only for merge to avoid repository execution; hosted CI/protection never disabled. No worker commit/push/tests/build/install/CI/nesting/network/provider/host/wallet/deployment action.
 - Resolved staged index/MERGE_HEAD retained for Core; no disposable output created or cleanup needed.
+
+Core Stage-2 review PASS: both exact coordination unions;320 retained source/UI/CI blobs; both reviewed documentation blobs exact. Core-only overbroad modules-directory assertion corrected to allow the explicit reviewed README; no product patch. Merge10393ae committed; combined-head hosted results still pending. Native worker closed; original held branches unchanged. Scoped static review COMPLETE/PARTIAL, not full-v2 acceptance.

@@ -2176,3 +2176,14 @@ without removing content or changing shared CSS/JS/assets. All8 corrected local
 responsive cases PASS and fresh images individually inspected. Previous partial
 evidence preserved, source/public baseline unchanged, local handles closed.
 Worker scope OK only; independent review, backport, CI and publication with Core.
+
+## Current-main / Held-v2 Test Candidate (2026-10-10)
+
+The isolated candidate combines exact main58d742a, held source24980e6 and
+reviewed docs649e495; merge checkpoints7abb76b/10393ae retain both histories.
+Hosted combined-head CI/Security are pending; parent green runs are not proof.
+The separate scoped static later-v2 scan is COMPLETE with no registered finding
+but PARTIAL coverage, not full-v2 release acceptance. No main merge, trust
+selection, D1-D7 adoption or activation. Frozen H-001/Rust-v1 pins unchanged,
+v2 non-promotable and D5 acceptance unconditionally closed. The October9
+project-wide public review baseline remains historical and unchanged.
