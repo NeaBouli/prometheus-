@@ -5,6 +5,10 @@ a production malware detector or reporting client.
 
 ## Current Boundary
 
+- Select `PROMETHEUS_RUNTIME=development` explicitly for local development.
+  Missing, empty, invalid or unreadable values use the restrictive Beta policy
+  and forbid security-critical stubs; this does not authorize a Beta deployment.
+  Commands requiring an explicit profile still reject missing/invalid values.
 - `ai/phi3.rs` is a fail-closed development stub. It never reports a loaded
   model from path existence, creates no ONNX Runtime session, performs no
   model inference, and in Development returns a safe default for inputs up to

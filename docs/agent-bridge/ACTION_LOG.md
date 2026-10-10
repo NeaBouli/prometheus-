@@ -6133,3 +6133,38 @@ Rules for all dev agents:
 ## 2026-10-10 - CODEX - Preview type warning resolved; exact source manifest
 - The inherited strict helper warning is resolved by one dict[str, Any] annotation only; strict validator/helper check SUCCESS2 files, focused Ruff PASS.49 imported files remain exact C2, workflow adds two-line existing D5 unit step. Parent main-path/source/append-only/seven historical source/provenance checks PASS.
 - Source manifest lists all51 worker blobs and both bounded glue exceptions; no hidden source redesign. Preserved historical EOF whitespace remains a documented global-diff warning, not silently fixed. Exact-head hosted CI/Draft publication pending; full-security/Codex Security/D1-D7/D5/main merge/rollout held.
+
+## 2026-10-10 - CODEX - CI baseline configured, hosted verification pending
+- Eleven existing CI/Security runner selectors now explicitly ubuntu-24.04; new CiRegistrationTest covers both .yml/.yaml workflow jobs. No product/contract/source/toolchain/action pin, permissions, triggers, checks or rollout policy change. No new runtime module, Ubuntu26 remains a separate compatibility task; OS pin is not an immutable image lock.
+- Scoped parent YAML equality/AST PASS, exactly eleven labels changed; Ruff and git diff --check PASS. Actionlint unavailable/NOT RUN; target suites not executed locally. Hosted exact-head full CI/Security and normal protected PR still required. Source task/report retained under .fleet; MAP records this existing release-tooling hop.
+- README/public landing claims unaffected and retained. PR293 stays Draft; D1-D7/constructor/trust/security/D5/client/full rollout open. Claude paused, no expanded Kimi payload or duplicate work. Full rollout goal ACTIVE/NOT_COMPLETE.
+
+
+## 2026-10-10 - CODEX - GH282 central runtime draft and regression prepared
+- Existing runtime selection/stub gate only: production equality confirms one fallback literal change to existing restrictive Beta; strict explicit parser/API/guards unchanged. Pure invalid/empty denial matrix plus direct from_env/stub-policy test in six isolated child processes (including env_remove), with one-test execution assertion. Existing CLI rejection/positive fixtures preserved; explicit Development only in intended test steps, separate runtime regression first.
+- Parent YAML equality (two test profiles/one regression step only), production-code equality, Rustfmt and diff whitespace PASS. Initial nonexistent Rustfmt config attempt rejected; corrected via /dev/null, no new config. Complete hosted tests/security and focused fix/security acceptance pending; local target execution NOT RUN. No source/new module/toolchain/contract/token/authority/production change beyond this existing guard policy.
+- Root/client README and MAP align with branch behavior; main/landing are not changed or claimed fixed. Draft first,282 stays open; v2 PR293/D1-D7/constructors/trust/rollout gates independent. Small guard/config task held by Codex, not worker outage; no expanded Kimi payload or duplicate work, Claude paused. Full goal ACTIVE/NOT_COMPLETE.
+
+## 2026-10-10 - CODEX - GH282 regression review follow-up
+- Native Codex source review41b301b: no blocking product findings. Actual CodeRabbit review5477386046: inherited expected-value variable can skip the child matrix. Separate child marker plus invalid CI parent sentinel prepared; only tests/CI invocation change, production/caller guards unchanged.
+- Existing architecture hop client runtime selection -> stub guard; bounded review repair, not a new module or permission. Existing owned archive restored and worktree moved to a unique follow-up path, original archive preserved. Fresh exact-head hosted checks and independent delta review required before normal protected PR295 merge.
+- Claude owner-paused; no Kimi payload or managed scan, no new paid review or chain/production action. Underlying v2, D5, constructor, key and rollout gates remain OPEN; full goal ACTIVE/NOT_COMPLETE.
+
+
+## 2026-10-10 - CODEX - M2 Cooldown Documentation Partial Delivery
+- Four named public surfaces clarify historical h001-v1 versus unaccepted/non-promotable v2-draft;100,800/6,048,000 consensus-score values remain, approximate2.8h/7d assumes10 score units/s rather than guaranteed wall time. No contract adoption or activation.
+- Immutable649e495 dedicated branch preserved; no source/config/fixture/pin/JS/CSS/assets/public-baseline changes or unmerged relative bundle links. Only bounded append-only coordination records and task report accompany the text patch.
+- Static checks PASS; all8 responsive changed-area images opened,7 cases PASS. Whitepaper390x844 changed text is clipped by the existing table; visual gate PARTIAL, repair outside CSS scope not attempted. Google Fonts not fetched; fallback-font-only local evidence.
+- Local worker server/browser handles closed; no repository tests/build, commits/push, hosted/provider/production action or private scan data. Core owns review, publication/backport and fresh hosted gates; no public deployment/main-adoption claim. Report .fleet/reports/v2-fixture-profile-clarity-20261010.md.
+
+## 2026-10-10 - CODEX - Same M2 Task Completed Under Core Amendment
+- Historical h001-v1 caller-provided block_height count is now explicitly distinct from v2-draft consensus DAA-score this.age. Retained100,800/6,048,000; nominal2.8h/7d only assumes10 respective units/s. Previous blanket score wording superseded, acceptance/activation limits unchanged.
+- Only authorized Whitepaper-local #validators responsive table CSS added, three lines; wrapping/fixed width preserves every cell and column. No shared CSS/JS/assets/source/fixture/pin/baseline change or unmerged public links.
+- Corrected local browser PASS8/8, all-cell clipping/scroll regression PASS, focus/navigation/contrast PASS. Eight fresh images opened; partial evidence preserved under original names, corrected/ adds final evidence. Worker scope OK; no public deployment/main adoption or hosted-CI claim.
+- Records/report append-only, same branch/base retained; local browser/server completed, temporary output removed. Core owns final semantic review/exact transplant, commit/push and fresh hosted/post-deploy gates; no new agent, target-code execution or remote action.
+
+
+
+## 2026-10-10 - CODEX - PR297 validation review follow-up
+- Exact source85d9c0f CI38026272562 SUCCESS8/8, Security38026272642 SUCCESS3/3; public claims/tests, status/tests and Memory checker actually passed. Full existing v1 operator chain through handoff passed. Authentic-font candidate gate8/8 PASS and all8 images independently opened by Core; no deployed HTML acceptance claimed.
+- Two review threads requested validators and recorded visual results. Actual inspection found existing documentation-hygiene checker/tests missing from CI registration; added only those two commands to the existing HTML Pages job. Source HTML unchanged, no permissions/pins/runners/product behavior modified or checks weakened. Fresh exact final-head CI/Security and main/live gates required before Done.

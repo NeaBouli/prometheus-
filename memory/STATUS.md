@@ -2144,3 +2144,35 @@ mypy now passes2 files; Ruff and parent source/pin/main-preservation/append-only
 checks pass.49 worker source blobs are exact plus two-line CI/one annotation
 glue, pinned by the task source manifest. No compiled identity beyond C2, Rust
 release pin or activation changes; hosted integration/full acceptance pending.
+
+## 2026-10-10 - CODEX - CI baseline configured, hosted verification pending
+- Eleven existing CI/Security runner selectors now explicitly ubuntu-24.04; new CiRegistrationTest covers both .yml/.yaml workflow jobs. No product/contract/source/toolchain/action pin, permissions, triggers, checks or rollout policy change. No new runtime module, Ubuntu26 remains a separate compatibility task; OS pin is not an immutable image lock.
+- Scoped parent YAML equality/AST PASS, exactly eleven labels changed; Ruff and git diff --check PASS. Actionlint unavailable/NOT RUN; target suites not executed locally. Hosted exact-head full CI/Security and normal protected PR still required. Source task/report retained under .fleet; MAP records this existing release-tooling hop.
+- README/public landing claims unaffected and retained. PR293 stays Draft; D1-D7/constructor/trust/security/D5/client/full rollout open. Claude paused, no expanded Kimi payload or duplicate work. Full rollout goal ACTIVE/NOT_COMPLETE.
+
+
+## Task-Only Cooldown Documentation Checkpoint (2026-10-10)
+
+M2-DOC-V1-V2-COOLDOWN clarifies the frozen historical h001-v1 100,800 and
+unaccepted, non-promotable v2-draft 6,048,000 consensus-score values on four
+surfaces. Approximately 2.8 hours/7 days assumes 10 consensus-score units/s,
+not guaranteed wall-clock time. No fully deployed/production-ready historical
+protocol, accepted duration, v1 pin replacement or D1-D7 adoption is claimed.
+Local static checks pass; all eight responsive images inspected, seven cases
+pass and whitepaper.html at 390x844 clips the changed text in its existing
+table. PARTIAL, not UI-release-ready; source/CSS/JS/assets and public baseline
+unchanged. Independent review, publication/main adoption and hosted gates
+remain Core-owned; this record does not grant acceptance or activation.
+
+## M2 Core-Amended Local Completion (2026-10-10)
+
+The preceding partial checkpoint remains historical. Final four-surface text
+distinguishes h001-v1 caller-provided block_height count from v2-draft consensus
+DAA-score age;100,800/6,048,000 remain unchanged and nominal2.8h/7d assumes10
+respective units/s, never guaranteed wall time. The draft remains unaccepted,
+non-promotable; no D1-D7 adoption, pin replacement, activation or readiness.
+Core-authorized Whitepaper-local validator-table CSS fixes the mobile clipping
+without removing content or changing shared CSS/JS/assets. All8 corrected local
+responsive cases PASS and fresh images individually inspected. Previous partial
+evidence preserved, source/public baseline unchanged, local handles closed.
+Worker scope OK only; independent review, backport, CI and publication with Core.
