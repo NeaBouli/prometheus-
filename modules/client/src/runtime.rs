@@ -98,7 +98,9 @@ mod tests {
     #[test]
     fn test_env_selection_and_stub_gate_in_isolated_processes() {
         const EXPECTED: &str = "PROMETHEUS_RUNTIME_TEST_EXPECTED";
-        if let Ok(expected) = env::var(EXPECTED) {
+        const CHILD: &str = "PROMETHEUS_RUNTIME_TEST_CHILD";
+        if env::var_os(CHILD).is_some() {
+            let expected = env::var(EXPECTED).expect("child expected runtime");
             assert_eq!(format!("{:?}", RuntimeMode::from_env()), expected);
             assert_eq!(
                 require_stub_allowed("test component").is_ok(),
@@ -121,7 +123,8 @@ mod tests {
                     "--exact",
                     "runtime::tests::test_env_selection_and_stub_gate_in_isolated_processes",
                 ])
-                .env(EXPECTED, expected);
+                .env(EXPECTED, expected)
+                .env(CHILD, "1");
             match value {
                 Some(value) => {
                     command.env(RUNTIME_MODE_ENV, value);

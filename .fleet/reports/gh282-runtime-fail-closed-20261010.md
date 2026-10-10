@@ -27,3 +27,17 @@ The two existing development test steps explicitly select Development. The
 runtime regression runs separately and child cases remove/override that value.
 Existing real-binary negative/positive tests are retained, not weakened. Public
 details are limited to the already public282 issue; no private operator data.
+
+## Review follow-up: child dispatch isolation
+
+Native Codex source review of41b301b found no blocking product issue. CodeRabbit
+review5477386046 identified an inherited expected-value variable bypassing the
+six-child regression matrix. A separate child-only marker now selects that
+branch; the expected value is read only inside it. The dedicated CI step supplies
+an invalid parent sentinel, so the prior implementation fails instead of
+silently skipping the matrix. Child commands override the expected result.
+
+Only test code and this CI step change; production runtime code and all caller
+guards remain byte-identical to41b301b. Fresh exact-head hosted CI/Security and
+independent delta review are required before merge. No local target execution,
+new paid review, deployment or broader v2 acceptance is implied.
