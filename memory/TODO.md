@@ -316,3 +316,9 @@
 - [x] [P2] Audit catalog protected publication | Codex | PR291 main1315ce4; candidate CI38006444235/Security38006444240 and mainCI38007173270/Security38007173221/Pages38007173026 PASS; live catalog/README byte-matched, own worktree archived. Audit270 itself remains open.
 - [~] [P2] PRM-31/45 metadata publication | Codex sole writer | Three static gaps corrected plus three regressions; parent static/Ruff/diff pass. Exact-head hosted CI, protected merge and live readback pending; no visible content or PWA change.
 - [!] [P1] Existing runtime/hygiene, source/constructor/D1-D7/v2/D5/client/full-security/rollout gates | Unchanged | No security issue auto-closure, model activation or production readiness from metadata. Claude remains owner-paused.
+
+## Current C2 Preview Checkpoint (2026-10-10)
+
+- [x] [P2] PRM-31/45 scoped metadata and273 closeout | Codex | PR292 eecbaf5; candidate/main CI/Security/Pages pass; three live byte matches, archive verified.275 archival/fallback residual remains.
+- [~] [P1] C2 current-main Draft integration preview | Codex sole writer | Reused source3e94ce0 in isolated candidate; current public claims/SW/K2 preserved. Hosted exact-head full verification and Draft PR pending; no main acceptance.
+- [!] [P1] Proposed D1-D7/constructor/counter/key/source-policy/full-review/Codex Security gates | Core dev plus applicable independent/owner approvals | Still required before any main activation or rollout; no expanded K1 code transfer, selected source or acceptance switch.

@@ -1,0 +1,220 @@
+{
+  "kind": "prometheus.integration.source_manifest",
+  "status": "DRAFT_PREVIEW_NOT_ACCEPTED",
+  "base": "eecbaf5731b6a0e2f3a77aebe8f42e97cf1daf47",
+  "worker": "3e94ce0fa81591d2a0e23758dfc46a735a8b8a92",
+  "source_paths": [
+    {
+      "path": ".github/workflows/ci.yml",
+      "worker_blob": "46bdaba7a6ebf2d0ade3361dddc0f77209edd7ec"
+    },
+    {
+      "path": "modules/contracts/silverc/CommunityDonationsState.sil",
+      "worker_blob": "51bea281ea679e003e80e138952b7e039d4bcf02"
+    },
+    {
+      "path": "modules/contracts/silverc/DevIncentivePoolState.sil",
+      "worker_blob": "3152f61d4b6740fe9b47345dc8170e4a91801e55"
+    },
+    {
+      "path": "modules/contracts/silverc/GovernanceAutoTuningState.sil",
+      "worker_blob": "5ac88454f1c3fbe17aef1bb01226671cb444adb4"
+    },
+    {
+      "path": "modules/contracts/silverc/README.md",
+      "worker_blob": "c70bf7488edaabe3a9387a1dbd1189795cb42924"
+    },
+    {
+      "path": "modules/contracts/silverc/RuleStorageState.sil",
+      "worker_blob": "60af525b86d4d55b6e9a0f025fd91a7ead266648"
+    },
+    {
+      "path": "modules/contracts/silverc/ValidatorStakingState.sil",
+      "worker_blob": "3875d4a353c53af881fa4d150c0803971e6642e5"
+    },
+    {
+      "path": "modules/contracts/silverc/bundles/h001-v1/README.md",
+      "worker_blob": "3ebcb97fca15a28f1b06913d83eb447b701272ed"
+    },
+    {
+      "path": "modules/contracts/silverc/bundles/h001-v1/fixtures.json",
+      "worker_blob": "820ef869680f512339717c07738bfb86a6d402f0"
+    },
+    {
+      "path": "modules/contracts/silverc/bundles/h001-v1/manifest.json",
+      "worker_blob": "054f5d35c60e5f0fe94621d0e8a7e45bcffd502c"
+    },
+    {
+      "path": "modules/contracts/silverc/bundles/h001-v1/provenance.json",
+      "worker_blob": "de503ae75d8c7dc96dfb8d8a9fffb08a16abdea9"
+    },
+    {
+      "path": "modules/contracts/silverc/bundles/h001-v1/sources/CommunityDonationsState.sil",
+      "worker_blob": "3e631108623117ddb9fb5b3bdc8eb75a2a8070f9"
+    },
+    {
+      "path": "modules/contracts/silverc/bundles/h001-v1/sources/DevIncentivePoolState.sil",
+      "worker_blob": "0f75900afdd34fa0fe5a2498dcc7547fde420610"
+    },
+    {
+      "path": "modules/contracts/silverc/bundles/h001-v1/sources/GovernanceAutoTuningState.sil",
+      "worker_blob": "5732c0fdebdd5eeebe120bc4b98752115a5e777a"
+    },
+    {
+      "path": "modules/contracts/silverc/bundles/h001-v1/sources/GuardianReputationState.sil",
+      "worker_blob": "b5ba74fdd6f75748227a35c038719558c89cd162"
+    },
+    {
+      "path": "modules/contracts/silverc/bundles/h001-v1/sources/RuleStorageState.sil",
+      "worker_blob": "7d807f07dd457ea7b6d9c33973602a7ffd7b6fb7"
+    },
+    {
+      "path": "modules/contracts/silverc/bundles/h001-v1/sources/ValidatorStakingH001.sil",
+      "worker_blob": "e7a55d537131c7c4e000aca99995ac2a990bb9b4"
+    },
+    {
+      "path": "modules/contracts/silverc/bundles/h001-v1/sources/ValidatorStakingState.sil",
+      "worker_blob": "afd8797535bf4c319503063593be7800fd0158ed"
+    },
+    {
+      "path": "modules/contracts/silverc/expected-compiled-artifacts.json",
+      "worker_blob": "41c408408b5f09206ca9c52b27b17e605508fa32"
+    },
+    {
+      "path": "modules/contracts/silverc/genesis-binding.draft.sample.json",
+      "worker_blob": "e380f018ae2b72b09c5307b3e5cd9a30d8275c5f"
+    },
+    {
+      "path": "modules/silverc-deployer/src/lib.rs",
+      "worker_blob": "3d99466146304a54a387a80dcc1c1e6bfa1e4ba7"
+    },
+    {
+      "path": "modules/silverc-deployer/src/main.rs",
+      "worker_blob": "028f3988f6c21d1bbdc9a11585b45293e2abd960"
+    },
+    {
+      "path": "modules/silverc-deployer/tests/calculate_covenant_id.rs",
+      "worker_blob": "edde1a9e869c336bc26698e26d04bf712b0193e9"
+    },
+    {
+      "path": "modules/silverc-deployer/tests/fixtures/d5-evidence-candidate.synthetic.json",
+      "worker_blob": "3132c02c73b8d764664dc8f0d21dbab1467e7057"
+    },
+    {
+      "path": "modules/silverc-deployer/tests/genesis_output_collisions.rs",
+      "worker_blob": "cd94976f76ca68e1a14dbf9ebca4c2f54bb7a411"
+    },
+    {
+      "path": "modules/validator-node/src/lib.rs",
+      "worker_blob": "33d9b7e63fadf58b55c67193e806cda58a47fa11"
+    },
+    {
+      "path": "scripts/build_metrics_oracle_operator_procedure.py",
+      "worker_blob": "a1d39b727653dd6e5b59ed66b443bc67f25b71ee"
+    },
+    {
+      "path": "scripts/build_metrics_oracle_tx_request.py",
+      "worker_blob": "a22aa4995e573757f715905ca5051a408aeb0147"
+    },
+    {
+      "path": "scripts/build_silverc_deploy_operator_procedure.py",
+      "worker_blob": "7997bb5bf693eb0e16eeaeda86388e8431f44538"
+    },
+    {
+      "path": "scripts/build_silverc_deploy_requests.py",
+      "worker_blob": "d297322c1229e60cd5c2c97310f504633537d252"
+    },
+    {
+      "path": "scripts/build_silverc_operator_handoff.py",
+      "worker_blob": "660a717fec7b19ab3687cae05d94f2c870d3411d"
+    },
+    {
+      "path": "scripts/build_silverc_operator_receipts.py",
+      "worker_blob": "aed5aa1b08a554387d003276881a52c7a54a6433"
+    },
+    {
+      "path": "scripts/preflight_silverc_deploy.py",
+      "worker_blob": "74809693cf9482a922ac1b1dd2a4c3e9747914e7"
+    },
+    {
+      "path": "scripts/silverc_bundles.py",
+      "worker_blob": "9ed6e27eb6ebc347d6ab93a791034568a5eda64d"
+    },
+    {
+      "path": "scripts/silverc_genesis_binding_draft.py",
+      "worker_blob": "e770b96555aaaebd1cb870e1c7ae7dd3eb73d67f"
+    },
+    {
+      "path": "scripts/smoke_silverc_artifacts.py",
+      "worker_blob": "2d09c8b84c9c3de7971484de9aa2d52721513447"
+    },
+    {
+      "path": "scripts/stage_metrics_oracle_status.py",
+      "worker_blob": "9c93951a1ef8f83e8b4de1601057a3df6e0efd58"
+    },
+    {
+      "path": "scripts/stage_silverc_deployment_status.py",
+      "worker_blob": "53367fa1c0fefe02952733647358a29788220e17"
+    },
+    {
+      "path": "scripts/test_silverc_bundle_profiles.py",
+      "worker_blob": "ce62fd0d83ef32fb9c25d36a169e16491fee6325"
+    },
+    {
+      "path": "scripts/test_silverc_bundles.py",
+      "worker_blob": "ff823e6404c6056454630c0e725d8178906b0f33"
+    },
+    {
+      "path": "scripts/test_silverc_canary_profile.py",
+      "worker_blob": "558eb81c92640fc6c2de7196107b680e942312aa"
+    },
+    {
+      "path": "scripts/test_silverc_early_gate.py",
+      "worker_blob": "7e3035483b776ef50aaec5d1552e5d4ccf06ac2d"
+    },
+    {
+      "path": "scripts/test_silverc_genesis_binding_draft.py",
+      "worker_blob": "88389530de0864474f3c46381e7d59688c4a5d2d"
+    },
+    {
+      "path": "scripts/test_silverc_manifest_build_pin.py",
+      "worker_blob": "1500919d2bf39ab0f4c7d1f64bac9ff59b51e365"
+    },
+    {
+      "path": "scripts/test_silverc_semantic_mutation.py",
+      "worker_blob": "baffea7c6aab5b4cf6ff3bcf0cd21e415a670c87"
+    },
+    {
+      "path": "scripts/verify_metrics_oracle_tx_evidence.py",
+      "worker_blob": "e63fb659a3594bdbaaeaccce993a1fc14818ba3b"
+    },
+    {
+      "path": "scripts/verify_metrics_oracle_tx_result.py",
+      "worker_blob": "999c947b4e71454605d2b50b407fa3a80940e8ba"
+    },
+    {
+      "path": "scripts/verify_silverc_deploy_receipt_evidence.py",
+      "worker_blob": "1fc37c88be6289eeb95c21b3f35aeb5642c33d5f"
+    },
+    {
+      "path": "scripts/verify_silverc_deploy_receipts.py",
+      "worker_blob": "24a2e38c6e5e52e4e0714f6cf01ff22b957a0776"
+    },
+    {
+      "path": "scripts/verify_silverc_deploy_requests.py",
+      "worker_blob": "be49827799c4a148f4f579b79177e4f435618d20"
+    },
+    {
+      "path": "scripts/verify_silverc_h001.py",
+      "worker_blob": "cc0afe447c7968582f41bb78ecbb0c26efb90aa3"
+    }
+  ],
+  "limited_new_deltas": {
+    ".github/workflows/ci.yml": "two-line explicit existing D5 unit step",
+    "scripts/smoke_silverc_artifacts.py": "one dict[str, Any] annotation; runtime unchanged"
+  },
+  "historical_data_exception": "Frozen ValidatorStakingH001.sil EOF whitespace retained byte-exact",
+  "main_merge_authorized": false,
+  "v2_executable": false,
+  "d5_acceptance": "UNCONDITIONALLY_CLOSED"
+}

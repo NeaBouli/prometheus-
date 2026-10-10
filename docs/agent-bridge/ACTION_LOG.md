@@ -6123,6 +6123,16 @@ Rules for all dev agents:
 - Actual parent-side scope/negative controls PASS after harness buffer/path corrections; Ruff and diff PASS. Repository-controlled local tests NOT RUN due isolation memory-limit blocker; actual relevant full hosted checks/publication still pending. No invented screenshots or local replay.
 - Codex sole writer, Claude paused (not outage). No secret, private audit detail, payload transfer, contract/pin/policy/tokenomics/chain/production/infrastructure action. Codex Security NOT CONNECTED/NOT RUN; all source/D1-D7/D5/client/full-security/rollout gates remain. Report records changed files and pending acceptance.
 
+## 2026-10-10 - CODEX - Metadata verified/closed; C2 preview assembled
+- PR292 main eecbaf5 final CI38009850053/Security38009850026/Pages38009849236 PASS; exact candidate CI38009266494/Security38009266584 PASS, identical tree.83 claim tests actually pass, three live byte matches/icons200.273 CLOSED after scoped assessment;275/270 remain open. Metadata worktree verified/archived552 files, evidence retained.
+- Reused exact C2 source3e94ce0 in own M1/MS-B Draft preview, not reimplemented.51 selected source/test/workflow paths;50 byte-equal and one two-line CI addition to run existing D5 tests. Preserved current main public/docs/status/SW/audit/K2 state; added required design/MAP/runbook pointers and task-only records.
+- Actual focused Ruff PASS. Strict mypy reports inherited helper finding; global diff check reports immutable historical H-001 blank EOF, neither falsely green nor rewritten. Hosted exact integration tests/normal Draft publication pending. No target-controlled local execution, fresh source design, crypto/formula/pin revision, model/capture/deploy/sign/chain action.
+- D1-D7/full independent review/constructors/source policy/Codex Security and main-integration/rollout gates held. Rust v1-pinned, v2 non-promotable, D5 acceptance unconditional NOT_CONFIRMED. Claude owner-paused, no outage/duplicate delegation or expanded Kimi transfer. Report lists scope, real results and limitations.
+
+
+## 2026-10-10 - CODEX - Preview type warning resolved; exact source manifest
+- The inherited strict helper warning is resolved by one dict[str, Any] annotation only; strict validator/helper check SUCCESS2 files, focused Ruff PASS.49 imported files remain exact C2, workflow adds two-line existing D5 unit step. Parent main-path/source/append-only/seven historical source/provenance checks PASS.
+- Source manifest lists all51 worker blobs and both bounded glue exceptions; no hidden source redesign. Preserved historical EOF whitespace remains a documented global-diff warning, not silently fixed. Exact-head hosted CI/Draft publication pending; full-security/Codex Security/D1-D7/D5/main merge/rollout held.
 
 ## 2026-10-10 - CODEX - CI baseline configured, hosted verification pending
 - Eleven existing CI/Security runner selectors now explicitly ubuntu-24.04; new CiRegistrationTest covers both .yml/.yaml workflow jobs. No product/contract/source/toolchain/action pin, permissions, triggers, checks or rollout policy change. No new runtime module, Ubuntu26 remains a separate compatibility task; OS pin is not an immutable image lock.
@@ -6158,3 +6168,12 @@ Rules for all dev agents:
 ## 2026-10-10 - CODEX - PR297 validation review follow-up
 - Exact source85d9c0f CI38026272562 SUCCESS8/8, Security38026272642 SUCCESS3/3; public claims/tests, status/tests and Memory checker actually passed. Full existing v1 operator chain through handoff passed. Authentic-font candidate gate8/8 PASS and all8 images independently opened by Core; no deployed HTML acceptance claimed.
 - Two review threads requested validators and recorded visual results. Actual inspection found existing documentation-hygiene checker/tests missing from CI registration; added only those two commands to the existing HTML Pages job. Source HTML unchanged, no permissions/pins/runners/product behavior modified or checks weakened. Fresh exact final-head CI/Security and main/live gates required before Done.
+## 2026-10-10 - CODEX - MS-B docs-only correction submitted
+- Existing ADR/current contract README reconciled to the delivered draft, including the stale autoTune description. No contract, fixture, release pin, runtime, workflow, tokenomics or trust-policy change; original review heads and main untouched.
+- Final exact-head scope/semantic and existing hosted CI/Security results pending at submission. Stacked PR is documentation review only, not D1-D7/security/constructor/D5/deployment acceptance; final external receipt must supersede this historical checkpoint.
+- Existing independent review/trust/client/rollout holds and paused-worker boundaries unchanged. No private gap data, new code transfer, target execution or chain/infrastructure action.
+
+## 2026-10-10 - CODEX - Current-main/v2 combined candidate prepared, not accepted
+- Exact merge checkpoints7abb76b (held24980e6 + main58d742a) and10393ae (plus reviewed docs649e495). Four then two coordination conflicts resolved as exact unions; Core independently verified every union,575 nondivergent first-stage parent blobs and320 retained product/public/workflow blobs after docs import. Module README is the explicit reviewed-doc exception, exactly649e495; an overbroad directory assertion corrected without product change.
+- Main Ubuntu24/runtime/sentinel/PR297 public/hygiene and held registry/artifact/v1 pins/D5 closed gates coexist; source implementation and rendered UI are unchanged against their respective reviewed parents. Sole native writer finished/closed; no repeat implementation or local target execution. Original293/296 heads untouched.
+- Combined-head hosted CI/Security NOT YET RUN. Publish only a normal Draft integration PR, no main acceptance/activation. Prior scoped static scan COMPLETE/PARTIAL and parent test results do not close full-v2/constructor/key/D1-D7/trust/client/rollout gates. Full goal ACTIVE/NOT_COMPLETE.

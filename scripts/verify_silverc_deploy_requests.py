@@ -11,6 +11,16 @@ from hashlib import sha256
 from pathlib import Path
 from typing import Any
 
+from silverc_bundles import (  # noqa: F401
+    DRAFT_BLOCKER,
+    DRAFT_REQUEST_SET_STATUS,
+    DRAFT_VERIFICATION_STATUS,
+    Bundle,
+    add_bundle_argument,
+    bundle_from_args,
+    require_profile,
+    require_promotable,
+)
 from preflight_silverc_deploy import (
     HEX_32_BYTES_RE,
     bundle_root_from_args,
@@ -27,7 +37,7 @@ from silverc_deployment_profiles import (
     validate_profile_document,
     validate_profile_inputs,
 )
-from smoke_silverc_artifacts import FIXTURES, canonical_json_bytes
+from smoke_silverc_artifacts import canonical_json_bytes
 from verify_silverc_h001 import DEFAULT_SILVERSCRIPT_REF
 
 REQUEST_TYPE = "prometheus_silverc_deploy_request"
@@ -59,6 +69,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--summary-out", type=Path, help="Optional JSON verification summary path")
     parser.add_argument("--runbook-out", type=Path, help="Optional Markdown verification runbook path")
+    add_bundle_argument(parser)
     return parser.parse_args()
 
 
@@ -133,8 +144,12 @@ def hash_without_key(data: dict[str, Any], key: str) -> str:
     return sha256(canonical_json_bytes(clone)).hexdigest()
 
 
-def fixture_args_by_contract() -> dict[str, Any]:
-    return {fixture.contract_name: fixture.args for fixture in FIXTURES}
+def fixture_args_by_contract(bundle: Bundle) -> dict[str, Any]:
+    return {fixture.contract_name: fixture.args for fixture in bundle.fixtures}
+
+
+def draft_marker(bundle: Bundle) -> dict[str, Any] | None:
+    return None if bundle.promotable else {"id": bundle.bundle_id, "promotable": False}
 
 
 def validate_request_set_hash(request_set: dict[str, Any]) -> None:
@@ -202,6 +217,7 @@ def validate_request_file(
     constructor_args: Any,
     order: int,
     deployment_profile: dict[str, Any],
+    bundle: Bundle,
 ) -> dict[str, Any]:
     reject_secret_fields(request)
     validate_request_hash(request, path)
@@ -212,6 +228,8 @@ def validate_request_file(
         raise ValueError(f"{path.name}: request_type mismatch")
     if request.get("status") != request_status(deployment_profile):
         raise ValueError(f"{path.name}: status mismatch")
+    if request.get("bundle_identity") != draft_marker(bundle):
+        raise ValueError(f"{path.name}: bundle identity mismatch")
     require_safety_scope(request, path.name)
     for key in ("network", "rpc_url", "deployer_address"):
         if request.get(key) != request_set[key]:
@@ -260,6 +278,7 @@ def validate_request_set(
     request_set: dict[str, Any],
     requests_dir: Path,
     manifest: dict[str, Any],
+    bundle: Bundle,
 ) -> dict[str, Any]:
     reject_secret_fields(request_set)
     validate_request_set_hash(request_set)
@@ -271,6 +290,7 @@ def validate_request_set(
         request_set.get("deployment_profile"),
         manifest,
     )
+    require_profile(bundle, deployment_profile["name"])
     metrics_oracle_pubkey = request_set.get("metrics_oracle_pubkey")
     validate_profile_inputs(
         profile_name=deployment_profile["name"],
@@ -286,8 +306,15 @@ def validate_request_set(
 
     if request_set.get("schema_version") != 1:
         raise ValueError("schema_version: expected 1")
-    if request_set.get("status") != request_set_status(deployment_profile):
+    expected_set_status = (
+        request_set_status(deployment_profile) if bundle.promotable else DRAFT_REQUEST_SET_STATUS
+    )
+    if request_set.get("status") != expected_set_status:
         raise ValueError("status: deployment-profile status mismatch")
+    if request_set.get("bundle_identity") != draft_marker(bundle):
+        raise ValueError("bundle: request-set bundle identity mismatch")
+    if not bundle.promotable and DRAFT_BLOCKER not in request_set.get("blockers", []):
+        raise ValueError("blockers: expected the non-promotable draft blocker")
     if request_set.get("silverscript_ref") != manifest["silverscript_ref"]:
         raise ValueError("silverscript_ref mismatch")
     if request_set.get("silverscript_commit") != manifest["silverscript_commit"]:
@@ -303,7 +330,7 @@ def validate_request_set(
     require_safety_scope(require_dict(request_set, "request_set"), "request_set")
 
     request_entries = require_list(request_set.get("requests"), "requests")
-    constructor_args = fixture_args_by_contract()
+    constructor_args = fixture_args_by_contract(bundle)
     if len(request_entries) != len(manifest_entries):
         raise ValueError("requests: expected one request per deployment-profile contract")
 
@@ -336,12 +363,17 @@ def validate_request_set(
                 constructor_args=constructor_args[manifest_entry["contract_name"]],
                 order=order,
                 deployment_profile=deployment_profile,
+                bundle=bundle,
             )
         )
 
     summary = {
         "schema_version": 1,
-        "status": request_verification_status(deployment_profile),
+        "status": (
+            request_verification_status(deployment_profile)
+            if bundle.promotable
+            else DRAFT_VERIFICATION_STATUS
+        ),
         "network": request_set["network"],
         "deployment_profile": deployment_profile,
         "silverscript_commit": manifest["silverscript_commit"],
@@ -421,12 +453,18 @@ def main() -> int:
     args = parse_args()
     bundle_dir, tmp = bundle_root_from_args(args)
     try:
-        manifest = validate_manifest(bundle_dir, args.silverscript_ref)
+        bundle = bundle_from_args(args)
+        manifest = validate_manifest(bundle_dir, args.silverscript_ref, bundle)
         request_set = load_json(args.request_set.expanduser().resolve())
         requests_dir = args.requests_dir.expanduser().resolve()
         if not requests_dir.is_dir():
             raise FileNotFoundError(f"requests directory not found: {requests_dir}")
-        summary = validate_request_set(request_set=request_set, requests_dir=requests_dir, manifest=manifest)
+        summary = validate_request_set(
+            request_set=request_set, requests_dir=requests_dir, manifest=manifest, bundle=bundle
+        )
+        if not bundle.promotable:
+            summary["bundle_identity"] = draft_marker(bundle)
+            summary["blockers"].append(DRAFT_BLOCKER)
         write_json(args.summary_out, summary)
         write_runbook(args.runbook_out, summary)
         print(json.dumps(summary, indent=2, sort_keys=True))

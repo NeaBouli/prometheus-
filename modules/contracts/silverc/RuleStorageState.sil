@@ -61,6 +61,24 @@ contract RuleStorageState(
         return(0x0000000000000000000000000000000000000000000000000000000000000000);
     }
 
+    // Proposal content binding shared by the submission and tally attestations.
+    function proposalContentHash(
+        pubkey content_guardian_pk,
+        byte[32] content_threat_hash,
+        int content_rule_type,
+        byte[36] content_rule_cid,
+        int content_confidence
+    ) : byte[32] {
+        byte[32] content_hash = sha256(
+            byte[32](content_guardian_pk)
+            + content_threat_hash
+            + byte[8](content_rule_type)
+            + content_rule_cid
+            + byte[8](content_confidence)
+        );
+        return(content_hash);
+    }
+
     #[covenant.singleton(mode = transition)]
     function submitProposal(
         State prev_state,
@@ -69,7 +87,7 @@ contract RuleStorageState(
         int new_rule_type,
         byte[36] new_rule_content_ipfs,
         int new_confidence,
-        int block_height,
+        datasig membership_attestation,
         sig guardian_sig
     ) : State {
         require(prev_state.status != STATUS_PENDING);
@@ -78,15 +96,28 @@ contract RuleStorageState(
         require(new_rule_type >= RULE_TYPE_YARA);
         require(new_rule_type <= RULE_TYPE_SIGMA);
         require(new_threat_hash != emptyThreatHash());
-        require(block_height >= 0);
         require(prev_state.next_proposal_id >= 0);
         require(checkSig(guardian_sig, new_guardian_pk));
 
+        // Versioned attestation context: domain, deployment (covenant id), replay nonce (proposal id), full content.
+        byte[32] instance_id = OpInputCovenantId(this.activeInputIndex);
+        byte[32] content_hash = proposalContentHash(new_guardian_pk, new_threat_hash, new_rule_type, new_rule_content_ipfs, new_confidence);
+        byte[32] submission_digest = sha256(
+            0x70726f6d6574686575732d72756c652d7375626d697373696f6e2d7632
+            + instance_id
+            + byte[8](prev_state.next_proposal_id)
+            + content_hash
+        );
+        require(checkSigFromStack(membership_attestation, submission_digest, prev_state.governance_pk));
+
+        // Consensus time of the previous transition (DAA score of the spent covenant UTXO); never caller-chosen.
+        int window_anchor = OpTxInputDaaScore(this.activeInputIndex);
+        require(window_anchor > 0);
         int next_count = prev_state.count_in_window;
         int next_reset_block = prev_state.last_count_reset_block;
-        if (block_height > prev_state.last_count_reset_block + VOTING_BLOCKS) {
+        if (window_anchor > prev_state.last_count_reset_block + VOTING_BLOCKS) {
             next_count = 0;
-            next_reset_block = block_height;
+            next_reset_block = window_anchor;
         }
 
         return({
@@ -98,10 +129,10 @@ contract RuleStorageState(
             rule_type: new_rule_type,
             rule_content_ipfs: new_rule_content_ipfs,
             confidence: new_confidence,
-            submitted_at_block: block_height,
+            submitted_at_block: 0,
             votes_for: 0,
             votes_against: 0,
-            voting_end_block: block_height + VOTING_BLOCKS,
+            voting_end_block: 0,
             status: STATUS_PENDING,
             rule_count: prev_state.rule_count,
             count_in_window: next_count + 1,
@@ -114,66 +145,68 @@ contract RuleStorageState(
     }
 
     #[covenant.singleton(mode = transition)]
-    function voteOnProposal(State prev_state, bool support, int block_height, sig validator_sig, pubkey validator_pk) : State {
+    function finalizeProposal(
+        State prev_state,
+        int tally_for,
+        int tally_against,
+        int active_set_size,
+        byte[32] validator_set_root,
+        datasig tally_attestation,
+        sig governance_sig
+    ) : State {
         require(prev_state.status == STATUS_PENDING);
-        require(block_height >= 0);
-        require(block_height < prev_state.voting_end_block);
-        require(checkSig(validator_sig, validator_pk));
-
-        int next_votes_for = prev_state.votes_for;
-        int next_votes_against = prev_state.votes_against;
-        if (support) {
-            next_votes_for = next_votes_for + 1;
-        } else {
-            next_votes_against = next_votes_against + 1;
-        }
-
-        return({
-            governance_pk: prev_state.governance_pk,
-            next_proposal_id: prev_state.next_proposal_id,
-            proposal_id: prev_state.proposal_id,
-            guardian_pk: prev_state.guardian_pk,
-            threat_hash: prev_state.threat_hash,
-            rule_type: prev_state.rule_type,
-            rule_content_ipfs: prev_state.rule_content_ipfs,
-            confidence: prev_state.confidence,
-            submitted_at_block: prev_state.submitted_at_block,
-            votes_for: next_votes_for,
-            votes_against: next_votes_against,
-            voting_end_block: prev_state.voting_end_block,
-            status: prev_state.status,
-            rule_count: prev_state.rule_count,
-            count_in_window: prev_state.count_in_window,
-            last_count_reset_block: prev_state.last_count_reset_block,
-            consensus_score: prev_state.consensus_score,
-            stored_at_block: prev_state.stored_at_block,
-            active: prev_state.active,
-            guardian_reputation_event: prev_state.guardian_reputation_event
-        });
-    }
-
-    #[covenant.singleton(mode = transition)]
-    function finalizeProposal(State prev_state, int block_height, sig governance_sig) : State {
-        require(prev_state.status == STATUS_PENDING);
-        require(block_height >= prev_state.voting_end_block);
         require(checkSig(governance_sig, prev_state.governance_pk));
+        require(tally_for >= 0);
+        require(tally_against >= 0);
+        require(active_set_size > 0);
 
-        int total_votes = prev_state.votes_for + prev_state.votes_against;
-        require(total_votes > 0);
+        // Nothing but finalizeProposal can spend a PENDING state, so the spent UTXO was created by
+        // submitProposal: its DAA score is the consensus submission time and opens the voting session.
+        int session_start = OpTxInputDaaScore(this.activeInputIndex);
+        require(session_start > 0);
+        int session_end = session_start + VOTING_BLOCKS;
+        require(tx.time >= session_end);
 
-        int approval = prev_state.votes_for * 10000 / total_votes;
+        int total_votes = tally_for + tally_against;
+        require(total_votes <= active_set_size);
+
+        byte[32] instance_id = OpInputCovenantId(this.activeInputIndex);
+        byte[32] content_hash = proposalContentHash(prev_state.guardian_pk, prev_state.threat_hash, prev_state.rule_type, prev_state.rule_content_ipfs, prev_state.confidence);
+        byte[32] tally_digest = sha256(
+            0x70726f6d6574686575732d72756c652d74616c6c792d7632
+            + instance_id
+            + byte[8](prev_state.proposal_id)
+            + content_hash
+            + byte[8](session_start)
+            + byte[8](tally_for)
+            + byte[8](tally_against)
+            + byte[8](active_set_size)
+            + validator_set_root
+        );
+        require(checkSigFromStack(tally_attestation, tally_digest, prev_state.governance_pk));
+
+        // Every attested tally is terminal: approval needs >= 50 % participation and >= 6700 bps of cast
+        // votes; zero or low participation ends REJECTED instead of leaving the single slot PENDING.
+        int approval = 0;
+        if (total_votes > 0) {
+            approval = tally_for * 10000 / total_votes;
+        }
         int next_status = STATUS_REJECTED;
         int next_rule_count = prev_state.rule_count;
         int next_stored_at_block = prev_state.stored_at_block;
         bool next_active = false;
         int next_event = GUARDIAN_EVENT_REJECTED;
 
-        if (approval >= VALIDATOR_QUORUM) {
-            next_status = STATUS_ACCEPTED;
-            next_rule_count = prev_state.rule_count + 1;
-            next_stored_at_block = block_height;
-            next_active = true;
-            next_event = GUARDIAN_EVENT_ACCEPTED;
+        if (total_votes * 2 >= active_set_size) {
+            if (total_votes > 0) {
+                if (approval >= VALIDATOR_QUORUM) {
+                    next_status = STATUS_ACCEPTED;
+                    next_rule_count = prev_state.rule_count + 1;
+                    next_stored_at_block = session_end;
+                    next_active = true;
+                    next_event = GUARDIAN_EVENT_ACCEPTED;
+                }
+            }
         }
 
         return({
@@ -185,10 +218,10 @@ contract RuleStorageState(
             rule_type: prev_state.rule_type,
             rule_content_ipfs: prev_state.rule_content_ipfs,
             confidence: prev_state.confidence,
-            submitted_at_block: prev_state.submitted_at_block,
-            votes_for: prev_state.votes_for,
-            votes_against: prev_state.votes_against,
-            voting_end_block: prev_state.voting_end_block,
+            submitted_at_block: session_start,
+            votes_for: tally_for,
+            votes_against: tally_against,
+            voting_end_block: session_end,
             status: next_status,
             rule_count: next_rule_count,
             count_in_window: prev_state.count_in_window,

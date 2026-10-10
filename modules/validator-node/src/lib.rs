@@ -19,8 +19,10 @@ pub const SLASH_DOUBLE_VOTE_PCT: u64 = 10;
 /// Slashing percentage for proven collusion
 pub const SLASH_COLLUSION_PCT: u64 = 20;
 
-/// Cooldown blocks before withdrawal (~7 days at 10 BPS)
-pub const COOLDOWN_BLOCKS: u64 = 100_800;
+/// Cooldown before withdrawal: 7 days at 10 BPS (7 * 24 * 3600 * 10 DAA score).
+/// Enforced on chain as a relative lock (`this.age`, OP_CHECKSEQUENCEVERIFY)
+/// and longer than the 1-day voting period (PRM-35, MS-B D6).
+pub const COOLDOWN_BLOCKS: u64 = 6_048_000;
 
 /// Bond = 10% of current stake
 pub const BOND_PERCENT: u64 = 10;

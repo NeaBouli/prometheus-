@@ -17,9 +17,15 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse
 
+from silverc_bundles import (
+    Bundle,
+    add_bundle_argument,
+    bundle_from_args,
+    require_manifest_pin,
+    require_profile,
+)
 from smoke_silverc_artifacts import (
     ARCHIVE_MEMBER_PREFIX,
-    FIXTURES,
     MANIFEST_NAME,
     ROOT,
     canonical_json_bytes,
@@ -99,6 +105,7 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Fail unless upstream silverc or the repository genesis operator provides a deploy path",
     )
+    add_bundle_argument(parser)
     return parser.parse_args()
 
 
@@ -159,18 +166,20 @@ def load_json(path: Path) -> dict[str, Any]:
     return data
 
 
-def validate_manifest(bundle_dir: Path, expected_silverscript_ref: str) -> dict[str, Any]:
+def validate_manifest(bundle_dir: Path, expected_silverscript_ref: str, bundle: Bundle) -> dict[str, Any]:
+    """Validate a release bundle against the explicitly selected registry bundle."""
     manifest_path = bundle_dir / MANIFEST_NAME
     manifest = load_json(manifest_path)
     fixtures = manifest.get("fixtures")
-    expected_names = [fixture.contract_name for fixture in FIXTURES]
-    fixtures_by_name = {fixture.contract_name: fixture for fixture in FIXTURES}
+    bundle_fixtures = bundle.fixtures
+    expected_names = [fixture.contract_name for fixture in bundle_fixtures]
+    fixtures_by_name = {fixture.contract_name: fixture for fixture in bundle_fixtures}
 
     if manifest.get("schema_version") != 1:
         raise ValueError(f"{manifest_path}: unsupported schema_version")
-    if manifest.get("fixture_count") != len(FIXTURES):
+    if manifest.get("fixture_count") != len(bundle_fixtures):
         raise ValueError(f"{manifest_path}: fixture_count mismatch")
-    if not isinstance(fixtures, list) or len(fixtures) != len(FIXTURES):
+    if not isinstance(fixtures, list) or len(fixtures) != len(bundle_fixtures):
         raise ValueError(f"{manifest_path}: fixtures list mismatch")
     actual_names = [entry.get("contract_name") for entry in fixtures]
     if actual_names != expected_names:
@@ -184,12 +193,13 @@ def validate_manifest(bundle_dir: Path, expected_silverscript_ref: str) -> dict[
 
     for entry in fixtures:
         fixture = fixtures_by_name[entry["contract_name"]]
-        validate_manifest_entry(bundle_dir, entry, fixture)
+        validate_manifest_entry(bundle_dir, entry, fixture, bundle)
 
+    require_manifest_pin(bundle, manifest)
     return manifest
 
 
-def validate_manifest_entry(bundle_dir: Path, entry: dict[str, Any], fixture: Any) -> None:
+def validate_manifest_entry(bundle_dir: Path, entry: dict[str, Any], fixture: Any, bundle: Bundle) -> None:
     artifact_name = entry.get("artifact_file")
     if not isinstance(artifact_name, str) or "/" in artifact_name:
         raise ValueError(f"{MANIFEST_NAME}: invalid artifact_file for {entry.get('contract_name')}")
@@ -204,7 +214,7 @@ def validate_manifest_entry(bundle_dir: Path, entry: dict[str, Any], fixture: An
     source_file = entry.get("source_file")
     if not isinstance(source_file, str):
         raise ValueError(f"{MANIFEST_NAME}: invalid source_file for {entry.get('contract_name')}")
-    source = ROOT / source_file
+    source = bundle.source_path(source_file)
     if not source.is_file():
         raise FileNotFoundError(f"{MANIFEST_NAME}: missing source file {source_file}")
     if entry.get("source_sha256") != sha256_file(source):
@@ -341,6 +351,7 @@ def write_plan(
     manifest: dict[str, Any],
     missing_inputs: list[str],
     tooling: ToolingStatus,
+    bundle: Bundle,
 ) -> dict[str, Any]:
     deployment_profile = expected_profile(args.deployment_profile, manifest)
     plan = {
@@ -370,7 +381,13 @@ def write_plan(
         )
         and not missing_inputs,
         "deploy_blockers": [],
+        "bundle_identity": {"id": bundle.bundle_id, "promotable": bundle.promotable},
     }
+    if not bundle.promotable:
+        plan["deploy_supported"] = False
+        plan["deploy_blockers"].append(
+            f"bundle {bundle.bundle_id} is a non-promotable draft; the deployer pins only the h001-v1 manifest"
+        )
     if missing_inputs:
         plan["deploy_blockers"].append("missing public operator inputs: " + ", ".join(missing_inputs))
     if not tooling.has_deploy_command and not tooling.has_repository_genesis_operator:
@@ -479,12 +496,14 @@ def write_runbook(args: argparse.Namespace, manifest: dict[str, Any], plan: dict
 def main() -> int:
     args = parse_args()
     silverscript_repo = Path(args.silverscript_repo).expanduser().resolve()
+    bundle = bundle_from_args(args)
+    require_profile(bundle, args.deployment_profile)
     bundle_dir, tmp = bundle_root_from_args(args)
     try:
-        manifest = validate_manifest(bundle_dir, args.silverscript_ref)
+        manifest = validate_manifest(bundle_dir, args.silverscript_ref, bundle)
         missing_inputs = validate_operator_inputs(args)
         tooling = inspect_silverc(silverscript_repo, args.silverscript_ref)
-        plan = write_plan(args, manifest, missing_inputs, tooling)
+        plan = write_plan(args, manifest, missing_inputs, tooling, bundle)
         write_runbook(args, manifest, plan)
         print(json.dumps(plan, indent=2, sort_keys=True))
 

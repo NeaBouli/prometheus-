@@ -13,6 +13,7 @@ from typing import Any
 
 from build_metrics_oracle_tx_request import ABI_ENTRYPOINT
 from preflight_metrics_oracle_report import CONTRACT_NAME, ENTRYPOINT, canonical_json_bytes
+from silverc_bundles import add_bundle_argument, bundle_from_args, require_profile, require_promotable  # noqa: F401
 from preflight_silverc_deploy import NETWORKS, bundle_root_from_args, validate_manifest
 from verify_silverc_h001 import DEFAULT_SILVERSCRIPT_REF
 
@@ -51,6 +52,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--summary-out", type=Path, help="Optional JSON verification summary path")
     parser.add_argument("--runbook-out", type=Path, help="Optional Markdown runbook path")
+    add_bundle_argument(parser)
     return parser.parse_args()
 
 
@@ -373,9 +375,12 @@ def write_runbook(path: Path | None, summary: dict[str, Any]) -> None:
 
 def main() -> int:
     args = parse_args()
+    # Bundle gate first: a draft bundle is refused before any input is read.
+    bundle = bundle_from_args(args)
+    require_promotable(bundle, "metrics-oracle results")
     bundle_dir, tmp = bundle_root_from_args(args)
     try:
-        manifest = validate_manifest(bundle_dir, args.silverscript_ref)
+        manifest = validate_manifest(bundle_dir, args.silverscript_ref, bundle)
         request_summary = validate_request(load_json(args.tx_request.expanduser().resolve()), manifest)
         result_summary = validate_result(load_json(args.tx_result.expanduser().resolve()), request_summary)
         write_json(args.summary_out, result_summary)

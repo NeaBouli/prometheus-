@@ -11,6 +11,7 @@ from hashlib import sha256
 from pathlib import Path
 from typing import Any
 
+from silverc_bundles import add_bundle_argument, bundle_from_args, require_profile, require_promotable  # noqa: F401
 from preflight_silverc_deploy import (
     KASPA_ADDRESS_RE,
     NETWORKS,
@@ -67,6 +68,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--summary-out", type=Path, help="Optional JSON verification summary path")
     parser.add_argument("--runbook-out", type=Path, help="Optional Markdown receipt runbook path")
+    add_bundle_argument(parser)
     return parser.parse_args()
 
 
@@ -157,7 +159,7 @@ def validate_receipts_document(
     if len(receipts) != len(expected_names):
         raise ValueError("receipts: expected one receipt per manifest contract")
 
-    seen = set()
+    seen: set[str] = set()
     normalized_receipts = []
     for index, receipt in enumerate(receipts):
         if not isinstance(receipt, dict):
@@ -315,9 +317,12 @@ def write_runbook(path: Path | None, summary: dict[str, Any]) -> None:
 
 def main() -> int:
     args = parse_args()
+    # Bundle gate first: a draft bundle is refused before any input is read.
+    bundle = bundle_from_args(args)
+    require_promotable(bundle, "deployment receipts")
     bundle_dir, tmp = bundle_root_from_args(args)
     try:
-        manifest = validate_manifest(bundle_dir, args.silverscript_ref)
+        manifest = validate_manifest(bundle_dir, args.silverscript_ref, bundle)
         receipts_doc = load_json(args.receipts.expanduser().resolve())
         summary = validate_receipts_document(receipts_doc, manifest, args.require_operator_record)
         write_json(args.summary_out, summary)
