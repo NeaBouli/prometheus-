@@ -5,10 +5,10 @@
   "status": "BROWSER_ASSERTIONS_PASS_ONLY",
   "production_readiness": false,
   "product_source_main": "58d742aa7442ddc1663dbd9c3553e644bf0a7a2b",
-  "tested_source_revision": "372ebfe993eb7a9691c1386f5a6a3ac75261bbd9",
+  "tested_source_revision": "d9ea9a9ef69bafb13253dc145b06bf0ce10ed07c",
   "harness": {
     "path": "scripts/browser_retired_service_worker_regression.mjs",
-    "sha256": "23831131ceef3a5d00c1288c6afb75aa0c382d96810d4408c4a2370afeb32cfa"
+    "sha256": "ee0dce5b9e7c51c5d41fb35e795679bea47341b5ba96fbbf70f68fe45a37a4f8"
   },
   "classification": "loopback lifecycle fixtures plus exact public HTTP response replay",
   "historical_live_install": "not inferred; counterfactual success is not deployed history",
@@ -704,5 +704,11 @@
     "Legacy successful install has explicitly counterfactual root availability; historical JavaScript unchanged",
     "Independent archival-history fallback remains OPEN; no chain-history evidence supplied",
     "No v2, full-security, protocol or production acceptance"
-  ]
+  ],
+  "archive_guard": {
+    "missing_repro_rejected": true,
+    "missing_screenshot_rejected": true,
+    "initial_absent_observations_allowed": true,
+    "verified_before_network": true
+  }
 }
