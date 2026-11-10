@@ -1,0 +1,119 @@
+{
+  "schema_version": "prometheus.silverc.genesis-constructor.v1",
+  "description": "SYNTHETIC public fixture for scripts/check_silverc_genesis_constructor.py. Keys are repeated-byte patterns, not real keys. Not a deployment set; no owner decision is implied.",
+  "synthetic": true,
+  "placeholder_pubkey": "0000000000000000000000000000000000000000000000000000000000000000",
+  "contracts": {
+    "ValidatorStakingState": {
+      "constructor": {
+        "init_validator_pk": "1111111111111111111111111111111111111111111111111111111111111111",
+        "init_stake_kas": 10000,
+        "init_active": true,
+        "init_joined_at": 0,
+        "init_reputation": 0,
+        "init_slashing_count": 0,
+        "init_last_vote_block": 0,
+        "init_commitment": "0000000000000000000000000000000000000000000000000000000000000000",
+        "init_bond_kas": 0,
+        "init_committed_at_block": 0,
+        "init_withdraw_request_block": 0
+      },
+      "genesis_value_sompi": 1000000000000
+    },
+    "GuardianReputationState": {
+      "constructor": {
+        "init_guardian_pk": "4141414141414141414141414141414141414141414141414141414141414141",
+        "init_governance_pk": "2121212121212121212121212121212121212121212121212121212121212121",
+        "init_compute_power_gflops": 0,
+        "init_reputation": 0,
+        "init_proposals_submitted": 0,
+        "init_proposals_accepted": 0,
+        "init_registered_at": 0,
+        "init_model_type": 0
+      }
+    },
+    "RuleStorageState": {
+      "constructor": {
+        "init_governance_pk": "2222222222222222222222222222222222222222222222222222222222222222",
+        "init_next_proposal_id": 0,
+        "init_proposal_id": 0,
+        "init_guardian_pk": "0000000000000000000000000000000000000000000000000000000000000000",
+        "init_threat_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+        "init_rule_type": 0,
+        "init_rule_content_ipfs": "000000000000000000000000000000000000000000000000000000000000000000000000",
+        "init_confidence": 0,
+        "init_submitted_at_block": 0,
+        "init_votes_for": 0,
+        "init_votes_against": 0,
+        "init_voting_end_block": 0,
+        "init_status": 0,
+        "init_rule_count": 0,
+        "init_count_in_window": 0,
+        "init_last_count_reset_block": 0,
+        "init_consensus_score": 0,
+        "init_stored_at_block": 0,
+        "init_active": false,
+        "init_guardian_reputation_event": 0
+      }
+    },
+    "CommunityDonationsState": {
+      "constructor": {
+        "init_governance_pk": "2323232323232323232323232323232323232323232323232323232323232323",
+        "init_donation_count": 0,
+        "init_total_donated_kas": 0,
+        "init_pool_balance_kas": 1,
+        "init_next_disbursement_id": 0,
+        "init_disbursement_id": 0,
+        "init_recipient_pk": "0000000000000000000000000000000000000000000000000000000000000000",
+        "init_amount_kas": 0,
+        "init_purpose_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+        "init_votes_for": 0,
+        "init_votes_against": 0,
+        "init_voting_end_block": 0,
+        "init_status": 0,
+        "init_executed": false,
+        "init_last_donor_pk": "0000000000000000000000000000000000000000000000000000000000000000",
+        "init_last_message_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+        "init_last_donation_block": 0
+      },
+      "genesis_value_sompi": 100000000
+    },
+    "DevIncentivePoolState": {
+      "constructor": {
+        "init_governance_pk": "2424242424242424242424242424242424242424242424242424242424242424",
+        "init_next_grant_id": 0,
+        "init_pool_balance_prom": 0,
+        "init_grant_id": 0,
+        "init_developer_pk": "0000000000000000000000000000000000000000000000000000000000000000",
+        "init_contribution_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+        "init_description_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+        "init_lines_of_code": 0,
+        "init_complexity": 0,
+        "init_requested_amount_prom": 0,
+        "init_votes_for": 0,
+        "init_votes_against": 0,
+        "init_voting_end_block": 0,
+        "init_executed": false,
+        "init_paid": false,
+        "init_status": 0,
+        "init_last_proposer_pk": "0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    },
+    "GovernanceAutoTuningState": {
+      "constructor": {
+        "init_metrics_oracle_pk": "3131313131313131313131313131313131313131313131313131313131313131",
+        "init_min_stake_kas": 10000,
+        "init_min_guardian_rep": 1000,
+        "init_min_confidence_ki": 8500,
+        "init_validator_consensus": 6700,
+        "init_reward_base": 100,
+        "init_last_tuning_block": 0,
+        "init_active_validators": 0,
+        "init_active_guardians": 0,
+        "init_proposals_per_day": 0,
+        "init_fp_rate": 0,
+        "init_last_metrics_block": 0
+      }
+    }
+  }
+}

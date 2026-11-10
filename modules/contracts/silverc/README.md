@@ -207,6 +207,44 @@ python3 scripts/verify_silverc_compiled_semantics.py \
   --built-manifest /tmp/prometheus-silverc-artifacts/manifest.json --write-expected
 ```
 
+## Genesis constructor checklist (MS-B, v2 state contracts)
+
+`scripts/check_silverc_genesis_constructor.py --values FILE` checks a
+constructor-values JSON for the six v2 state contracts (ValidatorStaking,
+GuardianReputation, RuleStorage, CommunityDonations, DevIncentivePool,
+GovernanceAutoTuning). The scripts themselves do not enforce a genesis state, so
+this pre-deployment gate does. Parameter names, order, types and the bound
+constants are parsed from the `.sil` sources; a source change without a checklist
+update fails closed (`G-PARSE-UNCOVERED`). The frozen H-001 canary is out of scope
+and rejected if present.
+
+Enforced per parameter (rule id `G-<contract>-<parameter>`):
+
+- status EMPTY/NONE, executed/paid/rule-active false, all-zero hashes,
+  commitment and IPFS bytes, and zero counters, nonces, tallies, labels, bond,
+  withdraw label and `registered_at`;
+- pending-entry key slots equal the declared `placeholder_pubkey`; role key slots
+  (validator, five governance, metrics oracle) are non-zero and not the placeholder;
+- `init_active == (init_stake_kas >= MIN_STAKE_KAS)`;
+- AutoTuning parameters within their floors and ceilings, `fp_rate` within
+  `[0, MAX_FP_RATE]`, and `last_tuning_block == 0` unless it equals an explicit
+  `observed_tuning_anchor_daa`;
+- value backing: `genesis_value_sompi == kas * SOMPI_PER_KAS` (within i64) for
+  ValidatorStaking and CommunityDonations;
+- key reuse across different roles is rejected (`G-ROLE-KEY-REUSE`).
+
+Owner decisions are reported, never decided: a shared governance key
+(`G-ROLE-SHARED-GOVERNANCE-KEY`) and a non-zero unbacked PROM pool, which also
+requires `pool_balance_owner_decision`. The best possible verdict is
+`NOT_ACCEPTED_OWNER_DECISIONS_PENDING` (exit 0); any violation gives `REJECT`
+(exit 1). The checker never accepts a deployment set: v2 stays non-promotable and
+the D5 `accept_state` gate stays closed. Role-key checks cover format only, not
+curve validity.
+
+`genesis-constructor.synthetic.sample.json` is a synthetic public fixture with
+repeated-byte placeholder keys. It is not a deployment set and implies no owner
+decision. Tests: `python3 -m unittest scripts.test_check_silverc_genesis_constructor`.
+
 ## Deploy preflight
 
 Every bundle tool requires `--bundle h001-v1|v2-draft` (closed registry in
