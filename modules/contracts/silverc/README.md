@@ -215,8 +215,10 @@ GuardianReputation, RuleStorage, CommunityDonations, DevIncentivePool,
 GovernanceAutoTuning). The scripts themselves do not enforce a genesis state, so
 this pre-deployment gate does. Parameter names, order, types and the bound
 constants are parsed from the `.sil` sources; a source change without a checklist
-update fails closed (`G-PARSE-UNCOVERED`). The frozen H-001 canary is out of scope
-and rejected if present.
+update fails closed (`G-PARSE-UNCOVERED`). The input rejects duplicate JSON
+object members at any nesting level before evaluating constructor values
+(`G-PARSE-SCHEMA`). The frozen H-001 canary is out of scope and rejected if
+present.
 
 Enforced per parameter (rule id `G-<contract>-<parameter>`):
 

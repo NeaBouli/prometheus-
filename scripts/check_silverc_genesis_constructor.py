@@ -624,6 +624,19 @@ def evaluate(doc: Any, contracts_dir: Path = DEFAULT_CONTRACTS_DIR) -> dict[str,
     }
 
 
+class DuplicateMemberError(ValueError):
+    """The input contains an ambiguous JSON object."""
+
+
+def _unique_members(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+    members: dict[str, Any] = {}
+    for key, value in pairs:
+        if key in members:
+            raise DuplicateMemberError("duplicate JSON object member")
+        members[key] = value
+    return members
+
+
 def main(argv: list[str] | None = None) -> int:
     """CLI entry point; exit 1 on any violation, 0 for clean-but-not-accepted."""
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
@@ -631,8 +644,10 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--contracts-dir", type=Path, default=DEFAULT_CONTRACTS_DIR)
     args = parser.parse_args(argv)
     try:
-        doc = json.loads(args.values.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError) as exc:
+        doc = json.loads(
+            args.values.read_text(encoding="utf-8"), object_pairs_hook=_unique_members
+        )
+    except (OSError, json.JSONDecodeError, DuplicateMemberError) as exc:
         report: dict[str, Any] = {
             "schema_version": REPORT_SCHEMA_VERSION,
             "verdict": VERDICT_REJECT,

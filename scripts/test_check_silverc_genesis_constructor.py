@@ -12,6 +12,7 @@ import tempfile
 import unittest
 from pathlib import Path
 from typing import Any, Callable
+from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
@@ -427,6 +428,37 @@ class GenesisChecklistTest(
             self.assertIn("G-RS-STATUS", out.getvalue())
             with contextlib.redirect_stdout(io.StringIO()):
                 self.assertEqual(gate.main(["--values", str(broken)]), 1)
+
+    def test_cli_rejects_duplicate_members_before_evaluation(self) -> None:
+        original = SAMPLE.read_text(encoding="utf-8")
+        cases = (
+            ('"schema_version":', '"schema_version": "invalid", "schema_version":'),
+            ('"constructor":', '"constructor": {}, "constructor":'),
+            ('"init_joined_at": 0', '"init_joined_at": 0, "init_joined_at": 0'),
+            ('"init_joined_at": 0', r'"init\u005fjoined_at": 1, "init_joined_at": 0'),
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            candidate = Path(tmp) / "duplicate.json"
+            for original_member, duplicate in cases:
+                with self.subTest(duplicate=duplicate):
+                    self.assertIn(original_member, original)
+                    candidate.write_text(
+                        original.replace(original_member, duplicate, 1),
+                        encoding="utf-8",
+                    )
+                    out = io.StringIO()
+                    with (
+                        contextlib.redirect_stdout(out),
+                        patch.object(gate, "evaluate", wraps=gate.evaluate) as evaluate,
+                    ):
+                        self.assertEqual(gate.main(["--values", str(candidate)]), 1)
+                    evaluate.assert_not_called()
+                    report = json.loads(out.getvalue())
+                    self.assertEqual(report["verdict"], "REJECT")
+                    self.assertEqual(report["findings"][0]["rule_id"], "G-PARSE-SCHEMA")
+                    self.assertEqual(
+                        report["findings"][0]["message"], "duplicate JSON object member"
+                    )
 
 
 if __name__ == "__main__":
