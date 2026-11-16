@@ -396,6 +396,14 @@ class Checker:
                 name,
                 missing_rule,
             )
+        stale = [p for p in RULES[name] if p not in declared]
+        for stale_rule in stale:
+            self.add(
+                "G-PARSE-STALE-RULE",
+                "checklist rule names a parameter the source no longer declares",
+                name,
+                stale_rule,
+            )
         if list(values) != declared:
             missing = [p for p in declared if p not in values]
             extra = [p for p in values if p not in declared]
@@ -404,7 +412,7 @@ class Checker:
                 detail = "parameters out of constructor order"
             self.add("G-PARSE-PARAMS", detail, name)
             return None
-        if uncovered:
+        if uncovered or stale:
             return None
         if not all(self.type_ok(name, p, values[p.name]) for p in spec.params):
             return None

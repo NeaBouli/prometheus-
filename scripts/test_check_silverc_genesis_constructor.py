@@ -396,6 +396,28 @@ class GenesisChecklistTest(
             self.assertIn("G-PARSE-UNCOVERED", fired(report))
             self.assertEqual(report["verdict"], gate.VERDICT_REJECT)
 
+    def test_source_removal_with_adapted_document_fails_closed(self) -> None:
+        """MSB-R3: removing a covered parameter must not yield a clean report."""
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_dir = Path(tmp)
+            for name in gate.RULES:
+                text = (gate.DEFAULT_CONTRACTS_DIR / f"{name}.sil").read_text(
+                    encoding="utf-8"
+                )
+                if name == VS:
+                    text = text.replace(
+                        "    int init_bond_kas,\n",
+                        "",
+                    )
+                (tmp_dir / f"{name}.sil").write_text(text, encoding="utf-8")
+            removed = gate.parse_contract(tmp_dir / f"{VS}.sil")
+            self.assertNotIn("init_bond_kas", [p.name for p in removed.params])
+            doc = sample()
+            del ctor(doc, VS)["init_bond_kas"]
+            report = gate.evaluate(doc, tmp_dir)
+            self.assertIn("G-PARSE-STALE-RULE", fired(report))
+            self.assertEqual(report["verdict"], gate.VERDICT_REJECT)
+
     def test_constants_come_from_source(self) -> None:
         specs = gate.load_specs(gate.DEFAULT_CONTRACTS_DIR)
         self.assertEqual(specs[VS].constants["MIN_STAKE_KAS"], 10000)
