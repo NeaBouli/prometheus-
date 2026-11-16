@@ -50,6 +50,8 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - name: Test compiled-artifact semantic gate (GH-283)
         run: python3 -m unittest scripts.test_silverc_compiled_semantics
+      - name: Test v2 genesis constructor checklist (MS-B)
+        run: python3 -m unittest scripts.test_check_silverc_genesis_constructor
       - name: Verify KAS/PROM separation (PATTERN-001)
         run: |
           echo "Checking contracts for KAS/PROM separation..."
