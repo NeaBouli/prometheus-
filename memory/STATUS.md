@@ -2120,6 +2120,30 @@ target tests were not run. Public2026-10-09 status baseline and all rendered
 content, assets and runtime/contract/policy/acceptance gates are unchanged.
 No production readiness follows. Codex Security NOT CONNECTED/NOT RUN.
 
+## Task-Only Integration Preview (2026-10-10)
+
+Metadata PR292 is Done at eecbaf5731b6a0e2f3a77aebe8f42e97cf1daf47:
+exact candidate/main CI/Security and Pages all pass, three live byte matches;
+273 closed after full scoped adjudication,275/270 stay open. Earlier pending
+metadata entries are historical checkpoints. Own worktree verified/archived.
+
+The current candidate reuses C2's already delivered contract-v2/profile/D5
+code on this main without restoring old public claims or changing source trust.
+It is a Draft integration preview, not accepted/merged main, real deployment,
+independent confirmation or production readiness. Exact integration tests still
+pending; strict mypy retains one inherited finding and frozen historical source
+has one documented EOF whitespace exception. D1-D7/constructor/full-security/
+Codex Security/D5/source-policy/client/rollout gates remain held.
+Rust remains v1-pinned, v2 non-promotable, accept_state unconditionally closed.
+The2026-10-09 project-wide public review baseline is unchanged.
+
+
+Final local preview checkpoint: the preceding inherited type warning was
+reproduced and resolved with one annotation. Scoped strict validator/helper
+mypy now passes2 files; Ruff and parent source/pin/main-preservation/append-only
+checks pass.49 worker source blobs are exact plus two-line CI/one annotation
+glue, pinned by the task source manifest. No compiled identity beyond C2, Rust
+release pin or activation changes; hosted integration/full acceptance pending.
 
 ## 2026-10-10 - CODEX - CI baseline configured, hosted verification pending
 - Eleven existing CI/Security runner selectors now explicitly ubuntu-24.04; new CiRegistrationTest covers both .yml/.yaml workflow jobs. No product/contract/source/toolchain/action pin, permissions, triggers, checks or rollout policy change. No new runtime module, Ubuntu26 remains a separate compatibility task; OS pin is not an immutable image lock.
@@ -2152,3 +2176,14 @@ without removing content or changing shared CSS/JS/assets. All8 corrected local
 responsive cases PASS and fresh images individually inspected. Previous partial
 evidence preserved, source/public baseline unchanged, local handles closed.
 Worker scope OK only; independent review, backport, CI and publication with Core.
+
+## Current-main / Held-v2 Test Candidate (2026-10-10)
+
+The isolated candidate combines exact main58d742a, held source24980e6 and
+reviewed docs649e495; merge checkpoints7abb76b/10393ae retain both histories.
+Hosted combined-head CI/Security are pending; parent green runs are not proof.
+The separate scoped static later-v2 scan is COMPLETE with no registered finding
+but PARTIAL coverage, not full-v2 release acceptance. No main merge, trust
+selection, D1-D7 adoption or activation. Frozen H-001/Rust-v1 pins unchanged,
+v2 non-promotable and D5 acceptance unconditionally closed. The October9
+project-wide public review baseline remains historical and unchanged.

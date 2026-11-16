@@ -23,10 +23,16 @@ RESOLVER = "kaspa-resolver://public"
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--archive", type=Path, required=True)
+    parser.add_argument("--bundle", required=True, choices=("h001-v1",), help="The canary profile exists only for h001-v1")
     return parser.parse_args()
 
 
+SELECTED_BUNDLE: list[str] = []
+
+
 def run(*args: str, expect_success: bool = True) -> subprocess.CompletedProcess[str]:
+    if "--archive" in args and "--bundle" not in args:
+        args = (*args, *SELECTED_BUNDLE)
     proc = subprocess.run(
         [sys.executable, *args],
         cwd=ROOT,
@@ -58,6 +64,7 @@ def rehash(value: dict[str, Any], key: str) -> None:
 
 
 def main(args: argparse.Namespace) -> int:
+    SELECTED_BUNDLE[:] = ["--bundle", args.bundle]
     archive = str(args.archive.expanduser().resolve())
     with tempfile.TemporaryDirectory(prefix="prometheus-h001-canary-test.") as tmp:
         root = Path(tmp)

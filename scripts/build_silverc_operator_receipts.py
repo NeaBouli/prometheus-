@@ -11,6 +11,7 @@ from hashlib import sha256
 from pathlib import Path
 from typing import Any
 
+from silverc_bundles import add_bundle_argument, bundle_from_args, require_profile, require_promotable  # noqa: F401
 from preflight_silverc_deploy import NETWORKS, bundle_root_from_args, load_json, validate_manifest
 from silverc_deployment_profiles import is_canary, receipt_import_status
 from smoke_silverc_artifacts import canonical_json_bytes
@@ -59,6 +60,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--operator-receipts-out", type=Path, help="Optional generated operator_record receipts JSON")
     parser.add_argument("--summary-out", type=Path, help="Optional JSON summary path")
     parser.add_argument("--runbook-out", type=Path, help="Optional Markdown runbook path")
+    add_bundle_argument(parser)
     return parser.parse_args()
 
 
@@ -333,14 +335,17 @@ def build_summary(
 
 def main() -> int:
     args = parse_args()
+    # Bundle gate first: a draft bundle is refused before any input is read.
+    bundle = bundle_from_args(args)
+    require_promotable(bundle, "operator receipts")
     bundle_dir, tmp = bundle_root_from_args(args)
     try:
-        manifest = validate_manifest(bundle_dir, args.silverscript_ref)
+        manifest = validate_manifest(bundle_dir, args.silverscript_ref, bundle)
         request_set = load_json(args.request_set.expanduser().resolve())
         requests_dir = args.requests_dir.expanduser().resolve()
         if not requests_dir.is_dir():
             raise FileNotFoundError(f"requests directory not found: {requests_dir}")
-        request_summary = validate_request_set(request_set=request_set, requests_dir=requests_dir, manifest=manifest)
+        request_summary = validate_request_set(request_set=request_set, requests_dir=requests_dir, manifest=manifest, bundle=bundle)
         results_doc = load_json(args.orchestrator_results.expanduser().resolve())
         receipts_doc = build_receipts(
             results_doc=results_doc,

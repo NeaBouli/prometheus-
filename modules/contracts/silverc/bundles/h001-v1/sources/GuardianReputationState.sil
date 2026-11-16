@@ -1,0 +1,106 @@
+pragma silverscript ^0.1.0;
+
+contract GuardianReputationState(
+    pubkey init_guardian_pk,
+    pubkey init_governance_pk,
+    int init_compute_power_gflops,
+    int init_reputation,
+    int init_proposals_submitted,
+    int init_proposals_accepted,
+    int init_registered_at,
+    int init_model_type
+) {
+    int constant MIN_COMPUTE_GFLOPS = 100;
+    int constant REPUTATION_START = 1000;
+    int constant REPUTATION_MAX = 100000;
+    int constant MIN_REPUTATION = 1000;
+    int constant MODEL_TYPE_70B = 0;
+    int constant MODEL_TYPE_8B = 1;
+
+    pubkey guardian_pk = init_guardian_pk;
+    pubkey governance_pk = init_governance_pk;
+    int compute_power_gflops = init_compute_power_gflops;
+    int reputation = init_reputation;
+    int proposals_submitted = init_proposals_submitted;
+    int proposals_accepted = init_proposals_accepted;
+    int registered_at = init_registered_at;
+    int model_type = init_model_type;
+
+    function isqrt(int n) : int {
+        require(n >= 0);
+        require(n < 1000000);
+
+        int result = 0;
+        for (i, 1, 1001, 1000) {
+            if (i * i <= n) {
+                result = i;
+            }
+        }
+        return(result);
+    }
+
+    #[covenant.singleton(mode = transition)]
+    function register(State prev_state, int new_compute_power_gflops, int new_registered_at, sig guardian_sig) : State {
+        require(prev_state.registered_at == 0);
+        require(new_compute_power_gflops >= MIN_COMPUTE_GFLOPS);
+        require(new_compute_power_gflops < 1000000);
+        require(new_registered_at >= 0);
+        require(checkSig(guardian_sig, prev_state.guardian_pk));
+
+        int model = new_compute_power_gflops >= 500 ? MODEL_TYPE_70B : MODEL_TYPE_8B;
+
+        return({
+            guardian_pk: prev_state.guardian_pk,
+            governance_pk: prev_state.governance_pk,
+            compute_power_gflops: new_compute_power_gflops,
+            reputation: REPUTATION_START,
+            proposals_submitted: 0,
+            proposals_accepted: 0,
+            registered_at: new_registered_at,
+            model_type: model
+        });
+    }
+
+    #[covenant.singleton(mode = transition)]
+    function proposalAccepted(State prev_state, sig governance_sig) : State {
+        require(prev_state.registered_at > 0);
+        require(prev_state.compute_power_gflops >= MIN_COMPUTE_GFLOPS);
+        require(prev_state.compute_power_gflops < 1000000);
+        require(checkSig(governance_sig, prev_state.governance_pk));
+
+        int reputation_increase = isqrt(prev_state.compute_power_gflops) * 100;
+        int increased_reputation = prev_state.reputation + reputation_increase;
+        int capped_reputation = increased_reputation > REPUTATION_MAX ? REPUTATION_MAX : increased_reputation;
+
+        return({
+            guardian_pk: prev_state.guardian_pk,
+            governance_pk: prev_state.governance_pk,
+            compute_power_gflops: prev_state.compute_power_gflops,
+            reputation: capped_reputation,
+            proposals_submitted: prev_state.proposals_submitted,
+            proposals_accepted: prev_state.proposals_accepted + 1,
+            registered_at: prev_state.registered_at,
+            model_type: prev_state.model_type
+        });
+    }
+
+    #[covenant.singleton(mode = transition)]
+    function proposalRejected(State prev_state, sig governance_sig) : State {
+        require(prev_state.registered_at > 0);
+        require(checkSig(governance_sig, prev_state.governance_pk));
+
+        int halved_reputation = prev_state.reputation / 2;
+        int final_reputation = halved_reputation < MIN_REPUTATION ? 0 : halved_reputation;
+
+        return({
+            guardian_pk: prev_state.guardian_pk,
+            governance_pk: prev_state.governance_pk,
+            compute_power_gflops: prev_state.compute_power_gflops,
+            reputation: final_reputation,
+            proposals_submitted: prev_state.proposals_submitted,
+            proposals_accepted: prev_state.proposals_accepted,
+            registered_at: prev_state.registered_at,
+            model_type: prev_state.model_type
+        });
+    }
+}

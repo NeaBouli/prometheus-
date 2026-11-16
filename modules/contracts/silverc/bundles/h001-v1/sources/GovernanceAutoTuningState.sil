@@ -1,0 +1,138 @@
+pragma silverscript ^0.1.0;
+
+contract GovernanceAutoTuningState(
+    pubkey init_metrics_oracle_pk,
+    int init_min_stake_kas,
+    int init_min_guardian_rep,
+    int init_min_confidence_ki,
+    int init_validator_consensus,
+    int init_reward_base,
+    int init_last_tuning_block,
+    int init_active_validators,
+    int init_active_guardians,
+    int init_proposals_per_day,
+    int init_fp_rate,
+    int init_last_metrics_block
+) {
+    int constant TUNING_INTERVAL_BLOCKS = 604800;
+    int constant MIN_STAKE_KAS_FLOOR = 1000;
+    int constant MIN_STAKE_KAS_CEILING = 100000;
+    int constant CONFIDENCE_FLOOR = 5000;
+    int constant CONFIDENCE_CEILING = 9900;
+    int constant REWARD_FLOOR = 10;
+    int constant REWARD_CEILING = 1000;
+    int constant TARGET_VALIDATORS_MIN = 50;
+    int constant TARGET_VALIDATORS_MAX = 200;
+    int constant TARGET_GUARDIANS_MIN = 200;
+    int constant TARGET_GUARDIANS_MAX = 1000;
+    int constant TARGET_FP_RATE_MAX = 50;
+    int constant MAX_FP_RATE = 10000;
+    int constant STEP_STAKE = 500;
+    int constant STEP_CONFIDENCE = 100;
+    int constant STEP_REWARD = 10;
+
+    pubkey metrics_oracle_pk = init_metrics_oracle_pk;
+    int min_stake_kas = init_min_stake_kas;
+    int min_guardian_rep = init_min_guardian_rep;
+    int min_confidence_ki = init_min_confidence_ki;
+    int validator_consensus = init_validator_consensus;
+    int reward_base = init_reward_base;
+    int last_tuning_block = init_last_tuning_block;
+    int active_validators = init_active_validators;
+    int active_guardians = init_active_guardians;
+    int proposals_per_day = init_proposals_per_day;
+    int fp_rate = init_fp_rate;
+    int last_metrics_block = init_last_metrics_block;
+
+    #[covenant.singleton(mode = transition)]
+    function reportMetrics(
+        State prev_state,
+        int new_active_validators,
+        int new_active_guardians,
+        int new_proposals_per_day,
+        int new_fp_rate,
+        int block_height,
+        sig oracle_sig
+    ) : State {
+        require(new_active_validators >= 0);
+        require(new_active_guardians >= 0);
+        require(new_proposals_per_day >= 0);
+        require(new_fp_rate >= 0);
+        require(new_fp_rate <= MAX_FP_RATE);
+        require(block_height >= prev_state.last_metrics_block);
+        require(checkSig(oracle_sig, prev_state.metrics_oracle_pk));
+
+        return({
+            metrics_oracle_pk: prev_state.metrics_oracle_pk,
+            min_stake_kas: prev_state.min_stake_kas,
+            min_guardian_rep: prev_state.min_guardian_rep,
+            min_confidence_ki: prev_state.min_confidence_ki,
+            validator_consensus: prev_state.validator_consensus,
+            reward_base: prev_state.reward_base,
+            last_tuning_block: prev_state.last_tuning_block,
+            active_validators: new_active_validators,
+            active_guardians: new_active_guardians,
+            proposals_per_day: new_proposals_per_day,
+            fp_rate: new_fp_rate,
+            last_metrics_block: block_height
+        });
+    }
+
+    #[covenant.singleton(mode = transition)]
+    function autoTune(State prev_state, int block_height) : State {
+        require(block_height >= prev_state.last_tuning_block + TUNING_INTERVAL_BLOCKS);
+        require(prev_state.min_stake_kas >= MIN_STAKE_KAS_FLOOR);
+        require(prev_state.min_stake_kas <= MIN_STAKE_KAS_CEILING);
+        require(prev_state.min_confidence_ki >= CONFIDENCE_FLOOR);
+        require(prev_state.min_confidence_ki <= CONFIDENCE_CEILING);
+        require(prev_state.reward_base >= REWARD_FLOOR);
+        require(prev_state.reward_base <= REWARD_CEILING);
+        require(prev_state.active_validators >= 0);
+        require(prev_state.active_guardians >= 0);
+        require(prev_state.proposals_per_day >= 0);
+        require(prev_state.fp_rate >= 0);
+        require(prev_state.fp_rate <= MAX_FP_RATE);
+
+        int next_min_stake_kas = prev_state.min_stake_kas;
+        if (prev_state.active_validators < TARGET_VALIDATORS_MIN) {
+            int lowered_stake = prev_state.min_stake_kas - STEP_STAKE;
+            next_min_stake_kas = lowered_stake < MIN_STAKE_KAS_FLOOR ? MIN_STAKE_KAS_FLOOR : lowered_stake;
+        } else if (prev_state.active_validators > TARGET_VALIDATORS_MAX) {
+            int raised_stake = prev_state.min_stake_kas + STEP_STAKE;
+            next_min_stake_kas = raised_stake > MIN_STAKE_KAS_CEILING ? MIN_STAKE_KAS_CEILING : raised_stake;
+        }
+
+        int next_min_confidence_ki = prev_state.min_confidence_ki;
+        if (prev_state.fp_rate > TARGET_FP_RATE_MAX) {
+            int raised_confidence = prev_state.min_confidence_ki + STEP_CONFIDENCE;
+            next_min_confidence_ki = raised_confidence > CONFIDENCE_CEILING ? CONFIDENCE_CEILING : raised_confidence;
+        } else if (prev_state.fp_rate == 0 && prev_state.min_confidence_ki > CONFIDENCE_FLOOR) {
+            int lowered_confidence = prev_state.min_confidence_ki - STEP_CONFIDENCE;
+            next_min_confidence_ki = lowered_confidence < CONFIDENCE_FLOOR ? CONFIDENCE_FLOOR : lowered_confidence;
+        }
+
+        int next_reward_base = prev_state.reward_base;
+        if (prev_state.proposals_per_day < 100) {
+            int raised_reward = prev_state.reward_base + STEP_REWARD;
+            next_reward_base = raised_reward > REWARD_CEILING ? REWARD_CEILING : raised_reward;
+        } else if (prev_state.proposals_per_day > 200) {
+            int lowered_reward = prev_state.reward_base - STEP_REWARD;
+            next_reward_base = lowered_reward < REWARD_FLOOR ? REWARD_FLOOR : lowered_reward;
+        }
+
+        return({
+            metrics_oracle_pk: prev_state.metrics_oracle_pk,
+            min_stake_kas: next_min_stake_kas,
+            min_guardian_rep: prev_state.min_guardian_rep,
+            min_confidence_ki: next_min_confidence_ki,
+            validator_consensus: prev_state.validator_consensus,
+            reward_base: next_reward_base,
+            last_tuning_block: block_height,
+            active_validators: prev_state.active_validators,
+            active_guardians: prev_state.active_guardians,
+            proposals_per_day: prev_state.proposals_per_day,
+            fp_rate: prev_state.fp_rate,
+            last_metrics_block: prev_state.last_metrics_block
+        });
+    }
+}

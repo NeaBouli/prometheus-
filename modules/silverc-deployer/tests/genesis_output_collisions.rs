@@ -10,6 +10,8 @@ use std::sync::atomic::{AtomicUsize, Ordering};
 
 const FIXTURE: &[u8] = b"public fixture, not json";
 const ACK: &str = "0000000000000000000000000000000000000000000000000000000000000000";
+const HEX32: &str = "1111111111111111111111111111111111111111111111111111111111111111";
+const OUTPOINT: &str = "1111111111111111111111111111111111111111111111111111111111111111:0";
 
 struct Subcommand {
     name: &'static str,
@@ -35,6 +37,21 @@ const SUBCOMMANDS: &[Subcommand] = &[
         ],
         outputs: &[("--evidence-out", "preflight evidence output")],
         extra: &[],
+    },
+    Subcommand {
+        name: "calculate-covenant-id",
+        inputs: &[("--artifact", "artifact input")],
+        outputs: &[("--calculation-out", "covenant-id calculation output")],
+        extra: &[
+            "--expected-artifact-sha256",
+            HEX32,
+            "--expected-script-sha256",
+            HEX32,
+            "--funding-outpoint",
+            OUTPOINT,
+            "--genesis-output-value-sompi",
+            "1",
+        ],
     },
     Subcommand {
         name: "prepare",
@@ -76,7 +93,13 @@ const SUBCOMMANDS: &[Subcommand] = &[
     Subcommand {
         name: "observe",
         inputs: GENESIS_INPUTS,
-        outputs: &[("--evidence-out", "observation evidence output")],
+        outputs: &[
+            ("--evidence-out", "observation evidence output"),
+            (
+                "--d5-evidence-candidate-out",
+                "D5 evidence candidate output",
+            ),
+        ],
         extra: &[],
     },
 ];

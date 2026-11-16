@@ -9,6 +9,7 @@ import sys
 from pathlib import Path
 from typing import Any
 
+from silverc_bundles import add_bundle_argument, bundle_from_args, require_profile, require_promotable  # noqa: F401
 from preflight_silverc_deploy import bundle_root_from_args, load_json, validate_manifest
 from silverc_deployment_profiles import CANARY_SCOPE_NOTICE, is_canary, status_draft_status
 from verify_silverc_deploy_receipts import validate_receipts_document
@@ -34,6 +35,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--status-out", type=Path, help="Optional JSON status draft path")
     parser.add_argument("--snippet-out", type=Path, help="Optional Markdown status snippet path")
+    add_bundle_argument(parser)
     return parser.parse_args()
 
 
@@ -150,9 +152,12 @@ def build_status(summary: dict[str, Any]) -> dict[str, Any]:
 
 def main() -> int:
     args = parse_args()
+    # Bundle gate first: a draft bundle is refused before any input is read.
+    bundle = bundle_from_args(args)
+    require_promotable(bundle, "deployment status staging")
     bundle_dir, tmp = bundle_root_from_args(args)
     try:
-        manifest = validate_manifest(bundle_dir, args.silverscript_ref)
+        manifest = validate_manifest(bundle_dir, args.silverscript_ref, bundle)
         receipts_doc = load_json(args.operator_receipts.expanduser().resolve())
         summary = validate_receipts_document(receipts_doc, manifest, require_operator_record=True)
         status = build_status(summary)

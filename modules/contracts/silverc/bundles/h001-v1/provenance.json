@@ -1,0 +1,23 @@
+{
+  "archive_sha256": "4989f0768f2d2fc749fdd3aea227c1be6e55f5cbf35ac9c83e891b6abdf3977d",
+  "bundle_id": "h001-v1",
+  "evidence": [
+    "docs/evidence/gh-9-h001-public-evidence-2026-08-12.json",
+    "docs/evidence/gh-9-h001-operator-receipts-2026-08-12.json"
+  ],
+  "files": {
+    "fixtures.json": "7528ece13dcfdf74c6e748f50e83007756b16db22463dbfb386c695d8a7de390",
+    "manifest.json": "5861281ccfefc63705edf064dd9f3161cc5eef11c473804ae0379d7c0f4fa662",
+    "sources/CommunityDonationsState.sil": "156aabe95b183b4539fa182b09c81631e70d05b61af1ef82201b76c1e9de85f8",
+    "sources/DevIncentivePoolState.sil": "b3558b03f1a47b44062799700a74b31d4c13cd385ec2b2ac568cdb6ed7112766",
+    "sources/GovernanceAutoTuningState.sil": "2903529bae477bd6ded0a02cccba8a7bbaa52a15f342f1c865074ee46e80afc4",
+    "sources/GuardianReputationState.sil": "eb6156e82e82596dc7d959a8826bd15dfafca17c0d1ff9f1c6a2c620da47c53c",
+    "sources/RuleStorageState.sil": "7e6dcd920217726d27ee592e0cf1534d6906b77e289842a526f1d39f4514057f",
+    "sources/ValidatorStakingH001.sil": "ebf17c5291934c90ea0df118791094b35bac12ea58ee4e65fc69bcebae6908d6",
+    "sources/ValidatorStakingState.sil": "0679d020f3df0f5558185f0b8f198ee91ea98bb716b21cd581a94c54083d17eb"
+  },
+  "manifest_sha256": "e6cec2aa5d740c47c972fe92d4607ffd8a7a3c3f26b353475451d50b2670aefd",
+  "origin_commit": "e6d5464a8535a9a3095507501af7f8706c336258",
+  "schema_version": 1,
+  "silverscript_commit": "d25bd3427a093c17327ca3d6b9e1aa5f7688c863"
+}

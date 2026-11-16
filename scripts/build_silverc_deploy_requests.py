@@ -11,6 +11,14 @@ from hashlib import sha256
 from pathlib import Path
 from typing import Any
 
+from silverc_bundles import (  # noqa: F401
+    DRAFT_BLOCKER,
+    DRAFT_REQUEST_SET_STATUS,
+    add_bundle_argument,
+    bundle_from_args,
+    require_profile,
+    require_promotable,
+)
 from preflight_silverc_deploy import (
     HEX_32_BYTES_RE,
     KASPA_ADDRESS_RE,
@@ -29,7 +37,7 @@ from silverc_deployment_profiles import (
     request_status,
     validate_profile_inputs,
 )
-from smoke_silverc_artifacts import FIXTURES, canonical_json_bytes
+from smoke_silverc_artifacts import canonical_json_bytes
 from verify_silverc_h001 import DEFAULT_SILVERSCRIPT_REF
 
 DEFAULT_OUT_DIR = Path("/tmp/prometheus-silverc-deploy-requests")
@@ -72,6 +80,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--request-set-out", type=Path, help="Optional JSON request-set summary path")
     parser.add_argument("--runbook-out", type=Path, help="Optional Markdown deploy-request runbook path")
+    add_bundle_argument(parser)
     return parser.parse_args()
 
 
@@ -100,8 +109,9 @@ def validate_public_inputs(args: argparse.Namespace) -> None:
         raise ValueError("--metrics-oracle-pubkey must be a 32-byte public key hex string")
 
 
-def fixture_args_by_contract() -> dict[str, Any]:
-    return {fixture.contract_name: fixture.args for fixture in FIXTURES}
+def fixture_args_by_contract(bundle: Any) -> dict[str, Any]:
+    return {fixture.contract_name: fixture.args for fixture in bundle.fixtures}
+
 
 
 def write_json(path: Path, value: dict[str, Any]) -> None:
@@ -121,6 +131,7 @@ def build_request(
     order: int,
     constructor_args: Any,
     deployment_profile: dict[str, Any],
+    bundle: Any,
 ) -> dict[str, Any]:
     reject_secret_fields(constructor_args, "$.constructor_args")
     request = {
@@ -170,6 +181,9 @@ def build_request(
     }
     if args.metrics_oracle_pubkey is not None:
         request["metrics_oracle_pubkey"] = args.metrics_oracle_pubkey
+    if not bundle.promotable:
+        # Draft requests carry their bundle identity; historical v1 requests stay byte-identical.
+        request["bundle_identity"] = {"id": bundle.bundle_id, "promotable": False}
     request["request_sha256"] = request_hash(request)
     return request
 
@@ -236,10 +250,12 @@ def main() -> int:
     validate_public_inputs(args)
     bundle_dir, tmp = bundle_root_from_args(args)
     try:
-        manifest = validate_manifest(bundle_dir, args.silverscript_ref)
+        bundle = bundle_from_args(args)
+        manifest = validate_manifest(bundle_dir, args.silverscript_ref, bundle)
+        require_profile(bundle, args.deployment_profile)
         deployment_profile = expected_profile(args.deployment_profile, manifest)
         selected_contracts = set(deployment_profile["selected_contracts"])
-        constructor_args = fixture_args_by_contract()
+        constructor_args = fixture_args_by_contract(bundle)
         out_dir = args.out_dir.expanduser().resolve()
         if out_dir.exists():
             shutil.rmtree(out_dir)
@@ -259,6 +275,7 @@ def main() -> int:
                 order=order,
                 constructor_args=constructor_args[contract_name],
                 deployment_profile=deployment_profile,
+                bundle=bundle,
             )
             filename = f"{order:02d}-{contract_name}.deploy-request.json"
             write_json(out_dir / filename, request)
@@ -295,6 +312,10 @@ def main() -> int:
             },
             "safety_scope": REQUEST_SAFETY_SCOPE,
         }
+        if not bundle.promotable:
+            summary["status"] = DRAFT_REQUEST_SET_STATUS
+            summary["bundle_identity"] = {"id": bundle.bundle_id, "promotable": False}
+            summary["blockers"].append(DRAFT_BLOCKER)
         if args.metrics_oracle_pubkey is not None:
             summary["metrics_oracle_pubkey"] = args.metrics_oracle_pubkey
         if deployment_profile["kind"] == "canary":

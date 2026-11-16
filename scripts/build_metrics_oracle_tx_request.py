@@ -20,6 +20,7 @@ from preflight_metrics_oracle_report import (
     load_json as load_report_json,
     validate_report,
 )
+from silverc_bundles import add_bundle_argument, bundle_from_args, require_profile, require_promotable  # noqa: F401
 from preflight_silverc_deploy import bundle_root_from_args, validate_manifest
 from verify_silverc_h001 import DEFAULT_SILVERSCRIPT_REF
 
@@ -59,6 +60,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--tx-request-out", type=Path, help="Optional JSON unsigned request output path")
     parser.add_argument("--runbook-out", type=Path, help="Optional Markdown operator handoff path")
+    add_bundle_argument(parser)
     return parser.parse_args()
 
 
@@ -231,6 +233,9 @@ def write_runbook(path: Path | None, request: dict[str, Any]) -> None:
 
 def main() -> int:
     args = parse_args()
+    # Bundle gate first: a draft bundle is refused before any input is processed.
+    bundle = bundle_from_args(args)
+    require_promotable(bundle, "a metrics-oracle transaction request")
     contract_instance_id = validate_contract_instance_id(
         args.contract_instance_id,
         args.require_contract_instance_id,
@@ -240,7 +245,7 @@ def main() -> int:
 
     bundle_dir, tmp = bundle_root_from_args(args)
     try:
-        manifest = validate_manifest(bundle_dir, args.silverscript_ref)
+        manifest = validate_manifest(bundle_dir, args.silverscript_ref, bundle)
         contract_entry = governance_manifest_entry(manifest)
         request = build_request(payload, report_plan, manifest, contract_entry, contract_instance_id)
         write_json(args.tx_request_out, request)

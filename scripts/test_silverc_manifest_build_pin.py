@@ -18,6 +18,7 @@ from unittest import mock
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import preflight_silverc_deploy as pf  # noqa: E402
+import silverc_bundles as bundles  # noqa: E402
 import smoke_silverc_artifacts as smoke  # noqa: E402
 import verify_silverc_h001 as vh  # noqa: E402
 
@@ -128,6 +129,8 @@ class CargoLockedTest(TempDirTest):
 
 
 class ManifestPinTest(TempDirTest):
+    BUNDLE = bundles.get_bundle(bundles.V2_DRAFT)
+
     def manifest(self, **overrides: Any) -> dict[str, Any]:
         data: dict[str, Any] = {
             "schema_version": 1,
@@ -153,15 +156,24 @@ class ManifestPinTest(TempDirTest):
         self.write(data)
         with mock.patch.object(pf, "validate_manifest_entry") as entry:
             with self.assertRaisesRegex(ValueError, message):
-                pf.validate_manifest(self.tmp, expected)
+                pf.validate_manifest(self.tmp, expected, self.BUNDLE)
         entry.assert_not_called()
 
     def test_preflight_accepts_ref_and_commit_equal_to_pin(self) -> None:
         self.write(self.manifest())
-        with mock.patch.object(pf, "validate_manifest_entry") as entry:
-            manifest = pf.validate_manifest(self.tmp, PIN)
+        with mock.patch.object(pf, "validate_manifest_entry") as entry, mock.patch.object(
+            pf, "require_manifest_pin"
+        ) as pin:
+            manifest = pf.validate_manifest(self.tmp, PIN, self.BUNDLE)
         self.assertEqual(manifest["silverscript_commit"], PIN)
         self.assertEqual(entry.call_count, len(smoke.FIXTURES))
+        pin.assert_called_once_with(self.BUNDLE, manifest)
+
+    def test_preflight_rejects_pinned_ref_with_unpinned_manifest_hash(self) -> None:
+        self.write(self.manifest())
+        with mock.patch.object(pf, "validate_manifest_entry"):
+            with self.assertRaisesRegex(ValueError, "manifest"):
+                pf.validate_manifest(self.tmp, PIN, self.BUNDLE)
 
     def test_preflight_rejects_commit_mismatch(self) -> None:
         self.assert_preflight_rejects(self.manifest(silverscript_commit=OTHER), PIN, "unexpected silverscript_commit")
@@ -179,23 +191,23 @@ class ManifestPinTest(TempDirTest):
     def test_preflight_rejection_does_not_echo_manifest_values(self) -> None:
         self.write(self.manifest(silverscript_commit="attacker-controlled-value"))
         with self.assertRaises(ValueError) as ctx:
-            pf.validate_manifest(self.tmp, PIN)
+            pf.validate_manifest(self.tmp, PIN, self.BUNDLE)
         self.assertNotIn("attacker-controlled-value", str(ctx.exception))
 
     def test_smoke_rejects_commit_mismatch(self) -> None:
         path = self.write(self.manifest(silverscript_commit=OTHER))
         with self.assertRaisesRegex(ValueError, "silverscript_commit does not match the workspace pin"):
-            smoke.validate_manifest(path, self.tmp)
+            smoke.validate_manifest(path, self.tmp, self.BUNDLE)
 
     def test_smoke_rejects_ref_mismatch(self) -> None:
         path = self.write(self.manifest(silverscript_ref=OTHER))
         with self.assertRaisesRegex(ValueError, "silverscript_ref does not match the workspace pin"):
-            smoke.validate_manifest(path, self.tmp)
+            smoke.validate_manifest(path, self.tmp, self.BUNDLE)
 
     def test_smoke_pinned_manifest_proceeds_to_artifact_checks(self) -> None:
         path = self.write(self.manifest())
         with self.assertRaises(FileNotFoundError):
-            smoke.validate_manifest(path, self.tmp)
+            smoke.validate_manifest(path, self.tmp, self.BUNDLE)
 
 
 if __name__ == "__main__":

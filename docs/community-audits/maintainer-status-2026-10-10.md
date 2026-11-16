@@ -254,3 +254,14 @@ remain pending at this candidate checkpoint. See
 [the task report](../../.fleet/reports/public-metadata-20261010.md).
 This does not close273/275 automatically, change historical severity totals or
 clear any contract/D5/full-security/rollout gate.
+
+## Metadata Follow-Up Verified (2026-10-10)
+
+PR292 merged eecbaf5731b6a0e2f3a77aebe8f42e97cf1daf47 with candidate/main
+CI/Security/Pages pass and three live byte matches. The PRM-31/45 bounded gaps
+above are now resolved,83 actual claim tests pass.273 was explicitly closed
+after its whole scoped acceptance mapping;275 archival/fallback residual and
+270 remain open. [Public receipt](https://github.com/NeaBouli/prometheus-/pull/292#issuecomment-6091827053)
+supersedes the candidate checkpoint, not the dated table/totals/report history.
+The current C2 integration preview is unmerged/non-promotable; it does not
+clear proposed D1-D7, independent review, Codex Security, D5 or rollout gates.

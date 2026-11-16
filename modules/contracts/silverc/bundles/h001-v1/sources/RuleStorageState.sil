@@ -1,0 +1,232 @@
+pragma silverscript ^0.1.0;
+
+contract RuleStorageState(
+    pubkey init_governance_pk,
+    int init_next_proposal_id,
+    int init_proposal_id,
+    pubkey init_guardian_pk,
+    byte[32] init_threat_hash,
+    int init_rule_type,
+    byte[36] init_rule_content_ipfs,
+    int init_confidence,
+    int init_submitted_at_block,
+    int init_votes_for,
+    int init_votes_against,
+    int init_voting_end_block,
+    int init_status,
+    int init_rule_count,
+    int init_count_in_window,
+    int init_last_count_reset_block,
+    int init_consensus_score,
+    int init_stored_at_block,
+    bool init_active,
+    int init_guardian_reputation_event
+) {
+    int constant MIN_CONFIDENCE = 8500;
+    int constant VALIDATOR_QUORUM = 6700;
+    int constant VOTING_BLOCKS = 864000;
+    int constant RULE_TYPE_YARA = 0;
+    int constant RULE_TYPE_STIX = 1;
+    int constant RULE_TYPE_SIGMA = 2;
+    int constant STATUS_EMPTY = 0;
+    int constant STATUS_PENDING = 1;
+    int constant STATUS_ACCEPTED = 2;
+    int constant STATUS_REJECTED = 3;
+    int constant GUARDIAN_EVENT_NONE = 0;
+    int constant GUARDIAN_EVENT_ACCEPTED = 1;
+    int constant GUARDIAN_EVENT_REJECTED = 2;
+
+    pubkey governance_pk = init_governance_pk;
+    int next_proposal_id = init_next_proposal_id;
+    int proposal_id = init_proposal_id;
+    pubkey guardian_pk = init_guardian_pk;
+    byte[32] threat_hash = init_threat_hash;
+    int rule_type = init_rule_type;
+    byte[36] rule_content_ipfs = init_rule_content_ipfs;
+    int confidence = init_confidence;
+    int submitted_at_block = init_submitted_at_block;
+    int votes_for = init_votes_for;
+    int votes_against = init_votes_against;
+    int voting_end_block = init_voting_end_block;
+    int status = init_status;
+    int rule_count = init_rule_count;
+    int count_in_window = init_count_in_window;
+    int last_count_reset_block = init_last_count_reset_block;
+    int consensus_score = init_consensus_score;
+    int stored_at_block = init_stored_at_block;
+    bool active = init_active;
+    int guardian_reputation_event = init_guardian_reputation_event;
+
+    function emptyThreatHash() : byte[32] {
+        return(0x0000000000000000000000000000000000000000000000000000000000000000);
+    }
+
+    #[covenant.singleton(mode = transition)]
+    function submitProposal(
+        State prev_state,
+        pubkey new_guardian_pk,
+        byte[32] new_threat_hash,
+        int new_rule_type,
+        byte[36] new_rule_content_ipfs,
+        int new_confidence,
+        int block_height,
+        sig guardian_sig
+    ) : State {
+        require(prev_state.status != STATUS_PENDING);
+        require(new_confidence >= MIN_CONFIDENCE);
+        require(new_confidence <= 10000);
+        require(new_rule_type >= RULE_TYPE_YARA);
+        require(new_rule_type <= RULE_TYPE_SIGMA);
+        require(new_threat_hash != emptyThreatHash());
+        require(block_height >= 0);
+        require(prev_state.next_proposal_id >= 0);
+        require(checkSig(guardian_sig, new_guardian_pk));
+
+        int next_count = prev_state.count_in_window;
+        int next_reset_block = prev_state.last_count_reset_block;
+        if (block_height > prev_state.last_count_reset_block + VOTING_BLOCKS) {
+            next_count = 0;
+            next_reset_block = block_height;
+        }
+
+        return({
+            governance_pk: prev_state.governance_pk,
+            next_proposal_id: prev_state.next_proposal_id + 1,
+            proposal_id: prev_state.next_proposal_id,
+            guardian_pk: new_guardian_pk,
+            threat_hash: new_threat_hash,
+            rule_type: new_rule_type,
+            rule_content_ipfs: new_rule_content_ipfs,
+            confidence: new_confidence,
+            submitted_at_block: block_height,
+            votes_for: 0,
+            votes_against: 0,
+            voting_end_block: block_height + VOTING_BLOCKS,
+            status: STATUS_PENDING,
+            rule_count: prev_state.rule_count,
+            count_in_window: next_count + 1,
+            last_count_reset_block: next_reset_block,
+            consensus_score: 0,
+            stored_at_block: 0,
+            active: false,
+            guardian_reputation_event: GUARDIAN_EVENT_NONE
+        });
+    }
+
+    #[covenant.singleton(mode = transition)]
+    function voteOnProposal(State prev_state, bool support, int block_height, sig validator_sig, pubkey validator_pk) : State {
+        require(prev_state.status == STATUS_PENDING);
+        require(block_height >= 0);
+        require(block_height < prev_state.voting_end_block);
+        require(checkSig(validator_sig, validator_pk));
+
+        int next_votes_for = prev_state.votes_for;
+        int next_votes_against = prev_state.votes_against;
+        if (support) {
+            next_votes_for = next_votes_for + 1;
+        } else {
+            next_votes_against = next_votes_against + 1;
+        }
+
+        return({
+            governance_pk: prev_state.governance_pk,
+            next_proposal_id: prev_state.next_proposal_id,
+            proposal_id: prev_state.proposal_id,
+            guardian_pk: prev_state.guardian_pk,
+            threat_hash: prev_state.threat_hash,
+            rule_type: prev_state.rule_type,
+            rule_content_ipfs: prev_state.rule_content_ipfs,
+            confidence: prev_state.confidence,
+            submitted_at_block: prev_state.submitted_at_block,
+            votes_for: next_votes_for,
+            votes_against: next_votes_against,
+            voting_end_block: prev_state.voting_end_block,
+            status: prev_state.status,
+            rule_count: prev_state.rule_count,
+            count_in_window: prev_state.count_in_window,
+            last_count_reset_block: prev_state.last_count_reset_block,
+            consensus_score: prev_state.consensus_score,
+            stored_at_block: prev_state.stored_at_block,
+            active: prev_state.active,
+            guardian_reputation_event: prev_state.guardian_reputation_event
+        });
+    }
+
+    #[covenant.singleton(mode = transition)]
+    function finalizeProposal(State prev_state, int block_height, sig governance_sig) : State {
+        require(prev_state.status == STATUS_PENDING);
+        require(block_height >= prev_state.voting_end_block);
+        require(checkSig(governance_sig, prev_state.governance_pk));
+
+        int total_votes = prev_state.votes_for + prev_state.votes_against;
+        require(total_votes > 0);
+
+        int approval = prev_state.votes_for * 10000 / total_votes;
+        int next_status = STATUS_REJECTED;
+        int next_rule_count = prev_state.rule_count;
+        int next_stored_at_block = prev_state.stored_at_block;
+        bool next_active = false;
+        int next_event = GUARDIAN_EVENT_REJECTED;
+
+        if (approval >= VALIDATOR_QUORUM) {
+            next_status = STATUS_ACCEPTED;
+            next_rule_count = prev_state.rule_count + 1;
+            next_stored_at_block = block_height;
+            next_active = true;
+            next_event = GUARDIAN_EVENT_ACCEPTED;
+        }
+
+        return({
+            governance_pk: prev_state.governance_pk,
+            next_proposal_id: prev_state.next_proposal_id,
+            proposal_id: prev_state.proposal_id,
+            guardian_pk: prev_state.guardian_pk,
+            threat_hash: prev_state.threat_hash,
+            rule_type: prev_state.rule_type,
+            rule_content_ipfs: prev_state.rule_content_ipfs,
+            confidence: prev_state.confidence,
+            submitted_at_block: prev_state.submitted_at_block,
+            votes_for: prev_state.votes_for,
+            votes_against: prev_state.votes_against,
+            voting_end_block: prev_state.voting_end_block,
+            status: next_status,
+            rule_count: next_rule_count,
+            count_in_window: prev_state.count_in_window,
+            last_count_reset_block: prev_state.last_count_reset_block,
+            consensus_score: approval,
+            stored_at_block: next_stored_at_block,
+            active: next_active,
+            guardian_reputation_event: next_event
+        });
+    }
+
+    #[covenant.singleton(mode = transition)]
+    function deactivateRule(State prev_state, sig governance_sig) : State {
+        require(prev_state.status == STATUS_ACCEPTED);
+        require(prev_state.active);
+        require(checkSig(governance_sig, prev_state.governance_pk));
+
+        return({
+            governance_pk: prev_state.governance_pk,
+            next_proposal_id: prev_state.next_proposal_id,
+            proposal_id: prev_state.proposal_id,
+            guardian_pk: prev_state.guardian_pk,
+            threat_hash: prev_state.threat_hash,
+            rule_type: prev_state.rule_type,
+            rule_content_ipfs: prev_state.rule_content_ipfs,
+            confidence: prev_state.confidence,
+            submitted_at_block: prev_state.submitted_at_block,
+            votes_for: prev_state.votes_for,
+            votes_against: prev_state.votes_against,
+            voting_end_block: prev_state.voting_end_block,
+            status: prev_state.status,
+            rule_count: prev_state.rule_count,
+            count_in_window: prev_state.count_in_window,
+            last_count_reset_block: prev_state.last_count_reset_block,
+            consensus_score: prev_state.consensus_score,
+            stored_at_block: prev_state.stored_at_block,
+            active: false,
+            guardian_reputation_event: prev_state.guardian_reputation_event
+        });
+    }
+}
