@@ -35,7 +35,7 @@
         "genesis_value_sompi": 100000000,
         "predicted_covenant_id": "8ecf87a6ffc7d5ea8ab184f36e65dfa378e5a22c56662558f53931a9df97fb5b",
         "role": "validator_staking",
-        "script_sha256": "b2f58a9451367c2c20b85cf1b0687288a2af56defd89b65b1569cdebbe536929",
+        "script_sha256": "48dcd9bc14eba809d6f5e191d047f1162c9d255c2e2f7170cc295b970998b82c",
         "trusted_roles": []
       },
       {
@@ -68,7 +68,7 @@
         "genesis_value_sompi": 100000000,
         "predicted_covenant_id": "2bc31c1d578ee83f5887177df1d5a927c0782d40123a72a2ca18aede6ecdbf90",
         "role": "community_donations",
-        "script_sha256": "826b9737066b2d424a3dc2457b2ef40df9aa6373275152c0aaa86ae1bf090c13",
+        "script_sha256": "7fd41d77a30e88eaa7fcbfda40c1a52012ee065a383dd92b9435ec84468a3bca",
         "trusted_roles": []
       },
       {
@@ -105,7 +105,7 @@
     "network_id": "testnet-10",
     "release": {
       "bundle_id": "v2-draft",
-      "bundle_manifest_sha256": "b4e48882f40e90ea3c7991454211b66572b999dd7cc02c805c642d73289e4150",
+      "bundle_manifest_sha256": "fbb6681010eb0da8666a7cf46b888b4c0119b84ef664908dd701ff0e721e181e",
       "silverscript_commit": "d25bd3427a093c17327ca3d6b9e1aa5f7688c863"
     },
     "schema": "prometheus.silverc.genesis-binding",

@@ -47,6 +47,12 @@ contract CommunityDonationsState(
     byte[32] last_message_hash = init_last_message_hash;
     int last_donation_block = init_last_donation_block;
 
+    // MSB-R1: the transition wrapper validates the successor state at the authorized output
+    // index, while value checks read tx.outputs[0]. Bind both to the same output.
+    function requireAuthorizedSuccessorAtZero() {
+        require(OpAuthOutputIdx(this.activeInputIndex, 0) == 0);
+    }
+
     function requirePoolBacked(State prev_state) : int {
         int covenant_value = tx.inputs[this.activeInputIndex].value;
         require(covenant_value == prev_state.pool_balance_kas * SOMPI_PER_KAS);
@@ -77,6 +83,7 @@ contract CommunityDonationsState(
         require(block_height >= spent_utxo_daa_score);
         require(tx.time >= block_height);
         require(checkSig(donor_sig, donor_pk));
+        requireAuthorizedSuccessorAtZero();
         int covenant_value = requirePoolBacked(prev_state);
         require(tx.outputs[0].value == covenant_value + amount * SOMPI_PER_KAS);
 
@@ -116,6 +123,7 @@ contract CommunityDonationsState(
         require(amount <= prev_state.pool_balance_kas);
         require(prev_state.next_disbursement_id >= 0);
         require(checkSig(proposer_sig, proposer_pk));
+        requireAuthorizedSuccessorAtZero();
         int covenant_value = requirePoolBacked(prev_state);
         require(tx.outputs[0].value == covenant_value);
 
@@ -194,6 +202,7 @@ contract CommunityDonationsState(
         );
         require(checkSigFromStack(tally_attestation, tally_digest, prev_state.governance_pk));
 
+        requireAuthorizedSuccessorAtZero();
         int covenant_value = requirePoolBacked(prev_state);
         int payout_sompi = prev_state.amount_kas * SOMPI_PER_KAS;
         bool approved = false;
