@@ -101,6 +101,50 @@ const D5_RELATIONSHIPS: [&str; 7] = [
     "observed_snapshot_sha256 == sha256(canonical_json(observed))",
 ];
 
+/// Compiled script identity (contract name, script length, script SHA-256) of every
+/// fixture in the frozen h001-v1 release bundle whose canonical manifest digest is
+/// `FULL_BUNDLE_MANIFEST_SHA256`. Must equal
+/// `modules/contracts/silverc/bundles/h001-v1/manifest.json` (checked by a unit test).
+/// Deploy requests and artifacts outside this set are rejected before any signing
+/// request can be prepared (MSB-R2).
+pub const PINNED_RELEASE_SCRIPTS: [(&str, usize, &str); 7] = [
+    (
+        "ValidatorStakingH001",
+        58,
+        "e5d99d8662e529a56a7d04acf66ea087ddb84d3c385f043e79d632b62596ba23",
+    ),
+    (
+        "ValidatorStakingState",
+        1713,
+        "152f48c7aa9526106001e3646b72df097375faf0abc13db9cec19c852617fc96",
+    ),
+    (
+        "GuardianReputationState",
+        16568,
+        "9e437234f5681559a192fc92551b6ee61099211f4a6336ff9d9d15cd37f416a9",
+    ),
+    (
+        "RuleStorageState",
+        1767,
+        "a08d4fd0ae9ea7f004a15036a4a68e125083c1aea2dc17f2770be356e8cc517b",
+    ),
+    (
+        "CommunityDonationsState",
+        1508,
+        "abf6c8735904f445ae0ca0b705a5ca4c188719851069bfc5a2beeb454b93cd2d",
+    ),
+    (
+        "DevIncentivePoolState",
+        1175,
+        "8d4d80e1afba745a76af524ba620bf196bda1aaacf0f998ac7b375d3f207ef47",
+    ),
+    (
+        "GovernanceAutoTuningState",
+        906,
+        "bbe2bd56b2085e7d4ee47aab0b5af66f8d64a485a1e967b8d547cd8c530e7004",
+    ),
+];
+
 const SCHNORR_SCRIPT_LEN: usize = 66;
 const RPC_REQUEST_TIMEOUT: Duration = Duration::from_secs(20);
 const SECRET_MARKERS: &[&str] = &[
@@ -820,6 +864,25 @@ fn validate_deployment_profile(request: &DeployRequest) -> Result<()> {
     Ok(())
 }
 
+/// Require that a contract script is a member of the pinned release bundle.
+fn validate_pinned_release_member(
+    name: &str,
+    script_len: usize,
+    script_sha256: &str,
+) -> Result<()> {
+    let pinned = PINNED_RELEASE_SCRIPTS
+        .iter()
+        .any(|(pinned_name, pinned_len, pinned_hash)| {
+            *pinned_name == name && *pinned_len == script_len && *pinned_hash == script_sha256
+        });
+    #[cfg(test)]
+    let pinned = pinned || tests::test_pins::contains(name, script_len, script_sha256);
+    if !pinned {
+        bail!("contract {name} is not a member of the pinned release manifest");
+    }
+    Ok(())
+}
+
 pub fn load_deploy_request(path: &Path) -> Result<DeployRequest> {
     let bytes = fs::read(path).with_context(|| format!("failed to read {}", path.display()))?;
     let mut value: Value = serde_json::from_slice(&bytes)
@@ -856,6 +919,11 @@ pub fn load_deploy_request(path: &Path) -> Result<DeployRequest> {
         bail!("unsupported deploy request schema/type/status/safety_scope");
     }
     validate_deployment_profile(&request)?;
+    validate_pinned_release_member(
+        &request.contract.name,
+        request.contract.script_len,
+        &request.contract.script_sha256,
+    )?;
     validate_rpc_url(&request.rpc_url)?;
     if request.rpc_url == PUBLIC_TESTNET_RESOLVER && request.network != "testnet" {
         bail!("the official public resolver is restricted to testnet requests");
@@ -894,6 +962,11 @@ pub fn load_artifact(path: &Path, request: &DeployRequest) -> Result<SilvercArti
     if artifact.script.is_empty() {
         bail!("Silverc compiled script must not be empty");
     }
+    validate_pinned_release_member(
+        &artifact.contract_name,
+        artifact.script.len(),
+        &sha256_hex(&artifact.script),
+    )?;
     Ok(artifact)
 }
 
@@ -2556,6 +2629,166 @@ mod tests {
     use super::*;
     use kaspa_bip32::secp256k1::{rand::thread_rng, Keypair};
 
+    /// Test-only, per-thread extension of the pinned release set so that loader
+    /// tests can use small synthetic scripts. Compiled out of every non-test build.
+    pub(super) mod test_pins {
+        use std::cell::RefCell;
+
+        thread_local! {
+            static EXTRA: RefCell<Vec<(String, usize, String)>> = const { RefCell::new(Vec::new()) };
+        }
+
+        pub(crate) fn allow(name: &str, script_len: usize, script_sha256: &str) {
+            EXTRA.with(|extra| {
+                extra
+                    .borrow_mut()
+                    .push((name.to_string(), script_len, script_sha256.to_string()));
+            });
+        }
+
+        pub(crate) fn clear() {
+            EXTRA.with(|extra| extra.borrow_mut().clear());
+        }
+
+        pub(crate) fn contains(name: &str, script_len: usize, script_sha256: &str) -> bool {
+            EXTRA.with(|extra| {
+                extra
+                    .borrow()
+                    .iter()
+                    .any(|(n, l, h)| n == name && *l == script_len && h == script_sha256)
+            })
+        }
+    }
+
+    const H001_PINNED_SCRIPT_LEN: usize = 58;
+    const H001_PINNED_SCRIPT_SHA256: &str =
+        "e5d99d8662e529a56a7d04acf66ea087ddb84d3c385f043e79d632b62596ba23";
+
+    #[test]
+    fn pinned_release_scripts_match_h001_v1_manifest() {
+        let expected: Value = serde_json::from_str(include_str!(
+            "../../contracts/silverc/bundles/h001-v1/manifest.json"
+        ))
+        .unwrap();
+        let fixtures = expected["fixtures"].as_array().unwrap();
+        assert_eq!(fixtures.len(), PINNED_RELEASE_SCRIPTS.len());
+        for (fixture, (name, len, hash)) in fixtures.iter().zip(PINNED_RELEASE_SCRIPTS) {
+            assert_eq!(fixture["contract_name"].as_str(), Some(name));
+            assert_eq!(fixture["script_len"].as_u64(), Some(len as u64));
+            assert_eq!(fixture["script_sha256"].as_str(), Some(hash));
+        }
+        let names: Vec<_> = PINNED_RELEASE_SCRIPTS.iter().map(|(n, _, _)| *n).collect();
+        assert_eq!(names, FULL_DEPLOYMENT_CONTRACTS);
+    }
+
+    #[test]
+    fn pinned_release_membership_is_exact() {
+        test_pins::clear();
+        validate_pinned_release_member(
+            H001_CANARY_CONTRACT,
+            H001_PINNED_SCRIPT_LEN,
+            H001_PINNED_SCRIPT_SHA256,
+        )
+        .unwrap();
+        let wrong_hash = "ab".repeat(32);
+        for (name, len, hash) in [
+            (
+                "ValidatorStakingState",
+                H001_PINNED_SCRIPT_LEN,
+                H001_PINNED_SCRIPT_SHA256,
+            ),
+            (
+                H001_CANARY_CONTRACT,
+                H001_PINNED_SCRIPT_LEN + 1,
+                H001_PINNED_SCRIPT_SHA256,
+            ),
+            (
+                H001_CANARY_CONTRACT,
+                H001_PINNED_SCRIPT_LEN,
+                wrong_hash.as_str(),
+            ),
+            (
+                "UnknownContract",
+                H001_PINNED_SCRIPT_LEN,
+                H001_PINNED_SCRIPT_SHA256,
+            ),
+        ] {
+            let error = validate_pinned_release_member(name, len, hash)
+                .expect_err("non-member must be rejected");
+            assert!(error
+                .to_string()
+                .contains("not a member of the pinned release manifest"));
+        }
+    }
+
+    fn write_rehashed_request(
+        dir: &std::path::Path,
+        request: &DeployRequest,
+    ) -> std::path::PathBuf {
+        let mut value = serde_json::to_value(request).unwrap();
+        value.as_object_mut().unwrap().insert(
+            "safety".to_string(),
+            serde_json::json!({
+                "accepts_private_keys": false,
+                "signs_transactions": false,
+                "assembles_chain_transaction": false,
+                "broadcasts_transactions": false,
+                "deploys_contracts": false,
+                "updates_status_files": false
+            }),
+        );
+        value.as_object_mut().unwrap().remove("request_sha256");
+        let hash = sha256_hex(&canonical_json(&value).unwrap());
+        value
+            .as_object_mut()
+            .unwrap()
+            .insert("request_sha256".to_string(), Value::String(hash));
+        let path = dir.join("deploy-request.json");
+        write_public_json(&path, &value).unwrap();
+        path
+    }
+
+    #[test]
+    fn foreign_artifact_is_rejected_before_signing_request_preparation() {
+        // MSB-R2: a self-consistent, correctly rehashed request whose artifact is not
+        // part of the pinned release must fail at the request boundary, and a
+        // self-consistent artifact must fail at the artifact boundary.
+        let (mut request, artifact, _, _) = fixture();
+        test_pins::clear();
+        let temp_dir = std::env::temp_dir().join(format!(
+            "prometheus-silverc-foreign-artifact-{}-{}",
+            std::process::id(),
+            SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        fs::create_dir_all(&temp_dir).unwrap();
+        let artifact_path = temp_dir.join("artifact.json");
+        write_public_json(&artifact_path, &artifact).unwrap();
+        request.contract.artifact_sha256 = sha256_hex(&fs::read(&artifact_path).unwrap());
+
+        let request_path = write_rehashed_request(&temp_dir, &request);
+        let error = load_deploy_request(&request_path)
+            .expect_err("foreign script identity must be rejected at request load");
+        assert!(error
+            .to_string()
+            .contains("not a member of the pinned release manifest"));
+
+        let error = load_artifact(&artifact_path, &request)
+            .expect_err("foreign artifact must be rejected at artifact load");
+        assert!(error
+            .to_string()
+            .contains("not a member of the pinned release manifest"));
+
+        // The pinned H-001 identity passes the request boundary.
+        request.contract.script_len = H001_PINNED_SCRIPT_LEN;
+        request.contract.script_sha256 = H001_PINNED_SCRIPT_SHA256.to_string();
+        let request_path = write_rehashed_request(&temp_dir, &request);
+        load_deploy_request(&request_path).unwrap();
+        fs::remove_dir_all(temp_dir).unwrap();
+    }
+
     #[test]
     fn recognizes_only_expected_typed_or_remote_transaction_not_found() {
         let expected = TransactionId::from_str(&"11".repeat(32)).unwrap();
@@ -2610,6 +2843,7 @@ mod tests {
         );
         let funding_spk = kaspa_txscript::pay_to_address_script(&address);
         let script = vec![0x51, 0x75, 0x51];
+        test_pins::allow(H001_CANARY_CONTRACT, script.len(), &sha256_hex(&script));
         let request = DeployRequest {
             schema_version: 1,
             request_type: "prometheus_silverc_deploy_request".to_string(),
@@ -2666,6 +2900,7 @@ mod tests {
         let address = Address::new(Prefix::Testnet, AddressVersion::PubKey, &public_key);
         let funding_spk = kaspa_txscript::pay_to_address_script(&address);
         let script = vec![0x51, 0x75, 0x51];
+        test_pins::allow(H001_CANARY_CONTRACT, script.len(), &sha256_hex(&script));
         let request = DeployRequest {
             schema_version: 1,
             request_type: "prometheus_silverc_deploy_request".to_string(),
